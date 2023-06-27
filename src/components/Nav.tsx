@@ -33,7 +33,7 @@ import {
 } from "@chakra-ui/icons";
 import Logo from "./Logo";
 import { GitHub } from "react-feather";
-
+import NextLink from "next/link"
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
   const { toggleColorMode } = useColorMode();
@@ -69,8 +69,9 @@ export default function WithSubnavigation() {
           />
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
+        
           <Logo />
-
+          <NextLink href='/' passHref>
           <Text
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
             color={useColorModeValue("gray.800", "white")}
@@ -80,6 +81,7 @@ export default function WithSubnavigation() {
           >
             EIPs Insights
           </Text>
+          </NextLink>
 
           <Spacer />
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
@@ -92,6 +94,7 @@ export default function WithSubnavigation() {
               mr={6}
               pr={4}
             >
+              <NextLink href='https://github.com/Avarch-org/EIPUI' passHref>
               <IconButton
               aria-label="github"
               variant={"outline"}
@@ -99,6 +102,7 @@ export default function WithSubnavigation() {
                               size="lg"
                               icon={<GitHub/>}
                               />
+                              </NextLink>
               <IconButton
                 aria-label="Mode Change"
                 variant="outline"
