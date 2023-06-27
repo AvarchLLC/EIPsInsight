@@ -1,67 +1,40 @@
-import { Box, Text, useColorModeValue, useTheme, Wrap, WrapItem, Badge } from "@chakra-ui/react";
-import React, { useState } from "react";
-import {
-  Table as Tb,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-} from "@chakra-ui/react";
+import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Table as Tb, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer } from "@chakra-ui/react";
 import ReactPaginate from "react-paginate";
 import { mockEIP } from "@/data/eipdata";
 import FlexBetween from "./FlexBetween";
 
-const Table = () => {
-  const data = mockEIP;
-  const theme = useTheme();
-  const bg = useColorModeValue("#f6f6f7", "#171923");
-  
-  const [filteredData, setFilteredData] = useState([]);
+const useSearchTerm = () => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const itemsPerPage = 10; // Number of items to display per page
-  const pageSize = 10;
-const totalPages = Math.ceil(filteredData.length / pageSize);
-const [currentPage, setCurrentPage] = useState(1);
-
-  const [searchTerm, setSearchTerm] = useState(""); // State for the search term
-  const pageCount = Math.ceil(data.length / itemsPerPage);
-
-  const handlePageChange = (selected: { selected: number }) => {
-    setCurrentPage(selected.selected);
-  };
-
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = (currentPage + 1) * itemsPerPage;
-  const currentItems = data.slice(startIndex, endIndex);
-
-  // Filter the data based on the search term
-  const filteredItems = currentItems.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
-
-  // Handle the search term change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e : React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-  
-    const filtered = data.filter((item) => {
-      // Customize the condition based on your search logic
-      const { eip, title, author, type, category, status } = item;
-      return (
-        eip.toString().includes(term) ||
-        title.toLowerCase().includes(term) ||
-        author.toLowerCase().includes(term) ||
-        type.toLowerCase().includes(term) ||
-        category.toLowerCase().includes(term) ||
-        status.toLowerCase().includes(term)
-      );
-    });
-    const [filteredData, setFilteredData] = useState<
+  };
+
+  useEffect(() => {
+    // Do something with the search term, such as filtering the data
+    // ...
+
+    // Cleanup (if necessary)
+    return () => {
+      // Cleanup code
+      // ...
+    };
+  }, [searchTerm]);
+
+  return {
+    searchTerm,
+    handleSearchChange,
+  };
+};
+
+const Table = () => {
+  const data = mockEIP;
+  const bg = useColorModeValue("#f6f6f7", "#171923");
+
+  const [filteredData, setFilteredData] = useState<
   {
     _id: string;
     eip: number;
@@ -75,12 +48,35 @@ const [currentPage, setCurrentPage] = useState(1);
     last_call_deadline: string;
   }[]
 >([]);
-  
-    setFilteredData(filtered);
-  };
-  const tableData = searchTerm ? filteredData : data;
 
-  
+  const itemsPerPage = 10; // Number of items to display per page
+  const pageSize = 10;
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { searchTerm, handleSearchChange } = useSearchTerm();
+
+  const pageCount = Math.ceil(data.length / itemsPerPage);
+
+  const handlePageChange = (selected: { selected: number }) => {
+    setCurrentPage(selected.selected);
+  };
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = (currentPage + 1) * itemsPerPage;
+  const currentItems = data.slice(startIndex, endIndex);
+
+  // Filter the data based on the search term
+  const filteredItems = currentItems.filter((item) =>
+    Object.values(item).some((value) =>
+      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  useEffect(() => {
+    setFilteredData(filteredItems);
+  }, [filteredItems]);
+
+  const tableData = searchTerm ? filteredData : data;
 
   return (
     <Box
@@ -95,7 +91,7 @@ const [currentPage, setCurrentPage] = useState(1);
       }}
       className="hover: cursor-pointer ease-in duration-200"
     >
-            <FlexBetween>
+      <FlexBetween>
         <Text fontSize="xl" fontWeight={"bold"} color={"#10b981"}>
           {`Search an EIP : ${mockEIP.length}`}
         </Text>
@@ -113,91 +109,91 @@ const [currentPage, setCurrentPage] = useState(1);
               <Th minW="100px">Status</Th>
             </Tr>
             <Tr>
-  <Th>
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearchChange}
-      placeholder="Search EIP"
-      className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </Th>
-  <Th>
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearchChange}
-      placeholder="Search Title"
-      className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </Th>
-  <Th>
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearchChange}
-      placeholder="Search Author"
-      className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </Th>
-  <Th>
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearchChange}
-      placeholder="Search Type"
-      className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </Th>
-  <Th>
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearchChange}
-      placeholder="Search Category"
-      className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </Th>
-  <Th>
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearchChange}
-      placeholder="Search Status"
-      className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </Th>
-</Tr>
+              <Th>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  placeholder="Search EIP"
+                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </Th>
+              <Th>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  placeholder="Search Title"
+                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </Th>
+              <Th>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  placeholder="Search Author"
+                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </Th>
+              <Th>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  placeholder="Search Type"
+                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </Th>
+              <Th>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  placeholder="Search Category"
+                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </Th>
+              <Th>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  placeholder="Search Status"
+                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </Th>
+            </Tr>
           </Thead>
           <Tbody>
-            {tableData.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item) => (
-              <Tr key={item._id}>
-                <Td minW="50px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                  {item.eip}
-                </Td>
-                <Td minW="200px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                  {item.title}
-                </Td>
-                <Td minW="200px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                  {item.author}
-                </Td>
-                <Td minW="100px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                  {item.type}
-                </Td>
-                <Td minW="100px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                  {item.category}
-                </Td>
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>
-                        {item.status}
-                      </Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-              </Tr>
-            ))}
+            {tableData
+              .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+              .map((item) => (
+                <Tr key={item._id}>
+                  <Td minW="50px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
+                    {item.eip}
+                  </Td>
+                  <Td minW="200px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
+                    {item.title}
+                  </Td>
+                  <Td minW="200px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
+                    {item.author}
+                  </Td>
+                  <Td minW="100px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
+                    {item.type}
+                  </Td>
+                  <Td minW="100px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
+                    {item.category}
+                  </Td>
+                  <Td minW="100px">
+                    <Wrap>
+                      <WrapItem>
+                        <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
+                      </WrapItem>
+                    </Wrap>
+                  </Td>
+                </Tr>
+              ))}
           </Tbody>
         </Tb>
       </TableContainer>
@@ -217,9 +213,11 @@ const [currentPage, setCurrentPage] = useState(1);
           activeClassName={"active"}
           previousLinkClassName={"border rounded px-3 py-1 bg-green-400"}
           nextLinkClassName={"border rounded px-3 py-1 bg-green-400"}
-          breakLinkClassName={"border rounded px-3 py-1 bg-green-400"}
-          pageLinkClassName={"border rounded px-3 py-1 bg-green-400"}
-          disabledClassName={"text-black-300"}
+          breakLinkClassName={"border rounded px-3 py-1 bg-gray-400"}
+          pageLinkClassName={"border rounded px-3 py-1"}
+          marginPagesDisplayed={1}
+          pageRangeDisplayed={3}
+          forcePage={currentPage - 1}
         />
       </Box>
     </Box>
