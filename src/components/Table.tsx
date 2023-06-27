@@ -29,7 +29,7 @@ const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState(""); // State for the search term
   const pageCount = Math.ceil(data.length / itemsPerPage);
 
-  const handlePageChange = (selected) => {
+  const handlePageChange = (selected: { selected: number }) => {
     setCurrentPage(selected.selected);
   };
 
@@ -45,21 +45,36 @@ const [currentPage, setCurrentPage] = useState(1);
   );
 
   // Handle the search term change
-  const handleSearchChange = (e) => {
-    const term = e.target.value;
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value.toLowerCase();
     setSearchTerm(term);
   
     const filtered = data.filter((item) => {
       // Customize the condition based on your search logic
+      const { eip, title, author, type, category, status } = item;
       return (
-        item.eip === term ||
-        item.title.toLowerCase().includes(term.toLowerCase()) ||
-        item.author.toLowerCase().includes(term.toLowerCase()) ||
-        item.type.toLowerCase().includes(term.toLowerCase()) ||
-        item.category.toLowerCase().includes(term.toLowerCase()) ||
-        item.status.toLowerCase().includes(term.toLowerCase())
+        eip.toString().includes(term) ||
+        title.toLowerCase().includes(term) ||
+        author.toLowerCase().includes(term) ||
+        type.toLowerCase().includes(term) ||
+        category.toLowerCase().includes(term) ||
+        status.toLowerCase().includes(term)
       );
     });
+    const [filteredData, setFilteredData] = useState<
+  {
+    _id: string;
+    eip: number;
+    title: string;
+    author: string;
+    status: string;
+    type: string;
+    category: string;
+    created: string;
+    requires: number[];
+    last_call_deadline: string;
+  }[]
+>([]);
   
     setFilteredData(filtered);
   };
@@ -211,7 +226,7 @@ const [currentPage, setCurrentPage] = useState(1);
   );
 };
 
-const getStatusColor = (status) => {
+const getStatusColor = (status: string) => {
   switch (status) {
     case "Living":
       return "green";

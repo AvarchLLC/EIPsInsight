@@ -93,11 +93,11 @@ export default function WithSubnavigation() {
               pr={4}
             >
               <IconButton
+              aria-label="github"
               variant={"outline"}
                               colorScheme="green"
                               size="lg"
                               icon={<GitHub/>}
-                            
                               />
               <IconButton
                 aria-label="Mode Change"

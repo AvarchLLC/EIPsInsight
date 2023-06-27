@@ -2,7 +2,14 @@ import { Box, Text, useColorModeValue, useTheme } from "@chakra-ui/react";
 import React from "react";
 import FlexBetween from "./FlexBetween";
 
-const StatBox = ({ title, value, icon, description }) => {
+interface StatBoxProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  description: string;
+}
+
+const StatBox: React.FC<StatBoxProps> = ({ title, value, icon, description }) => {
   const theme = useTheme();
   const bg = useColorModeValue("#f6f6f7", "#171923");
   return (

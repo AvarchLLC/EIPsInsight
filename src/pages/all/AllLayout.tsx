@@ -6,7 +6,11 @@ import { Montserrat } from 'next/font/google'
 import React from 'react'
 import '../../app/globals.css'
 const mont = Montserrat({ subsets: ['latin'] })
-const AllLayout = ({children}) => {
+const AllLayout = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
   return (
     <div className={`${mont.className}`}>
     <ColorModeScript initialColorMode='light' />

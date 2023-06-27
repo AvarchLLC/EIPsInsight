@@ -7,7 +7,6 @@ import { ColorModeScript } from '@chakra-ui/react';
 import WithSubnavigation from '@/components/Nav';
 import Nav from '@/components/Nav';
 import LargeWithAppLinksAndSocial from '@/components/Footer';
-
 const mont = Montserrat({ subsets: ['latin'] })
 
 

@@ -60,10 +60,10 @@ const BarChart = () => {
             label: 'Networking',
             data: [data.filter(item => item.category === 'Networking').length],
             backgroundColor: [
-                'rgba(75, 192, 192, 0.2)',
+              'rgba(255, 159, 64, 0.2)',
             ],
             borderColor: [
-                'rgb(75, 192, 192)',
+              'rgb(255, 159, 64)',
   
             ],
             borderWidth: 1
@@ -72,10 +72,10 @@ const BarChart = () => {
             label: 'Interface',
             data: [data.filter(item => item.category === 'Interface').length],
             backgroundColor: [
-                'rgba(54, 162, 235, 0.2)',
+              'rgba(201, 203, 207, 0.2)'
             ],
             borderColor: [
-                'rgb(54, 162, 235)',
+              'rgb(201, 203, 207)'
   
             ],
             borderWidth: 1
@@ -84,10 +84,10 @@ const BarChart = () => {
             label: 'Meta',
             data: [0, data.filter(item => item.category === 'Meta').length, 0],
             backgroundColor: [
-                'rgba(54, 162, 235, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
             ],
             borderColor: [
-                'rgb(54, 162, 235)',
+              'rgb(54, 162, 235)',
   
             ],
             borderWidth: 1
@@ -96,10 +96,10 @@ const BarChart = () => {
             label: 'Informational',
             data: [0,0,data.filter(item => item.category === 'Informational').length],
             backgroundColor: [
-                'rgba(54, 162, 235, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
             ],
             borderColor: [
-                'rgb(54, 162, 235)',
+              'rgb(153, 102, 255)',
   
             ],
             borderWidth: 1
