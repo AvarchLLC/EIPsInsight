@@ -33,7 +33,7 @@ const Dasboard = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const text = useColorModeValue("white", "black");
   return (
-    <Box className="ml-40 mr-40 pl-10 pr-10 mt-10">
+    <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 pb-10" paddingBottom={"10"}>
       <FlexBetween>
         <Header title="DASHBOARD" subtitle="Welcome to the dashboard" />
 
