@@ -25,7 +25,7 @@ import {
 } from "react-feather";
 import Table from "@/components/Table";
 import AreaC from "@/components/AreaC";
-
+import NextLink from "next/link";
 const Dasboard = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
@@ -58,11 +58,13 @@ const Dasboard = () => {
         gridAutoRows="160px"
         gap="20px"
       >
+        
         <StatBox
           title="Core EIPs"
           value={data.filter((item) => item.category === "Core").length}
           description={"Core EIPs describe changes \nto the Ethereum protocol."}
           icon={<Icon as={Anchor} />}
+          url="core"
         />
 
         <StatBox
@@ -72,6 +74,7 @@ const Dasboard = () => {
             "ERCs describe application-level standards for tthe Ethereum ecosystem."
           }
           icon={<Icon as={BookOpen} />}
+          url="erc"
         />
         <StatBox
           title="Networking EIPs"
@@ -80,6 +83,7 @@ const Dasboard = () => {
             "Networking EIPs describe changes to the Ethereum network protocol."
           }
           icon={<Icon as={Radio} />}
+          url="networking"
         />
 
         <Box
@@ -103,6 +107,7 @@ const Dasboard = () => {
             "Interface EIPs describe changes to the Ethereum client API."
           }
           icon={<Icon as={Link} />}
+          url="interface"
         />
         <StatBox
           title="Informational EIPs"
@@ -113,6 +118,7 @@ const Dasboard = () => {
             "Informational EIPs describe other changes to the Ethereum ecosystem."
           }
           icon={<Icon as={Clipboard} />}
+          url="informational"
         />
         <StatBox
           title="Meta EIPs"
@@ -121,6 +127,7 @@ const Dasboard = () => {
             "Meta EIPs describe changes to the EIP process, or other non optional changes."
           }
           icon={<Icon as={Briefcase} />}
+          url="meta"
         />
       </Box>
       <Table />

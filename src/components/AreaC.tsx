@@ -1,7 +1,8 @@
+'use-client'
 import { mockEIP } from '@/data/eipdata';
 import { Box, Text, useColorModeValue } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import FlexBetween from './FlexBetween';
 
 const Area = dynamic(() => import('@ant-design/plots').then(({ Area }) => Area), { ssr: false });
@@ -9,6 +10,11 @@ const categoryColors: string[] = ['rgb(255, 99, 132)', 'rgb(255, 159, 64)', 'rgb
 const categoryBo: string[] = ['rgba(255, 99, 132, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 205, 86, 0.2)', 'rgb(75, 192, 192)', 'rgb(201, 203, 207)', 'rgb(54, 162, 235)'];
 
 const AreaC = ({ status }: { status: string }) => {
+  const [isChartReady, setIsChartReady] = useState(false);
+
+  useEffect(() => {
+    setIsChartReady(true);
+  }, []);
   const data1 = mockEIP;
   const filteredData = data1.filter((item: { status: string; category: string }) => item.status === status);
 
@@ -37,27 +43,31 @@ const AreaC = ({ status }: { status: string }) => {
   });
 
   const config = {
-    data: dataa,
-    xField: 'date',
-    yField: 'value',
-    color: categoryColors,
-    seriesField: 'category',
-    xAxis: {
-      range: [0, 1],
-      tickCount: 5,
-    },
-    fill: categoryColors,
-    shadowColor: categoryBo,
-    line: {
-      color: categoryBo,
-    },
-    columnStyle: {
-      radius: [20, 20, 0, 0],
-    },
-    slider: {
-      start: 0.1,
-      end: 0.9,
-    },
+  data: dataa,
+  xField: 'date',
+  yField: 'value',
+  color: categoryColors,
+  seriesField: 'category',
+  xAxis: {
+    range: [0, 1],
+    tickCount: 5,
+  },
+  fill: categoryColors,
+  shadowColor: categoryBo,
+  line: {
+    color: categoryBo,
+  },
+  columnStyle: {
+    radius: [20, 20, 0, 0],
+  },
+  slider: {
+    start: 0.1,
+    end: 0.9,
+  },
+  legend: {
+    position: 'top-right',
+  },
+  smooth: true, // Enable curved lines
   };
 
   const bg = useColorModeValue('#f6f6f7', '#171923');
@@ -82,7 +92,7 @@ const AreaC = ({ status }: { status: string }) => {
         </Text>
       </FlexBetween>
       <Box>
-        <Area {...config} />
+      {isChartReady && <Area {...config} />}
       </Box>
     </Box>
   );
