@@ -1,9 +1,9 @@
-'use-client'
 import { mockEIP } from '@/data/eipdata';
 import { Box, Text, useColorModeValue } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 import FlexBetween from './FlexBetween';
+
 
 const Area = dynamic(() => import('@ant-design/plots').then(({ Area }) => Area), { ssr: false });
 const categoryColors: string[] = ['rgb(255, 99, 132)', 'rgb(255, 159, 64)', 'rgb(255, 205, 86)', 'rgba(75, 192, 192, 0.2)', 'rgba(201, 203, 207, 0.2)', 'rgba(54, 162, 235, 0.2)'];
@@ -43,31 +43,31 @@ const AreaC = ({ status }: { status: string }) => {
   });
 
   const config = {
-  data: dataa,
-  xField: 'date',
-  yField: 'value',
-  color: categoryColors,
-  seriesField: 'category',
-  xAxis: {
-    range: [0, 1],
-    tickCount: 5,
-  },
-  fill: categoryColors,
-  shadowColor: categoryBo,
-  line: {
-    color: categoryBo,
-  },
-  columnStyle: {
-    radius: [20, 20, 0, 0],
-  },
-  slider: {
-    start: 0.1,
-    end: 0.9,
-  },
-  legend: {
-    position: 'top-right',
-  },
-  smooth: true, // Enable curved lines
+    data: dataa,
+    xField: 'date',
+    yField: 'value',
+    color: categoryColors,
+    seriesField: 'category',
+    xAxis: {
+      range: [0, 1],
+      tickCount: 5,
+    },
+    fill: categoryColors,
+    shadowColor: categoryBo,
+    line: {
+      color: categoryBo,
+    },
+    columnStyle: {
+      radius: [20, 20, 0, 0],
+    },
+    slider: {
+      start: 0.1,
+      end: 0.9,
+    },
+    legend: {
+      position: 'top-right' as 'top-right', // Specify the correct type for the position
+    },
+    smooth: true, // Enable curved lines
   };
 
   const bg = useColorModeValue('#f6f6f7', '#171923');
@@ -92,7 +92,7 @@ const AreaC = ({ status }: { status: string }) => {
         </Text>
       </FlexBetween>
       <Box>
-      {isChartReady && <Area {...config} />}
+        {isChartReady && <Area {...config} />}
       </Box>
     </Box>
   );
