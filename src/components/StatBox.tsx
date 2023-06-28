@@ -14,10 +14,6 @@ interface StatBoxProps {
 const StatBox: React.FC<StatBoxProps> = ({ title, value, icon, description, url}) => {
   const theme = useTheme();
   const bg = useColorModeValue("#f6f6f7", "#171923");
-  const router = useRouter()
-  const handleBoxClick = () => {
-    router.push(`/${url}`); // Replace "/your-desired-route" with the actual route you want to navigate to
-  };
   return (
     <Box
       gridColumn="span 2"
@@ -35,7 +31,6 @@ const StatBox: React.FC<StatBoxProps> = ({ title, value, icon, description, url}
         borderColor: "#10b981",
       }}
       className="hover: cursor-pointer ease-in duration-200"
-      onClick={handleBoxClick}
     >
       <FlexBetween>
         <Text fontWeight={"bold"}>{title}</Text>
