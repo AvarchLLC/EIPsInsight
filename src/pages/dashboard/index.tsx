@@ -24,6 +24,7 @@ import {
   Briefcase,
 } from "react-feather";
 import Table from "@/components/Table";
+import AreaC from "@/components/AreaC";
 
 const Dasboard = () => {
   const theme = useTheme();
@@ -123,6 +124,12 @@ const Dasboard = () => {
         />
       </Box>
       <Table />
+        <AreaC status={"Final"}/>
+        <AreaC status={"Draft"}/>
+        <AreaC status={"Living"}/>
+        <AreaC status={"Stagnant"}/>
+        <AreaC status={"Review"}/>
+        <AreaC status={"Last Call"}/>
     </Box>
   );
 };
