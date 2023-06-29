@@ -6,13 +6,14 @@ import Header from '@/components/Header'
 import { DownloadIcon } from '@chakra-ui/icons'
 import Table from '@/components/Table'
 import LineChart from '@/components/LineChart'
-
+import TableStatus from '@/components/TableStatus'
+import LineStatus from '@/components/LineStatus'
 const Meta = () => {
   return (
     <AllLayout>
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10">
       <FlexBetween>
-        <Header title="All EIPs" subtitle="Your Roadway to All" />
+      <Header title="Category - Meta" subtitle="Meta EIPs describe changes to the EIP process, or other non optional changes." />
         <Box>
           <Button
             colorScheme="green"
@@ -26,8 +27,8 @@ const Meta = () => {
           </Button>
         </Box>
       </FlexBetween>
-      <Table />
-      <LineChart />
+      <TableStatus cat='Meta'/>
+      <LineStatus cat='Meta' />
     </Box>
   </AllLayout>
   )

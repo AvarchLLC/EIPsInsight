@@ -67,7 +67,7 @@ const Dasboard = () => {
         <StatBox
           title="Core EIPs"
           value={data.filter((item) => item.category === "Core").length}
-          description={"Core EIPs describe changes \nto the Ethereum protocol."}
+          description={"Core EIPs describe changes to the Ethereum protocol."}
           icon={<Icon as={Anchor} />}
           url="core"
         />
