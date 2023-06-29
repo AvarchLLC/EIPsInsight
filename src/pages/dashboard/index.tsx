@@ -131,12 +131,8 @@ const Dasboard = () => {
         />
       </Box>
       <Table />
-        <AreaC status={"Final"}/>
-        <AreaC status={"Draft"}/>
-        <AreaC status={"Living"}/>
-        <AreaC status={"Stagnant"}/>
-        <AreaC status={"Review"}/>
-        <AreaC status={"Last Call"}/>
+        <AreaC/>
+
     </Box>
   );
 };
