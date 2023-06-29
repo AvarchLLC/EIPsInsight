@@ -108,6 +108,10 @@ const AreaC = () => {
     areaStyle: { fillOpacity: 0.6 },
     legend: { position: 'top-right' },
     smooth: true,
+    slider: {
+      start: 0.1,
+      end: 0.9,
+    },
   };
 
   const bg = useColorModeValue('#f6f6f7', '#171923');
@@ -126,12 +130,19 @@ const AreaC = () => {
       }}
       className="hover: cursor-pointer ease-in duration-200"
     >
-      <FlexBetween>
-        <Text fontSize="xl" fontWeight="bold" color="#10b981" marginEnd="6">
-          {`Status: ${selectedStatus}`}
-        </Text>
-        <Select variant="outline" placeholder="Select Option" value={selectedStatus} onChange={handleChangeStatus} className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-green-500">
-          <option value="">All</option>
+
+
+    <Text fontSize="xl" fontWeight="bold" color="#10b981" marginRight="6">
+      {`Status: ${selectedStatus}`}
+    </Text>
+    <Select
+      variant="outline"
+      placeholder="Select Option"
+      value={selectedStatus}
+      onChange={handleChangeStatus}
+      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-green-500"
+      size="sm" // Set the select size to small
+    ><option value="">All</option>
           <option value="Final">Final</option>
           <option value="Review">Review</option>
           <option value="Last Call">Last Call</option>
@@ -139,7 +150,8 @@ const AreaC = () => {
           <option value="Draft">Draft</option>
           <option value="Living">Living</option>
         </Select>
-      </FlexBetween>
+
+
       <Box>
         {isLoading ? (
           // Show loading spinner while chart is rendering
