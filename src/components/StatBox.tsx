@@ -1,7 +1,10 @@
-import { Box, Text, useColorModeValue, useTheme } from "@chakra-ui/react";
+'use client'
+import { Box, Link, Text, useColorModeValue, useTheme } from "@chakra-ui/react";
 import React from "react";
 import FlexBetween from "./FlexBetween";
-import { Router, useRouter } from "next/router";
+
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 
 interface StatBoxProps {
   title: string;
@@ -11,10 +14,20 @@ interface StatBoxProps {
   url: string;
 }
 
-const StatBox: React.FC<StatBoxProps> = ({ title, value, icon, description, url}) => {
+const StatBox: React.FC<StatBoxProps> = ({
+  title,
+  value,
+  icon,
+  description,
+  url,
+}) => {
   const theme = useTheme();
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const router = useRouter();
+
+
   return (
+    
     <Box
       gridColumn="span 2"
       gridRow="span 1"
@@ -25,25 +38,28 @@ const StatBox: React.FC<StatBoxProps> = ({ title, value, icon, description, url}
       flex="1 1 100%"
       borderRadius="0.55rem"
       bgColor={bg}
-      overflow={"clip"}
+      overflow="clip"
       _hover={{
         border: "1px",
         borderColor: "#10b981",
       }}
-      className="hover: cursor-pointer ease-in duration-200"
+      className="hover:cursor-pointer ease-in duration-200"
     >
+      <Link href={url}       textDecoration="none" _hover={{ textDecoration: "none" }}>
       <FlexBetween>
-        <Text fontWeight={"bold"}>{title}</Text>
+        <Text fontWeight="bold">{title}</Text>
         {icon}
       </FlexBetween>
 
-      <Text fontWeight="600" color={"#10b981"}>
+      <Text fontWeight="600" color="#10b981">
         {value}
       </Text>
       <FlexBetween gap="1rem">
         <Text fontSize="xs">{description}</Text>
       </FlexBetween>
+      </Link>
     </Box>
+
   );
 };
 

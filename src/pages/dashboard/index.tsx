@@ -9,6 +9,7 @@ import {
   useColorModeValue,
   useMediaQuery,
   useTheme,
+  Link as LI
 } from "@chakra-ui/react";
 import React from "react";
 import { mockEIP } from "../../data/eipdata";
@@ -26,12 +27,16 @@ import {
 import Table from "@/components/Table";
 import AreaC from "@/components/AreaC";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+
+
 const Dasboard = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const data = mockEIP;
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const text = useColorModeValue("white", "black");
+  const router = useRouter()
   return (
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 pb-10" paddingBottom={"10"}>
       <FlexBetween>
@@ -75,6 +80,7 @@ const Dasboard = () => {
           }
           icon={<Icon as={BookOpen} />}
           url="erc"
+         
         />
         <StatBox
           title="Networking EIPs"
@@ -84,6 +90,7 @@ const Dasboard = () => {
           }
           icon={<Icon as={Radio} />}
           url="networking"
+         
         />
 
         <Box
@@ -108,6 +115,7 @@ const Dasboard = () => {
           }
           icon={<Icon as={Link} />}
           url="interface"
+         
         />
         <StatBox
           title="Informational EIPs"
@@ -119,6 +127,7 @@ const Dasboard = () => {
           }
           icon={<Icon as={Clipboard} />}
           url="informational"
+         
         />
         <StatBox
           title="Meta EIPs"
@@ -128,6 +137,7 @@ const Dasboard = () => {
           }
           icon={<Icon as={Briefcase} />}
           url="meta"
+         
         />
       </Box>
       <Table />
