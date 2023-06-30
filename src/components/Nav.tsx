@@ -34,6 +34,7 @@ import {
 import Logo from "./Logo";
 import { GitHub } from "react-feather";
 import NextLink from "next/link"
+import { useState } from "react";
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
   const { toggleColorMode } = useColorMode();
@@ -152,7 +153,23 @@ const DesktopNav = () => {
               </Link>
             </PopoverTrigger>
 
-            {navItem.children && (
+            {navItem.children && navItem.label === "Insight" && (
+              <PopoverContent
+                border={0}
+                boxShadow={"xl"}
+                bg={popoverContentBgColor}
+                p={4}
+                rounded={"xl"}
+                minW={"sm"}
+              >
+                <Stack direction={"column"} spacing={2}>
+                  {navItem.children.map((child) => (
+                    <DesktopSubNav key={child.label} {...child} />
+                  ))}
+                </Stack>
+              </PopoverContent>
+            )}
+            {navItem.children && navItem.label !== "Insight" && (
               <PopoverContent
                 border={0}
                 boxShadow={"xl"}
@@ -175,18 +192,21 @@ const DesktopNav = () => {
   );
 };
 
-const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
+const DesktopSubNav = ({ label, href, subLabel, children }: NavItem) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const handleToggle = () => setIsOpen(!isOpen);
+
   return (
-    <Link
-      href={href}
-      role={"group"}
-      display={"block"}
-      p={2}
-      rounded={"md"}
-      _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
-    >
-      <Stack direction={"row"} align={"center"}>
-        <Box>
+    <Box>
+      <Link
+        role={"group"}
+        display={"block"}
+        p={2}
+        rounded={"md"}
+        onClick={handleToggle}
+        _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
+      >
+        <VStack spacing={1} align="start">
           <Text
             transition={"all .3s ease"}
             _groupHover={{ color: "pink.400" }}
@@ -195,22 +215,34 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
             {label}
           </Text>
           <Text fontSize={"sm"}>{subLabel}</Text>
-        </Box>
-        <Flex
-          transition={"all .3s ease"}
-          transform={"translateX(-10px)"}
-          opacity={0}
-          _groupHover={{ opacity: "100%", transform: "translateX(0)" }}
-          justify={"flex-end"}
-          align={"center"}
-          flex={1}
+        </VStack>
+      </Link>
+      
+      <Collapse in={isOpen} animateOpacity style={{ marginTop: "0!important" }}>
+        <Stack
+          mt={2}
+          pl={4}
+          borderLeft={1}
+          borderStyle={"solid"}
+          borderColor={useColorModeValue("gray.200", "gray.700")}
+          align={"start"}
         >
-          <Icon color={"pink.400"} w={5} h={5} as={ChevronRightIcon} />
-        </Flex>
-      </Stack>
-    </Link>
+          {children &&
+            children.map((subNavItem) => (
+              <Link key={subNavItem.label} py={2} href={subNavItem.href}                 _hover={{
+                  textDecoration: "none",
+                  color: "pink.400",
+                }}>
+                {subNavItem.label}
+              </Link>
+            ))}
+        </Stack>
+      </Collapse>
+    </Box>
   );
 };
+
+
 
 const MobileNav = () => {
   return (
@@ -286,6 +318,77 @@ interface NavItem {
   href?: string;
 }
 
+function getMonthsTillCurrentYear(): NavItem[] {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const months: NavItem[] = [];
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  for (let i = 0; i <= currentMonth; i++) {
+    months.push({
+      label: monthNames[i],
+      subLabel: "January-December",
+      href: `insight/${currentYear}/${i+1}`,
+    });
+  }
+
+  return months;
+}
+
+
+function getMonthsTillYear(year: number): NavItem[] {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const months: NavItem[] = [];
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  let startMonth = 0;
+  if (currentYear === year) {
+    startMonth = currentMonth;
+  }
+
+  for (let i = startMonth; i < 12; i++) {
+    months.push({
+      label: monthNames[i],
+      subLabel: `${monthNames[startMonth]}-${monthNames[11]}`,
+      href: `insight/${year}/${i+1}`,
+    });
+  }
+
+  return months;
+}
+
+
+
+
 const NAV_ITEMS: Array<NavItem> = [
   {
     label: "All",
@@ -304,13 +407,11 @@ const NAV_ITEMS: Array<NavItem> = [
     children: [
       {
         label: "2023",
-        subLabel: "June",
-        href: "#",
+        children: getMonthsTillCurrentYear(),
       },
       {
         label: "2022",
-        subLabel: "December",
-        href: "dashboard",
+        children: getMonthsTillYear(2022),
       },
     ],
   },
