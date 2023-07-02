@@ -342,7 +342,7 @@ function getMonthsTillCurrentYear(): NavItem[] {
     months.push({
       label: monthNames[i],
       subLabel: "January-December",
-      href: `insight/${currentYear}/${i+1}`,
+      href: `/insight/${currentYear}/${i+1}`,
     });
   }
 
@@ -379,7 +379,7 @@ function getMonthsTillYear(year: number): NavItem[] {
     months.push({
       label: monthNames[i],
       subLabel: `${monthNames[startMonth]}-${monthNames[11]}`,
-      href: `insight/${year}/${i+1}`,
+      href: `/insight/${year}/${i+1}`,
     });
   }
 
@@ -392,15 +392,15 @@ function getMonthsTillYear(year: number): NavItem[] {
 const NAV_ITEMS: Array<NavItem> = [
   {
     label: "All",
-    href: "all",
+    href: "/all",
   },
   {
     label: "Type",
-    href: "type",
+    href: "/type",
   },
   {
     label: "Status",
-    href: "status",
+    href: "/status",
   },
   {
     label: "Insight",
@@ -413,10 +413,30 @@ const NAV_ITEMS: Array<NavItem> = [
         label: "2022",
         children: getMonthsTillYear(2022),
       },
+      {
+        label: "2021",
+        children: getMonthsTillYear(2022),
+      },
+      {
+        label: "2020",
+        children: getMonthsTillYear(2022),
+      },
+      {
+        label: "2019",
+        children: getMonthsTillYear(2022),
+      },
+      {
+        label: "2018",
+        children: getMonthsTillYear(2022),
+      },
+      {
+        label: "2017",
+        children: getMonthsTillYear(2022),
+      },
     ],
   },
   {
     label: "Resources",
-    href: "resources",
+    href: "/resources",
   },
 ];

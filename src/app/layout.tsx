@@ -7,6 +7,7 @@ import { ColorModeScript } from '@chakra-ui/react';
 import WithSubnavigation from '@/components/Nav';
 import Nav from '@/components/Nav';
 import LargeWithAppLinksAndSocial from '@/components/Footer';
+import { Suspense } from 'react';
 const mont = Montserrat({ subsets: ['latin'] })
 
 
@@ -17,14 +18,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      
       <body  className={`${mont.className}`}>
       <ColorModeScript initialColorMode='light' />
       <Providers>
         <WithSubnavigation/>
+
           {children}
         <LargeWithAppLinksAndSocial/>
         </Providers>
       </body>
+  
     </html>
   )
 }
