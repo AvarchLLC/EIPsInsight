@@ -235,7 +235,7 @@ const getStatusColor = (status: string) => {
     case "Final":
       return "blue";
     case "Stagnant":
-      return "gray";
+      return "purple";
     case "Draft":
       return "orange"
     case "Withdrawn":

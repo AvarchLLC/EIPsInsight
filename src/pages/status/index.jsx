@@ -1,5 +1,5 @@
 import React from 'react';
-import AllLayout from '../all/AllLayout';
+import AllLayout from "@/components/Layout";;
 import Header from '@/components/Header';
 import { Box } from '@chakra-ui/react';
 
