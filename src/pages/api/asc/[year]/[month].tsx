@@ -40,8 +40,6 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
       page++;
     }
        // Print the titles of merged PRs
-       console.log('\nMerged PR Titles:');
-       console.log('------------------');
        for (const pr of mergedPRsThisMonth) {
            console.log(pr.title);
        }
@@ -60,8 +58,6 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
        );
 
        // Print the titles of open PRs
-       console.log('\nOpen PR Titles:');
-       console.log('----------------');
        for (const pr of openPRsThisMonth) {
            console.log(pr.title);
        }

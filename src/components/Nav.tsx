@@ -433,6 +433,14 @@ const NAV_ITEMS: Array<NavItem> = [
         label: "2017",
         children: getMonthsTillYear(2022),
       },
+      {
+        label: "2016",
+        children: getMonthsTillYear(2016),
+      },
+      {
+        label: "2015",
+        children: getMonthsTillYear(2015),
+      },
     ],
   },
   {
