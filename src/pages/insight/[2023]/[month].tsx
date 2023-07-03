@@ -57,7 +57,7 @@ const Month = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/statusChanges/${year}/${month}`);
+        const response = await fetch(`/api/statusChanges/${year}/${month}`);
         const jsonData = await response.json();
         setData(jsonData);
       } catch (error) {
