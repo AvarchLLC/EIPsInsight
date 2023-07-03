@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import AllLayout from "./AllLayout";
 import RootLayout from "@/app/layout";
 import { Box, Button, Spinner } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
@@ -7,6 +6,7 @@ import Header from "@/components/Header";
 import Table from "@/components/Table";
 import { DownloadIcon } from "@chakra-ui/icons";
 import LineChart from "@/components/LineChart";
+import AllLayout from "@/components/Layout";
 
 const All = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -40,16 +40,6 @@ const All = () => {
           </Box>
         </FlexBetween>
         <Table />
-
-        {isLoading ? (
-          // Show loading spinner while the content is being loaded
-          <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-            <Spinner size="xl" color="green.500" />
-          </Box>
-        ) : (
-          // Show the LineChart component when loading is complete
-          <LineChart />
-        )}
       </Box>
     </AllLayout>
   );
