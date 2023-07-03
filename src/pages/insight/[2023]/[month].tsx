@@ -1,11 +1,11 @@
-import AllLayout from '@/pages/all/AllLayout';
+
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import { Box, Grid } from '@chakra-ui/react';
 import CustomBox from '@/components/CustomBox';
 import { PieC } from '@/components/PieC';
-
+import AllLayout from '@/components/Layout';
 interface StatusChange {
   _id: string;
   count: number;
