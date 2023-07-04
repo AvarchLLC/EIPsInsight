@@ -30,24 +30,40 @@ const useSearchTerm = () => {
   };
 };
 
+interface EIP {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+}
+
 const Table = () => {
-  const data = mockEIP;
+  const [data, setData] = useState<EIP[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/alleips`);
+        const jsonData = await response.json();
+        setData(jsonData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  const [filteredData, setFilteredData] = useState<
-  {
-    _id: string;
-    eip: number;
-    title: string;
-    author: string;
-    status: string;
-    type: string;
-    category: string;
-    created: string;
-    requires: number[];
-    last_call_deadline: string;
-  }[]
->([]);
+  const [filteredData, setFilteredData] = useState<EIP[]>([]);
 
   const itemsPerPage = 10; // Number of items to display per page
   const pageSize = 10;
@@ -93,7 +109,7 @@ const Table = () => {
     >
       <FlexBetween>
         <Text fontSize="xl" fontWeight={"bold"} color={"#10b981"}>
-          {`Search an EIP : ${mockEIP.length}`}
+          {`Search an EIP : ${data.length}`}
         </Text>
       </FlexBetween>
       <TableContainer>

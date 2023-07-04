@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -22,8 +22,37 @@ import { Bar }            from 'react-chartjs-2'
 import { Box } from '@chakra-ui/react';
 import { mockEIP } from '@/data/eipdata';
 
+interface EIP {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+}
+
 const BarChart = () => {
-    const data = mockEIP;
+  const [data, setData] = useState<EIP[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/alleips`);
+        const jsonData = await response.json();
+        setData(jsonData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
     const dataa = {
         labels: ["Standards Track", "Meta", "Informational"],
         datasets: [{
@@ -82,7 +111,7 @@ const BarChart = () => {
           },
           {
             label: 'Meta',
-            data: [0, data.filter(item => item.category === 'Meta').length, 0],
+            data: [0, data.filter(item => item.type === 'Meta').length, 0],
             backgroundColor: [
               'rgba(54, 162, 235, 0.2)',
             ],
@@ -94,7 +123,7 @@ const BarChart = () => {
           },
           {
             label: 'Informational',
-            data: [0,0,data.filter(item => item.category === 'Informational').length],
+            data: [0,0,data.filter(item => item.type === 'Informational').length],
             backgroundColor: [
               'rgba(153, 102, 255, 0.2)',
             ],

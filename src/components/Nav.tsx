@@ -346,7 +346,7 @@ function getMonthsTillCurrentYear(): NavItem[] {
     });
   }
 
-  return months;
+  return months.reverse();
 }
 
 
@@ -375,16 +375,17 @@ function getMonthsTillYear(year: number): NavItem[] {
     startMonth = currentMonth;
   }
 
-  for (let i = startMonth; i < 12; i++) {
+  for (let i = 11; i >= startMonth; i--) {
     months.push({
       label: monthNames[i],
       subLabel: `${monthNames[startMonth]}-${monthNames[11]}`,
-      href: `/insight/${year}/${i+1}`,
+      href: `/insight/${year}/${i + 1}`,
     });
   }
-
+  console.log(months)
   return months;
 }
+
 
 
 
