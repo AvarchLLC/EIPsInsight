@@ -11,7 +11,7 @@ import {
   useTheme,
   Link as LI
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
 import BarChart from "@/components/BarChart";
@@ -28,12 +28,42 @@ import AreaC from "@/components/AreaC";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { mockEIP } from "@/data/eipdata";
+import { usePathname } from 'next/navigation';
 
+interface EIP {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+}
 
 const Dashboard = () => {
+  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/alleips`);
+        console.log(response)
+        const jsonData = await response.json();
+        setData(jsonData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-  const data = mockEIP;
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const text = useColorModeValue("white", "black");
   const router = useRouter()
@@ -120,7 +150,7 @@ const Dashboard = () => {
         <StatBox
           title="Informational EIPs"
           value={
-            data.filter((item) => item.category === "Informational").length
+            data.filter((item) => item.type === "Informational").length
           }
           description={
             "Informational EIPs describe other changes to the Ethereum ecosystem."
@@ -131,7 +161,7 @@ const Dashboard = () => {
         />
         <StatBox
           title="Meta EIPs"
-          value={data.filter((item) => item.category === "Meta").length}
+          value={data.filter((item) => item.type === "Meta").length}
           description={
             "Meta EIPs describe changes to the EIP process, or other non optional changes."
           }
