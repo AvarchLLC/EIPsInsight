@@ -1,8 +1,7 @@
 import React from 'react';
 import AllLayout from "@/components/Layout";;
 import Header from '@/components/Header';
-import { Box } from '@chakra-ui/react';
-
+import { Box } from '@chakra-ui/react'
 const Type = () => {
     return (
         <div>

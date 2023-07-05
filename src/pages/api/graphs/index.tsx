@@ -54,6 +54,7 @@ export default async (req: Request, res: Response) => {
             $group: {
                 _id: {
                     status: '$status',
+                    category: '$category',
                     changedYear: { $year: '$changeDate' },
                     changedMonth: { $month: '$changeDate' }
                 },
@@ -66,6 +67,7 @@ export default async (req: Request, res: Response) => {
                 _id: '$_id.status',
                 eips: {
                     $push: {
+                        category: '$_id.category',
                         changedYear: '$_id.changedYear',
                         changedMonth: '$_id.changedMonth',
                         count: '$count',
@@ -73,25 +75,32 @@ export default async (req: Request, res: Response) => {
                     }
                 }
             }
+        },
+        {
+            $sort: {
+                '_id': 1
+            }
         }
     ])
         .then((result:any) => {
             const formattedResult = result.map((group:any) => ({
                 status: group._id,
                 eips: group.eips.reduce((acc:any, eipGroup:any) => {
-                    const { changedYear, changedMonth, count, eips } = eipGroup;
-                    acc[changedYear] = acc[changedYear] || {};
-                    acc[changedYear][changedMonth] = {
-                        count,
-                        eips
-                    };
+                    const { category, changedYear, changedMonth, count, eips } = eipGroup;
+                    acc.push({
+                        category,
+                        month: changedMonth,
+                        year: changedYear,
+                        date: `${changedYear}-${changedMonth}`,
+                        count
+                    });
                     return acc;
-                }, {})
+                }, []).sort((a:any, b:any) => (a.date > b.date ? 1 : -1))
             }));
             res.json(formattedResult);
         })
         .catch((error:any) => {
-            console.error('Error retrieving EIPs:', error);
+            console.error('Error retrieving EIPs:', error.message);
             res.status(500).json({ error: 'Internal server error' });
         });
 };

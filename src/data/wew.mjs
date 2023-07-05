@@ -35,6 +35,7 @@ interface MappedDataItem {
   value: number;
 }
 
+
 interface EIP {
   status: string;
   eips: {
@@ -49,7 +50,7 @@ interface EIP {
 interface FormattedEIP {
   category: string;
   date: string;
-  value: number;
+  count: number;
 }
 
 function getMonthName(month: number): string {
@@ -101,7 +102,7 @@ const AreaC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/graphs`);
+        const response = await fetch(`/api/alleips`);
         console.log(response)
         const jsonData = await response.json();
         setData(jsonData);
@@ -112,7 +113,6 @@ const AreaC = () => {
 
     fetchData();
   }, []);
-
   const [isChartReady, setIsChartReady] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
@@ -123,7 +123,6 @@ const AreaC = () => {
       setIsLoading(false); // Set isLoading to false after a small delay (simulating chart rendering)
     }, 1000);
   }, [selectedStatus]);
-
   useEffect(() => {
     setIsChartReady(true);
   }, []); // Trigger initial render
@@ -138,21 +137,44 @@ const AreaC = () => {
   const handleChangeStatus = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
-  const formattedData: FormattedEIP[] = data.reduce((acc, item) => {
-    if (item.status === selectedStatus) {
-      const formattedEIPs: FormattedEIP[] = item.eips.map(eip => ({
-        category: eip.category,
-        date: `${getMonthName(eip.month)} ${eip.year}`,
-        value: eip.count
-      }));
-      acc.push(...formattedEIPs);
-    }
-    return acc;
-  }, []);
+
+  const formattedEIPs: {
+    category: string;
+    date: string;
+    value: number;
+  }[] = data ? data.flatMap(eip => eip.eips.map(({ category, month, year, count }) => ({
+    category,
+    date: `${getMonthName(month)} ${year}`,
+    value: count
+  }))) : [];
   
-  
-  const filteredData = formattedData;
-  
+
+  const filteredData = formattedEIPs;
+
+  // const mappedData= filteredData.reduce(
+  //   (acc: MappedData, item) => {
+  //     const createdDate = new Date(item.date);
+  //     const monthYear = `${createdDate.toLocaleString('en-US', { month: 'long' })} ${createdDate.getFullYear()}`;
+
+  //     const key = `${item.category}-${monthYear}`;
+
+  //     if (acc.hasOwnProperty(key)) {
+  //       acc[key].value++;
+  //     } else {
+  //       acc[key] = { category: item.category, date: monthYear, value: 1 };
+  //     }
+
+  //     return acc;
+  //   },
+  //   {}
+  // );
+
+  // const data = Object.values(mappedData).sort((a, b) => {
+  //   const dateA = new Date(a.date);
+  //   const dateB = new Date(b.date);
+  //   return dateA.getTime() - dateB.getTime();
+  // });
+  console.log(filteredData)
 
   const config = {
     data: filteredData,
@@ -189,25 +211,28 @@ const AreaC = () => {
       }}
       className="hover: cursor-pointer ease-in duration-200"
     >
-      <Text fontSize="xl" fontWeight="bold" color="#10b981" marginRight="6">
-        {`Status: ${selectedStatus}`}
-      </Text>
-      <Select
-        variant="outline"
-        placeholder="Select Option"
-        value={selectedStatus}
-        onChange={handleChangeStatus}
-        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-green-500"
-        size="sm" // Set the select size to small
-      >
-        <option value="">All</option>
-        <option value="Final">Final</option>
-        <option value="Review">Review</option>
-        <option value="Last Call">Last Call</option>
-        <option value="Stagnant">Stagnant</option>
-        <option value="Draft">Draft</option>
-        <option value="Living">Living</option>
-      </Select>
+
+
+    <Text fontSize="xl" fontWeight="bold" color="#10b981" marginRight="6">
+      {`Status: ${selectedStatus}`}
+    </Text>
+    <Select
+      variant="outline"
+      placeholder="Select Option"
+      value={selectedStatus}
+      onChange={handleChangeStatus}
+      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-green-500"
+      size="sm" // Set the select size to small
+    ><option value="">All</option>
+          <option value="Final">Final</option>
+          <option value="Review">Review</option>
+          <option value="Last Call">Last Call</option>
+          <option value="Stagnant">Stagnant</option>
+          <option value="Draft">Draft</option>
+          <option value="Living">Living</option>
+        </Select>
+
+
       <Box>
         {isLoading ? (
           // Show loading spinner while chart is rendering

@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/charts": "^1.4.2",
     "@ant-design/plots": "^1.2.5",
+    "@antv/g2plot": "^2.4.31",
     "@chakra-ui/icons": "^2.0.19",
     "@chakra-ui/next-js": "^2.1.4",
     "@chakra-ui/react": "^2.7.0",
