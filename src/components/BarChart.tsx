@@ -136,7 +136,6 @@ const BarChart = () => {
     ]
       };
   return (
-    <Box>
         <Bar
 
     data={dataa} options={{
@@ -157,7 +156,6 @@ const BarChart = () => {
           }
     }}
     />
-    </Box>
 
 
   )
