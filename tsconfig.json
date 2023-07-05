@@ -2,8 +2,6 @@
   "compilerOptions": {
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "strictNullChecks": true,
-    "noImplicitAny": false,
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,

@@ -138,7 +138,7 @@ const AreaC = () => {
   const handleChangeStatus = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
-  const formattedData: FormattedEIP[] = data.reduce((acc, item) => {
+  const formattedData = data.reduce((acc: FormattedEIP[], item: EIP) => {
     if (item.status === selectedStatus) {
       const formattedEIPs: FormattedEIP[] = item.eips.map(eip => ({
         category: eip.category,
@@ -150,9 +150,8 @@ const AreaC = () => {
     return acc;
   }, []);
   
-  
-  const filteredData = formattedData;
-  
+
+  const filteredData: FormattedEIP[] = formattedData;
 
   const config = {
     data: filteredData,
@@ -200,7 +199,6 @@ const AreaC = () => {
         className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-green-500"
         size="sm" // Set the select size to small
       >
-        <option value="">All</option>
         <option value="Final">Final</option>
         <option value="Review">Review</option>
         <option value="Last Call">Last Call</option>
