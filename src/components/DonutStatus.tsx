@@ -18,7 +18,11 @@ interface EIP {
   last_call_deadline: string;
 }
 
-const DoughnutChart = () => {
+interface DonutTypeProps {
+    status: string;
+  }
+
+const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
   const [data, setData] = useState<EIP[]>([]);
 
   useEffect(() => {
@@ -35,28 +39,36 @@ const DoughnutChart = () => {
     fetchData();
   }, []);
 
-  const coreCount = data.filter(item => item.category === 'Core').length;
-  const ercCount = data.filter(item => item.category === 'ERC').length;
-  const networkingCount = data.filter(item => item.category === 'Networking').length;
-  const interfaceCount = data.filter(item => item.category === 'Interface').length;
+  const coreCount = data.filter(item => item.status === status && item.category === 'Core').length;
+  const ercCount = data.filter(item => item.status === status && item.category === 'ERC').length;
+  const networkingCount = data.filter(item => item.status === status && item.category === 'Networking').length;
+  const interfaceCount = data.filter(item => item.status === status && item.category === 'Interface').length;
+  const metaCount = data.filter(item => item.status === status && item.type === 'Meta').length;
+  const informationalCount = data.filter(item => item.status === status && item.type === 'Informational').length;
 
   const chartData = {
-    labels: ['Core', 'ERC', 'Networking', 'Interface'],
+    labels: ['Core', 'ERC', 'Networking', 'Interface', "Meta", "Informational"],
     datasets: [
       {
-        data: [coreCount, ercCount, networkingCount, interfaceCount],
+        data: [coreCount, ercCount, networkingCount, interfaceCount, metaCount, informationalCount],
         backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(201, 203, 207, 0.2)'
-        ],
-        borderColor: [
-          'rgb(255, 99, 132)',
-          'rgb(75, 192, 192)',
-          'rgb(255, 159, 64)',
-          'rgb(201, 203, 207)'
-        ],
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+            'rgba(201, 203, 207, 0.6)',
+            'rgba(255, 205, 86, 0.6)',
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+          ],
+          borderColor: [
+            'rgb(255, 99, 132)',
+            'rgb(75, 192, 192)',
+            'rgb(255, 159, 64)',
+            'rgb(201, 203, 207)',
+            'rgb(255, 205, 86)',
+            'rgb(54, 162, 235)',
+            'rgb(153, 102, 255)',
+          ],
         borderWidth: 1
       }
     ]
@@ -101,4 +113,4 @@ const DoughnutChart = () => {
   );
 };
 
-export default DoughnutChart;
+export default DonutStatus;

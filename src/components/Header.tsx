@@ -10,10 +10,10 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
   const theme = useTheme();
   return (
     <Box>
-      <Text fontSize="3xl" fontWeight="bold" color="#10b981">
+      <Text fontSize="6xl" fontWeight="bold" color="#10b981">
         {title}
       </Text>
-      <Text fontSize="xl" className="">
+      <Text fontSize="2xl" className="">
         {subtitle}
       </Text>
     </Box>

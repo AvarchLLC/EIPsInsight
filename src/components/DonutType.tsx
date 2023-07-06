@@ -18,7 +18,11 @@ interface EIP {
   last_call_deadline: string;
 }
 
-const DoughnutChart = () => {
+interface DonutTypeProps {
+  type: string;
+}
+
+const DonutType: React.FC<DonutTypeProps> = ({ type }) => {
   const [data, setData] = useState<EIP[]>([]);
 
   useEffect(() => {
@@ -34,33 +38,44 @@ const DoughnutChart = () => {
 
     fetchData();
   }, []);
+  
 
-  const coreCount = data.filter(item => item.category === 'Core').length;
-  const ercCount = data.filter(item => item.category === 'ERC').length;
-  const networkingCount = data.filter(item => item.category === 'Networking').length;
-  const interfaceCount = data.filter(item => item.category === 'Interface').length;
+  const LivingCount = data.filter(item => item.type === type && item.status === "Living").length;
+  const FinalCount = data.filter(item => item.type === type && item.status === "Final").length;
+  const LastCount = data.filter(item => item.type === type && item.status === "Last Call").length;
+  const ReviewCount = data.filter(item => item.type === type && item.status === "Review").length;
+  const DraftCount = data.filter(item => item.type === type && item.status === "Draft").length;
+  const StagnantCount = data.filter(item => item.type === type && item.status === "Stagnant").length;
+  const WithdrawnCount = data.filter(item => item.type === type && item.status === "Withdrawn").length;
 
   const chartData = {
-    labels: ['Core', 'ERC', 'Networking', 'Interface'],
+    labels: ['Living', 'Final', 'Last Count', 'Review', 'Draft', 'Stagnant', 'Withdrawn'],
     datasets: [
       {
-        data: [coreCount, ercCount, networkingCount, interfaceCount],
+        data: [LivingCount, FinalCount, LastCount, ReviewCount, DraftCount, StagnantCount, WithdrawnCount],
         backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(201, 203, 207, 0.2)'
+          'rgba(255, 99, 132, 0.6)',
+          'rgba(75, 192, 192, 0.6)',
+          'rgba(255, 159, 64, 0.6)',
+          'rgba(201, 203, 207, 0.6)',
+          'rgba(255, 205, 86, 0.6)',
+          'rgba(54, 162, 235, 0.6)',
+          'rgba(153, 102, 255, 0.6)',
         ],
         borderColor: [
           'rgb(255, 99, 132)',
           'rgb(75, 192, 192)',
           'rgb(255, 159, 64)',
-          'rgb(201, 203, 207)'
+          'rgb(201, 203, 207)',
+          'rgb(255, 205, 86)',
+          'rgb(54, 162, 235)',
+          'rgb(153, 102, 255)',
         ],
         borderWidth: 1
       }
     ]
   };
+
 
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -101,4 +116,4 @@ const DoughnutChart = () => {
   );
 };
 
-export default DoughnutChart;
+export default DonutType;
