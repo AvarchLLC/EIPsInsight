@@ -15,23 +15,23 @@ const Type = () => {
                         Standard Track
                     </Text>
                     <Grid templateColumns="repeat(2, 1fr)" gap={8} paddingBottom={8}>
-                    <CBox/>
-                    <Donut/>
+                        <CBox />
+                        <Donut />
                     </Grid>
                     <Grid templateColumns="repeat(2, 1fr)" gap={8}>
                         <Box>
-                        <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
-                        Meta
-                    </Text>
-                    <DonutType type={'Meta'}/>
+                            <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
+                                Meta
+                            </Text>
+                            <DonutType type={'Meta'} />
                         </Box>
                         <Box>
-                        <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
-                        Informational
-                    </Text>
-                    <DonutType type={'Informational'}/>
+                            <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
+                                Informational
+                            </Text>
+                            <DonutType type={'Informational'} />
                         </Box>
-                        
+
                     </Grid>
                 </Box>
             </AllLayout>
