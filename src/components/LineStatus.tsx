@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { mockEIP } from '@/data/eipdata';
 import { Box, useColorModeValue } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 
 ChartJS.register(
   CategoryScale,
@@ -144,6 +145,10 @@ const LineStatus: React.FC<TabProps> = ({cat }) => {
         border: '1px',
         borderColor: '#10b981',
       }}
+      as={motion.div}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 } as any}
       className="hover: cursor-pointer ease-in duration-200"
     >
       <Line data={data} />

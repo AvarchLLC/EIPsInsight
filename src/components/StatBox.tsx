@@ -2,6 +2,7 @@
 import { Box, Link, Text, useColorModeValue, useTheme } from "@chakra-ui/react";
 import React from "react";
 import FlexBetween from "./FlexBetween";
+import { motion } from 'framer-motion';
 
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,8 +28,9 @@ const StatBox: React.FC<StatBoxProps> = ({
 
 
   return (
-    
+
     <Box
+    
       gridColumn="span 2"
       gridRow="span 1"
       display="flex"
@@ -44,6 +46,10 @@ const StatBox: React.FC<StatBoxProps> = ({
         borderColor: "#10b981",
       }}
       className="hover:cursor-pointer ease-in duration-200"
+      as={motion.div}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 } as any}
     >
       <Link href={url}       textDecoration="none" _hover={{ textDecoration: "none" }}>
       <FlexBetween>
@@ -59,6 +65,7 @@ const StatBox: React.FC<StatBoxProps> = ({
       </FlexBetween>
       </Link>
     </Box>
+
 
   );
 };

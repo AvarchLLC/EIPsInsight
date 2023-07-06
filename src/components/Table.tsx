@@ -4,6 +4,7 @@ import { Table as Tb, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer } f
 import ReactPaginate from "react-paginate";
 import { mockEIP } from "@/data/eipdata";
 import FlexBetween from "./FlexBetween";
+import { motion } from "framer-motion";
 
 const useSearchTerm = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -105,6 +106,10 @@ const Table = () => {
         border: "1px",
         borderColor: "#10b981",
       }}
+      as={motion.div}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 } as any}
       className="hover: cursor-pointer ease-in duration-200"
     >
       <FlexBetween>

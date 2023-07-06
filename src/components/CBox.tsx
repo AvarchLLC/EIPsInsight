@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Badge, Box, Link, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem, useColorModeValue } from "@chakra-ui/react";
+import { motion } from 'framer-motion';
 
 interface EIP {
   _id: string;
@@ -127,6 +128,10 @@ const CBox = () => {
       }}
       maxH={maxHeight}
       className="hover: cursor-pointer ease-in duration-200"
+      as={motion.div}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 } as any}
     >
       <TableContainer>
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">

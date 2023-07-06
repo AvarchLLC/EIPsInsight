@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Box, useColorModeValue } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -93,6 +94,10 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
         border: '1px',
         borderColor: '#10b981',
       }}
+      as={motion.div}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 } as any}
       className="hover: cursor-pointer ease-in duration-200"
     >
      <Box width="60%" maxWidth={500} maxHeight={500} className='px-10'> <Doughnut data={chartData} options={{
