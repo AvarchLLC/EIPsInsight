@@ -1,6 +1,5 @@
 'use client'
 
-
 import {
   Box,
   Flex,
@@ -41,10 +40,15 @@ export default function WithSubnavigation() {
   
 
   return (
-    <Box>
+    <Box
+    bg={useColorModeValue("gray.50", "gray.900")}
+    color={useColorModeValue("gray.700", "gray.200")}
+    position="sticky"
+    top={0}
+    zIndex="sticky"
+    >
       <Flex
-        bg={useColorModeValue("white", "gray.800")}
-        color={useColorModeValue("gray.600", "white")}
+        
         minH={"60px"}
         py={{ base: 2 }}
         px={{ base: 4 }}
@@ -82,6 +86,7 @@ export default function WithSubnavigation() {
           >
             EIPs Insights
           </Text>
+          
           </NextLink>
 
           <Spacer />
@@ -349,7 +354,6 @@ function getMonthsTillCurrentYear(): NavItem[] {
   return months.reverse();
 }
 
-
 function getMonthsTillYear(year: number): NavItem[] {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -385,10 +389,6 @@ function getMonthsTillYear(year: number): NavItem[] {
   console.log(months)
   return months;
 }
-
-
-
-
 
 const NAV_ITEMS: Array<NavItem> = [
   {

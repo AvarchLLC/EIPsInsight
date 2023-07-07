@@ -12,12 +12,11 @@ const LoaderComponent = () => {
         transition={{ duration: 0.5 }}
       >
         <motion.div
-          className="absolute top-0 left-0 w-full h-full bg-blue-500"
+          className="absolute top-0 left-0 w-full h-full bg-blue-300"
           initial={{ width: 0 }}
           animate={{ width: '100%' }}
           transition={{ duration: 1, delay: 0.3 }}
         />
-        {/* Make sure the Logo component is correctly imported */}
         <Logo />
       </motion.div>
       <motion.p

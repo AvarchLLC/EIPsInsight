@@ -6,6 +6,8 @@ import { Box, Grid } from '@chakra-ui/react';
 import CustomBox from '@/components/CustomBox';
 import { PieC } from '@/components/PieC';
 import AllLayout from '@/components/Layout';
+import { motion } from 'framer-motion';
+import LoaderComponent from '@/components/Loader';
 interface StatusChange {
   _id: string;
   count: number;
@@ -69,10 +71,44 @@ const Month = () => {
   }, [year, month]);
 
   console.log(data);
+  const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    // Simulating a loading delay
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    // Cleanup function
+    return () => clearTimeout(timeout);
+  }, []);
   return (
     <AllLayout>
-      <Box className="ml-40 mr-40 pl-10 pr-10 mt-10">
+            {isLoading ? ( // Check if the data is still loading
+        // Show loader if data is loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* Your loader component */}
+            <LoaderComponent />
+          </motion.div>
+        </Box>
+      ) : (
+        <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+      <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
         <Header title={getMonthName(Number(month))} subtitle={year} />
         <Grid templateColumns="repeat(2, 1fr)" gap={6}>
           <CustomBox data={data} />
@@ -91,6 +127,8 @@ const Month = () => {
           <PieC data={data} status='Withdrawn'/>
         </Grid>
       </Box>
+      </motion.div>
+      )}
     </AllLayout>
   );
 };

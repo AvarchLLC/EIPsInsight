@@ -1,14 +1,14 @@
 // app/providers.tsx
 'use client'
 import './globals.css'
-import { Montserrat } from 'next/font/google'
+import { Montserrat, DM_Sans, Inter } from 'next/font/google'
 import { Providers } from './providers'
 import { ColorModeScript } from '@chakra-ui/react';
 import WithSubnavigation from '@/components/Nav';
 import Nav from '@/components/Nav';
 import LargeWithAppLinksAndSocial from '@/components/Footer';
 import { Suspense } from 'react';
-const mont = Montserrat({ subsets: ['latin'] })
+const mont = Inter({ subsets: ['latin'] })
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 

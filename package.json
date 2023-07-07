@@ -37,6 +37,8 @@
     "octokit": "^2.1.0",
     "postcss": "8.4.24",
     "react": "18.2.0",
+    "react-awesome-slider": "^4.1.0",
+    "react-awesome-slider-fc": "^1.0.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "18.2.0",
     "react-feather": "^2.0.10",
@@ -48,6 +50,7 @@
     "redux-thunk": "^2.4.2",
     "simple-git": "^3.19.1",
     "styled-components": "^6.0.2",
+    "swiper": "^10.0.3",
     "tailwindcss": "3.3.2",
     "typescript": "5.1.3"
   },

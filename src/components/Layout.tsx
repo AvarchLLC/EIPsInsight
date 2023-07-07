@@ -3,12 +3,12 @@ import React from 'react'
 import LargeWithAppLinksAndSocial from '@/components/Footer'
 import WithSubnavigation from '@/components/Nav'
 import { Box, ColorModeScript } from '@chakra-ui/react'
-import { Montserrat } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import '../app/globals.css'
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from 'next/navigation'
 
-const mont = Montserrat({ subsets: ['latin'] })
+const mont = Inter({ subsets: ['latin'] })
 const AllLayout = ({
   children,
 }: {
