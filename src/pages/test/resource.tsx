@@ -6,6 +6,7 @@ import { Youtube } from 'react-feather';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import LoaderComponent from '@/components/Loader';
+import Table from '@/components/Tab';
 import AwesomeSlider from 'react-awesome-slider';
 import 'react-awesome-slider/dist/styles.css';
 // import Swiper core and required modules
@@ -179,8 +180,11 @@ const Resources = () => {
               asd
               </Box>
               </Box>
+              <Table/>
           </Box>
+          
         </motion.div>
+
       )}
     </AllLayout>
   );
