@@ -26,7 +26,7 @@ import {
 } from "react-feather";
 import FlexBetween from "@/components/FlexBetween";
 import StackedColumnChart from "@/components/StackedColumnChart";
-
+import AreaC from "@/components/AreaC";
 interface EIP {
   _id: string;
   eip: string;
@@ -195,50 +195,214 @@ const Type = () => {
                 <DonutType type={"Informational"} />
               </Box>
             </Grid>
+            <Grid templateColumns="1fr 3fr" gap={8} paddingTop={8}>
+              <Box>
+                <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
+                  Draft
+                </Text>
+               
+              </Box>
+              <Box>
+                <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
+                  Draft vs Final
+                </Text>
+         
+              </Box>
+            </Grid>
             <Grid templateColumns="1fr 3fr" gap={8}>
-            <Box
-      marginTop={'2rem'}
-      p="0.5rem"
-      borderRadius="0.35rem"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      height={400}
-      overflowX="auto"
-      _hover={{
-        border: '1px',
-        borderColor: '#10b981',
-      }}
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200"
-    >
-            <StackedColumnChart/>
-            </Box>
-            <Box
-      marginTop={'2rem'}
-      p="0.5rem"
-      borderRadius="0.35rem"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      height={400}
-      overflowX="auto"
-      _hover={{
-        border: '1px',
-        borderColor: '#10b981',
-      }}
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200"
-    >as</Box>
+              <Box
+                marginTop={"2rem"}
+                p="0.5rem"
+                borderRadius="0.35rem"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                height={400}
+                overflowX="auto"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#10b981",
+                }}
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
+                
+      
             
+                <StackedColumnChart status="Draft" />
+       
+               
+              </Box>
+              <AreaC />
+            </Grid>
+            <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
+              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
+                Review -{" "}
+                {data.filter((item) => item.status === "Review").length}
+              </Text>
+              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
+                Stagnant -{" "}
+                {data.filter((item) => item.status === "Stagnant").length}
+              </Text>
+              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
+                Living -{" "}
+                {data.filter((item) => item.status === "Living").length}
+              </Text>
+            </Grid>
+            <Grid templateColumns="1fr 1fr 1fr" gap={8}>
+              <Box
+                marginTop={"2rem"}
+                p="0.5rem"
+                borderRadius="0.35rem"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                height={400}
+                overflowX="auto"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#10b981",
+                }}
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
+                <StackedColumnChart status="Review" />
+              </Box>
+              <Box
+                marginTop={"2rem"}
+                p="0.5rem"
+                borderRadius="0.35rem"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                height={400}
+                overflowX="auto"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#10b981",
+                }}
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
+                <StackedColumnChart status="Stagnant" />
+              </Box>
+              <Box
+                marginTop={"2rem"}
+                p="0.5rem"
+                borderRadius="0.35rem"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                height={400}
+                overflowX="auto"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#10b981",
+                }}
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
+                <StackedColumnChart status="Living" />
+              </Box>
+            </Grid>
+            <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
+              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
+                Last Call -{" "}
+                {data.filter((item) => item.status === "Last Call").length}
+              </Text>
+              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
+                Withdrawn -{" "}
+                {data.filter((item) => item.status === "Withdrawn").length}
+              </Text>
+              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
+                Final - {data.filter((item) => item.status === "Final").length}
+              </Text>
+            </Grid>
+            <Grid templateColumns="1fr 1fr 1fr" gap={8}>
+              <Box
+                marginTop={"2rem"}
+                p="0.5rem"
+                borderRadius="0.35rem"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                height={400}
+                overflowX="auto"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#10b981",
+                }}
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
+                <StackedColumnChart status="Last Call" />
+              </Box>
+
+              <Box
+                marginTop={"2rem"}
+                p="0.5rem"
+                borderRadius="0.35rem"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                height={400}
+                overflowX="auto"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#10b981",
+                }}
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
+                <StackedColumnChart status="Withdrawn" />
+              </Box>
+
+              <Box
+                marginTop={"2rem"}
+                p="0.5rem"
+                borderRadius="0.35rem"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                height={400}
+                overflowX="auto"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#10b981",
+                }}
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
+                <StackedColumnChart status="Final" />
+              </Box>
             </Grid>
           </Box>
         </motion.div>

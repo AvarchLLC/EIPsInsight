@@ -91,12 +91,13 @@ interface AreaProps {
   ];
 
   interface AreaCProps {
-    category: string;
+    status: string;
   }
 
-  const StackedColumnChart = () => {
+  const StackedColumnChart : React.FC<AreaCProps> = ( {status} ) => {
     const [data, setData] = useState<EIP[]>([]);
     const windowSize = useWindowSize();
+    const bg = useColorModeValue("#f6f6f7", "#171923");
   
     useEffect(() => {
       const fetchData = async () => {
@@ -118,7 +119,7 @@ interface AreaProps {
       setIsChartReady(true);
     }, []);
   
-    const filteredData = data.filter((item) => item.status === 'Draft');
+    const filteredData = data.filter((item) => item.status === status);
   
     const transformedData = filteredData.flatMap((item) =>
       item.eips.map((eip) => ({
@@ -155,8 +156,11 @@ interface AreaProps {
     };
   
     return (
+      <Box boxSize={"xs"}>
 
-        <Area {...config} />
+<Area {...config} />
+      </Box>
+        
 
     );
   };
