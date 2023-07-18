@@ -26,7 +26,7 @@ import {
 } from "react-feather";
 import FlexBetween from "@/components/FlexBetween";
 import StackedColumnChart from "@/components/StackedColumnChart";
-import AreaC from "@/components/AreaC";
+import AreaC from "@/components/AreaStatus";
 interface EIP {
   _id: string;
   eip: string;

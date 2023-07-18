@@ -1,6 +1,16 @@
-import { Box, useColorModeValue, Spinner } from '@chakra-ui/react';
-import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
+import { mockEIP } from "@/data/eipdata";
+import {
+  Box,
+  Text,
+  useColorModeValue,
+  useColorMode,
+  Select,
+  Spinner,
+} from "@chakra-ui/react";
+
+import dynamic from "next/dynamic";
+import React, { useEffect, useState } from "react";
+import FlexBetween from "./FlexBetween";
 
 interface AreaProps {
   data: MappedDataItem[];
@@ -15,18 +25,16 @@ interface AreaProps {
   areaStyle: {
     fillOpacity: number;
   };
-  legend: {
-    position: string;
-  };
+  legend: any; // Adjust the type based on the actual props required by the library
   smooth: boolean;
 }
 
 const Area = dynamic(
-    (): any => import('@ant-design/plots').then((item) => item.Area),
-    {
-      ssr: false,
-    }
-  ) as React.ComponentType<AreaProps>;
+  (): any => import("@ant-design/plots").then((item) => item.Area),
+  {
+    ssr: false,
+  }
+) as React.ComponentType<AreaProps>;
 
 interface MappedDataItem {
   status: string;
@@ -53,60 +61,59 @@ interface FormattedEIP {
 
 function getMonthName(month: number): string {
   const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   return months[month - 1];
 }
 
 const categoryColors: string[] = [
-  'rgb(255, 99, 132)',
-  'rgb(255, 159, 64)',
-  'rgb(255, 205, 86)',
-  'rgb(75, 192, 192)',
-  'rgb(54, 162, 235)',
-  'rgb(153, 102, 255)',
-  'rgb(255, 99, 255)',
-  'rgb(50, 205, 50)',
-  'rgb(255, 0, 0)',
-  'rgb(0, 128, 0)',
+  "rgb(255, 99, 132)",
+  "rgb(255, 159, 64)",
+  "rgb(255, 205, 86)",
+  "rgb(75, 192, 192)",
+  "rgb(54, 162, 235)",
+  "rgb(153, 102, 255)",
+  "rgb(255, 99, 255)",
+  "rgb(50, 205, 50)",
+  "rgb(255, 0, 0)",
+  "rgb(0, 128, 0)",
 ];
 const categoryBorder: string[] = [
-  'rgba(255, 99, 132, 0.2)',
-  'rgba(255, 159, 64, 0.2)',
-  'rgba(255, 205, 86, 0.2)',
-  'rgba(75, 192, 192, 0.2)',
-  'rgba(54, 162, 235, 0.2)',
-  'rgba(153, 102, 255, 0.2)',
-  'rgba(255, 99, 255, 0.2)',
-  'rgba(50, 205, 50, 0.2)',
-  'rgba(255, 0, 0, 0.2)',
-  'rgba(0, 128, 0, 0.2)',
+  "rgba(255, 99, 132, 0.2)",
+  "rgba(255, 159, 64, 0.2)",
+  "rgba(255, 205, 86, 0.2)",
+  "rgba(75, 192, 192, 0.2)",
+  "rgba(54, 162, 235, 0.2)",
+  "rgba(153, 102, 255, 0.2)",
+  "rgba(255, 99, 255, 0.2)",
+  "rgba(50, 205, 50, 0.2)",
+  "rgba(255, 0, 0, 0.2)",
+  "rgba(0, 128, 0, 0.2)",
 ];
-interface AreaCProps {
-    category: string;
-  }
-  const AreaStatus: React.FC<AreaCProps> = ({ category }) => {
-  const [data, setData] = useState<EIP[]>([]);
+
+const AreaC = () => {
+  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/graphs`);
+        console.log(response);
         const jsonData = await response.json();
         setData(jsonData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -114,45 +121,46 @@ interface AreaCProps {
   }, []);
 
   const [isChartReady, setIsChartReady] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
+
+  useEffect(() => {
+    setIsLoading(true); // Set isLoading to true before rendering chart
+    setTimeout(() => {
+      setIsLoading(false); // Set isLoading to false after a small delay (simulating chart rendering)
+    }, 1000);
+  }, [selectedStatus]);
 
   useEffect(() => {
     setIsChartReady(true);
+  }, []); // Trigger initial render
+
+  const formattedData = data.reduce((acc: FormattedEIP[], item: EIP) => {
+    if (item.status === "Final" || item.status === "Draft") {
+      const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
+        status: item.status,
+        date: `${getMonthName(eip.month)} ${eip.year}`,
+        value: eip.count,
+      }));
+      acc.push(...formattedEIPs);
+    }
+    return acc;
   }, []);
 
-  const transformedData = data.reduce<FormattedEIP[]>((result, item) => {
-    const coreEips = item.eips.filter((eip) => eip.category === category);
-    const groupedByDate: { [key: string]: FormattedEIP } = coreEips.reduce((grouped, eip) => {
-      const date = new Date(eip.year, eip.month - 1);
-      const monthName = getMonthName(eip.month);
-      const formattedDate = `${monthName} ${eip.year}`;
-      if (!grouped[formattedDate]) {
-        grouped[formattedDate] = {
-          status: item.status,
-          date: formattedDate,
-          value: 0,
-        };
-      }
-      grouped[formattedDate].value += eip.count;
-      return grouped;
-    }, {} as { [key: string]: FormattedEIP }); // Add index signature for groupedByDate
-  
-    return result.concat(Object.values(groupedByDate));
-  }, []);
-
-  const filteredData: FormattedEIP[] = transformedData;
+  const filteredData: FormattedEIP[] = formattedData;
 
   const config = {
     data: filteredData,
-    xField: 'date',
-    yField: 'value',
+    xField: "date",
+    yField: "value",
     color: categoryColors,
-    seriesField: 'status',
+    seriesField: "status",
     xAxis: {
       range: [0, 1],
       tickCount: 5,
     },
     areaStyle: { fillOpacity: 0.6 },
-    legend: { position: 'top-right' },
+    legend: { position: "top-right" },
     smooth: true,
     slider: {
       start: 0.1,
@@ -160,7 +168,7 @@ interface AreaCProps {
     },
   };
 
-  const bg = useColorModeValue('#f6f6f7', '#171923');
+  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   return (
     <Box
@@ -171,20 +179,29 @@ interface AreaCProps {
       borderRadius="0.55rem"
       overflowX="auto"
       _hover={{
-        border: '1px',
-        borderColor: '#10b981',
+        border: "1px",
+        borderColor: "#10b981",
       }}
       className="hover: cursor-pointer ease-in duration-200"
     >
-      {isChartReady ? (
-        <Area {...config} />
-      ) : (
-        <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-          <Spinner size="xl" color="green.500" />
-        </Box>
-      )}
+      <Box>
+        {isLoading ? (
+          // Show loading spinner while chart is rendering
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="200px"
+          >
+            <Spinner size="xl" color="green.500" />
+          </Box>
+        ) : (
+          // Show chart when it's ready
+          <Area {...config} />
+        )}
+      </Box>
     </Box>
   );
 };
 
-export default AreaStatus;
+export default AreaC;
