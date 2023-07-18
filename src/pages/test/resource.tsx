@@ -180,7 +180,7 @@ const Resources = () => {
               asd
               </Box>
               </Box>
-              <Table/>
+              
           </Box>
           
         </motion.div>

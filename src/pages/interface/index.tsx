@@ -68,7 +68,7 @@ const Interface = () => {
         </Box>
       </FlexBetween>
       <TableStatus cat='Interface'/>
-      <AreaStatus category='Interface'/>
+      <AreaStatus />
     </Box>
     </motion.div>
       )}

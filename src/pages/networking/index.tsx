@@ -67,7 +67,7 @@ const Networking = () => {
         </Box>
       </FlexBetween>
       <TableStatus cat='Networking'/>
-      <AreaStatus category='Networking'/>
+      <AreaStatus/>
       
     </Box>
     </motion.div>

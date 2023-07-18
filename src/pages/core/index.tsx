@@ -55,7 +55,7 @@ const Core = () => {
         <Header title="Category - Core" subtitle="Core EIPs describe changes to the Ethereum protocol." />
       </FlexBetween>
       <TableStatus cat='Core'/>
-      <AreaStatus category='Core'/>
+      <AreaStatus/>
     </Box>
     </motion.div>
       )}

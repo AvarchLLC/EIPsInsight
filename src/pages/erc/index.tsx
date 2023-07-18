@@ -66,7 +66,7 @@ const ERC = () => {
         </Box>
       </FlexBetween>
       <TableStatus cat='ERC'/>
-      <AreaStatus category='ERC'/>
+      <AreaStatus/>
     </Box>
     </motion.div>)}
   </AllLayout>
