@@ -3,8 +3,16 @@ import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Box, useColorModeValue } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import dynamic from "next/dynamic";
+const Pie = dynamic(
+  (): any => import("@ant-design/plots").then((item) => item.Pie),
+  {
+    ssr: false,
+  }
+) as any;
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+
 
 interface EIP {
   _id: string;
@@ -17,6 +25,11 @@ interface EIP {
   created: string;
   requires: any[]; // Adjust the type based on the actual data structure
   last_call_deadline: string;
+}
+
+interface PieChartData {
+  status: string;
+  value: number;
 }
 
 interface DonutTypeProps {
@@ -46,6 +59,65 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
   const interfaceCount = data.filter(item => item.status === status && item.category === 'Interface').length;
   const metaCount = data.filter(item => item.status === status && item.type === 'Meta').length;
   const informationalCount = data.filter(item => item.status === status && item.type === 'Informational').length;
+  const total = coreCount+ercCount+networkingCount+ interfaceCount+metaCount+informationalCount;
+  const pieChartData: PieChartData[] = [
+    {
+      status : "Core",
+      value: coreCount
+    },
+    {
+      status : "ERC",
+      value: ercCount
+    },
+    {
+      status : "Networking",
+      value: networkingCount
+    },
+    {
+      status : "Interface",
+      value: interfaceCount
+    },
+    {
+      status : "Meta",
+      value: metaCount
+    },
+    {
+      status : "Informational",
+      value: informationalCount
+    }
+  ]
+  const config = {
+    appendPadding: 10,
+    data: pieChartData,
+    angleField: "value",
+    colorField: "status",
+    radius: 1,
+    innerRadius: 0.5,
+    label: {
+      type: "inner",
+      offset: "-50%",
+      content: "{value}",
+      style: {
+        textAlign: "center",
+        fontSize: 14
+      }
+    },
+    interactions: [{ type: "element-selected" }, { type: "element-active" }],
+    statistic: {
+      title: false as const,
+      content: {
+        style: {
+          whiteSpace: "pre-wrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis"
+        },
+        formatter: function formatter() {
+          return `EIPS : ${total}`;
+        }
+      }
+    }
+  };
+  
 
   const chartData = {
     labels: ['Core', 'ERC', 'Networking', 'Interface', "Meta", "Informational"],
@@ -100,21 +172,9 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
       transition={{ duration: 0.5 } as any}
       className="hover: cursor-pointer ease-in duration-200"
     >
-     <Box width="60%" maxWidth={500} maxHeight={500} className='px-5 md:px-10'> <Doughnut data={chartData} options={{
-          maintainAspectRatio: true, // Set it to false if you want to disable maintaining aspect ratio
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                usePointStyle: true,
-                padding: 8,
-              },
-            },
-          },
-     }} /> </Box>
+     
+<Pie {...config}/> </Box>
       
-    </Box>
   );
 };
 
