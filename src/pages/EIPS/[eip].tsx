@@ -6,6 +6,8 @@ import { Badge, Box, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Wrap
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
+import { motion } from 'framer-motion';
+
 interface EIP {
   _id: string;
   eip: string;
@@ -22,34 +24,28 @@ interface EIP {
   __v: number;
 }
 
+interface ContentData {
+  content: string;
+}
+
 const EIP = () => {
   const pathname = usePathname();
   const pathnameParts = pathname ? pathname.split("/") : [];
-  // const [allData, setAllData] = useState<any[]>([]); // Set initial state as an empty array
+
   const thirdPart = pathnameParts[2] || ""; // Set a default value if thirdPart is undefined
   const [data, setData] = useState<EIP | null>(null); // Set initial state as null
+  const [con, setcon] = useState<ContentData | undefined>(undefined);
 
-  // const fetchAllData = async () => {
-  //   try {
-  //     const res = await fetch(`https://eipsinsight.com/api/rawData`, {
-  //       // method: 'GET',
-  //       // headers: {
-  //       //   Accept: 'application/json',
-  //       //   'Content-Type': 'application',
-  //       // },
-  //       // credentials: 'include',
-  //     });
-  //     const datas = await res.json();
-  //     setData(datas);
-  //     console.log(datas)
-
-  //     const filterData = datas.filter(function (e: any) {
-  //       return e.data.eip === thirdPart;
-  //     });
-
-  //     setAllData(filterData);
-  //   } catch (err) {}
-  // };
+  const fetchContent = async () => {
+    try {
+      const response = await fetch(`/api/eipcontent/${thirdPart}`);
+      const jsonD = await response.json();
+      console.log(jsonD["content"]);
+      setcon(jsonD);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,7 +60,7 @@ const EIP = () => {
     };
 
     fetchData();
-    // fetchAllData();
+    fetchContent();
   }, [thirdPart]); // Add thirdPart as a dependency to re-fetch data when it changes
 
   
@@ -72,36 +68,52 @@ const EIP = () => {
     <AllLayout>
       <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
 
-        {data !== null ? ( // Check if data is not null before rendering
+        {data !== null ? (
           <>
-            <Header title={`EIP : ${thirdPart}`} subtitle={data.title} />
-            <TableContainer paddingTop={6}>
-              <Table variant="striped" minW="50%" maxH={"50%"} layout="fixed">
-
-                <Tbody>
-                  {Object.entries(data).map(([key, value]) => (
-                    key !== 'requires' && key !== 'unique_ID' && key !== 'eip' && key !== '_id' && key !=='__v' && value && (
-                      <Tr key={key}>
-                        <Td>
-                          {key.charAt(0).toUpperCase() + key.slice(1)}:
-                        </Td>
-                        <Td>
-                          <Wrap>
-                            <WrapItem>
-                              <Badge colorScheme="cyan">{value}</Badge>
-                            </WrapItem>
-                          </Wrap>
-                        </Td>
-                      </Tr>
-                    )
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-            {/* {allData !== undefined && allData.map((item: any, index: number) => (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Header title={`EIP : ${thirdPart}`} subtitle={data.title} />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <TableContainer paddingTop={6}>
+                <Table variant="striped" minW="50%" maxH="50%" layout="fixed">
+                  <Tbody>
+                    {Object.entries(data).map(([key, value]) => (
+                      key !== 'requires' && key !== 'unique_ID' && key !== 'eip' && key !== '_id' && key !=='__v' && value && (
+                        <Tr key={key}>
+                          <Td>
+                            {key.charAt(0).toUpperCase() + key.slice(1)}:
+                          </Td>
+                          <Td>
+                            <Wrap>
+                              <WrapItem>
+                                <Badge colorScheme="cyan">{value}</Badge>
+                              </WrapItem>
+                            </Wrap>
+                          </Td>
+                        </Tr>
+                      )
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </motion.div>
+            {/* ... Other content with animations */}
+            {con !== undefined ? (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7 }}
+              >
                 <ReactMarkdown
-                key={index}
-                children={item?.content ?? ''} // Ensure content is a string or use an empty string as fallback
+                  children={con.content}
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeRaw]}
                   components={{
@@ -149,7 +161,10 @@ const EIP = () => {
                     ),
                   }}
                 />
-              ))} */}
+              </motion.div>
+            ) : (
+              <Text>No content found.</Text>
+            )}
           </>
         ) : (
           <Text>No data found.</Text>

@@ -1,9 +1,6 @@
-import { mockEIP } from '@/data/eipdata';
-import { Box, Text, useColorModeValue, useColorMode, Select, Spinner } from '@chakra-ui/react';
-
+import { Box, Text, useColorModeValue, Select, Spinner } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
-import FlexBetween from './FlexBetween';
 
 interface AreaProps {
   data: MappedDataItem[];
@@ -97,6 +94,9 @@ const categoryBorder: string[] = [
 
 const AreaC = () => {
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
+  const [selectedStatus, setSelectedStatus] = useState('Draft'); // Set default select option as 'Final'
+  const [isChartReady, setIsChartReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
 
   useEffect(() => {
     const fetchData = async () => {
@@ -112,10 +112,6 @@ const AreaC = () => {
 
     fetchData();
   }, []);
-
-  const [isChartReady, setIsChartReady] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
 
   useEffect(() => {
     setIsLoading(true); // Set isLoading to true before rendering chart
@@ -138,6 +134,7 @@ const AreaC = () => {
   const handleChangeStatus = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
+  
   const formattedData = data.reduce((acc: FormattedEIP[], item: EIP) => {
     if (item.status === selectedStatus) {
       const formattedEIPs: FormattedEIP[] = item.eips.map(eip => ({
@@ -150,7 +147,6 @@ const AreaC = () => {
     return acc;
   }, []);
   
-
   const filteredData: FormattedEIP[] = formattedData;
 
   const config = {

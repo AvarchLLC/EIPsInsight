@@ -109,7 +109,7 @@ export default function WithSubnavigation() {
                               icon={<GitHub/>}
                               />
                               </NextLink>
-              <IconButton
+              {/* <IconButton
                 aria-label="Mode Change"
                 variant="outline"
                 colorScheme="green"
@@ -117,7 +117,7 @@ export default function WithSubnavigation() {
                 icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
                 onClick={toggleColorMode}
                 
-              />
+              /> */}
             </Stack>
           </Flex>
         </Flex>

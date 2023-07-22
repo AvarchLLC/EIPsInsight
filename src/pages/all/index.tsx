@@ -6,7 +6,7 @@ import { DownloadIcon } from '@chakra-ui/icons';
 import AllLayout from '@/components/Layout';
 import FlexBetween from '@/components/FlexBetween';
 import Header from '@/components/Header';
-import Table from '@/components/Table';
+import Table from '@/components/TableS';
 import AreaC from '@/components/AreaC';
 import LoaderComponent from '@/components/Loader';
 
