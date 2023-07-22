@@ -83,27 +83,27 @@ const DonutType: React.FC<DonutTypeProps> = ({ type }) => {
 
   return (
     <Box
-      bgColor={bg}
-      marginTop={'2rem'}
-      p="0.5rem"
-      borderRadius="0.35rem"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      height={400}
-      overflowX="auto"
-      _hover={{
-        border: '1px',
-        borderColor: '#10b981',
-      }}
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200"
+        bgColor={bg}
+        marginTop={'2rem'}
+        paddingX="0.5rem"
+        borderRadius="0.55rem"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        height={400}
+        overflowX="auto"
+        _hover={{
+          border: '1px',
+          borderColor: '#10b981',
+        }}
+        as={motion.div}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 } as any}
+        className="hover: cursor-pointer ease-in duration-200"
     >
-     <Box width="60%" maxWidth={500} maxHeight={500} className='px-10'> <Doughnut data={chartData} options={{
+     <Box width="60%" maxWidth={500} maxHeight={500} className='md:px-10 px-5'> <Doughnut data={chartData} options={{
           maintainAspectRatio: true, // Set it to false if you want to disable maintaining aspect ratio
           responsive: true,
           plugins: {
@@ -111,7 +111,7 @@ const DonutType: React.FC<DonutTypeProps> = ({ type }) => {
               position: 'bottom',
               labels: {
                 usePointStyle: true,
-                padding: 20,
+                padding: 4,
               },
             },
           },

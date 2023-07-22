@@ -24,6 +24,7 @@ import {
   Clipboard,
   Briefcase,
 } from "react-feather";
+import TypeGraphs from "@/components/TypeGraphs";
 import FlexBetween from "@/components/FlexBetween";
 import StackedColumnChart from "@/components/StackedColumnChart";
 import AreaC from "@/components/AreaStatus";
@@ -99,12 +100,18 @@ const Type = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-40">
+          <Box
+              hideBelow={'md'}
+              paddingBottom={{md:'10', base: '10'}}
+              marginX={{md:"40", base: '2'}}
+              paddingX={{md:"10", base:'5'}}
+              marginTop={{md:"10", base:'5'}}
+          >
             <Header
               title="Type - Category"
               subtitle="Your Roadway to Type and Category"
             ></Header>
-            <Grid templateColumns="repeat(2, 1fr)" gap={8} paddingTop={8}>
+            <Grid templateColumns="1fr 2fr" gap={2} paddingTop={8}>
               <Text fontSize="3xl" fontWeight="bold" color="#10b981">
                 All EIPs - {data.length}
               </Text>
@@ -121,14 +128,7 @@ const Type = () => {
               gridAutoRows="160px"
               gap="20px"
             >
-              <CatBox
-                title="Standard Tracks"
-                value={
-                  data.filter((item) => item.type === "Standards Track").length
-                }
-                icon={<Icon as={Anchor} />}
-                url="core"
-              />
+
 
               <CatBox
                 title="Meta"
@@ -168,7 +168,14 @@ const Type = () => {
                 icon={<Icon as={Briefcase} />}
                 url="meta"
               />
+              <CatBox
+                    title="Interface"
+                    value={data.filter((item) => item.category === "Interface").length}
+                    icon={<Icon as={BookOpen} fontSize={{md:'15', base: '10'}}/>}
+                    url="erc"
+                />
             </Box>
+
             <Text
               fontSize="3xl"
               fontWeight="bold"
@@ -195,216 +202,129 @@ const Type = () => {
                 <DonutType type={"Informational"} />
               </Box>
             </Grid>
-            <Grid templateColumns="1fr 3fr" gap={8} paddingTop={8}>
-              <Box>
-                <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
-                  Draft
-                </Text>
-               
-              </Box>
-              <Box>
-                <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
-                  Draft vs Final
-                </Text>
-         
-              </Box>
-            </Grid>
-            <Grid templateColumns="1fr 3fr" gap={8}>
-              <Box
-                marginTop={"2rem"}
-                p="0.5rem"
-                borderRadius="0.35rem"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                height={400}
-                overflowX="auto"
-                _hover={{
-                  border: "1px",
-                  borderColor: "#10b981",
-                }}
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 } as any}
-                className="hover: cursor-pointer ease-in duration-200"
-              >
-                
-      
-            
-                <StackedColumnChart status="Draft" />
-       
-               
-              </Box>
-              <AreaC />
-            </Grid>
-            <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
-              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                Review -{" "}
-                {data.filter((item) => item.status === "Review").length}
-              </Text>
-              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                Stagnant -{" "}
-                {data.filter((item) => item.status === "Stagnant").length}
-              </Text>
-              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                Living -{" "}
-                {data.filter((item) => item.status === "Living").length}
-              </Text>
-            </Grid>
-            <Grid templateColumns="1fr 1fr 1fr" gap={8}>
-              <Box
-                marginTop={"2rem"}
-                p="0.5rem"
-                borderRadius="0.35rem"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                height={400}
-                overflowX="auto"
-                _hover={{
-                  border: "1px",
-                  borderColor: "#10b981",
-                }}
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 } as any}
-                className="hover: cursor-pointer ease-in duration-200"
-              >
-                <StackedColumnChart status="Review" />
-              </Box>
-              <Box
-                marginTop={"2rem"}
-                p="0.5rem"
-                borderRadius="0.35rem"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                height={400}
-                overflowX="auto"
-                _hover={{
-                  border: "1px",
-                  borderColor: "#10b981",
-                }}
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 } as any}
-                className="hover: cursor-pointer ease-in duration-200"
-              >
-                <StackedColumnChart status="Stagnant" />
-              </Box>
-              <Box
-                marginTop={"2rem"}
-                p="0.5rem"
-                borderRadius="0.35rem"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                height={400}
-                overflowX="auto"
-                _hover={{
-                  border: "1px",
-                  borderColor: "#10b981",
-                }}
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 } as any}
-                className="hover: cursor-pointer ease-in duration-200"
-              >
-                <StackedColumnChart status="Living" />
-              </Box>
-            </Grid>
-            <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
-              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                Last Call -{" "}
-                {data.filter((item) => item.status === "Last Call").length}
-              </Text>
-              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                Withdrawn -{" "}
-                {data.filter((item) => item.status === "Withdrawn").length}
-              </Text>
-              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                Final - {data.filter((item) => item.status === "Final").length}
-              </Text>
-            </Grid>
-            <Grid templateColumns="1fr 1fr 1fr" gap={8}>
-              <Box
-                marginTop={"2rem"}
-                p="0.5rem"
-                borderRadius="0.35rem"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                height={400}
-                overflowX="auto"
-                _hover={{
-                  border: "1px",
-                  borderColor: "#10b981",
-                }}
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 } as any}
-                className="hover: cursor-pointer ease-in duration-200"
-              >
-                <StackedColumnChart status="Last Call" />
-              </Box>
-
-              <Box
-                marginTop={"2rem"}
-                p="0.5rem"
-                borderRadius="0.35rem"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                height={400}
-                overflowX="auto"
-                _hover={{
-                  border: "1px",
-                  borderColor: "#10b981",
-                }}
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 } as any}
-                className="hover: cursor-pointer ease-in duration-200"
-              >
-                <StackedColumnChart status="Withdrawn" />
-              </Box>
-
-              <Box
-                marginTop={"2rem"}
-                p="0.5rem"
-                borderRadius="0.35rem"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                height={400}
-                overflowX="auto"
-                _hover={{
-                  border: "1px",
-                  borderColor: "#10b981",
-                }}
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 } as any}
-                className="hover: cursor-pointer ease-in duration-200"
-              >
-                <StackedColumnChart status="Final" />
-              </Box>
-            </Grid>
           </Box>
+
+
+          <Box
+            display={{md:'none', base: 'block'}}
+            paddingBottom={{md:'10', base: '10'}}
+            marginX={{md:"40", base: '2'}}
+            paddingX={{md:"10", base:'5'}}
+            marginTop={{md:"10", base:'5'}}
+          >
+            <Header
+                title="Type - Category"
+                subtitle="Your Roadway to Type and Category"
+            ></Header>
+
+            <Box paddingTop={8}>
+              <Text fontSize="xl" fontWeight="bold" color="#10b981">
+                All EIPs - {data.length}
+              </Text>
+              <Box
+                display="grid"
+                gridTemplateColumns="repeat(6, 1fr)"
+                paddingTop={'5'}
+                gap="10px"
+              >
+
+<CatBox
+                    title="Meta"
+                    value={data.filter((item) => item.type === "Meta").length}
+                    icon={<Icon as={BookOpen} fontSize={{md:'15', base: '10'}}/>}
+                    url="erc"
+                />
+
+                <CatBox
+                    title="Meta"
+                    value={data.filter((item) => item.type === "Meta").length}
+                    icon={<Icon as={BookOpen} fontSize={{md:'15', base: '10'}}/>}
+                    url="erc"
+                />
+
+                <CatBox
+                    title="Informational"
+                    value={
+                      data.filter((item) => item.type === "Informational").length
+                    }
+                    icon={<Icon as={Radio} fontSize={{md:'15', base: '10'}}/>}
+                    url="networking"
+                />
+              </Box>
+            </Box>
+
+            <Box
+              paddingTop={'8'}
+            >
+              <Text fontSize="xl" fontWeight="bold" color="#10b981">
+                Standards Track -{" "}
+                {data.filter((item) => item.type === "Standards Track").length}
+              </Text>
+              <Box
+                  display="grid"
+                  gridTemplateColumns="repeat(7, 1fr)"
+                  paddingTop={'5'}
+                  gap="10px"
+              >
+                <CatBox
+                    title="Core"
+                    value={data.filter((item) => item.category === "Core").length}
+                    icon={<Icon as={Link} />}
+                    url="interface"
+                />
+
+                <CatBox
+                    title="ERCs"
+                    value={data.filter((item) => item.category === "ERC").length}
+                    icon={<Icon as={Clipboard} />}
+                    url="informational"
+                />
+
+                <CatBox
+                    title="Networking"
+                    value={
+                      data.filter((item) => item.category === "Networking").length
+                    }
+                    icon={<Icon as={Briefcase} />}
+                    url="meta"
+                />
+                <CatBox
+                    title="Interface"
+                    value={data.filter((item) => item.category === "Interface").length}
+                    icon={<Icon as={Clipboard} />}
+                    url="interface"
+                />
+              </Box>
+
+              <Box paddingTop={'8'}>
+                <Text
+                    fontSize="xl"
+                    fontWeight="bold"
+                    color="#4267B2"
+                >
+                  Standard Track
+                </Text>
+                <CBox />
+                <Donut />
+              </Box>
+
+              <Box paddingTop={'8'}>
+                <Text fontSize="xl" fontWeight="bold" color="#4267B2">
+                  Meta
+                </Text>
+                <DonutType type={"Meta"} />
+              </Box>
+            </Box>
+
+            <Box paddingTop={'8'}>
+              <Text fontSize="xl" fontWeight="bold" color="#4267B2">
+                Informational
+              </Text>
+              <DonutType type={"Informational"} />
+            </Box>
+
+          </Box>
+          <TypeGraphs />
         </motion.div>
       )}
     </AllLayout>

@@ -161,7 +161,10 @@ const AreaC = () => {
     },
     areaStyle: { fillOpacity: 0.6 },
     legend: { position: "top-right" },
-    smooth: true,
+    line: {
+      visible: false, // Set line visibility to false to remove the points and make the graph non-pointy
+    },
+    smooth: true, // Set smooth to true to create a smooth curve
     slider: {
       start: 0.1,
       end: 0.9,

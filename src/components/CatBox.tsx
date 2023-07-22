@@ -92,11 +92,11 @@ const CatBox: React.FC<CatBoxProps> = ({
     >
       <Link href={url}       textDecoration="none" _hover={{ textDecoration: "none" }}>
       <FlexBetween>
-        <Text fontWeight="bold" fontSize="l">{title}</Text>
+        <Text fontWeight="bold" fontSize={{md:"md", base: "xs"}}>{title}</Text>
         {icon}
       </FlexBetween>
 
-      <Text fontWeight="600" fontSize="5xl" color="#10b981">
+      <Text fontWeight="600" fontSize={{md: "5xl", base: "2xl"}} color="#10b981">
         {value}
       </Text>
       </Link>

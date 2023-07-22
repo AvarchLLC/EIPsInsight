@@ -156,9 +156,11 @@ interface AreaProps {
     };
   
     return (
-      <Box boxSize={"xs"}>
+      <Box boxSize={"xs"}
+           paddingX={'1rem'}
+      >
 
-<Area {...config} />
+        <Area {...config}/>
       </Box>
         
 

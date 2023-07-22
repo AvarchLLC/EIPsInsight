@@ -5326,7 +5326,7 @@ export const mockEIP = [
     {
       _id: "6490b4c774a035ea0696a78b",
       eip: 5219,
-      title: "Contract Resource Requests",
+      title: "Contract Index Requests",
       author: "Gavin John (@Pandapip1)",
       status: "Final",
       type: "Standards Track",

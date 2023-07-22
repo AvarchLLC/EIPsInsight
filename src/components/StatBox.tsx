@@ -30,8 +30,7 @@ const StatBox: React.FC<StatBoxProps> = ({
   return (
 
     <Box
-    
-      gridColumn="span 2"
+      gridColumn="span 1"
       gridRow="span 1"
       display="flex"
       flexDirection="column"
@@ -53,15 +52,15 @@ const StatBox: React.FC<StatBoxProps> = ({
     >
       <Link href={url}       textDecoration="none" _hover={{ textDecoration: "none" }}>
       <FlexBetween>
-        <Text fontWeight="bold">{title}</Text>
+        <Text fontWeight="bold" fontSize={{md:'16px',base:'11px'}}>{title}</Text>
         {icon}
       </FlexBetween>
 
-      <Text fontWeight="600" color="#10b981">
+      <Text fontWeight="600" color="#10b981" fontSize={{md:'16px', base:'11px'}}>
         {value}
       </Text>
       <FlexBetween gap="1rem">
-        <Text fontSize="xs">{description}</Text>
+        <Text fontSize={{md:'xs', base:'10px'}}>{description}</Text>
       </FlexBetween>
       </Link>
     </Box>

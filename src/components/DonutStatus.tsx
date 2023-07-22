@@ -100,7 +100,7 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
       transition={{ duration: 0.5 } as any}
       className="hover: cursor-pointer ease-in duration-200"
     >
-     <Box width="60%" maxWidth={500} maxHeight={500} className='px-10'> <Doughnut data={chartData} options={{
+     <Box width="60%" maxWidth={500} maxHeight={500} className='px-5 md:px-10'> <Doughnut data={chartData} options={{
           maintainAspectRatio: true, // Set it to false if you want to disable maintaining aspect ratio
           responsive: true,
           plugins: {
@@ -108,7 +108,7 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
               position: 'bottom',
               labels: {
                 usePointStyle: true,
-                padding: 20,
+                padding: 8,
               },
             },
           },

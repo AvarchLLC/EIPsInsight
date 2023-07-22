@@ -1,10 +1,12 @@
 import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
-import { Table as Tb, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer } from "@chakra-ui/react";
+import { Table as Tb, Thead, Tbody, Tr, Th, Td, TableCaption,TableContainer} from "@chakra-ui/react";
 import ReactPaginate from "react-paginate";
 import { mockEIP } from "@/data/eipdata";
 import FlexBetween from "./FlexBetween";
 import { motion } from "framer-motion";
+import {CTableRow} from "@coreui/react-pro";
+
 
 const useSearchTerm = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,9 +38,9 @@ interface EIP {
   eip: string;
   title: string;
   author: string;
-  status: string;
   type: string;
   category: string;
+  status: string;
   created: string;
   discussion: string;
   deadline: string;
@@ -47,7 +49,7 @@ interface EIP {
   __v: number;
 }
 
-const Table = () => {
+const TableAll = () => {
   const [data, setData] = useState<EIP[]>([]);
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +103,6 @@ const Table = () => {
       marginTop={"12"}
       p="1rem 1rem"
       borderRadius="0.55rem"
-      overflowX="auto"
       _hover={{
         border: "1px",
         borderColor: "#10b981",
@@ -110,24 +111,24 @@ const Table = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200"
+      className=" ease-in duration-200"
     >
       <FlexBetween>
         <Text fontSize="xl" fontWeight={"bold"} color={"#10b981"}>
           {`Search an EIP : ${data.length}`}
         </Text>
       </FlexBetween>
-      <TableContainer>
+      <TableContainer overflowX={'hidden'}>
         <Tb variant="simple" minW="100%" layout="fixed">
           <TableCaption>Data Grid</TableCaption>
           <Thead>
             <Tr>
-              <Th minW="50px">EIP</Th>
-              <Th minW="200px">Title</Th>
-              <Th minW="200px">Author</Th>
-              <Th minW="100px">Type</Th>
-              <Th minW="100px">Category</Th>
-              <Th minW="100px">Status</Th>
+              <Th minW="50px" fontSize={{base:'10px', md:'12px'}}>EIP</Th>
+              <Th minW="200px" fontSize={{base:'10px', md:'12px'}}>Title</Th>
+              <Th minW="200px" fontSize={{base:'10px', md:'12px'}}>Author</Th>
+              <Th minW="100px" fontSize={{base:'10px', md:'12px'}}>Type</Th>
+              <Th minW="100px" fontSize={{base:'10px', md:'12px'}}>Category</Th>
+              <Th minW="100px" fontSize={{base:'10px', md:'12px'}}>Status</Th>
             </Tr>
             <Tr>
               <Th>
@@ -136,7 +137,7 @@ const Table = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   placeholder="Search EIP"
-                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className=" py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </Th>
               <Th>
@@ -145,7 +146,7 @@ const Table = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   placeholder="Search Title"
-                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className=" py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </Th>
               <Th>
@@ -154,7 +155,7 @@ const Table = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   placeholder="Search Author"
-                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </Th>
               <Th>
@@ -163,7 +164,7 @@ const Table = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   placeholder="Search Type"
-                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className=" py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </Th>
               <Th>
@@ -172,7 +173,7 @@ const Table = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   placeholder="Search Category"
-                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className=" py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </Th>
               <Th>
@@ -181,7 +182,7 @@ const Table = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   placeholder="Search Status"
-                  className="px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </Th>
             </Tr>
@@ -190,7 +191,7 @@ const Table = () => {
             {tableData
               .slice((currentPage - 1) * pageSize, currentPage * pageSize)
               .map((item) => (
-                <Tr key={item._id}>
+                <Tr key={item._id} fontSize={{md:'16px',base:'10px'}}>
                   <Td minW="50px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
                     {item.eip}
                   </Td>
@@ -242,6 +243,7 @@ const Table = () => {
         />
       </Box>
     </Box>
+
   );
 };
 
@@ -264,4 +266,4 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export default Table;
+export default TableAll;

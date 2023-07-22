@@ -186,7 +186,7 @@ const AreaC = () => {
         border: '1px',
         borderColor: '#10b981',
       }}
-      className="hover: cursor-pointer ease-in duration-200"
+      className=" ease-in duration-200"
     >
       <Text fontSize="xl" fontWeight="bold" color="#10b981" marginRight="6">
         {`Status: ${selectedStatus}`}

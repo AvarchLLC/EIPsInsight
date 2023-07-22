@@ -12,7 +12,7 @@ import {
   Link as LI
 } from "@chakra-ui/react";
 import React from "react";
-import { mockEIP } from "../../data/eipdata";
+import { mockEIP } from "@/data/eipdata";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
 import BarChart from "@/components/BarChart";
@@ -29,7 +29,8 @@ import AreaC from "@/components/AreaC";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import AllLayout from "@/components/Layout";
-import Dashboard from "@/components/Dashboard";
+import Dashboard from "@/components/Dashboard"
+
 
 const Dasboard = () => {
   const theme = useTheme();

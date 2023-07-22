@@ -49,16 +49,21 @@ const All = () => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-10">
+        <Box
+            paddingBottom={{md:'10', base: '10'}}
+            marginX={{md:"40", base: '2'}}
+            paddingX={{md:"10", base:'5'}}
+            marginTop={{md:"10", base:'5'}}
+        >
           <FlexBetween>
             <Header title="All EIPs" subtitle="Your Roadway to All" />
             <Box>
               <Button
                 colorScheme="green"
                 variant="outline"
-                fontSize="14px"
-                fontWeight="bold"
-                padding="10px 20px"
+                fontSize={{md:'14px', base:'10px'}}
+                fontWeight={'bold'}
+                padding={{md:'10px 20px', base:'5px 10px'}}
               >
                 <DownloadIcon marginEnd={1.5} />
                 Download Reports

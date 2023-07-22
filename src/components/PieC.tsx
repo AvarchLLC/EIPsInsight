@@ -153,7 +153,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
         {status} : {Object.values(transformedData).reduce((total, value) => total + value, 0)}
       </Text>
       <Divider mt="1rem" mb="1rem" />
-      <Box width="60%" maxWidth={500} maxHeight={500}>
+      <Box width="60%" maxWidth={500} maxHeight={400}>
         <Pie
           data={dataa}
           options={{

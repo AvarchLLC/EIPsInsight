@@ -67,12 +67,12 @@ export default function LargeWithAppLinksAndSocial() {
           as={Stack}
           maxW={"6xl"}
           py={4}
-          direction={{ base: "column", md: "row" }}
+          direction={'row'}
           spacing={4}
-          justify={{ md: "space-between" }}
+          justify={{ base: "space-between" }}
           align={{ md: "center" }}
         >
-          <Text>
+          <Text paddingTop={{base:"1",md:"0"}}>
             Build With <span> &#x1F49A;</span> by&nbsp; Avarch
           </Text>
           <Stack direction={"row"} spacing={6}>

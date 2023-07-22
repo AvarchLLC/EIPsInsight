@@ -114,18 +114,18 @@ const Month = () => {
           <CustomBox data={data} />
           <PieC data={data} status='Final'/>
         </Grid>
-        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-          <PieC data={data} status='Review'/>
+        <Grid templateColumns="1fr 1fr 1fr" gap={6}>
+        <PieC data={data} status='Review'/>
           <PieC data={data} status='Living'/>
-        </Grid>
-        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
           <PieC data={data} status='Stagnant'/>
-          <PieC data={data} status='Draft'/>
         </Grid>
-        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+
+        <Grid templateColumns="1fr 1fr 1fr" gap={6}>
+          <PieC data={data} status='Draft'/>
           <PieC data={data} status='Last Call'/>
           <PieC data={data} status='Withdrawn'/>
-        </Grid>
+          </Grid>
+
       </Box>
       </motion.div>
       )}
