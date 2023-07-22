@@ -3,9 +3,18 @@ import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Box, useColorModeValue } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-
+import dynamic from "next/dynamic";
+const Pie = dynamic(
+  (): any => import("@ant-design/plots").then((item) => item.Pie),
+  {
+    ssr: false,
+  }
+) as any;
 ChartJS.register(ArcElement, Tooltip, Legend);
-
+interface PieChartData {
+  status: string;
+  value: number;
+}
 interface EIP {
   _id: string;
   eip: number;
@@ -49,6 +58,66 @@ const DonutType: React.FC<DonutTypeProps> = ({ type }) => {
   const StagnantCount = data.filter(item => item.type === type && item.status === "Stagnant").length;
   const WithdrawnCount = data.filter(item => item.type === type && item.status === "Withdrawn").length;
 
+  const total = LivingCount+FinalCount+LastCount+ReviewCount+DraftCount+StagnantCount+WithdrawnCount;
+  const pieChartData: PieChartData[] = [
+    {
+      status : "Living",
+      value: LivingCount
+    },
+    {
+      status : "Final",
+      value: FinalCount
+    },
+    {
+      status : "Last Count",
+      value: LastCount
+    },
+    {
+      status : "Review",
+      value: ReviewCount
+    },
+    {
+      status : "Draft",
+      value: DraftCount
+    },
+    {
+      status : "Stagnant",
+      value: StagnantCount
+    },
+    {
+      status : "Withdrawn",
+      value: WithdrawnCount
+    }
+  ]
+  const config = {
+    appendPadding: 10,
+    data: pieChartData,
+    angleField: "value",
+    colorField: "status",
+    radius: 1,
+    innerRadius: 0.5,
+    label: {
+      type: "inner",
+      offset: "-50%",
+      content: "{value}",
+      style: {
+        textAlign: "center",
+        fontSize: 14
+      }
+    },
+    interactions: [{ type: "element-selected" }, { type: "element-active" }],
+    statistic: {
+      title: false as const,
+      content: {
+        style: {
+          whiteSpace: "pre-wrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis"
+        },
+      }
+    }
+  };
+
   const chartData = {
     labels: ['Living', 'Final', 'Last Count', 'Review', 'Draft', 'Stagnant', 'Withdrawn'],
     datasets: [
@@ -82,17 +151,18 @@ const DonutType: React.FC<DonutTypeProps> = ({ type }) => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   return (
-    <Box
+      <Box
         bgColor={bg}
         marginTop={'2rem'}
-        paddingX="0.5rem"
-        borderRadius="0.55rem"
+        p="0.5rem"
+        borderRadius="0.35rem"
         display="flex"
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
         height={400}
         overflowX="auto"
+        overflowY="hidden"
         _hover={{
           border: '1px',
           borderColor: '#10b981',
@@ -102,23 +172,11 @@ const DonutType: React.FC<DonutTypeProps> = ({ type }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 } as any}
         className="hover: cursor-pointer ease-in duration-200"
-    >
-     <Box width="60%" maxWidth={500} maxHeight={500} className='md:px-10 px-5'> <Doughnut data={chartData} options={{
-          maintainAspectRatio: true, // Set it to false if you want to disable maintaining aspect ratio
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                usePointStyle: true,
-                padding: 4,
-              },
-            },
-          },
-     }} /> </Box>
-      
-    </Box>
-  );
+      >
+       
+  <Pie {...config}/> </Box>
+        
+    );
 };
 
 export default DonutType;

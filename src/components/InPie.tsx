@@ -1,12 +1,16 @@
 import React from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
 import { Box, Card, CardFooter, CardHeader, Stack, StackDivider, Text, Divider, useColorModeValue } from '@chakra-ui/react';
 import FlexBetween from './FlexBetween';
 import { motion } from 'framer-motion';
-
-ChartJS.register(ArcElement, Tooltip, Legend);
-
+import LoaderComponent from './Loader';
+import dynamic from "next/dynamic";
+const Pie = dynamic(
+  (): any => import("@ant-design/plots").then((item) => item.Pie),
+  {
+    ssr: false,
+  }
+) as any;
 interface CustomBoxProps {
   status: string;
   data: {
@@ -40,7 +44,6 @@ interface CustomBoxProps {
 }
 
 export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
-  let tempData = {Core : 0, ERC : 0, Networking:0, Interface: 0, Meta: 0, Informational: 0 }
   const transformedData: { [key: string]: number } = data.reduce((result: { [key: string]: number }, obj) => {
     if (obj._id === status) {
     
@@ -53,33 +56,61 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
     }
     return result;
   }, {});
-  console.log(transformedData)
+
+  const datam = [
+    {
+        cat : "Core",
+        value: transformedData["Core"] || 0
+    },
+    {
+        cat : "ERC",
+        value: transformedData["ERC"] || 0
+    },
+    {
+        cat : "Networking",
+        value: transformedData["Networking"] || 0
+    },
+    {
+        cat : "Interface",
+        value: transformedData["Interface"] || 0
+    },
+    {
+        cat : "Meta",
+        value: transformedData["Meta"] || 0
+    },
+    {
+        cat : "Informational",
+        value: transformedData["Informational"] || 0
+    }
+  ]
   const bg = useColorModeValue('#f6f6f7', '#171923');
-  const dataa = {
-    labels: Object.keys(transformedData),
-    datasets: [
-      {
-        label: 'Number of EIPs',
-        data: Object.values(transformedData),
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-        ],
-        borderWidth: 1,
-      },
-    ],
+  const config = {
+    appendPadding: 10,
+    data: datam,
+    angleField: "value",
+    colorField: "cat",
+    radius: 1,
+    innerRadius: 0.5,
+    label: {
+      type: "inner",
+      offset: "-50%",
+      content: "{value}",
+      style: {
+        textAlign: "center",
+        fontSize: 14
+      }
+    },
+    interactions: [{ type: "element-selected" }, { type: "element-active" }],
+    statistic: {
+      title: false as const,
+      content: {
+        style: {
+          whiteSpace: "pre-wrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis"
+        },
+      }
+    }
   };
 
   if (data.length === 0) {
@@ -96,7 +127,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
         }}
         className="hover: cursor-pointer ease-in duration-200"
       >
-        <Text>Loading...</Text>
+        <LoaderComponent/>
       </Box>
     );
   }
@@ -156,21 +187,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
       </Text>
       <Divider mt="1rem" mb="1rem" />
       <Box width="60%" maxWidth={500} maxHeight={400}>
-        <Pie
-          data={dataa}
-          options={{
-            plugins: {
-              legend: {
-                position: 'right',
-                display: true,
-                labels: {
-                  usePointStyle: true,
-                  padding: 20,
-                },
-              },
-            },
-          }}
-        />
+      <Pie {...config}/>
       </Box>
     </Box>
   );

@@ -111,9 +111,6 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
           overflow: "hidden",
           textOverflow: "ellipsis"
         },
-        formatter: function formatter() {
-          return `EIPS : ${total}`;
-        }
       }
     }
   };
@@ -162,6 +159,7 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
       alignItems="center"
       height={400}
       overflowX="auto"
+      overflowY="hidden"
       _hover={{
         border: '1px',
         borderColor: '#10b981',

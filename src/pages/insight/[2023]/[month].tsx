@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import { Box, Grid } from '@chakra-ui/react';
 import CustomBox from '@/components/CustomBox';
-import { PieC } from '@/components/PieC';
+import { PieC } from '@/components/InPie';
 import AllLayout from '@/components/Layout';
 import { motion } from 'framer-motion';
 import LoaderComponent from '@/components/Loader';
