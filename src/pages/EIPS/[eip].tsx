@@ -146,18 +146,19 @@ const EIP = () => {
                       />
                     ),
                     h3: ({ node, ...props }) => (
-                      <h2
-                        style={{
-                          fontSize: '17px',
-                          fontWeight: 'bold',
-                          color: `#339af0`,
-                          // borderBottom: `2px solid #339af0`,
-                          borderLeft: `4px solid #339af0`,
-                          display: 'inline-block',
-                        }}
-                        className="my-3 px-2 rounded-sm"
-                        {...props}
-                      />
+<h2
+  style={{
+    fontSize: '17px',
+    fontWeight: 'bold',
+    color: `#339af0`,
+    // borderBottom: `2px solid #339af0`,
+    borderLeft: `4px solid #339af0`,
+    display: 'inline-block',
+  }}
+  className="my-3 px-2 rounded-sm"
+>
+  {props.children}
+</h2>
                     ),
                   }}
                 />
@@ -173,5 +174,7 @@ const EIP = () => {
     </AllLayout>
   )
 }
+
+
 
 export default EIP;
