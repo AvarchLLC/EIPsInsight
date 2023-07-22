@@ -1,10 +1,11 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link } from "@chakra-ui/react";
 import { CBadge, CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCollapse, CSmartTable } from '@coreui/react-pro'
 import React, { useEffect, useState } from 'react'
 import FlexBetween from './FlexBetween'
 import { motion } from "framer-motion";
+
 const statusArr = ['Final', 'Draft', 'Review', 'Last_Call', 'Stagnant', 'Withdrawn', 'Living']
+
 interface EIP {
   _id: string;
   eip: string;
@@ -22,23 +23,19 @@ interface EIP {
 }
 
 import '@coreui/coreui/dist/css/coreui.min.css';
+
 const Table = () => {
   const [data, setData] = useState<EIP[]>([]);
 
-
-
   const factorAuthor = (data: any) => {
-    //
-    let list = data.split(',')
-    //
+    let list = data.split(',');
     for (let i = 0; i < list.length; i++) {
-      list[i] = list[i].split(' ')
+      list[i] = list[i].split(' ');
     }
-    //
     if (list[list.length - 1][list[list.length - 1].length - 1] === 'al.') {
-      list.pop()
+      list.pop();
     }
-    return list
+    return list;
   }
 
   useEffect(() => {
@@ -51,20 +48,11 @@ const Table = () => {
         console.error("Error fetching data:", error);
       }
     };
-
     fetchData();
   }, []);
-  
 
-  const filteredData = data.map((item : any) => {
-    const {
-      eip,
-      title,
-      author,
-      status,
-      type,
-      category,
-    } = item;
+  const filteredData = data.map((item: any) => {
+    const { eip, title, author, status, type, category } = item;
     return {
       eip,
       title,
@@ -76,117 +64,97 @@ const Table = () => {
   });
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
+
   return (
-
     <Box className="coreui-styled-components mt-10 card-container">
-<CCardBody
-          style={{
-
-            fontSize: '13px',
+      <CCardBody
+        style={{
+          fontSize: '13px',
+        }}
+        className="scrollbarDesign"
+      >
+        <CSmartTable
+          items={filteredData}
+          activePage={1}
+          clickableRows
+          columnFilter
+          columnSorter
+          itemsPerPage={7}
+          pagination
+          tableProps={{
+            hover: true,
+            responsive: true,
           }}
-          className="scrollbarDesign"
-        >
-   <CSmartTable
-    items={filteredData}
-    activePage={1}
-    clickableRows
-    columnFilter
-    columnSorter
-    itemsPerPage={7}
-    pagination
-    tableProps={{
-      // borderless: true,
-      // striped: true,
-      hover: true,
-      responsive: true,
-    }}
-    scopedColumns={{
-      eip: (item : any) => (
-  
-          
-          <td style={{}}>
-            <Link href={`/EIPS/${item.number}`}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
-                      </WrapItem>
-                    </Wrap>
-                    </Link>
-        </td>
-      
-      ),
-      title: (item : any) => (
-        <td
-          style={{
-            // borderBottomWidth: item.id % 2 !== 0 ? '1px' : '',
-            // borderColor: item.id % 2 !== 0 ? `${getBadgeColor(item.status)}` : '',
-
-
-            fontWeight: 'bold',
-            height: '100%',
-          }}
-          className="hover:text-[#1c7ed6]"
-        >
-          <Link href={`/EIPS/${item.eip}`} className="hover:text-[#1c7ed6] text-[13px]">
-            {item.title}
-          </Link>
-        </td>
-      ),
-
-      author: (it : any) => (
-        <td>
-          <div>
-            {factorAuthor(it.author).map((item :any, index :any) => {
-              let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1)
-
-              return (
+          scopedColumns={{
+            eip: (item: any) => (
+              <td key={item.eip}>
+                <Link href={`/EIPS/${item.number}`}>
+                  <Wrap>
+                    <WrapItem>
+                      <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
+                    </WrapItem>
+                  </Wrap>
+                </Link>
+              </td>
+            ),
+            title: (item: any) => (
+              <td key={item.eip} style={{ fontWeight: 'bold', height: '100%' }} className="hover:text-[#1c7ed6]">
+                <Link href={`/EIPS/${item.eip}`} className="hover:text-[#1c7ed6] text-[13px]">
+                  {item.title}
+                </Link>
+              </td>
+            ),
+            author: (it: any) => (
+              <td key={it.author}>
+                <div>
+                  {factorAuthor(it.author).map((item: any, index: any) => {
+                    let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
+                    return (
+                      <Wrap key={index}>
+                        <WrapItem>
+                          <Badge colorScheme={"linkedin"}>{t}</Badge>
+                        </WrapItem>
+                      </Wrap>
+                    );
+                  })}
+                </div>
+              </td>
+            ),
+            type: (item: any) => (
+              <td key={item.eip}>
                 <Wrap>
-                <WrapItem>
-                  <Badge colorScheme={"linkedin"}>{t}</Badge>
-                </WrapItem>
-              </Wrap>
-              )
-            })}
-          </div>
-        </td>
-      ),
+                  <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}>{item.type}</Badge>
+                  </WrapItem>
+                </Wrap>
+              </td>
+            ),
+            category: (item: any) => (
+              <td key={item.eip}>
+                <Wrap>
+                  <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}>{item.category}</Badge>
+                  </WrapItem>
+                </Wrap>
+              </td>
+            ),
+            status: (item: any) => (
+              <td key={item.eip}>
+                <Wrap>
+                  <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
+                  </WrapItem>
+                </Wrap>
+              </td>
+            ),
+          }}
+        />
+      </CCardBody>
+    </Box>
+  );
+};
 
-      type: (item : any) => (
-        <td style={{}}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.type}</Badge>
-                      </WrapItem>
-                    </Wrap>
-        </td>
-      ),
-
-      category: (item : any) => (
-        <td style={{}}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.category}</Badge>
-                      </WrapItem>
-                    </Wrap>
-        </td>
-      ),
-      status: (item : any) => (
-        <td style={{}}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
-                      </WrapItem>
-                    </Wrap>
-        </td>
-      ),
-    }}
-  />
-  </CCardBody>
-  </Box>
-  )
-}
-
-const getStatusColor = (status :any) => {
+const getStatusColor = (status: any) => {
   switch (status) {
     case "Living":
       return "green";
@@ -204,4 +172,5 @@ const getStatusColor = (status :any) => {
       return "gray";
   }
 };
+
 export default Table;
