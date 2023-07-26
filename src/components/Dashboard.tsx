@@ -51,6 +51,9 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
+
+
+
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery('(min-width: 1200px)');
   const bg = useColorModeValue('#f6f6f7', '#171923');
@@ -197,7 +200,6 @@ const Dashboard = () => {
             </Box>
           </Box>
           <AreaC />
-
           <Table />
         </motion.div>
       )}

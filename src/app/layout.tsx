@@ -46,7 +46,7 @@ export default function RootLayout({
         }}
         className="base-page-size"
       >
-      <ColorModeScript initialColorMode='light' />
+      {/* <ColorModeScript initialColorMode='light' /> */}
       <Providers>
         <WithSubnavigation/>
 

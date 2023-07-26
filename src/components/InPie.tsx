@@ -43,54 +43,65 @@ interface CustomBoxProps {
   }[];
 }
 
+interface DataItem {
+  cat: string;
+  value: number;
+}
+
+interface TransformedDataItem {
+  cat: string;
+  value: number;
+}
+
+interface TransformedDataResult {
+  transformedData: TransformedDataItem[];
+  sum: number;
+}
+
+function transformAndAddUp(data: DataItem[]): TransformedDataResult {
+  const transformedData: { [key: string]: number } = {};
+  let sum = 0;
+
+  data.forEach(item => {
+    const { cat, value } = item;
+    if (transformedData[cat]) {
+      transformedData[cat] += value;
+    } else {
+      transformedData[cat] = value;
+    }
+    sum += value;
+  });
+
+  const result: TransformedDataItem[] = Object.entries(transformedData).map(([cat, value]) => ({ cat, value }));
+  return { transformedData: result, sum };
+}
+
 export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
+  const objs :any = []
   const transformedData: { [key: string]: number } = data.reduce((result: { [key: string]: number }, obj) => {
+    
     if (obj._id === status) {
+      
     
       obj.statusChanges.forEach((statusChange) => {
+        objs.push({ cat : statusChange.category, value:1})
         result[statusChange.category] = obj.count;
-        if (statusChange.status === "Draft") {
-            console.log(statusChange)
-        }
       });
     }
     return result;
   }, {});
+  console.log(transformedData)
 
-  const datam = [
-    {
-        cat : "Core",
-        value: transformedData["Core"] || 0
-    },
-    {
-        cat : "ERC",
-        value: transformedData["ERC"] || 0
-    },
-    {
-        cat : "Networking",
-        value: transformedData["Networking"] || 0
-    },
-    {
-        cat : "Interface",
-        value: transformedData["Interface"] || 0
-    },
-    {
-        cat : "Meta",
-        value: transformedData["Meta"] || 0
-    },
-    {
-        cat : "Informational",
-        value: transformedData["Informational"] || 0
-    }
-  ]
+  const tdata = transformAndAddUp(objs)
   const bg = useColorModeValue('#f6f6f7', '#171923');
   const config = {
     appendPadding: 10,
-    data: datam,
+    data: tdata.transformedData,
     angleField: "value",
     colorField: "cat",
     radius: 1,
     innerRadius: 0.5,
+    legend: { position: 'top' as const },
     label: {
       type: "inner",
       offset: "-50%",
@@ -144,7 +155,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
-        height={550}
+        height={500}
         overflowX="auto"
         _hover={{
           border: '1px',
@@ -170,7 +181,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      height={550}
+      height={500}
       overflowX="auto"
       _hover={{
         border: '1px',
@@ -183,7 +194,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
       className="hover: cursor-pointer ease-in duration-200"
     >
       <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#10b981" paddingTop="1rem">
-        {status} : {Object.values(transformedData).reduce((total, value) => total + value, 0)}
+        {status} : {tdata.sum}
       </Text>
       <Divider mt="1rem" mb="1rem" />
       <Box width="60%" maxWidth={500} maxHeight={400}>

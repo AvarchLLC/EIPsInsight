@@ -140,7 +140,7 @@ interface AreaProps {
       data: transformedData,
       xField: 'year',
       yField: 'value',
-      color: categoryBorder,
+      color: categoryColors,
       seriesField: 'category',
       isStack: true,
       areaStyle: { fillOpacity: 0.6 },

@@ -1,4 +1,4 @@
-import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link } from "@chakra-ui/react";
+import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link, ThemeProvider } from "@chakra-ui/react";
 import { CCardBody, CSmartTable } from '@coreui/react-pro';
 import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
@@ -27,6 +27,7 @@ import '@coreui/coreui/dist/css/coreui.min.css';
 const Table = () => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
 
   const factorAuthor = (data: any) => {
     let list = data.split(',');
@@ -85,84 +86,85 @@ const Table = () => {
     className=" ease-in duration-200"
   >
       <CCardBody
-        style={{
-          fontSize: '13px',
-        }}
-        className="scrollbarDesign"
+          style={{
+            fontSize: '13px',
+          }}
+          className="scrollbarDesign"
+          color={useColorModeValue("black", "white")}
       >
         {isLoading ? ( // Show loader while data is loading
-          <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-            <Spinner size="xl" color="green.500" />
-          </Box>
+            <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+              <Spinner size="xl" color="green.500" />
+            </Box>
         ) : (
-          <CSmartTable
-            items={filteredData}
-            activePage={1}
-            clickableRows
-            columnFilter
-            columnSorter
-            itemsPerPage={7}
-            pagination
-            tableProps={{
-              hover: true,
-              responsive: true,
-            }}
-            scopedColumns={{
-              eip: (item: any) => (
-                <td key={item.eip}>
-                  <Link href={`/EIPS/${item.number}`}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
-                      </WrapItem>
-                    </Wrap>
-                  </Link>
-                </td>
-              ),
-              title: (item: any) => (
-                <td key={item.eip} style={{ fontWeight: 'bold', height: '100%' }} className="hover:text-[#1c7ed6]">
-                  <Link href={`/EIPS/${item.eip}`} className="hover:text-[#1c7ed6] text-[13px]">
-                    {item.title}
-                  </Link>
-                </td>
-              ),
-              author: (it: any) => (
-                <td key={it.author}>
-                  <div>
-                    {factorAuthor(it.author).map((item: any, index: any) => {
-                      let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
-                      return (
-                        <Wrap key={index}>
+            <CSmartTable
+                items={filteredData}
+                activePage={1}
+                clickableRows
+                columnFilter
+                columnSorter
+                itemsPerPage={7}
+                pagination
+                tableProps={{
+                  hover: true,
+                  responsive: true,
+                }}
+                scopedColumns={{
+                  eip: (item: any) => (
+                      <td key={item.eip}>
+                        <Link href={`/EIPS/${item.number}`}>
+                          <Wrap>
+                            <WrapItem>
+                              <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
+                            </WrapItem>
+                          </Wrap>
+                        </Link>
+                      </td>
+                  ),
+                  title: (item: any) => (
+                      <td key={item.eip} style={{ fontWeight: 'bold', height: '100%' }} className="hover:text-[#1c7ed6]">
+                        <Link href={`/EIPS/${item.eip}`} className="hover:text-[#1c7ed6] text-[13px]">
+                          {item.title}
+                        </Link>
+                      </td>
+                  ),
+                  author: (it: any) => (
+                      <td key={it.author}>
+                        <div>
+                          {factorAuthor(it.author).map((item: any, index: any) => {
+                            let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
+                            return (
+                                <Wrap key={index}>
+                                  <WrapItem>
+                                    <Badge colorScheme={"teal"}>{t}</Badge>
+                                  </WrapItem>
+                                </Wrap>
+                            );
+                          })}
+                        </div>
+                      </td>
+                  ),
+                  type: (item: any) => (
+                      <td key={item.eip}>
+                        {item.type}
+                      </td>
+                  ),
+                  category: (item: any) => (
+                      <td key={item.eip}>
+                        {item.category}
+                      </td>
+                  ),
+                  status: (item: any) => (
+                      <td key={item.eip}>
+                        <Wrap>
                           <WrapItem>
-                            <Badge colorScheme={"teal"}>{t}</Badge>
+                            <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
                           </WrapItem>
                         </Wrap>
-                      );
-                    })}
-                  </div>
-                </td>
-              ),
-              type: (item: any) => (
-                <td key={item.eip}>
- {item.type}
-                </td>
-              ),
-              category: (item: any) => (
-                <td key={item.eip}>
-{item.category}
-                </td>
-              ),
-              status: (item: any) => (
-                <td key={item.eip}>
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </td>
-              ),
-            }}
-          />
+                      </td>
+                  ),
+                }}
+            />
         )}
       </CCardBody>
     </Box>

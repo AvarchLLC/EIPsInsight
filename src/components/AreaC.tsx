@@ -1,6 +1,7 @@
 import { Box, Text, useColorModeValue, Select, Spinner } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
+import LoaderComponent from './Loader';
 
 interface AreaProps {
   data: MappedDataItem[];
@@ -206,7 +207,7 @@ const AreaC = () => {
         {isLoading ? (
           // Show loading spinner while chart is rendering
           <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-            <Spinner size="xl" color="green.500" />
+            <LoaderComponent/>
           </Box>
         ) : (
           // Show chart when it's ready

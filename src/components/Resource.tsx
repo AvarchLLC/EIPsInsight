@@ -281,9 +281,9 @@ const Resources: React.FC<FeaturedVideosProps> = () => {
                                     <p className="text-sm">EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.</p>
                                     <h2 className="text-xl text-[#10b981] font-bold pt-5">Useful Resources</h2>
                                     <ul className="list-disc ml-6 text-sm">
-                                        <li className="underline"><Link href={'https://eips.ethereum.org/EIPS/eip-1'} target="_blank">https://eips.ethereum.org/EIPS/eip-1</Link></li>
-                                        <li className="underline"><Link href={'https://eips.ethereum.org/EIPS/eip-1'} target="_blank">https://eips.ethereum.org/EIPS/eip-1</Link></li>
-                                        <li className="underline"><Link href={'https://eips.ethereum.org/EIPS/eip-1'} target="_blank">https://eips.ethereum.org/EIPS/eip-1</Link></li>
+                                        <li className="underline"><Link href={'https://github.com/ethereum/EIPs'} target="_blank">EIPs Github</Link></li>
+                                        <li className="underline"><Link href={'https://hackmd.io/@poojaranjan/EthereumImprovementProposalsInsight/'} target="_blank">EIPsInsight HackMD</Link></li>
+                                        <li className="underline"><Link href={'https://eips.ethereum.org/'} target="_blank">eips.ethereum.org website</Link></li>
                                     </ul>
                                 </div>
                             </Box>

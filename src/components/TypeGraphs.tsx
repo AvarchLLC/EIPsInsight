@@ -77,16 +77,13 @@ const TypeGraphs: React.FC = () => {
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
                     <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                        Review -{" "}
-                        {data.filter((item) => item.status === "Review").length}
+                        Review 
                     </Text>
                     <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                        Stagnant -{" "}
-                        {data.filter((item) => item.status === "Stagnant").length}
+                        Stagnant
                     </Text>
                     <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                        Living -{" "}
-                        {data.filter((item) => item.status === "Living").length}
+                        Living 
                     </Text>
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8}>
@@ -159,15 +156,13 @@ const TypeGraphs: React.FC = () => {
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
                     <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                        Last Call -{" "}
-                        {data.filter((item) => item.status === "Last Call").length}
+                        Last Call 
                     </Text>
                     <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                        Withdrawn -{" "}
-                        {data.filter((item) => item.status === "Withdrawn").length}
+                        Withdrawn
                     </Text>
                     <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                        Final - {data.filter((item) => item.status === "Final").length}
+                        Final 
                     </Text>
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8}>
@@ -286,8 +281,7 @@ const TypeGraphs: React.FC = () => {
                 <AreaC/>
 
                 <Text fontSize="xl" fontWeight="bold" color="#10b981" paddingTop={'8'}>
-                    Review -{" "}
-                    {data.filter((item) => item.status === "Review").length}
+                    Review
                 </Text>
 
                 <Box
@@ -315,8 +309,7 @@ const TypeGraphs: React.FC = () => {
                 </Box>
 
                 <Text fontSize="xl" fontWeight="bold" color="#10b981" paddingTop={'8'}>
-                    Stagnant -{" "}
-                    {data.filter((item) => item.status === "Stagnant").length}
+                    Stagnant
                 </Text>
 
                 <Box
@@ -344,8 +337,7 @@ const TypeGraphs: React.FC = () => {
                 </Box>
 
                 <Text fontSize="xl" fontWeight="bold" color="#10b981" paddingTop={'8'}>
-                    Living -{" "}
-                    {data.filter((item) => item.status === "Living").length}
+                    Living
                 </Text>
 
                 <Box
@@ -373,8 +365,7 @@ const TypeGraphs: React.FC = () => {
                 </Box>
 
                 <Text fontSize="xl" fontWeight="bold" color="#10b981" paddingTop={'8'}>
-                    Last Call -{" "}
-                    {data.filter((item) => item.status === "Last Call").length}
+                    Last Call
                 </Text>
 
                 <Box
@@ -402,8 +393,7 @@ const TypeGraphs: React.FC = () => {
                 </Box>
 
                 <Text fontSize="xl" fontWeight="bold" color="#10b981" paddingTop={'8'}>
-                    Withdrawn -{" "}
-                    {data.filter((item) => item.status === "Withdrawn").length}
+                    Withdrawn
                 </Text>
 
                 <Box
@@ -431,7 +421,7 @@ const TypeGraphs: React.FC = () => {
                 </Box>
 
                 <Text fontSize="xl" fontWeight="bold" color="#10b981" paddingTop={'8'}>
-                    Final - {data.filter((item) => item.status === "Final").length}
+                    Final
                 </Text>
 
                 <Box

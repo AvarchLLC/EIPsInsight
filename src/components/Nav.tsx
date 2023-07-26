@@ -109,15 +109,14 @@ export default function WithSubnavigation() {
                               icon={<GitHub/>}
                               />
                               </NextLink>
-              {/* <IconButton
+              <IconButton
                 aria-label="Mode Change"
                 variant="outline"
                 colorScheme="green"
                 size="lg"
                 icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
                 onClick={toggleColorMode}
-                
-              /> */}
+              />
             </Stack>
           </Flex>
         </Flex>
@@ -386,7 +385,7 @@ function getMonthsTillYear(year: number): NavItem[] {
       href: `/insight/${year}/${i + 1}`,
     });
   }
-  console.log(months)
+  // console.log(months)
   return months;
 }
 

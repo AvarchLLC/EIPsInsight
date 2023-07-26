@@ -100,7 +100,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data }) => {
                 </Td>
                 <Td>
                   <Link
-                    href={`/numbers-route-${index + 1}`}
+                    href={`/`}
                     className="text-emerald-400 hover:cursor-pointer font-semibold"
                   >
                     {entry.count}

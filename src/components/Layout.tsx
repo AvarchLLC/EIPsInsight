@@ -42,7 +42,6 @@ const AllLayout = ({
     <ColorModeScript initialColorMode='light' />
     <Providers>
       <WithSubnavigation/>
-      
         {children}
       <LargeWithAppLinksAndSocial/>
       </Providers>

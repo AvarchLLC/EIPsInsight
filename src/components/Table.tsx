@@ -8,30 +8,30 @@ import { motion } from "framer-motion";
 import {CTableRow} from "@coreui/react-pro";
 
 
-const useSearchTerm = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const useSearchTerm = () => {
+    const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSearchChange = (e : React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-  };
-
-  useEffect(() => {
-    // Do something with the search term, such as filtering the data
-    // ...
-
-    // Cleanup (if necessary)
-    return () => {
-      // Cleanup code
-      // ...
+    const handleSearchChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+      const term = e.target.value.toLowerCase();
+      setSearchTerm(term);
     };
-  }, [searchTerm]);
 
-  return {
-    searchTerm,
-    handleSearchChange,
+    useEffect(() => {
+      // Do something with the search term, such as filtering the data
+      // ...
+
+      // Cleanup (if necessary)
+      return () => {
+        // Cleanup code
+        // ...
+      };
+    }, [searchTerm]);
+
+    return {
+      searchTerm,
+      handleSearchChange,
+    };
   };
-};
 
 interface EIP {
   _id: string;

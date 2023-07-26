@@ -139,7 +139,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      height={550}
+      height={400}
       overflowX="auto"
       _hover={{
         border: '1px',
@@ -155,7 +155,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
         {status} : {Object.values(transformedData).reduce((total, value) => total + value, 0)}
       </Text>
       <Divider mt="1rem" mb="1rem" />
-      <Box width="60%" maxWidth={500} maxHeight={400}>
+      
         <Pie
           data={dataa}
           options={{
@@ -171,7 +171,6 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
             },
           }}
         />
-      </Box>
     </Box>
   );
 };
