@@ -11,6 +11,7 @@ import {
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import FlexBetween from "./FlexBetween";
+import LoaderComponent from "./Loader";
 
 interface AreaProps {
   data: MappedDataItem[];
@@ -166,8 +167,8 @@ const AreaC = () => {
     },
     smooth: true, // Set smooth to true to create a smooth curve
     slider: {
-      start: 0.1,
-      end: 0.9,
+      start: 0,
+      end: 1,
     },
   };
 
@@ -183,7 +184,7 @@ const AreaC = () => {
       overflowX="auto"
       _hover={{
         border: "1px",
-        borderColor: "#10b981",
+        borderColor: "#30A0E0",
       }}
       className="hover: cursor-pointer ease-in duration-200"
     >
@@ -196,7 +197,7 @@ const AreaC = () => {
             alignItems="center"
             height="200px"
           >
-            <Spinner size="xl" color="green.500" />
+            <Spinner/>
           </Box>
         ) : (
           // Show chart when it's ready

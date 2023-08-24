@@ -51,10 +51,10 @@ const ERC = () => {
       
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
       <FlexBetween>
-      <Header title="Category - ERC" subtitle="ERCs describe application-level standards for tthe Ethereum ecosystem." />
+      <Header title="Standard Tracks - ERC" subtitle="ERCs describe application-level standards for tthe Ethereum ecosystem." />
         <Box>
           <Button
-            colorScheme="green"
+            colorScheme="blue"
             variant="outline"
             fontSize={"14px"}
             fontWeight={"bold"}

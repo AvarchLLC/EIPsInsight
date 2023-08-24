@@ -29,13 +29,17 @@ interface CustomBoxProps {
       __v: number;
     }[];
   }[];
+  per : number;
+  year: string;
+  month: string
 }
 
-const CustomBox: React.FC<CustomBoxProps> = ({ data }) => {
+
+const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Living":
-        return "green";
+        return "blue";
       case "Final":
         return "blue";
       case "Stagnant":
@@ -51,6 +55,15 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data }) => {
     }
   };
 
+  const getStatus = (status: string) => {
+    switch (status) {
+      case "Last Call":
+        return "LastCall";
+      default:
+        return status;
+    }
+  };
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const transformedData = data
     .filter(obj => obj._id === 'Final')
@@ -62,6 +75,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data }) => {
   const rowHeight = 40; // Assuming each row has a height of 40px
   const maxHeight = `${numRows * rowHeight}px`;
 
+
   return (
     <Box
       bgColor={bg}
@@ -71,7 +85,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data }) => {
       overflowX="auto"
       _hover={{
         border: "1px",
-        borderColor: "#10b981",
+        borderColor: "#30A0E0",
       }}
       maxH={maxHeight}
       as={motion.div}
@@ -86,6 +100,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data }) => {
             <Tr>
               <Th minW="50px">Status</Th>
               <Th minW="200px">Numbers</Th>
+              <Th minW={'200px'}>Percentage</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -100,11 +115,16 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data }) => {
                 </Td>
                 <Td>
                   <Link
-                    href={`/`}
-                    className="text-emerald-400 hover:cursor-pointer font-semibold"
+                    href={`/tableinsights/${year}/${month}/${getStatus(entry._id)}`}
+                    className="text-blue-400 hover:cursor-pointer font-semibold"
                   >
                     {entry.count}
                   </Link>
+                </Td>
+                <Td className={'text-blue-400'}>
+                  {
+                    ((entry.count/per)*100).toFixed(2)
+                  }%
                 </Td>
               </Tr>
             ))}

@@ -92,7 +92,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
         overflowX="auto"
         _hover={{
           border: '1px',
-          borderColor: '#10b981',
+          borderColor: '#30A0E0',
         }}
         className="hover: cursor-pointer ease-in duration-200"
       >
@@ -117,11 +117,11 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
         overflowX="auto"
         _hover={{
           border: '1px',
-          borderColor: '#10b981',
+          borderColor: '#30A0E0',
         }}
         className="hover: cursor-pointer ease-in duration-200"
       >
-        <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#10b981" paddingTop="1rem">
+        <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#30A0E0" paddingTop="1rem">
           {status} : {Object.values(transformedData).reduce((total, value) => total + value, 0)}
         </Text>
         <Divider mt="1rem" mb="1rem" />
@@ -143,7 +143,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
       overflowX="auto"
       _hover={{
         border: '1px',
-        borderColor: '#10b981',
+        borderColor: '#30A0E0',
       }}
       as={motion.div}
       initial={{ opacity: 0, y: -20 }}
@@ -151,7 +151,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
       transition={{ duration: 0.5 } as any}
       className="hover: cursor-pointer ease-in duration-200"
     >
-      <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#10b981" paddingTop="1rem">
+      <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#30A0E0" paddingTop="1rem">
         {status} : {Object.values(transformedData).reduce((total, value) => total + value, 0)}
       </Text>
       <Divider mt="1rem" mb="1rem" />

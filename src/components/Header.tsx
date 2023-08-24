@@ -16,9 +16,9 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 } as any}
-        fontSize={{base: "2xl", md: "6xl"}}
+        fontSize={{base: "2xl",md:"2xl", lg: "6xl"}}
         fontWeight="bold"
-        color="#10b981"
+        color="#30A0E0"
 
       >
         {title}
@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 } as any}
-        fontSize={{base: "md", md: "2xl"}}
+        fontSize={{base: "lg",md:'lg', lg: "2xl"}}
         className=""
       >
         {subtitle}

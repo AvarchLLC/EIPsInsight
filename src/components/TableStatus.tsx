@@ -23,6 +23,7 @@ interface EIP {
 }
 
 import '@coreui/coreui/dist/css/coreui.min.css';
+import LoaderComponent from "./Loader";
 interface TabProps {
     cat: string;
   }
@@ -31,6 +32,7 @@ interface TabProps {
 const TableStatus: React.FC<TabProps> = ({cat})  => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const factorAuthor = (data: any) => {
     let list = data.split(',');
@@ -58,6 +60,14 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
     fetchData();
   }, []);
 
+  useEffect(()=> {
+    if(bg === "#f6f6f7") {
+      setIsDarkMode(false);
+    } else {
+        setIsDarkMode(true);
+    }
+  })
+
   const filteredData = data
   .map((item: any) => {
     const { eip, title, author, status, type, category } = item;
@@ -82,7 +92,7 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
     borderRadius="0.55rem"
     _hover={{
       border: "1px",
-      borderColor: "#10b981",
+      borderColor: "#30A0E0",
     }}
     as={motion.div}
     initial={{ opacity: 0, y: -20 }}
@@ -99,11 +109,11 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
       >
         {isLoading ? ( // Show loader while data is loading
           <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-            <Spinner size="xl" color="green.500" />
+           <Spinner/>
           </Box>
         ) : (
           <CSmartTable
-            items={filteredData}
+          items={filteredData.sort((a, b) => parseInt(a.eip) - parseInt(b.eip))}
             activePage={1}
             clickableRows
             columnFilter
@@ -116,55 +126,64 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
             }}
             scopedColumns={{
               eip: (item: any) => (
-                <td key={item.eip}>
-                  <Link href={`/EIPS/${item.number}`}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
-                      </WrapItem>
-                    </Wrap>
-                  </Link>
-                </td>
+                  <td key={item.eip}>
+                    <Link href={`/EIPS/${item.eip}`}>
+                      <Wrap>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
+                        </WrapItem>
+                      </Wrap>
+                    </Link>
+                  </td>
               ),
               title: (item: any) => (
-                <td key={item.eip} style={{ fontWeight: 'bold', height: '100%' }} className="hover:text-[#1c7ed6]">
-                  <Link href={`/EIPS/${item.eip}`} className="hover:text-[#1c7ed6] text-[13px]">
-                    {item.title}
-                  </Link>
-                </td>
+                  <td key={item.eip} style={{ fontWeight: 'bold', height: '100%' }} className="hover:text-[#1c7ed6]">
+                    <Link href={`/EIPS/${item.eip}`} className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
+                      {item.title}
+                    </Link>
+                  </td>
               ),
               author: (it: any) => (
-                <td key={it.author}>
-                  <div>
-                    {factorAuthor(it.author).map((item: any, index: any) => {
-                      let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
-                      return (
-                        <Wrap key={index}>
-                          <WrapItem>
-                            <Badge colorScheme={"teal"}>{t}</Badge>
-                          </WrapItem>
-                        </Wrap>
-                      );
-                    })}
-                  </div>
-                </td>
+                  <td key={it.author}>
+                    <div>
+                      {factorAuthor(it.author).map((item: any, index: any) => {
+                        let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
+                        return (
+                            <Wrap key={index}>
+                              <WrapItem>
+                              <Link href={`${
+                          item[item.length - 1].substring(item[item.length - 1].length - 1) ===
+                          '>'
+                            ? 'mailto:' + t
+                            : 'https://github.com/' + t.substring(1)
+                        }`} target="_blank" className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
+                                {item}
+                                </Link>
+                              </WrapItem>
+                            </Wrap>
+                        );
+                      })}
+                    </div>
+                  </td>
               ),
               type: (item: any) => (
-                <td key={item.eip}>{item.type}
-                </td>
+                  <td key={item.eip} className={isDarkMode ? "text-white" : "text-black"}>
+                    {item.type}
+                  </td>
               ),
               category: (item: any) => (
-                <td key={item.eip}>{item.category}
-                </td>
+                  <td key={item.eip} className={isDarkMode ? "text-white" : "text-black"}>
+                    {item.category}
+                  </td>
               ),
               status: (item: any) => (
-                <td key={item.eip}>
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </td>
+                  <td key={item.eip}>
+                    <Wrap>
+                      <WrapItem>
+                        <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
+                      </WrapItem>
+                    </Wrap>
+                  </td>
               ),
             }}
           />
@@ -177,7 +196,7 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case "Living":
-      return "green";
+      return "blue";
     case "Final":
       return "blue";
     case "Stagnant":

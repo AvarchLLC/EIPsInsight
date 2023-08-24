@@ -51,10 +51,10 @@ const Meta = () => {
       >
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
       <FlexBetween>
-      <Header title="Category - Meta" subtitle="Meta EIPs describe changes to the EIP process, or other non optional changes." />
+      <Header title="Meta" subtitle="Meta EIPs describe changes to the EIP process, or other non optional changes." />
         <Box>
           <Button
-            colorScheme="green"
+            colorScheme="blue"
             variant="outline"
             fontSize={"14px"}
             fontWeight={"bold"}

@@ -207,13 +207,13 @@ const AreaC = () => {
       overflowX="auto"
       _hover={{
         border: '1px',
-        borderColor: '#10b981',
+        borderColor: '#30A0E0',
       }}
       className="hover: cursor-pointer ease-in duration-200"
     >
 
 
-    <Text fontSize="xl" fontWeight="bold" color="#10b981" marginRight="6">
+    <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
       {`Status: ${selectedStatus}`}
     </Text>
     <Select
@@ -221,7 +221,7 @@ const AreaC = () => {
       placeholder="Select Option"
       value={selectedStatus}
       onChange={handleChangeStatus}
-      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-green-500"
+      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
       size="sm" // Set the select size to small
     ><option value="">All</option>
           <option value="Final">Final</option>
@@ -237,7 +237,7 @@ const AreaC = () => {
         {isLoading ? (
           // Show loading spinner while chart is rendering
           <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-            <Spinner size="xl" color="green.500" />
+            <Spinner size="xl" color="blue.500" />
           </Box>
         ) : (
           // Show chart when it's ready

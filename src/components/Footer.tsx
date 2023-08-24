@@ -11,6 +11,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { FaTwitter, FaYoutube, FaInstagram } from "react-icons/fa";
+import NextLink from "next/link";
 
 const ListHeader = ({ children }: { children: ReactNode }) => {
   return (
@@ -73,16 +74,16 @@ export default function LargeWithAppLinksAndSocial() {
           align={{ md: "center" }}
         >
           <Text paddingTop={{base:"1",md:"0"}}>
-            Build With <span> &#x1F49A;</span> by&nbsp; Avarch
+            Build With <span> 💙 </span> by&nbsp; <NextLink href={'https://avarch.org/index.html#0'} target={'_blank'}>Avarch</NextLink>
           </Text>
           <Stack direction={"row"} spacing={6}>
-            <SocialButton label={"Twitter"} href={"#"}>
+            <SocialButton label={"Twitter"} href={"https://twitter.com/ether_world"} >
               <FaTwitter />
             </SocialButton>
-            <SocialButton label={"YouTube"} href={"#"}>
+            <SocialButton label={"YouTube"} href={"https://www.youtube.com/channel/UCnceAY-vAQsO8TgGAj5SGFA"}>
               <FaYoutube />
             </SocialButton>
-            <SocialButton label={"Instagram"} href={"#"}>
+            <SocialButton label={"Instagram"} href={"https://www.instagram.com/etherworld.co/?hl=en"}>
               <FaInstagram />
             </SocialButton>
           </Stack>

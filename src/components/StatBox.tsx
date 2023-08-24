@@ -42,7 +42,7 @@ const StatBox: React.FC<StatBoxProps> = ({
       overflow="clip"
       _hover={{
         border: "1px",
-        borderColor: "#10b981",
+        borderColor: "#30A0E0",
       }}
       className="hover:cursor-pointer ease-in duration-200"
       as={motion.div}
@@ -52,11 +52,11 @@ const StatBox: React.FC<StatBoxProps> = ({
     >
       <Link href={url}       textDecoration="none" _hover={{ textDecoration: "none" }}>
       <FlexBetween>
-        <Text fontWeight="bold" fontSize={{md:'16px',base:'11px'}}>{title}</Text>
+        <Text fontWeight="bold" fontSize={{lg:'16px',base:'11px',md:'14px',sm:'12px'}}>{title}</Text>
         {icon}
       </FlexBetween>
 
-      <Text fontWeight="600" color="#10b981" fontSize={{md:'16px', base:'11px'}}>
+      <Text fontWeight="600" color="#30A0E0" fontSize={'16'}>
         {value}
       </Text>
       <FlexBetween gap="1rem">

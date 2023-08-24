@@ -20,6 +20,35 @@ interface CBoxTypeProps {
     status: string;
   }
 
+  import NextLink from "next/link";
+const getStatus = (status: string) => {
+    switch (status) {
+      case "Last Call":
+        return "LastCall";
+      default:
+        return status;
+    }
+  };
+
+  const getCat= (cat: string) => {
+    switch (cat) {
+        case "standard - networking":
+            return "Networking";
+        case "standard - interface":
+            return "Interface";
+        case "standard - erc":
+            return "ERC";
+            case "standard - core":
+              return "Core";
+        case "Meta":
+            return "Meta";
+        case "Informational":
+            return "Informational";
+        default:
+            return "Core"
+    }
+  }
+
 const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
   const [data, setData] = useState<EIP[]>([]);
 
@@ -65,7 +94,12 @@ const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
   const rows = [];
   const standardTrackKeys = [];
 
+  var total = 0;
+  for(const key in result){
+    total = total+result[key];
+  }
   for (const key in result) {
+    let percentage = ((result[key]*100)/total).toFixed(2);
     if (key.startsWith("Standard")) {
       standardTrackKeys.push(key);
     } else {
@@ -80,11 +114,14 @@ const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
           </Td>
           <Td>
             <Link
-              href={`/numbers-route`}
-              className="text-emerald-400 hover:cursor-pointer font-semibold"
+              href={`/table/${getCat(key)}/${status}`}
+              className="text-blue-400 hover:cursor-pointer font-semibold"
             >
               {result[key]}
             </Link>
+          </Td>
+          <Td className={'ml-10 text-blue-400'}>
+            {percentage}%
           </Td>
         </Tr>
       );
@@ -94,6 +131,7 @@ const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
   standardTrackKeys.sort();
 
   for (const key of standardTrackKeys) {
+    let percentage = ((result[key]*100)/total).toFixed(2);
     rows.unshift(
       <Tr key={key}>
         <Td minW="100px">
@@ -105,11 +143,14 @@ const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
         </Td>
         <Td>
           <Link
-            href={`/numbers-route`}
-            className="text-emerald-400 hover:cursor-pointer font-semibold"
+            href={`/table/${getCat(key)}/${status}`}
+            className="text-blue-400 hover:cursor-pointer font-semibold"
           >
             {result[key]}
           </Link>
+        </Td>
+        <Td className={'ml-10 text-blue-400'}>
+          {percentage}%
         </Td>
       </Tr>
     );
@@ -126,7 +167,7 @@ const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
       overflowX="auto"
       _hover={{
         border: "1px",
-        borderColor: "#10b981",
+        borderColor: "#30A0E0",
       }}
       maxH={maxHeight}
       as={motion.div}
@@ -135,12 +176,16 @@ const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
       transition={{ duration: 0.5 } as any}
       className="hover: cursor-pointer ease-in duration-200"
     >
+      <Text fontSize="2xl" fontWeight="bold" color="#A020F0" className={'ml-5 py-2'}>
+        TOTAL EIPS - <NextLink href={`/tableStatus/${getStatus(status)}`}> [{total}] </NextLink>
+      </Text>
       <TableContainer>
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
           <Thead>
             <Tr>
               <Th minW="50px">Type - Category</Th>
               <Th minW="200px">Numbers</Th>
+              <Th minW="200px">Percentage</Th>
             </Tr>
           </Thead>
           <Tbody>

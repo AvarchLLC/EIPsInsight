@@ -31,9 +31,13 @@ import {
   MoonIcon,
 } from "@chakra-ui/icons";
 import Logo from "./Logo";
+
 import { GitHub } from "react-feather";
 import NextLink from "next/link"
 import { useState } from "react";
+
+
+
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
   const { toggleColorMode } = useColorMode();
@@ -104,7 +108,7 @@ export default function WithSubnavigation() {
               <IconButton
               aria-label="github"
               variant={"outline"}
-                              colorScheme="green"
+                              colorScheme="blue"
                               size="lg"
                               icon={<GitHub/>}
                               />
@@ -112,7 +116,7 @@ export default function WithSubnavigation() {
               <IconButton
                 aria-label="Mode Change"
                 variant="outline"
-                colorScheme="green"
+                colorScheme="blue"
                 size="lg"
                 icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
                 onClick={toggleColorMode}
@@ -151,7 +155,7 @@ const DesktopNav = () => {
                   textDecoration: "none",
                   color: linkHoverColor,
                 }}
-                className="font-bold hover:text-emerald-400 cursor-pointer ease-in duration-300"
+                className="font-bold hover:text-blue-400 cursor-pointer ease-in duration-300"
               >
                 {navItem.label}
               </Link>

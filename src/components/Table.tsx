@@ -1,46 +1,19 @@
-import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
-import { Table as Tb, Thead, Tbody, Tr, Th, Td, TableCaption,TableContainer} from "@chakra-ui/react";
-import ReactPaginate from "react-paginate";
-import { mockEIP } from "@/data/eipdata";
-import FlexBetween from "./FlexBetween";
+import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link, ThemeProvider, Button } from "@chakra-ui/react";
+import { CCardBody, CSmartTable } from '@coreui/react-pro';
+import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
-import {CTableRow} from "@coreui/react-pro";
+import { Spinner } from "@chakra-ui/react";
 
-
-  const useSearchTerm = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const handleSearchChange = (e : React.ChangeEvent<HTMLInputElement>) => {
-      const term = e.target.value.toLowerCase();
-      setSearchTerm(term);
-    };
-
-    useEffect(() => {
-      // Do something with the search term, such as filtering the data
-      // ...
-
-      // Cleanup (if necessary)
-      return () => {
-        // Cleanup code
-        // ...
-      };
-    }, [searchTerm]);
-
-    return {
-      searchTerm,
-      handleSearchChange,
-    };
-  };
+const statusArr = ['Final', 'Draft', 'Review', 'Last_Call', 'Stagnant', 'Withdrawn', 'Living']
 
 interface EIP {
   _id: string;
   eip: string;
   title: string;
   author: string;
+  status: string;
   type: string;
   category: string;
-  status: string;
   created: string;
   discussion: string;
   deadline: string;
@@ -49,221 +22,196 @@ interface EIP {
   __v: number;
 }
 
-const TableAll = () => {
+import '@coreui/coreui/dist/css/coreui.min.css';
+import { Console } from "console";
+import LoaderComponent from "./Loader";
+
+const Table = () => {
   const [data, setData] = useState<EIP[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+
+  const factorAuthor = (data : any) => {
+    //
+    let list = data.split(',')
+    //
+    for (let i = 0; i < list.length; i++) {
+      list[i] = list[i].split(' ')
+    }
+    //
+    if (list[list.length - 1][list[list.length - 1].length - 1] === 'al.') {
+      list.pop()
+    }
+    return list
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/alleips`);
         const jsonData = await response.json();
         setData(jsonData);
+        setIsLoading(false); // Set isLoading to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
+        setIsLoading(false); // Set isLoading to false if there's an error
       }
     };
-
     fetchData();
   }, []);
+
+  const filteredData = data.map((item: any) => {
+    const { eip, title, author, status, type, category } = item;
+    return {
+      eip,
+      title,
+      author,
+      status,
+      type,
+      category,
+    };
+  });
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  const [filteredData, setFilteredData] = useState<EIP[]>([]);
+  useEffect(()=> {
+    if(bg === "#f6f6f7") {
+      setIsDarkMode(false);
+    } else {
+        setIsDarkMode(true);
+    }
+  })
 
-  const itemsPerPage = 10; // Number of items to display per page
-  const pageSize = 10;
-  const totalPages = Math.ceil(filteredData.length / pageSize);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const { searchTerm, handleSearchChange } = useSearchTerm();
-
-  const pageCount = Math.ceil(data.length / itemsPerPage);
-
-  const handlePageChange = (selected: { selected: number }) => {
-    setCurrentPage(selected.selected);
-  };
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = (currentPage + 1) * itemsPerPage;
-  const currentItems = data.slice(startIndex, endIndex);
-
-  // Filter the data based on the search term
-  const filteredItems = currentItems.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
-
-  useEffect(() => {
-    setFilteredData(filteredItems);
-  }, [filteredItems]);
-
-  const tableData = searchTerm ? filteredData : data;
+  console.log(filteredData)
 
   return (
     <Box
-      bgColor={bg}
-      marginTop={"12"}
-      p="1rem 1rem"
-      borderRadius="0.55rem"
-      _hover={{
-        border: "1px",
-        borderColor: "#10b981",
-      }}
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className=" ease-in duration-200"
-    >
-      <FlexBetween>
-        <Text fontSize="xl" fontWeight={"bold"} color={"#10b981"}>
-          {`Search an EIP : ${data.length}`}
-        </Text>
-      </FlexBetween>
-      <TableContainer overflowX={'hidden'}>
-        <Tb variant="simple" minW="100%" layout="fixed">
-          <TableCaption>Data Grid</TableCaption>
-          <Thead>
-            <Tr>
-              <Th minW="50px" fontSize={{base:'10px', md:'12px'}}>EIP</Th>
-              <Th minW="200px" fontSize={{base:'10px', md:'12px'}}>Title</Th>
-              <Th minW="200px" fontSize={{base:'10px', md:'12px'}}>Author</Th>
-              <Th minW="100px" fontSize={{base:'10px', md:'12px'}}>Type</Th>
-              <Th minW="100px" fontSize={{base:'10px', md:'12px'}}>Category</Th>
-              <Th minW="100px" fontSize={{base:'10px', md:'12px'}}>Status</Th>
-            </Tr>
-            <Tr>
-              <Th>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  placeholder="Search EIP"
-                  className=" py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </Th>
-              <Th>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  placeholder="Search Title"
-                  className=" py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </Th>
-              <Th>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  placeholder="Search Author"
-                  className="py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </Th>
-              <Th>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  placeholder="Search Type"
-                  className=" py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </Th>
-              <Th>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  placeholder="Search Category"
-                  className=" py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </Th>
-              <Th>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  placeholder="Search Status"
-                  className="py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {tableData
-              .slice((currentPage - 1) * pageSize, currentPage * pageSize)
-              .map((item) => (
-                <Tr key={item._id} fontSize={{md:'16px',base:'10px'}}>
-                  <Td minW="50px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                    {item.eip}
-                  </Td>
-                  <Td minW="200px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                    {item.title}
-                  </Td>
-                  <Td minW="200px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                    {item.author}
-                  </Td>
-                  <Td minW="100px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                    {item.type}
-                  </Td>
-                  <Td minW="100px" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-                    {item.category}
-                  </Td>
-                  <Td minW="100px">
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
-                      </WrapItem>
-                    </Wrap>
-                  </Td>
-                </Tr>
-              ))}
-          </Tbody>
-        </Tb>
-      </TableContainer>
-
-      <Box display="flex" justifyContent="center" mt="4">
-        <ReactPaginate
-          previousLabel={"Previous"}
-          nextLabel={"Next"}
-          breakLabel={"..."}
-          pageCount={pageCount}
-          onPageChange={handlePageChange}
-          containerClassName={"pagination flex justify-center"}
-          pageClassName={"px-2"}
-          previousClassName={"px-2"}
-          nextClassName={"px-2"}
-          breakClassName={"px-2"}
-          activeClassName={"active"}
-          previousLinkClassName={"border rounded px-3 py-1 bg-green-400"}
-          nextLinkClassName={"border rounded px-3 py-1 bg-green-400"}
-          breakLinkClassName={"border rounded px-3 py-1 bg-gray-400"}
-          pageLinkClassName={"border rounded px-3 py-1"}
-          marginPagesDisplayed={1}
-          pageRangeDisplayed={3}
-          forcePage={currentPage - 1}
-        />
-      </Box>
+    bgColor={bg}
+    marginTop={"12"}
+    p="1rem 1rem"
+    borderRadius="0.55rem"
+    _hover={{
+      border: "1px",
+      borderColor: "#30A0E0",
+    }}
+    as={motion.div}
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 } as any}
+    className=" ease-in duration-200"
+  >
+      <CCardBody
+          style={{
+            fontSize: '13px',
+          }}
+          className="scrollbarDesign"
+          color={useColorModeValue("black", "white")}
+      >
+        {isLoading ? ( // Show loader while data is loading
+            <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+              <Spinner/>
+            </Box>
+        ) : (
+            <CSmartTable
+                className={'text-[#008080]'}
+                items={filteredData.sort((a, b) => parseInt(a.eip) - parseInt(b.eip))}
+                activePage={1}
+                clickableRows
+                columnFilter
+                columnSorter
+                itemsPerPage={7}
+                pagination
+                tableProps={{
+                  hover: true,
+                  responsive: true,
+                }}
+                scopedColumns={{
+                  eip: (item: any) => (
+                      <td key={item.eip}>
+                        <Link href={`/EIPS/${item.eip}`}>
+                          <Wrap>
+                            <WrapItem>
+                              <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
+                            </WrapItem>
+                          </Wrap>
+                        </Link>
+                      </td>
+                  ),
+                  title: (item: any) => (
+                      <td key={item.eip} style={{ fontWeight: 'bold', height: '100%' }} className="hover:text-[#1c7ed6]">
+                        <Link href={`/EIPS/${item.eip}`} className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
+                          {item.title}
+                        </Link>
+                      </td>
+                  ),
+                  author: (it: any) => (
+                      <td key={it.author}>
+                        <div>
+                          {factorAuthor(it.author).map((item: any, index: any) => {
+                            let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
+                            return (
+                                <Wrap key={index}>
+                                  <WrapItem>
+                                  <Link href={`${
+                              item[item.length - 1].substring(item[item.length - 1].length - 1) ===
+                              '>'
+                                ? 'mailto:' + t
+                                : 'https://github.com/' + t.substring(1)
+                            }`} target="_blank" className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
+                                    {item}
+                                    </Link>
+                                  </WrapItem>
+                                </Wrap>
+                            );
+                          })}
+                        </div>
+                      </td>
+                  ),
+                  type: (item: any) => (
+                      <td key={item.eip} className={isDarkMode ? "text-white" : "text-black"}>
+                        {item.type}
+                      </td>
+                  ),
+                  category: (item: any) => (
+                      <td key={item.eip} className={isDarkMode ? "text-white" : "text-black"}>
+                        {item.category}
+                      </td>
+                  ),
+                  status: (item: any) => (
+                      <td key={item.eip}>
+                        <Wrap>
+                          <WrapItem>
+                            <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
+                          </WrapItem>
+                        </Wrap>
+                      </td>
+                  ),
+                }}
+            />
+        )}
+      </CCardBody>
     </Box>
-
   );
 };
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: any) => {
   switch (status) {
     case "Living":
-      return "green";
+      return "blue";
     case "Final":
       return "blue";
     case "Stagnant":
       return "purple";
     case "Draft":
-      return "orange"
+      return "orange";
     case "Withdrawn":
-      return "red"
+      return "red";
     case "Last Call":
-      return "yellow"
+      return "yellow";
     default:
       return "gray";
   }
 };
 
-export default TableAll;
+export default Table;

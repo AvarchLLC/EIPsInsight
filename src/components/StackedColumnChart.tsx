@@ -22,6 +22,32 @@ const getCat= (cat: string) => {
     }
 }
 
+const getStatus = (status: string) => {
+  switch (status) {
+    case "Draft":
+      return "Draft";
+    case "Final":
+    case "Accepted":
+    case "Superseded":
+      return "Final";
+    case "Last Call":
+      return "Last Call";
+    case "Withdrawn":
+    case "Abandoned" :
+    case "Rejected":
+      return "Withdrawn";
+    case "Review":
+      return "Review";
+    case "Living":
+    case "Active":
+      return "Living";
+    case "Stagnant":
+      return "Stagnant";
+    default:
+      return "Final";
+  }
+};
+
 interface AreaProps {
     data: MappedDataItem[];
     xField: string;
@@ -119,7 +145,7 @@ interface AreaProps {
       setIsChartReady(true);
     }, []);
   
-    const filteredData = data.filter((item) => item.status === status);
+    const filteredData = data.filter((item) => status === getStatus(item.status));
   
     const transformedData = filteredData.flatMap((item) =>
       item.eips.map((eip) => ({
@@ -154,10 +180,12 @@ interface AreaProps {
         },
       } as any,
     };
-  
+
     return (
       <Box boxSize={"xs"}
            paddingX={'1rem'}
+           overflowX={'hidden'}
+
       >
 
         <Area {...config}/>

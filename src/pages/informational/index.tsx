@@ -51,10 +51,10 @@ const Info = () => {
       >
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
       <FlexBetween>
-      <Header title="Category - Informational" subtitle="Informational EIPs describe other changes to the Ethereum ecosystem." />
+      <Header title="Informational" subtitle="Informational EIPs describe other changes to the Ethereum ecosystem." />
         <Box>
           <Button
-            colorScheme="green"
+            colorScheme="blue"
             variant="outline"
             fontSize={"14px"}
             fontWeight={"bold"}

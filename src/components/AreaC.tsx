@@ -20,6 +20,25 @@ interface AreaProps {
   smooth: boolean;
 }
 
+const getCat= (cat: string) => {
+  switch (cat) {
+      case "Standards Track" || "Standard Track" || "Standards Track (Core, Networking, Interface, ERC)" || "Standard" || "Process" || "Core" || "core":
+          return "Core";
+      case "ERC":
+          return "ERCs";
+      case "Networking":
+          return "Networking";
+      case "Interface":
+          return "Interface";
+      case "Meta":
+          return "Meta";
+      case "Informational":
+          return "Informational";
+      default:
+          return "Core"
+  }
+}
+
 const Area = dynamic(
   (): any => import('@ant-design/plots').then((item) => item.Area),
   {
@@ -139,7 +158,7 @@ const AreaC = () => {
   const formattedData = data.reduce((acc: FormattedEIP[], item: EIP) => {
     if (item.status === selectedStatus) {
       const formattedEIPs: FormattedEIP[] = item.eips.map(eip => ({
-        category: eip.category,
+        category:  getCat(eip.category),
         date: `${getMonthName(eip.month)} ${eip.year}`,
         value: eip.count
       }));
@@ -164,8 +183,8 @@ const AreaC = () => {
     legend: { position: 'top-right' },
     smooth: true,
     slider: {
-      start: 0.1,
-      end: 0.9,
+      start: 0,
+      end: 1,
     },
   };
 
@@ -181,11 +200,11 @@ const AreaC = () => {
       overflowX="auto"
       _hover={{
         border: '1px',
-        borderColor: '#10b981',
+        borderColor: '#30A0E0',
       }}
       className=" ease-in duration-200"
     >
-      <Text fontSize="xl" fontWeight="bold" color="#10b981" marginRight="6">
+      <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
         {`Status: ${selectedStatus}`}
       </Text>
       <Select
@@ -193,7 +212,7 @@ const AreaC = () => {
         placeholder="Select Option"
         value={selectedStatus}
         onChange={handleChangeStatus}
-        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-green-500"
+        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
         size="sm" // Set the select size to small
       >
         <option value="Final">Final</option>
@@ -207,7 +226,7 @@ const AreaC = () => {
         {isLoading ? (
           // Show loading spinner while chart is rendering
           <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-            <LoaderComponent/>
+            <Spinner/>
           </Box>
         ) : (
           // Show chart when it's ready

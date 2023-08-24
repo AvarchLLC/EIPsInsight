@@ -14,6 +14,7 @@ interface CatBoxProps {
   url: string;
 }
 
+
 const CatBox: React.FC<CatBoxProps> = ({
   title,
   value,
@@ -92,11 +93,11 @@ const CatBox: React.FC<CatBoxProps> = ({
     >
       <Link href={url}       textDecoration="none" _hover={{ textDecoration: "none" }}>
       <FlexBetween>
-        <Text fontWeight="bold" fontSize={{md:"md", base: "xs"}}>{title}</Text>
+        <Text fontWeight="bold" fontSize={{lg:"lg", sm: "xs",md:"sm"}}>{title}</Text>
         {icon}
       </FlexBetween>
 
-      <Text fontWeight="600" fontSize={{md: "5xl", base: "2xl"}} color="#10b981">
+      <Text fontWeight="600" fontSize={{lg: "5xl", sm: "2xl",base:"2xl",md:"3xl"}} color="#30A0E0">
         {value}
       </Text>
       </Link>

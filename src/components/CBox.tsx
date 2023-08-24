@@ -17,7 +17,24 @@ interface EIP {
   unique_ID: number;
   __v: number;
 }
-
+const getCat= (cat: string) => {
+  switch (cat) {
+      case "standard - networking":
+          return "networking";
+      case "standard - interface":
+          return "interface";
+      case "standard - erc":
+          return "Interface";
+          case "standard - core":
+            return "core";
+      case "Meta":
+          return "meta";
+      case "Informational":
+          return "informational";
+      default:
+          return "core"
+  }
+}
 const CBox = () => {
   const [data, setData] = useState<EIP[]>([]);
 
@@ -63,26 +80,35 @@ const CBox = () => {
   const rows = [];
   const standardTrackKeys = [];
 
+
+  var total = 0;
+  for(const key in result){
+    total = total+result[key];
+  }
   for (const key in result) {
+    let percentage = ((result[key]*100)/total).toFixed(2);
     if (key.startsWith("Standard")) {
       standardTrackKeys.push(key);
     } else {
       rows.push(
-        <Tr key={key}>
-          <Td minW="100px">
+        <Tr key={key} className="space-x-10">
+          <Td className="ml-10">
             <Wrap>
               <WrapItem>
                 <Badge colorScheme="pink">{key}</Badge>
               </WrapItem>
             </Wrap>
           </Td>
-          <Td>
+          <Td className="ml-10">
             <Link
-              href={`/numbers-route`}
-              className="text-emerald-400 hover:cursor-pointer font-semibold"
+              href={`/${getCat(key.toLowerCase())}`}
+              className="text-blue-400 hover:cursor-pointer font-semibold"
             >
               {result[key]}
             </Link>
+          </Td>
+          <Td className={'ml-10 text-blue-400'}>
+            {percentage}%
           </Td>
         </Tr>
       );
@@ -92,22 +118,26 @@ const CBox = () => {
   standardTrackKeys.sort();
 
   for (const key of standardTrackKeys) {
+    let percentage = ((result[key]*100)/total).toFixed(2);
     rows.unshift(
       <Tr key={key}>
-        <Td minW="100px">
+        <Td className="ml-10">
           <Wrap>
             <WrapItem>
               <Badge colorScheme="blue">{key}</Badge>
             </WrapItem>
           </Wrap>
         </Td>
-        <Td>
+        <Td className="ml-10">
           <Link
-            href={`/numbers-route`}
-            className="text-emerald-400 hover:cursor-pointer font-semibold"
+            href={`/${getCat(key.toLowerCase())}`}
+            className="text-blue-400 hover:cursor-pointer font-semibold"
           >
             {result[key]}
           </Link>
+        </Td>
+        <Td className={'ml-10 text-blue-400 ml-10'}>
+          {percentage}%
         </Td>
       </Tr>
     );
@@ -124,10 +154,10 @@ const CBox = () => {
       overflowX="auto"
       _hover={{
         border: "1px",
-        borderColor: "#10b981",
+        borderColor: "#30A0E0",
       }}
       maxH={maxHeight}
-      className="hover: cursor-pointer ease-in duration-200"
+      className="hover: ease-in duration-200"
       as={motion.div}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -137,8 +167,9 @@ const CBox = () => {
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
           <Thead>
             <Tr>
-              <Th minW="50px">Type - Category</Th>
-              <Th minW="200px">Numbers</Th>
+              <Th>Type - Category</Th>
+              <Th>Numbers</Th>
+              <Th>Percentage</Th>
             </Tr>
           </Thead>
           <Tbody>

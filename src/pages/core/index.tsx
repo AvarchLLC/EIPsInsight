@@ -52,7 +52,7 @@ const Core = () => {
       >
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
       <FlexBetween>
-        <Header title="Category - Core" subtitle="Core EIPs describe changes to the Ethereum protocol." />
+        <Header title="Standard Tracks - Core" subtitle="Core EIPs describe changes to the Ethereum protocol." />
       </FlexBetween>
       <TableStatus cat='Core'/>
       <AreaStatus/>

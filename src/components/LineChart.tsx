@@ -138,7 +138,7 @@ const LineChart: React.FC = () => {
       overflowX="auto"
       _hover={{
         border: '1px',
-        borderColor: '#10b981',
+        borderColor: '#30A0E0',
       }}
       as={motion.div}
       initial={{ opacity: 0, y: -20 }}

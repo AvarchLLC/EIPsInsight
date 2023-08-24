@@ -253,7 +253,7 @@ const Table = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Living":
-        return "green";
+        return "blue";
       case "Final":
         return "blue";
       case "Stagnant":

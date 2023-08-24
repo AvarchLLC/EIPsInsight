@@ -16,11 +16,7 @@ import {
     Tooltip,
     Legend
   );
-
-
-import { Bar }            from 'react-chartjs-2'
-import { Box } from '@chakra-ui/react';
-import { mockEIP } from '@/data/eipdata';
+  import dynamic from 'next/dynamic';
 
 interface EIP {
   _id: string;
@@ -53,109 +49,80 @@ const BarChart = () => {
 
     fetchData();
   }, []);
-    const dataa = {
-        labels: ["Standards Track", "Meta", "Informational"],
-        datasets: [{
-          label: 'Core',
-          data: [data.filter(item => item.category === 'Core').length,0, 0],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(255, 159, 64, 0.2)',
-            'rgba(255, 205, 86, 0.2)',
 
-          ],
-          borderColor: [
-            'rgb(255, 99, 132)',
-            'rgb(255, 159, 64)',
-            'rgb(255, 205, 86)',
+  const dat = [
+    {'category' : "Standards Track", "type" : "Core", "value" : data.filter(item => item.category === 'Core').length},
+    {'category' : "Standards Track", "type" : "ERC", "value" : data.filter(item => item.category === 'ERC').length},
+    {'category' : "Standards Track", "type" : "Networking", "value" : data.filter(item => item.category === 'Networking').length},
+    {'category' : "Standards Track", "type" : "Interface", "value" : data.filter(item => item.category === 'Interface').length},
+    {'category' : "Meta", "type" : "Meta", "value" : data.filter(item => item.type === 'Meta').length},
+    {'category' : "Informational", "type" : "Informational", "value" : data.filter(item => item.type === 'Informational').length}
+  ];
+  const Area = dynamic(() => import("@ant-design/plots").then((item) => item.Pie), {
+    ssr: false,
+  });
 
-          ],
-          borderWidth: 1,
-          
+
+  const categoryColors: string[] = [
+    'rgb(255, 99, 132)',
+    'rgb(255, 159, 64)',
+    'rgb(255, 205, 86)',
+    'rgb(75, 192, 192)',
+    'rgb(54, 162, 235)',
+    'rgb(153, 102, 255)',
+    'rgb(255, 99, 255)',
+    'rgb(50, 205, 50)',
+    'rgb(255, 0, 0)',
+    'rgb(0, 128, 0)',
+  ];
+  const categoryBorder: string[] = [
+    'rgba(255, 99, 132, 0.2)',
+    'rgba(255, 159, 64, 0.2)',
+    'rgba(255, 205, 86, 0.2)',
+    'rgba(75, 192, 192, 0.2)',
+    'rgba(54, 162, 235, 0.2)',
+    'rgba(153, 102, 255, 0.2)',
+    'rgba(255, 99, 255, 0.2)',
+    'rgba(50, 205, 50, 0.2)',
+    'rgba(255, 0, 0, 0.2)',
+    'rgba(0, 128, 0, 0.2)',
+  ];
+
+
+  const config = {
+    appendPadding: 10,
+    data: dat,
+    angleField: "value",
+    colorField: "type",
+    radius: 1,
+    innerRadius: 0.5,
+    legend: { position: 'top' as const },
+    label: {
+      type: "inner",
+      offset: "-50%",
+      content: "{value}",
+      style: {
+        textAlign: "center",
+        fontSize: 14
+      }
+    },
+    interactions: [{ type: "element-selected" }, { type: "element-active" }],
+    statistic: {
+      title: false as const,
+      content: {
+        style: {
+          whiteSpace: "pre-wrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis"
         },
-        {
-            label: 'ERC',
-            data: [data.filter(item => item.category === 'ERC').length],
-            backgroundColor: [
-              'rgba(75, 192, 192, 0.2)',
-            ],
-            borderColor: [
-              'rgb(75, 192, 192)',
-  
-            ],
-            borderWidth: 1
-          },
-          {
-            label: 'Networking',
-            data: [data.filter(item => item.category === 'Networking').length],
-            backgroundColor: [
-              'rgba(255, 159, 64, 0.2)',
-            ],
-            borderColor: [
-              'rgb(255, 159, 64)',
-  
-            ],
-            borderWidth: 1
-          },
-          {
-            label: 'Interface',
-            data: [data.filter(item => item.category === 'Interface').length],
-            backgroundColor: [
-              'rgba(201, 203, 207, 0.2)'
-            ],
-            borderColor: [
-              'rgb(201, 203, 207)'
-  
-            ],
-            borderWidth: 1
-          },
-          {
-            label: 'Meta',
-            data: [0, data.filter(item => item.type === 'Meta').length, 0],
-            backgroundColor: [
-              'rgba(54, 162, 235, 0.2)',
-            ],
-            borderColor: [
-              'rgb(54, 162, 235)',
-  
-            ],
-            borderWidth: 1
-          },
-          {
-            label: 'Informational',
-            data: [0,0,data.filter(item => item.type === 'Informational').length],
-            backgroundColor: [
-              'rgba(153, 102, 255, 0.2)',
-            ],
-            borderColor: [
-              'rgb(153, 102, 255)',
-  
-            ],
-            borderWidth: 1
-          },
-    ]
-      };
+      }
+    }
+  };
+
+
+    
   return (
-        <Bar
-
-    data={dataa} options={{
-        responsive: true,
-        interaction: {
-            mode: 'index',
-            intersect: true,
-          },
-
-        scales: {
-            x: {
-              stacked: true,
-              
-            },
-            y: {
-              stacked: true
-            }
-          }
-    }}
-    />
+    <Area {...config}/>
 
 
   )

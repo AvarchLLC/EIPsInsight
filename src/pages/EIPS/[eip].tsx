@@ -1,13 +1,26 @@
-import AllLayout from '@/components/Layout'
-import React, { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation'
-import Header from '@/components/Header';
-import { Badge, Box, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem } from '@chakra-ui/react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm'
-import rehypeRaw from 'rehype-raw'
-import { motion } from 'framer-motion';
-
+import AllLayout from "@/components/Layout";
+import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import Header from "@/components/Header";
+import {
+  Badge,
+  Box,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  Wrap,
+  WrapItem,
+} from "@chakra-ui/react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import { motion } from "framer-motion";
+import Prog from "@/components/Prog"
 interface EIP {
   _id: string;
   eip: string;
@@ -24,14 +37,42 @@ interface EIP {
   __v: number;
 }
 
+const getStatus = (status: string) => {
+  switch (status) {
+    case "Draft":
+      return "Draft";
+    case "Final" || "Accepted" || "Superseded":
+      return "Final";
+    case "Last Call":
+      return "Last Call";
+    case "Withdrawn" || "Abandoned" || "Rejected":
+      return "Withdrawn";
+    case "Review":
+      return "Review";
+    case "Living" || "Active":
+      return "Living";
+    case "Stagnant":
+      return "Stagnant";
+    default:
+      return "Final";
+  }
+};
+
 interface ContentData {
   content: string;
 }
+const StatusContent: React.FC<{ status: string }> = ({ status }) => {
+  const pathname = usePathname();
+  const pathnameParts = pathname ? pathname.split("/") : [];
+  const thirdPart = pathnameParts[2] || ""; // Set a default value if thirdPart is undefined
+  if (status === "Final") {
+    return <Prog num={`${thirdPart}`}/>
+  } 
+};
 
 const EIP = () => {
   const pathname = usePathname();
   const pathnameParts = pathname ? pathname.split("/") : [];
-
   const thirdPart = pathnameParts[2] || ""; // Set a default value if thirdPart is undefined
   const [data, setData] = useState<EIP | null>(null); // Set initial state as null
   const [con, setcon] = useState<ContentData | undefined>(undefined);
@@ -43,9 +84,9 @@ const EIP = () => {
       console.log(jsonD["content"]);
       setcon(jsonD);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +96,7 @@ const EIP = () => {
         console.log(jsonData);
         setData(jsonData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -63,11 +104,11 @@ const EIP = () => {
     fetchContent();
   }, [thirdPart]); // Add thirdPart as a dependency to re-fetch data when it changes
 
-  
+
+
   return (
     <AllLayout>
       <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
-
         {data !== null ? (
           <>
             <motion.div
@@ -82,25 +123,28 @@ const EIP = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
+              <StatusContent status={data.status}/>
               <TableContainer paddingTop={6}>
                 <Table variant="striped" minW="50%" maxH="50%" layout="fixed">
                   <Tbody>
-                    {Object.entries(data).map(([key, value]) => (
-                      key !== 'requires' && key !== 'unique_ID' && key !== 'eip' && key !== '_id' && key !=='__v' && value && (
-                        <Tr key={key}>
-                          <Td>
-                            {key.charAt(0).toUpperCase() + key.slice(1)}:
-                          </Td>
-                          <Td>
-                            <Wrap>
-                              <WrapItem>
-                                <Badge colorScheme="cyan">{value}</Badge>
-                              </WrapItem>
-                            </Wrap>
-                          </Td>
-                        </Tr>
-                      )
-                    ))}
+                    {Object.entries(data).map(
+                      ([key, value]) =>
+                        key !== "requires" &&
+                        key !== "unique_ID" &&
+                        key !== "eip" &&
+                        key !== "_id" &&
+                        key !== "__v" &&
+                        value && (
+                          <Tr key={key}>
+                            <Td>
+                              {key.charAt(0).toUpperCase() + key.slice(1)}:
+                            </Td>
+                            <Td>
+                              {value}
+                            </Td>
+                          </Tr>
+                        )
+                    )}
                   </Tbody>
                 </Table>
               </TableContainer>
@@ -111,8 +155,10 @@ const EIP = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
+                className="pt-5"
               >
                 <ReactMarkdown
+              
                   children={con.content}
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeRaw]}
@@ -120,12 +166,12 @@ const EIP = () => {
                     h2: ({ node, ...props }) => (
                       <h2
                         style={{
-                          fontSize: '17px',
-                          fontWeight: 'bold',
+                          fontSize: "17px",
+                          fontWeight: "bold",
                           color: `#339af0`,
                           // borderBottom: `2px solid #339af0`,
                           borderLeft: `4px solid #339af0`,
-                          display: 'inline-block',
+                          display: "inline-block",
                         }}
                         className="my-3 px-2 rounded-sm"
                         {...props}
@@ -134,31 +180,31 @@ const EIP = () => {
                     h1: ({ node, ...props }) => (
                       <h2
                         style={{
-                          fontSize: '22px',
-                          fontWeight: 'bold',
+                          fontSize: "22px",
+                          fontWeight: "bold",
                           color: `#339af0`,
                           borderBottom: `2px solid #339af0`,
                           borderLeft: `4px solid #339af0`,
-                          display: 'inline-block',
+                          display: "inline-block",
                         }}
                         className="my-3 px-2 rounded-sm"
                         {...props}
                       />
                     ),
                     h3: ({ node, ...props }) => (
-<h2
-  style={{
-    fontSize: '17px',
-    fontWeight: 'bold',
-    color: `#339af0`,
-    // borderBottom: `2px solid #339af0`,
-    borderLeft: `4px solid #339af0`,
-    display: 'inline-block',
-  }}
-  className="my-3 px-2 rounded-sm"
->
-  {props.children}
-</h2>
+                      <h2
+                        style={{
+                          fontSize: "17px",
+                          fontWeight: "bold",
+                          color: `#339af0`,
+                          // borderBottom: `2px solid #339af0`,
+                          borderLeft: `4px solid #339af0`,
+                          display: "inline-block",
+                        }}
+                        className="my-3 px-2 rounded-sm"
+                      >
+                        {props.children}
+                      </h2>
                     ),
                   }}
                 />
@@ -172,9 +218,7 @@ const EIP = () => {
         )}
       </Box>
     </AllLayout>
-  )
-}
-
-
+  );
+};
 
 export default EIP;

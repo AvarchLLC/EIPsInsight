@@ -53,10 +53,10 @@ const Interface = () => {
       >
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
       <FlexBetween>
-      <Header title="Category - Interface" subtitle="Interface EIPs describe changes to the Ethereum client API." />
+      <Header title="Standard Tracks - Interface" subtitle="Interface EIPs describe changes to the Ethereum client API." />
         <Box>
           <Button
-            colorScheme="green"
+            colorScheme="blue"
             variant="outline"
             fontSize={"14px"}
             fontWeight={"bold"}

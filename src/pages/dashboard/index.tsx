@@ -30,7 +30,7 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import AllLayout from "@/components/Layout";
 import Dashboard from "@/components/Dashboard"
-
+import Head from "next/head"
 
 const Dasboard = () => {
   const theme = useTheme();
@@ -41,7 +41,13 @@ const Dasboard = () => {
   const router = useRouter()
   return (
     <AllLayout>
+                  <Head>
+                <title>
+                    Dashboard
+                </title>
+            </Head>
       <Dashboard/>
+    
     </AllLayout>
   );
 };

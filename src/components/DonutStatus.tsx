@@ -162,7 +162,7 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
       overflowY="hidden"
       _hover={{
         border: '1px',
-        borderColor: '#10b981',
+        borderColor: '#30A0E0',
       }}
       as={motion.div}
       initial={{ opacity: 0, y: -20 }}

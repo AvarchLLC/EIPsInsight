@@ -24,10 +24,13 @@ import {
   Clipboard,
   Briefcase,
 } from "react-feather";
-import TypeGraphs from "@/components/TypeGraphs";
+import TypeG from "@/components/TypeGraphs";
 import FlexBetween from "@/components/FlexBetween";
 import StackedColumnChart from "@/components/StackedColumnChart";
 import AreaC from "@/components/AreaStatus";
+import Banner from "@/components/NewsBanner";
+import StandardTrackCatBox from "@/components/StandardTrackCatBox";
+
 interface EIP {
   _id: string;
   eip: string;
@@ -42,6 +45,25 @@ interface EIP {
   requires: string;
   unique_ID: number;
   __v: number;
+}
+
+const getCat= (cat: string) => {
+  switch (cat) {
+      case "standard - networking":
+          return "networking";
+      case "standard - interface":
+          return "interface";
+      case "standard - erc":
+          return "Interface";
+          case "standard - core":
+            return "core";
+      case "Meta":
+          return "meta";
+      case "Informational":
+          return "informational";
+      default:
+          return "core"
+  }
 }
 
 const Type = () => {
@@ -75,259 +97,218 @@ const Type = () => {
     return () => clearTimeout(timeout);
   }, []);
   return (
-    <AllLayout>
-      {isLoading ? ( // Check if the data is still loading
-        // Show loader if data is loading
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Your loader component */}
-            <LoaderComponent />
-          </motion.div>
-        </Box>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Box
-              hideBelow={'md'}
-              paddingBottom={{md:'10', base: '10'}}
-              marginX={{md:"40", base: '2'}}
-              paddingX={{md:"10", base:'5'}}
-              marginTop={{md:"10", base:'5'}}
-          >
-            <Header
-              title="Type - Category"
-              subtitle="Your Roadway to Type and Category"
-            ></Header>
-            <Grid templateColumns="1fr 2fr" gap={2} paddingTop={8}>
-              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                All EIPs - {data.length}
-              </Text>
-              <Text fontSize="3xl" fontWeight="bold" color="#10b981">
-                Standards Track -{" "}
-                {data.filter((item) => item.type === "Standards Track").length}
-              </Text>
-            </Grid>
-
+      <AllLayout>
+        {isLoading ? ( // Check if the data is still loading
+            // Show loader if data is loading
             <Box
-              mt="20px"
-              display="grid"
-              gridTemplateColumns="repeat(12, 1fr)"
-              gridAutoRows="160px"
-              gap="20px"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="100vh"
             >
-
-
-              <CatBox
-                title="Meta"
-                value={data.filter((item) => item.type === "Meta").length}
-                icon={<Icon as={BookOpen} />}
-                url="erc"
-              />
-
-              <CatBox
-                title="Informational"
-                value={
-                  data.filter((item) => item.type === "Informational").length
-                }
-                icon={<Icon as={Radio} />}
-                url="networking"
-              />
-
-              <CatBox
-                title="Core"
-                value={data.filter((item) => item.category === "Core").length}
-                icon={<Icon as={Link} />}
-                url="interface"
-              />
-
-              <CatBox
-                title="ERCs"
-                value={data.filter((item) => item.category === "ERC").length}
-                icon={<Icon as={Clipboard} />}
-                url="informational"
-              />
-
-              <CatBox
-                title="Networking"
-                value={
-                  data.filter((item) => item.category === "Networking").length
-                }
-                icon={<Icon as={Briefcase} />}
-                url="meta"
-              />
-              <CatBox
-                    title="Interface"
-                    value={data.filter((item) => item.category === "Interface").length}
-                    icon={<Icon as={BookOpen} fontSize={{md:'15', base: '10'}}/>}
-                    url="erc"
-                />
-            </Box>
-
-            <Text
-              fontSize="3xl"
-              fontWeight="bold"
-              color="#4267B2"
-              paddingTop={8}
-            >
-              Standard Track
-            </Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={8} paddingBottom={8}>
-              <CBox />
-              <Donut />
-            </Grid>
-            <Grid templateColumns="repeat(2, 1fr)" gap={8}>
-              <Box>
-                <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
-                  Meta
-                </Text>
-                <DonutType type={"Meta"} />
-              </Box>
-              <Box>
-                <Text fontSize="3xl" fontWeight="bold" color="#4267B2">
-                  Informational
-                </Text>
-                <DonutType type={"Informational"} />
-              </Box>
-            </Grid>
-          </Box>
-
-
-          <Box
-            display={{md:'none', base: 'block'}}
-            paddingBottom={{md:'10', base: '10'}}
-            marginX={{md:"40", base: '2'}}
-            paddingX={{md:"10", base:'5'}}
-            marginTop={{md:"10", base:'5'}}
-          >
-            <Header
-                title="Type - Category"
-                subtitle="Your Roadway to Type and Category"
-            ></Header>
-
-            <Box paddingTop={8}>
-              <Text fontSize="xl" fontWeight="bold" color="#10b981">
-                All EIPs - {data.length}
-              </Text>
-              <Box
-                display="grid"
-                gridTemplateColumns="repeat(6, 1fr)"
-                paddingTop={'5'}
-                gap="10px"
+              <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
               >
-
-<CatBox
-                    title="Meta"
-                    value={data.filter((item) => item.type === "Meta").length}
-                    icon={<Icon as={BookOpen} fontSize={{md:'15', base: '10'}}/>}
-                    url="erc"
-                />
-
-                <CatBox
-                    title="Meta"
-                    value={data.filter((item) => item.type === "Meta").length}
-                    icon={<Icon as={BookOpen} fontSize={{md:'15', base: '10'}}/>}
-                    url="erc"
-                />
-
-                <CatBox
-                    title="Informational"
-                    value={
-                      data.filter((item) => item.type === "Informational").length
-                    }
-                    icon={<Icon as={Radio} fontSize={{md:'15', base: '10'}}/>}
-                    url="networking"
-                />
-              </Box>
+                {/* Your loader component */}
+                <LoaderComponent />
+              </motion.div>
             </Box>
-
-            <Box
-              paddingTop={'8'}
+        ) : (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
             >
-              <Text fontSize="xl" fontWeight="bold" color="#10b981">
-                Standards Track -{" "}
-                {data.filter((item) => item.type === "Standards Track").length}
-              </Text>
               <Box
-                  display="grid"
-                  gridTemplateColumns="repeat(7, 1fr)"
-                  paddingTop={'5'}
-                  gap="10px"
+                  hideBelow={'lg'}
+                  paddingBottom={{lg:'10', sm: '10',base: '10'}}
+                  marginX={{lg:"40",md:'2', sm: '2', base: '2'}}
+                  paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}
+                  marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}
               >
-                <CatBox
-                    title="Core"
-                    value={data.filter((item) => item.category === "Core").length}
-                    icon={<Icon as={Link} />}
-                    url="interface"
-                />
+                <Header
+                    title="Type - Category"
+                    subtitle="Your Roadway to Type and Category"
+                ></Header>
+                <Grid templateColumns="1fr 2fr" gap={2} paddingTop={8}>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    All EIPs - {data.length}
+                  </Text>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    Standards Track -{" "}
+                    {data.filter((item) => item.type === "Standards Track").length}
+                  </Text>
+                </Grid>
 
-                <CatBox
-                    title="ERCs"
-                    value={data.filter((item) => item.category === "ERC").length}
-                    icon={<Icon as={Clipboard} />}
-                    url="informational"
-                />
-
-                <CatBox
-                    title="Networking"
-                    value={
-                      data.filter((item) => item.category === "Networking").length
-                    }
-                    icon={<Icon as={Briefcase} />}
-                    url="meta"
-                />
-                <CatBox
-                    title="Interface"
-                    value={data.filter((item) => item.category === "Interface").length}
-                    icon={<Icon as={Clipboard} />}
-                    url="interface"
-                />
-              </Box>
-
-              <Box paddingTop={'8'}>
-                <Text
-                    fontSize="xl"
-                    fontWeight="bold"
-                    color="#4267B2"
+                <Box
+                    mt="20px"
+                    display="grid"
+                    gridTemplateColumns="repeat(12, 1fr)"
+                    gridAutoRows="160px"
+                    gap="20px"
                 >
-                  Standard Track
-                </Text>
-                <CBox />
-                <Donut />
+
+
+                  <CatBox
+                      title="Meta"
+                      value={data.filter((item) => item.type === "Meta").length}
+                      icon={<Icon as={BookOpen} />}
+                      url="erc"
+                  />
+
+                  <CatBox
+                      title="Informational"
+                      value={
+                        data.filter((item) => item.type === "Informational").length
+                      }
+                      icon={<Icon as={Radio} />}
+                      url="networking"
+                  />
+
+                  <StandardTrackCatBox />
+
+
+                </Box>
+
+                <Grid gridTemplateColumns={'1fr 1fr'}>
+                  <Text
+                      fontSize="3xl"
+                      fontWeight="bold"
+                      color="#4267B2"
+                      paddingTop={8}
+                  >
+                    Standard Track
+                  </Text>
+                  <Text
+                      fontSize="3xl"
+                      fontWeight="bold"
+                      color="#4267B2"
+                      paddingTop={8}
+                      paddingLeft={'4'}
+                  >
+                    Draft vs Final
+                  </Text>
+                </Grid>
+                <Grid templateColumns="repeat(2, 1fr)" gap={8}>
+                  <CBox />
+                  {/*<Donut />*/}
+                  <Box paddingTop={'2'}>
+                    <AreaC />
+                  </Box>
+                </Grid>
+                {/*<Grid templateColumns="repeat(2, 1fr)" gap={8}>*/}
+                {/*  <Box>*/}
+                {/*    <Text fontSize="3xl" fontWeight="bold" color="#4267B2">*/}
+                {/*      Meta*/}
+                {/*    </Text>*/}
+                {/*    <DonutType type={"Meta"} />*/}
+                {/*  </Box>*/}
+                {/*  <Box>*/}
+                {/*    <Text fontSize="3xl" fontWeight="bold" color="#4267B2">*/}
+                {/*      Informational*/}
+                {/*    </Text>*/}
+                {/*    <DonutType type={"Informational"} />*/}
+                {/*  </Box>*/}
+                {/*</Grid>*/}
               </Box>
 
-              <Box paddingTop={'8'}>
-                <Text fontSize="xl" fontWeight="bold" color="#4267B2">
-                  Meta
-                </Text>
-                <DonutType type={"Meta"} />
+
+
+
+
+              <Box
+                  display={{lg:'none', sm: 'block'}}
+                  paddingBottom={{lg:'10', sm: '10',base: '10'}}
+                  marginX={{lg:"40",md:'2', sm: '2', base: '2'}}
+                  paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}
+                  marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}
+              >
+                <Header
+                    title="Type - Category"
+                    subtitle="Your Roadway to Type and Category"
+                ></Header>
+
+                <Box paddingTop={8}>
+                  <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+                    All EIPs - {data.length}
+                  </Text>
+                  <Box
+                      display="grid"
+                      gridTemplateColumns="repeat(4, 1fr)"
+                      paddingTop={'5'}
+                      gap="10px"
+                  >
+
+                    <CatBox
+                        title="Meta"
+                        value={data.filter((item) => item.type === "Meta").length}
+                        icon={<Icon as={BookOpen} fontSize={{lg:'15', sm: '10'}}/>}
+                        url="erc"
+                    />
+
+
+                    <CatBox
+                        title="Informational"
+                        value={
+                          data.filter((item) => item.type === "Informational").length
+                        }
+                        icon={<Icon as={Radio} fontSize={{lg:'15', sm: '10'}}/>}
+                        url="networking"
+                    />
+
+                  </Box>
+                </Box>
+
+                <Box
+                    paddingTop={'8'}
+                >
+                  <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+                    Standards Track -{" "}
+                    {data.filter((item) => item.type === "Standards Track").length}
+                  </Text>
+                  <StandardTrackCatBox />
+
+                  <Box paddingTop={'8'}>
+                    <Text
+                        fontSize="xl"
+                        fontWeight="bold"
+                        color="#4267B2"
+                    >
+                      Standard Track
+                    </Text>
+                    <CBox />
+                    <Text
+                        fontSize="xl"
+                        fontWeight="bold"
+                        color="#4267B2"
+                        paddingTop={'8'}
+                    >
+                      Draft vs Final
+                    </Text>
+                    <AreaC />
+                  </Box>
+                </Box>
+                {/*<Box paddingTop={'8'}>*/}
+                {/*  <Text fontSize="xl" fontWeight="bold" color="#4267B2">*/}
+                {/*    Meta*/}
+                {/*  </Text>*/}
+                {/*  <DonutType type={"Meta"} />*/}
+                {/*</Box>*/}
+                {/*<Box paddingTop={'8'}>*/}
+                {/*  <Text fontSize="xl" fontWeight="bold" color="#4267B2">*/}
+                {/*    Informational*/}
+                {/*  </Text>*/}
+                {/*  <DonutType type={"Informational"} />*/}
+                {/*</Box>*/}
+
               </Box>
-            </Box>
-
-            <Box paddingTop={'8'}>
-              <Text fontSize="xl" fontWeight="bold" color="#4267B2">
-                Informational
-              </Text>
-              <DonutType type={"Informational"} />
-            </Box>
-
-          </Box>
-          <TypeGraphs />
-        </motion.div>
-      )}
-    </AllLayout>
+              <TypeG/>
+            </motion.div>
+        )}
+      </AllLayout>
   );
 };
 

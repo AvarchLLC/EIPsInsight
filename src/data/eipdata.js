@@ -5006,7 +5006,7 @@ export const mockEIP = [
       _id: "6490b4c740005fd0230e29ef",
       eip: 5022,
       title: "Increase price of SSTORE from zero to non-zero to 40k gas",
-      author: "Green (@greenlucid)",
+      author: "blue (@bluelucid)",
       status: "Stagnant",
       type: "Standards Track",
       category: "Core",

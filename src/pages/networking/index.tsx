@@ -52,10 +52,10 @@ const Networking = () => {
       >
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
       <FlexBetween>
-      <Header title="Category - Networking" subtitle="Networking EIPs describe changes to the Ethereum network protocol." />
+      <Header title="Standard Tracks - Networking" subtitle="Networking EIPs describe changes to the Ethereum network protocol." />
         <Box>
           <Button
-            colorScheme="green"
+            colorScheme="blue"
             variant="outline"
             fontSize={"14px"}
             fontWeight={"bold"}
