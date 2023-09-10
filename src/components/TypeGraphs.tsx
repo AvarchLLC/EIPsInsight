@@ -2,8 +2,11 @@ import React, {useEffect, useState} from "react";
 import {Box, Grid, Text, useColorModeValue} from "@chakra-ui/react";
 import {motion} from "framer-motion";
 import StackedColumnChart from "@/components/StackedColumnChart";
+import StatusColumnChart from "@/components/StatusColumnChart";
 import AreaC from "@/components/AreaStatus";
 import NextLink from "next/link";
+import StatusChart from "@/components/StatusColumnChart";
+import DateTime from "./DateTime";
 const getStatus = (status: string) => {
     switch (status) {
       case "Last Call":
@@ -12,6 +15,19 @@ const getStatus = (status: string) => {
         return status;
     }
   };
+
+interface StatusChartData{
+    statusChanges:[
+        {
+            eip: string;
+            lastStatus: string;
+            eipTitle: string;
+            eipCategory: string;
+        }
+    ];
+    year: number;
+}
+
 interface EIP {
     _id: string;
     eip: string;
@@ -28,22 +44,28 @@ interface EIP {
     __v: number;
 }
 
-const TypeGraphs: React.FC = () => {
+const TypeGraphs = () => {
     const bg = useColorModeValue("#f6f6f7", "#171923");
-    const [data, setData] = useState<EIP[]>([]);
+
+    const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
+    const [isLoading, setIsLoading] = useState(true); // Loader state
     useEffect(() => {
         const fetchData = async () => {
-          try {
-            const response = await fetch(`/api/alleips`);
-            const jsonData = await response.json();
-            setData(jsonData);
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          }
+            try {
+                const response = await fetch(`/api/alleips`);
+                console.log(response);
+                const jsonData = await response.json();
+                setData(jsonData);
+                setIsLoading(false); // Set loader state to false after data is fetched
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setIsLoading(false); // Set loader state to false even if an error occurs
+            }
         };
-    
+
         fetchData();
-      }, []);
+    }, []);
+
     return (
         <>
             <Box
@@ -53,59 +75,22 @@ const TypeGraphs: React.FC = () => {
                 paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}
                 marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}
             >
-                {/*<Grid templateColumns="1fr 2fr" gap={8} paddingTop={8}>*/}
-                {/*    <Box>*/}
-                {/*        <Text fontSize="3xl" fontWeight="bold" color="#4267B2">*/}
-                {/*            Draft*/}
-                {/*        </Text>*/}
-
-                {/*    </Box>*/}
-                {/*    <Box marginLeft={'38'} paddingLeft={'8'}>*/}
-                {/*        <Text fontSize="3xl" fontWeight="bold" color="#4267B2">*/}
-                {/*            Draft vs Final*/}
-                {/*        </Text>*/}
-
-                {/*    </Box>*/}
-                {/*</Grid>*/}
-                {/*<Grid templateColumns="2fr 3fr" gap={8}>*/}
-                {/*    <Box*/}
-                {/*        marginTop={"2rem"}*/}
-                {/*        bg={bg}*/}
-                {/*        p="0.5rem"*/}
-                {/*        borderRadius="0.55rem"*/}
-                {/*        display="flex"*/}
-                {/*        flexDirection="column"*/}
-                {/*        justifyContent="center"*/}
-                {/*        alignItems="center"*/}
-                {/*        height={400}*/}
-                {/*        overflowX="auto"*/}
-                {/*        _hover={{*/}
-                {/*            border: "1px",*/}
-                {/*            borderColor: "#30A0E0",*/}
-                {/*        }}*/}
-                {/*        as={motion.div}*/}
-                {/*        initial={{ opacity: 0, y: -20 }}*/}
-                {/*        animate={{ opacity: 1, y: 0 }}*/}
-                {/*        transition={{ duration: 0.5 } as any}*/}
-                {/*        className="hover: cursor-pointer ease-in duration-200"*/}
-                {/*    >*/}
-
-                {/*        <StackedColumnChart status="Draft"/>*/}
-
-
-                {/*    </Box>*/}
-                {/*    <AreaC />*/}
-                {/*</Grid>*/}
                 <Grid templateColumns="1fr 1fr 1fr" gap={8} >
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Review - <NextLink href={`/tableStatus/Review`}> [ {data.filter((item) => item.status === 'Review').length} ]</NextLink>
-                    </Text>
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Stagnant -<NextLink href={`/tableStatus/Stagnant`}> [ {data.filter((item) => item.status === 'Stagnant').length} ]</NextLink>
-                    </Text>
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Living -<NextLink href={`/tableStatus/Living`}> [ {data.filter((item) => item.status === 'Living').length} ]</NextLink>
-                    </Text>
+                    <NextLink href={'/core'}>
+                        <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                            Core - [{data.filter((item) => item.category === "Core").length}]
+                        </Text>
+                    </NextLink>
+                    <NextLink href={'/networking'}>
+                        <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                            Networking - [{data.filter((item) => item.category === "Networking").length}]
+                        </Text>
+                    </NextLink>
+                    <NextLink href={'/interface'}>
+                        <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                            Interface - [{data.filter((item) => item.category === "Interface").length}]
+                        </Text>
+                    </NextLink>
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8}>
                     <Box
@@ -128,7 +113,10 @@ const TypeGraphs: React.FC = () => {
                         transition={{ duration: 0.5 } as any}
                         className="hover: cursor-pointer ease-in duration-200"
                     >
-                        <StackedColumnChart status="Review" />
+                        <StatusColumnChart category={'Core'} />
+                        <Box className={'w-full'}>
+                            <DateTime />
+                        </Box>
                     </Box>
                     <Box
                         marginTop={"2rem"}
@@ -150,7 +138,10 @@ const TypeGraphs: React.FC = () => {
                         transition={{ duration: 0.5 } as any}
                         className="hover: cursor-pointer ease-in duration-200"
                     >
-                        <StackedColumnChart status="Stagnant" />
+                        <StatusColumnChart category={'Networking'} />
+                        <Box className={'w-full'}>
+                            <DateTime />
+                        </Box>
                     </Box>
                     <Box
                         marginTop={"2rem"}
@@ -172,19 +163,28 @@ const TypeGraphs: React.FC = () => {
                         transition={{ duration: 0.5 } as any}
                         className="hover: cursor-pointer ease-in duration-200"
                     >
-                        <StackedColumnChart status="Living" />
+                        <StatusColumnChart category={'Interface'} />
+                        <Box className={'w-full'}>
+                            <DateTime />
+                        </Box>
                     </Box>
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Last Call -<NextLink href={`/tableStatus/LastCall`}> [ {data.filter((item) => item.status === 'Last Call').length} ] </NextLink>
-                    </Text>
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Withdrawn -<NextLink href={`/tableStatus/Withdrawn`}> [ {data.filter((item) => item.status === 'Withdrawn').length} ] </NextLink>
-                    </Text>
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Final -<NextLink href={`/tableStatus/Final`}> [ {data.filter((item) => item.status === 'Final').length} ] </NextLink>
-                    </Text>
+                    <NextLink href={'/erc'}>
+                        <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                            ERC - [{data.filter((item) => item.category === "ERC").length}]
+                        </Text>
+                    </NextLink>
+                    <NextLink href={'/meta'}>
+                        <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                            Meta - [{data.filter((item) => item.type === "Meta").length}]
+                        </Text>
+                    </NextLink>
+                    <NextLink href={'/informational'}>
+                        <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                            Informational - [{data.filter((item) => item.type === "Informational").length}]
+                        </Text>
+                    </NextLink>
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8}>
                     <Box
@@ -207,7 +207,10 @@ const TypeGraphs: React.FC = () => {
                         transition={{ duration: 0.5 } as any}
                         className="hover: cursor-pointer ease-in duration-200"
                     >
-                        <StackedColumnChart status="Last Call" />
+                        <StatusColumnChart category={'ERCs'} />
+                        <Box className={'w-full'}>
+                            <DateTime />
+                        </Box>
                     </Box>
 
                     <Box
@@ -230,7 +233,10 @@ const TypeGraphs: React.FC = () => {
                         transition={{ duration: 0.5 } as any}
                         className="hover: cursor-pointer ease-in duration-200"
                     >
-                        <StackedColumnChart status="Withdrawn" />
+                        <StatusColumnChart category={'Meta'} />
+                        <Box className={'w-full'}>
+                            <DateTime />
+                        </Box>
                     </Box>
 
                     <Box
@@ -253,7 +259,10 @@ const TypeGraphs: React.FC = () => {
                         transition={{ duration: 0.5 } as any}
                         className="hover: cursor-pointer ease-in duration-200"
                     >
-                        <StackedColumnChart status="Final" />
+                        <StatusColumnChart category={'Informational'} />
+                        <Box className={'w-full'}>
+                            <DateTime />
+                        </Box>
                     </Box>
                 </Grid>
             </Box>
@@ -293,6 +302,9 @@ const TypeGraphs: React.FC = () => {
                     className="hover: cursor-pointer ease-in duration-200"
                 >
                     <StackedColumnChart status="Draft"/>
+                    <Box className={'w-full'}>
+                        <DateTime />
+                    </Box>
                 </Box>
 
                 <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={'8'}>
@@ -301,13 +313,14 @@ const TypeGraphs: React.FC = () => {
 
                 <AreaC/>
 
-                <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={'8'}>
-                    Review
-                </Text>
+                <NextLink href={'/core'}>
+                    <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+                        Core - [{data.filter((item) => item.category === "Core").length}]
+                    </Text>
+                </NextLink>
 
                 <Box
                     marginTop={"2rem"}
-                    paddingTop={'8'}
                     bg={bg}
                     p="0.5rem"
                     borderRadius="0.55rem"
@@ -326,16 +339,20 @@ const TypeGraphs: React.FC = () => {
                     transition={{ duration: 0.5 } as any}
                     className="hover: cursor-pointer ease-in duration-200"
                 >
-                    <StackedColumnChart status="Review" />
+                    <StatusColumnChart category={'Core'} />
+                    <Box className={'w-full'}>
+                        <DateTime />
+                    </Box>
                 </Box>
 
-                <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={'8'}>
-                    Stagnant
-                </Text>
+                <NextLink href={'/networking'}>
+                    <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+                        Networking - [{data.filter((item) => item.category === "Networking").length}]
+                    </Text>
+                </NextLink>
 
                 <Box
                     marginTop={"2rem"}
-                    paddingTop={'8'}
                     bg={bg}
                     p="0.5rem"
                     borderRadius="0.55rem"
@@ -354,16 +371,20 @@ const TypeGraphs: React.FC = () => {
                     transition={{ duration: 0.5 } as any}
                     className="hover: cursor-pointer ease-in duration-200"
                 >
-                    <StackedColumnChart status="Stagnant" />
+                    <StatusColumnChart category={'Networking'} />
+                    <Box className={'w-full'}>
+                        <DateTime />
+                    </Box>
                 </Box>
 
-                <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={'8'}>
-                    Living
-                </Text>
+                <NextLink href={'/interface'}>
+                    <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+                        Interface - [{data.filter((item) => item.category === "Interface").length}]
+                    </Text>
+                </NextLink>
 
                 <Box
                     marginTop={"2rem"}
-                    paddingTop={'8'}
                     bg={bg}
                     p="0.5rem"
                     borderRadius="0.55rem"
@@ -382,16 +403,20 @@ const TypeGraphs: React.FC = () => {
                     transition={{ duration: 0.5 } as any}
                     className="hover: cursor-pointer ease-in duration-200"
                 >
-                    <StackedColumnChart status="Living" />
+                    <StatusColumnChart category={'Interface'} />
+                    <Box className={'w-full'}>
+                        <DateTime />
+                    </Box>
                 </Box>
 
-                <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={'8'}>
-                    Last Call
-                </Text>
+                <NextLink href={'/erc'}>
+                    <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+                        ERC - [{data.filter((item) => item.category === "ERC").length}]
+                    </Text>
+                </NextLink>
 
                 <Box
                     marginTop={"2rem"}
-                    paddingTop={'8'}
                     bg={bg}
                     p="0.5rem"
                     borderRadius="0.55rem"
@@ -410,16 +435,20 @@ const TypeGraphs: React.FC = () => {
                     transition={{ duration: 0.5 } as any}
                     className="hover: cursor-pointer ease-in duration-200"
                 >
-                    <StackedColumnChart status="Last Call" />
+                    <StatusColumnChart category={'ERCs'} />
+                    <Box className={'w-full'}>
+                        <DateTime />
+                    </Box>
                 </Box>
 
-                <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={'8'}>
-                    Withdrawn
-                </Text>
+                <NextLink href={'/meta'}>
+                    <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+                        Meta - [{data.filter((item) => item.type === "Meta").length}]
+                    </Text>
+                </NextLink>
 
                 <Box
                     marginTop={"2rem"}
-                    paddingTop={'8'}
                     bg={bg}
                     p="0.5rem"
                     borderRadius="0.55rem"
@@ -438,16 +467,20 @@ const TypeGraphs: React.FC = () => {
                     transition={{ duration: 0.5 } as any}
                     className="hover: cursor-pointer ease-in duration-200"
                 >
-                    <StackedColumnChart status="Withdrawn" />
+                    <StatusColumnChart category={'Meta'} />
+                    <Box className={'w-full'}>
+                        <DateTime />
+                    </Box>
                 </Box>
 
-                <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={'8'}>
-                    Final
-                </Text>
+                <NextLink href={'/informational'}>
+                    <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+                        Informational - [{data.filter((item) => item.type === "Informational").length}]
+                    </Text>
+                </NextLink>
 
                 <Box
                     marginTop={"2rem"}
-                    paddingTop={'8'}
                     bg={bg}
                     p="0.5rem"
                     borderRadius="0.55rem"
@@ -466,7 +499,10 @@ const TypeGraphs: React.FC = () => {
                     transition={{ duration: 0.5 } as any}
                     className="hover: cursor-pointer ease-in duration-200"
                 >
-                    <StackedColumnChart status="Final" />
+                    <StatusColumnChart category={'Informational'} />
+                    <Box className={'w-full'}>
+                        <DateTime />
+                    </Box>
                 </Box>
             </Box>
         </>

@@ -116,7 +116,7 @@ const EIP = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Header title={`EIP : ${thirdPart}`} subtitle={data.title} />
+              <Header title={`EIP - ${thirdPart}`} subtitle={data.title} />
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: -10 }}

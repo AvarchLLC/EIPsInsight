@@ -24,6 +24,7 @@ interface EIP {
 
 import '@coreui/coreui/dist/css/coreui.min.css';
 import LoaderComponent from "./Loader";
+import DateTime from "./DateTime";
 interface TabProps {
     cat: string;
     status :string;
@@ -61,6 +62,7 @@ const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
     fetchData();
   }, []);
 
+
   useEffect(()=> {
     if(bg === "#f6f6f7") {
       setIsDarkMode(false);
@@ -71,7 +73,7 @@ const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
 
   const filteredData = data
   .map((item: any) => {
-    const { eip, title, author, status, type, category } = item;
+    const { eip, title, author, status, type, category} = item;
     return {
       eip,
       title,

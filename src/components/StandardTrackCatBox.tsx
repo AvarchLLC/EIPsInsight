@@ -59,14 +59,14 @@ const StandardTrackCatBox: React.FC = () => {
                     title="Core"
                     value={data.filter((item) => item.category === "Core").length}
                     icon={<Icon as={Link} />}
-                    url="interface"
+                    url="core"
                 />
 
                 <CatBox
                     title="ERCs"
                     value={data.filter((item) => item.category === "ERC").length}
                     icon={<Icon as={Clipboard} />}
-                    url="informational"
+                    url="erc"
                 />
 
                 <CatBox
@@ -75,13 +75,13 @@ const StandardTrackCatBox: React.FC = () => {
                         data.filter((item) => item.category === "Networking").length
                     }
                     icon={<Icon as={Briefcase} />}
-                    url="meta"
+                    url="networking"
                 />
                 <CatBox
                     title="Interface"
                     value={data.filter((item) => item.category === "Interface").length}
                     icon={<Icon as={BookOpen} fontSize={{lg:'15', sm: '10'}}/>}
-                    url="erc"
+                    url="interface"
                 />
             </Box>
 
@@ -100,13 +100,13 @@ const StandardTrackCatBox: React.FC = () => {
                     title="Core"
                     value={data.filter((item) => item.category === "Core").length}
                     icon={<Icon as={Link} />}
-                    url="interface"
+                    url="core"
                 />
                 <CatBox
                     title="ERCs"
                     value={data.filter((item) => item.category === "ERC").length}
                     icon={<Icon as={Clipboard} />}
-                    url="informational"
+                    url="erc"
                 />
 
                 <CatBox
@@ -115,7 +115,7 @@ const StandardTrackCatBox: React.FC = () => {
                         data.filter((item) => item.category === "Networking").length
                     }
                     icon={<Icon as={Briefcase} />}
-                    url="meta"
+                    url="networking"
                 />
                 <CatBox
                     title="Interface"

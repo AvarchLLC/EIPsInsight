@@ -25,6 +25,8 @@ interface EIP {
 import '@coreui/coreui/dist/css/coreui.min.css';
 import { Console } from "console";
 import LoaderComponent from "./Loader";
+import DateTime from "@/components/DateTime";
+import {DownloadIcon} from "@chakra-ui/icons";
 
 const Table = () => {
   const [data, setData] = useState<EIP[]>([]);
@@ -83,7 +85,35 @@ const Table = () => {
     }
   })
 
-  console.log(filteredData)
+  const convertAndDownloadCSV = () => {
+    if (filteredData && filteredData.length > 0) {
+      // Create CSV headers
+      const headers = Object.keys(filteredData[0]).join(',') + '\n';
+
+      // Convert data to CSV rows
+      const csvRows = filteredData.map((item) =>
+          Object.values(item)
+              .map((value) => (typeof value === 'string' && value.includes(',')
+                  ? `"${value}"`
+                  : value))
+              .join(',')
+      );
+
+      // Combine headers and rows
+      const csvContent = headers + csvRows.join('\n');
+
+      // Trigger CSV download
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `All_EIPs.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  };
 
   return (
     <Box
@@ -101,6 +131,12 @@ const Table = () => {
     transition={{ duration: 0.5 } as any}
     className=" ease-in duration-200"
   >
+      <Box>
+        <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'} onClick={convertAndDownloadCSV}>
+          <DownloadIcon marginEnd={'1.5'} />
+          Download Reports
+        </Button>
+      </Box>
       <CCardBody
           style={{
             fontSize: '13px',

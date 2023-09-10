@@ -7,7 +7,7 @@ import { ColorModeScript, Button, useColorMode } from '@chakra-ui/react';
 import {redirect} from "next/navigation";
 
 
-redirect('/dashboard');
+redirect('/home');
 
 
 export default function Home() {

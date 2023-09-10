@@ -12,9 +12,43 @@ import StackedColumnChart from '@/components/StackedBarChart';
 import {PieC} from "@/components/InPie";
 import AreaC from '@/components/AreaStatus';
 import Banner from "@/components/NewsBanner";
+import NextLink from "next/link";
+
+
+
+interface EIP {
+    _id: string;
+    eip: string;
+    title: string;
+    author: string;
+    status: string;
+    type: string;
+    category: string;
+    created: string;
+    discussion: string;
+    deadline: string;
+    requires: string;
+    unique_ID: number;
+    __v: number;
+}
 
 const Status = () => {
     const [isLoading, setIsLoading] = useState(true);
+    const [data, setData] = useState<EIP[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`/api/alleips`);
+                const jsonData = await response.json();
+                setData(jsonData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     useEffect(() => {
       // Simulating a loading delay
@@ -65,8 +99,8 @@ const Status = () => {
                         </Text>
                         <AreaC />
                     </Box>
-                    <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
-                        Draft
+                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                        Draft - <NextLink href={`/tableStatus/Draft`}> [ {data.filter((item) => item.status === 'Draft').length} ]</NextLink>
                     </Text>
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
 
@@ -77,8 +111,8 @@ const Status = () => {
                         <CBoxStatus status={'Draft'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
-                        Review
+                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                        Review - <NextLink href={`/tableStatus/Review`}> [ {data.filter((item) => item.status === 'Review').length} ]</NextLink>
                     </Text>
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
 
@@ -89,8 +123,8 @@ const Status = () => {
                         <CBoxStatus status={'Review'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
-                        Last Call
+                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                        Last Call -<NextLink href={`/tableStatus/LastCall`}> [ {data.filter((item) => item.status === 'Last Call').length} ] </NextLink>
                     </Text>
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
 
@@ -101,8 +135,8 @@ const Status = () => {
                         <CBoxStatus status={'Last Call'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#A020F0" paddingTop={'8'}>
-                        Living
+                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                        Living -<NextLink href={`/tableStatus/Living`}> [ {data.filter((item) => item.status === 'Living').length} ]</NextLink>
                     </Text>
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
                     
@@ -113,21 +147,32 @@ const Status = () => {
                         
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
-                        Final
+                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                        Final -<NextLink href={`/tableStatus/Final`}> [ {data.filter((item) => item.status === 'Final').length} ] </NextLink>
                     </Text>
+
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                    
-    
-                    <StackedColumnChart status={'Final'}/>
+                        <StackedColumnChart status={'Final'}/>
                         
 
                         <CBoxStatus status={'Final'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
-                        Withdrawn
+                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                        Stagnant -<NextLink href={`/tableStatus/Stagnant`}> [ {data.filter((item) => item.status === 'Stagnant').length} ] </NextLink>
                     </Text>
+
+                    <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
+                        <StackedColumnChart status={'Stagnant'}/>
+
+
+                        <CBoxStatus status={'Stagnant'}/>
+                    </Grid>
+
+                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                        Withdrawn -<NextLink href={`/tableStatus/Withdrawn`}> [ {data.filter((item) => item.status === 'Withdrawn').length} ] </NextLink>
+                    </Text>
+
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
 
                     <StackedColumnChart status={'Withdrawn'}/>
@@ -152,8 +197,8 @@ const Status = () => {
 
                   <AreaC />
 
-                  <Text fontSize="xl" fontWeight="bold" color="#A020F0" paddingTop={'8'}>
-                      Draft
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                      Draft - <NextLink href={`/tableStatus/Draft`}> [ {data.filter((item) => item.status === 'Draft').length} ]</NextLink>
                   </Text>
 
                   <Box>
@@ -161,8 +206,8 @@ const Status = () => {
                       <CBoxStatus status={'Draft'}/>
                   </Box>
 
-                  <Text fontSize="xl" fontWeight="bold" color="#A020F0" paddingTop={'8'}>
-                      Review
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                      Review - <NextLink href={`/tableStatus/Review`}> [ {data.filter((item) => item.status === 'Review').length} ]</NextLink>
                   </Text>
 
                   <Box>
@@ -170,8 +215,8 @@ const Status = () => {
                       <CBoxStatus status={'Review'}/>
                   </Box>
 
-                  <Text fontSize="xl" fontWeight="bold" color="#A020F0" paddingTop={'8'}>
-                      Last Call
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                      Last Call -<NextLink href={`/tableStatus/LastCall`}> [ {data.filter((item) => item.status === 'Last Call').length} ] </NextLink>
                   </Text>
 
                   <Box>
@@ -179,8 +224,8 @@ const Status = () => {
                       <CBoxStatus status={'Last Call'}/>
                   </Box>
 
-                  <Text fontSize="xl" fontWeight="bold" color="#A020F0" paddingTop={'8'}>
-                      Living
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                      Living -<NextLink href={`/tableStatus/Living`}> [ {data.filter((item) => item.status === 'Living').length} ]</NextLink>
                   </Text>
 
                   <Box>
@@ -188,17 +233,17 @@ const Status = () => {
                       <CBoxStatus status={'Living'}/>
                   </Box>
 
-                  <Text fontSize="xl" fontWeight="bold" color="#A020F0" paddingTop={'8'}>
-                      Final
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                      Stagnant -<NextLink href={`/tableStatus/Stagnant`}> [ {data.filter((item) => item.status === 'Stagnant').length} ] </NextLink>
                   </Text>
 
                   <Box>
-                  <StackedColumnChart status='Final'/>
-                      <CBoxStatus status={'Final'}/>
+                  <StackedColumnChart status='Stagnant'/>
+                      <CBoxStatus status={'Stagnant'}/>
                   </Box>
 
-                  <Text fontSize="xl" fontWeight="bold" color="#A020F0" paddingTop={'8'}>
-                      Withdrawn
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                      Withdrawn -<NextLink href={`/tableStatus/Withdrawn`}> [ {data.filter((item) => item.status === 'Withdrawn').length} ] </NextLink>
                   </Text>
 
                   <Box>

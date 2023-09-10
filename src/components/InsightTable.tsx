@@ -1,4 +1,4 @@
-import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link } from "@chakra-ui/react";
+import {Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link, Button} from "@chakra-ui/react";
 import { CCardBody, CSmartTable } from '@coreui/react-pro';
 import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
@@ -38,6 +38,7 @@ interface StatusChange {
 
 import '@coreui/coreui/dist/css/coreui.min.css';
 import LoaderComponent from "./Loader";
+import {DownloadIcon} from "@chakra-ui/icons";
 interface TabProps {
     month : string;
     year : string;
@@ -97,7 +98,7 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
   
   const filteredData = finalStatusChanges
       .map((item: any) => {
-          const { eip, title, author, status, type, category, pr } = item;
+          const { eip, title, author, status, type, category, pr, changedYear, changedMonth } = item;
           return {
               eip,
               title,
@@ -105,13 +106,45 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
               status,
               type,
               category,
-              pr
+              pr,
+              changedMonth,
+              changedYear
           };
       });
 
       console.log(filteredData);
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
+
+    const convertAndDownloadCSV = () => {
+        if (filteredData && filteredData.length > 0) {
+            // Create CSV headers
+            const headers = Object.keys(filteredData[0]).join(',') + '\n';
+
+            // Convert data to CSV rows
+            const csvRows = filteredData.map((item) =>
+                Object.values(item)
+                    .map((value) => (typeof value === 'string' && value.includes(',')
+                        ? `"${value}"`
+                        : value))
+                    .join(',')
+            );
+
+            // Combine headers and rows
+            const csvContent = headers + csvRows.join('\n');
+
+            // Trigger CSV download
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `${status}_${month}_${year}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    };
 
   return (
     <Box
@@ -141,92 +174,122 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
            <LoaderComponent/>
           </Box>
         ) : (
-          <CSmartTable
-          items={filteredData.sort((a, b) => parseInt(a.eip) - parseInt(b.eip))}
-            activePage={1}
-            clickableRows
-            columnFilter
-            columnSorter
-            itemsPerPage={7}
-            pagination
-            tableProps={{
+            <>
+                <Box>
+                    <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'} onClick={convertAndDownloadCSV}>
+                        <DownloadIcon marginEnd={'1.5'}/>
+                        Download Reports
+                    </Button>
+                </Box>
+            <CSmartTable
+            items={filteredData.sort((a, b) => parseInt(a.eip) - parseInt(b.eip))}
+          activePage={1}
+          clickableRows
+          columnFilter
+          columnSorter
+          itemsPerPage={7}
+          pagination
+          tableProps={{
               hover: true,
               responsive: true,
-            }}
-            scopedColumns={{
+          }}
+          scopedColumns={{
               eip: (item: any) => (
                   <td key={item.eip}>
-                    <Link href={`/EIPS/${item.eip}`}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </Link>
+                      <Link href={`/EIPS/${item.eip}`}>
+                          <Wrap>
+                              <WrapItem>
+                                  <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
+                              </WrapItem>
+                          </Wrap>
+                      </Link>
                   </td>
               ),
               title: (item: any) => (
                   <td key={item.eip} style={{ fontWeight: 'bold', height: '100%' }} className="hover:text-[#1c7ed6]">
-                    <Link href={`/EIPS/${item.eip}`} className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
-                      {item.title}
-                    </Link>
+                      <Link href={`/EIPS/${item.eip}`} className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
+                          {item.title}
+                      </Link>
                   </td>
               ),
               author: (it: any) => (
                   <td key={it.author}>
-                    <div>
-                      {factorAuthor(it.author).map((item: any, index: any) => {
-                        let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
-                        return (
-                            <Wrap key={index}>
-                              <WrapItem>
-                              <Link href={`${
-                          item[item.length - 1].substring(item[item.length - 1].length - 1) ===
-                          '>'
-                            ? 'mailto:' + t
-                            : 'https://github.com/' + t.substring(1)
-                        }`} target="_blank" className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
-                                {item}
-                                </Link>
-                              </WrapItem>
-                            </Wrap>
-                        );
-                      })}
-                    </div>
+                      <div>
+                          {factorAuthor(it.author).map((item: any, index: any) => {
+                              let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
+                              return (
+                                  <Wrap key={index}>
+                                      <WrapItem>
+                                          <Link href={`${
+                                              item[item.length - 1].substring(item[item.length - 1].length - 1) ===
+                                              '>'
+                                                  ? 'mailto:' + t
+                                                  : 'https://github.com/' + t.substring(1)
+                                          }`} target="_blank" className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
+                                              {item}
+                                          </Link>
+                                      </WrapItem>
+                                  </Wrap>
+                              );
+                          })}
+                      </div>
                   </td>
               ),
               type: (item: any) => (
                   <td key={item.eip} className={isDarkMode ? "text-white" : "text-black"}>
-                    {item.type}
+                      {item.type}
                   </td>
               ),
               category: (item: any) => (
                   <td key={item.eip} className={isDarkMode ? "text-white" : "text-black"}>
-                    {item.category}
+                      {item.category}
                   </td>
               ),
               status: (item: any) => (
                   <td key={item.eip}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
-                      </WrapItem>
-                    </Wrap>
+                      <Wrap>
+                          <WrapItem>
+                              <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
+                          </WrapItem>
+                      </Wrap>
                   </td>
               ),
               pr: (item: any) => (
+                  <td key={item.eip}>
+                      <Link href={`/PR/${item.pr}`}>
+                          <Wrap>
+                              <WrapItem>
+                                  <Badge colorScheme={getStatusColor(item.status)}>{item.pr}</Badge>
+                              </WrapItem>
+                          </Wrap>
+                      </Link>
+                  </td>
+              ),
+              changedMonth: (item: any) => (
                 <td key={item.eip}>
-                  <Link href={`/PR/${item.pr}`}>
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>{item.pr}</Badge>
-                    </WrapItem>
-                  </Wrap>
-                  </Link>
+                    <Link href={`/PR/${item.pr}`}>
+                        <Wrap>
+                            <WrapItem>
+                                <Badge colorScheme={"purple"}>{item.changedMonth}</Badge>
+                            </WrapItem>
+                        </Wrap>
+                    </Link>
                 </td>
             ),
-            }}
-          />
+            changedYear: (item: any) => (
+              <td key={item.eip}>
+                  <Link href={`/PR/${item.pr}`}>
+                      <Wrap>
+                          <WrapItem>
+                              <Badge colorScheme={"purple"}>{item.changedYear}</Badge>
+                          </WrapItem>
+                      </Wrap>
+                  </Link>
+              </td>
+          ),
+          }}
+      />
+            </>
         )}
       </CCardBody>
     </Box>

@@ -2,6 +2,8 @@ import { Box, Text, useColorModeValue, Select, Spinner } from '@chakra-ui/react'
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 import LoaderComponent from './Loader';
+import DateTime from "@/components/DateTime";
+import NextLink from "next/link";
 
 interface AreaProps {
   data: MappedDataItem[];
@@ -63,6 +65,22 @@ interface EIP {
   }[];
 }
 
+interface EIP2 {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+}
+
 interface FormattedEIP {
   category: string;
   date: string;
@@ -117,6 +135,23 @@ const AreaC = () => {
   const [selectedStatus, setSelectedStatus] = useState('Draft'); // Set default select option as 'Final'
   const [isChartReady, setIsChartReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
+
+  const [data2, setData2] = useState<EIP2[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/alleips`);
+        const jsonData = await response.json();
+        setData2(jsonData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -204,9 +239,11 @@ const AreaC = () => {
       }}
       className=" ease-in duration-200"
     >
-      <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
-        {`Status: ${selectedStatus}`}
-      </Text>
+      <NextLink href={`/tableStatus/${selectedStatus}`}>
+        <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
+          {`Status: ${selectedStatus} - [${data2.filter((item) => item.status === selectedStatus).length}] `}
+        </Text>
+      </NextLink>
       <Select
         variant="outline"
         placeholder="Select Option"
@@ -230,7 +267,9 @@ const AreaC = () => {
           </Box>
         ) : (
           // Show chart when it's ready
-          <Area {...config} />
+          <>
+            <Area {...config} />
+          </>
         )}
       </Box>
     </Box>

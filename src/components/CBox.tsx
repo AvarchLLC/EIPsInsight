@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Badge, Box, Link, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem, useColorModeValue } from "@chakra-ui/react";
 import { motion } from 'framer-motion';
+import DateTime from "@/components/DateTime";
 
 interface EIP {
   _id: string;
@@ -136,7 +137,7 @@ const CBox = () => {
             {result[key]}
           </Link>
         </Td>
-        <Td className={'ml-10 text-blue-400 ml-10'}>
+        <Td className={'ml-10 text-blue-400 '}>
           {percentage}%
         </Td>
       </Tr>
@@ -167,9 +168,9 @@ const CBox = () => {
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
           <Thead>
             <Tr>
-              <Th>Type - Category</Th>
-              <Th>Numbers</Th>
-              <Th>Percentage</Th>
+              <Th minW={'50%'}>Type - Category</Th>
+              <Th minW={'100px'}>Numbers</Th>
+              <Th minW={'100px'}>Percentage</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -177,6 +178,9 @@ const CBox = () => {
           </Tbody>
         </Table>
       </TableContainer>
+        <Box className={'w-full'}>
+            <DateTime />
+        </Box>
     </Box>
   );
 }

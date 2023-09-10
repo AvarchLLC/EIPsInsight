@@ -125,7 +125,7 @@ const StatusChart: React.FC<AreaCProps> = ({category}) => {
 
     const filteredData = data.map(item => ({
         year: item.year,
-        statusChanges: item.statusChanges.filter(x => getCat(x.eipCategory) === "Meta")
+        statusChanges: item.statusChanges.filter(x => getCat(x.eipCategory) === category)
     }));
 
     console.log(filteredData);
@@ -135,11 +135,9 @@ const StatusChart: React.FC<AreaCProps> = ({category}) => {
         item.statusChanges.map(change => ({
             status: getStatus(change.lastStatus),
             year: item.year,
-            value: item.statusChanges.length
+            value: 1
         }))
     ));
-
-
 
     const Area = dynamic(() => import('@ant-design/plots').then((item) => item.Column), {
         ssr: false,

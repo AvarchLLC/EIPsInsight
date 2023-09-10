@@ -55,15 +55,16 @@ When you're ready to submit your changes, follow these steps:
 The Ethereum Insight Proposals Insights is deployed using Vercel for seamless hosting and continuous deployment. The deployment process is automated through GitHub integration. When changes are pushed to the main branch, Vercel automatically builds and deploys the updated website.
 
 
-## Authors
+## Contributors
 
 - Dhanush Naik [(@dhanushlnaik)](https://www.github.com/dhanushlnaik)
-- Nandan [(@nandanpi)](https://github.com/nandanpi)
+- Nandan R Pai [(@nandanpi)](https://github.com/nandanpi)
 - Viwin [(@viwinkumarpadala)](https://github.com/viwinkumarpadala)
+- Arjun [(@Arjundotadex)](https://github.com/Arjundotadex)
 
 ---
 
 Thank you for your interest in the Ethereum Insight Proposals Insights. Let's work together to make Ethereum even better through collaborative development and insightful proposals. If you have any questions or need assistance, feel free to open an issue or reach out to us.
 
-Happy coding! 🚀🌐
+Happy buidl! 🚀🌐
 

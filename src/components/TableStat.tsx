@@ -1,4 +1,4 @@
-import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link } from "@chakra-ui/react";
+import {Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link, Button} from "@chakra-ui/react";
 import { CCardBody, CSmartTable } from '@coreui/react-pro';
 import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
@@ -24,6 +24,7 @@ interface EIP {
 
 import '@coreui/coreui/dist/css/coreui.min.css';
 import LoaderComponent from "./Loader";
+import {DownloadIcon} from "@chakra-ui/icons";
 interface TabProps {
     cat: string;
   }
@@ -84,6 +85,37 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
+  const convertAndDownloadCSV = () => {
+    if (filteredData && filteredData.length > 0) {
+      // Create CSV headers
+      const headers = Object.keys(filteredData[0]).join(',') + '\n';
+
+      // Convert data to CSV rows
+      const csvRows = filteredData.map((item) =>
+          Object.values(item)
+              .map((value) => (typeof value === 'string' && value.includes(',')
+                  ? `"${value}"`
+                  : value))
+              .join(',')
+      );
+
+      // Combine headers and rows
+      const csvContent = headers + csvRows.join('\n');
+
+      // Trigger CSV download
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `${cat}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  };
+
+
   return (
     <Box
     bgColor={bg}
@@ -100,6 +132,12 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
     transition={{ duration: 0.5 } as any}
     className=" ease-in duration-200"
   >
+      <Box>
+        <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'} onClick={convertAndDownloadCSV}>
+          <DownloadIcon marginEnd={'1.5'} />
+          Download Reports
+        </Button>
+      </Box>
 
       <CCardBody
         style={{

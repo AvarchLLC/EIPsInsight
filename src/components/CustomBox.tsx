@@ -1,5 +1,7 @@
 import { Badge, Box, Link, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import DateTime from "@/components/DateTime";
+import React from "react";
 
 interface CustomBoxProps {
   data: {
@@ -31,9 +33,23 @@ interface CustomBoxProps {
   }[];
   per : number;
   year: string;
-  month: string
+  month: string;
 }
+const customStatusOrder = [
+  "Draft",
+  "Review",
+  "Last Call",
+  "Final",
+  "Living",
+  "Stagnant",
+  "Withdrawn",
+];
 
+const sortByCustomOrder = (a:any, b:any) => {
+  const statusA = customStatusOrder.indexOf(a._id);
+  const statusB = customStatusOrder.indexOf(b._id);
+  return statusA - statusB;
+};
 
 const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
   const getStatusColor = (status: string) => {
@@ -92,7 +108,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200"
+      className="hover: cursor-pointer ease-in duration-200 overflow-y-hidden"
     >
       <TableContainer>
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
@@ -104,7 +120,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {data.map((entry, index) => (
+          {data.sort(sortByCustomOrder).map((entry, index) => (
               <Tr key={index}>
                 <Td minW="100px">
                   <Wrap>
@@ -131,6 +147,9 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
           </Tbody>
         </Table>
       </TableContainer>
+      <Box className={'w-full'}>
+        <DateTime />
+      </Box>
     </Box>
   );
 };

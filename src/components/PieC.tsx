@@ -4,6 +4,7 @@ import { Pie } from 'react-chartjs-2';
 import { Box, Card, CardFooter, CardHeader, Stack, StackDivider, Text, Divider, useColorModeValue } from '@chakra-ui/react';
 import FlexBetween from './FlexBetween';
 import { motion } from 'framer-motion';
+import DateTime from "@/components/DateTime";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -171,6 +172,10 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
             },
           }}
         />
+
+      <Box className={'w-full'}>
+        <DateTime />
+      </Box>
     </Box>
   );
 };

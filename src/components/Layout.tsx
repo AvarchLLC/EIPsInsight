@@ -1,7 +1,7 @@
 import { Providers } from '@/app/providers'
 import React from 'react'
 import LargeWithAppLinksAndSocial from '@/components/Footer'
-import WithSubnavigation from '@/components/Nav'
+import Navbar from "@/components/Navbar";
 import { Box, ColorModeScript } from '@chakra-ui/react'
 import { Inter } from 'next/font/google'
 import '../app/globals.css'
@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from 'next/navigation'
 import Head from 'next/head'
 import Banner from "@/components/NewsBanner";
+import PageHelpful from "@/components/PageHelpful";
+// import ViewsShare from "@/components/ViewsNShare";
 
 const mont = Inter({ subsets: ['latin'] })
 const AllLayout = ({
@@ -50,10 +52,17 @@ const AllLayout = ({
     </Head>
     <ColorModeScript initialColorMode='dark' />
     <Providers>
-      <WithSubnavigation/>
-        <Banner />
+      <Navbar />
+        {/*<Banner />*/}
         {children}
+      <Box
+        className={'flex justify-center mb-6'}
+      >
+        {/*<PageHelpful/>*/}
+      </Box>
+      {/*<ViewsShare/>*/}
       <LargeWithAppLinksAndSocial/>
+
       </Providers>
     </motion.div>
   )

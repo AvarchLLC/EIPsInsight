@@ -21,6 +21,7 @@ interface CBoxTypeProps {
   }
 
   import NextLink from "next/link";
+import DateTime from "@/components/DateTime";
 const getStatus = (status: string) => {
     switch (status) {
       case "Last Call":
@@ -176,9 +177,7 @@ const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
       transition={{ duration: 0.5 } as any}
       className="hover: cursor-pointer ease-in duration-200"
     >
-      <Text fontSize="2xl" fontWeight="bold" color="#A020F0" className={'ml-5 py-2'}>
-        TOTAL EIPS - <NextLink href={`/tableStatus/${getStatus(status)}`}> [{total}] </NextLink>
-      </Text>
+
       <TableContainer>
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
           <Thead>
@@ -193,6 +192,9 @@ const CBoxStatus: React.FC<CBoxTypeProps> = ( { status } ) => {
           </Tbody>
         </Table>
       </TableContainer>
+        <Box className={'w-full'}>
+            <DateTime />
+        </Box>
     </Box>
   );
 }

@@ -181,15 +181,15 @@ const Month = () => {
                             </Box>
 
                             <Grid templateColumns={{lg:"1fr 1fr 1fr",md:""}} gap={6}>
-                                <PieC data={data} status='Review'/>
-                                <PieC data={data} status='Draft'/>
-                                <PieC data={data} status='Last Call'/>
+                                <PieC data={data} status='Review' year={year} month={month}/>
+                                <PieC data={data} status='Draft' year={year} month={month}/>
+                                <PieC data={data} status='Last Call' year={year} month={month}/>
                             </Grid>
-                            <PieC data={data} status='Final'/>
+                            <PieC data={data} status='Final' year={year} month={month}/>
                             <Grid templateColumns={{lg:"1fr 1fr 1fr",md:""}} gap={6}>
-                                <PieC data={data} status='Living'/>
-                                <PieC data={data} status='Stagnant'/>
-                                <PieC data={data} status='Withdrawn'/>
+                                <PieC data={data} status='Living' year={year} month={month}/>
+                                <PieC data={data} status='Stagnant' year={year} month={month}/>
+                                <PieC data={data} status='Withdrawn' year={year} month={month}/>
                             </Grid>
                         </Box>
                     </motion.div>

@@ -1,6 +1,7 @@
 import { Badge, Box, Link, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import DateTime from "@/components/DateTime";
 
 
 
@@ -55,7 +56,7 @@ const OtherBox = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200"
+      className="hover: cursor-pointer ease-in duration-200 overflow-y-hidden"
     >
       <TableContainer>
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
@@ -137,6 +138,9 @@ const OtherBox = () => {
           </Tbody>
         </Table>
       </TableContainer>
+      <Box className={'w-full'}>
+        <DateTime />
+      </Box>
     </Box>
   );
 };

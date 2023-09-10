@@ -4,8 +4,7 @@ import './globals.css'
 import { Montserrat, DM_Sans, Inter } from 'next/font/google'
 import { Providers } from './providers'
 import { ColorModeScript } from '@chakra-ui/react';
-import WithSubnavigation from '@/components/Nav';
-import Nav from '@/components/Nav';
+import Navbar from "@/components/Navbar";
 import LargeWithAppLinksAndSocial from '@/components/Footer';
 import { Suspense } from 'react';
 const mont = Inter({ subsets: ['latin'] })
@@ -48,7 +47,7 @@ export default function RootLayout({
       >
        <ColorModeScript initialColorMode='dark' />
       <Providers>
-        <WithSubnavigation/>
+          <Navbar/>
 
           {children}
         <LargeWithAppLinksAndSocial/>

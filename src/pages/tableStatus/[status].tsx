@@ -44,12 +44,6 @@ const StatTab2 = () => {
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
             <FlexBetween>
               <Header title={getStatus(pathname[2])} subtitle='' />
-              <Box>
-                <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'}>
-                  <DownloadIcon marginEnd={'1.5'} />
-                  Download Reports
-                </Button>
-              </Box>
             </FlexBetween>
             <TableStat cat={getStatus(pathname[2])}/>
           </Box>

@@ -5,6 +5,9 @@ import FlexBetween from './FlexBetween';
 import { motion } from 'framer-motion';
 import LoaderComponent from './Loader';
 import dynamic from "next/dynamic";
+import DateTime from "@/components/DateTime";
+import NextLink from "next/link";
+import {usePathname} from "next/navigation";
 const Pie = dynamic(
   (): any => import("@ant-design/plots").then((item) => item.Pie),
   {
@@ -41,6 +44,8 @@ interface CustomBoxProps {
       __v: number;
     }[];
   }[];
+  year: string;
+  month: string;
 }
 
 interface DataItem {
@@ -76,7 +81,7 @@ function transformAndAddUp(data: DataItem[]): TransformedDataResult {
   return { transformedData: result, sum };
 }
 
-export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
+export const PieC: React.FC<CustomBoxProps> = ({ data, status , year, month}) => {
   const objs :any = []
   const transformedData: { [key: string]: number } = data.reduce((result: { [key: string]: number }, obj) => {
     
@@ -191,14 +196,19 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200"
+      className="hover: ease-in duration-200 overflow-y-hidden"
     >
-      <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#30A0E0" paddingTop="1rem">
-        {status} : {tdata.sum}
-      </Text>
+      <NextLink href={`/tableinsights/${year}/${month}/${status}`}>
+        <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#30A0E0" paddingTop="1rem">
+          {status} : {tdata.sum}
+        </Text>
+      </NextLink>
       <Divider mt="1rem" mb="1rem" />
       <Box width="60%" maxWidth={500} maxHeight={400}>
       <Pie {...config}/>
+      </Box>
+      <Box className={'w-full'}>
+        <DateTime />
       </Box>
     </Box>
   );

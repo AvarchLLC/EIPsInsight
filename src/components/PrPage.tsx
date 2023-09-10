@@ -12,11 +12,12 @@ import NextLink from 'next/link';
 import { BiGitMerge } from 'react-icons/bi';
 import {usePathname} from "next/navigation";
 import SearchBox from "@/components/SearchBox";
+import PrConversations from "@/components/PrConversations";
 
 
 
 
-interface EIP {
+interface PR {
     _id: string;
     __v: number;
     prNumber: number;
@@ -50,6 +51,8 @@ interface EIP {
                 type: string;
                 site_admin: boolean;
             }
+            author_association: string;
+            body: string;
         }
     ];
     participants: [];
@@ -133,8 +136,7 @@ function getLabelColor(label : string){
 }
 
 const PrPage: React.FC = () => {
-    const [data, setData] = useState<EIP | null>(null);
-    const [data2, setData2] = useState();
+    const [data, setData] = useState<PR | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const bg = useColorModeValue('#f6f6f7', '#171923');
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -172,28 +174,6 @@ const PrPage: React.FC = () => {
         }
     }, [prNumber]);
 
-    useEffect(() => {
-        if (prNumber) {
-            const fetchData = async () => {
-                try {
-                    const response = await fetch(`/api/time-to-editor-review/${prNumber}`);
-                    const jsonData = await response.json();
-
-                    if (jsonData && typeof jsonData === 'object') {
-                        setData2(jsonData);
-                    } else {
-                        console.error('API response is not an object:', jsonData);
-                    }
-
-                    setIsLoading(false);
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                    setIsLoading(false);
-                }
-            };
-            fetchData();
-        }
-    }, [prNumber]);
 
 
     useEffect(() => {
@@ -269,37 +249,27 @@ const PrPage: React.FC = () => {
                             </Box>
                         </Box>
 
-                        {/*Will be removed later*/}
-                        <Box
-                            paddingTop={8}
-                        >
-                            <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prNumber}`} target={'_blank'}>
-                                <div className={`w-full text-center border border-white rounded-[0.55rem] py-2`}>
-                                    <Text>All Conversations</Text>
-                                </div>
-                            </NextLink>
-                        </Box>
 
                         <div className="pt-8">
                             <Box
-                                className={'border border-white rounded-[0.55rem]'}
+                                className={'border border-blue-400 rounded-[0.55rem]'}
                                 display={'grid'}
                                 gridTemplateColumns={'1fr 1fr'}
                                 paddingY={4}
                                 paddingX={8}
                             >
                                 <Box
-                                    className={'border-r border-white'}
+                                    className={'border-r border-blue-400'}
                                 >
                                     <table>
                                         <tbody>
                                         <tr>
-                                            <td className={'text-3xl pb-10  pr-16'}>Commits:</td>
-                                            <td className={'text-2xl pb-10 rounded'}>
+                                            <td className={'text-2xl pb-10  pr-16'}>Commits:</td>
+                                            <td className={'text-lg pb-10 rounded'}>
                                                 <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prNumber}/commits`} target={'_blank'}>
                                                     <Wrap>
                                                         <WrapItem>
-                                                            <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'3xl'} paddingX={4} paddingY={2}>
+                                                            <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
                                                                 {data?.numCommits}
                                                             </Badge>
                                                         </WrapItem>
@@ -308,12 +278,12 @@ const PrPage: React.FC = () => {
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td className={'text-3xl pr-16 '}>Files Changed:</td>
-                                            <td className={'text-2xl'}>
+                                            <td className={'text-2xl pr-16 '}>Files Changed:</td>
+                                            <td className={'text-xl'}>
                                                 <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prNumber}/files`} target={'_blank'}>
                                                     <Wrap>
                                                         <WrapItem>
-                                                            <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'3xl'} paddingX={4} paddingY={2}>
+                                                            <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
                                                                 {data?.filesChanged.length}
                                                             </Badge>
                                                         </WrapItem>
@@ -324,7 +294,7 @@ const PrPage: React.FC = () => {
                                         </tbody>
                                     </table>
 
-                                    <Text className={'text-3xl pt-8 py-5'}>
+                                    <Text className={'text-2xl pt-8 py-5'}>
                                         Labels:
                                     </Text>
                                     <div className="flex space-x-3">
@@ -339,7 +309,7 @@ const PrPage: React.FC = () => {
                                         ))}
                                     </div>
 
-                                    <Text className={'text-3xl pt-8 py-5'}>
+                                    <Text className={'text-2xl pt-8 py-5'}>
                                         Participants:
                                     </Text>
                                     <div className={'flex flex-wrap'}>
@@ -369,11 +339,11 @@ const PrPage: React.FC = () => {
 
                                 <Box className={'pl-8'}>
                                     <Box display={'flex'} className={'space-x-10 pb-10'}>
-                                        <Text className={'text-3xl'}>Link:</Text>
+                                        <Text className={'text-2xl pt-2'}>Link:</Text>
                                         <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prNumber}`} target={'_blank'}>
                                             <Wrap>
                                                 <Button variant={'outline'} colorScheme={'purple'}>
-                                                    <Text className={'text-2xl'}>Go to Github PR Page</Text>
+                                                    <Text className={'text-sm'}>Go to Github PR Page</Text>
                                                 </Button>
                                             </Wrap>
                                         </NextLink>
@@ -382,7 +352,7 @@ const PrPage: React.FC = () => {
                                     <table>
                                         <tbody>
                                         <tr>
-                                            <td className={'text-3xl pb-10  pr-16 flex'}>
+                                            <td className={'text-2xl pb-10  pr-16 flex'}>
                                                 <NextLink href={'https://github.com/eth-bot'} target={'_blank'}>
                                                     <img
                                                         src={`https://avatars.githubusercontent.com/u/85952233?v=4`}
@@ -394,10 +364,10 @@ const PrPage: React.FC = () => {
                                                 </NextLink>
                                                 <span className="pt-5">ETH-Bot Comments:</span>
                                             </td>
-                                            <td className={'text-2xl pb-10 rounded'}>
+                                            <td className={'text-xl pb-10 rounded'}>
                                                 <Wrap>
                                                     <WrapItem>
-                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'3xl'} paddingX={4} paddingY={2}>
+                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
                                                             {ethBotCount}
                                                         </Badge>
                                                     </WrapItem>
@@ -405,7 +375,7 @@ const PrPage: React.FC = () => {
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td className={'text-3xl pr-16 flex'}>
+                                            <td className={'text-2xl pr-16 flex'}>
                                                 <NextLink href={'https://github.com/features/actions'} target={'_blank'}>
                                                     <img
                                                         src={`https://avatars.githubusercontent.com/in/15368?s=80&v=4`}
@@ -417,10 +387,10 @@ const PrPage: React.FC = () => {
                                                 </NextLink>
                                                 <span className='pt-4'>Github-Actions Bot:</span>
                                             </td>
-                                            <td className={'text-2xl'}>
+                                            <td className={'text-xl'}>
                                                 <Wrap>
                                                     <WrapItem>
-                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'3xl'} paddingX={4} paddingY={2}>
+                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
                                                             {gitActionsBotCount}
                                                         </Badge>
                                                     </WrapItem>
@@ -430,7 +400,47 @@ const PrPage: React.FC = () => {
                                         </tbody>
                                     </table>
 
+                                    <Box>
+                                        <Text className={'text-2xl pt-8'}>
+                                            Editor Comments:
+                                        </Text>
+
+                                        <Box>
+                                            {
+                                                data?.conversations.map(conversation => (
+                                                    <>
+                                                        {
+                                                           conversation.user.login === 'axic' || conversation.user.login === 'Pandapip1' || conversation.user.login === 'gcolvin' || conversation.user.login === 'lightclient' || conversation.user.login === 'SamWilsn' ? (
+                                                               <Box>
+                                                                   <NextLink href={conversation.user.html_url} target={'_blank'}>
+                                                                       <img
+                                                                           src={conversation.user.avatar_url}
+                                                                           alt=""
+                                                                           width={50}
+                                                                           height={50}
+                                                                           className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
+                                                                       />
+                                                                   </NextLink>
+                                                               </Box>
+                                                           ):(
+                                                               <>
+                                                               </>
+                                                           )
+                                                        }
+                                                    </>
+                                                ))
+                                            }
+                                        </Box>
+                                    </Box>
                                 </Box>
+                            </Box>
+
+                            <Box>
+                                <Text className={'text-3xl font-bold'} paddingY={8}>
+                                    All Conversations
+                                </Text>
+
+                                <PrConversations prNumber={prNumber}/>
                             </Box>
                         </div>
                     </Box>

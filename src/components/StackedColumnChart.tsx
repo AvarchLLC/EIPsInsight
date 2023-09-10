@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Box, useColorModeValue, Spinner } from '@chakra-ui/react';
 import { useWindowSize } from 'react-use';
+import DateTime from "@/components/DateTime";
 
 const getCat= (cat: string) => {
     switch (cat) {
@@ -189,6 +190,9 @@ interface AreaProps {
       >
 
         <Area {...config}/>
+        <Box className={'w-full'}>
+          <DateTime />
+        </Box>
       </Box>
         
 

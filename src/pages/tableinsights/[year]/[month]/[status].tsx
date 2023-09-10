@@ -64,13 +64,16 @@ interface StatusChange {
     }[];
 }
 
-const Insi = () => {
+
+
+const Insi= () => {
   const [isLoading, setIsLoading] = useState(true);
   const path = usePathname();
   const [isResEmpty, setIsResEmpty] = useState(false);
   const [data, setData] = useState<StatusChange[]>([]); // Set initial state as an empty array
 
-  let year = '';
+
+    let year = '';
   let month = '';
   let status = '';
 
@@ -103,18 +106,17 @@ useEffect(() => {
         setIsResEmpty(false);
     }
 })
-  return (
+
+
+
+
+
+    return (
     <AllLayout>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
             <FlexBetween>
               <Header title={`${monthNames[Number(month)-1]} - ${year}`} subtitle={getStatus(status)} />
-              <Box>
-                <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'}>
-                  <DownloadIcon marginEnd={'1.5'} />
-                  Download Reports
-                </Button>
-              </Box>
             </FlexBetween>
             <InsightTable year={year} month={month} status={status}/>
           </Box>

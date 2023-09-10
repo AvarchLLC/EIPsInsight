@@ -7,6 +7,7 @@ import {PieC} from "@/components/InPie";
 import OtherBox from "@/components/OtherStats";
 import {motion} from "framer-motion";
 import {usePathname} from "next/navigation";
+import DateTime from "@/components/DateTime";
 
 
 
@@ -161,6 +162,9 @@ const EmptyInsight = () => {
                                 </Tbody>
                             </Table>
                         </TableContainer>
+                        <Box className={'w-full'}>
+                            <DateTime />
+                        </Box>
                     </Box>
 
 

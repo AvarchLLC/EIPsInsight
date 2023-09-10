@@ -7,7 +7,6 @@ import BarChart from '@/components/BarChart';
 import { Anchor, BookOpen, Radio, Link, Clipboard, Briefcase } from 'react-feather';
 import {BsArrowUpRight, BsGraphUp} from 'react-icons/bs';
 import StackedColumnChart from "@/components/StackedBarChart";
-
 import AreaC from '@/components/AreaC';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -19,6 +18,7 @@ import LoaderComponent from './Loader';
 import Table from './Table';
 import Banner from "@/components/NewsBanner";
 import SearchBox from "@/components/SearchBox";
+import BoyGirl from '@/components/BoyGirl'
 
 interface EIP {
   _id: string;
@@ -137,7 +137,7 @@ const Dashboard = () => {
                           <Box
 
                           >
-                            <NextLink href={'/dashboard#1'}>
+                            <NextLink href={'/home#1'}>
                               <Button
                                   colorScheme="blue"
                                   variant={'outline'}
@@ -205,7 +205,7 @@ const Dashboard = () => {
                       <Box
 
                       >
-                        <NextLink href={'/dashboard#1'}>
+                        <NextLink href={'/home#1'}>
                           <Button
                               colorScheme="blue"
                               variant={'outline'}
@@ -240,11 +240,23 @@ const Dashboard = () => {
                   </div>
                 </Box>
 
-                <div className="py-8">
-                  <Box className={'w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500'} bgColor={bg} >
-                    <SearchBox />
-                  </Box>
-                </div>
+
+                <Box
+                    className={'lg:grid grid-cols-2 hidden pb-20'}
+                >
+                  <div className={'pl-8'}>
+                    <BoyGirl />
+                  </div>
+
+                  <div className={' flex justify-center items-center'}>
+                    <div className={'pt-24 space-y-6'}>
+                      <h1 className={'text-5xl font-bold'}>What is <span className='text-blue-400'>an EIP</span>?</h1>
+                      <p className={'text-3xl max-w-xl'}>EIP is a design document providing information to the Ethereum community or describing a new feature or improvement for the <span className='text-blue-400'>Ethereum blockchain</span>.</p>
+                      <NextLink href={'/resources'}><span className='text-blue-400 text-xl flex space-x-5'>Learn More <BsArrowUpRight className={'pt-2'} size={25}/></span></NextLink>
+                    </div>
+                  </div>
+                </Box>
+
 
                 <FlexBetween
 
@@ -254,22 +266,27 @@ const Dashboard = () => {
                   >
                     <Header title="DASHBOARD" subtitle="Welcome to the dashboard" />
                   </Box>
-
                   <Box
 
                   >
-                    <Button
-                        colorScheme="blue"
-                        variant="outline"
-                        fontSize={{lg:'14px',md:'12px', sm:'12px',base:'10px'}}
-                        fontWeight={'bold'}
-                        padding={{lg:'10px 20px',md:'5px 10px', sm:'5px 10px',base:'5px 10px'}}
-                    >
-                      <DownloadIcon marginEnd={'1.5'} />
-                      Download Reports
-                    </Button>
+                    {/*<Button*/}
+                    {/*    colorScheme="blue"*/}
+                    {/*    variant="outline"*/}
+                    {/*    fontSize={{lg:'14px',md:'12px', sm:'12px',base:'10px'}}*/}
+                    {/*    fontWeight={'bold'}*/}
+                    {/*    padding={{lg:'10px 20px',md:'5px 10px', sm:'5px 10px',base:'5px 10px'}}*/}
+                    {/*>*/}
+                    {/*  <DownloadIcon marginEnd={'1.5'} />*/}
+                    {/*  Download Reports*/}
+                    {/*</Button>*/}
                   </Box>
                 </FlexBetween>
+                <div className="py-8">
+                  <Box className={'w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500'} bgColor={bg} >
+                    <SearchBox />
+                  </Box>
+                </div>
+
               </motion.div>
 
 
@@ -358,6 +375,19 @@ const Dashboard = () => {
               </Box>
               <AreaC />
               <Table />
+
+              {/*<Box*/}
+              {/* className={'lg:grid hidden grid-cols-3'}*/}
+              {/*>*/}
+              {/*  <div className='col-span-2'>*/}
+              {/*    <h1 className='py-4'>*/}
+              {/*      Our <span className='text-blue-400'>Vision</span>*/}
+              {/*    </h1>*/}
+              {/*    <p>*/}
+              {/*     Demo text*/}
+              {/*    </p>*/}
+              {/*  </div>*/}
+              {/*</Box>*/}
             </motion.div>
         )}
       </Box>

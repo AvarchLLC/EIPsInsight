@@ -30,6 +30,7 @@ import StackedColumnChart from "@/components/StackedColumnChart";
 import AreaC from "@/components/AreaStatus";
 import Banner from "@/components/NewsBanner";
 import StandardTrackCatBox from "@/components/StandardTrackCatBox";
+import DateTime from "@/components/DateTime";
 
 interface EIP {
   _id: string;
@@ -156,7 +157,7 @@ const Type = () => {
                       title="Meta"
                       value={data.filter((item) => item.type === "Meta").length}
                       icon={<Icon as={BookOpen} />}
-                      url="erc"
+                      url="meta"
                   />
 
                   <CatBox
@@ -165,7 +166,7 @@ const Type = () => {
                         data.filter((item) => item.type === "Informational").length
                       }
                       icon={<Icon as={Radio} />}
-                      url="networking"
+                      url="informational"
                   />
 
                   <StandardTrackCatBox />
@@ -173,46 +174,27 @@ const Type = () => {
 
                 </Box>
 
-                <Grid gridTemplateColumns={'1fr 1fr'}>
-                  <Text
-                      fontSize="3xl"
-                      fontWeight="bold"
-                      color="#4267B2"
-                      paddingTop={8}
-                  >
-                    Standard Track
-                  </Text>
-                  <Text
-                      fontSize="3xl"
-                      fontWeight="bold"
-                      color="#4267B2"
-                      paddingTop={8}
-                      paddingLeft={'4'}
-                  >
-                    Draft vs Final
-                  </Text>
-                </Grid>
-                <Grid templateColumns="repeat(2, 1fr)" gap={8}>
-                  <CBox />
-                  {/*<Donut />*/}
-                  <Box paddingTop={'2'}>
-                    <AreaC />
-                  </Box>
-                </Grid>
-                {/*<Grid templateColumns="repeat(2, 1fr)" gap={8}>*/}
-                {/*  <Box>*/}
-                {/*    <Text fontSize="3xl" fontWeight="bold" color="#4267B2">*/}
-                {/*      Meta*/}
-                {/*    </Text>*/}
-                {/*    <DonutType type={"Meta"} />*/}
-                {/*  </Box>*/}
-                {/*  <Box>*/}
-                {/*    <Text fontSize="3xl" fontWeight="bold" color="#4267B2">*/}
-                {/*      Informational*/}
-                {/*    </Text>*/}
-                {/*    <DonutType type={"Informational"} />*/}
-                {/*  </Box>*/}
+                {/*<Grid gridTemplateColumns={'1fr 1fr'}>*/}
+                {/*  <Text*/}
+                {/*      fontSize="3xl"*/}
+                {/*      fontWeight="bold"*/}
+                {/*      color="#4267B2"*/}
+                {/*      paddingTop={8}*/}
+                {/*  >*/}
+                {/*    Type */}
+                {/*  </Text>*/}
+                {/*  <Text*/}
+                {/*      fontSize="3xl"*/}
+                {/*      fontWeight="bold"*/}
+                {/*      color="#4267B2"*/}
+                {/*      paddingTop={8}*/}
+                {/*      paddingLeft={'4'}*/}
+                {/*  >*/}
+                {/*    Draft vs Final*/}
+                {/*  </Text>*/}
                 {/*</Grid>*/}
+
+                  <CBox />
               </Box>
 
 
@@ -246,7 +228,7 @@ const Type = () => {
                         title="Meta"
                         value={data.filter((item) => item.type === "Meta").length}
                         icon={<Icon as={BookOpen} fontSize={{lg:'15', sm: '10'}}/>}
-                        url="erc"
+                        url="meta"
                     />
 
 
@@ -256,7 +238,7 @@ const Type = () => {
                           data.filter((item) => item.type === "Informational").length
                         }
                         icon={<Icon as={Radio} fontSize={{lg:'15', sm: '10'}}/>}
-                        url="networking"
+                        url="informational"
                     />
 
                   </Box>
@@ -288,21 +270,10 @@ const Type = () => {
                     >
                       Draft vs Final
                     </Text>
-                    <AreaC />
+                      <AreaC />
                   </Box>
                 </Box>
-                {/*<Box paddingTop={'8'}>*/}
-                {/*  <Text fontSize="xl" fontWeight="bold" color="#4267B2">*/}
-                {/*    Meta*/}
-                {/*  </Text>*/}
-                {/*  <DonutType type={"Meta"} />*/}
-                {/*</Box>*/}
-                {/*<Box paddingTop={'8'}>*/}
-                {/*  <Text fontSize="xl" fontWeight="bold" color="#4267B2">*/}
-                {/*    Informational*/}
-                {/*  </Text>*/}
-                {/*  <DonutType type={"Informational"} />*/}
-                {/*</Box>*/}
+
 
               </Box>
               <TypeG/>

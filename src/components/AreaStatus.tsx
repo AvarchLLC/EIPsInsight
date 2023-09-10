@@ -12,6 +12,7 @@ import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import FlexBetween from "./FlexBetween";
 import LoaderComponent from "./Loader";
+import DateTime from "./DateTime";
 
 interface AreaProps {
   data: MappedDataItem[];
@@ -110,16 +111,18 @@ const AreaC = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/graphs`);
-        console.log(response);
+        console.log(response)
         const jsonData = await response.json();
         setData(jsonData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
   }, []);
+
+  console.log(data);
 
   const [isChartReady, setIsChartReady] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -151,7 +154,7 @@ const AreaC = () => {
   const filteredData: FormattedEIP[] = formattedData;
 
   const config = {
-    data: filteredData,
+    data: formattedData,
     xField: "date",
     yField: "value",
     color: categoryColors,
@@ -203,6 +206,9 @@ const AreaC = () => {
           // Show chart when it's ready
           <Area {...config} />
         )}
+      </Box>
+      <Box className={'w-full'}>
+        <DateTime />
       </Box>
     </Box>
   );
