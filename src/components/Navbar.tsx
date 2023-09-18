@@ -31,8 +31,12 @@ const Navbar: React.FC = () => {
             href: `/all`,
         },
         {
-            label: "Type",
-            href: `/type`,
+            label: "EIP",
+            href: `/eip`,
+        },
+        {
+          label: "ERC",
+          href: `/erc`,
         },
         {
             label: "Status",
@@ -80,9 +84,14 @@ const Navbar: React.FC = () => {
             ],
         },
         {
+            label: "Authors",
+            href: `/authors`,
+        },
+        {
             label: "Resources",
             href: `/resources`,
         },
+
     ];
 
     function getMonthsTillCurrentYear(): NavItem[] {
@@ -197,7 +206,7 @@ const Navbar: React.FC = () => {
 
                         <Spacer />
 
-                        <div className={'flex space-x-8 font-bold '}>
+                        <div className={'flex space-x-8 font-bold'}>
                             {NAV_ITEMS.map((navItem) => (
                                 <Box key={navItem.label}>
                                     <Popover trigger={"hover"} placement={"bottom-start"}>
@@ -227,7 +236,7 @@ const Navbar: React.FC = () => {
                                                 rounded={"xl"}
                                                 minW={"sm"}
                                                 className={'overflow-y-auto'}
-                                                maxH={"800px"}
+                                                maxH={"900px"}
                                             >
                                                 <Stack direction={"column"} spacing={2}>
                                                     {navItem.children.map((child) => (
@@ -254,7 +263,13 @@ const Navbar: React.FC = () => {
                                                 </Stack>
                                             </PopoverContent>
                                         )}
+
                                     </Popover>
+
+
+
+
+
                                 </Box>
                             ))}
                         </div>

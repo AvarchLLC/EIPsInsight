@@ -98,7 +98,7 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
   
   const filteredData = finalStatusChanges
       .map((item: any) => {
-          const { eip, title, author, status, type, category, pr, changedYear, changedMonth } = item;
+          const { eip, title, author, status, type, category, pr, deadline } = item;
           return {
               eip,
               title,
@@ -107,8 +107,7 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
               type,
               category,
               pr,
-              changedMonth,
-              changedYear
+              deadline
           };
       });
 
@@ -265,28 +264,15 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
                       </Link>
                   </td>
               ),
-              changedMonth: (item: any) => (
+              deadline: (item: any) => (
                 <td key={item.eip}>
-                    <Link href={`/PR/${item.pr}`}>
-                        <Wrap>
-                            <WrapItem>
-                                <Badge colorScheme={"purple"}>{item.changedMonth}</Badge>
-                            </WrapItem>
-                        </Wrap>
-                    </Link>
+                  <Wrap>
+                    <WrapItem>
+                      <Badge colorScheme="purple">{item.deadline}</Badge>
+                    </WrapItem>
+                  </Wrap>
                 </td>
             ),
-            changedYear: (item: any) => (
-              <td key={item.eip}>
-                  <Link href={`/PR/${item.pr}`}>
-                      <Wrap>
-                          <WrapItem>
-                              <Badge colorScheme={"purple"}>{item.changedYear}</Badge>
-                          </WrapItem>
-                      </Wrap>
-                  </Link>
-              </td>
-          ),
           }}
       />
             </>

@@ -28,10 +28,36 @@ import LoaderComponent from "./Loader";
 import DateTime from "@/components/DateTime";
 import {DownloadIcon} from "@chakra-ui/icons";
 
+async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
+  try {
+    const apiUrl = `/api/eipshistory/${eipNumber}`;
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      const lastElement = data[0];
+      const lastElementCreatedYear = lastElement.mergedYear;
+      const lastElementCreatedMonth = lastElement.mergedMonth;
+      return { mergedYear: lastElementCreatedYear, mergedMonth: lastElementCreatedMonth };
+    } else {
+      throw new Error('No data found or data format is invalid.');
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
 const Table = () => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mergedData, setMergedData] = useState<{ mergedYear: string, mergedMonth: string }[]>([]);
 
 
   const factorAuthor = (data : any) => {
@@ -55,8 +81,17 @@ const Table = () => {
         const jsonData = await response.json();
         setData(jsonData);
         setIsLoading(false); // Set isLoading to false after data is fetched
+
+        // Fetch merged years and months for each item
+        const mergedDataPromises = jsonData.map((item: any) =>
+          fetchLastCreatedYearAndMonthFromAPI(item.eip)
+        );
+
+        // Wait for all promises to resolve
+        const mergedDataValues = await Promise.all(mergedDataPromises);
+        setMergedData(mergedDataValues);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         setIsLoading(false); // Set isLoading to false if there's an error
       }
     };
@@ -76,6 +111,13 @@ const Table = () => {
   });
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
+
+  
+  const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
+    ...item,
+    mergedYear: mergedData[index]?.mergedYear || '', // Replace '' with a default value if needed
+    mergedMonth: mergedData[index]?.mergedMonth || '', // Replace '' with a default value if needed
+  }));
 
   useEffect(()=> {
     if(bg === "#f6f6f7") {
@@ -151,7 +193,9 @@ const Table = () => {
         ) : (
             <CSmartTable
                 className={'text-[#008080]'}
-                items={filteredData.sort((a, b) => parseInt(a.eip) - parseInt(b.eip))}
+                items={filteredDataWithMergedYearsAndMonths .sort(
+                  (a, b) => parseInt(a.eip) - parseInt(b.eip)
+                )}
                 activePage={1}
                 clickableRows
                 columnFilter

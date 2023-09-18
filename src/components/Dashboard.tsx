@@ -3,7 +3,7 @@ import { Box, Button, Heading, Icon, Text, useColorModeValue, useMediaQuery, use
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import { DownloadIcon } from '@chakra-ui/icons';
-import BarChart from '@/components/BarChart';
+import DashboardDonut from '@/components/DashboardDonut';
 import { Anchor, BookOpen, Radio, Link, Clipboard, Briefcase } from 'react-feather';
 import {BsArrowUpRight, BsGraphUp} from 'react-icons/bs';
 import StackedColumnChart from "@/components/StackedBarChart";
@@ -240,6 +240,11 @@ const Dashboard = () => {
                   </div>
                 </Box>
 
+                <div className="py-8">
+                  <Box className={'w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500'} bgColor={bg} >
+                    <SearchBox />
+                  </Box>
+                </div>
 
                 <Box
                     className={'lg:grid grid-cols-2 hidden pb-20'}
@@ -281,11 +286,6 @@ const Dashboard = () => {
                     {/*</Button>*/}
                   </Box>
                 </FlexBetween>
-                <div className="py-8">
-                  <Box className={'w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500'} bgColor={bg} >
-                    <SearchBox />
-                  </Box>
-                </div>
 
               </motion.div>
 
@@ -370,11 +370,11 @@ const Dashboard = () => {
                     }}
                     className="hover: cursor-pointer ease-in duration-200"
                 >
-                  <BarChart />
+                  <DashboardDonut />
                 </Box>
               </Box>
-              <AreaC />
-              <Table />
+              {/*<AreaC />*/}
+              {/*<Table />*/}
 
               {/*<Box*/}
               {/* className={'lg:grid hidden grid-cols-3'}*/}
