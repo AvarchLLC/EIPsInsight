@@ -58,7 +58,7 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
   const data = cat;
   const filteredData = data
   .map((item: any) => {
-    const { eip, title, author, status, type, category } = item;
+    const { eip, title, author, status, type, category, deadline } = item;
     return {
       eip,
       title,
@@ -66,6 +66,7 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
       status,
       type,
       category,
+      deadline
       
     };
   })
@@ -174,6 +175,15 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
                     </Wrap>
                   </td>
               ),
+              deadline: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                      <Badge colorScheme={getStatusColor(item.status)}>{item.deadline}</Badge>
+                    </WrapItem>
+                  </Wrap>
+                </td>
+            ),
             }}
           />
         )}

@@ -12,6 +12,7 @@ interface CatBoxProps {
   value: string | number;
   icon: React.ReactNode;
   url: string;
+  percent: number;
 }
 
 
@@ -19,7 +20,7 @@ const CatBox: React.FC<CatBoxProps> = ({
   title,
   value,
   icon,
-  url,
+  url, percent,
 }) => {
   const theme = useTheme();
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -97,9 +98,14 @@ const CatBox: React.FC<CatBoxProps> = ({
         {icon}
       </FlexBetween>
 
-      <Text fontWeight="600" fontSize={{lg: "5xl", sm: "2xl",base:"2xl",md:"3xl"}} color="#30A0E0">
-        {value}
-      </Text>
+      <FlexBetween>
+        <Text fontWeight="600" fontSize={{lg: "5xl", sm: "2xl",base:"2xl",md:"3xl"}} color="#30A0E0">
+          {value}
+        </Text>
+        <Text fontWeight="600" fontSize={{lg: "3xl", sm: "xl",base:"lg",md:"2xl"}} color="#30A0E0">
+            {percent}%
+        </Text>
+      </FlexBetween>
       </Link>
     </Box>
 

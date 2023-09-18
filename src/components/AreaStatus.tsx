@@ -104,7 +104,7 @@ const categoryBorder: string[] = [
   "rgba(0, 128, 0, 0.2)",
 ];
 
-const AreaC = () => {
+const AreaStatus = () => {
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
 
   useEffect(() => {
@@ -214,4 +214,4 @@ const AreaC = () => {
   );
 };
 
-export default AreaC;
+export default AreaStatus;

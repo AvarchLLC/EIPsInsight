@@ -1,5 +1,5 @@
 'use client'
-import BarChart from '@/components/BarChart';
+import DashboardDonut from '@/components/DashboardDonut';
 import Dashboard from '@/components/Dashboard';
 import StatBox from '@/components/StatBox';
 import { EmailIcon } from '@chakra-ui/icons';

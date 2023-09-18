@@ -13,79 +13,104 @@ import { BiGitMerge } from 'react-icons/bi';
 import {usePathname} from "next/navigation";
 import SearchBox from "@/components/SearchBox";
 import PrConversations from "@/components/PrConversations";
+import FlexBetween from "@/components/FlexBetween";
+import Header from "@/components/Header";
+import {motion} from "framer-motion";
+import LoaderComponent from "@/components/Loader";
 
 
 
 
 interface PR {
-    _id: string;
-    __v: number;
-    prNumber: number;
-    prTitle: string;
-    prDescription: string;
-    labels: [];
-    conversations: [
-        {
+    type: string;
+    title: string;
+    url: string;
+    prDetails: {
+        prNumber: number;
+        prTitle: string;
+        prDescription: string;
+        labels: string[];
+        conversations: Conversation[];
+        numConversations: number;
+        participants: string[];
+        commits: Commit[];
+        numFilesChanged:number;
+    }
+}
+
+interface Conversation {
+    url: string;
+    html_url: string;
+    issue_url: string;
+    id: number;
+    node_id: string;
+    user: {
+        login: string;
+        id: number;
+        node_id: string;
+        avatar_url: string;
+    };
+    created_at: string;
+    updated_at: string;
+    author_association: string;
+    body: string;
+    reactions: {
+        url: string;
+        total_count: number;
+    };
+    performed_via_github_app: null | any;
+}
+
+interface Commit {
+    sha: string;
+    node_id: string;
+    commit: {
+        author: {
+            name: string;
+            email: string;
+            date: string;
+        };
+        committer: {
+            name: string;
+            email: string;
+            date: string;
+        };
+        message: string;
+        tree: {
+            sha: string;
             url: string;
-            html_url: string;
-            issue_url: string;
-            id: number;
-            node_id: string;
-            user: {
-                login: string;
-                id: number;
-                node_id: string;
-                avatar_url: string;
-                gravatar_id: string;
-                url: string;
-                html_url: string;
-                followers_url: string;
-                following_url: string;
-                gists_url: string;
-                starred_url: string;
-                subscriptions_url: string;
-                organizations_url: string;
-                repos_url: string;
-                events_url: string;
-                received_events_url: string;
-                type: string;
-                site_admin: boolean;
-            }
-            author_association: string;
-            body: string;
-        }
-    ];
-    participants: [];
-    mergeDate: string;
-    numCommits: number;
-    numFilesChanged: number;
-    numParticipants: number;
-    numConversations: number;
-    filesChanged: [];
-    commits: [
-        {
-            author: {
-                login: string;
-                id: number;
-                node_id: string;
-                avatar_url: string;
-                gravatar_id: string;
-                url: string;
-                html_url: string;
-                followers_url: string;
-                following_url: string;
-                gists_url: string;
-                starred_url: string;
-                subscriptions_url: string;
-                organizations_url: string;
-                repos_url: string;
-                events_url: string;
-                received_events_url: string;
-                type: string;
-                site_admin: boolean;
-            }
-        }
-    ];
+        };
+        url: string;
+        comment_count: number;
+        verification: {
+            verified: boolean;
+            reason: string;
+            signature: string;
+            payload: string;
+        };
+    };
+    url: string;
+    html_url: string;
+    comments_url: string;
+    author: {
+        login: string;
+        id: number;
+        node_id: string;
+        avatar_url: string;
+    };
+    committer: {
+        login: string;
+        id: number;
+        node_id: string;
+        avatar_url: string;
+    };
+    parents: Parent[];
+}
+
+interface Parent {
+    sha: string;
+    url: string;
+    html_url: string;
 }
 
 
@@ -140,7 +165,7 @@ const PrPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const bg = useColorModeValue('#f6f6f7', '#171923');
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [isLabelEmpty, setIsLabelEmpty] = useState(false);
+
 
     useEffect(() => {
         setIsDarkMode(bg === '#171923');
@@ -155,7 +180,7 @@ const PrPage: React.FC = () => {
         if (prNumber) {
             const fetchData = async () => {
                 try {
-                    const response = await fetch(`/api/pr/${prNumber}`);
+                    const response = await fetch(`/api/get-pr-or-issue-details/${prNumber}`);
                     const jsonData = await response.json();
 
                     if (jsonData && typeof jsonData === 'object') {
@@ -173,20 +198,17 @@ const PrPage: React.FC = () => {
             fetchData();
         }
     }, [prNumber]);
+    console.log(data);
 
 
 
-    useEffect(() => {
-        if(data?.labels.length === 0){
-            setIsLabelEmpty(true);
-        }
-    })
 
-    const ethBotFiltered = data?.conversations.filter(
+
+    const ethBotFiltered = data?.prDetails?.conversations.filter(
         (item) => item.user.login === 'eth-bot'
     );
     const ethBotCount = ethBotFiltered?.length;
-    const gitActionsBotFiltered = data?.conversations.filter(
+    const gitActionsBotFiltered = data?.prDetails?.conversations.filter(
         (item) => item.user.login === 'github-actions[bot]'
     );
     const gitActionsBotCount = gitActionsBotFiltered?.length;
@@ -201,248 +223,234 @@ const PrPage: React.FC = () => {
                         paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}
                         marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}
                     >
-                        <Box className={'flex justify-between'}>
-                            <h1 className="text-7xl font-bold pt-4">
-                                Pull Request
-                            </h1>
-                            <Box className={'pt-10'}>
-                                <SearchBox />
-                            </Box>
-                        </Box>
-
-                        <Box
-                            paddingTop={8}
-                            display={'flex'}
-                            gap={5}
-                        >
-                            <NextLink href={`https://github.com/${data?.commits[0].author.login}`} target={'_blank'}>
-                                <img
-                                    src={`${data?.commits.map(item => item.author.avatar_url)}`}
-                                    alt=""
-                                    width={80}
-                                    height={80}
-                                    className={'rounded-full hover:scale-110 duration-200'}
-                                />
-                            </NextLink>
-
-                            <Box
-                                paddingTop={5}
-                                display={'flex'}
-                                className={'space-x-4'}
-                            >
-                                <Text className={'text-4xl'}>
-                                    {data?.prTitle}
-                                </Text>
-                                <Text className={'text-4xl text-gray-400'}>
-                                    #{data?.prNumber}
-                                </Text>
-                            </Box>
-
-                            <Box paddingTop={3}>
-                                <Wrap>
-                                    <WrapItem>
-                                        <Badge variant={'solid'} colorScheme={'purple'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
-                                            <BiGitMerge />  Merged
-                                        </Badge>
-                                    </WrapItem>
-                                </Wrap>
-                            </Box>
-                        </Box>
-
-
-                        <div className="pt-8">
-                            <Box
-                                className={'border border-blue-400 rounded-[0.55rem]'}
-                                display={'grid'}
-                                gridTemplateColumns={'1fr 1fr'}
-                                paddingY={4}
-                                paddingX={8}
-                            >
+                        {
+                            isLoading ? (
                                 <Box
-                                    className={'border-r border-blue-400'}
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    height="100vh"
                                 >
-                                    <table>
-                                        <tbody>
-                                        <tr>
-                                            <td className={'text-2xl pb-10  pr-16'}>Commits:</td>
-                                            <td className={'text-lg pb-10 rounded'}>
-                                                <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prNumber}/commits`} target={'_blank'}>
-                                                    <Wrap>
-                                                        <WrapItem>
-                                                            <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
-                                                                {data?.numCommits}
-                                                            </Badge>
-                                                        </WrapItem>
-                                                    </Wrap>
-                                                </NextLink>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className={'text-2xl pr-16 '}>Files Changed:</td>
-                                            <td className={'text-xl'}>
-                                                <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prNumber}/files`} target={'_blank'}>
-                                                    <Wrap>
-                                                        <WrapItem>
-                                                            <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
-                                                                {data?.filesChanged.length}
-                                                            </Badge>
-                                                        </WrapItem>
-                                                    </Wrap>
-                                                </NextLink>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <Text className={'text-2xl pt-8 py-5'}>
-                                        Labels:
-                                    </Text>
-                                    <div className="flex space-x-3">
-                                        {data?.labels.map(item => (
-                                            <Wrap>
-                                                <WrapItem>
-                                                    <Badge  colorScheme={getLabelColor(item)} paddingX={4} paddingY={2} className={'rounded-full'}>
-                                                        {isLabelEmpty ? 'No Label' : item}
-                                                    </Badge>
-                                                </WrapItem>
-                                            </Wrap>
-                                        ))}
-                                    </div>
-
-                                    <Text className={'text-2xl pt-8 py-5'}>
-                                        Participants:
-                                    </Text>
-                                    <div className={'flex flex-wrap'}>
-                                        {
-                                            data?.participants.map(participant => {
-                                                const matchingConversation = data?.conversations.find(conversation => conversation.user.login === participant);
-
-                                                if (matchingConversation) {
-                                                    return (
-                                                        <NextLink key={participant} href={`https://github.com/${matchingConversation.user.login}`} target={'_blank'}>
-                                                            <img
-                                                                src={`${matchingConversation.user.avatar_url}`}
-                                                                alt=""
-                                                                width={50}
-                                                                height={50}
-                                                                className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
-                                                            />
-                                                        </NextLink>
-                                                    );
-                                                }
-
-                                                return null;
-                                            })
-                                        }
-                                    </div>
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <LoaderComponent />
+                                    </motion.div>
                                 </Box>
-
-                                <Box className={'pl-8'}>
-                                    <Box display={'flex'} className={'space-x-10 pb-10'}>
-                                        <Text className={'text-2xl pt-2'}>Link:</Text>
-                                        <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prNumber}`} target={'_blank'}>
-                                            <Wrap>
-                                                <Button variant={'outline'} colorScheme={'purple'}>
-                                                    <Text className={'text-sm'}>Go to Github PR Page</Text>
-                                                </Button>
-                                            </Wrap>
-                                        </NextLink>
-                                    </Box>
-
-                                    <table>
-                                        <tbody>
-                                        <tr>
-                                            <td className={'text-2xl pb-10  pr-16 flex'}>
-                                                <NextLink href={'https://github.com/eth-bot'} target={'_blank'}>
-                                                    <img
-                                                        src={`https://avatars.githubusercontent.com/u/85952233?v=4`}
-                                                        alt=""
-                                                        width={50}
-                                                        height={50}
-                                                        className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
-                                                    />
-                                                </NextLink>
-                                                <span className="pt-5">ETH-Bot Comments:</span>
-                                            </td>
-                                            <td className={'text-xl pb-10 rounded'}>
-                                                <Wrap>
-                                                    <WrapItem>
-                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
-                                                            {ethBotCount}
-                                                        </Badge>
-                                                    </WrapItem>
-                                                </Wrap>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className={'text-2xl pr-16 flex'}>
-                                                <NextLink href={'https://github.com/features/actions'} target={'_blank'}>
-                                                    <img
-                                                        src={`https://avatars.githubusercontent.com/in/15368?s=80&v=4`}
-                                                        alt=""
-                                                        width={50}
-                                                        height={50}
-                                                        className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
-                                                    />
-                                                </NextLink>
-                                                <span className='pt-4'>Github-Actions Bot:</span>
-                                            </td>
-                                            <td className={'text-xl'}>
-                                                <Wrap>
-                                                    <WrapItem>
-                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
-                                                            {gitActionsBotCount}
-                                                        </Badge>
-                                                    </WrapItem>
-                                                </Wrap>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-
+                            ):(
+                                <>
                                     <Box>
-                                        <Text className={'text-2xl pt-8'}>
-                                            Editor Comments:
-                                        </Text>
+                                        <FlexBetween>
+                                            <Header title={"Pull Request"} subtitle={`#${data?.prDetails?.prNumber}`}/>
+                                            <SearchBox />
+                                        </FlexBetween>
+
+                                        <Box className={'flex space-x-10 items-center'} paddingTop={8}>
+                                            <NextLink href={``} target={'_blank'}>
+                                                <img
+                                                    src={data?.prDetails.commits[0].author.avatar_url}
+                                                    alt={data?.prDetails.commits[0].author.login}
+                                                    width={80}
+                                                    height={80}
+                                                    className={'rounded-full hover:scale-110 duration-200'}
+                                                />
+                                            </NextLink>
+                                            <Text className={'text-3xl'}>{data?.title}</Text>
+                                            <Box paddingTop={3}>
+                                                <Wrap>
+                                                    <WrapItem>
+                                                        <Badge variant={'solid'} colorScheme={'purple'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
+                                                            <BiGitMerge />  Merged
+                                                        </Badge>
+                                                    </WrapItem>
+                                                </Wrap>
+                                            </Box>
+                                        </Box>
+
+                                        <Box paddingTop={8}>
+                                            <Box
+                                                className={'border border-blue-400 rounded-[0.55rem]'}
+                                                display={'grid'}
+                                                gridTemplateColumns={'1fr 1fr'}
+                                                paddingY={4}
+                                                paddingX={8}
+                                            >
+                                                <Box
+                                                    className={'border-r border-blue-400'}
+                                                >
+                                                    <table>
+                                                        <tbody>
+                                                        <tr>
+                                                            <td
+                                                                className={'pb-10 pr-16'}
+                                                            >
+                                                                <Text className={'text-2xl font-bold'}>Commits:</Text>
+                                                            </td>
+                                                            <td className={'pb-10'}>
+                                                                <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prDetails.prNumber}/commits`} target={'_blank'}>
+                                                                    <Wrap>
+                                                                        <WrapItem>
+                                                                            <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={1}>
+                                                                                {data?.prDetails.commits.length}
+                                                                            </Badge>
+                                                                        </WrapItem>
+                                                                    </Wrap>
+                                                                </NextLink>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td className={'pb-10 pr-16'}><Text className={'text-2xl font-bold'}>Files Changed: </Text></td>
+                                                            <td className={'pb-10'}>
+                                                                <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prDetails.prNumber}/files`} target={'_blank'}>
+                                                                    <Wrap>
+                                                                        <WrapItem>
+                                                                            <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={1}>
+                                                                                {data?.prDetails.numFilesChanged}
+                                                                            </Badge>
+                                                                        </WrapItem>
+                                                                    </Wrap>
+                                                                </NextLink>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    {
+                                                        data?.prDetails.labels.length !== 0 ? (
+                                                            <Box className={'pb-10'}>
+                                                                <Text className={'text-2xl font-bold pb-5'}>Labels: </Text>
+                                                                <div className="flex space-x-3">
+                                                                    {
+                                                                        data?.prDetails.labels.map(item => (
+                                                                            <Wrap>
+                                                                                <WrapItem>
+                                                                                    <Badge  colorScheme={getLabelColor(item)} paddingX={4} paddingY={2} className={'rounded-full'}>
+                                                                                        item
+                                                                                    </Badge>
+                                                                                </WrapItem>
+                                                                            </Wrap>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            </Box>
+                                                        ):(
+                                                            <>
+                                                            </>
+                                                        )
+                                                    }
+
+                                                    <Box>
+                                                        <Text className={'text-2xl font-bold pb-5'}>Participants: </Text>
+                                                        <div className={'flex flex-wrap'}>
+                                                            {
+                                                                data?.prDetails.participants.map(participant => {
+                                                                    const matchingConversation = data?.prDetails.conversations.find(conversation => conversation.user.login === participant);
+
+                                                                    if (matchingConversation) {
+                                                                        return (
+                                                                            <NextLink key={participant} href={`https://github.com/${matchingConversation.user.login}`} target={'_blank'}>
+                                                                                <img
+                                                                                    src={`${matchingConversation.user.avatar_url}`}
+                                                                                    alt=""
+                                                                                    width={50}
+                                                                                    height={50}
+                                                                                    className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
+                                                                                />
+                                                                            </NextLink>
+                                                                        );
+                                                                    }
+
+                                                                    return null;
+                                                                })
+                                                            }
+                                                        </div>
+                                                    </Box>
+                                                </Box>
+
+                                                <Box
+                                                    className={'pl-10'}
+                                                >
+                                                    <div className={'flex items-center space-x-10 pb-10'}>
+                                                        <Text className={'text-2xl font-bold'}>Link:</Text>
+                                                        <NextLink href={`${data?.url}`} target={'_blank'}>
+                                                            <Wrap>
+                                                                <Button variant={'outline'} colorScheme={'purple'}>
+                                                                    <Text className={'text-sm'}>Go to Github PR Page</Text>
+                                                                </Button>
+                                                            </Wrap>
+                                                        </NextLink>
+                                                    </div>
+
+                                                    <table>
+                                                        <tbody>
+                                                        <tr>
+                                                            <td className={'text-2xl pb-10  pr-16 flex'}>
+                                                                <NextLink href={'https://github.com/eth-bot'} target={'_blank'}>
+                                                                    <img
+                                                                        src={`https://avatars.githubusercontent.com/u/85952233?v=4`}
+                                                                        alt=""
+                                                                        width={50}
+                                                                        height={50}
+                                                                        className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
+                                                                    />
+                                                                </NextLink>
+                                                                <span className="pt-5">ETH-Bot Comments:</span>
+                                                            </td>
+                                                            <td className={'text-xl pb-10 rounded'}>
+                                                                <Wrap>
+                                                                    <WrapItem>
+                                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
+                                                                            {ethBotCount}
+                                                                        </Badge>
+                                                                    </WrapItem>
+                                                                </Wrap>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className={'text-2xl pr-16 flex'}>
+                                                                <NextLink href={'https://github.com/features/actions'} target={'_blank'}>
+                                                                    <img
+                                                                        src={`https://avatars.githubusercontent.com/in/15368?s=80&v=4`}
+                                                                        alt=""
+                                                                        width={50}
+                                                                        height={50}
+                                                                        className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
+                                                                    />
+                                                                </NextLink>
+                                                                <span className='pt-4'>Github-Actions Bot:</span>
+                                                            </td>
+                                                            <td className={'text-xl'}>
+                                                                <Wrap>
+                                                                    <WrapItem>
+                                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
+                                                                            {gitActionsBotCount}
+                                                                        </Badge>
+                                                                    </WrapItem>
+                                                                </Wrap>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </Box>
+                                            </Box>
+                                        </Box>
 
                                         <Box>
-                                            {
-                                                data?.conversations.map(conversation => (
-                                                    <>
-                                                        {
-                                                           conversation.user.login === 'axic' || conversation.user.login === 'Pandapip1' || conversation.user.login === 'gcolvin' || conversation.user.login === 'lightclient' || conversation.user.login === 'SamWilsn' ? (
-                                                               <Box>
-                                                                   <NextLink href={conversation.user.html_url} target={'_blank'}>
-                                                                       <img
-                                                                           src={conversation.user.avatar_url}
-                                                                           alt=""
-                                                                           width={50}
-                                                                           height={50}
-                                                                           className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
-                                                                       />
-                                                                   </NextLink>
-                                                               </Box>
-                                                           ):(
-                                                               <>
-                                                               </>
-                                                           )
-                                                        }
-                                                    </>
-                                                ))
-                                            }
+                                            <Text className={'text-3xl font-bold'} paddingY={8}>
+                                                All Conversations
+                                            </Text>
+
+                                            <PrConversations prNumber={prNumber}/>
                                         </Box>
+
                                     </Box>
-                                </Box>
-                            </Box>
+                                </>
+                            )
+                        }
 
-                            <Box>
-                                <Text className={'text-3xl font-bold'} paddingY={8}>
-                                    All Conversations
-                                </Text>
-
-                                <PrConversations prNumber={prNumber}/>
-                            </Box>
-                        </div>
                     </Box>
 
 

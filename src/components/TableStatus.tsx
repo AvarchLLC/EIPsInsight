@@ -1,10 +1,27 @@
-import {Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link, Button} from "@chakra-ui/react";
-import { CCardBody, CSmartTable } from '@coreui/react-pro';
 import React, { useEffect, useState } from 'react';
-import { motion } from "framer-motion";
-import { Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  useColorModeValue,
+  Wrap,
+  WrapItem,
+  Badge,
+  Link,
+  Button,
+} from '@chakra-ui/react';
+import { CCardBody, CSmartTable } from '@coreui/react-pro';
+import { motion } from 'framer-motion';
+import { Spinner } from '@chakra-ui/react';
 
-const statusArr = ['Final', 'Draft', 'Review', 'Last_Call', 'Stagnant', 'Withdrawn', 'Living']
+const statusArr = [
+  'Final',
+  'Draft',
+  'Review',
+  'Last_Call',
+  'Stagnant',
+  'Withdrawn',
+  'Living',
+];
 
 interface EIP {
   _id: string;
@@ -23,17 +40,45 @@ interface EIP {
 }
 
 import '@coreui/coreui/dist/css/coreui.min.css';
-import LoaderComponent from "./Loader";
-import {DownloadIcon} from "@chakra-ui/icons";
+import LoaderComponent from './Loader';
+import { DownloadIcon } from '@chakra-ui/icons';
+
 interface TabProps {
-    cat: string;
+  cat: string;
+}
+
+async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
+  try {
+    const apiUrl = `/api/eipshistory/${eipNumber}`;
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      const lastElement = data[0];
+      const lastElementCreatedYear = lastElement.mergedYear;
+      const lastElementCreatedMonth = lastElement.mergedMonth;
+      return { mergedYear: lastElementCreatedYear, mergedMonth: lastElementCreatedMonth };
+    } else {
+      throw new Error('No data found or data format is invalid.');
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
   }
+}
 
 
-const TableStatus: React.FC<TabProps> = ({cat})  => {
+
+const TableStatus: React.FC<TabProps> = ({ cat }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mergedData, setMergedData] = useState<{ mergedYear: string, mergedMonth: string }[]>([]);
 
   const factorAuthor = (data: any) => {
     let list = data.split(',');
@@ -44,7 +89,7 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
       list.pop();
     }
     return list;
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,49 +98,87 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
         const jsonData = await response.json();
         setData(jsonData);
         setIsLoading(false); // Set isLoading to false after data is fetched
+
+        // Fetch merged years and months for each item
+        const mergedDataPromises = jsonData.map((item: any) =>
+          fetchLastCreatedYearAndMonthFromAPI(item.eip)
+        );
+
+        // Wait for all promises to resolve
+        const mergedDataValues = await Promise.all(mergedDataPromises);
+        setMergedData(mergedDataValues);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         setIsLoading(false); // Set isLoading to false if there's an error
       }
     };
     fetchData();
   }, []);
 
-  useEffect(()=> {
-    if(bg === "#f6f6f7") {
+  useEffect(() => {
+    if (bg === '#f6f6f7') {
       setIsDarkMode(false);
     } else {
-        setIsDarkMode(true);
+      setIsDarkMode(true);
     }
-  })
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Living':
+        return 'blue';
+      case 'Final':
+        return 'blue';
+      case 'Stagnant':
+        return 'purple';
+      case 'Draft':
+        return 'orange';
+      case 'Withdrawn':
+        return 'red';
+      case 'Last Call':
+        return 'yellow';
+      default:
+        return 'gray';
+    }
+  };
+
+  const bg = useColorModeValue('#f6f6f7', '#171923');
 
   const filteredData = data
-  .map((item: any) => {
-    const { eip, title, author, status, type, category } = item;
-    return {
-      eip,
-      title,
-      author,
-      status,
-      type,
-      category,
-    };
-  })
-  .filter((item: any) => item.category === cat);
+    .map((item: any) => {
+      const { eip, title, author, status, type, category } = item;
 
+      return {
+        eip,
+        title,
+        author,
+        status,
+        type,
+        category,
+      };
+    })
+    .filter((item: any) => item.category === cat);
+
+    const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
+      ...item,
+      mergedYear: mergedData[index]?.mergedYear || '', // Replace '' with a default value if needed
+      mergedMonth: mergedData[index]?.mergedMonth || '', // Replace '' with a default value if needed
+    }));
 
   const convertAndDownloadCSV = () => {
-    if (filteredData && filteredData.length > 0) {
+    if (filteredDataWithMergedYearsAndMonths  && filteredDataWithMergedYearsAndMonths .length > 0) {
       // Create CSV headers
-      const headers = Object.keys(filteredData[0]).join(',') + '\n';
+      const headers = Object.keys(filteredDataWithMergedYearsAndMonths [0]).join(',') + '\n';
 
       // Convert data to CSV rows
-      const csvRows = filteredData.map((item) =>
-          Object.values(item)
-              .map((value) => (typeof value === 'string' && value.includes(',')
-                  ? `"${value}"`
-                  : value))
-              .join(',')
+      const csvRows = filteredDataWithMergedYearsAndMonths .map((item) =>
+        Object.values(item)
+          .map((value) =>
+            typeof value === 'string' && value.includes(',')
+              ? `"${value}"`
+              : value
+          )
+          .join(',')
       );
 
       // Combine headers and rows
@@ -114,27 +197,31 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
     }
   };
 
-  const bg = useColorModeValue("#f6f6f7", "#171923");
-
   return (
     <Box
-    bgColor={bg}
-    marginTop={"12"}
-    p="1rem 1rem"
-    borderRadius="0.55rem"
-    _hover={{
-      border: "1px",
-      borderColor: "#30A0E0",
-    }}
-    as={motion.div}
-    initial={{ opacity: 0, y: -20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 } as any}
-    className=" ease-in duration-200"
-  >
-
+      bgColor={bg}
+      marginTop={'12'}
+      p="1rem 1rem"
+      borderRadius="0.55rem"
+      _hover={{
+        border: '1px',
+        borderColor: '#30A0E0',
+      }}
+      as={motion.div}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 } as any}
+      className=" ease-in duration-200"
+    >
       <Box>
-        <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'} onClick={convertAndDownloadCSV}>
+        <Button
+          colorScheme="blue"
+          variant="outline"
+          fontSize={'14px'}
+          fontWeight={'bold'}
+          padding={'10px 20px'}
+          onClick={convertAndDownloadCSV}
+        >
           <DownloadIcon marginEnd={'1.5'} />
           Download Reports
         </Button>
@@ -148,11 +235,13 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
       >
         {isLoading ? ( // Show loader while data is loading
           <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-           <Spinner/>
+            <Spinner />
           </Box>
         ) : (
           <CSmartTable
-          items={filteredData.sort((a, b) => parseInt(a.eip) - parseInt(b.eip))}
+            items={filteredDataWithMergedYearsAndMonths .sort(
+              (a, b) => parseInt(a.eip) - parseInt(b.eip)
+            )}
             activePage={1}
             clickableRows
             columnFilter
@@ -165,64 +254,107 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
             }}
             scopedColumns={{
               eip: (item: any) => (
-                  <td key={item.eip}>
-                    <Link href={`/EIPS/${item.eip}`}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </Link>
-                  </td>
-              ),
-              title: (item: any) => (
-                  <td key={item.eip} style={{ fontWeight: 'bold', height: '100%' }} className="hover:text-[#1c7ed6]">
-                    <Link href={`/EIPS/${item.eip}`} className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
-                      {item.title}
-                    </Link>
-                  </td>
-              ),
-              author: (it: any) => (
-                  <td key={it.author}>
-                    <div>
-                      {factorAuthor(it.author).map((item: any, index: any) => {
-                        let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
-                        return (
-                            <Wrap key={index}>
-                              <WrapItem>
-                              <Link href={`${
-                          item[item.length - 1].substring(item[item.length - 1].length - 1) ===
-                          '>'
-                            ? 'mailto:' + t
-                            : 'https://github.com/' + t.substring(1)
-                        }`} target="_blank" className={isDarkMode? "hover:text-[#1c7ed6] text-[13px] text-white" : "hover:text-[#1c7ed6] text-[13px] text-black"}>
-                                {item}
-                                </Link>
-                              </WrapItem>
-                            </Wrap>
-                        );
-                      })}
-                    </div>
-                  </td>
-              ),
-              type: (item: any) => (
-                  <td key={item.eip} className={isDarkMode ? "text-white" : "text-black"}>
-                    {item.type}
-                  </td>
-              ),
-              category: (item: any) => (
-                  <td key={item.eip} className={isDarkMode ? "text-white" : "text-black"}>
-                    {item.category}
-                  </td>
-              ),
-              status: (item: any) => (
-                  <td key={item.eip}>
+                <td key={item.eip}>
+                  <Link href={`/EIPS/${item.eip}`}>
                     <Wrap>
                       <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
+                        <Badge colorScheme={getStatusColor(item.status)}>{item.eip}</Badge>
                       </WrapItem>
                     </Wrap>
-                  </td>
+                  </Link>
+                </td>
+              ),
+              title: (item: any) => (
+                <td
+                  key={item.eip}
+                  style={{ fontWeight: 'bold', height: '100%' }}
+                  className="hover:text-[#1c7ed6]"
+                >
+                  <Link
+                    href={`/EIPS/${item.eip}`}
+                    className={
+                      isDarkMode
+                        ? 'hover:text-[#1c7ed6] text-[13px] text-white'
+                        : 'hover:text-[#1c7ed6] text-[13px] text-black'
+                    }
+                  >
+                    {item.title}
+                  </Link>
+                </td>
+              ),
+              author: (it: any) => (
+                <td key={it.author}>
+                  <div>
+                    {factorAuthor(it.author).map((item: any, index: any) => {
+                      let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
+                      return (
+                        <Wrap key={index}>
+                          <WrapItem>
+                            <Link
+                              href={`${
+                                item[item.length - 1].substring(item[item.length - 1].length - 1) ===
+                                '>'
+                                  ? 'mailto:' + t
+                                  : 'https://github.com/' + t.substring(1)
+                              }`}
+                              target="_blank"
+                              className={
+                                isDarkMode
+                                  ? 'hover:text-[#1c7ed6] text-[13px] text-white'
+                                  : 'hover:text-[#1c7ed6] text-[13px] text-black'
+                              }
+                            >
+                              {item}
+                            </Link>
+                          </WrapItem>
+                        </Wrap>
+                      );
+                    })}
+                  </div>
+                </td>
+              ),
+              type: (item: any) => (
+                <td
+                  key={item.eip}
+                  className={isDarkMode ? 'text-white' : 'text-black'}
+                >
+                  {item.type}
+                </td>
+              ),
+              category: (item: any) => (
+                <td
+                  key={item.eip}
+                  className={isDarkMode ? 'text-white' : 'text-black'}
+                >
+                  {item.category}
+                </td>
+              ),
+              status: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                      <Badge colorScheme={getStatusColor(item.status)}>{item.status}</Badge>
+                    </WrapItem>
+                  </Wrap>
+                </td>
+              ),
+              mergedYear: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}> {item.mergedYear}</Badge>
+                  </WrapItem>
+                  </Wrap>
+                </td>
+              ),
+              mergedMonth: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}> {item.mergedMonth}</Badge>
+                  </WrapItem>
+                  </Wrap>
+                </td>
               ),
             }}
           />
@@ -230,25 +362,6 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
       </CCardBody>
     </Box>
   );
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "Living":
-      return "blue";
-    case "Final":
-      return "blue";
-    case "Stagnant":
-      return "purple";
-    case "Draft":
-      return "orange"
-    case "Withdrawn":
-      return "red"
-    case "Last Call":
-      return "yellow"
-    default:
-      return "gray";
-  }
 };
 
 export default TableStatus;

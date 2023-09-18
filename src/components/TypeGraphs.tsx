@@ -170,11 +170,11 @@ const TypeGraphs = () => {
                     </Box>
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
-                    <NextLink href={'/erc'}>
-                        <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                            ERC - [{data.filter((item) => item.category === "ERC").length}]
-                        </Text>
-                    </NextLink>
+                    {/*<NextLink href={'/erc'}>*/}
+                    {/*    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">*/}
+                    {/*        ERC - [{data.filter((item) => item.category === "ERC").length}]*/}
+                    {/*    </Text>*/}
+                    {/*</NextLink>*/}
                     <NextLink href={'/meta'}>
                         <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                             Meta - [{data.filter((item) => item.type === "Meta").length}]
@@ -187,31 +187,31 @@ const TypeGraphs = () => {
                     </NextLink>
                 </Grid>
                 <Grid templateColumns="1fr 1fr 1fr" gap={8}>
-                    <Box
-                        marginTop={"2rem"}
-                        bg={bg}
-                        p="0.5rem"
-                        borderRadius="0.55rem"
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                        alignItems="center"
-                        height={400}
-                        _hover={{
-                            border: "1px",
-                            borderColor: "#30A0E0",
-                        }}
-                        as={motion.div}
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 } as any}
-                        className="hover: cursor-pointer ease-in duration-200"
-                    >
-                        <StatusColumnChart category={'ERCs'} />
-                        <Box className={'w-full'}>
-                            <DateTime />
-                        </Box>
-                    </Box>
+                    {/*<Box*/}
+                    {/*    marginTop={"2rem"}*/}
+                    {/*    bg={bg}*/}
+                    {/*    p="0.5rem"*/}
+                    {/*    borderRadius="0.55rem"*/}
+                    {/*    display="flex"*/}
+                    {/*    flexDirection="column"*/}
+                    {/*    justifyContent="center"*/}
+                    {/*    alignItems="center"*/}
+                    {/*    height={400}*/}
+                    {/*    _hover={{*/}
+                    {/*        border: "1px",*/}
+                    {/*        borderColor: "#30A0E0",*/}
+                    {/*    }}*/}
+                    {/*    as={motion.div}*/}
+                    {/*    initial={{ opacity: 0, y: -20 }}*/}
+                    {/*    animate={{ opacity: 1, y: 0 }}*/}
+                    {/*    transition={{ duration: 0.5 } as any}*/}
+                    {/*    className="hover: cursor-pointer ease-in duration-200"*/}
+                    {/*>*/}
+                    {/*    <StatusColumnChart category={'ERCs'} />*/}
+                    {/*    <Box className={'w-full'}>*/}
+                    {/*        <DateTime />*/}
+                    {/*    </Box>*/}
+                    {/*</Box>*/}
 
                     <Box
                         marginTop={"2rem"}

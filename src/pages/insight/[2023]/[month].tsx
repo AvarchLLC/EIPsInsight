@@ -124,6 +124,8 @@ const Month = () => {
         return () => clearTimeout(timeout);
     }, []);
     const bg = useColorModeValue("#f6f6f7", "#171923");
+
+
     return (
         <AllLayout>
             {isLoading ? ( // Check if the data is still loading
@@ -159,7 +161,7 @@ const Month = () => {
                             <Header title={getMonthName(Number(month))} subtitle={year} />
                             <Grid className={'justify-center'} paddingBottom={'8'} gridTemplateColumns={{lg: '2fr 2fr',md:''}} gap={'8'} paddingY={'8'}>
                                 <Box>
-                                    <CustomBox data={data} per={total} year={year} month={month}/>
+                                    <CustomBox data={data.filter(item => !item.statusChanges.every(it => it.category === 'ERC'))} per={total} year={year} month={month}/>
                                 </Box>
                                 <Box>
                                     <OtherBox />
