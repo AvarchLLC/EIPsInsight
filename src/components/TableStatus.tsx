@@ -73,8 +73,35 @@ async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{
 }
 
 
+  async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
+    try {
+      const apiUrl = `/api/eipshistory/${eipNumber}`;
+      const response = await fetch(apiUrl);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      if (Array.isArray(data) && data.length > 0) {
+        const lastElement = data[0];
+        const lastElementCreatedYear = lastElement.mergedYear;
+        const lastElementCreatedMonth = lastElement.mergedMonth;
+        return { mergedYear: lastElementCreatedYear, mergedMonth: lastElementCreatedMonth };
+      } else {
+        throw new Error('No data found or data format is invalid.');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  }
+
+
 
 const TableStatus: React.FC<TabProps> = ({ cat }) => {
+
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -145,25 +172,27 @@ const TableStatus: React.FC<TabProps> = ({ cat }) => {
   const bg = useColorModeValue('#f6f6f7', '#171923');
 
   const filteredData = data
-    .map((item: any) => {
-      const { eip, title, author, status, type, category } = item;
+  .map((item: any) => {
+    const { eip, title, author, status, type, category } = item;
+    return {
+      eip,
+      title,
+      author,
+      status,
+      type,
+      category,
+    };
+  })
+  .filter((item: any) => item.category === cat);
 
-      return {
-        eip,
-        title,
-        author,
-        status,
-        type,
-        category,
-      };
-    })
-    .filter((item: any) => item.category === cat);
+  const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
+    "#": (index + 1).toString(), // Add the sr number
+    ...item,
+    mergedYear: mergedData[index]?.mergedYear || '', // Replace '' with a default value if needed
+    mergedMonth: mergedData[index]?.mergedMonth || '', // Replace '' with a default value if needed
+  }));
 
-    const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
-      ...item,
-      mergedYear: mergedData[index]?.mergedYear || '', // Replace '' with a default value if needed
-      mergedMonth: mergedData[index]?.mergedMonth || '', // Replace '' with a default value if needed
-    }));
+  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
     if (filteredDataWithMergedYearsAndMonths  && filteredDataWithMergedYearsAndMonths .length > 0) {
@@ -197,22 +226,25 @@ const TableStatus: React.FC<TabProps> = ({ cat }) => {
     }
   };
 
+
+
   return (
     <Box
-      bgColor={bg}
-      marginTop={'12'}
-      p="1rem 1rem"
-      borderRadius="0.55rem"
-      _hover={{
-        border: '1px',
-        borderColor: '#30A0E0',
-      }}
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className=" ease-in duration-200"
-    >
+    bgColor={bg}
+    marginTop={"12"}
+    p="1rem 1rem"
+    borderRadius="0.55rem"
+    _hover={{
+      border: "1px",
+      borderColor: "#30A0E0",
+    }}
+    as={motion.div}
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 } as any}
+    className=" ease-in duration-200"
+  >
+
       <Box>
         <Button
           colorScheme="blue"
@@ -239,9 +271,10 @@ const TableStatus: React.FC<TabProps> = ({ cat }) => {
           </Box>
         ) : (
           <CSmartTable
-            items={filteredDataWithMergedYearsAndMonths .sort(
-              (a, b) => parseInt(a.eip) - parseInt(b.eip)
-            )}
+          items={filteredDataWithMergedYearsAndMonths .sort(
+            (a, b) => parseInt(a["#"]) - parseInt(b["#"])
+          )}
+
             activePage={1}
             clickableRows
             columnFilter
@@ -253,6 +286,17 @@ const TableStatus: React.FC<TabProps> = ({ cat }) => {
               responsive: true,
             }}
             scopedColumns={{
+              "#": (item: any) => (
+                <td key={item.eip}>
+                  <Link href={`/EIPS/${item.eip}`}>
+                    <Wrap>
+                      <WrapItem>
+                        <Badge colorScheme={getStatusColor(item.status)}>{item["#"]}</Badge>
+                      </WrapItem>
+                    </Wrap>
+                  </Link>
+                </td>
+            ),
               eip: (item: any) => (
                 <td key={item.eip}>
                   <Link href={`/EIPS/${item.eip}`}>
@@ -356,6 +400,24 @@ const TableStatus: React.FC<TabProps> = ({ cat }) => {
                   </Wrap>
                 </td>
               ),
+              mergedYear: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}> {item.mergedYear}</Badge>
+                  </WrapItem>
+                  </Wrap>
+                </td>
+              ),
+              mergedMonth: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}> {item.mergedMonth}</Badge>
+                  </WrapItem>
+                  </Wrap>
+                </td>
+              ),
             }}
           />
         )}
@@ -364,4 +426,26 @@ const TableStatus: React.FC<TabProps> = ({ cat }) => {
   );
 };
 
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "Living":
+      return "blue";
+    case "Final":
+      return "blue";
+    case "Stagnant":
+      return "purple";
+    case "Draft":
+      return "orange"
+    case "Withdrawn":
+      return "red"
+    case "Last Call":
+      return "yellow"
+    default:
+      return "gray";
+  }
+};
+
+
 export default TableStatus;
+

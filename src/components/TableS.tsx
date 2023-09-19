@@ -175,15 +175,24 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
                     </Wrap>
                   </td>
               ),
-              deadline: (item: any) => (
-                <td key={item.eip}>
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>{item.deadline}</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </td>
-            ),
+              deadline: (item: any) => {
+                // Conditionally render the "deadline" column if the "status" is "Last Call"
+                if (item.status === 'Last Call') {
+                  return (
+                    <td key={item.eip}>
+                      <Wrap>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>{item.deadline}</Badge>
+                        </WrapItem>
+                      </Wrap>
+                    </td>
+                  );
+                } else {
+                  // Return null for other statuses to hide the column
+                  return null;
+                }
+              },
+
             }}
           />
         )}

@@ -119,6 +119,7 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
   .filter((item: any) => item.status === cat);
 
   const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
+    "#": (index + 1).toString(), // Add the sr number
     ...item,
     mergedYear: mergedData[index]?.mergedYear || '', // Replace '' with a default value if needed
     mergedMonth: mergedData[index]?.mergedMonth || '', // Replace '' with a default value if needed
@@ -195,7 +196,9 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
         ) : (
           <CSmartTable
           items={filteredDataWithMergedYearsAndMonths .sort(
-            (a, b) => parseInt(a.eip) - parseInt(b.eip)
+
+            (a, b) => parseInt(a["#"]) - parseInt(b["#"])
+
           )}
             activePage={1}
             clickableRows
@@ -208,6 +211,17 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
               responsive: true,
             }}
             scopedColumns={{
+              "#": (item: any) => (
+                <td key={item.eip}>
+                  <Link href={`/EIPS/${item.eip}`}>
+                    <Wrap>
+                      <WrapItem>
+                        <Badge colorScheme={getStatusColor(item.status)}>{item["#"]}</Badge>
+                      </WrapItem>
+                    </Wrap>
+                  </Link>
+                </td>
+            ),
               eip: (item: any) => (
                   <td key={item.eip}>
                     <Link href={`/EIPS/${item.eip}`}>

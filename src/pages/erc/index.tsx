@@ -89,7 +89,7 @@ const ERC = () => {
       
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
       <FlexBetween>
-      <Header title={`Ethereum Request for Comment - [ ${data.filter((item) => item.type === "Standards Track" && item.category === "ERC").length} ]`} subtitle="ERCs describe application-level standards for the Ethereum ecosystem." />
+      <Header title={`Ethereum Request for Comment - [ ${data.filter((item) => item.type === "Standards Track" && item.category === "ERC").length} ]`} subtitle="ERCs describe application-level standard for the Ethereum ecosystem." />
       </FlexBetween>
       <Box className={'w-full pt-10'}>
         <SearchBox />

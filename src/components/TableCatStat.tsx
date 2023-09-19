@@ -1,4 +1,4 @@
-import { Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link } from "@chakra-ui/react";
+import {Box, Text, useColorModeValue, Wrap, WrapItem, Badge, Link, Button} from "@chakra-ui/react";
 import { CCardBody, CSmartTable } from '@coreui/react-pro';
 import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
@@ -49,19 +49,42 @@ async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{
 
 import '@coreui/coreui/dist/css/coreui.min.css';
 import LoaderComponent from "./Loader";
-import DateTime from "./DateTime";
+import {DownloadIcon} from "@chakra-ui/icons";
 interface TabProps {
     cat: string;
-    status :string;
+  }
+
+  async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
+    try {
+      const apiUrl = `/api/eipshistory/${eipNumber}`;
+      const response = await fetch(apiUrl);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      if (Array.isArray(data) && data.length > 0) {
+        const lastElement = data[0];
+        const lastElementCreatedYear = lastElement.mergedYear;
+        const lastElementCreatedMonth = lastElement.mergedMonth;
+        return { mergedYear: lastElementCreatedYear, mergedMonth: lastElementCreatedMonth };
+      } else {
+        throw new Error('No data found or data format is invalid.');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
   }
 
 
-const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
+const TableStat: React.FC<TabProps> = ({cat})  => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mergedData, setMergedData] = useState<{ mergedYear: string, mergedMonth: string }[]>([]);
-
 
   const factorAuthor = (data: any) => {
     let list = data.split(',');
@@ -98,7 +121,6 @@ const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
     fetchData();
   }, []);
 
-
   useEffect(()=> {
     if(bg === "#f6f6f7") {
       setIsDarkMode(false);
@@ -109,7 +131,7 @@ const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
 
   const filteredData = data
   .map((item: any) => {
-    const { eip, title, author, status, type, category} = item;
+    const { eip, title, author, status, type, category } = item;
     return {
       eip,
       title,
@@ -120,12 +142,49 @@ const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
     };
   })
   .filter((item: any) => item.category === cat && item.status === status );
+
+
   const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
+    "#": (index + 1).toString(), // Add the sr number
+
     ...item,
     mergedYear: mergedData[index]?.mergedYear || '', // Replace '' with a default value if needed
     mergedMonth: mergedData[index]?.mergedMonth || '', // Replace '' with a default value if needed
   }));
   const bg = useColorModeValue("#f6f6f7", "#171923");
+
+  const convertAndDownloadCSV = () => {
+    if (filteredDataWithMergedYearsAndMonths  && filteredDataWithMergedYearsAndMonths .length > 0) {
+      // Create CSV headers
+      const headers = Object.keys(filteredDataWithMergedYearsAndMonths [0]).join(',') + '\n';
+
+      // Convert data to CSV rows
+      const csvRows = filteredDataWithMergedYearsAndMonths .map((item) =>
+        Object.values(item)
+          .map((value) =>
+            typeof value === 'string' && value.includes(',')
+              ? `"${value}"`
+              : value
+          )
+          .join(',')
+      );
+
+      // Combine headers and rows
+      const csvContent = headers + csvRows.join('\n');
+
+      // Trigger CSV download
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `${cat}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  };
+
 
   return (
     <Box
@@ -143,6 +202,12 @@ const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
     transition={{ duration: 0.5 } as any}
     className=" ease-in duration-200"
   >
+      <Box>
+        <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'} onClick={convertAndDownloadCSV}>
+          <DownloadIcon marginEnd={'1.5'} />
+          Download Reports
+        </Button>
+      </Box>
 
       <CCardBody
         style={{
@@ -157,7 +222,9 @@ const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
         ) : (
           <CSmartTable
           items={filteredDataWithMergedYearsAndMonths .sort(
-            (a, b) => parseInt(a.eip) - parseInt(b.eip)
+
+            (a, b) => parseInt(a["#"]) - parseInt(b["#"])
+
           )}
             activePage={1}
             clickableRows
@@ -170,6 +237,17 @@ const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
               responsive: true,
             }}
             scopedColumns={{
+              "#": (item: any) => (
+                <td key={item.eip}>
+                  <Link href={`/EIPS/${item.eip}`}>
+                    <Wrap>
+                      <WrapItem>
+                        <Badge colorScheme={getStatusColor(item.status)}>{item["#"]}</Badge>
+                      </WrapItem>
+                    </Wrap>
+                  </Link>
+                </td>
+            ),
               eip: (item: any) => (
                   <td key={item.eip}>
                     <Link href={`/EIPS/${item.eip}`}>
@@ -275,4 +353,4 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export default TableCatStat;
+export default TableStat;
