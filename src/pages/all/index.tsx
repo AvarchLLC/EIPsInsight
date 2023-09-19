@@ -6,7 +6,7 @@ import { DownloadIcon } from '@chakra-ui/icons';
 import AllLayout from '@/components/Layout';
 import FlexBetween from '@/components/FlexBetween';
 import Header from '@/components/Header';
-import Table from '@/components/Table';
+import Tab from '@/components/Tab';
 import AreaC from '@/components/AreaC';
 import LoaderComponent from '@/components/Loader';
 import Banner from "@/components/NewsBanner";
@@ -102,7 +102,7 @@ const All = () => {
               {/*</Button>*/}
             </Box>
           </FlexBetween>
-          <Table />
+          <Tab />
           <AreaC/>
         </Box>
       </motion.div>

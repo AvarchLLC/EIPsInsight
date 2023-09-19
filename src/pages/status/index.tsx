@@ -10,9 +10,10 @@ import { motion } from 'framer-motion';
 import LoaderComponent from '@/components/Loader';
 import StackedColumnChart from '@/components/StackedBarChart';
 import {PieC} from "@/components/InPie";
-import AreaC from '@/components/AreaStatus';
+import AreaStatus from '@/components/AreaStatus';
 import Banner from "@/components/NewsBanner";
 import NextLink from "next/link";
+import AreaC from "@/components/AreaC";
 
 
 
@@ -93,11 +94,12 @@ const Status = () => {
                     marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}
                 >
                     <Header title="Status" subtitle="Your Roadway to Status"></Header>
+                    <AreaC />
                     <Box paddingY={'8'}>
                         <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
                             Draft vs Final
                         </Text>
-                        <AreaC />
+                        <AreaStatus />
                     </Box>
                     <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                         Draft - <NextLink href={`/tableStatus/Draft`}> [ {data.filter((item) => item.status === 'Draft').length} ]</NextLink>
@@ -195,6 +197,7 @@ const Status = () => {
                       Draft vs Final
                   </Text>
 
+                  <AreaStatus />
                   <AreaC />
 
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">

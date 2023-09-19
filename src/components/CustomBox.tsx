@@ -85,9 +85,9 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
     .filter(obj => obj._id === 'Final')
     .map(obj => ({ category: obj.statusChanges[0].category, number: obj.count }));
 
-  console.log(transformedData);
+  console.log(data);
 
-  const numRows = data.length + 4;
+  const numRows = data.length + 5;
   const rowHeight = 40; // Assuming each row has a height of 40px
   const maxHeight = `${numRows * rowHeight}px`;
 

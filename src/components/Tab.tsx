@@ -549,7 +549,7 @@ const Table = () => {
                   </CBadge>
                 </td>
               ),
-              'PR No.': (item : any) => (
+              pr: (item : any) => (
                 <td>
                   <a
                     href={`https://github.com/ethereum/EIPs/pull/${
