@@ -338,6 +338,7 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
                   </td>
               ),
               deadline: (item: any) => (
+
                     <td key={item.eip}>
                       <Wrap>
                         <WrapItem>
@@ -365,6 +366,7 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
                 </td>
               ),
           
+
           }}
           
       />

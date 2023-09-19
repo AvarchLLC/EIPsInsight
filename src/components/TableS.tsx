@@ -192,6 +192,7 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
                   return null;
                 }
               },
+
             }}
           />
         )}

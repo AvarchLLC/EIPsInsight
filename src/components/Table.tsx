@@ -55,7 +55,33 @@ interface TabProps {
   }
 
 
-const TableStat: React.FC<TabProps> = ({cat})  => {
+async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
+  try {
+    const apiUrl = `/api/eipshistory/${eipNumber}`;
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      const lastElement = data[0];
+      const lastElementCreatedYear = lastElement.mergedYear;
+      const lastElementCreatedMonth = lastElement.mergedMonth;
+      return { mergedYear: lastElementCreatedYear, mergedMonth: lastElementCreatedMonth };
+    } else {
+      throw new Error('No data found or data format is invalid.');
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
+const Table = () => {
+
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -126,6 +152,7 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
+
   const convertAndDownloadCSV = () => {
     if (filteredDataWithMergedYearsAndMonths  && filteredDataWithMergedYearsAndMonths .length > 0) {
       // Create CSV headers
@@ -193,6 +220,7 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
            <Spinner/>
           </Box>
         ) : (
+
           <CSmartTable
           items={filteredDataWithMergedYearsAndMonths .sort(
             (a, b) => parseInt(a["#"]) - parseInt(b["#"])
@@ -299,6 +327,7 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
               ),
             }}
           />
+
         )}
       </CCardBody>
     </Box>
