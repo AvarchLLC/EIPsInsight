@@ -22,36 +22,12 @@ interface EIP {
   __v: number;
 }
 
-async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
-  try {
-    const apiUrl = `/api/eipshistory/${eipNumber}`;
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (Array.isArray(data) && data.length > 0) {
-      const lastElement = data[0];
-      const lastElementCreatedYear = lastElement.mergedYear;
-      const lastElementCreatedMonth = lastElement.mergedMonth;
-      return { mergedYear: lastElementCreatedYear, mergedMonth: lastElementCreatedMonth };
-    } else {
-      throw new Error('No data found or data format is invalid.');
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
 import '@coreui/coreui/dist/css/coreui.min.css';
 import LoaderComponent from "./Loader";
 import {DownloadIcon} from "@chakra-ui/icons";
 interface TabProps {
     cat: string;
+    status: string
   }
 
   async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
@@ -80,7 +56,7 @@ interface TabProps {
   }
 
 
-const TableStat: React.FC<TabProps> = ({cat})  => {
+  const TableCatStat: React.FC<TabProps> = ({cat, status})  => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -143,14 +119,13 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
   })
   .filter((item: any) => item.category === cat && item.status === status );
 
-
   const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
     "#": (index + 1).toString(), // Add the sr number
-
     ...item,
     mergedYear: mergedData[index]?.mergedYear || '', // Replace '' with a default value if needed
     mergedMonth: mergedData[index]?.mergedMonth || '', // Replace '' with a default value if needed
   }));
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
@@ -222,9 +197,7 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
         ) : (
           <CSmartTable
           items={filteredDataWithMergedYearsAndMonths .sort(
-
             (a, b) => parseInt(a["#"]) - parseInt(b["#"])
-
           )}
             activePage={1}
             clickableRows
@@ -353,4 +326,4 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export default TableStat;
+export default TableCatStat;

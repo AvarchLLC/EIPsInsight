@@ -30,7 +30,7 @@ interface TabProps {
   }
 
 
-const TableStatus: React.FC<TabProps> = ({cat})  => {
+  const TableStatus: React.FC<TabProps> = ({cat})  => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -54,6 +54,8 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
         setIsDarkMode(true);
     }
   })
+
+  
  
   const data = cat;
   const filteredData = data
@@ -192,7 +194,6 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
                   return null;
                 }
               },
-
             }}
           />
         )}

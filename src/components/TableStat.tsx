@@ -55,7 +55,7 @@ interface TabProps {
   }
 
 
-const TableStat: React.FC<TabProps> = ({cat})  => {
+  const TableStat: React.FC<TabProps> = ({cat})  => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -196,9 +196,7 @@ const TableStat: React.FC<TabProps> = ({cat})  => {
         ) : (
           <CSmartTable
           items={filteredDataWithMergedYearsAndMonths .sort(
-
             (a, b) => parseInt(a["#"]) - parseInt(b["#"])
-
           )}
             activePage={1}
             clickableRows
