@@ -119,7 +119,7 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
     // Define a variable for the filtered data
     let newData: FilteredDataItem[] = [];
   
-    if (status === "LastCall" || status === "Draft" || status === "Final") {
+    if (status === "LastCall") {
       let srNo = 1; // Initialize the serial number
   
       newData = finalStatusChanges.map((item: StatusChange) => {
@@ -132,8 +132,6 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
           category,
           pr,
           deadline,
-          created,
-          changeDate,
         } = item;
   
         return {
@@ -145,12 +143,69 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
           type,
           category,
           pr,
-          deadline,
-          created,
-          changeDate,
+          deadline
         };
       });
-    } else {
+     } else if (status === "Draft") {
+      let srNo = 1; // Initialize the serial number
+  
+      newData = finalStatusChanges.map((item: StatusChange) => {
+        const {
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          created,
+        } = item;
+  
+        return {
+          sr: srNo++, // Add the serial number and increment it
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          created,
+        };
+      });
+     } else if (status === "Final") {
+      let srNo = 1; // Initialize the serial number
+  
+      newData = finalStatusChanges.map((item: StatusChange) => {
+        const {
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          created,
+          changeDate
+          
+        } = item;
+  
+        return {
+          sr: srNo++, // Add the serial number and increment it
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          created,
+          changeDate
+        };
+      });
+     }
+    
+    else {
       // Handle other cases here if needed
       newData = finalStatusChanges.map((item: StatusChange) => {
         const { eip, title, author, status, type, category, pr } = item;
@@ -338,7 +393,6 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
                   </td>
               ),
               deadline: (item: any) => (
-
                     <td key={item.eip}>
                       <Wrap>
                         <WrapItem>
@@ -366,7 +420,6 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
                 </td>
               ),
           
-
           }}
           
       />

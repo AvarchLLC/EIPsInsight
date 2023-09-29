@@ -55,33 +55,7 @@ interface TabProps {
   }
 
 
-async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
-  try {
-    const apiUrl = `/api/eipshistory/${eipNumber}`;
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (Array.isArray(data) && data.length > 0) {
-      const lastElement = data[0];
-      const lastElementCreatedYear = lastElement.mergedYear;
-      const lastElementCreatedMonth = lastElement.mergedMonth;
-      return { mergedYear: lastElementCreatedYear, mergedMonth: lastElementCreatedMonth };
-    } else {
-      throw new Error('No data found or data format is invalid.');
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
-const Table = () => {
-
+  const Table = () => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -143,6 +117,8 @@ const Table = () => {
     };
   });
 
+
+
   const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
     "#": (index + 1).toString(), // Add the sr number
     ...item,
@@ -152,21 +128,18 @@ const Table = () => {
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-
   const convertAndDownloadCSV = () => {
-    if (filteredDataWithMergedYearsAndMonths  && filteredDataWithMergedYearsAndMonths .length > 0) {
+    if (filteredData && filteredData.length > 0) {
       // Create CSV headers
-      const headers = Object.keys(filteredDataWithMergedYearsAndMonths [0]).join(',') + '\n';
+      const headers = Object.keys(filteredData[0]).join(',') + '\n';
 
       // Convert data to CSV rows
-      const csvRows = filteredDataWithMergedYearsAndMonths .map((item) =>
-        Object.values(item)
-          .map((value) =>
-            typeof value === 'string' && value.includes(',')
-              ? `"${value}"`
-              : value
-          )
-          .join(',')
+      const csvRows = filteredData.map((item) =>
+          Object.values(item)
+              .map((value) => (typeof value === 'string' && value.includes(',')
+                  ? `"${value}"`
+                  : value))
+              .join(',')
       );
 
       // Combine headers and rows
@@ -178,7 +151,7 @@ const Table = () => {
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = `${cat}.csv`;
+      a.download = `All_EIPs.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -220,7 +193,6 @@ const Table = () => {
            <Spinner/>
           </Box>
         ) : (
-
           <CSmartTable
           items={filteredDataWithMergedYearsAndMonths .sort(
             (a, b) => parseInt(a["#"]) - parseInt(b["#"])
@@ -327,7 +299,6 @@ const Table = () => {
               ),
             }}
           />
-
         )}
       </CCardBody>
     </Box>
@@ -353,4 +324,4 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export default TableStat;
+export default Table;
