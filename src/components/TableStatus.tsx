@@ -29,11 +29,37 @@ interface TabProps {
     cat: string;
   }
 
+  async function fetchLastCreatedYearAndMonthFromAPI(eipNumber: number): Promise<{ mergedYear: string, mergedMonth: string } | null> {
+    try {
+      const apiUrl = `/api/eipshistory/${eipNumber}`;
+      const response = await fetch(apiUrl);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      if (Array.isArray(data) && data.length > 0) {
+        const lastElement = data[0];
+        const lastElementCreatedYear = lastElement.mergedYear;
+        const lastElementCreatedMonth = lastElement.mergedMonth;
+        return { mergedYear: lastElementCreatedYear, mergedMonth: lastElementCreatedMonth };
+      } else {
+        throw new Error('No data found or data format is invalid.');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  }
 
-const TableStatus: React.FC<TabProps> = ({cat})  => {
+
+const TableStat: React.FC<TabProps> = ({cat})  => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mergedData, setMergedData] = useState<{ mergedYear: string, mergedMonth: string }[]>([]);
 
   const factorAuthor = (data: any) => {
     let list = data.split(',');
@@ -53,8 +79,17 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
         const jsonData = await response.json();
         setData(jsonData);
         setIsLoading(false); // Set isLoading to false after data is fetched
+
+        // Fetch merged years and months for each item
+        const mergedDataPromises = jsonData.map((item: any) =>
+          fetchLastCreatedYearAndMonthFromAPI(item.eip)
+        );
+
+        // Wait for all promises to resolve
+        const mergedDataValues = await Promise.all(mergedDataPromises);
+        setMergedData(mergedDataValues);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         setIsLoading(false); // Set isLoading to false if there's an error
       }
     };
@@ -83,19 +118,29 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
   })
   .filter((item: any) => item.category === cat);
 
+  const filteredDataWithMergedYearsAndMonths = filteredData.map((item, index) => ({
+    "#": (index + 1).toString(), // Add the sr number
+    ...item,
+    mergedYear: mergedData[index]?.mergedYear || '', // Replace '' with a default value if needed
+    mergedMonth: mergedData[index]?.mergedMonth || '', // Replace '' with a default value if needed
+  }));
+
+  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
-    if (filteredData && filteredData.length > 0) {
+    if (filteredDataWithMergedYearsAndMonths  && filteredDataWithMergedYearsAndMonths .length > 0) {
       // Create CSV headers
-      const headers = Object.keys(filteredData[0]).join(',') + '\n';
+      const headers = Object.keys(filteredDataWithMergedYearsAndMonths [0]).join(',') + '\n';
 
       // Convert data to CSV rows
-      const csvRows = filteredData.map((item) =>
-          Object.values(item)
-              .map((value) => (typeof value === 'string' && value.includes(',')
-                  ? `"${value}"`
-                  : value))
-              .join(',')
+      const csvRows = filteredDataWithMergedYearsAndMonths .map((item) =>
+        Object.values(item)
+          .map((value) =>
+            typeof value === 'string' && value.includes(',')
+              ? `"${value}"`
+              : value
+          )
+          .join(',')
       );
 
       // Combine headers and rows
@@ -114,7 +159,6 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
     }
   };
 
-  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   return (
     <Box
@@ -132,7 +176,6 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
     transition={{ duration: 0.5 } as any}
     className=" ease-in duration-200"
   >
-
       <Box>
         <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'} onClick={convertAndDownloadCSV}>
           <DownloadIcon marginEnd={'1.5'} />
@@ -152,7 +195,9 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
           </Box>
         ) : (
           <CSmartTable
-          items={filteredData.sort((a, b) => parseInt(a.eip) - parseInt(b.eip))}
+          items={filteredDataWithMergedYearsAndMonths .sort(
+            (a, b) => parseInt(a["#"]) - parseInt(b["#"])
+          )}
             activePage={1}
             clickableRows
             columnFilter
@@ -164,6 +209,17 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
               responsive: true,
             }}
             scopedColumns={{
+              "#": (item: any) => (
+                <td key={item.eip}>
+                  <Link href={`/EIPS/${item.eip}`}>
+                    <Wrap>
+                      <WrapItem>
+                        <Badge colorScheme={getStatusColor(item.status)}>{item["#"]}</Badge>
+                      </WrapItem>
+                    </Wrap>
+                  </Link>
+                </td>
+            ),
               eip: (item: any) => (
                   <td key={item.eip}>
                     <Link href={`/EIPS/${item.eip}`}>
@@ -224,6 +280,24 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
                     </Wrap>
                   </td>
               ),
+              mergedYear: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}> {item.mergedYear}</Badge>
+                  </WrapItem>
+                  </Wrap>
+                </td>
+              ),
+              mergedMonth: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                    <Badge colorScheme={getStatusColor(item.status)}> {item.mergedMonth}</Badge>
+                  </WrapItem>
+                  </Wrap>
+                </td>
+              ),
             }}
           />
         )}
@@ -251,4 +325,4 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export default TableStatus;
+export default TableStat;

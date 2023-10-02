@@ -30,7 +30,7 @@ interface TabProps {
   }
 
 
-const TableStatus: React.FC<TabProps> = ({cat})  => {
+  const TableStatus: React.FC<TabProps> = ({cat})  => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -54,11 +54,13 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
         setIsDarkMode(true);
     }
   })
+
+  
  
   const data = cat;
   const filteredData = data
   .map((item: any) => {
-    const { eip, title, author, status, type, category } = item;
+    const { eip, title, author, status, type, category, deadline } = item;
     return {
       eip,
       title,
@@ -66,6 +68,7 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
       status,
       type,
       category,
+      deadline
       
     };
   })
@@ -174,6 +177,23 @@ const TableStatus: React.FC<TabProps> = ({cat})  => {
                     </Wrap>
                   </td>
               ),
+              deadline: (item: any) => {
+                // Conditionally render the "deadline" column if the "status" is "Last Call"
+                if (item.status === 'Last Call') {
+                  return (
+                    <td key={item.eip}>
+                      <Wrap>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>{item.deadline}</Badge>
+                        </WrapItem>
+                      </Wrap>
+                    </td>
+                  );
+                } else {
+                  // Return null for other statuses to hide the column
+                  return null;
+                }
+              },
             }}
           />
         )}

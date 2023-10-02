@@ -1,6 +1,6 @@
 
 import AllLayout from "@/components/Layout";
-import { Box, Button } from '@chakra-ui/react'
+import {Box, Button, Grid, Text, useColorModeValue} from '@chakra-ui/react'
 import FlexBetween from '@/components/FlexBetween'
 import Header from '@/components/Header'
 import { DownloadIcon } from '@chakra-ui/icons'
@@ -9,6 +9,12 @@ import AreaStatus from '@/components/AreaStatus';
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion';
 import LoaderComponent from '@/components/Loader';
+import ERCGraph from '@/components/ERCGraph';
+import NextLink from "next/link";
+import StatusColumnChart from "@/components/StatusColumnChart";
+import DateTime from "@/components/DateTime";
+import SearchBox from "@/components/SearchBox";
+import ERCCatBoxGrid from "@/components/ERCCatBoxGrid";
 interface EIP {
   _id: string;
   eip: string;
@@ -83,22 +89,27 @@ const ERC = () => {
       
     <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
       <FlexBetween>
-      <Header title={`Standard Tracks - ERC [ ${data.filter((item) => item.type === "Standards Track" && item.category === "ERC").length} ]`} subtitle="ERCs describe application-level standards for the Ethereum ecosystem." />
-        <Box>
-          <Button
-            colorScheme="blue"
-            variant="outline"
-            fontSize={"14px"}
-            fontWeight={"bold"}
-            padding={"10px 20px"}
-          >
-            <DownloadIcon marginEnd={"1.5"} />
-            Download Reports
-          </Button>
-        </Box>
+      <Header title={`Ethereum Request for Comment - [ ${data.filter((item) => item.type === "Standards Track" && item.category === "ERC").length} ]`} subtitle="ERCs describe application-level standard for the Ethereum ecosystem." />
       </FlexBetween>
+      <Box className={'w-full pt-10'}>
+        <SearchBox />
+      </Box>
+      <Box paddingTop={8}>
+        <ERCCatBoxGrid />
+      </Box>
       <TableStatus cat='ERC'/>
-      <AreaStatus/>
+      <Grid templateColumns="1fr 1fr" gap={8} paddingTop={8}>
+          <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+            Draft vs Final
+          </Text>
+          <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+            ERCs
+          </Text>
+      </Grid>
+      <Grid templateColumns="1fr 1fr" gap={8}>
+        <AreaStatus/>
+        <ERCGraph />
+      </Grid>
     </Box>
     </motion.div>)}
   </AllLayout>

@@ -53,10 +53,25 @@ interface TabProps {
     }
   };
 
+  interface FilteredDataItem {
+    sr: number;
+    eip: string;
+    title: string;
+    author: string;
+    status: string;
+    type: string;
+    category: string;
+    pr: number; // Change the type to number
+    deadline?: string;
+    created?: string;
+    changeDate?: string;
+  }
+
 const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
   const [data, setData] = useState<DataObject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [filteredData, setFilteredData] = useState<FilteredDataItem[]>([]);
 
   const factorAuthor = (data: any) => {
     let list = data.split(',');
@@ -95,24 +110,133 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
  
   const finalObject = data.find(item => item._id === getStatus(status));
   const finalStatusChanges = finalObject ? finalObject.statusChanges : [];
-  
-  const filteredData = finalStatusChanges
-      .map((item: any) => {
-          const { eip, title, author, status, type, category, pr, changedYear, changedMonth } = item;
-          return {
-              eip,
-              title,
-              author,
-              status,
-              type,
-              category,
-              pr,
-              changedMonth,
-              changedYear
-          };
-      });
 
-      console.log(filteredData);
+
+  useEffect(() => {
+    const finalObject = data.find((item) => item._id === getStatus(status));
+    const finalStatusChanges = finalObject ? finalObject.statusChanges : [];
+  
+    // Define a variable for the filtered data
+    let newData: FilteredDataItem[] = [];
+  
+    if (status === "LastCall") {
+      let srNo = 1; // Initialize the serial number
+  
+      newData = finalStatusChanges.map((item: StatusChange) => {
+        const {
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          deadline,
+        } = item;
+  
+        return {
+          sr: srNo++, // Add the serial number and increment it
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          deadline
+        };
+      });
+     } else if (status === "Draft") {
+      let srNo = 1; // Initialize the serial number
+  
+      newData = finalStatusChanges.map((item: StatusChange) => {
+        const {
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          created,
+        } = item;
+  
+        return {
+          sr: srNo++, // Add the serial number and increment it
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          created,
+        };
+      });
+     } else if (status === "Final") {
+      let srNo = 1; // Initialize the serial number
+  
+      newData = finalStatusChanges.map((item: StatusChange) => {
+        const {
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          created,
+          changeDate
+          
+        } = item;
+  
+        return {
+          sr: srNo++, // Add the serial number and increment it
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          created,
+          changeDate
+        };
+      });
+     }
+    
+    else {
+      let srNo = 1; // Initialize the serial number
+  
+      newData = finalStatusChanges.map((item: StatusChange) => {
+        const {
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          
+        } = item;
+  
+        return {
+          sr: srNo++, // Add the serial number and increment it
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr
+        };
+      });
+    }
+  
+    // Update the state with the new data
+    setFilteredData(newData);
+  }, [data, status]);
+  
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
@@ -182,7 +306,7 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
                     </Button>
                 </Box>
             <CSmartTable
-            items={filteredData.sort((a, b) => parseInt(a.eip) - parseInt(b.eip))}
+            items={filteredData.sort((a, b) => a.sr - b.sr)}
           activePage={1}
           clickableRows
           columnFilter
@@ -194,6 +318,17 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
               responsive: true,
           }}
           scopedColumns={{
+            sr: (item: any) => (
+              <td key={item.eip}>
+                  <Link href={`/EIPS/${item.eip}`}>
+                      <Wrap>
+                          <WrapItem>
+                              <Badge colorScheme={getStatusColor(item.status)}>{item.sr}</Badge>
+                          </WrapItem>
+                      </Wrap>
+                  </Link>
+              </td>
+          ),
               eip: (item: any) => (
                   <td key={item.eip}>
                       <Link href={`/EIPS/${item.eip}`}>
@@ -265,29 +400,38 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
                       </Link>
                   </td>
               ),
-              changedMonth: (item: any) => (
-                <td key={item.eip}>
-                    <Link href={`/PR/${item.pr}`}>
-                        <Wrap>
-                            <WrapItem>
-                                <Badge colorScheme={"purple"}>{item.changedMonth}</Badge>
-                            </WrapItem>
-                        </Wrap>
-                    </Link>
-                </td>
-            ),
-            changedYear: (item: any) => (
-              <td key={item.eip}>
-                  <Link href={`/PR/${item.pr}`}>
+              deadline: (item: any) => (
+                    <td key={item.eip}>
                       <Wrap>
-                          <WrapItem>
-                              <Badge colorScheme={"purple"}>{item.changedYear}</Badge>
-                          </WrapItem>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>{item.deadline}</Badge>
+                        </WrapItem>
                       </Wrap>
-                  </Link>
-              </td>
-          ),
+                    </td>
+                  ),
+                  created: (item: any) => (
+                    <td key={item.eip}>
+                      <Wrap>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>
+                            {item.created ? item.created.substring(0, 10) : ''}
+                          </Badge>
+                        </WrapItem>
+                      </Wrap>
+                    </td>
+                  ),
+              changeDate: (item: any) => (
+                <td key={item.eip}>
+                  <Wrap>
+                    <WrapItem>
+                      <Badge colorScheme={getStatusColor(item.status)}>{item.changeDate.substring(0, 10)}</Badge>
+                    </WrapItem>
+                  </Wrap>
+                </td>
+              ),
+          
           }}
+          
       />
             </>
         )}

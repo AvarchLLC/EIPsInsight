@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 import Table from '@/components/Table';
 import AreaC from '@/components/AreaC';
 import LoaderComponent from '@/components/Loader';
-import Banner from "@/components/NewsBanner";
+
 interface EIP {
   _id: string;
   eip: string;
@@ -82,24 +82,24 @@ const All = () => {
         transition={{ duration: 0.5 }}
       >
         <Box
-            paddingBottom={{lg:'10', sm: '10',base: '10'}}
-            marginX={{lg:"40",md:'2', sm: '2', base: '2'}}
-            paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}
-            marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}
+            paddingBottom={{md:'10', base: '10'}}
+            marginX={{md:"40", base: '2'}}
+            paddingX={{md:"10", base:'5'}}
+            marginTop={{md:"10", base:'5'}}
         >
           <FlexBetween>
             <Header title={`All EIPs - [ ${data.length} ]`} subtitle="Your Roadway to All" />
             <Box>
-              {/*<Button*/}
-              {/*    colorScheme="blue"*/}
-              {/*    variant="outline"*/}
-              {/*    fontSize={{lg:'14px',md:'12px', sm:'12px',base:'10px'}}*/}
-              {/*    fontWeight={'bold'}*/}
-              {/*    padding={{lg:'10px 20px',md:'5px 10px', sm:'5px 10px',base:'5px 10px'}}*/}
-              {/*>*/}
-              {/*  <DownloadIcon marginEnd={'1.5'} />*/}
-              {/*  Download Reports*/}
-              {/*</Button>*/}
+              <Button
+                colorScheme="blue"
+                variant="outline"
+                fontSize={{md:'14px', base:'10px'}}
+                fontWeight={'bold'}
+                padding={{md:'10px 20px', base:'5px 10px'}}
+              >
+                <DownloadIcon marginEnd={1.5} />
+                Download Reports
+              </Button>
             </Box>
           </FlexBetween>
           <Table />

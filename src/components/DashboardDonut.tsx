@@ -34,7 +34,7 @@ interface EIP {
   __v: number;
 }
 
-const BarChart = () => {
+const DashboardDonut = () => {
   const [data, setData] = useState<EIP[]>([]);
   useEffect(() => {
     const fetchData = async () => {
@@ -128,4 +128,4 @@ const BarChart = () => {
   )
 }
 
-export default BarChart
+export default DashboardDonut;

@@ -15,7 +15,7 @@ import React from "react";
 import { mockEIP } from "@/data/eipdata";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
-import BarChart from "@/components/BarChart";
+import DashboardDonut from "@/components/DashboardDonut";
 import {
   Anchor,
   BookOpen,

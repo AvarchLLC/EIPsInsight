@@ -124,6 +124,8 @@ const Month = () => {
         return () => clearTimeout(timeout);
     }, []);
     const bg = useColorModeValue("#f6f6f7", "#171923");
+
+
     return (
         <AllLayout>
             {isLoading ? ( // Check if the data is still loading
