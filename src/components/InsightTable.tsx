@@ -206,11 +206,19 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
      }
     
     else {
-      // Handle other cases here if needed
-      newData = finalStatusChanges.map((item: StatusChange) => {
-        const { eip, title, author, status, type, category, pr } = item;
+      let srNo = 1; // Initialize the serial number
   
-        let srNo = 1; // Initialize the serial number
+      newData = finalStatusChanges.map((item: StatusChange) => {
+        const {
+          eip,
+          title,
+          author,
+          status,
+          type,
+          category,
+          pr,
+          
+        } = item;
   
         return {
           sr: srNo++, // Add the serial number and increment it
@@ -220,7 +228,7 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
           status,
           type,
           category,
-          pr,
+          pr
         };
       });
     }
@@ -401,15 +409,17 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
                       </Wrap>
                     </td>
                   ),
-              created: (item: any) => (
-                <td key={item.eip}>
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>{item.created.substring(0, 10)}</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </td>
-              ),
+                  created: (item: any) => (
+                    <td key={item.eip}>
+                      <Wrap>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>
+                            {item.created ? item.created.substring(0, 10) : ''}
+                          </Badge>
+                        </WrapItem>
+                      </Wrap>
+                    </td>
+                  ),
               changeDate: (item: any) => (
                 <td key={item.eip}>
                   <Wrap>
