@@ -20,7 +20,6 @@ const AllLayout = ({
   children: React.ReactNode
 }) => {
   const router = usePathname();
-
   return (
     <motion.div
     key={router}
@@ -62,7 +61,7 @@ const AllLayout = ({
       >
         <PageHelpful pageName={router ? router.split('/')[1] : ''}/>
       </Box>
-      {/*<ViewsShare/>*/}
+      <ViewsShare path={`${router}`}/>
       <LargeWithAppLinksAndSocial/>
 
       </Providers>

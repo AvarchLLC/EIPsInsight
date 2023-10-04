@@ -23,8 +23,13 @@ interface EIP {
     __v: number;
 }
 
+interface PRorIssueProps{
+    type: string;
+}
+
 const SearchBox: React.FC = () => {
     // const [data, setData] = useState<PRItem[]>([]);
+    const [prorissue, setPRorIssue] = useState<PRorIssueProps>({type: 'Pull Request'}); // pr or issue
     const [eipData, setEipData] = useState<EIP[]>([]);
     const [query, setQuery] = useState('');
     const router = usePathname();
@@ -73,9 +78,28 @@ const SearchBox: React.FC = () => {
         item.eip.toString().includes(query)
     );
 
-    const handleSearchResultClick = (selectedPRNumber: number) => {
-        window.location.href = `/PR/${selectedPRNumber}`;
-        return selectedPRNumber;
+
+    const handleSearchResultClick = async (selectedNumber: number) => {
+        try {
+            const response = await fetch(`/api/get-pr-or-issue-details/${selectedNumber}`);
+            const jsonData = await response.json();
+
+            if (jsonData && typeof jsonData === 'object') {
+                setPRorIssue(jsonData);
+
+                if (jsonData.type === 'Pull Request') {
+                    window.location.href = `/PR/${selectedNumber}`;
+                } else if (jsonData.type === 'Issue') {
+                    window.location.href = `/issue/${selectedNumber}`;
+                } else {
+                    console.error('Invalid data type:', jsonData.type);
+                }
+            } else {
+                console.error('API response is not an object:', jsonData);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
     const EIPhandleSearchResultClick = (selectedEIPNumber: string) => {
@@ -89,7 +113,7 @@ const SearchBox: React.FC = () => {
             <div>
                 <input
                     type="text"
-                    placeholder="Search Pull Request or EIP"
+                    placeholder="Search PR or Issue or EIP"
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     className="border p-2 rounded w-full text-center focus:border-blue-100"
