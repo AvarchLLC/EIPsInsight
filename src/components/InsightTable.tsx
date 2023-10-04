@@ -240,22 +240,57 @@ const InsightTable: React.FC<TabProps> = ({month , year, status})  => {
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
+    // const convertAndDownloadCSV = () => {
+    //     if (filteredData && filteredData.length > 0) {
+    //         // Create CSV headers
+    //         const headers = Object.keys(filteredData[0]).join(',') + '\n';
+    //
+    //         // Convert data to CSV rows
+    //         const csvRows = filteredData.map((item) =>
+    //             Object.values(item)
+    //                 .map((value) => (typeof value === 'string' && value.includes(',')
+    //                     ? `"${value}"`
+    //                     : value))
+    //                 .join(',')
+    //         );
+    //
+    //         // Combine headers and rows
+    //         const csvContent = headers + csvRows.join('\n');
+    //
+    //         // Trigger CSV download
+    //         const blob = new Blob([csvContent], { type: 'text/csv' });
+    //         const url = window.URL.createObjectURL(blob);
+    //         const a = document.createElement('a');
+    //         a.style.display = 'none';
+    //         a.href = url;
+    //         a.download = `${status}_${month}_${year}.csv`;
+    //         document.body.appendChild(a);
+    //         a.click();
+    //         window.URL.revokeObjectURL(url);
+    //     }
+    // };
+
+
     const convertAndDownloadCSV = () => {
         if (filteredData && filteredData.length > 0) {
-            // Create CSV headers
-            const headers = Object.keys(filteredData[0]).join(',') + '\n';
-
-            // Convert data to CSV rows
-            const csvRows = filteredData.map((item) =>
-                Object.values(item)
-                    .map((value) => (typeof value === 'string' && value.includes(',')
+            const headers = Object.keys(filteredData[0]);
+            headers.push('PR Link');
+            headers.push('EIP Link');
+            const csvRows = filteredData.map((item) => {
+                const values = Object.values(item);
+                const prLink = `github.com/ethereum/eips/pull/${item.pr}`;
+                const eipLink = `github.com/ethereum/EIPs/blob/master/EIPS/eip-${item.eip}.md`;
+                values.push(prLink);
+                values.push(eipLink);
+                return values.map((value) =>
+                    typeof value === 'string' && value.includes(',')
                         ? `"${value}"`
-                        : value))
-                    .join(',')
-            );
+                        : value
+                ).join(',');
+            });
 
             // Combine headers and rows
-            const csvContent = headers + csvRows.join('\n');
+            const csvContent = headers.join(',') + '\n' + csvRows.join('\n');
 
             // Trigger CSV download
             const blob = new Blob([csvContent], { type: 'text/csv' });
