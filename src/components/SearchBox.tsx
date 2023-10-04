@@ -4,7 +4,7 @@ import {usePathname} from "next/navigation";
 
 
 interface PRItem {
-    prNumber: number;
+    prOrIssueNumber: number;
 }
 
 interface EIP {
@@ -24,27 +24,33 @@ interface EIP {
 }
 
 const SearchBox: React.FC = () => {
-    const [data, setData] = useState<PRItem[]>([]);
+    // const [data, setData] = useState<PRItem[]>([]);
     const [eipData, setEipData] = useState<EIP[]>([]);
     const [query, setQuery] = useState('');
     const router = usePathname();
     const splitPath = router?.split('/') || [];
     const type = splitPath[1] || 'eip';
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`/api/allprs`);
-                console.log(response);
-                const jsonData = await response.json();
-                setData(jsonData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+    const data = [];
 
-        fetchData();
-    }, []);
+    for (let i = 1; i <= 8000; i++) {
+        data.push({"prOrIssueNumber": i});
+    }
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetch(`/api/allprs`);
+    //             console.log(response);
+    //             const jsonData = await response.json();
+    //             setData(jsonData);
+    //         } catch (error) {
+    //             console.error('Error fetching data:', error);
+    //         }
+    //     };
+    //
+    //     fetchData();
+    // }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,7 +66,7 @@ const SearchBox: React.FC = () => {
     }, []);
 
     const filteredResults = data.filter(item =>
-        item.prNumber.toString().includes(query)
+        item.prOrIssueNumber.toString().includes(query)
     );
 
     const filteredEIPResults = eipData.filter(item =>
@@ -92,13 +98,13 @@ const SearchBox: React.FC = () => {
                 <div className={'grid grid-cols-2'}>
                     <div>
                         {query && filteredResults.length === 0 ? (
-                            <p className="mt-2 text-red-500 text-center font-bold">PR Not Found</p>
+                            <p className="mt-2 text-red-500 text-center font-bold">Invalid PR number</p>
                         ) : (
                             query && (
                                 <select className={`mt-2 border p-2 rounded w-full text-center space-y-5`} size={10}>
                                     {filteredResults.map(result => (
-                                        <option key={result.prNumber} value={result.prNumber} onClick={() => handleSearchResultClick(result.prNumber)} className={'py-2'}>
-                                            PR Number: {result.prNumber}
+                                        <option key={result.prOrIssueNumber} value={result.prOrIssueNumber} onClick={() => handleSearchResultClick(result.prOrIssueNumber)} className={'py-2'}>
+                                            PR & Issue: {result.prOrIssueNumber}
                                         </option>
                                     ))}
                                 </select>
@@ -108,7 +114,7 @@ const SearchBox: React.FC = () => {
 
                     <div>
                         {query && filteredEIPResults.length === 0 ? (
-                            <p className="mt-2 text-red-500 text-center font-bold">EIP Not Found</p>
+                            <p className="mt-2 text-red-500 text-center font-bold">Invalid EIP number</p>
                         ) : (
                             query && (
                                 <select className={`mt-2 border p-2 rounded w-full text-center space-y-5`} size={10}>

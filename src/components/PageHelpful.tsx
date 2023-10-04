@@ -5,7 +5,7 @@ interface PageHelpfulProps {
     pageName: string;
 }
 
-const PageHelpful: React.FC = () => {
+const PageHelpful: React.FC<PageHelpfulProps> = ({pageName}) => {
     const bg = useColorModeValue('#f6f6f7', '#171923');
     const border = useColorModeValue('#000000', '#ffffff');
     const [likeCount, setLikeCount] = useState(0);
@@ -15,7 +15,7 @@ const PageHelpful: React.FC = () => {
 
     const fetchLikeCount = async () => {
         try {
-            const response = await fetch('/api/count/like?pageName=home', {
+            const response = await fetch(`/api/count/like?pageName=${pageName}`, {
                 method: 'GET',
             });
 

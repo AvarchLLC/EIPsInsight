@@ -4,30 +4,13 @@ import {BsFillShareFill} from "react-icons/bs";
 
 const ViewsShare = () => {
 
-    const [counter, setCounter] = useState<number>(9000);
+    const [viewCount, setViewCount] = useState(0);
 
     useEffect(() => {
-        const incrementViewsOnLoad = async () => {
-            try {
-                // Make a POST request to update the views count
-                const response = await fetch('/api/count/viewCounter', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                if (response.ok) {
-                    // Fetch the updated views count after the POST request
-                    const updatedResponse = await fetch('/api/views');
-                    const data = await updatedResponse.json();
-                    setCounter(data.viewsCount);
-                }
-            } catch (error) {
-                console.error('Error updating views count:', error);
-            }
-        };
-
-        incrementViewsOnLoad();
+        // Fetch the view count from the API route
+        fetch('/api/viewCount')
+            .then((response) => response.json())
+            .then((data) => setViewCount(data.viewCount));
     }, []);
 
 
@@ -35,6 +18,7 @@ const ViewsShare = () => {
     return(
         <>
             <div className="relative inline-block cursor-pointer group">
+                {viewCount}
                 <div>
                     <BsFillShareFill />
                 </div>
