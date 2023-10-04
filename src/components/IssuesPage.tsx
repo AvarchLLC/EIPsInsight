@@ -6,22 +6,45 @@ import AllLayout from '@/components/Layout';
 import NextLink from "next/link";
 import IssuesComments from "@/components/IssuesComments";
 interface Issues{
-    issueNumber: number;
-    issueTitle: string;
-    issueDescription: string;
-    comments: [{
-        html_url: string;
-        user:{
-            login: string;
-            id: number;
-            avatar_url: string;
+    type: string;
+    title: string;
+    url : string;
+    issueDetails:{
+        issueNumber: number;
+        issueTitle: string;
+        issueDescription: string;
+        comments: Array<{
+            url: string;
             html_url: string;
-        }
-        author_association:string;
-        body: string;
-    }];
-    labels: [];
-    participants:[];
+            issue_url: string;
+            id: number;
+            node_id: string;
+            user: {
+                login: string;
+                id: number;
+                node_id: string;
+                avatar_url: string;
+                gravatar_id: string;
+                url: string;
+                html_url: string;
+                followers_url: string;
+                following_url: string;
+                gists_url: string;
+                starred_url: string;
+                subscriptions_url: string;
+                organizations_url: string;
+                repos_url: string;
+                events_url: string;
+                received_events_url: string;
+                type: string;
+                site_admin: boolean
+            };
+            created_at: string;
+            updated_at: string;
+            author_association: string;
+            body: string;
+        }>
+    }
 }
 
 const IssuesPage:React.FC  = () => {
@@ -64,7 +87,7 @@ const IssuesPage:React.FC  = () => {
                     >
 
                         <Box className={'flex justify-between'}>
-                            <h1 className="text-7xl font-bold pt-4">
+                            <h1 className="text-7xl font-bold pt-4 text-blue-400">
                                 Issues
                             </h1>
                             <Box className={'pt-10'}>
@@ -77,19 +100,19 @@ const IssuesPage:React.FC  = () => {
                             display={'flex'}
                             className={'space-x-4'}
                         >
-                            <Text className={'text-4xl'}>
-                                {data?.issueTitle}
+                            <Text className={'text-4xl font-bold'}>
+                                {data?.issueDetails?.issueTitle}
                             </Text>
                             <Text className={'text-4xl text-gray-400'}>
-                                #{data?.issueNumber}
+                                #{data?.issueDetails?.issueNumber}
                             </Text>
                         </Box>
 
-                        <Text className={'text-3xl font-bold'} paddingY={8}>
-                            Comments
-                        </Text>
 
-                        <IssuesComments issueNumber={issueNumber}/>
+
+                        <Box className={'pt-8'}>
+                            <IssuesComments issueNumber={issueNumber}/>
+                        </Box>
 
                     </Box>
                 </AllLayout>

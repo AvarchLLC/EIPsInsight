@@ -84,13 +84,18 @@ const Navbar: React.FC = () => {
             ],
         },
         {
-            label: "Authors",
-            href: `/authors`,
-        },
-        {
-            label: "Resources",
-            href: `/resources`,
-        },
+            label: "More",
+            children: [
+                // {
+                //     label: "Authors",
+                //     href: `/authors`
+                // },
+                {
+                    label: "Resources",
+                    href: `/resources`
+                },
+            ]
+        }
 
     ];
 
@@ -245,7 +250,37 @@ const Navbar: React.FC = () => {
                                                 </Stack>
                                             </PopoverContent>
                                         )}
-                                        {navItem.children && navItem.label !== "Insight" && (
+
+
+
+                                        {navItem.children && navItem.label === "More" && (
+                                            <PopoverContent
+                                                border={0}
+                                                boxShadow={"xl"}
+                                                bg={popoverContentBgColor}
+                                                p={4}
+                                                rounded={"xl"}
+                                                minW={"sm"}
+                                                className={'overflow-y-auto'}
+                                                maxH={"900px"}
+                                            >
+                                                <Stack direction={"column"} spacing={2}>
+                                                    {navItem.children.map((child) => (
+                                                        <Box _hover={{ bg: useColorModeValue("pink.50", "gray.900") }} p={2} rounded={"md"} role={'group'}>
+                                                            <Text transition={"all .3s ease"} _groupHover={{ color: "pink.400" }} fontWeight={500}>
+                                                                <NextLink href={`${child.href}`}>
+                                                                    {child.label}
+                                                                </NextLink>
+                                                            </Text>
+                                                        </Box>
+                                                    ))}
+                                                </Stack>
+                                            </PopoverContent>
+                                        )}
+
+
+
+                                        {navItem.children && navItem.label !== "Insight" && navItem.label !== "More" && (
                                             <PopoverContent
                                                 border={0}
                                                 boxShadow={"xl"}
@@ -265,11 +300,6 @@ const Navbar: React.FC = () => {
                                         )}
 
                                     </Popover>
-
-
-
-
-
                                 </Box>
                             ))}
                         </div>
@@ -425,7 +455,34 @@ const Navbar: React.FC = () => {
                                                             </Stack>
                                                         </PopoverContent>
                                                     )}
-                                                    {navItem.children && navItem.label !== "Insight" && (
+
+                                                    {navItem.children && navItem.label === "More" && (
+                                                        <PopoverContent
+                                                            border={0}
+                                                            boxShadow={"xl"}
+                                                            bg={popoverContentBgColor}
+                                                            p={4}
+                                                            rounded={"xl"}
+                                                            minW={"sm"}
+                                                            className={'overflow-y-auto'}
+                                                            maxH={"900px"}
+                                                        >
+                                                            <Stack direction={"column"} spacing={2}>
+                                                                {navItem.children.map((child) => (
+                                                                    <Box _hover={{ bg: useColorModeValue("pink.50", "gray.900") }} p={2} rounded={"md"} role={'group'}>
+                                                                        <Text transition={"all .3s ease"} _groupHover={{ color: "pink.400" }} fontWeight={500}>
+                                                                            <NextLink href={`${child.href}`}>
+                                                                                {child.label}
+                                                                            </NextLink>
+                                                                        </Text>
+                                                                    </Box>
+                                                                ))}
+                                                            </Stack>
+                                                        </PopoverContent>
+                                                    )}
+
+
+                                                    {navItem.children && navItem.label !== "Insight" && navItem.label !== "More" && (
                                                         <PopoverContent
                                                             border={0}
                                                             boxShadow={"xl"}

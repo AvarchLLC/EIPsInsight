@@ -18,7 +18,8 @@ import LoaderComponent from './Loader';
 import Table from './Table';
 import Banner from "@/components/NewsBanner";
 import SearchBox from "@/components/SearchBox";
-import BoyGirl from '@/components/BoyGirl'
+import BoyGirl from '@/components/BoyGirl';
+
 
 interface EIP {
   _id: string;
@@ -373,6 +374,8 @@ const Dashboard = () => {
                   <DashboardDonut />
                 </Box>
               </Box>
+
+
               {/*<AreaC />*/}
               {/*<Table />*/}
 

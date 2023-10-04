@@ -208,7 +208,7 @@ const PrPage: React.FC = () => {
         (item) => item.user.login === 'eth-bot'
     );
     const ethBotCount = ethBotFiltered?.length;
-    const gitActionsBotFiltered = data?.prDetails?.conversations.filter(
+    const gitActionsBotFiltered = data?.prDetails?.conversations?.filter(
         (item) => item.user.login === 'github-actions[bot]'
     );
     const gitActionsBotCount = gitActionsBotFiltered?.length;
@@ -248,10 +248,10 @@ const PrPage: React.FC = () => {
                                         </FlexBetween>
 
                                         <Box className={'flex space-x-10 items-center'} paddingTop={8}>
-                                            <NextLink href={``} target={'_blank'}>
+                                            <NextLink href={`https://github.com/${data?.prDetails?.commits[0]?.author?.login}`} target={'_blank'}>
                                                 <img
-                                                    src={data?.prDetails.commits[0].author.avatar_url}
-                                                    alt={data?.prDetails.commits[0].author.login}
+                                                    src={data?.prDetails?.commits[0]?.author?.avatar_url}
+                                                    alt={data?.prDetails?.commits[0]?.author?.login}
                                                     width={80}
                                                     height={80}
                                                     className={'rounded-full hover:scale-110 duration-200'}
@@ -289,11 +289,11 @@ const PrPage: React.FC = () => {
                                                                 <Text className={'text-2xl font-bold'}>Commits:</Text>
                                                             </td>
                                                             <td className={'pb-10'}>
-                                                                <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prDetails.prNumber}/commits`} target={'_blank'}>
+                                                                <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prDetails?.prNumber}/commits`} target={'_blank'}>
                                                                     <Wrap>
                                                                         <WrapItem>
                                                                             <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={1}>
-                                                                                {data?.prDetails.commits.length}
+                                                                                {data?.prDetails?.commits.length}
                                                                             </Badge>
                                                                         </WrapItem>
                                                                     </Wrap>
@@ -304,11 +304,11 @@ const PrPage: React.FC = () => {
                                                         <tr>
                                                             <td className={'pb-10 pr-16'}><Text className={'text-2xl font-bold'}>Files Changed: </Text></td>
                                                             <td className={'pb-10'}>
-                                                                <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prDetails.prNumber}/files`} target={'_blank'}>
+                                                                <NextLink href={`https://github.com/ethereum/EIPs/pull/${data?.prDetails?.prNumber}/files`} target={'_blank'}>
                                                                     <Wrap>
                                                                         <WrapItem>
                                                                             <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={1}>
-                                                                                {data?.prDetails.numFilesChanged}
+                                                                                {data?.prDetails?.numFilesChanged}
                                                                             </Badge>
                                                                         </WrapItem>
                                                                     </Wrap>
@@ -319,12 +319,12 @@ const PrPage: React.FC = () => {
                                                     </table>
 
                                                     {
-                                                        data?.prDetails.labels.length !== 0 ? (
+                                                        data?.prDetails?.labels.length !== 0 ? (
                                                             <Box className={'pb-10'}>
                                                                 <Text className={'text-2xl font-bold pb-5'}>Labels: </Text>
                                                                 <div className="flex space-x-3">
                                                                     {
-                                                                        data?.prDetails.labels.map(item => (
+                                                                        data?.prDetails?.labels.map(item => (
                                                                             <Wrap>
                                                                                 <WrapItem>
                                                                                     <Badge  colorScheme={getLabelColor(item)} paddingX={4} paddingY={2} className={'rounded-full'}>
@@ -346,8 +346,8 @@ const PrPage: React.FC = () => {
                                                         <Text className={'text-2xl font-bold pb-5'}>Participants: </Text>
                                                         <div className={'flex flex-wrap'}>
                                                             {
-                                                                data?.prDetails.participants.map(participant => {
-                                                                    const matchingConversation = data?.prDetails.conversations.find(conversation => conversation.user.login === participant);
+                                                                data?.prDetails?.participants.map(participant => {
+                                                                    const matchingConversation = data?.prDetails?.conversations.find(conversation => conversation.user.login === participant);
 
                                                                     if (matchingConversation) {
                                                                         return (

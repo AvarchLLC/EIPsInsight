@@ -8,6 +8,7 @@ import OtherBox from "@/components/OtherStats";
 import {motion} from "framer-motion";
 import {usePathname} from "next/navigation";
 import DateTime from "@/components/DateTime";
+import NextLink from "next/link";
 
 
 
@@ -28,7 +29,8 @@ const EmptyInsight = () => {
         year = pathParts[2];
         month = pathParts[3];
     }
-
+    const prevMonth = Number(month) - 1;
+    const prevMonthName = getMonthName(prevMonth);
     const getStatusColor = (status: string) => {
         switch (status) {
             case "Living":
@@ -64,107 +66,137 @@ const EmptyInsight = () => {
                     marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}>
                     <Header title={getMonthName(Number(month))} subtitle={year} />
 
-                    <Box
-                        bgColor={bg}
-                        marginTop={"2rem"}
-                        p="1rem 1rem"
-                        borderRadius="0.55rem"
-                        overflowX="auto"
-                        overflowY={'hidden'}
-                        _hover={{
-                            border: "1px",
-                            borderColor: "#30A0E0",
-                        }}
-                        maxH={maxHeight}
-                        as={motion.div}
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 } as any}
-                        className="hover: cursor-pointer ease-in duration-200"
-                    >
-                        <TableContainer>
-                            <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
-                                <Thead>
-                                    <Tr>
-                                        <Th minW="50px">Status</Th>
-                                        <Th minW="200px">Numbers</Th>
-                                    </Tr>
-                                </Thead>
-                                <Tbody>
-                                    <Tr>
-                                        <Td minW="100px">
-                                            <Wrap>
-                                                <WrapItem>
-                                                    <Badge colorScheme={getStatusColor('Draft')}>Draft</Badge>
-                                                </WrapItem>
-                                            </Wrap>
-                                        </Td>
-                                        <Td>
-                                            <Link
-                                                href={`/`}
-                                                className="text-blue-400 hover:cursor-pointer font-semibold"
-                                            >
-                                                0
-                                            </Link>
-                                        </Td>
-                                    </Tr>
-                                    <Tr>
-                                        <Td minW="100px">
-                                            <Wrap>
-                                                <WrapItem>
-                                                    <Badge colorScheme={getStatusColor('Final')}>Final</Badge>
-                                                </WrapItem>
-                                            </Wrap>
-                                        </Td>
-                                        <Td>
-                                            <Link
-                                                href={`/`}
-                                                className="text-blue-400 hover:cursor-pointer font-semibold"
-                                            >
-                                                0
-                                            </Link>
-                                        </Td>
-                                    </Tr>
-                                    <Tr>
-                                        <Td minW="100px">
-                                            <Wrap>
-                                                <WrapItem>
-                                                    <Badge colorScheme={getStatusColor('Review')}>Review</Badge>
-                                                </WrapItem>
-                                            </Wrap>
-                                        </Td>
-                                        <Td>
-                                            <Link
-                                                href={`/`}
-                                                className="text-blue-400 hover:cursor-pointer font-semibold"
-                                            >
-                                                0
-                                            </Link>
-                                        </Td>
-                                    </Tr>
-                                    <Tr>
-                                        <Td minW="100px">
-                                            <Wrap>
-                                                <WrapItem>
-                                                    <Badge colorScheme={getStatusColor('Last Call')}>Last Call</Badge>
-                                                </WrapItem>
-                                            </Wrap>
-                                        </Td>
-                                        <Td>
-                                            <Link
-                                                href={`/`}
-                                                className="text-blue-400 hover:cursor-pointer font-semibold"
-                                            >
-                                                0
-                                            </Link>
-                                        </Td>
-                                    </Tr>
-                                </Tbody>
-                            </Table>
-                        </TableContainer>
-                        <Box className={'w-full'}>
-                            <DateTime />
+                    <Box paddingY={8}>
+                        <p className={'text-2xl'}>
+                            There is no data available for this month. Would you like to see <NextLink href={`/insight/${year}/${prevMonth}`}><span className={'text-blue-400 font-bold'}>{prevMonthName} {year}</span></NextLink> insights?
+                        </p>
+                    </Box>
+
+                    <Box className={'grid grid-cols-2 gap-10 h-full'}>
+                        <Box
+                            bgColor={bg}
+                            marginTop={"2rem"}
+                            p="1rem 1rem"
+                            borderRadius="0.55rem"
+                            overflowX="auto"
+                            overflowY={'hidden'}
+                            _hover={{
+                                border: "1px",
+                                borderColor: "#30A0E0",
+                            }}
+                            maxH={maxHeight}
+                            as={motion.div}
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 } as any}
+                            className="hover: cursor-pointer ease-in duration-200"
+                        >
+                            <TableContainer>
+                                <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
+                                    <Thead>
+                                        <Tr>
+                                            <Th minW="50px">Status</Th>
+                                            <Th minW="200px">Numbers</Th>
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        <Tr>
+                                            <Td minW="100px">
+                                                <Wrap>
+                                                    <WrapItem>
+                                                        <Badge colorScheme={getStatusColor('Draft')}>Draft</Badge>
+                                                    </WrapItem>
+                                                </Wrap>
+                                            </Td>
+                                            <Td>
+                                                <Link
+                                                    href={`/`}
+                                                    className="text-blue-400 hover:cursor-pointer font-semibold"
+                                                >
+                                                    0
+                                                </Link>
+                                            </Td>
+                                        </Tr>
+
+                                        <Tr>
+                                            <Td minW="100px">
+                                                <Wrap>
+                                                    <WrapItem>
+                                                        <Badge colorScheme={getStatusColor('Review')}>Review</Badge>
+                                                    </WrapItem>
+                                                </Wrap>
+                                            </Td>
+                                            <Td>
+                                                <Link
+                                                    href={`/`}
+                                                    className="text-blue-400 hover:cursor-pointer font-semibold"
+                                                >
+                                                    0
+                                                </Link>
+                                            </Td>
+                                        </Tr>
+
+                                        <Tr>
+                                            <Td minW="100px">
+                                                <Wrap>
+                                                    <WrapItem>
+                                                        <Badge colorScheme={getStatusColor('Last Call')}>Last Call</Badge>
+                                                    </WrapItem>
+                                                </Wrap>
+                                            </Td>
+                                            <Td>
+                                                <Link
+                                                    href={`/`}
+                                                    className="text-blue-400 hover:cursor-pointer font-semibold"
+                                                >
+                                                    0
+                                                </Link>
+                                            </Td>
+                                        </Tr>
+
+                                        <Tr>
+                                            <Td minW="100px">
+                                                <Wrap>
+                                                    <WrapItem>
+                                                        <Badge colorScheme={getStatusColor('Final')}>Final</Badge>
+                                                    </WrapItem>
+                                                </Wrap>
+                                            </Td>
+                                            <Td>
+                                                <Link
+                                                    href={`/`}
+                                                    className="text-blue-400 hover:cursor-pointer font-semibold"
+                                                >
+                                                    0
+                                                </Link>
+                                            </Td>
+                                        </Tr>
+
+                                        <Tr>
+                                            <Td minW="100px">
+                                                <Wrap>
+                                                    <WrapItem>
+                                                        <Badge colorScheme={getStatusColor('Last Call')}>Stagnant</Badge>
+                                                    </WrapItem>
+                                                </Wrap>
+                                            </Td>
+                                            <Td>
+                                                <Link
+                                                    href={`/`}
+                                                    className="text-blue-400 hover:cursor-pointer font-semibold"
+                                                >
+                                                    0
+                                                </Link>
+                                            </Td>
+                                        </Tr>
+                                    </Tbody>
+                                </Table>
+                            </TableContainer>
+                            <Box className={'w-full'}>
+                                <DateTime />
+                            </Box>
                         </Box>
+                        <OtherBox />
                     </Box>
 
 

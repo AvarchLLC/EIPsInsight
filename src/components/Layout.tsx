@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation'
 import Head from 'next/head'
 import Banner from "@/components/NewsBanner";
 import PageHelpful from "@/components/PageHelpful";
+import ViewsShare from "@/components/ViewsNShare";
 // import ViewsShare from "@/components/ViewsNShare";
 
 const mont = Inter({ subsets: ['latin'] })
@@ -58,9 +59,9 @@ const AllLayout = ({
       <Box
         className={'flex justify-center mb-6'}
       >
-        {/*<PageHelpful/>*/}
+        <PageHelpful pageName={router ? router.split('/')[1] : ''}/>
       </Box>
-      {/*<ViewsShare/>*/}
+      <ViewsShare path={`${router}`}/>
       <LargeWithAppLinksAndSocial/>
 
       </Providers>
