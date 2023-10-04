@@ -86,10 +86,10 @@ const Navbar: React.FC = () => {
         {
             label: "More",
             children: [
-                {
-                    label: "Authors",
-                    href: `/authors`
-                },
+                // {
+                //     label: "Authors",
+                //     href: `/authors`
+                // },
                 {
                     label: "Resources",
                     href: `/resources`
