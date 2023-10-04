@@ -208,7 +208,7 @@ const PrPage: React.FC = () => {
         (item) => item.user.login === 'eth-bot'
     );
     const ethBotCount = ethBotFiltered?.length;
-    const gitActionsBotFiltered = data?.prDetails?.conversations.filter(
+    const gitActionsBotFiltered = data?.prDetails?.conversations?.filter(
         (item) => item.user.login === 'github-actions[bot]'
     );
     const gitActionsBotCount = gitActionsBotFiltered?.length;
@@ -248,10 +248,10 @@ const PrPage: React.FC = () => {
                                         </FlexBetween>
 
                                         <Box className={'flex space-x-10 items-center'} paddingTop={8}>
-                                            <NextLink href={``} target={'_blank'}>
+                                            <NextLink href={`https://github.com/${data?.prDetails?.commits[0]?.author?.login}`} target={'_blank'}>
                                                 <img
-                                                    src={data?.prDetails?.commits[0].author.avatar_url}
-                                                    alt={data?.prDetails?.commits[0].author.login}
+                                                    src={data?.prDetails?.commits[0]?.author?.avatar_url}
+                                                    alt={data?.prDetails?.commits[0]?.author?.login}
                                                     width={80}
                                                     height={80}
                                                     className={'rounded-full hover:scale-110 duration-200'}
