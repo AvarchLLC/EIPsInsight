@@ -49,18 +49,21 @@ const DashboardDonut = () => {
 
     fetchData();
   }, []);
+  console.log(data.length)
 
   const dat = [
-    {'category' : "Standards Track", "type" : "Core", "value" : data.filter(item => item.category === 'Core').length},
-    {'category' : "Standards Track", "type" : "ERC", "value" : data.filter(item => item.category === 'ERC').length},
-    {'category' : "Standards Track", "type" : "Networking", "value" : data.filter(item => item.category === 'Networking').length},
-    {'category' : "Standards Track", "type" : "Interface", "value" : data.filter(item => item.category === 'Interface').length},
-    {'category' : "Meta", "type" : "Meta", "value" : data.filter(item => item.type === 'Meta').length},
-    {'category' : "Informational", "type" : "Informational", "value" : data.filter(item => item.type === 'Informational').length}
+    {"status": "Final", "value" : data.filter(item => item.status === 'Final').length},
+    {"status": "Draft", "value" : data.filter(item => item.status === 'Draft').length},
+    {"status": "Review", "value" : data.filter(item => item.status === 'Review').length},
+    {"status": "Last Call", "value" : data.filter(item => item.status === 'Last Call').length},
+    {"status": "Living", "value" : data.filter(item => item.status === 'Living').length},
+    {"status": "Stagnant", "value" : data.filter(item => item.status === 'Stagnant').length},
+    {"status": "Withdrawn", "value" : data.filter(item => item.status === 'Withdrawn').length}
   ];
   const Area = dynamic(() => import("@ant-design/plots").then((item) => item.Pie), {
     ssr: false,
   });
+
 
 
   const categoryColors: string[] = [
@@ -93,7 +96,7 @@ const DashboardDonut = () => {
     appendPadding: 10,
     data: dat,
     angleField: "value",
-    colorField: "type",
+    colorField: "status",
     radius: 1,
     innerRadius: 0.5,
     legend: { position: 'top' as const },

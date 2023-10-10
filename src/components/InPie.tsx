@@ -188,6 +188,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status , year, month}) =>
       alignItems="center"
       height={500}
       overflowX="auto"
+      overflowY="auto"
       _hover={{
         border: '1px',
         borderColor: '#30A0E0',
@@ -196,13 +197,15 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status , year, month}) =>
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 } as any}
-      className="hover: ease-in duration-200 overflow-y-hidden"
+      className="hover:ease-in duration-200 overflow-y-hidden" // Change the class name to control overflow
     >
+      <Box className={'w-full'}>
       <NextLink href={`/tableinsights/${year}/${month}/${status}`}>
-        <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#30A0E0" paddingTop="1rem">
+        <Text textAlign="center" fontSize={['md', 'lg']} fontWeight="bold" color="#30A0E0" paddingTop="1rem">
           {status} : {tdata.sum}
         </Text>
       </NextLink>
+      </Box>
       <Divider mt="1rem" mb="1rem" />
       <Box width="60%" maxWidth={500} maxHeight={400}>
       <Pie {...config}/>
