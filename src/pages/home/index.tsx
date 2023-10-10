@@ -11,7 +11,7 @@ import {
   useTheme,
   Link as LI
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
 import { mockEIP } from "@/data/eipdata";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
@@ -32,6 +32,7 @@ import AllLayout from "@/components/Layout";
 import Dashboard from "@/components/Dashboard"
 import Head from "next/head"
 
+
 const Dasboard = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
@@ -39,6 +40,17 @@ const Dasboard = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const text = useColorModeValue("white", "black");
   const router = useRouter()
+  useEffect(() => {
+    // Send a POST request to increment the counter when the page loads
+    fetch('/api/count/views', { method: 'POST' })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('View count incremented:', data.count);
+        // Any additional logic after the successful request can be placed here.
+      })
+      .catch((error) => console.error('Error incrementing view count:', error));
+  }, []);
+  
   return (
     <AllLayout>
                   <Head>
