@@ -89,18 +89,18 @@ const All = () => {
         >
           <FlexBetween>
             <Header title={`All EIPs - [ ${data.length} ]`} subtitle="Your Roadway to All" />
-            <Box>
-              <Button
-                colorScheme="blue"
-                variant="outline"
-                fontSize={{md:'14px', base:'10px'}}
-                fontWeight={'bold'}
-                padding={{md:'10px 20px', base:'5px 10px'}}
-              >
-                <DownloadIcon marginEnd={1.5} />
-                Download Reports
-              </Button>
-            </Box>
+            {/*<Box>*/}
+            {/*  <Button*/}
+            {/*    colorScheme="blue"*/}
+            {/*    variant="outline"*/}
+            {/*    fontSize={{md:'14px', base:'10px'}}*/}
+            {/*    fontWeight={'bold'}*/}
+            {/*    padding={{md:'10px 20px', base:'5px 10px'}}*/}
+            {/*  >*/}
+            {/*    <DownloadIcon marginEnd={1.5} />*/}
+            {/*    Download Reports*/}
+            {/*  </Button>*/}
+            {/*</Box>*/}
           </FlexBetween>
           <Table />
           <AreaC/>
