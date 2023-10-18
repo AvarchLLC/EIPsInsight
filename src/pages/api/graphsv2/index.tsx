@@ -82,10 +82,10 @@ export default async (req: Request, res: Response) => {
             }
         }
     ])
-        .then((result :any) => {
-            const formattedResult = result.map((group: any) => ({
+        .then((result: { _id: any; eips: any[]; }[]) => {
+            const formattedResult = result.map((group: { _id: any; eips: any[]; }) => ({
                 status: group._id,
-                eips: group.eips.reduce((acc: any, eipGroup :any) => {
+                eips: group.eips.reduce((acc, eipGroup) => {
                     const { category, changedYear, changedMonth, count, eips } = eipGroup;
                     acc.push({
                         category,
@@ -96,11 +96,11 @@ export default async (req: Request, res: Response) => {
                         eips
                     });
                     return acc;
-                }, []).sort((a:any, b:any) => (a.date > b.date ? 1 : -1))
+                }, []).sort((a: { date: number; }, b: { date: number; }) => (a.date > b.date ? 1 : -1))
             }));
             res.json(formattedResult);
         })
-        .catch((error :any) => {
+        .catch((error: { message: any; }) => {
             console.error('Error retrieving EIPs:', error.message);
             res.status(500).json({ error: 'Internal server error' });
         });
