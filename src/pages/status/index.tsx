@@ -1,7 +1,16 @@
 import React from 'react';
 import AllLayout from "@/components/Layout";
 import Header from '@/components/Header';
-import { Box, Grid, Text } from '@chakra-ui/react';
+import {
+    Box,
+    Grid,
+    Popover,
+    PopoverArrow, PopoverBody,
+    PopoverCloseButton,
+    PopoverContent, PopoverHeader,
+    PopoverTrigger,
+    Text
+} from '@chakra-ui/react';
 import CBoxStatus from "@/components/CBoxStatus";
 import Donut from "@/components/Donut"
 import DonutStatus from "@/components/DonutStatus"
@@ -101,9 +110,15 @@ const Status = () => {
                         </Text>
                         <AreaStatus />
                     </Box>
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Draft - <NextLink href={`/tableStatus/Draft`}> [ {data.filter((item) => item.status === 'Draft').length} ]</NextLink>
-                    </Text>
+                    <Box className={"group relative flex gap-3"}>
+                        <Box className={'flex'}>
+                            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                                Draft - <NextLink href={`/tableStatus/Draft`}> [ {data.filter((item) => item.status === 'Draft').length} ]</NextLink>
+                            </Text>
+                            <p className={'text-red-700'}>*</p>
+                        </Box>
+                        <p className={'hidden group-hover:block text-lg'}>Count as on date</p>
+                    </Box>
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
 
 
@@ -113,9 +128,16 @@ const Status = () => {
                         <CBoxStatus status={'Draft'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Review - <NextLink href={`/tableStatus/Review`}> [ {data.filter((item) => item.status === 'Review').length} ]</NextLink>
-                    </Text>
+                    <Box className={"group relative flex gap-3"}>
+                        <Box className={'flex'}>
+                            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                                Review - <NextLink href={`/tableStatus/Review`}> [ {data.filter((item) => item.status === 'Review').length} ]</NextLink>
+                            </Text>
+                            <p className={'text-red-700'}>*</p>
+                        </Box>
+                        <p className={'hidden group-hover:block text-lg'}>Count as on date</p>
+                    </Box>
+
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
 
 
@@ -125,9 +147,18 @@ const Status = () => {
                         <CBoxStatus status={'Review'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Last Call -<NextLink href={`/tableStatus/LastCall`}> [ {data.filter((item) => item.status === 'Last Call').length} ] </NextLink>
-                    </Text>
+
+
+                    <Box className={"group relative flex gap-3"}>
+                        <Box className={'flex'}>
+                            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                                Last Call -<NextLink href={`/tableStatus/LastCall`}> [ {data.filter((item) => item.status === 'Last Call').length} ] </NextLink>
+                            </Text>
+                            <p className={'text-red-700'}>*</p>
+                        </Box>
+                        <p className={'hidden group-hover:block text-lg'}>Count as on date</p>
+                    </Box>
+
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
 
 
@@ -137,9 +168,18 @@ const Status = () => {
                         <CBoxStatus status={'Last Call'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Living -<NextLink href={`/tableStatus/Living`}> [ {data.filter((item) => item.status === 'Living').length} ]</NextLink>
-                    </Text>
+
+
+                    <Box className={"group relative flex gap-3"}>
+                        <Box className={'flex'}>
+                            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                                Living -<NextLink href={`/tableStatus/Living`}> [ {data.filter((item) => item.status === 'Living').length} ]</NextLink>
+                            </Text>
+                            <p className={'text-red-700'}>*</p>
+                        </Box>
+                        <p className={'hidden group-hover:block text-lg'}>Count as on date</p>
+                    </Box>
+
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
                     
               
@@ -149,9 +189,17 @@ const Status = () => {
                         
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Final -<NextLink href={`/tableStatus/Final`}> [ {data.filter((item) => item.status === 'Final').length} ] </NextLink>
-                    </Text>
+
+
+                    <Box className={"group relative flex gap-3"}>
+                        <Box className={'flex'}>
+                            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                                Final -<NextLink href={`/tableStatus/Final`}> [ {data.filter((item) => item.status === 'Final').length} ] </NextLink>
+                            </Text>
+                            <p className={'text-red-700'}>*</p>
+                        </Box>
+                        <p className={'hidden group-hover:block text-lg'}>Count as on date</p>
+                    </Box>
 
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
                         <StackedColumnChart status={'Final'}/>
@@ -160,9 +208,18 @@ const Status = () => {
                         <CBoxStatus status={'Final'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Stagnant -<NextLink href={`/tableStatus/Stagnant`}> [ {data.filter((item) => item.status === 'Stagnant').length} ] </NextLink>
-                    </Text>
+
+
+                    <Box className={"group relative flex gap-3"}>
+                        <Box className={'flex'}>
+                            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                                Stagnant -<NextLink href={`/tableStatus/Stagnant`}> [ {data.filter((item) => item.status === 'Stagnant').length} ] </NextLink>
+                            </Text>
+                            <p className={'text-red-700'}>*</p>
+                        </Box>
+                        <p className={'hidden group-hover:block text-lg'}>Count as on date</p>
+                    </Box>
+
 
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
                         <StackedColumnChart status={'Stagnant'}/>
@@ -171,9 +228,17 @@ const Status = () => {
                         <CBoxStatus status={'Stagnant'}/>
                     </Grid>
 
-                    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                        Withdrawn -<NextLink href={`/tableStatus/Withdrawn`}> [ {data.filter((item) => item.status === 'Withdrawn').length} ] </NextLink>
-                    </Text>
+
+
+                    <Box className={"group relative flex gap-3"}>
+                        <Box className={'flex'}>
+                            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                                Withdrawn -<NextLink href={`/tableStatus/Withdrawn`}> [ {data.filter((item) => item.status === 'Withdrawn').length} ] </NextLink>
+                            </Text>
+                            <p className={'text-red-700'}>*</p>
+                        </Box>
+                        <p className={'hidden group-hover:block text-lg'}>Count as on date</p>
+                    </Box>
 
                     <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
 
@@ -203,6 +268,7 @@ const Status = () => {
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                       Draft - <NextLink href={`/tableStatus/Draft`}> [ {data.filter((item) => item.status === 'Draft').length} ]</NextLink>
                   </Text>
+
 
                   <Box>
                       <StackedColumnChart status='Draft'/>
@@ -257,7 +323,7 @@ const Status = () => {
 
                 </motion.div>
         )}
-            </AllLayout>
+      </AllLayout>
         
     );
 };
