@@ -12,6 +12,15 @@ const ERCGraph =() => {
                 bg={bg}
                 marginTop={"1.5rem"}
                 borderRadius="0.55rem"
+                _hover={{
+                    border: "1px",
+                    borderColor: "#30A0E0",
+                }}
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                className="hover:cursor-pointer ease-in duration-200 overflow-y-hidden"
             >
                 <Box
 
@@ -22,15 +31,7 @@ const ERCGraph =() => {
                     justifyContent="center"
                     alignItems="center"
                     height={400}
-                    _hover={{
-                        border: "1px",
-                        borderColor: "#30A0E0",
-                    }}
-                    as={motion.div}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 } as any}
-                    className="hover:cursor-pointer ease-in duration-200 overflow-y-hidden"
+
                 >
                     <StatusColumnChart category={'ERCs'}/>
                 </Box>
