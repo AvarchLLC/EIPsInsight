@@ -101,36 +101,62 @@ interface EIP {
 
   return (
     <>
-        <Flex alignItems="center" justifyContent="space-between" p="1rem" borderRadius="8px" position="relative" paddingTop={5}>
-      <Box bg={bg} width="100%" height="20px" position="absolute" top="50%" left="0" transform="translateY(-50%)" />
-      <Box bg={"blue.500"} w="150px" h="70px" borderRadius="0.7rem" textAlign="center" lineHeight="70px" fontSize="22px" color="white" position="relative" fontWeight='semibold'>
-        DRAFT
-      </Box>
-      <Box bg={"blue.500"} w="150px" h="70px" borderRadius="0.7rem" textAlign="center" lineHeight="70px" fontSize="22px" color="white" position="relative" fontWeight='semibold'>
-        REVIEW
-      </Box>
-      <Box bg={"blue.500"} w="150px" h="70px" borderRadius="0.7rem" textAlign="center" lineHeight="70px" fontSize="22px" color="white" position="relative" fontWeight='semibold'>
-        LAST CALL
-      </Box>
-      <Box bg={"blue.500"} w="150px" h="70px" borderRadius="0.7rem" textAlign="center" lineHeight="70px" fontSize="22px"  color="white" position="relative" fontWeight='semibold'>
-        FINAL
-      </Box>
-    </Flex>
-    <Flex alignItems="center" justifyContent="space-between" p="1rem" borderRadius="8px" position="relative">
+        <Flex>
+            {/*<Flex alignItems="center" justifyContent="space-between" p="1rem" borderRadius="8px" position="relative" paddingTop={5}>*/}
+            {/*    */}
+            {/*</Flex>*/}
+            <Box>
+                {/*<Box bg={bg} width="100%" height="20px" position="absolute" top="50%" left="0" transform="translateY(-50%)" />*/}
+                <Flex>
+                    <Box bg={"blue.500"} w="150px" h="70px" borderRadius="0.7rem" textAlign="center" lineHeight="70px" fontSize="22px" color="white" position="relative" fontWeight='semibold'>
+                        DRAFT
+                    </Box>
+                    <Box bg={bg} w="150px" h="50px" borderRadius="0.55rem" textAlign="center" lineHeight="50px"   color="blue.500" position="relative" fontWeight='semibold'>
+                        {getStatusDate(data, "Draft")}
+                    </Box>
+                </Flex>
 
-      <Box bg={bg} w="150px" h="50px" borderRadius="0.55rem" textAlign="center" lineHeight="50px"   color="blue.500" position="relative" fontWeight='semibold'>
-      {getStatusDate(data, "Draft")}
-      </Box>
-      <Box bg={bg} w="150px" h="50px" borderRadius="0.55rem" textAlign="center" lineHeight="50px"  color="blue.500" position="relative" fontWeight='semibold'>
-      {getStatusDate(data, "Review")}
-      </Box>
-      <Box bg={bg} w="150px" h="50px" borderRadius="0.55rem" textAlign="center" lineHeight="50px"  color="blue.500" position="relative" fontWeight='semibold'>
-      {getStatusDate(data, "Last Call")}
-      </Box>
-      <Box bg={bg} w="150px" h="50px" borderRadius="0.55rem" textAlign="center" lineHeight="50px"   color="blue.500" position="relative" fontWeight='semibold'>
-      {getStatusDate(data, "Final")}
-      </Box>
-    </Flex>
+                <Flex>
+                    <Box bg={"blue.500"} w="150px" h="70px" borderRadius="0.7rem" textAlign="center" lineHeight="70px" fontSize="22px" color="white" position="relative" fontWeight='semibold'>
+                        REVIEW
+                    </Box>
+                    <Box bg={bg} w="150px" h="50px" borderRadius="0.55rem" textAlign="center" lineHeight="50px"  color="blue.500" position="relative" fontWeight='semibold'>
+                        {getStatusDate(data, "Review")}
+                    </Box>
+                </Flex>
+
+                <Flex>
+                    <Box bg={"blue.500"} w="150px" h="70px" borderRadius="0.7rem" textAlign="center" lineHeight="70px" fontSize="22px" color="white" position="relative" fontWeight='semibold'>
+                        LAST CALL
+                    </Box>
+                    <Box bg={bg} w="150px" h="50px" borderRadius="0.55rem" textAlign="center" lineHeight="50px"  color="blue.500" position="relative" fontWeight='semibold'>
+                        {getStatusDate(data, "Last Call")}
+                    </Box>
+                </Flex>
+
+                <Flex>
+                    <Box bg={"blue.500"} w="150px" h="70px" borderRadius="0.7rem" textAlign="center" lineHeight="70px" fontSize="22px"  color="white" position="relative" fontWeight='semibold'>
+                        FINAL
+                    </Box>
+                    <Box bg={bg} w="150px" h="50px" borderRadius="0.55rem" textAlign="center" lineHeight="50px"   color="blue.500" position="relative" fontWeight='semibold'>
+                        {getStatusDate(data, "Final")}
+                    </Box>
+                </Flex>
+            </Box>
+            {/*<Flex alignItems="center" justifyContent="space-between" p="1rem" borderRadius="8px" position="relative">*/}
+
+            {/*    */}
+            {/*</Flex>*/}
+
+           <Box
+            className={'justify-center items-center'}
+           >
+
+
+
+
+           </Box>
+        </Flex>
     </>
 
   );

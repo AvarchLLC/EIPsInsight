@@ -97,19 +97,16 @@ const ERC = () => {
       <Box paddingTop={8}>
         <ERCCatBoxGrid />
       </Box>
-      <TableStatus cat='ERC'/>
-      <Grid templateColumns="1fr 1fr" gap={8} paddingTop={8}>
-          <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-            Draft vs Final
-          </Text>
-          <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-            ERCs
-          </Text>
-      </Grid>
-      <Grid templateColumns="1fr 1fr" gap={8}>
-        <AreaStatus/>
+      <Box paddingTop={8}>
         <ERCGraph />
-      </Grid>
+      </Box>
+      <TableStatus cat='ERC'/>
+      <Box className={'pt-8'}>
+        <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+          Draft vs Final
+        </Text>
+        <AreaStatus/>
+      </Box>
     </Box>
     </motion.div>)}
   </AllLayout>

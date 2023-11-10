@@ -164,7 +164,7 @@ const StatusChart: React.FC<AreaCProps> = ({category}) => {
 
     return (
         <>
-            <Box boxSize={"xs"}
+            <Box boxSize={"100%"}
                  paddingX={'1rem'}
                  overflowX={'hidden'}
 

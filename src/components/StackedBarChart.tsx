@@ -104,7 +104,7 @@ interface AreaProps {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await fetch(`/api/graphs`);
+          const response = await fetch(`/api/graphsv2`);
           const jsonData = await response.json();
           setData(jsonData);
         } catch (error) {
@@ -175,11 +175,13 @@ interface AreaProps {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 } as any}
-        className="hover: cursor-pointer ease-in duration-200"
+        className="hover: cursor-pointer ease-in duration-200 h-max"
       >
 
         <Area {...config}/>
-
+            <Box className={'w-full'}>
+                <DateTime />
+            </Box>
       </Box>
         
 
