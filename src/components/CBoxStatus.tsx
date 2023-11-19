@@ -20,6 +20,7 @@ import {
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
 import { DownloadIcon } from "@chakra-ui/icons";
+import { Spinner } from "@chakra-ui/react";
 
 interface EIP {
   _id: string;
@@ -123,7 +124,7 @@ const getCat = (cat: string) => {
 const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
   const [data, setData] = useState<Data>();
   const [selectedYear, setSelectedYear] = useState<number>(2023);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [typeData, setTypeData] = useState<APIResponse[]>([]);
 
   useEffect(() => {
@@ -142,6 +143,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
         }
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -351,75 +353,93 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
   const bg = useColorModeValue("#f6f6f7", "gray.700");
 
   return (
-    <Box
-      bgColor={bg}
-      marginTop={"2rem"}
-      p="1rem 1rem"
-      borderRadius="0.55rem"
-      overflowX="auto"
-      _hover={{
-        border: "1px",
-        borderColor: "#30A0E0",
-      }}
-      maxH={maxHeight}
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className="ease-in duration-200"
-    >
-      <Box className={"flex w-full gap-10"}>
-        <Select
-          variant="outline"
-          placeholder="Select Option"
-          value={selectedYear}
-          onChange={handleYearChange}
-          className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-          size="md"
+    <>
+      {isLoading ? ( // Show loader while data is loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="200px"
         >
-          {years.map((item) => (
-            <option value={`${item}`} key={item}>
-              {item}
-            </option>
-          ))}
-        </Select>
-
-        <Box>
-          <Button
-            colorScheme="blue"
-            variant="outline"
-            fontSize={"14px"}
-            fontWeight={"bold"}
-            padding={"8px 20px"}
-            onClick={convertAndDownloadCSV}
-          >
-            <DownloadIcon marginEnd={"1.5"} />
-            Download Reports
-          </Button>
+          <Spinner />
         </Box>
-      </Box>
+      ) : (
+        <Box
+          bgColor={bg}
+          marginTop={"2rem"}
+          p="1rem 1rem"
+          borderRadius="0.55rem"
+          overflowX="auto"
+          _hover={{
+            border: "1px",
+            borderColor: "#30A0E0",
+          }}
+          maxH={maxHeight}
+          as={motion.div}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 } as any}
+          className="ease-in duration-200"
+        >
+          <Box className={"flex w-full gap-10"}>
+            <Select
+              variant="outline"
+              placeholder="Select Option"
+              value={selectedYear}
+              onChange={handleYearChange}
+              className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+              size="md"
+            >
+              {years.map((item) => (
+                <option value={`${item}`} key={item}>
+                  {item}
+                </option>
+              ))}
+            </Select>
 
-      <TableContainer>
-        <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
-          <Thead>
-            <Tr>
-              <Th minW="50px">Type - Category</Th>
-              <Th minW="200px">Numbers</Th>
-              <Th minW="200px">Percentage</Th>
-            </Tr>
-          </Thead>
-          <Tbody>{rows}</Tbody>
-        </Table>
-      </TableContainer>
-      <Box className={"flex justify-center w-full text-center"}>
-        <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
-          Total: {total}
-        </Text>
-      </Box>
-      <Box className={"w-full"}>
-        <DateTime />
-      </Box>
-    </Box>
+            <Box>
+              <Button
+                colorScheme="blue"
+                variant="outline"
+                fontSize={"14px"}
+                fontWeight={"bold"}
+                padding={"8px 20px"}
+                onClick={convertAndDownloadCSV}
+              >
+                <DownloadIcon marginEnd={"1.5"} />
+                Download Reports
+              </Button>
+            </Box>
+          </Box>
+
+          <TableContainer>
+            <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
+              <Thead>
+                <Tr>
+                  <Th minW="50px">Type - Category</Th>
+                  <Th minW="200px">Numbers</Th>
+                  <Th minW="200px">Percentage</Th>
+                </Tr>
+              </Thead>
+              <Tbody>{rows}</Tbody>
+            </Table>
+          </TableContainer>
+          <Box className={"flex justify-center w-full text-center"}>
+            <Text
+              fontSize="xl"
+              fontWeight="bold"
+              color="#30A0E0"
+              marginRight="6"
+            >
+              Total: {total}
+            </Text>
+          </Box>
+          <Box className={"w-full"}>
+            <DateTime />
+          </Box>
+        </Box>
+      )}
+    </>
   );
 };
 

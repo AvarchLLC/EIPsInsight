@@ -225,7 +225,10 @@ const Dashboard = () => {
                           color="#30A0E0"
                           marginRight="6"
                         >
-                          {`Total - ${data.length}`}
+                          {`Total EIPs - ${
+                            data.filter((item) => item.category !== "ERC")
+                              .length
+                          }`}
                         </Text>
                       </NextLink>
                       <StackedColumnChart type={"EIPs"} status={"Final"} />
@@ -254,7 +257,9 @@ const Dashboard = () => {
                         marginX="6"
                         paddingTop={6}
                       >
-                        {`Total EIPs - ${data.length}`}
+                        {`Total EIPs - ${
+                          data.filter((item) => item.category !== "ERC").length
+                        }`}
                       </Text>
                     </NextLink>
                     <StackedColumnChart type={"EIPs"} status={"Final"} />

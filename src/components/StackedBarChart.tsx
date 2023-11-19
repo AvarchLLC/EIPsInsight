@@ -111,6 +111,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
   const [data, setData] = useState<APIResponse>();
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const [isLoading, setIsLoading] = useState(true);
 
   const [typeData, setTypeData] = useState<EIP[]>([]);
 
@@ -127,6 +128,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
         }
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -159,9 +161,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
         value: eip.count,
       }))
     )
-    .filter((item) => {
-      type === "EIPs" ? item.category !== "ERCs" : item.category === "ERCs";
-    });
+    .filter((item) => item.category !== "ERCs");
 
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Column),
@@ -197,29 +197,42 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
   };
 
   return (
-    <Box
-      bgColor={bg}
-      marginTop={"2rem"}
-      p="0.5rem"
-      borderRadius="0.35rem"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      height={400}
-      overflowX="auto"
-      overflowY="hidden"
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200 h-max"
-    >
-      <Area {...config} />
-      <Box className={"w-full"}>
-        <DateTime />
-      </Box>
-    </Box>
+    <>
+      {isLoading ? ( // Show loader while data is loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="200px"
+        >
+          <Spinner />
+        </Box>
+      ) : (
+        <Box
+          bgColor={bg}
+          marginTop={"2rem"}
+          p="0.5rem"
+          borderRadius="0.35rem"
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          height={400}
+          overflowX="auto"
+          overflowY="hidden"
+          as={motion.div}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 } as any}
+          className="hover: cursor-pointer ease-in duration-200 h-max"
+        >
+          <Area {...config} />
+          <Box className={"w-full"}>
+            <DateTime />
+          </Box>
+        </Box>
+      )}
+    </>
   );
 };
 
