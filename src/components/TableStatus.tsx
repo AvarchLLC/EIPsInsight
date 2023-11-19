@@ -7,6 +7,7 @@ import {
   Badge,
   Link,
   Button,
+  Select,
 } from "@chakra-ui/react";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import React, { useEffect, useState } from "react";
@@ -17,10 +18,32 @@ const statusArr = [
   "Final",
   "Draft",
   "Review",
-  "Last_Call",
+  "Last Call",
   "Stagnant",
   "Withdrawn",
   "Living",
+];
+const monthArr = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+];
+const catArr = [
+  "Core",
+  "Networking",
+  "Interface",
+  "ERC",
+  "Meta",
+  "Informational",
 ];
 
 interface EIP {
@@ -50,7 +73,7 @@ async function fetchLastCreatedYearAndMonthFromAPI(
   eipNumber: number
 ): Promise<{ mergedYear: string; mergedMonth: string } | null> {
   try {
-    const apiUrl = `/api/eipshistory/${eipNumber}`;
+    const apiUrl = `/api/new/erchistory/${eipNumber}`;
     const response = await fetch(apiUrl);
 
     if (!response.ok) {
@@ -83,6 +106,16 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
   const [mergedData, setMergedData] = useState<
     { mergedYear: string; mergedMonth: string }[]
   >([]);
+  const [selectedYearRange, setSelectedYearRange] = useState({
+    start: "",
+    end: "",
+  });
+  const [selectedMonthRange, setSelectedMonthRange] = useState({
+    start: "",
+    end: "",
+  });
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
@@ -150,27 +183,43 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
     })
   );
 
+  const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
+    const isYearInRange =
+      (!selectedYearRange.start ||
+        item.mergedYear >= selectedYearRange.start) &&
+      (!selectedYearRange.end || item.mergedYear <= selectedYearRange.end);
+
+    const isMonthInRange =
+      (!selectedMonthRange.start ||
+        item.mergedMonth >= selectedMonthRange.start) &&
+      (!selectedMonthRange.end || item.mergedMonth <= selectedMonthRange.end);
+
+    const isStatusMatch = !selectedStatus || item.status === selectedStatus;
+
+    const isCategoryMatch =
+      !selectedCategory || item.category === selectedCategory;
+    return isYearInRange && isMonthInRange && isStatusMatch && isCategoryMatch;
+  });
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
-    if (
-      filteredDataWithMergedYearsAndMonths &&
-      filteredDataWithMergedYearsAndMonths.length > 0
-    ) {
+    if (DataForFilter && DataForFilter.length > 0) {
       // Create CSV headers
       const headers =
         Object.keys(filteredDataWithMergedYearsAndMonths[0]).join(",") + "\n";
 
       // Convert data to CSV rows
-      const csvRows = filteredDataWithMergedYearsAndMonths.map((item) =>
-        Object.values(item)
-          .map((value) =>
-            typeof value === "string" && value.includes(",")
-              ? `"${value}"`
-              : value
-          )
-          .join(",")
-      );
+      const csvRows = DataForFilter.map((item) => {
+        const values = Object.values(item).map((value) => {
+          // Ensure values with commas are enclosed in double quotes
+          if (typeof value === "string" && value.includes(",")) {
+            return `"${value}"`;
+          }
+          return value;
+        });
+
+        return values.join(",");
+      });
 
       // Combine headers and rows
       const csvContent = headers + csvRows.join("\n");
@@ -181,209 +230,328 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
       const a = document.createElement("a");
       a.style.display = "none";
       a.href = url;
-      a.download = `${cat}.csv`;
+      if (
+        selectedCategory === "" &&
+        selectedStatus === "" &&
+        selectedYearRange.start === "" &&
+        selectedYearRange.end === "" &&
+        selectedMonthRange.start === "" &&
+        selectedMonthRange.end === ""
+      ) {
+        a.download = `All_ERCs.csv`;
+      } else {
+        a.download = `ERC_${selectedStatus}_${selectedCategory}_${selectedMonthRange.start}_${selectedMonthRange.end}_${selectedYearRange.start}_${selectedYearRange.end}.csv`;
+      }
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
     }
   };
 
-  return (
-    <Box
-      bgColor={bg}
-      marginTop={"12"}
-      p="1rem 1rem"
-      borderRadius="0.55rem"
-      _hover={{
-        border: "1px",
-        borderColor: "#30A0E0",
-      }}
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className=" ease-in duration-200"
-    >
-      <Box>
-        <Button
-          colorScheme="blue"
-          variant="outline"
-          fontSize={"14px"}
-          fontWeight={"bold"}
-          padding={"10px 20px"}
-          onClick={convertAndDownloadCSV}
-        >
-          <DownloadIcon marginEnd={"1.5"} />
-          Download Reports
-        </Button>
-      </Box>
+  const currentYear = new Date().getFullYear();
+  const startYear = 2015;
+  const yearsArr = [];
 
-      <CCardBody
-        style={{
-          fontSize: "13px",
+  for (let year = startYear; year <= currentYear; year++) {
+    yearsArr.push(year);
+  }
+
+  return (
+    <>
+      <Box
+        bgColor={bg}
+        marginTop={"12"}
+        p="1rem 1rem"
+        borderRadius="0.55rem"
+        _hover={{
+          border: "1px",
+          borderColor: "#30A0E0",
         }}
-        className="scrollbarDesign"
+        as={motion.div}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 } as any}
+        className=" ease-in duration-200"
       >
-        {isLoading ? ( // Show loader while data is loading
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="200px"
-          >
-            <Spinner />
-          </Box>
-        ) : (
-          <CSmartTable
-            items={filteredDataWithMergedYearsAndMonths.sort(
-              (a, b) => parseInt(a["#"]) - parseInt(b["#"])
-            )}
-            activePage={1}
-            clickableRows
-            columnFilter
-            columnSorter
-            itemsPerPage={7}
-            pagination
-            tableProps={{
-              hover: true,
-              responsive: true,
-            }}
-            scopedColumns={{
-              "#": (item: any) => (
-                <td key={item.eip}>
-                  <Link href={`/EIPS/${item.eip}`}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>
-                          {item["#"]}
-                        </Badge>
-                      </WrapItem>
-                    </Wrap>
-                  </Link>
-                </td>
-              ),
-              eip: (item: any) => (
-                <td key={item.eip}>
-                  <Link href={`/EIPS/${item.eip}`}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>
-                          {item.eip}
-                        </Badge>
-                      </WrapItem>
-                    </Wrap>
-                  </Link>
-                </td>
-              ),
-              title: (item: any) => (
-                <td
-                  key={item.eip}
-                  style={{ fontWeight: "bold", height: "100%" }}
-                  className="hover:text-[#1c7ed6]"
+        <CCardBody
+          style={{
+            fontSize: "13px",
+          }}
+          className="scrollbarDesign"
+        >
+          {isLoading ? ( // Show loader while data is loading
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="200px"
+            >
+              <Spinner />
+            </Box>
+          ) : (
+            <>
+              <div className={"flex space-x-10 py-4"}>
+                <Select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
                 >
-                  <Link
-                    href={`/EIPS/${item.eip}`}
-                    className={
-                      isDarkMode
-                        ? "hover:text-[#1c7ed6] text-[13px] text-white"
-                        : "hover:text-[#1c7ed6] text-[13px] text-black"
-                    }
+                  <option value="">Select Status</option>
+                  {statusArr.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </Select>
+
+                <Select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  <option value="">Select Category</option>
+                  {catArr.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </Select>
+
+                <Select
+                  value={selectedYearRange.start}
+                  onChange={(e) =>
+                    setSelectedYearRange({
+                      ...selectedYearRange,
+                      start: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">Start Year</option>
+                  {yearsArr.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </Select>
+
+                <Select
+                  value={selectedYearRange.end}
+                  onChange={(e) =>
+                    setSelectedYearRange({
+                      ...selectedYearRange,
+                      end: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">End Year</option>
+                  {yearsArr.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </Select>
+
+                <Select
+                  value={selectedMonthRange.start}
+                  onChange={(e) =>
+                    setSelectedMonthRange({
+                      ...selectedMonthRange,
+                      start: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">Start Month</option>
+                  {monthArr.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </Select>
+
+                <Select
+                  value={selectedMonthRange.end}
+                  onChange={(e) =>
+                    setSelectedMonthRange({
+                      ...selectedMonthRange,
+                      end: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">End Month</option>
+                  {monthArr.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </Select>
+
+                <Box>
+                  <Button
+                    colorScheme="blue"
+                    variant="outline"
+                    fontSize={"14px"}
+                    fontWeight={"bold"}
+                    padding={"10px 20px"}
+                    onClick={convertAndDownloadCSV}
                   >
-                    {item.title}
-                  </Link>
-                </td>
-              ),
-              author: (it: any) => (
-                <td key={it.author}>
-                  <div>
-                    {factorAuthor(it.author).map((item: any, index: any) => {
-                      let t = item[item.length - 1].substring(
-                        1,
-                        item[item.length - 1].length - 1
-                      );
-                      return (
-                        <Wrap key={index}>
+                    <DownloadIcon marginEnd={"1.5"} />
+                    Download Reports
+                  </Button>
+                </Box>
+              </div>
+
+              <CSmartTable
+                items={filteredDataWithMergedYearsAndMonths.sort(
+                  (a, b) => parseInt(a["#"]) - parseInt(b["#"])
+                )}
+                activePage={1}
+                clickableRows
+                columnFilter
+                columnSorter
+                itemsPerPage={7}
+                pagination
+                tableProps={{
+                  hover: true,
+                  responsive: true,
+                }}
+                scopedColumns={{
+                  "#": (item: any) => (
+                    <td key={item.eip}>
+                      <Link href={`/EIPS/${item.eip}`}>
+                        <Wrap>
                           <WrapItem>
-                            <Link
-                              href={`${
-                                item[item.length - 1].substring(
-                                  item[item.length - 1].length - 1
-                                ) === ">"
-                                  ? "mailto:" + t
-                                  : "https://github.com/" + t.substring(1)
-                              }`}
-                              target="_blank"
-                              className={
-                                isDarkMode
-                                  ? "hover:text-[#1c7ed6] text-[13px] text-white"
-                                  : "hover:text-[#1c7ed6] text-[13px] text-black"
-                              }
-                            >
-                              {item}
-                            </Link>
+                            <Badge colorScheme={getStatusColor(item.status)}>
+                              {item["#"]}
+                            </Badge>
                           </WrapItem>
                         </Wrap>
-                      );
-                    })}
-                  </div>
-                </td>
-              ),
-              type: (item: any) => (
-                <td
-                  key={item.eip}
-                  className={isDarkMode ? "text-white" : "text-black"}
-                >
-                  {item.type}
-                </td>
-              ),
-              category: (item: any) => (
-                <td
-                  key={item.eip}
-                  className={isDarkMode ? "text-white" : "text-black"}
-                >
-                  {item.category}
-                </td>
-              ),
-              status: (item: any) => (
-                <td key={item.eip}>
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>
-                        {item.status}
-                      </Badge>
-                    </WrapItem>
-                  </Wrap>
-                </td>
-              ),
-              mergedYear: (item: any) => (
-                <td key={item.eip}>
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>
-                        {" "}
-                        {item.mergedYear}
-                      </Badge>
-                    </WrapItem>
-                  </Wrap>
-                </td>
-              ),
-              mergedMonth: (item: any) => (
-                <td key={item.eip}>
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme={getStatusColor(item.status)}>
-                        {" "}
-                        {item.mergedMonth}
-                      </Badge>
-                    </WrapItem>
-                  </Wrap>
-                </td>
-              ),
-            }}
-          />
-        )}
-      </CCardBody>
-    </Box>
+                      </Link>
+                    </td>
+                  ),
+                  eip: (item: any) => (
+                    <td key={item.eip}>
+                      <Link href={`/EIPS/${item.eip}`}>
+                        <Wrap>
+                          <WrapItem>
+                            <Badge colorScheme={getStatusColor(item.status)}>
+                              {item.eip}
+                            </Badge>
+                          </WrapItem>
+                        </Wrap>
+                      </Link>
+                    </td>
+                  ),
+                  title: (item: any) => (
+                    <td
+                      key={item.eip}
+                      style={{ fontWeight: "bold", height: "100%" }}
+                      className="hover:text-[#1c7ed6]"
+                    >
+                      <Link
+                        href={`/EIPS/${item.eip}`}
+                        className={
+                          isDarkMode
+                            ? "hover:text-[#1c7ed6] text-[13px] text-white"
+                            : "hover:text-[#1c7ed6] text-[13px] text-black"
+                        }
+                      >
+                        {item.title}
+                      </Link>
+                    </td>
+                  ),
+                  author: (it: any) => (
+                    <td key={it.author}>
+                      <div>
+                        {factorAuthor(it.author).map(
+                          (item: any, index: any) => {
+                            let t = item[item.length - 1].substring(
+                              1,
+                              item[item.length - 1].length - 1
+                            );
+                            return (
+                              <Wrap key={index}>
+                                <WrapItem>
+                                  <Link
+                                    href={`${
+                                      item[item.length - 1].substring(
+                                        item[item.length - 1].length - 1
+                                      ) === ">"
+                                        ? "mailto:" + t
+                                        : "https://github.com/" + t.substring(1)
+                                    }`}
+                                    target="_blank"
+                                    className={
+                                      isDarkMode
+                                        ? "hover:text-[#1c7ed6] text-[13px] text-white"
+                                        : "hover:text-[#1c7ed6] text-[13px] text-black"
+                                    }
+                                  >
+                                    {item}
+                                  </Link>
+                                </WrapItem>
+                              </Wrap>
+                            );
+                          }
+                        )}
+                      </div>
+                    </td>
+                  ),
+                  type: (item: any) => (
+                    <td
+                      key={item.eip}
+                      className={isDarkMode ? "text-white" : "text-black"}
+                    >
+                      {item.type}
+                    </td>
+                  ),
+                  category: (item: any) => (
+                    <td
+                      key={item.eip}
+                      className={isDarkMode ? "text-white" : "text-black"}
+                    >
+                      {item.category}
+                    </td>
+                  ),
+                  status: (item: any) => (
+                    <td key={item.eip}>
+                      <Wrap>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>
+                            {item.status}
+                          </Badge>
+                        </WrapItem>
+                      </Wrap>
+                    </td>
+                  ),
+                  mergedYear: (item: any) => (
+                    <td key={item.eip}>
+                      <Wrap>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>
+                            {" "}
+                            {item.mergedYear}
+                          </Badge>
+                        </WrapItem>
+                      </Wrap>
+                    </td>
+                  ),
+                  mergedMonth: (item: any) => (
+                    <td key={item.eip}>
+                      <Wrap>
+                        <WrapItem>
+                          <Badge colorScheme={getStatusColor(item.status)}>
+                            {" "}
+                            {item.mergedMonth}
+                          </Badge>
+                        </WrapItem>
+                      </Wrap>
+                    </td>
+                  ),
+                }}
+              />
+            </>
+          )}
+        </CCardBody>
+      </Box>
+    </>
   );
 };
 
