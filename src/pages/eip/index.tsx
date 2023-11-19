@@ -9,6 +9,7 @@ import FlexBetween from "@/components/FlexBetween";
 import SearchBox from "@/components/SearchBox";
 import StatusBox from "@/components/StatusBox";
 import EIPCatBoxGrid from "@/components/EIPCatBoxGrid";
+import Table from "@/components/Table";
 import {
   Box,
   Grid,
@@ -152,7 +153,9 @@ const Type = () => {
               hideBelow={"lg"}
               paddingBottom={{ lg: "10", sm: "10", base: "10" }}
             >
-              <Header title="Status" subtitle="Your Roadway to Status"></Header>
+              <Box>
+                <Table />
+              </Box>
               <AreaC type={"EIPs"} />
               <Box paddingY={"8"}>
                 <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
