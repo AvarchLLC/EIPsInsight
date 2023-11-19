@@ -1,45 +1,83 @@
-import { Badge, Box, Link, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem, useColorModeValue } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  Link,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  Wrap,
+  WrapItem,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import DateTime from "@/components/DateTime";
-
-
+import { type } from "os";
 
 interface EIP {
-    forksCount: number;
-    watchlistCount:number;
-    stars: number;
-    openIssuesCount: number;
-  }
+  forksCount: number;
+  watchlistCount: number;
+  stars: number;
+  openIssuesCount: number;
+}
 
-const OtherBox = () => {
-  const [data, setData] = useState<EIP>({
+interface Props {
+  type: string;
+}
+
+const OtherBox: React.FC<Props> = ({ type }) => {
+  const [EIPdata, setEIPData] = useState<EIP>({
     forksCount: 0,
     watchlistCount: 0,
     stars: 0,
     openIssuesCount: 0,
   });
-  
-    const bg = useColorModeValue("#f6f6f7", "#171923");
-  
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await fetch(`/api/info`);
-          const jsonData = await response.json();
-          setData(jsonData);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-  
-      fetchData();
-    }, []);
+  const [ERCdata, setERCData] = useState<EIP>({
+    forksCount: 0,
+    watchlistCount: 0,
+    stars: 0,
+    openIssuesCount: 0,
+  });
+
+  const bg = useColorModeValue("#f6f6f7", "#171923");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/EIPinfo`);
+        const jsonData = await response.json();
+        setEIPData(jsonData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/ERCinfo`);
+        const jsonData = await response.json();
+        setERCData(jsonData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const numRows = 4 + 4;
   const rowHeight = 40; // Assuming each row has a height of 40px
   const maxHeight = `${numRows * rowHeight}px`;
-    console.log(data)
+
   return (
     <Box
       bgColor={bg}
@@ -67,78 +105,82 @@ const OtherBox = () => {
             </Tr>
           </Thead>
           <Tbody>
-              <Tr key="forks">
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme="orange">Forks</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-                <Td>
-                  <Link
-                    href={`https://github.com/ethereum/EIPs`}
-                    className="text-blue-400 hover:cursor-pointer font-semibold"
-                  >
-                    {data.forksCount}
-                  </Link>
-                </Td>
-              </Tr>
-              <Tr key="watchlist">
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme="orange">Watchlist</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-                <Td>
-                  <Link
-                    href={`https://github.com/ethereum/EIPs`}
-                    className="text-blue-400 hover:cursor-pointer font-semibold"
-                  >
-                    {data.watchlistCount}
-                  </Link>
-                </Td>
-              </Tr>
-              <Tr key="stars">
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme="orange">Stars</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-                <Td>
-                  <Link
-                    href={`https://github.com/ethereum/EIPs`}
-                    className="text-blue-400 hover:cursor-pointer font-semibold"
-                  >
-                    {data.stars}
-                  </Link>
-                </Td>
-              </Tr>
-              <Tr key="openissues">
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme="orange">Open Issues & PR</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-                <Td>
-                  <Link
-                    href={`https://github.com/ethereum/EIPs`}
-                    className="text-blue-400 hover:cursor-pointer font-semibold"
-                  >
-                    {data.openIssuesCount}
-                  </Link>
-                </Td>
-              </Tr>
+            <Tr key="forks">
+              <Td minW="100px">
+                <Wrap>
+                  <WrapItem>
+                    <Badge colorScheme="orange">Forks</Badge>
+                  </WrapItem>
+                </Wrap>
+              </Td>
+              <Td>
+                <Link
+                  href={`https://github.com/ethereum/EIPs`}
+                  className="text-blue-400 hover:cursor-pointer font-semibold"
+                >
+                  {type === "EIPs" ? EIPdata.forksCount : ERCdata.forksCount}
+                </Link>
+              </Td>
+            </Tr>
+            <Tr key="watchlist">
+              <Td minW="100px">
+                <Wrap>
+                  <WrapItem>
+                    <Badge colorScheme="orange">Watchlist</Badge>
+                  </WrapItem>
+                </Wrap>
+              </Td>
+              <Td>
+                <Link
+                  href={`https://github.com/ethereum/EIPs`}
+                  className="text-blue-400 hover:cursor-pointer font-semibold"
+                >
+                  {type === "EIPs"
+                    ? EIPdata.watchlistCount
+                    : ERCdata.watchlistCount}
+                </Link>
+              </Td>
+            </Tr>
+            <Tr key="stars">
+              <Td minW="100px">
+                <Wrap>
+                  <WrapItem>
+                    <Badge colorScheme="orange">Stars</Badge>
+                  </WrapItem>
+                </Wrap>
+              </Td>
+              <Td>
+                <Link
+                  href={`https://github.com/ethereum/EIPs`}
+                  className="text-blue-400 hover:cursor-pointer font-semibold"
+                >
+                  {type === "EIPs" ? EIPdata.stars : ERCdata.stars}
+                </Link>
+              </Td>
+            </Tr>
+            <Tr key="openissues">
+              <Td minW="100px">
+                <Wrap>
+                  <WrapItem>
+                    <Badge colorScheme="orange">Open Issues & PR</Badge>
+                  </WrapItem>
+                </Wrap>
+              </Td>
+              <Td>
+                <Link
+                  href={`https://github.com/ethereum/EIPs`}
+                  className="text-blue-400 hover:cursor-pointer font-semibold"
+                >
+                  {type === "EIPs"
+                    ? EIPdata.openIssuesCount
+                    : ERCdata.openIssuesCount}
+                </Link>
+              </Td>
+            </Tr>
           </Tbody>
         </Table>
       </TableContainer>
-      <Box className={'w-full'}>
+      <Box className={"w-full"}>
         <DateTime />
       </Box>
     </Box>

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Box, Icon, useColorModeValue } from "@chakra-ui/react";
+import DateTime from "@/components/DateTime";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -34,12 +36,12 @@ interface EIP {
   __v: number;
 }
 
-const DashboardDonut = () => {
+const ERCStatusDonut = () => {
   const [data, setData] = useState<EIP[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
+        const response = await fetch(`/api/new/allercs`);
         const jsonData = await response.json();
         setData(jsonData);
       } catch (error) {
@@ -147,11 +149,17 @@ const DashboardDonut = () => {
     },
   };
 
+  const bg = useColorModeValue("#f6f6f7", "#171923");
   return (
     <>
-      <Area {...config} />
+      <Box bg={bg} borderRadius="0.55rem">
+        <Area {...config} />
+        <Box className={"w-full"}>
+          <DateTime />
+        </Box>
+      </Box>
     </>
   );
 };
 
-export default DashboardDonut;
+export default ERCStatusDonut;

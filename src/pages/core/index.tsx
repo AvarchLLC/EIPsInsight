@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import AllLayout from "@/components/Layout";
-import { Box, Button } from '@chakra-ui/react'
-import FlexBetween from '@/components/FlexBetween'
-import Header from '@/components/Header'
-import { DownloadIcon } from '@chakra-ui/icons'
-import Table from '@/components/Table'
-import LineChart from '@/components/LineChart'
-import TableStatus from '@/components/TableStatus'
-import LineStatus from '@/components/LineStatus'
-import AreaStatus from '@/components/AreaStatus';
-import { motion } from 'framer-motion';
-import LoaderComponent from '@/components/Loader';
+import { Box, Button } from "@chakra-ui/react";
+import FlexBetween from "@/components/FlexBetween";
+import Header from "@/components/Header";
+import { DownloadIcon } from "@chakra-ui/icons";
+import Table from "@/components/Table";
+import LineChart from "@/components/LineChart";
+import TableStatus from "@/components/TableStatus";
+import LineStatus from "@/components/LineStatus";
+import AreaStatus from "@/components/AreaStatus";
+import { motion } from "framer-motion";
+import LoaderComponent from "@/components/Loader";
 interface EIP {
   _id: string;
   eip: string;
@@ -39,14 +39,13 @@ const Core = () => {
         setData(jsonData);
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setIsLoading(false); // Set loader state to false even if an error occurs
       }
     };
 
     fetchData();
   }, []);
-  
 
   useEffect(() => {
     // Simulating a loading delay
@@ -59,7 +58,7 @@ const Core = () => {
   }, []);
   return (
     <AllLayout>
-            {isLoading ? ( // Check if the data is still loading
+      {isLoading ? ( // Check if the data is still loading
         // Show loader if data is loading
         <Box
           display="flex"
@@ -78,22 +77,31 @@ const Core = () => {
         </Box>
       ) : (
         <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-    <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
-      <FlexBetween>
-        <Header title={`Standard Tracks - Core [ ${data.filter((item) => item.type === "Standards Track" && item.category === "Core").length} ]`} subtitle="Core EIPs describe changes to the Ethereum protocol." />
-      </FlexBetween>
-      <TableStatus cat='Core'/>
-      <AreaStatus/>
-    </Box>
-    </motion.div>
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
+            <FlexBetween>
+              <Header
+                title={`Standard Tracks - Core [ ${
+                  data.filter(
+                    (item) =>
+                      item.type === "Standards Track" &&
+                      item.category === "Core"
+                  ).length
+                } ]`}
+                subtitle="Core EIPs describe changes to the Ethereum protocol."
+              />
+            </FlexBetween>
+            <TableStatus cat="Core" />
+            <AreaStatus type={"EIPs"} />
+          </Box>
+        </motion.div>
       )}
-  </AllLayout>
-  )
-}
+    </AllLayout>
+  );
+};
 
-export default Core
+export default Core;

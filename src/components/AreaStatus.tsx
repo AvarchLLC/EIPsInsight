@@ -79,6 +79,11 @@ function getMonthName(month: number): string {
   return months[month - 1];
 }
 
+interface APIResponse {
+  eip: EIP[];
+  erc: EIP[];
+}
+
 const categoryColors: string[] = [
   "rgb(255, 99, 132)",
   "rgb(255, 159, 64)",
@@ -104,25 +109,43 @@ const categoryBorder: string[] = [
   "rgba(0, 128, 0, 0.2)",
 ];
 
-const AreaStatus = () => {
-  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
+interface AreaCProps {
+  type: string;
+}
+
+const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
+  const [data, setData] = useState<APIResponse>();
+
+  const [typeData, setTypeData] = useState<EIP[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/graphs`);
-        console.log(response)
+        const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
         setData(jsonData);
+        if (type === "EIPs" && jsonData.eip) {
+          setTypeData(
+            jsonData.eip.filter((item: any) => item.category !== "ERCs")
+          );
+        } else if (type === "ERCs" && jsonData.erc) {
+          setTypeData(jsonData.erc);
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
   }, []);
 
-  console.log(data);
+  useEffect(() => {
+    if (type === "EIPs") {
+      setTypeData(data?.eip || []);
+    } else if (type === "ERCs") {
+      setTypeData(data?.erc || []);
+    }
+  });
 
   const [isChartReady, setIsChartReady] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -139,7 +162,7 @@ const AreaStatus = () => {
     setIsChartReady(true);
   }, []); // Trigger initial render
 
-  const formattedData = data.reduce((acc: FormattedEIP[], item: EIP) => {
+  const formattedData = typeData.reduce((acc: FormattedEIP[], item: EIP) => {
     if (item.status === "Final" || item.status === "Draft") {
       const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
         status: item.status,
@@ -200,14 +223,14 @@ const AreaStatus = () => {
             alignItems="center"
             height="200px"
           >
-            <Spinner/>
+            <Spinner />
           </Box>
         ) : (
           // Show chart when it's ready
           <Area {...config} />
         )}
       </Box>
-      <Box className={'w-full'}>
+      <Box className={"w-full"}>
         <DateTime />
       </Box>
     </Box>

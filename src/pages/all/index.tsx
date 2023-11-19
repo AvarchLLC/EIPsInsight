@@ -1,14 +1,14 @@
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import { Box, Button, Spinner } from '@chakra-ui/react';
-import { DownloadIcon } from '@chakra-ui/icons';
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { Box, Button, Spinner } from "@chakra-ui/react";
+import { DownloadIcon } from "@chakra-ui/icons";
 
-import AllLayout from '@/components/Layout';
-import FlexBetween from '@/components/FlexBetween';
-import Header from '@/components/Header';
-import Table from '@/components/Table';
-import AreaC from '@/components/AreaC';
-import LoaderComponent from '@/components/Loader';
+import AllLayout from "@/components/Layout";
+import FlexBetween from "@/components/FlexBetween";
+import Header from "@/components/Header";
+import Table from "@/components/Table";
+import AreaC from "@/components/AreaC";
+import LoaderComponent from "@/components/Loader";
 
 interface EIP {
   _id: string;
@@ -38,7 +38,7 @@ const All = () => {
         setData(jsonData);
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setIsLoading(false); // Set loader state to false even if an error occurs
       }
     };
@@ -57,7 +57,7 @@ const All = () => {
 
   return (
     <AllLayout>
-            {isLoading ? ( // Check if the data is still loading
+      {isLoading ? ( // Check if the data is still loading
         // Show loader if data is loading
         <Box
           display="flex"
@@ -75,37 +75,40 @@ const All = () => {
           </motion.div>
         </Box>
       ) : (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Box
-            paddingBottom={{md:'10', base: '10'}}
-            marginX={{md:"40", base: '2'}}
-            paddingX={{md:"10", base:'5'}}
-            marginTop={{md:"10", base:'5'}}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <FlexBetween>
-            <Header title={`All EIPs - [ ${data.length} ]`} subtitle="Your Roadway to All" />
-            {/*<Box>*/}
-            {/*  <Button*/}
-            {/*    colorScheme="blue"*/}
-            {/*    variant="outline"*/}
-            {/*    fontSize={{md:'14px', base:'10px'}}*/}
-            {/*    fontWeight={'bold'}*/}
-            {/*    padding={{md:'10px 20px', base:'5px 10px'}}*/}
-            {/*  >*/}
-            {/*    <DownloadIcon marginEnd={1.5} />*/}
-            {/*    Download Reports*/}
-            {/*  </Button>*/}
-            {/*</Box>*/}
-          </FlexBetween>
-          <Table />
-          <AreaC/>
-        </Box>
-      </motion.div>
+          <Box
+            paddingBottom={{ md: "10", base: "10" }}
+            marginX={{ md: "40", base: "2" }}
+            paddingX={{ md: "10", base: "5" }}
+            marginTop={{ md: "10", base: "5" }}
+          >
+            <FlexBetween>
+              <Header
+                title={`All EIPs - [ ${data.length} ]`}
+                subtitle="Your Roadway to All"
+              />
+              {/*<Box>*/}
+              {/*  <Button*/}
+              {/*    colorScheme="blue"*/}
+              {/*    variant="outline"*/}
+              {/*    fontSize={{md:'14px', base:'10px'}}*/}
+              {/*    fontWeight={'bold'}*/}
+              {/*    padding={{md:'10px 20px', base:'5px 10px'}}*/}
+              {/*  >*/}
+              {/*    <DownloadIcon marginEnd={1.5} />*/}
+              {/*    Download Reports*/}
+              {/*  </Button>*/}
+              {/*</Box>*/}
+            </FlexBetween>
+            <Table />
+            <AreaC type={"EIPs"} />
+          </Box>
+        </motion.div>
       )}
     </AllLayout>
   );
