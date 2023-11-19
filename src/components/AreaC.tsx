@@ -1,7 +1,13 @@
-import { Box, Text, useColorModeValue, Select, Spinner } from '@chakra-ui/react';
-import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
-import LoaderComponent from './Loader';
+import {
+  Box,
+  Text,
+  useColorModeValue,
+  Select,
+  Spinner,
+} from "@chakra-ui/react";
+import dynamic from "next/dynamic";
+import React, { useEffect, useState } from "react";
+import LoaderComponent from "./Loader";
 import DateTime from "@/components/DateTime";
 import NextLink from "next/link";
 
@@ -22,27 +28,33 @@ interface AreaProps {
   smooth: boolean;
 }
 
-const getCat= (cat: string) => {
+const getCat = (cat: string) => {
   switch (cat) {
-      case "Standards Track" || "Standard Track" || "Standards Track (Core, Networking, Interface, ERC)" || "Standard" || "Process" || "Core" || "core":
-          return "Core";
-      case "ERC":
-          return "ERCs";
-      case "Networking":
-          return "Networking";
-      case "Interface":
-          return "Interface";
-      case "Meta":
-          return "Meta";
-      case "Informational":
-          return "Informational";
-      default:
-          return "Core"
+    case "Standards Track" ||
+      "Standard Track" ||
+      "Standards Track (Core, Networking, Interface, ERC)" ||
+      "Standard" ||
+      "Process" ||
+      "Core" ||
+      "core":
+      return "Core";
+    case "ERC":
+      return "ERCs";
+    case "Networking":
+      return "Networking";
+    case "Interface":
+      return "Interface";
+    case "Meta":
+      return "Meta";
+    case "Informational":
+      return "Informational";
+    default:
+      return "Core";
   }
-}
+};
 
 const Area = dynamic(
-  (): any => import('@ant-design/plots').then((item) => item.Area),
+  (): any => import("@ant-design/plots").then((item) => item.Area),
   {
     ssr: false,
   }
@@ -63,6 +75,11 @@ interface EIP {
     date: string;
     count: number;
   }[];
+}
+
+interface GrpahsProps {
+  eip: EIP[];
+  erc: EIP[];
 }
 
 interface EIP2 {
@@ -100,39 +117,43 @@ function getMonthName(month: number): string {
     "September",
     "October",
     "November",
-    "December"
+    "December",
   ];
   return months[month - 1];
 }
 
 const categoryColors: string[] = [
-  'rgb(255, 99, 132)',
-  'rgb(255, 159, 64)',
-  'rgb(255, 205, 86)',
-  'rgb(75, 192, 192)',
-  'rgb(54, 162, 235)',
-  'rgb(153, 102, 255)',
-  'rgb(255, 99, 255)',
-  'rgb(50, 205, 50)',
-  'rgb(255, 0, 0)',
-  'rgb(0, 128, 0)',
+  "rgb(255, 99, 132)",
+  "rgb(255, 159, 64)",
+  "rgb(255, 205, 86)",
+  "rgb(75, 192, 192)",
+  "rgb(54, 162, 235)",
+  "rgb(153, 102, 255)",
+  "rgb(255, 99, 255)",
+  "rgb(50, 205, 50)",
+  "rgb(255, 0, 0)",
+  "rgb(0, 128, 0)",
 ];
 const categoryBorder: string[] = [
-  'rgba(255, 99, 132, 0.2)',
-  'rgba(255, 159, 64, 0.2)',
-  'rgba(255, 205, 86, 0.2)',
-  'rgba(75, 192, 192, 0.2)',
-  'rgba(54, 162, 235, 0.2)',
-  'rgba(153, 102, 255, 0.2)',
-  'rgba(255, 99, 255, 0.2)',
-  'rgba(50, 205, 50, 0.2)',
-  'rgba(255, 0, 0, 0.2)',
-  'rgba(0, 128, 0, 0.2)',
+  "rgba(255, 99, 132, 0.2)",
+  "rgba(255, 159, 64, 0.2)",
+  "rgba(255, 205, 86, 0.2)",
+  "rgba(75, 192, 192, 0.2)",
+  "rgba(54, 162, 235, 0.2)",
+  "rgba(153, 102, 255, 0.2)",
+  "rgba(255, 99, 255, 0.2)",
+  "rgba(50, 205, 50, 0.2)",
+  "rgba(255, 0, 0, 0.2)",
+  "rgba(0, 128, 0, 0.2)",
 ];
 
-const AreaC = () => {
-  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
-  const [selectedStatus, setSelectedStatus] = useState('Draft'); // Set default select option as 'Final'
+interface AreaCProps {
+  type: string;
+}
+
+const AreaC: React.FC<AreaCProps> = ({ type }) => {
+  const [data, setData] = useState<GrpahsProps>(); // Set initial state as an empty array
+  const [selectedStatus, setSelectedStatus] = useState("Draft"); // Set default select option as 'Final'
   const [isChartReady, setIsChartReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
 
@@ -141,32 +162,45 @@ const AreaC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/alleips`);
+        const response = await fetch(`/api/new/alleips`);
         const jsonData = await response.json();
         setData2(jsonData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
   }, []);
 
+  const [typeData, setTypeData] = useState<EIP[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/graphs`);
-        console.log(response)
+        const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
         setData(jsonData);
+        if (type === "EIPs" && jsonData.eip) {
+          setTypeData(jsonData.eip);
+        } else if (type === "ERCs" && jsonData.erc) {
+          setTypeData(jsonData.erc);
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (type === "EIPs") {
+      setTypeData(data?.eip || []);
+    } else if (type === "ERCs") {
+      setTypeData(data?.erc || []);
+    }
+  });
 
   useEffect(() => {
     setIsLoading(true); // Set isLoading to true before rendering chart
@@ -189,33 +223,35 @@ const AreaC = () => {
   const handleChangeStatus = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
-  
-  const formattedData = data.reduce((acc: FormattedEIP[], item: EIP) => {
+
+  const formattedData = typeData.reduce((acc: FormattedEIP[], item: EIP) => {
     if (item.status === selectedStatus) {
-      const formattedEIPs: FormattedEIP[] = item.eips.map(eip => ({
-        category:  getCat(eip.category),
+      const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
+        category: getCat(eip.category),
         date: `${getMonthName(eip.month)} ${eip.year}`,
-        value: eip.count
+        value: eip.count,
       }));
       acc.push(...formattedEIPs);
     }
     return acc;
   }, []);
-  
-  const filteredData: FormattedEIP[] = formattedData;
+
+  const filteredData: FormattedEIP[] = formattedData.filter(
+    (item) => item.category !== "ERCs"
+  );
 
   const config = {
     data: filteredData,
-    xField: 'date',
-    yField: 'value',
+    xField: "date",
+    yField: "value",
     color: categoryColors,
-    seriesField: 'category',
+    seriesField: "category",
     xAxis: {
       range: [0, 1],
       tickCount: 5,
     },
     areaStyle: { fillOpacity: 0.6 },
-    legend: { position: 'top-right' },
+    legend: { position: "top-right" },
     smooth: true,
     slider: {
       start: 0,
@@ -223,7 +259,7 @@ const AreaC = () => {
     },
   };
 
-  const bg = useColorModeValue('#f6f6f7', '#171923');
+  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   return (
     <Box
@@ -234,14 +270,16 @@ const AreaC = () => {
       borderRadius="0.55rem"
       overflowX="auto"
       _hover={{
-        border: '1px',
-        borderColor: '#30A0E0',
+        border: "1px",
+        borderColor: "#30A0E0",
       }}
       className=" ease-in duration-200"
     >
       <NextLink href={`/tableStatus/${selectedStatus}`}>
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
-          {`Status: ${selectedStatus} - [${data2.filter((item) => item.status === selectedStatus).length}] `}
+          {`Status: ${selectedStatus} - [${
+            data2.filter((item) => item.status === selectedStatus).length
+          }] `}
         </Text>
       </NextLink>
       <Select
@@ -262,8 +300,13 @@ const AreaC = () => {
       <Box>
         {isLoading ? (
           // Show loading spinner while chart is rendering
-          <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-            <Spinner/>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="200px"
+          >
+            <Spinner />
           </Box>
         ) : (
           // Show chart when it's ready

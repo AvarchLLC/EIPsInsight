@@ -1,23 +1,37 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
 import Header from "@/components/Header";
-import {
-  Box,
-  Grid,
-  Icon,
-  Text,
-  useColorMode,
-  useColorModeValue,
-} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
 import TypeG from "@/components/TypeGraphs";
 import FlexBetween from "@/components/FlexBetween";
-import AreaC from "@/components/AreaStatus";
 import SearchBox from "@/components/SearchBox";
 import StatusBox from "@/components/StatusBox";
 import EIPCatBoxGrid from "@/components/EIPCatBoxGrid";
+import {
+  Box,
+  Grid,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import CBoxStatus from "@/components/CBoxStatus";
+import Donut from "@/components/Donut";
+import DonutStatus from "@/components/DonutStatus";
+import StackedColumnChart from "@/components/StackedBarChart";
+import { PieC } from "@/components/InPie";
+import AreaStatus from "@/components/AreaStatus";
+import Banner from "@/components/NewsBanner";
+import NextLink from "next/link";
+import AreaC from "@/components/AreaC";
+
 interface EIP {
   _id: string;
   eip: string;
@@ -34,24 +48,24 @@ interface EIP {
   __v: number;
 }
 
-const getCat= (cat: string) => {
+const getCat = (cat: string) => {
   switch (cat) {
-      case "standard - networking":
-          return "networking";
-      case "standard - interface":
-          return "interface";
-      case "standard - erc":
-          return "Interface";
-          case "standard - core":
-            return "core";
-      case "Meta":
-          return "meta";
-      case "Informational":
-          return "informational";
-      default:
-          return "core"
+    case "standard - networking":
+      return "networking";
+    case "standard - interface":
+      return "interface";
+    case "standard - erc":
+      return "Interface";
+    case "standard - core":
+      return "core";
+    case "Meta":
+      return "meta";
+    case "Informational":
+      return "informational";
+    default:
+      return "core";
   }
-}
+};
 
 const Type = () => {
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
@@ -59,10 +73,10 @@ const Type = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/alleips`);
+        const response = await fetch(`/api/new/alleips`);
         console.log(response);
         const jsonData = await response.json();
-        setData(jsonData);
+        setData(jsonData.filter((item: EIP) => item.category !== "ERC"));
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -84,97 +98,290 @@ const Type = () => {
     return () => clearTimeout(timeout);
   }, []);
   return (
-      <AllLayout>
-        {isLoading ? ( // Check if the data is still loading
-            // Show loader if data is loading
-            <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                height="100vh"
-            >
-              <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-              >
-                {/* Your loader component */}
-                <LoaderComponent />
-              </motion.div>
+    <AllLayout>
+      {isLoading ? ( // Check if the data is still loading
+        // Show loader if data is loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* Your loader component */}
+            <LoaderComponent />
+          </motion.div>
+        </Box>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Box
+            hideBelow={"lg"}
+            paddingBottom={{ lg: "10", sm: "10", base: "10" }}
+            marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
+            paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+            marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          >
+            <FlexBetween>
+              <Header
+                title={`Ethereum Improvement Proposal - [${
+                  data.filter((item) => item.category !== "ERC").length
+                }]`}
+                subtitle="Meta, Informational, Standard Track - Core, Interface, Networking."
+              />
+            </FlexBetween>
+            <Box className={"w-full pt-10"}>
+              <SearchBox />
             </Box>
-        ) : (
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
+            <Box paddingTop={"8"}>
+              <EIPCatBoxGrid />
+            </Box>
+            <Box paddingTop={8}>
+              <StatusBox />
+            </Box>
+
+            <Box
+              hideBelow={"lg"}
+              paddingBottom={{ lg: "10", sm: "10", base: "10" }}
             >
-              <Box
-                  hideBelow={'lg'}
-                  paddingBottom={{lg:'10', sm: '10',base: '10'}}
-                  marginX={{lg:"40",md:'2', sm: '2', base: '2'}}
-                  paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}
-                  marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}
-              >
-                <FlexBetween>
-                    <Header
-                        title={`Ethereum Improvement Proposal - [${data.filter((item) => item.category !== 'ERC' ).length}]`}
-                        subtitle="Meta, Informational, Standard Track - Core, Interface, Networking." />
-                </FlexBetween>
-                  <Box className={'w-full pt-10'}>
-                      <SearchBox />
-                  </Box>
-                <Box paddingTop={'8'}>
-                    <EIPCatBoxGrid />
+              <Header title="Status" subtitle="Your Roadway to Status"></Header>
+              <AreaC type={"EIPs"} />
+              <Box paddingY={"8"}>
+                <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
+                  Draft vs Final
+                </Text>
+                <AreaStatus type={"EIPs"} />
+              </Box>
+              <Box className={"group relative flex gap-3"}>
+                <Box className={"flex"}>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    Draft -{" "}
+                    <NextLink href={`/tableStatus/Draft`}>
+                      {" "}
+                      [ {
+                        data.filter((item) => item.status === "Draft").length
+                      }{" "}
+                      ]
+                    </NextLink>
+                  </Text>
+                  <p className={"text-red-700"}>*</p>
                 </Box>
-                  <Box paddingTop={8}>
-                      <StatusBox />
-                  </Box>
+                <p className={"hidden group-hover:block text-lg"}>
+                  Count as on date
+                </p>
+              </Box>
+              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
+                <StackedColumnChart type={"EIPs"} status={"Draft"} />
+
+                <CBoxStatus status={"Draft"} type={"EIPs"} />
+              </Grid>
+
+              <Box className={"group relative flex gap-3"}>
+                <Box className={"flex"}>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    Review -{" "}
+                    <NextLink href={`/tableStatus/Review`}>
+                      {" "}
+                      [ {
+                        data.filter((item) => item.status === "Review").length
+                      }{" "}
+                      ]
+                    </NextLink>
+                  </Text>
+                  <p className={"text-red-700"}>*</p>
+                </Box>
+                <p className={"hidden group-hover:block text-lg"}>
+                  Count as on date
+                </p>
               </Box>
 
+              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
+                <StackedColumnChart type={"EIPs"} status={"Review"} />
 
+                <CBoxStatus status={"Review"} type={"EIPs"} />
+              </Grid>
 
-
-
-              <Box
-                  display={{lg:'none', sm: 'block'}}
-                  paddingBottom={{lg:'10', sm: '10',base: '10'}}
-                  marginX={{lg:"40",md:'2', sm: '2', base: '2'}}
-                  paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}
-                  marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}
-              >
-                <Header
-                    title={`Ethereum Improvement Proposal - [${data.filter((item) => item.category !== 'ERC' ).length}]`}
-                    subtitle="Meta, Informational, Standard Track - Core, Interface, Networking."
-                ></Header>
-
-                  <Box className={'w-full pt-10'}>
-                      <SearchBox />
-                  </Box>
-
-                <Box >
-                  <EIPCatBoxGrid />
-
-                  <Box paddingTop={'8'}>
-                      <Box paddingTop={8}>
-                          <StatusBox />
-                      </Box>
-                    <Text
-                        fontSize="xl"
-                        fontWeight="bold"
-                        color="#4267B2"
-                        paddingTop={'8'}
-                    >
-                      Draft vs Final
-                    </Text>
-                      <AreaC />
-                  </Box>
+              <Box className={"group relative flex gap-3"}>
+                <Box className={"flex"}>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    Last Call -
+                    <NextLink href={`/tableStatus/LastCall`}>
+                      {" "}
+                      [{" "}
+                      {
+                        data.filter((item) => item.status === "Last Call")
+                          .length
+                      }{" "}
+                      ]{" "}
+                    </NextLink>
+                  </Text>
+                  <p className={"text-red-700"}>*</p>
                 </Box>
+                <p className={"hidden group-hover:block text-lg"}>
+                  Count as on date
+                </p>
               </Box>
-              <TypeG/>
-            </motion.div>
-        )}
-      </AllLayout>
+
+              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
+                <StackedColumnChart type={"EIPs"} status={"Last Call"} />
+
+                <CBoxStatus status={"Last Call"} type={"EIPs"} />
+              </Grid>
+
+              <Box className={"group relative flex gap-3"}>
+                <Box className={"flex"}>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    Living -
+                    <NextLink href={`/tableStatus/Living`}>
+                      {" "}
+                      [ {
+                        data.filter((item) => item.status === "Living").length
+                      }{" "}
+                      ]
+                    </NextLink>
+                  </Text>
+                  <p className={"text-red-700"}>*</p>
+                </Box>
+                <p className={"hidden group-hover:block text-lg"}>
+                  Count as on date
+                </p>
+              </Box>
+
+              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
+                <StackedColumnChart type={"EIPs"} status={"Living"} />
+
+                <CBoxStatus status={"Living"} type={"EIPs"} />
+              </Grid>
+
+              <Box className={"group relative flex gap-3"}>
+                <Box className={"flex"}>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    Final -
+                    <NextLink href={`/tableStatus/Final`}>
+                      {" "}
+                      [ {
+                        data.filter((item) => item.status === "Final").length
+                      }{" "}
+                      ]{" "}
+                    </NextLink>
+                  </Text>
+                  <p className={"text-red-700"}>*</p>
+                </Box>
+                <p className={"hidden group-hover:block text-lg"}>
+                  Count as on date
+                </p>
+              </Box>
+
+              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
+                <StackedColumnChart type={"EIPs"} status={"Final"} />
+
+                <CBoxStatus status={"Final"} type={"EIPs"} />
+              </Grid>
+
+              <Box className={"group relative flex gap-3"}>
+                <Box className={"flex"}>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    Stagnant -
+                    <NextLink href={`/tableStatus/Stagnant`}>
+                      {" "}
+                      [{" "}
+                      {
+                        data.filter((item) => item.status === "Stagnant").length
+                      }{" "}
+                      ]{" "}
+                    </NextLink>
+                  </Text>
+                  <p className={"text-red-700"}>*</p>
+                </Box>
+                <p className={"hidden group-hover:block text-lg"}>
+                  Count as on date
+                </p>
+              </Box>
+
+              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
+                <StackedColumnChart type={"EIPs"} status={"Stagnant"} />
+
+                <CBoxStatus status={"Stagnant"} type={"EIPs"} />
+              </Grid>
+
+              <Box className={"group relative flex gap-3"}>
+                <Box className={"flex"}>
+                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+                    Withdrawn -
+                    <NextLink href={`/tableStatus/Withdrawn`}>
+                      {" "}
+                      [{" "}
+                      {
+                        data.filter((item) => item.status === "Withdrawn")
+                          .length
+                      }{" "}
+                      ]{" "}
+                    </NextLink>
+                  </Text>
+                  <p className={"text-red-700"}>*</p>
+                </Box>
+                <p className={"hidden group-hover:block text-lg"}>
+                  Count as on date
+                </p>
+              </Box>
+
+              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
+                <StackedColumnChart type={"EIPs"} status={"Withdrawn"} />
+
+                <CBoxStatus status={"Withdrawn"} type={"EIPs"} />
+              </Grid>
+            </Box>
+          </Box>
+
+          <Box
+            display={{ lg: "none", sm: "block" }}
+            paddingBottom={{ lg: "10", sm: "10", base: "10" }}
+            marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
+            paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+            marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          >
+            <Header
+              title={`Ethereum Improvement Proposal - [${
+                data.filter((item) => item.category !== "ERC").length
+              }]`}
+              subtitle="Meta, Informational, Standard Track - Core, Interface, Networking."
+            ></Header>
+
+            <Box className={"w-full pt-10"}>
+              <SearchBox />
+            </Box>
+
+            <Box>
+              <EIPCatBoxGrid />
+
+              <Box paddingTop={"8"}>
+                <Box paddingTop={8}>
+                  <StatusBox />
+                </Box>
+                <Text
+                  fontSize="xl"
+                  fontWeight="bold"
+                  color="#4267B2"
+                  paddingTop={"8"}
+                >
+                  Draft vs Final
+                </Text>
+                <AreaC type={"EIPs"} />
+              </Box>
+            </Box>
+          </Box>
+          <TypeG />
+        </motion.div>
+      )}
+    </AllLayout>
   );
 };
 
