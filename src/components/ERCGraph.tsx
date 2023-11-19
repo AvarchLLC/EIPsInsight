@@ -10,7 +10,6 @@ const ERCGraph = () => {
     <>
       <Box
         bg={bg}
-        marginTop={"1.5rem"}
         borderRadius="0.55rem"
         _hover={{
           border: "1px",

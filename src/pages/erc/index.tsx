@@ -14,6 +14,7 @@ import StatusColumnChart from "@/components/StatusColumnChart";
 import DateTime from "@/components/DateTime";
 import SearchBox from "@/components/SearchBox";
 import ERCCatBoxGrid from "@/components/ERCCatBoxGrid";
+import ERCStatusDonut from "@/components/ERCStatusDonut";
 import StackedColumnChart from "@/components/StackedBarChart";
 import CBoxStatus from "@/components/CBoxStatus";
 interface EIP {
@@ -90,23 +91,20 @@ const ERC = () => {
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
             <FlexBetween>
               <Header
-                title={`Ethereum Request for Comment - [ ${
-                  data.filter(
-                    (item) =>
-                      item.type === "Standards Track" && item.category === "ERC"
-                  ).length
-                } ]`}
+                title={`Ethereum Request for Comment - [ ${data.length} ]`}
                 subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
               />
             </FlexBetween>
             <Box className={"w-full pt-10"}>
               <SearchBox />
             </Box>
-            <Box paddingTop={8}>
-              <ERCCatBoxGrid />
-            </Box>
-            <Box paddingTop={8}>
-              <ERCGraph />
+            <Box className="grid grid-cols-2 pt-8 gap-x-5">
+              <Box>
+                <ERCStatusDonut />
+              </Box>
+              <Box>
+                <ERCGraph />
+              </Box>
             </Box>
             <TableStatus cat="ERC" />
             <Box className={"pt-8"}>
