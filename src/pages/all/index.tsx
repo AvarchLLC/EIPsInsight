@@ -32,10 +32,10 @@ const All = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/alleips`);
+        const response = await fetch(`/api/new/all`);
         console.log(response);
         const jsonData = await response.json();
-        setData(jsonData);
+        setData(jsonData.eip.concat(jsonData.erc));
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -89,24 +89,12 @@ const All = () => {
           >
             <FlexBetween>
               <Header
-                title={`All EIPs - [ ${data.length} ]`}
-                subtitle="Your Roadway to All"
+                title={`All EIPs & ERCs - [ ${data.length} ]`}
+                subtitle=""
               />
-              {/*<Box>*/}
-              {/*  <Button*/}
-              {/*    colorScheme="blue"*/}
-              {/*    variant="outline"*/}
-              {/*    fontSize={{md:'14px', base:'10px'}}*/}
-              {/*    fontWeight={'bold'}*/}
-              {/*    padding={{md:'10px 20px', base:'5px 10px'}}*/}
-              {/*  >*/}
-              {/*    <DownloadIcon marginEnd={1.5} />*/}
-              {/*    Download Reports*/}
-              {/*  </Button>*/}
-              {/*</Box>*/}
             </FlexBetween>
-            <Table />
-            <AreaC type={"EIPs"} />
+            <Table type="Total" />
+            {/* <AreaC type={"EIPs"} /> */}
           </Box>
         </motion.div>
       )}

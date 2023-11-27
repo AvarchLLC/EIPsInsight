@@ -13,6 +13,7 @@ import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Spinner } from "@chakra-ui/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/react";
 
 const statusArr = [
   "Final",
@@ -131,13 +132,17 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/allercs`);
+        const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData);
+        if (cat === "ERC") {
+          setData(jsonData.erc);
+        } else {
+          setData(jsonData.eip);
+        }
         setIsLoading(false); // Set isLoading to false after data is fetched
 
         // Fetch merged years and months for each item
-        const mergedDataPromises = jsonData.map((item: any) =>
+        const mergedDataPromises = jsonData.erc.map((item: any) =>
           fetchLastCreatedYearAndMonthFromAPI(item.eip)
         );
 
@@ -238,9 +243,9 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
         selectedMonthRange.start === "" &&
         selectedMonthRange.end === ""
       ) {
-        a.download = `All_ERCs.csv`;
+        a.download = `All_${cat}.csv`;
       } else {
-        a.download = `ERC_${selectedStatus}_${selectedCategory}_${selectedMonthRange.start}_${selectedMonthRange.end}_${selectedYearRange.start}_${selectedYearRange.end}.csv`;
+        a.download = `${cat}_${selectedStatus}_${selectedCategory}_${selectedMonthRange.start}_${selectedMonthRange.end}_${selectedYearRange.start}_${selectedYearRange.end}.csv`;
       }
       document.body.appendChild(a);
       a.click();
@@ -290,113 +295,119 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
             </Box>
           ) : (
             <>
-              <div className={"flex space-x-10 py-4"}>
-                <Select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                >
-                  <option value="">Select Status</option>
-                  {statusArr.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </Select>
+              <Popover trigger={"hover"} placement={"bottom-start"}>
+                <PopoverTrigger>
+                  <Box>
+                    <Button
+                      colorScheme="blue"
+                      variant="outline"
+                      fontSize={"14px"}
+                      fontWeight={"bold"}
+                      padding={"10px 20px"}
+                      onClick={convertAndDownloadCSV}
+                    >
+                      <DownloadIcon marginEnd={"1.5"} />
+                      Download Reports
+                    </Button>
+                  </Box>
+                </PopoverTrigger>
 
-                <Select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                  <option value="">Select Category</option>
-                  {catArr.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </Select>
+                <PopoverContent className={"px-4"}>
+                  <div className={"space-y-10 py-4"}>
+                    <Select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                    >
+                      <option value="">Select Status</option>
+                      {statusArr.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </Select>
 
-                <Select
-                  value={selectedYearRange.start}
-                  onChange={(e) =>
-                    setSelectedYearRange({
-                      ...selectedYearRange,
-                      start: e.target.value,
-                    })
-                  }
-                >
-                  <option value="">Start Year</option>
-                  {yearsArr.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </Select>
+                    <Select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                      <option value="">Select Category</option>
+                      {catArr.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </Select>
 
-                <Select
-                  value={selectedYearRange.end}
-                  onChange={(e) =>
-                    setSelectedYearRange({
-                      ...selectedYearRange,
-                      end: e.target.value,
-                    })
-                  }
-                >
-                  <option value="">End Year</option>
-                  {yearsArr.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </Select>
+                    <Select
+                      value={selectedYearRange.start}
+                      onChange={(e) =>
+                        setSelectedYearRange({
+                          ...selectedYearRange,
+                          start: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Start Year</option>
+                      {yearsArr.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </Select>
 
-                <Select
-                  value={selectedMonthRange.start}
-                  onChange={(e) =>
-                    setSelectedMonthRange({
-                      ...selectedMonthRange,
-                      start: e.target.value,
-                    })
-                  }
-                >
-                  <option value="">Start Month</option>
-                  {monthArr.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </Select>
+                    <Select
+                      value={selectedYearRange.end}
+                      onChange={(e) =>
+                        setSelectedYearRange({
+                          ...selectedYearRange,
+                          end: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">End Year</option>
+                      {yearsArr.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </Select>
 
-                <Select
-                  value={selectedMonthRange.end}
-                  onChange={(e) =>
-                    setSelectedMonthRange({
-                      ...selectedMonthRange,
-                      end: e.target.value,
-                    })
-                  }
-                >
-                  <option value="">End Month</option>
-                  {monthArr.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </Select>
+                    <Select
+                      value={selectedMonthRange.start}
+                      onChange={(e) =>
+                        setSelectedMonthRange({
+                          ...selectedMonthRange,
+                          start: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Start Month</option>
+                      {monthArr.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </Select>
 
-                <Box>
-                  <Button
-                    colorScheme="blue"
-                    variant="outline"
-                    fontSize={"14px"}
-                    fontWeight={"bold"}
-                    padding={"10px 20px"}
-                    onClick={convertAndDownloadCSV}
-                  >
-                    <DownloadIcon marginEnd={"1.5"} />
-                    Download Reports
-                  </Button>
-                </Box>
-              </div>
+                    <Select
+                      value={selectedMonthRange.end}
+                      onChange={(e) =>
+                        setSelectedMonthRange({
+                          ...selectedMonthRange,
+                          end: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">End Month</option>
+                      {monthArr.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
               <CSmartTable
                 items={filteredDataWithMergedYearsAndMonths.sort(
@@ -406,7 +417,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                 clickableRows
                 columnFilter
                 columnSorter
-                itemsPerPage={7}
+                itemsPerPage={5}
                 pagination
                 tableProps={{
                   hover: true,

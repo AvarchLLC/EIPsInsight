@@ -1,7 +1,23 @@
-import { Badge, Box, Link, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem, useColorModeValue } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  Link,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  Wrap,
+  WrapItem,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
 import React from "react";
+import { type } from "os";
 
 interface CustomBoxProps {
   data: {
@@ -31,9 +47,10 @@ interface CustomBoxProps {
       __v: number;
     }[];
   }[];
-  per : number;
+  per: number;
   year: string;
   month: string;
+  type: string;
 }
 const customStatusOrder = [
   "Draft",
@@ -45,13 +62,19 @@ const customStatusOrder = [
   "Withdrawn",
 ];
 
-const sortByCustomOrder = (a:any, b:any) => {
+const sortByCustomOrder = (a: any, b: any) => {
   const statusA = customStatusOrder.indexOf(a._id);
   const statusB = customStatusOrder.indexOf(b._id);
   return statusA - statusB;
 };
 
-const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
+const CustomBox: React.FC<CustomBoxProps> = ({
+  data,
+  per,
+  year,
+  month,
+  type,
+}) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Living":
@@ -61,11 +84,11 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
       case "Stagnant":
         return "gray";
       case "Draft":
-        return "orange"
+        return "orange";
       case "Withdrawn":
-        return "red"
+        return "red";
       case "Last Call":
-        return "yellow"
+        return "yellow";
       default:
         return "gray";
     }
@@ -82,15 +105,17 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const transformedData = data
-    .filter(obj => obj._id === 'Final')
-    .map(obj => ({ category: obj.statusChanges[0].category, number: obj.count }));
+    .filter((obj) => obj._id === "Final")
+    .map((obj) => ({
+      category: obj.statusChanges[0].category,
+      number: obj.count,
+    }));
 
   console.log(data);
 
   const numRows = data.length + 5;
   const rowHeight = 40; // Assuming each row has a height of 40px
   const maxHeight = `${numRows * rowHeight}px`;
-
 
   return (
     <Box
@@ -116,38 +141,40 @@ const CustomBox: React.FC<CustomBoxProps> = ({ data,per, year, month }) => {
             <Tr>
               <Th minW="50px">Status</Th>
               <Th minW="200px">Numbers</Th>
-              <Th minW={'200px'}>Percentage</Th>
+              <Th minW={"200px"}>Percentage</Th>
             </Tr>
           </Thead>
           <Tbody>
-          {data.sort(sortByCustomOrder).map((entry, index) => (
+            {data.sort(sortByCustomOrder).map((entry, index) => (
               <Tr key={index}>
                 <Td minW="100px">
                   <Wrap>
                     <WrapItem>
-                      <Badge colorScheme={getStatusColor(entry._id)}>{entry._id}</Badge>
+                      <Badge colorScheme={getStatusColor(entry._id)}>
+                        {entry._id}
+                      </Badge>
                     </WrapItem>
                   </Wrap>
                 </Td>
                 <Td>
                   <Link
-                    href={`/tableinsights/${year}/${month}/${getStatus(entry._id)}`}
+                    href={`/monthly/${
+                      type === "EIPs" ? "eip" : type === "ERCs" ? "erc" : "eip"
+                    }/${year}/${month}/${getStatus(entry._id)}`}
                     className="text-blue-400 hover:cursor-pointer font-semibold"
                   >
                     {entry.count}
                   </Link>
                 </Td>
-                <Td className={'text-blue-400'}>
-                  {
-                    ((entry.count/per)*100).toFixed(2)
-                  }%
+                <Td className={"text-blue-400"}>
+                  {((entry.count / per) * 100).toFixed(2)}%
                 </Td>
               </Tr>
             ))}
           </Tbody>
         </Table>
       </TableContainer>
-      <Box className={'w-full'}>
+      <Box className={"w-full"}>
         <DateTime />
       </Box>
     </Box>

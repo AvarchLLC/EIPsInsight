@@ -162,17 +162,19 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
     setIsChartReady(true);
   }, []); // Trigger initial render
 
-  const formattedData = typeData.reduce((acc: FormattedEIP[], item: EIP) => {
-    if (item.status === "Final" || item.status === "Draft") {
-      const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
-        status: item.status,
-        date: `${getMonthName(eip.month)} ${eip.year}`,
-        value: eip.count,
-      }));
-      acc.push(...formattedEIPs);
-    }
-    return acc;
-  }, []);
+  const formattedData = typeData
+    .reduce((acc: FormattedEIP[], item: EIP) => {
+      if (item.status === "Final" || item.status === "Draft") {
+        const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
+          status: item.status,
+          date: `${getMonthName(eip.month)} ${eip.year}`,
+          value: eip.count,
+        }));
+        acc.push(...formattedEIPs);
+      }
+      return acc;
+    }, [])
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const filteredData: FormattedEIP[] = formattedData;
 

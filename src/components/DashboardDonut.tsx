@@ -34,12 +34,17 @@ interface EIP {
   __v: number;
 }
 
+interface APIResponse {
+  eip: EIP[];
+  erc: EIP[];
+}
+
 const DashboardDonut = () => {
-  const [data, setData] = useState<EIP[]>([]);
+  const [data, setData] = useState<APIResponse>();
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
+        const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
         setData(jsonData);
       } catch (error) {
@@ -49,40 +54,36 @@ const DashboardDonut = () => {
 
     fetchData();
   }, []);
-  console.log(data.length);
+  const allData: EIP[] = data?.eip.concat(data?.erc) || [];
 
   const dat = [
     {
       status: "Final",
-      value: data.filter((item) => item.status === "Final").length,
+      value: allData.filter((item) => item.status === "Final").length,
     },
     {
       status: "Draft",
-      value: data.filter((item) => item.status === "Draft").length,
+      value: allData.filter((item) => item.status === "Draft").length,
     },
     {
       status: "Review",
-      value: data.filter((item) => item.status === "Review").length,
+      value: allData.filter((item) => item.status === "Review").length,
     },
     {
       status: "Last Call",
-      value: data.filter((item) => item.status === "Last Call").length,
+      value: allData.filter((item) => item.status === "Last Call").length,
     },
     {
       status: "Living",
-      value: data.filter((item) => item.status === "Living").length,
+      value: allData.filter((item) => item.status === "Living").length,
     },
     {
       status: "Stagnant",
-      value: data.filter((item) => item.status === "Stagnant").length,
+      value: allData.filter((item) => item.status === "Stagnant").length,
     },
     {
       status: "Withdrawn",
-      value: data.filter((item) => item.status === "Withdrawn").length,
-    },
-    {
-      status: "Moved to ERC",
-      value: data.filter((item) => item.status === "Moved").length,
+      value: allData.filter((item) => item.status === "Withdrawn").length,
     },
   ];
   const Area = dynamic(

@@ -162,9 +162,13 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
+        const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData2(jsonData);
+        if (type === "EIPs") {
+          setData2(jsonData.eip);
+        } else if (type === "ERCs") {
+          setData2(jsonData.erc);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -236,9 +240,17 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     return acc;
   }, []);
 
-  const filteredData: FormattedEIP[] = formattedData.filter(
-    (item) => item.category !== "ERCs"
+  let filteredData = formattedData.filter(
+    (item: any) => item.category !== "ERCs"
   );
+
+  if (type === "ERCs") {
+    filteredData = formattedData;
+  } else {
+    filteredData = formattedData.filter(
+      (item: any) => item.category !== "ERCs"
+    );
+  }
 
   const config = {
     data: filteredData,

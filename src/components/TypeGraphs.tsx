@@ -52,10 +52,10 @@ const TypeGraphs = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
+        const response = await fetch(`/api/new/all`);
         console.log(response);
         const jsonData = await response.json();
-        setData(jsonData);
+        setData(jsonData.eip);
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -68,13 +68,7 @@ const TypeGraphs = () => {
 
   return (
     <>
-      <Box
-        hideBelow={"lg"}
-        paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-        marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-        paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-        marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
-      >
+      <Box hideBelow={"lg"}>
         <Grid templateColumns="1fr 1fr 1fr" gap={8}>
           <NextLink href={"/core"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
@@ -270,13 +264,7 @@ const TypeGraphs = () => {
         </Grid>
       </Box>
 
-      <Box
-        display={{ lg: "none", sm: "block" }}
-        paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-        marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-        paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-        marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
-      >
+      <Box display={{ lg: "none", sm: "block" }}>
         <Text fontSize="xl" fontWeight="bold" color="#4267B2">
           Draft
         </Text>

@@ -33,10 +33,9 @@ const Networking = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/alleips`);
-        console.log(response);
+        const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData);
+        setData(jsonData.eip);
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -93,18 +92,6 @@ const Networking = () => {
                 } ]`}
                 subtitle="Networking EIPs describe changes to the Ethereum network protocol."
               />
-              <Box>
-                <Button
-                  colorScheme="blue"
-                  variant="outline"
-                  fontSize={"14px"}
-                  fontWeight={"bold"}
-                  padding={"10px 20px"}
-                >
-                  <DownloadIcon marginEnd={"1.5"} />
-                  Download Reports
-                </Button>
-              </Box>
             </FlexBetween>
             <TableStatus cat="Networking" />
             <AreaStatus type={"EIPs"} />

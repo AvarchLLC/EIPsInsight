@@ -87,7 +87,7 @@ const getCat = (cat: string) => {
     case "core":
       return "Core";
     case "ERC":
-      return "ERCs";
+      return "ERC";
     case "Networking":
       return "Networking";
     case "Interface":
@@ -111,16 +111,7 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
         const response = await fetch(`/api/new/final-status-by-year`);
         const jsonData = await response.json();
         setData(jsonData);
-        if (type === "EIPs" && jsonData.eip) {
-          setTypeData(
-            jsonData.eip.filter(
-              (item: any) =>
-                item.category !== getCat("ERC") && item.category !== "ERCs"
-            )
-          );
-        } else if (type === "ERCs" && jsonData.erc) {
-          setTypeData(jsonData.erc);
-        }
+        setTypeData(jsonData.eip);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -129,13 +120,13 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (type === "EIPs") {
-      setTypeData(data?.eip || []);
-    } else if (type === "ERCs") {
-      setTypeData(data?.erc || []);
-    }
-  });
+  // useEffect(() => {
+  //   if (type === "EIPs") {
+  //     setTypeData(data?.eip || []);
+  //   } else if (type === "ERCs") {
+  //     setTypeData(data?.erc || []);
+  //   }
+  // });
 
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -146,8 +137,6 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
       (x) => getCat(x.eipCategory) === category
     ),
   }));
-
-  console.log(filteredData);
 
   const transformedData = filteredData.flatMap((item) =>
     item.statusChanges.map((change) => ({

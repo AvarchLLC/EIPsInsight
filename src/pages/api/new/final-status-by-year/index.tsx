@@ -60,6 +60,11 @@ export default async (req: Request, res: Response) => {
   try {
     const EipfinalStatusByYear = await EipStatusChange.aggregate([
       {
+        $match: {
+          category: { $nin: ["ERC", "ERCs", "Standards Track - ERC"] },
+        },
+      },
+      {
         $sort: { eip: 1, changeDate: 1 }, // Sort by EIP and change date
       },
       {

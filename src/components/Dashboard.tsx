@@ -37,6 +37,7 @@ import Table from "./Table";
 import Banner from "@/components/NewsBanner";
 import SearchBox from "@/components/SearchBox";
 import BoyGirl from "@/components/BoyGirl";
+import AllChart from "./AllChart";
 
 interface EIP {
   _id: string;
@@ -54,14 +55,19 @@ interface EIP {
   __v: number;
 }
 
+interface APIResponse {
+  eip: EIP[];
+  erc: EIP[];
+}
+
 const Dashboard = () => {
-  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
+  const [data, setData] = useState<APIResponse>(); // Set initial state as an empty array
   const [isLoading, setIsLoading] = useState(true); // Loader state
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
+        const response = await fetch(`/api/new/all`);
         console.log(response);
         const jsonData = await response.json();
         setData(jsonData);
@@ -74,7 +80,7 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
-  console.log(data);
+  const allData: EIP[] = data?.eip.concat(data?.erc) || [];
 
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
@@ -218,20 +224,7 @@ const Dashboard = () => {
                         !isDarkMode ? "custom-shadow-black" : "custom-shadow"
                       }
                     >
-                      <NextLink href={"/all"}>
-                        <Text
-                          fontSize="2xl"
-                          fontWeight="bold"
-                          color="#30A0E0"
-                          marginRight="6"
-                        >
-                          {`Total EIPs - ${
-                            data.filter((item) => item.category !== "ERC")
-                              .length
-                          }`}
-                        </Text>
-                      </NextLink>
-                      <StackedColumnChart type={"EIPs"} status={"Final"} />
+                      <AllChart type="Total" />
                     </Box>
                   </Box>
                 </div>
@@ -249,20 +242,7 @@ const Dashboard = () => {
                     padding={{ lg: "2rem", md: "1rem", sm: "0.5rem" }}
                     className={"custom-shadow"}
                   >
-                    <NextLink href={"/all"}>
-                      <Text
-                        fontSize="2xl"
-                        fontWeight="bold"
-                        color="#30A0E0"
-                        marginX="6"
-                        paddingTop={6}
-                      >
-                        {`Total EIPs - ${
-                          data.filter((item) => item.category !== "ERC").length
-                        }`}
-                      </Text>
-                    </NextLink>
-                    <StackedColumnChart type={"EIPs"} status={"Final"} />
+                    <AllChart type="Total" />
                   </Box>
 
                   <Stack direction={"row"} spacing={"6"} paddingTop={"20"}>
@@ -390,7 +370,9 @@ const Dashboard = () => {
               <div className="grid grid-cols-3 grid-rows-2 gap-6">
                 <StatBox
                   title="Core EIPs"
-                  value={data.filter((item) => item.category === "Core").length}
+                  value={
+                    allData.filter((item) => item.category === "Core").length
+                  }
                   description={
                     "Core EIPs describe changes to the Ethereum protocol."
                   }
@@ -400,7 +382,9 @@ const Dashboard = () => {
 
                 <StatBox
                   title="ERCs"
-                  value={data.filter((item) => item.category === "ERC").length}
+                  value={
+                    allData.filter((item) => item.category === "ERC").length
+                  }
                   description={
                     "ERCs describe application-level standards for the Ethereum ecosystem."
                   }
@@ -413,7 +397,8 @@ const Dashboard = () => {
                 <StatBox
                   title="Networking EIPs"
                   value={
-                    data.filter((item) => item.category === "Networking").length
+                    allData.filter((item) => item.category === "Networking")
+                      .length
                   }
                   description={
                     "Networking EIPs describe changes to the Ethereum network protocol."
@@ -425,7 +410,8 @@ const Dashboard = () => {
                 <StatBox
                   title="Interface EIPs"
                   value={
-                    data.filter((item) => item.category === "Interface").length
+                    allData.filter((item) => item.category === "Interface")
+                      .length
                   }
                   description={
                     "Interface EIPs describe changes to the Ethereum client API."
@@ -437,7 +423,8 @@ const Dashboard = () => {
                 <StatBox
                   title="Informational EIPs"
                   value={
-                    data.filter((item) => item.type === "Informational").length
+                    allData.filter((item) => item.type === "Informational")
+                      .length
                   }
                   description={
                     "Informational EIPs describe other changes to the Ethereum ecosystem."
@@ -450,7 +437,7 @@ const Dashboard = () => {
 
                 <StatBox
                   title="Meta EIPs"
-                  value={data.filter((item) => item.type === "Meta").length}
+                  value={allData.filter((item) => item.type === "Meta").length}
                   description={
                     "Meta EIPs describe changes to the EIP process, or other non-optional changes."
                   }
@@ -475,25 +462,20 @@ const Dashboard = () => {
                 }}
                 className="hover: cursor-pointer ease-in duration-200"
               >
+                <NextLink href="/all">
+                  <Text
+                    fontSize="2xl"
+                    fontWeight="bold"
+                    color="#30A0E0"
+                    marginRight="6"
+                    paddingBottom={6}
+                  >
+                    {`Status - [${allData.length}]`}
+                  </Text>
+                </NextLink>
                 <DashboardDonut />
               </Box>
             </Box>
-
-            {/*<AreaC />*/}
-            {/*<Table />*/}
-
-            {/*<Box*/}
-            {/* className={'lg:grid hidden grid-cols-3'}*/}
-            {/*>*/}
-            {/*  <div className='col-span-2'>*/}
-            {/*    <h1 className='py-4'>*/}
-            {/*      Our <span className='text-blue-400'>Vision</span>*/}
-            {/*    </h1>*/}
-            {/*    <p>*/}
-            {/*     Demo text*/}
-            {/*    </p>*/}
-            {/*  </div>*/}
-            {/*</Box>*/}
           </motion.div>
         )}
       </Box>

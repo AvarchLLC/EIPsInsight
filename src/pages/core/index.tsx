@@ -33,10 +33,10 @@ const Core = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/alleips`);
+        const response = await fetch(`/api/new/all`);
         console.log(response);
         const jsonData = await response.json();
-        setData(jsonData);
+        setData(jsonData.eip);
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Icon, useColorModeValue, Text } from "@chakra-ui/react";
+import { Box, Icon, useColorModeValue, Text, Spinner } from "@chakra-ui/react";
 import DateTime from "@/components/DateTime";
 import {
   Chart as ChartJS,
@@ -36,14 +36,16 @@ interface EIP {
   __v: number;
 }
 
-const ERCStatusDonut = () => {
+const EIPStatusDonut = () => {
   const [data, setData] = useState<EIP[]>([]);
+  const [isReady, setIsReady] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData.erc);
+        setData(jsonData.eip);
+        setIsReady(true);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -51,7 +53,6 @@ const ERCStatusDonut = () => {
 
     fetchData();
   }, []);
-  console.log(data.length);
 
   const dat = [
     {
@@ -149,7 +150,7 @@ const ERCStatusDonut = () => {
   return (
     <>
       <Box bg={bg} borderRadius="0.55rem">
-        <a href="/erctable">
+        <a href="/eiptable">
           <Text
             fontSize="2xl"
             fontWeight="bold"
@@ -169,4 +170,4 @@ const ERCStatusDonut = () => {
   );
 };
 
-export default ERCStatusDonut;
+export default EIPStatusDonut;

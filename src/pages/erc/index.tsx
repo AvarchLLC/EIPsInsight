@@ -17,6 +17,9 @@ import ERCCatBoxGrid from "@/components/ERCCatBoxGrid";
 import ERCStatusDonut from "@/components/ERCStatusDonut";
 import StackedColumnChart from "@/components/StackedBarChart";
 import CBoxStatus from "@/components/CBoxStatus";
+import AllChart from "@/components/AllChart";
+import AreaC from "@/components/AreaC";
+import ERCStatusGraph from "@/components/ERCStatusGraph";
 interface EIP {
   _id: string;
   eip: string;
@@ -33,16 +36,21 @@ interface EIP {
   __v: number;
 }
 
+interface APIResponse {
+  eip: EIP[];
+  erc: EIP[];
+}
+
 const ERC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/allercs`);
+        const response = await fetch(`/api/new/all`);
         console.log(response);
         const jsonData = await response.json();
-        setData(jsonData);
+        setData(jsonData.erc);
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -95,7 +103,11 @@ const ERC = () => {
                 subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
               />
             </FlexBetween>
-            <Box className={"w-full pt-10"}>
+            <Text className="text-red-400">
+              The data before Oct 25 2023 is missing due to EIP ERC split. It
+              will be here soon!
+            </Text>
+            <Box className={"w-full pt-4"}>
               <SearchBox />
             </Box>
             <Box className="grid grid-cols-2 pt-8 gap-x-5">
@@ -103,15 +115,21 @@ const ERC = () => {
                 <ERCStatusDonut />
               </Box>
               <Box>
-                <ERCGraph />
+                <AllChart type="ERC" />
               </Box>
             </Box>
-            <TableStatus cat="ERC" />
+            {/* <TableStatus cat="ERC" /> */}
+            <Box>
+              <AreaC type={"ERCs"} />
+            </Box>
             <Box className={"pt-8"}>
               <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 Draft vs Final
               </Text>
               <AreaStatus type={"ERCs"} />
+            </Box>
+            <Box paddingY={8}>
+              <ERCStatusGraph />
             </Box>
           </Box>
         </motion.div>
