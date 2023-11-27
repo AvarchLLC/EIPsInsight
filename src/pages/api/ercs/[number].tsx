@@ -25,22 +25,23 @@ const mdFilesSchema = new mongoose.Schema({
   created: { type: String },
 });
 
-const MdFiles =
-  mongoose.models.EipMdFiles || mongoose.model("EipMdFiles", mdFilesSchema);
+const ERCMdFiles =
+  mongoose.models.ErcMdFiles || mongoose.model("ErcMdFiles", mdFilesSchema);
 
 export default async (req: Request, res: Response) => {
-  MdFiles.aggregate([
-    {
-      $sort: {
-        _id: 1, // Sort by status in ascending order
-      },
-    },
-  ])
-    .then((result: any) => {
-      res.json(result);
+  const parts = req.url.split("/");
+  const eipNumber = parseInt(parts[3]);
+
+  ERCMdFiles.findOne({ eip: eipNumber })
+    .then((eip: any) => {
+      if (eip) {
+        res.json(eip);
+      } else {
+        res.status(404).json({ error: "EIP not found" });
+      }
     })
     .catch((error: any) => {
-      console.error("Error retrieving EIPs:", error);
+      console.error("Error retrieving EIP:", error);
       res.status(500).json({ error: "Internal server error" });
     });
 };

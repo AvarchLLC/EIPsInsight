@@ -20,7 +20,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { motion } from "framer-motion";
-import Prog from "@/components/Prog"
+import Prog from "@/components/Prog";
 interface EIP {
   _id: string;
   eip: string;
@@ -61,28 +61,36 @@ const getStatus = (status: string) => {
 interface ContentData {
   content: string;
 }
-const StatusContent: React.FC<{ status: string }> = ({ status }) => {
-  const pathname = usePathname();
-  const pathnameParts = pathname ? pathname.split("/") : [];
-  const thirdPart = pathnameParts[2] || ""; // Set a default value if thirdPart is undefined
-  if (status === "Final") {
-    return <Prog num={`${thirdPart}`}/>
-  } 
-};
+// const StatusContent: React.FC<{ status: string }> = ({ status }) => {
+//   const pathname = usePathname();
+//   const pathnameParts = pathname ? pathname.split("/") : [];
+//   const file = pathnameParts[1] || "";
+//   const type = file.split('/');
+//   if (status === "Final") {
+//     return <Prog num={`${thirdPart}`}/>
+//   }
+// };
 
 const EIP = () => {
   const pathname = usePathname();
   const pathnameParts = pathname ? pathname.split("/") : [];
-  const thirdPart = pathnameParts[2] || ""; // Set a default value if thirdPart is undefined
+  const part = pathnameParts[1] || "";
+  const number = part.split("-")[1];
+  const cat = part.split("-")[0];
   const [data, setData] = useState<EIP | null>(null); // Set initial state as null
   const [con, setcon] = useState<ContentData | undefined>(undefined);
 
   const fetchContent = async () => {
     try {
-      const response = await fetch(`/api/eipcontent/${thirdPart}`);
-      const jsonD = await response.json();
-      console.log(jsonD["content"]);
-      setcon(jsonD);
+      if (cat === "erc") {
+        const response = await fetch(`/api/new/erccontent/${number}`);
+        const jsonD = await response.json();
+        setcon(jsonD);
+      } else {
+        const response = await fetch(`/api/new/eipcontent/${number}`);
+        const jsonD = await response.json();
+        setcon(jsonD);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -91,10 +99,17 @@ const EIP = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/eips/${thirdPart}`);
-        const jsonData = await response.json();
-        console.log(jsonData);
-        setData(jsonData);
+        if (cat === "erc") {
+          const response = await fetch(`/api/ercs/${number}`);
+          const jsonData = await response.json();
+          console.log(jsonData);
+          setData(jsonData);
+        } else {
+          const response = await fetch(`/api/eips/${number}`);
+          const jsonData = await response.json();
+          console.log(jsonData);
+          setData(jsonData);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -102,9 +117,7 @@ const EIP = () => {
 
     fetchData();
     fetchContent();
-  }, [thirdPart]); // Add thirdPart as a dependency to re-fetch data when it changes
-
-
+  }, [number]); // Add thirdPart as a dependency to re-fetch data when it changes
 
   return (
     <AllLayout>
@@ -116,14 +129,17 @@ const EIP = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Header title={`EIP - ${thirdPart}`} subtitle={data.title} />
+              <Header
+                title={`${cat === "erc" ? "ERC" : "EIP"} - ${number}`}
+                subtitle={data.title}
+              />
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <StatusContent status={data.status}/>
+              {/* <StatusContent status={data.status} /> */}
               <TableContainer paddingTop={6}>
                 <Table variant="striped" minW="50%" maxH="50%" layout="fixed">
                   <Tbody>
@@ -139,9 +155,7 @@ const EIP = () => {
                             <Td>
                               {key.charAt(0).toUpperCase() + key.slice(1)}:
                             </Td>
-                            <Td>
-                              {value}
-                            </Td>
+                            <Td>{value}</Td>
                           </Tr>
                         )
                     )}
@@ -158,7 +172,6 @@ const EIP = () => {
                 className="pt-5"
               >
                 <ReactMarkdown
-              
                   children={con.content}
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeRaw]}

@@ -44,6 +44,7 @@ import LoaderComponent from "./Loader";
 import { DownloadIcon } from "@chakra-ui/icons";
 interface TabProps {
   cat: string;
+  type: string;
 }
 
 async function fetchLastCreatedYearAndMonthFromAPI(
@@ -76,7 +77,7 @@ async function fetchLastCreatedYearAndMonthFromAPI(
   }
 }
 
-const TableStat: React.FC<TabProps> = ({ cat }) => {
+const TableStat: React.FC<TabProps> = ({ cat, type }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -98,9 +99,15 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
+        const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData);
+        if (type === "erc") {
+          setData(jsonData.erc);
+        } else if (type === "eip") {
+          setData(jsonData.eip);
+        } else {
+          setData(jsonData.eip.concat(jsonData.erc));
+        }
         setIsLoading(false); // Set isLoading to false after data is fetched
 
         // Fetch merged years and months for each item

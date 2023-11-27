@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
-import TypeG from "@/components/TypeGraphs";
+import TypeGraphs from "@/components/TypeGraphs";
 import FlexBetween from "@/components/FlexBetween";
 import SearchBox from "@/components/SearchBox";
 import StatusBox from "@/components/StatusBox";
@@ -32,6 +32,8 @@ import AreaStatus from "@/components/AreaStatus";
 import Banner from "@/components/NewsBanner";
 import NextLink from "next/link";
 import AreaC from "@/components/AreaC";
+import EIPStatusDonut from "@/components/EIPStatusDonut";
+import AllChart from "@/components/AllChart";
 
 interface EIP {
   _id: string;
@@ -74,10 +76,9 @@ const Type = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
-        console.log(response);
+        const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData.filter((item: EIP) => item.category !== "ERC"));
+        setData(jsonData.eip);
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -133,29 +134,43 @@ const Type = () => {
           >
             <FlexBetween>
               <Header
-                title={`Ethereum Improvement Proposal - [${
-                  data.filter((item) => item.category !== "ERC").length
-                }]`}
+                title={`Ethereum Improvement Proposal - [${data.length}]`}
                 subtitle="Meta, Informational, Standard Track - Core, Interface, Networking."
               />
             </FlexBetween>
             <Box className={"w-full pt-10"}>
               <SearchBox />
             </Box>
-            <Box paddingTop={"8"}>
+
+            {/* <Box paddingTop={"8"}>
               <EIPCatBoxGrid />
+            </Box> */}
+            <Box className="grid grid-cols-2 pt-8 gap-x-5">
+              <Box>
+                <EIPStatusDonut />
+              </Box>
+              <Box>
+                <AllChart type="EIP" />
+              </Box>
+              {/* <Box>
+                <ERCGraph />
+              </Box> */}
             </Box>
-            <Box paddingTop={8}>
+            {/* <Box paddingTop={8}>
               <StatusBox />
+            </Box> */}
+
+            <Box paddingTop={8}>
+              <TypeGraphs />
             </Box>
 
             <Box
               hideBelow={"lg"}
               paddingBottom={{ lg: "10", sm: "10", base: "10" }}
             >
-              <Box>
+              {/* <Box>
                 <Table />
-              </Box>
+              </Box> */}
               <AreaC type={"EIPs"} />
               <Box paddingY={"8"}>
                 <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
@@ -167,7 +182,7 @@ const Type = () => {
                 <Box className={"flex"}>
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                     Draft -{" "}
-                    <NextLink href={`/tableStatus/Draft`}>
+                    <NextLink href={`/tableStatus/eip/Draft`}>
                       {" "}
                       [ {
                         data.filter((item) => item.status === "Draft").length
@@ -191,7 +206,7 @@ const Type = () => {
                 <Box className={"flex"}>
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                     Review -{" "}
-                    <NextLink href={`/tableStatus/Review`}>
+                    <NextLink href={`/tableStatus/eip/Review`}>
                       {" "}
                       [ {
                         data.filter((item) => item.status === "Review").length
@@ -216,7 +231,7 @@ const Type = () => {
                 <Box className={"flex"}>
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                     Last Call -
-                    <NextLink href={`/tableStatus/LastCall`}>
+                    <NextLink href={`/tableStatus/eip/LastCall`}>
                       {" "}
                       [{" "}
                       {
@@ -243,7 +258,7 @@ const Type = () => {
                 <Box className={"flex"}>
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                     Living -
-                    <NextLink href={`/tableStatus/Living`}>
+                    <NextLink href={`/tableStatus/eip/Living`}>
                       {" "}
                       [ {
                         data.filter((item) => item.status === "Living").length
@@ -268,7 +283,7 @@ const Type = () => {
                 <Box className={"flex"}>
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                     Final -
-                    <NextLink href={`/tableStatus/Final`}>
+                    <NextLink href={`/tableStatus/eip/Final`}>
                       {" "}
                       [ {
                         data.filter((item) => item.status === "Final").length
@@ -293,7 +308,7 @@ const Type = () => {
                 <Box className={"flex"}>
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                     Stagnant -
-                    <NextLink href={`/tableStatus/Stagnant`}>
+                    <NextLink href={`/tableStatus/eip/Stagnant`}>
                       {" "}
                       [{" "}
                       {
@@ -319,7 +334,7 @@ const Type = () => {
                 <Box className={"flex"}>
                   <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                     Withdrawn -
-                    <NextLink href={`/tableStatus/Withdrawn`}>
+                    <NextLink href={`/tableStatus/eip/Withdrawn`}>
                       {" "}
                       [{" "}
                       {
@@ -381,7 +396,6 @@ const Type = () => {
               </Box>
             </Box>
           </Box>
-          <TypeG />
         </motion.div>
       )}
     </AllLayout>

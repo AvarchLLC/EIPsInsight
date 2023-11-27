@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { Box, useColorModeValue, Spinner } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import DateTime from "@/components/DateTime";
+import { motion } from "framer-motion";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -125,6 +126,7 @@ interface APIResponse {
 }
 
 const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<APIResponse>();
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -141,6 +143,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
         }
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -163,7 +166,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
     setIsChartReady(true);
   }, []);
 
-  const filteredData = typeData.filter((item) => item.status === status);
+  let filteredData = typeData.filter((item) => item.status === status);
 
   const transformedData = filteredData.flatMap((item) =>
     item.eips.map((eip) => ({
@@ -172,6 +175,31 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
       value: eip.count,
     }))
   );
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  transformedData.sort((a, b) => {
+    const [aMonth, aYear] = a.year.split(" ");
+    const [bMonth, bYear] = b.year.split(" ");
+
+    if (aYear !== bYear) {
+      return parseInt(aYear, 10) - parseInt(bYear, 10);
+    }
+    return months.indexOf(aMonth) - months.indexOf(bMonth);
+  });
 
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Column),
@@ -214,12 +242,34 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
   };
 
   return (
-    <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
-      <Area {...config} />
-      <Box className={"w-full"}>
-        <DateTime />
-      </Box>
-    </Box>
+    <>
+      {isLoading ? (
+        <>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            className="h-full"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Your loader component */}
+              <Spinner />
+            </motion.div>
+          </Box>
+        </>
+      ) : (
+        <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
+          <Area {...config} />
+          <Box className={"w-full"}>
+            <DateTime />
+          </Box>
+        </Box>
+      )}
+    </>
   );
 };
 

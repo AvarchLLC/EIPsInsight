@@ -77,7 +77,6 @@ const Month = () => {
   const [data, setData] = useState<APIData>(); // Set initial state as an empty array
   const [type, setType] = useState("EIPs"); // Set initial state as an empty array
   const path = usePathname();
-  const [isResEmpty, setIsResEmpty] = useState(false);
 
   let year = "";
   let month = "";
@@ -108,13 +107,13 @@ const Month = () => {
     fetchData();
   }, [year, month]);
 
-  useEffect(() => {
-    if (typeData.length === 0) {
-      setIsResEmpty(true);
-    } else {
-      setIsResEmpty(false);
-    }
-  });
+  // useEffect(() => {
+  //   if (typeData.length === 0) {
+  //     setIsResEmpty(true);
+  //   } else {
+  //     setIsResEmpty(false);
+  //   }
+  // });
   let total = 0;
   typeData.map((item) => {
     total = total + item.count;
@@ -132,7 +131,7 @@ const Month = () => {
     return () => clearTimeout(timeout);
   }, []);
   const bg = useColorModeValue("#f6f6f7", "#171923");
-  console.log(typeData);
+
   return (
     <AllLayout>
       {isLoading ? ( // Check if the data is still loading
@@ -152,7 +151,7 @@ const Month = () => {
             <LoaderComponent />
           </motion.div>
         </Box>
-      ) : !isResEmpty ? (
+      ) : (
         <>
           <motion.div
             initial={{ opacity: 0 }}
@@ -167,6 +166,17 @@ const Month = () => {
               marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
             >
               <Header title={getMonthName(Number(month))} subtitle={year} />
+
+              {type === "ERCs" ? (
+                parseInt(year) <= 2023 ? (
+                  parseInt(month) <= 10 ? (
+                    <Text className="text-red-400">
+                      The data before Oct 25 2023 is missing due to EIP ERC
+                      split. It will be here soon!
+                    </Text>
+                  ) : null
+                ) : null
+              ) : null}
 
               <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold">
                 <button
@@ -201,6 +211,7 @@ const Month = () => {
               >
                 <Box>
                   <CustomBox
+                    type={type}
                     data={typeData}
                     per={total}
                     year={year}
@@ -230,13 +241,73 @@ const Month = () => {
                 color="blue.400"
                 paddingTop={8}
               >
+                Review
+              </Text>
+              <Box paddingY={"8"}>
+                <StackedColumnChart type={type} status="Review" />
+              </Box>
+
+              <Text
+                fontSize="3xl"
+                fontWeight="bold"
+                color="blue.400"
+                paddingTop={8}
+              >
+                Last Call
+              </Text>
+              <Box paddingY={"8"}>
+                <StackedColumnChart type={type} status="Last Call" />
+              </Box>
+
+              <Text
+                fontSize="3xl"
+                fontWeight="bold"
+                color="blue.400"
+                paddingTop={8}
+              >
+                Living
+              </Text>
+              <Box paddingY={"8"}>
+                <StackedColumnChart type={type} status="Living" />
+              </Box>
+
+              <Text
+                fontSize="3xl"
+                fontWeight="bold"
+                color="blue.400"
+                paddingTop={8}
+              >
                 Final
               </Text>
               <Box paddingY={"8"}>
                 <StackedColumnChart type={type} status="Final" />
               </Box>
 
-              <Grid templateColumns={{ lg: "1fr 1fr 1fr", md: "" }} gap={6}>
+              <Text
+                fontSize="3xl"
+                fontWeight="bold"
+                color="blue.400"
+                paddingTop={8}
+              >
+                Stagnant
+              </Text>
+              <Box paddingY={"8"}>
+                <StackedColumnChart type={type} status="Stagnant" />
+              </Box>
+
+              <Text
+                fontSize="3xl"
+                fontWeight="bold"
+                color="blue.400"
+                paddingTop={8}
+              >
+                Withdrawn
+              </Text>
+              <Box paddingY={"8"}>
+                <StackedColumnChart type={type} status="Withdrawn" />
+              </Box>
+
+              {/* <Grid templateColumns={{ lg: "1fr 1fr 1fr", md: "" }} gap={6}>
                 <PieC
                   data={typeData}
                   status="Review"
@@ -276,13 +347,9 @@ const Month = () => {
                   year={year}
                   month={month}
                 />
-              </Grid>
+              </Grid> */}
             </Box>
           </motion.div>
-        </>
-      ) : (
-        <>
-          <EmptyInsight />
         </>
       )}
     </AllLayout>
