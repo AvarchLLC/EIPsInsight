@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AllLayout from "@/components/Layout";
-import { Box } from "@chakra-ui/react";
+import { Box, Spinner } from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 
 const All = () => {
@@ -14,6 +14,7 @@ const All = () => {
     "ERC",
     "RIP",
   ];
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <>
