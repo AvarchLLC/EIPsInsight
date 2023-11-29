@@ -20,6 +20,7 @@ import CBoxStatus from "@/components/CBoxStatus";
 import AllChart from "@/components/AllChart";
 import AreaC from "@/components/AreaC";
 import ERCStatusGraph from "@/components/ERCStatusGraph";
+import OtherBox from "@/components/OtherStats";
 interface EIP {
   _id: string;
   eip: string;
@@ -110,12 +111,15 @@ const ERC = () => {
             <Box className={"w-full pt-4"}>
               <SearchBox />
             </Box>
-            <Box className="grid grid-cols-2 pt-8 gap-x-5">
+            <Box className="grid grid-cols-3 pt-8 gap-x-5">
               <Box>
                 <ERCStatusDonut />
               </Box>
               <Box>
                 <AllChart type="ERC" />
+              </Box>
+              <Box className="h-fit">
+                <OtherBox type="ERCs" />
               </Box>
             </Box>
             {/* <TableStatus cat="ERC" /> */}

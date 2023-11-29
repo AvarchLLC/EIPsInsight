@@ -50,6 +50,7 @@ interface EIP {
   unique_ID: number;
   __v: number;
 }
+import OtherBox from "@/components/OtherStats";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -145,12 +146,15 @@ const Type = () => {
             {/* <Box paddingTop={"8"}>
               <EIPCatBoxGrid />
             </Box> */}
-            <Box className="grid grid-cols-2 pt-8 gap-x-5">
+            <Box className="grid grid-cols-3 pt-8 gap-x-5">
               <Box>
                 <EIPStatusDonut />
               </Box>
               <Box>
                 <AllChart type="EIP" />
+              </Box>
+              <Box className="h-fit">
+                <OtherBox type="EIPs" />
               </Box>
               {/* <Box>
                 <ERCGraph />

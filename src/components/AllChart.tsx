@@ -189,7 +189,15 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         </Box>
       ) : (
         <>
-          <Box bgColor={bg} paddingX="0.5rem" borderRadius="0.55rem">
+          <Box
+            bgColor={bg}
+            paddingX="0.5rem"
+            borderRadius="0.55rem"
+            _hover={{
+              border: "1px",
+              borderColor: "#30A0E0",
+            }}
+          >
             <NextLink
               href={
                 type === "ERC"

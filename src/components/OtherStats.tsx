@@ -43,6 +43,12 @@ const OtherBox: React.FC<Props> = ({ type }) => {
     stars: 0,
     openIssuesCount: 0,
   });
+  const [RIPdata, setRIPData] = useState<EIP>({
+    forksCount: 0,
+    watchlistCount: 0,
+    stars: 0,
+    openIssuesCount: 0,
+  });
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
@@ -74,27 +80,30 @@ const OtherBox: React.FC<Props> = ({ type }) => {
     fetchData();
   }, []);
 
-  const numRows = 4 + 4;
-  const rowHeight = 40; // Assuming each row has a height of 40px
-  const maxHeight = `${numRows * rowHeight}px`;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/RIPIinfo`);
+        const jsonData = await response.json();
+        setRIPData(jsonData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <Box
       bgColor={bg}
-      marginTop={"2rem"}
       p="1rem 1rem"
       borderRadius="0.55rem"
-      overflowX="auto"
       _hover={{
         border: "1px",
         borderColor: "#30A0E0",
       }}
-      maxH={maxHeight}
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200 overflow-y-hidden"
+      className="hover:cursor-pointer ease-in duration-200 overflow-y-hidden h-[32.5rem] items-center"
     >
       <TableContainer>
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
@@ -118,7 +127,13 @@ const OtherBox: React.FC<Props> = ({ type }) => {
                   href={`https://github.com/ethereum/EIPs`}
                   className="text-blue-400 hover:cursor-pointer font-semibold"
                 >
-                  {type === "EIPs" ? EIPdata.forksCount : ERCdata.forksCount}
+                  {type === "EIPs"
+                    ? EIPdata.forksCount
+                    : type === "ERCs"
+                    ? ERCdata.forksCount
+                    : type === "RIPs"
+                    ? RIPdata.forksCount
+                    : EIPdata.forksCount}
                 </Link>
               </Td>
             </Tr>
@@ -137,7 +152,11 @@ const OtherBox: React.FC<Props> = ({ type }) => {
                 >
                   {type === "EIPs"
                     ? EIPdata.watchlistCount
-                    : ERCdata.watchlistCount}
+                    : type === "ERCs"
+                    ? ERCdata.watchlistCount
+                    : type === "RIPs"
+                    ? RIPdata.watchlistCount
+                    : EIPdata.watchlistCount}
                 </Link>
               </Td>
             </Tr>
@@ -154,7 +173,13 @@ const OtherBox: React.FC<Props> = ({ type }) => {
                   href={`https://github.com/ethereum/EIPs`}
                   className="text-blue-400 hover:cursor-pointer font-semibold"
                 >
-                  {type === "EIPs" ? EIPdata.stars : ERCdata.stars}
+                  {type === "EIPs"
+                    ? EIPdata.stars
+                    : type === "ERCs"
+                    ? ERCdata.stars
+                    : type === "RIPs"
+                    ? RIPdata.stars
+                    : EIPdata.stars}
                 </Link>
               </Td>
             </Tr>
@@ -173,7 +198,11 @@ const OtherBox: React.FC<Props> = ({ type }) => {
                 >
                   {type === "EIPs"
                     ? EIPdata.openIssuesCount
-                    : ERCdata.openIssuesCount}
+                    : type === "ERCs"
+                    ? ERCdata.openIssuesCount
+                    : type === "RIPs"
+                    ? RIPdata.openIssuesCount
+                    : EIPdata.openIssuesCount}
                 </Link>
               </Td>
             </Tr>
