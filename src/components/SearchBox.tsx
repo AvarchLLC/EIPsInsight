@@ -118,7 +118,7 @@ const SearchBox: React.FC = () => {
       <div>
         <input
           type="text"
-          placeholder="Search EIP or ERC"
+          placeholder="Search EIP or ERC or RIP"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="border p-2 rounded w-full text-center focus:border-blue-100"
