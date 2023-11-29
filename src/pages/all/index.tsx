@@ -57,13 +57,13 @@ const All = () => {
             </>
           ) : (
             <Box>
-              <CatTable cat={selected} status={"Draft"} />
-              <CatTable cat={selected} status={"Review"} />
-              <CatTable cat={selected} status={"Last Call"} />
               <CatTable cat={selected} status={"Living"} />
               <CatTable cat={selected} status={"Final"} />
-              <CatTable cat={selected} status={"Stagnant"} />
+              <CatTable cat={selected} status={"Last Call"} />
+              <CatTable cat={selected} status={"Review"} />
+              <CatTable cat={selected} status={"Draft"} />
               <CatTable cat={selected} status={"Withdrawn"} />
+              <CatTable cat={selected} status={"Stagnant"} />
             </Box>
           )}
         </Box>
