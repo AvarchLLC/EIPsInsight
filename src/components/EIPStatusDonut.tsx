@@ -149,7 +149,14 @@ const EIPStatusDonut = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
   return (
     <>
-      <Box bg={bg} borderRadius="0.55rem">
+      <Box
+        bg={bg}
+        borderRadius="0.55rem"
+        _hover={{
+          border: "1px",
+          borderColor: "#30A0E0",
+        }}
+      >
         <a href="/eiptable">
           <Text
             fontSize="2xl"

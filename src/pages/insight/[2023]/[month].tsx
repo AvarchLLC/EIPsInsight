@@ -203,9 +203,7 @@ const Month = () => {
                 </button>
               </Box>
               <Grid
-                className={"justify-center"}
-                paddingBottom={"8"}
-                gridTemplateColumns={{ lg: "2fr 2fr", md: "" }}
+                className={"justify-center flex w-full"}
                 gap={"8"}
                 paddingY={"8"}
               >
@@ -218,9 +216,9 @@ const Month = () => {
                     month={month}
                   />
                 </Box>
-                <Box>
+                {/* <Box>
                   <OtherBox type={type} />
-                </Box>
+                </Box> */}
               </Grid>
 
               <Text
