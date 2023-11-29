@@ -1,104 +1,57 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import { Box, Button, Spinner } from "@chakra-ui/react";
-import { DownloadIcon } from "@chakra-ui/icons";
-
+import React, { useState, useEffect } from "react";
 import AllLayout from "@/components/Layout";
-import FlexBetween from "@/components/FlexBetween";
-import Header from "@/components/Header";
-import Table from "@/components/Table";
-import AreaC from "@/components/AreaC";
-import LoaderComponent from "@/components/Loader";
-
-interface EIP {
-  _id: string;
-  eip: string;
-  title: string;
-  author: string;
-  status: string;
-  type: string;
-  category: string;
-  created: string;
-  discussion: string;
-  deadline: string;
-  requires: string;
-  unique_ID: number;
-  __v: number;
-}
+import { Box } from "@chakra-ui/react";
+import CatTable from "@/components/CatTable";
 
 const All = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/all`);
-        console.log(response);
-        const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc));
-        setIsLoading(false); // Set loader state to false after data is fetched
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsLoading(false); // Set loader state to false even if an error occurs
-      }
-    };
-
-    fetchData();
-  }, []);
-  useEffect(() => {
-    // Simulating a loading delay
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    // Cleanup function
-    return () => clearTimeout(timeout);
-  }, []);
+  const [selected, setSelected] = useState("Meta");
+  const optionArr = [
+    "Meta",
+    "Informational",
+    "Core",
+    "Networking",
+    "Interface",
+    "ERC",
+    "RIP",
+  ];
 
   return (
-    <AllLayout>
-      {isLoading ? ( // Check if the data is still loading
-        // Show loader if data is loading
+    <>
+      <AllLayout>
         <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
+          paddingBottom={{ lg: "10", sm: "10", base: "10" }}
+          marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
+          paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Your loader component */}
-            <LoaderComponent />
-          </motion.div>
-        </Box>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Box
-            paddingBottom={{ md: "10", base: "10" }}
-            marginX={{ md: "40", base: "2" }}
-            paddingX={{ md: "10", base: "5" }}
-            marginTop={{ md: "10", base: "5" }}
-          >
-            <FlexBetween>
-              <Header
-                title={`All EIPs & ERCs - [ ${data.length} ]`}
-                subtitle=""
-              />
-            </FlexBetween>
-            <Table type="Total" />
-            {/* <AreaC type={"EIPs"} /> */}
+          <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold py-8">
+            {optionArr.map((item, key) => (
+              <button
+                onClick={() => {
+                  setSelected(item);
+                }}
+                className={
+                  selected === item ? "underline underline-offset-4" : ""
+                }
+                key={key}
+              >
+                {item}
+              </button>
+            ))}
           </Box>
-        </motion.div>
-      )}
-    </AllLayout>
+
+          <Box>
+            <CatTable cat={selected} status={"Draft"} />
+            <CatTable cat={selected} status={"Review"} />
+            <CatTable cat={selected} status={"Last Call"} />
+            <CatTable cat={selected} status={"Living"} />
+            <CatTable cat={selected} status={"Final"} />
+            <CatTable cat={selected} status={"Stagnant"} />
+            <CatTable cat={selected} status={"Withdrawn"} />
+          </Box>
+        </Box>
+      </AllLayout>
+    </>
   );
 };
 

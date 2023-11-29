@@ -196,7 +196,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
                   ? "/erctable"
                   : type === "EIP"
                   ? "/eiptable"
-                  : "/all"
+                  : "/alltable"
               }
             >
               <Text
