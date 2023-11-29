@@ -32,10 +32,10 @@ interface NavItem {
 
 const Navbar: React.FC = () => {
   const NAV_ITEMS: Array<NavItem> = [
-    // {
-    //     label: "All",
-    //     href: `/all`,
-    // },
+    {
+      label: "All",
+      href: `/all`,
+    },
     {
       label: "EIP",
       href: `/eip`,
@@ -44,10 +44,6 @@ const Navbar: React.FC = () => {
       label: "ERC",
       href: `/erc`,
     },
-    // {
-    //   label: "Status",
-    //   href: `/status`,
-    // },
     {
       label: "Insight",
       children: [

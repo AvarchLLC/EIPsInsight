@@ -306,48 +306,6 @@ const Month = () => {
               <Box paddingY={"8"}>
                 <StackedColumnChart type={type} status="Withdrawn" />
               </Box>
-
-              {/* <Grid templateColumns={{ lg: "1fr 1fr 1fr", md: "" }} gap={6}>
-                <PieC
-                  data={typeData}
-                  status="Review"
-                  year={year}
-                  month={month}
-                />
-                <PieC
-                  data={typeData}
-                  status="Draft"
-                  year={year}
-                  month={month}
-                />
-                <PieC
-                  data={typeData}
-                  status="Last Call"
-                  year={year}
-                  month={month}
-                />
-              </Grid>
-              <PieC data={typeData} status="Final" year={year} month={month} />
-              <Grid templateColumns={{ lg: "1fr 1fr 1fr", md: "" }} gap={6}>
-                <PieC
-                  data={typeData}
-                  status="Living"
-                  year={year}
-                  month={month}
-                />
-                <PieC
-                  data={typeData}
-                  status="Stagnant"
-                  year={year}
-                  month={month}
-                />
-                <PieC
-                  data={typeData}
-                  status="Withdrawn"
-                  year={year}
-                  month={month}
-                />
-              </Grid> */}
             </Box>
           </motion.div>
         </>
