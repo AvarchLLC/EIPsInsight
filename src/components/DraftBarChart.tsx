@@ -118,31 +118,24 @@ const categoryBorder: string[] = [
 
 interface AreaCProps {
   status: string;
-  type: string;
 }
 interface APIResponse {
   eip: EIP[];
   erc: EIP[];
 }
 
-const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
+const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<APIResponse>();
+  const [data, setData] = useState<EIP[]>([]);
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
-  const [typeData, setTypeData] = useState<EIP[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData);
-        if (type === "EIPs" && jsonData.eip) {
-          setTypeData(jsonData.eip);
-        } else if (type === "ERCs" && jsonData.erc) {
-          setTypeData(jsonData.erc);
-        }
+        setData(jsonData.eip.concat(jsonData.erc));
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -152,21 +145,13 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (type === "EIPs") {
-      setTypeData(data?.eip || []);
-    } else if (type === "ERCs") {
-      setTypeData(data?.erc || []);
-    }
-  });
-
   const [isChartReady, setIsChartReady] = useState(false);
 
   useEffect(() => {
     setIsChartReady(true);
   }, []);
 
-  let filteredData = typeData.filter((item) => item.status === status);
+  let filteredData = data.filter((item) => item.status === status);
 
   const transformedData = filteredData.flatMap((item) =>
     item.eips.map((eip) => ({

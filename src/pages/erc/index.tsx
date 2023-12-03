@@ -104,10 +104,10 @@ const ERC = () => {
                 subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
               />
             </FlexBetween>
-            <Text className="text-red-400">
+            {/* <Text className="text-red-400">
               The data before Oct 25 2023 is missing due to EIP ERC split. It
               will be here soon!
-            </Text>
+            </Text> */}
             <Box className={"w-full pt-4"}>
               <SearchBox />
             </Box>

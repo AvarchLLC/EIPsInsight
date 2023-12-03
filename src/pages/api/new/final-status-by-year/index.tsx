@@ -100,7 +100,12 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const ErcfinalStatusByYear = await ErcStatusChange.aggregate([
+    const FrozenErcData = await EipStatusChange.aggregate([
+      {
+        $match: {
+          category: { $in: ["ERC", "ERCs", "Standards Track - ERC"] },
+        },
+      },
       {
         $sort: { eip: 1, changeDate: 1 }, // Sort by EIP and change date
       },
@@ -137,7 +142,50 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    res.json({ eip: EipfinalStatusByYear, erc: ErcfinalStatusByYear });
+    const ErcfinalStatusByYear = await ErcStatusChange.aggregate([
+      {
+        $match: { changeDate: { $gte: new Date("2023-11-01T00:00:00.000Z") } },
+      },
+      {
+        $sort: { eip: 1, changeDate: 1 }, // Sort by EIP and change date
+      },
+      {
+        $group: {
+          _id: { year: { $year: "$changeDate" }, eip: "$eip" },
+          lastStatus: { $last: "$toStatus" },
+          eipTitle: { $last: "$title" },
+          eipCategory: { $last: "$category" }, // Include the category field
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.year",
+          statusChanges: {
+            $push: {
+              eip: "$_id.eip",
+              lastStatus: "$lastStatus",
+              eipTitle: "$eipTitle",
+              eipCategory: "$eipCategory", // Include the category field
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id",
+          statusChanges: 1,
+        },
+      },
+      {
+        $sort: { year: 1 },
+      },
+    ]);
+
+    res.json({
+      eip: EipfinalStatusByYear,
+      erc: [...ErcfinalStatusByYear, ...FrozenErcData],
+    });
   } catch (error) {
     console.log("Error:", error);
     res.status(500).json({ error: "Something went wrong" });

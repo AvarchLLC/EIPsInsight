@@ -60,7 +60,7 @@ interface TabProps {
   month: string;
   year: string;
   status: string;
-  type: string;
+  Tabletype: string;
 }
 const getStatus = (status: string) => {
   switch (status) {
@@ -79,13 +79,18 @@ interface FilteredDataItem {
   status: string;
   type: string;
   category: string;
-  pr: number; // Change the type to number
   deadline?: string;
   created?: string;
   changeDate?: string;
+  commitLink?: string;
 }
 
-const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
+const InsightTable: React.FC<TabProps> = ({
+  month,
+  year,
+  status,
+  Tabletype,
+}) => {
   const [data, setData] = useState<DataObject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -107,9 +112,9 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
       try {
         const response = await fetch(`/api/new/statusChanges/${year}/${month}`);
         const jsonData = await response.json();
-        if (type === "erc") {
+        if (Tabletype === "erc") {
           setData(jsonData.erc);
-        } else if (type === "eip") {
+        } else if (Tabletype === "eip") {
           setData(jsonData.eip);
         } else {
           setData(jsonData.eip);
@@ -145,8 +150,7 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
       let srNo = 1; // Initialize the serial number
 
       newData = finalStatusChanges.map((item: StatusChange) => {
-        const { eip, title, author, status, type, category, pr, deadline } =
-          item;
+        const { eip, title, author, status, type, category, deadline } = item;
 
         return {
           sr: srNo++, // Add the serial number and increment it
@@ -156,7 +160,6 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
           status,
           type,
           category,
-          pr,
           deadline,
         };
       });
@@ -164,8 +167,7 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
       let srNo = 1; // Initialize the serial number
 
       newData = finalStatusChanges.map((item: StatusChange) => {
-        const { eip, title, author, status, type, category, pr, created } =
-          item;
+        const { eip, title, author, status, type, category, created } = item;
 
         return {
           sr: srNo++, // Add the serial number and increment it
@@ -175,7 +177,6 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
           status,
           type,
           category,
-          pr,
           created,
         };
       });
@@ -190,7 +191,6 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
           status,
           type,
           category,
-          pr,
           created,
           changeDate,
         } = item;
@@ -203,7 +203,6 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
           status,
           type,
           category,
-          pr,
           created,
           changeDate,
         };
@@ -212,7 +211,12 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
       let srNo = 1; // Initialize the serial number
 
       newData = finalStatusChanges.map((item: StatusChange) => {
-        const { eip, title, author, status, type, category, pr } = item;
+        const { eip, title, author, status, type, category } = item;
+        const commitLink = `https://github.com/ethereum/${
+          Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
+        }/commits/master/${
+          Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
+        }/${Tabletype}-${eip}.md`;
 
         return {
           sr: srNo++, // Add the serial number and increment it
@@ -222,7 +226,7 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
           status,
           type,
           category,
-          pr,
+          commitLink,
         };
       });
     }
@@ -233,46 +237,20 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  // const convertAndDownloadCSV = () => {
-  //     if (filteredData && filteredData.length > 0) {
-  //         // Create CSV headers
-  //         const headers = Object.keys(filteredData[0]).join(',') + '\n';
-  //
-  //         // Convert data to CSV rows
-  //         const csvRows = filteredData.map((item) =>
-  //             Object.values(item)
-  //                 .map((value) => (typeof value === 'string' && value.includes(',')
-  //                     ? `"${value}"`
-  //                     : value))
-  //                 .join(',')
-  //         );
-  //
-  //         // Combine headers and rows
-  //         const csvContent = headers + csvRows.join('\n');
-  //
-  //         // Trigger CSV download
-  //         const blob = new Blob([csvContent], { type: 'text/csv' });
-  //         const url = window.URL.createObjectURL(blob);
-  //         const a = document.createElement('a');
-  //         a.style.display = 'none';
-  //         a.href = url;
-  //         a.download = `${status}_${month}_${year}.csv`;
-  //         document.body.appendChild(a);
-  //         a.click();
-  //         window.URL.revokeObjectURL(url);
-  //     }
-  // };
-
   const convertAndDownloadCSV = () => {
     if (filteredData && filteredData.length > 0) {
       const headers = Object.keys(filteredData[0]);
-      headers.push("PR Link");
+      headers.push("Commit Link");
       headers.push("EIP Link");
       const csvRows = filteredData.map((item) => {
         const values = Object.values(item);
-        const prLink = `github.com/ethereum/eips/pull/${item.pr}`;
+        const commitLink = `https://github.com/ethereum/${
+          Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
+        }/commits/master/${
+          Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
+        }/${Tabletype}-${item.eip}.md`;
         const eipLink = `github.com/ethereum/EIPs/blob/master/EIPS/eip-${item.eip}.md`;
-        values.push(prLink);
+        values.push(commitLink);
         values.push(eipLink);
         return values
           .map((value) =>
@@ -351,7 +329,7 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
               clickableRows
               columnFilter
               columnSorter
-              itemsPerPage={7}
+              itemsPerPage={5}
               pagination
               tableProps={{
                 hover: true,
@@ -464,16 +442,10 @@ const InsightTable: React.FC<TabProps> = ({ month, year, status, type }) => {
                     </Wrap>
                   </td>
                 ),
-                pr: (item: any) => (
+                commitLink: (item: any) => (
                   <td key={item.eip}>
-                    <Link href={`/PR/${item.pr}`}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>
-                            {item.pr}
-                          </Badge>
-                        </WrapItem>
-                      </Wrap>
+                    <Link href={item.commitLink} target="_blank">
+                      <Button className="bg-blue-400">Commit</Button>
                     </Link>
                   </td>
                 ),

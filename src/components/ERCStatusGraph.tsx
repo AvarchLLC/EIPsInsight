@@ -82,13 +82,15 @@ const ERCStatusGraph = () => {
     fetchData();
   }, []);
 
-  const transformedData = graphData.flatMap((item) =>
-    item.statusChanges.map((change) => ({
-      status: getStatus(change.lastStatus),
-      year: item.year,
-      value: 1,
-    }))
-  );
+  const transformedData = graphData
+    .flatMap((item) =>
+      item.statusChanges.map((change) => ({
+        status: getStatus(change.lastStatus),
+        year: item.year,
+        value: 1,
+      }))
+    )
+    .sort((a, b) => a.year - b.year);
 
   const categoryColors: string[] = [
     "rgb(255, 99, 132)",

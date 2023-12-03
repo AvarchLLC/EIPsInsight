@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
 import { usePathname } from "next/navigation";
 import InsightTable from "@/components/InsightTable";
+import NextLink from "next/link";
 
 const getStatus = (status: string) => {
   switch (status) {
@@ -121,12 +122,19 @@ const Insi = () => {
       >
         <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
           <FlexBetween>
-            <Header
-              title={`${monthNames[Number(month) - 1]} - ${year}`}
-              subtitle={getStatus(status)}
-            />
+            <NextLink href={`/insight/${year}/${month}`}>
+              <Header
+                title={`${monthNames[Number(month) - 1]} - ${year}`}
+                subtitle={getStatus(status)}
+              />
+            </NextLink>
           </FlexBetween>
-          <InsightTable type={type} year={year} month={month} status={status} />
+          <InsightTable
+            Tabletype={type}
+            year={year}
+            month={month}
+            status={status}
+          />
         </Box>
       </motion.div>
     </AllLayout>

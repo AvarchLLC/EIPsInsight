@@ -216,16 +216,7 @@ const Dashboard = () => {
                         </Box>
                       </Stack>
                     </Stack>
-                    <Box
-                      bgColor={bg}
-                      borderRadius={"0.55rem"}
-                      padding={{ lg: "2rem", md: "1rem", sm: "0.5rem" }}
-                      className={
-                        !isDarkMode ? "custom-shadow-black" : "custom-shadow"
-                      }
-                    >
-                      <AllChart type="Total" />
-                    </Box>
+                    <AllChart type="Total" />
                   </Box>
                 </div>
                 <div className="lg:hidden block">
@@ -236,14 +227,7 @@ const Dashboard = () => {
                   >
                     Ethereum <br /> Improvement <br /> Proposal <br /> Insights
                   </Text>
-                  <Box
-                    bgColor={bg}
-                    borderRadius={"0.55rem"}
-                    padding={{ lg: "2rem", md: "1rem", sm: "0.5rem" }}
-                    className={"custom-shadow"}
-                  >
-                    <AllChart type="Total" />
-                  </Box>
+                  <AllChart type="Total" />
 
                   <Stack direction={"row"} spacing={"6"} paddingTop={"20"}>
                     <Box>

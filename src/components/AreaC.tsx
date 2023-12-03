@@ -228,22 +228,46 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     setSelectedStatus(event.target.value);
   };
 
-  const formattedData = typeData.reduce((acc: FormattedEIP[], item: EIP) => {
-    if (item.status === selectedStatus) {
-      const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
-        category: getCat(eip.category),
-        date: `${getMonthName(eip.month)} ${eip.year}`,
-        value: eip.count,
-      }));
-      acc.push(...formattedEIPs);
-    }
-    return acc;
-  }, []);
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const formattedData = typeData
+    .reduce((acc: FormattedEIP[], item: EIP) => {
+      if (item.status === selectedStatus) {
+        const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
+          category: getCat(eip.category),
+          date: `${getMonthName(eip.month)} ${eip.year}`,
+          value: eip.count,
+        }));
+        acc.push(...formattedEIPs);
+      }
+      return acc;
+    }, [])
+    .sort((a: any, b: any) => {
+      const [aMonth, aYear] = a.date.split(" ");
+      const [bMonth, bYear] = b.date.split(" ");
+
+      if (aYear !== bYear) {
+        return parseInt(aYear, 10) - parseInt(bYear, 10);
+      }
+      return months.indexOf(aMonth) - months.indexOf(bMonth);
+    });
 
   let filteredData = formattedData.filter(
     (item: any) => item.category !== "ERCs"
   );
-
   if (type === "ERCs") {
     filteredData = formattedData;
   } else {
