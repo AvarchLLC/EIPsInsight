@@ -71,7 +71,14 @@ export default async (req: Request, res: Response) => {
 
     // Query the database for status changes within the specified date range
     const EipstatusChanges = await EipStatusChange.aggregate([
-      { $match: { changeDate: { $gte: startDate, $lte: endDate } } },
+      {
+        $match: {
+          changeDate: { $gte: startDate, $lte: endDate },
+          category: {
+            $ne: "ERC",
+          },
+        },
+      },
       {
         $group: {
           _id: "$toStatus",
@@ -81,18 +88,71 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const ErcstatusChanges = await ErcStatusChange.aggregate([
-      { $match: { changeDate: { $gte: startDate, $lte: endDate } } },
-      {
-        $group: {
-          _id: "$toStatus",
-          count: { $sum: 1 },
-          statusChanges: { $push: "$$ROOT" },
+    if (yearNum === 2023 && monthNum === 10) {
+      const FrozenErcStatusChanges = await EipStatusChange.aggregate([
+        {
+          $match: {
+            changeDate: { $gte: startDate, $lte: endDate },
+            category: "ERC",
+          },
         },
-      },
-    ]);
+        {
+          $group: {
+            _id: "$toStatus",
+            count: { $sum: 1 },
+            statusChanges: { $push: "$$ROOT" },
+          },
+        },
+      ]);
+      res.json({
+        eip: EipstatusChanges,
+        erc: FrozenErcStatusChanges,
+      });
+    } else if (yearNum < 2023 || (yearNum === 2023 && monthNum <= 11)) {
+      const FrozenErcStatusChanges = await EipStatusChange.aggregate([
+        {
+          $match: {
+            changeDate: { $gte: startDate, $lte: endDate },
+            category: "ERC",
+          },
+        },
+        {
+          $group: {
+            _id: "$toStatus",
+            count: { $sum: 1 },
+            statusChanges: { $push: "$$ROOT" },
+          },
+        },
+      ]);
 
-    res.json({ eip: EipstatusChanges, erc: ErcstatusChanges });
+      const ErcstatusChanges = await ErcStatusChange.aggregate([
+        { $match: { changeDate: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: "$toStatus",
+            count: { $sum: 1 },
+            statusChanges: { $push: "$$ROOT" },
+          },
+        },
+      ]);
+
+      res.json({
+        eip: EipstatusChanges,
+        erc: [...ErcstatusChanges, ...FrozenErcStatusChanges],
+      });
+    } else {
+      const ErcstatusChanges = await ErcStatusChange.aggregate([
+        { $match: { changeDate: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: "$toStatus",
+            count: { $sum: 1 },
+            statusChanges: { $push: "$$ROOT" },
+          },
+        },
+      ]);
+      res.json({ eip: EipstatusChanges, erc: ErcstatusChanges });
+    }
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
     console.log(error);

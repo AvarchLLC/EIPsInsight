@@ -83,7 +83,7 @@ const OtherBox: React.FC<Props> = ({ type }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/RIPIinfo`);
+        const response = await fetch(`/api/RIPInfo`);
         const jsonData = await response.json();
         setRIPData(jsonData);
       } catch (error) {

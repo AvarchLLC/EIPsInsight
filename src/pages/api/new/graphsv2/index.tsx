@@ -56,6 +56,7 @@ const ErcStatusChange =
 export default async (req: Request, res: Response) => {
   try {
     const eipResult = await EipStatusChange.aggregate([
+      { $match: { category: { $ne: "ERC" } } },
       {
         $group: {
           _id: {
@@ -112,7 +113,66 @@ export default async (req: Request, res: Response) => {
       })
     );
 
+    const frozenErcResult = await EipStatusChange.aggregate([
+      { $match: { category: "ERC" } },
+      {
+        $group: {
+          _id: {
+            status: "$status",
+            category: "$category",
+            changedYear: { $year: "$changeDate" },
+            changedMonth: { $month: "$changeDate" },
+          },
+          count: { $sum: 1 },
+          eips: { $push: "$$ROOT" },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.status",
+          eips: {
+            $push: {
+              category: "$_id.category",
+              changedYear: "$_id.changedYear",
+              changedMonth: "$_id.changedMonth",
+              count: "$count",
+              eips: "$eips",
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          _id: 1,
+        },
+      },
+    ]);
+
+    const formattedFrozenErcResult = frozenErcResult.map(
+      (group: { _id: any; eips: any[] }) => ({
+        status: group._id,
+        eips: group.eips
+          .reduce((acc, eipGroup) => {
+            const { category, changedYear, changedMonth, count, eips } =
+              eipGroup;
+            acc.push({
+              category,
+              month: changedMonth,
+              year: changedYear,
+              date: `${changedYear}-${changedMonth}`,
+              count,
+              eips,
+            });
+            return acc;
+          }, [])
+          .sort((a: { date: number }, b: { date: number }) =>
+            a.date > b.date ? 1 : -1
+          ),
+      })
+    );
+
     const ercResult = await ErcStatusChange.aggregate([
+      { $match: { changeDate: { $gte: new Date("2023-11-01") } } },
       {
         $group: {
           _id: {
@@ -169,7 +229,10 @@ export default async (req: Request, res: Response) => {
       })
     );
 
-    res.json({ eip: formattedResult, erc: ERCformattedResult });
+    res.json({
+      eip: formattedResult,
+      erc: [...ERCformattedResult, ...formattedFrozenErcResult],
+    });
   } catch (error: any) {
     console.error("Error retrieving EIPs:", error.message);
     res.status(500).json({ error: "Internal server error" });

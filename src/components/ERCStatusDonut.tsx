@@ -51,7 +51,6 @@ const ERCStatusDonut = () => {
 
     fetchData();
   }, []);
-  console.log(data.length);
 
   const dat = [
     {

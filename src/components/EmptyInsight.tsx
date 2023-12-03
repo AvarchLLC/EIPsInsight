@@ -237,7 +237,7 @@ const EmptyInsight = () => {
             Draft
           </Text>
           <Box paddingTop={"8"}>
-            <StackedColumnChart type={"EIPs"} status="Draft" />
+            <StackedColumnChart status="Draft" />
           </Box>
           <Text
             fontSize="3xl"
@@ -248,7 +248,7 @@ const EmptyInsight = () => {
             Final
           </Text>
           <Box paddingY={"8"}>
-            <StackedColumnChart type={"EIPs"} status="Final" />
+            <StackedColumnChart status="Final" />
           </Box>
         </Box>
       </motion.div>

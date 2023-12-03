@@ -113,14 +113,13 @@ const CustomBox: React.FC<CustomBoxProps> = ({
 
   console.log(data);
 
-  const numRows = data.length + 5;
-  const rowHeight = 40; // Assuming each row has a height of 40px
-  const maxHeight = `${numRows * rowHeight}px`;
+  // const numRows = data.length + 5;
+  // const rowHeight = 40; // Assuming each row has a height of 40px
+  // const maxHeight = `${numRows * rowHeight}px`;
 
   return (
     <Box
       bgColor={bg}
-      marginTop={"2rem"}
       p="1rem 1rem"
       borderRadius="0.55rem"
       overflowX="auto"
@@ -128,12 +127,12 @@ const CustomBox: React.FC<CustomBoxProps> = ({
         border: "1px",
         borderColor: "#30A0E0",
       }}
-      maxH={maxHeight}
+      // maxH={maxHeight}
       as={motion.div}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 } as any}
-      className="hover: cursor-pointer ease-in duration-200 overflow-y-hidden"
+      className="hover: cursor-pointer ease-in duration-200 overflow-y-hidden h-full"
     >
       <TableContainer>
         <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">

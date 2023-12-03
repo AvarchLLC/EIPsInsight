@@ -11,6 +11,8 @@ import LoaderComponent from "@/components/Loader";
 import EmptyInsight from "@/components/EmptyInsight";
 import Banner from "@/components/NewsBanner";
 import StackedColumnChart from "@/components/DraftBarChart";
+import NextLink from "next/link";
+import InsightDoughnut from "@/components/InsightDoughnut";
 interface StatusChange {
   _id: string;
   count: number;
@@ -131,6 +133,8 @@ const Month = () => {
     return () => clearTimeout(timeout);
   }, []);
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const prevMonth = Number(month) - 1;
+  const prevMonthName = getMonthName(prevMonth);
 
   return (
     <AllLayout>
@@ -165,27 +169,18 @@ const Month = () => {
               paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
               marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
             >
-              <Header title={getMonthName(Number(month))} subtitle={year} />
+              <NextLink href={`/insight/${year}/${month}`}>
+                <Header title={getMonthName(Number(month))} subtitle={year} />
+              </NextLink>
 
-              {type === "ERCs" ? (
-                parseInt(year) <= 2023 ? (
-                  parseInt(month) <= 10 ? (
-                    <Text className="text-red-400">
-                      The data before Oct 25 2023 is missing due to EIP ERC
-                      split. It will be here soon!
-                    </Text>
-                  ) : null
-                ) : null
-              ) : null}
-
-              <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold">
+              <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold pb-8">
                 <button
                   onClick={() => {
                     setTypeData(data?.eip || []);
                     setType("EIPs");
                   }}
                   className={
-                    type === "EIPs" ? "underline underline-offset-4" : ""
+                    type === "EIPs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
                   }
                 >
                   EIPs Insight
@@ -196,30 +191,64 @@ const Month = () => {
                     setType("ERCs");
                   }}
                   className={
-                    type === "ERCs" ? "underline underline-offset-4" : ""
+                    type === "ERCs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
                   }
                 >
-                  ERCsInsight
+                  ERCs Insight
+                </button>
+                <button
+                  onClick={() => {
+                    setTypeData([]);
+                    setType("RIPs");
+                  }}
+                  className={
+                    type === "RIPs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
+                  }
+                >
+                  RIPs Insight
                 </button>
               </Box>
-              <Grid
-                className={"justify-center flex w-full"}
-                gap={"8"}
-                paddingY={"8"}
-              >
-                <Box>
-                  <CustomBox
-                    type={type}
-                    data={typeData}
-                    per={total}
-                    year={year}
-                    month={month}
-                  />
+              {typeData.length === 0 && type !== "RIPs" ? (
+                <>
+                  <Box paddingY={8}>
+                    <p className={"text-2xl"}>
+                      There is no data available for this month. Would you like
+                      to see{" "}
+                      <NextLink href={`/insight/${year}/${prevMonth}`}>
+                        <span className={"text-blue-400 font-bold"}>
+                          {prevMonthName} {year}
+                        </span>
+                      </NextLink>{" "}
+                      insights?
+                    </p>
+                  </Box>
+                </>
+              ) : typeData.length === 0 && type === "RIPs" ? (
+                <>
+                  <h1 className="text-3xl text-center pt-8 justify-center items-center flex">
+                    No Rolling Improvement Proposals have been made yet
+                  </h1>
+                </>
+              ) : (
+                <Box
+                  className={
+                    "justify-center gap-8 w-full grid grid-cols-2 mt-8"
+                  }
+                >
+                  <Box>
+                    <CustomBox
+                      type={type}
+                      data={typeData}
+                      per={total}
+                      year={year}
+                      month={month}
+                    />
+                  </Box>
+                  <Box>
+                    <InsightDoughnut data={typeData} />
+                  </Box>
                 </Box>
-                {/* <Box>
-                  <OtherBox type={type} />
-                </Box> */}
-              </Grid>
+              )}
 
               <Text
                 fontSize="3xl"
@@ -231,7 +260,7 @@ const Month = () => {
               </Text>
 
               <Box paddingTop={"8"}>
-                <StackedColumnChart type={type} status="Draft" />
+                <StackedColumnChart status="Draft" />
               </Box>
               <Text
                 fontSize="3xl"
@@ -242,7 +271,7 @@ const Month = () => {
                 Review
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart type={type} status="Review" />
+                <StackedColumnChart status="Review" />
               </Box>
 
               <Text
@@ -254,7 +283,7 @@ const Month = () => {
                 Last Call
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart type={type} status="Last Call" />
+                <StackedColumnChart status="Last Call" />
               </Box>
 
               <Text
@@ -266,7 +295,7 @@ const Month = () => {
                 Living
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart type={type} status="Living" />
+                <StackedColumnChart status="Living" />
               </Box>
 
               <Text
@@ -278,7 +307,7 @@ const Month = () => {
                 Final
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart type={type} status="Final" />
+                <StackedColumnChart status="Final" />
               </Box>
 
               <Text
@@ -290,7 +319,7 @@ const Month = () => {
                 Stagnant
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart type={type} status="Stagnant" />
+                <StackedColumnChart status="Stagnant" />
               </Box>
 
               <Text
@@ -302,7 +331,7 @@ const Month = () => {
                 Withdrawn
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart type={type} status="Withdrawn" />
+                <StackedColumnChart status="Withdrawn" />
               </Box>
             </Box>
           </motion.div>
