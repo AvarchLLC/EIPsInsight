@@ -151,6 +151,11 @@ const InsightTable: React.FC<TabProps> = ({
 
       newData = finalStatusChanges.map((item: StatusChange) => {
         const { eip, title, author, status, type, category, deadline } = item;
+        const commitLink = `https://github.com/ethereum/${
+          Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
+        }/commits/master/${
+          Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
+        }/${Tabletype}-${eip}.md`;
 
         return {
           sr: srNo++, // Add the serial number and increment it
@@ -161,6 +166,7 @@ const InsightTable: React.FC<TabProps> = ({
           type,
           category,
           deadline,
+          commitLink,
         };
       });
     } else if (status === "Draft") {
@@ -168,6 +174,11 @@ const InsightTable: React.FC<TabProps> = ({
 
       newData = finalStatusChanges.map((item: StatusChange) => {
         const { eip, title, author, status, type, category, created } = item;
+        const commitLink = `https://github.com/ethereum/${
+          Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
+        }/commits/master/${
+          Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
+        }/${Tabletype}-${eip}.md`;
 
         return {
           sr: srNo++, // Add the serial number and increment it
@@ -178,6 +189,7 @@ const InsightTable: React.FC<TabProps> = ({
           type,
           category,
           created,
+          commitLink,
         };
       });
     } else if (status === "Final") {
@@ -194,6 +206,11 @@ const InsightTable: React.FC<TabProps> = ({
           created,
           changeDate,
         } = item;
+        const commitLink = `https://github.com/ethereum/${
+          Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
+        }/commits/master/${
+          Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
+        }/${Tabletype}-${eip}.md`;
 
         return {
           sr: srNo++, // Add the serial number and increment it
@@ -205,6 +222,7 @@ const InsightTable: React.FC<TabProps> = ({
           category,
           created,
           changeDate,
+          commitLink,
         };
       });
     } else {

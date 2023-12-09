@@ -1,5 +1,5 @@
 import AllLayout from "@/components/Layout";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import {
@@ -15,12 +15,14 @@ import {
   Tr,
   Wrap,
   WrapItem,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { motion } from "framer-motion";
 import Prog from "@/components/Prog";
+
 interface EIP {
   _id: string;
   eip: string;
@@ -57,6 +59,7 @@ const getStatus = (status: string) => {
       return "Final";
   }
 };
+import EIPMD from "@/components/EIPMD";
 
 interface ContentData {
   content: string;
@@ -72,56 +75,9 @@ interface ContentData {
 // };
 
 const EIP = () => {
-  const pathname = usePathname();
-  const pathnameParts = pathname ? pathname.split("/") : [];
-  const part = pathnameParts[1] || "";
-  const number = part.split("-")[1];
-  const cat = part.split("-")[0];
-  const [data, setData] = useState<EIP | null>(null); // Set initial state as null
-  const [con, setcon] = useState<ContentData | undefined>(undefined);
-
-  const fetchContent = async () => {
-    try {
-      if (cat === "erc") {
-        const response = await fetch(`/api/new/erccontent/${number}`);
-        const jsonD = await response.json();
-        setcon(jsonD);
-      } else {
-        const response = await fetch(`/api/new/eipcontent/${number}`);
-        const jsonD = await response.json();
-        setcon(jsonD);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (cat === "erc") {
-          const response = await fetch(`/api/ercs/${number}`);
-          const jsonData = await response.json();
-          console.log(jsonData);
-          setData(jsonData);
-        } else {
-          const response = await fetch(`/api/eips/${number}`);
-          const jsonData = await response.json();
-          console.log(jsonData);
-          setData(jsonData);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-    fetchContent();
-  }, [number]); // Add thirdPart as a dependency to re-fetch data when it changes
-
   return (
     <AllLayout>
-      <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
+      {/* <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
         {data !== null ? (
           <>
             <motion.div
@@ -139,7 +95,7 @@ const EIP = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {/* <StatusContent status={data.status} /> */}
+             
               <TableContainer paddingTop={6}>
                 <Table variant="striped" minW="50%" maxH="50%" layout="fixed">
                   <Tbody>
@@ -163,7 +119,7 @@ const EIP = () => {
                 </Table>
               </TableContainer>
             </motion.div>
-            {/* ... Other content with animations */}
+            
             {con !== undefined ? (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -229,7 +185,9 @@ const EIP = () => {
         ) : (
           <Text>No data found.</Text>
         )}
-      </Box>
+      </Box> */}
+
+      <EIPMD />
     </AllLayout>
   );
 };

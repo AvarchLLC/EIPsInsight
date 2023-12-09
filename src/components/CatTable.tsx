@@ -160,7 +160,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/eip-${item.eip}`}
+                        href={`/${cat === "ERC" ? "erc" : "eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
@@ -178,7 +178,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/eip-${item.eip}`}
+                        href={`/${cat === "ERC" ? "erc" : "eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
