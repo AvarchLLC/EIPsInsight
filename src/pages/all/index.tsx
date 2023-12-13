@@ -52,7 +52,7 @@ const All = () => {
           {selected === "RIP" ? (
             <>
               <h1 className="text-3xl text-center h-[70dvh] justify-center items-center flex">
-                No Rolling Improvement Proposals have been made yet
+                No Rolling Improvement Proposals have been merged yet
               </h1>
             </>
           ) : (
