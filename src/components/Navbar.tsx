@@ -45,6 +45,10 @@ const Navbar: React.FC = () => {
       href: `/erc`,
     },
     {
+      label: "RIP",
+      href: `/rip`,
+    },
+    {
       label: "Insight",
       children: [
         {

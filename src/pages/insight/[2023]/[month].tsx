@@ -226,7 +226,7 @@ const Month = () => {
               ) : typeData.length === 0 && type === "RIPs" ? (
                 <>
                   <h1 className="text-3xl text-center pt-8 justify-center items-center flex">
-                    No Rolling Improvement Proposals have been made yet
+                    No Rolling Improvement Proposals have been merged yet.
                   </h1>
                 </>
               ) : (
