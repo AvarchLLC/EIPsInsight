@@ -212,7 +212,7 @@ const Month = () => {
                   RIPs Insight
                 </button>
               </Box>
-              {typeData.length === 0 && type !== "RIPs" ? (
+              {typeData.length === 0 ? (
                 <>
                   <Box paddingY={8}>
                     <p className={"text-2xl"}>

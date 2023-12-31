@@ -158,7 +158,13 @@ const CustomBox: React.FC<CustomBoxProps> = ({
                 <Td>
                   <Link
                     href={`/monthly/${
-                      type === "EIPs" ? "eip" : type === "ERCs" ? "erc" : "eip"
+                      type === "EIPs"
+                        ? "eip"
+                        : type === "ERCs"
+                        ? "erc"
+                        : type === "RIPs"
+                        ? "rip"
+                        : "eip"
                     }/${year}/${month}/${getStatus(entry._id)}`}
                     className="text-blue-400 hover:cursor-pointer font-semibold"
                   >

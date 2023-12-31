@@ -116,6 +116,8 @@ const InsightTable: React.FC<TabProps> = ({
           setData(jsonData.erc);
         } else if (Tabletype === "eip") {
           setData(jsonData.eip);
+        } else if (Tabletype === "rip") {
+          setData(jsonData.rip);
         } else {
           setData(jsonData.eip);
         }
@@ -356,7 +358,7 @@ const InsightTable: React.FC<TabProps> = ({
               scopedColumns={{
                 sr: (item: any) => (
                   <td key={item.eip}>
-                    <Link href={`/EIPS/${item.eip}`}>
+                    <Link href={`/${Tabletype}-${item.eip}`}>
                       <Wrap>
                         <WrapItem>
                           <Badge colorScheme={getStatusColor(item.status)}>
@@ -369,7 +371,7 @@ const InsightTable: React.FC<TabProps> = ({
                 ),
                 eip: (item: any) => (
                   <td key={item.eip}>
-                    <Link href={`/EIPS/${item.eip}`}>
+                    <Link href={`/${Tabletype}-${item.eip}`}>
                       <Wrap>
                         <WrapItem>
                           <Badge colorScheme={getStatusColor(item.status)}>
@@ -387,7 +389,7 @@ const InsightTable: React.FC<TabProps> = ({
                     className="hover:text-[#1c7ed6]"
                   >
                     <Link
-                      href={`/EIPS/${item.eip}`}
+                      href={`/${Tabletype}-${item.eip}`}
                       className={
                         isDarkMode
                           ? "hover:text-[#1c7ed6] text-[13px] text-white"

@@ -25,17 +25,17 @@ const mdFilesSchema = new mongoose.Schema({
   created: { type: String },
 });
 
-const EIPMdFiles =
-  mongoose.models.EipMdFiles || mongoose.model("EipMdFiles", mdFilesSchema);
+const RIPMdFiles =
+  mongoose.models.RipMdFiles || mongoose.model("RipMdFiles", mdFilesSchema);
 
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");
   const eipNumber = parseInt(parts[3]);
 
-  EIPMdFiles.findOne({ eip: eipNumber })
+  RIPMdFiles.findOne({ eip: eipNumber })
     .then((eip: any) => {
       if (eip) {
-        res.json({ ...eip, repo: "eip" });
+        res.json({ ...eip, repo: "rip" });
       } else {
         res.status(404).json({ error: "EIP not found" });
       }
