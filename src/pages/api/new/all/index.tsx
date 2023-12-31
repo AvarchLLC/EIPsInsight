@@ -29,32 +29,8 @@ const EIPMdFiles =
   mongoose.models.EipMdFiles || mongoose.model("EipMdFiles", mdFilesSchema);
 const ERCMdFiles =
   mongoose.models.ErcMdFiles || mongoose.model("ErcMdFiles", mdFilesSchema);
-
-// export default async (req: Request, res: Response) => {
-// const EIPResult = await EIPMdFiles.aggregate([
-//   {
-//     $sort: {
-//       _id: 1, // Sort by status in ascending order
-//     },
-//   },
-// ]).catch((error: any) => {
-//   console.error("Error retrieving EIPs:", error);
-//   res.status(500).json({ error: "Internal server error" });
-// });
-
-//   const ERCResult = await ERCMdFiles.aggregate([
-//     {
-//       $sort: {
-//         _id: 1, // Sort by status in ascending order
-//       },
-//     },
-//   ]).catch((error: any) => {
-//     console.error("Error retrieving EIPs:", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   });
-
-//   res.json({ eip: EIPResult, erc: ERCResult });
-// };
+const RIPMdFiles =
+  mongoose.models.RipMdFiles || mongoose.model("RipMdFiles", mdFilesSchema);
 
 export default async (req: Request, res: Response) => {
   try {
@@ -79,7 +55,15 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    res.json({ eip: eipResult, erc: ercResult });
+    const ripResult = await RIPMdFiles.aggregate([
+      {
+        $sort: {
+          _id: 1, // Sort by status in ascending order
+        },
+      },
+    ]);
+
+    res.json({ eip: eipResult, erc: ercResult, rip: ripResult });
   } catch (error: any) {
     console.error("Error retrieving EIPs:", error.message);
     res.status(500).json({ error: "Internal server error" });

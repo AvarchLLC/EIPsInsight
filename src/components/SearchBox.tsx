@@ -63,7 +63,7 @@ const SearchBox: React.FC = () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setEipData(jsonData.eip.concat(jsonData.erc));
+        setEipData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -109,6 +109,7 @@ const SearchBox: React.FC = () => {
     type: string
   ) => {
     if (type === "ERC") window.location.href = `/erc-${selectedEIPNumber}`;
+    else if (type === "RIP") window.location.href = `/rip-${selectedEIPNumber}`;
     else window.location.href = `/eip-${selectedEIPNumber}`;
     return selectedEIPNumber;
   };
@@ -161,8 +162,12 @@ const SearchBox: React.FC = () => {
                       }
                       className={"py-2"}
                     >
-                      {result.category === "ERC" ? "ERC" : "EIP"} Number:{" "}
-                      {result.eip}
+                      {result.category === "ERC"
+                        ? "ERC"
+                        : result.category === "RIP"
+                        ? "RIP"
+                        : "EIP"}{" "}
+                      Number: {result.eip}
                     </option>
                   ))}
                 </select>

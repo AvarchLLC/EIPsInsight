@@ -56,6 +56,10 @@ const ErcStatusChange =
   mongoose.models.ErcStatusChange ||
   mongoose.model("ErcStatusChange", statusChangeSchema, "ercstatuschanges");
 
+const RipStatusChange =
+  mongoose.models.RipStatusChange ||
+  mongoose.model("RipStatusChange", statusChangeSchema, "ripstatuschanges");
+
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");
   const year = parseInt(parts[4]);
@@ -71,6 +75,24 @@ export default async (req: Request, res: Response) => {
 
     // Query the database for status changes within the specified date range
     const EipstatusChanges = await EipStatusChange.aggregate([
+      {
+        $match: {
+          changeDate: { $gte: startDate, $lte: endDate },
+          category: {
+            $ne: "ERC",
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$toStatus",
+          count: { $sum: 1 },
+          statusChanges: { $push: "$$ROOT" },
+        },
+      },
+    ]);
+
+    const RipstatusChanges = await RipStatusChange.aggregate([
       {
         $match: {
           changeDate: { $gte: startDate, $lte: endDate },
@@ -107,6 +129,7 @@ export default async (req: Request, res: Response) => {
       res.json({
         eip: EipstatusChanges,
         erc: FrozenErcStatusChanges,
+        rip: RipstatusChanges,
       });
     } else if (yearNum < 2023 || (yearNum === 2023 && monthNum <= 11)) {
       const FrozenErcStatusChanges = await EipStatusChange.aggregate([
@@ -139,6 +162,7 @@ export default async (req: Request, res: Response) => {
       res.json({
         eip: EipstatusChanges,
         erc: [...ErcstatusChanges, ...FrozenErcStatusChanges],
+        rip: RipstatusChanges,
       });
     } else {
       const ErcstatusChanges = await ErcStatusChange.aggregate([
@@ -151,7 +175,11 @@ export default async (req: Request, res: Response) => {
           },
         },
       ]);
-      res.json({ eip: EipstatusChanges, erc: ErcstatusChanges });
+      res.json({
+        eip: EipstatusChanges,
+        erc: ErcstatusChanges,
+        rip: RipstatusChanges,
+      });
     }
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });

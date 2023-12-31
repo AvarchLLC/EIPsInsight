@@ -56,6 +56,10 @@ const ErcStatusChange =
   mongoose.models.ErcStatusChange ||
   mongoose.model("ErcStatusChange", statusChangeSchema, "ercstatuschanges");
 
+const RipStatusChange =
+  mongoose.models.RipStatusChange ||
+  mongoose.model("RipStatusChange", statusChangeSchema, "ripstatuschanges");
+
 export default async (req: Request, res: Response) => {
   try {
     const EipfinalStatusByYear = await EipStatusChange.aggregate([
@@ -182,9 +186,47 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
+    const RipfinalStatusByYear = await RipStatusChange.aggregate([
+      {
+        $sort: { eip: 1, changeDate: 1 }, // Sort by EIP and change date
+      },
+      {
+        $group: {
+          _id: { year: { $year: "$changeDate" }, eip: "$eip" },
+          lastStatus: { $last: "$toStatus" },
+          eipTitle: { $last: "$title" },
+          eipCategory: { $last: "$category" }, // Include the category field
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.year",
+          statusChanges: {
+            $push: {
+              eip: "$_id.eip",
+              lastStatus: "$lastStatus",
+              eipTitle: "$eipTitle",
+              eipCategory: "$eipCategory", // Include the category field
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id",
+          statusChanges: 1,
+        },
+      },
+      {
+        $sort: { year: 1 },
+      },
+    ]);
+
     res.json({
       eip: EipfinalStatusByYear,
       erc: [...ErcfinalStatusByYear, ...FrozenErcData],
+      rip: RipfinalStatusByYear,
     });
   } catch (error) {
     console.log("Error:", error);
