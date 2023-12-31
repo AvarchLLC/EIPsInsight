@@ -39,7 +39,7 @@ export default async (req: Request, res: Response) => {
       return res.status(404).json({ message: "EIP not found" });
     }
 
-    res.json(eip);
+    res.json({ ...eip, repo: "eip" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });

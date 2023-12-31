@@ -39,12 +39,14 @@ interface StatusChange {
     createdMonth: number;
     createdYear: number;
     __v: number;
+    repo: string;
   }[];
 }
 
 interface APIData {
   erc: StatusChange[];
   eip: StatusChange[];
+  rip: StatusChange[];
 }
 
 const getStatus = (status: string) => {
@@ -100,6 +102,8 @@ const Month = () => {
           setTypeData(jsonData.eip);
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
+        } else if (type === "RIPs" && jsonData.rip) {
+          setTypeData(jsonData.rip);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -198,7 +202,7 @@ const Month = () => {
                 </button>
                 <button
                   onClick={() => {
-                    setTypeData([]);
+                    setTypeData(data?.rip || []);
                     setType("RIPs");
                   }}
                   className={
@@ -222,12 +226,6 @@ const Month = () => {
                       insights?
                     </p>
                   </Box>
-                </>
-              ) : typeData.length === 0 && type === "RIPs" ? (
-                <>
-                  <h1 className="text-3xl text-center pt-8 justify-center items-center flex">
-                    No Rolling Improvement Proposals have been merged yet.
-                  </h1>
                 </>
               ) : (
                 <Box

@@ -19,6 +19,7 @@ interface EIP {
   deadline: string;
   requires: string;
   unique_ID: number;
+  repo: string;
   __v: number;
 }
 
@@ -109,7 +110,6 @@ const SearchBox: React.FC = () => {
     type: string
   ) => {
     if (type === "ERC") window.location.href = `/erc-${selectedEIPNumber}`;
-    else if (type === "RIP") window.location.href = `/rip-${selectedEIPNumber}`;
     else window.location.href = `/eip-${selectedEIPNumber}`;
     return selectedEIPNumber;
   };
@@ -158,16 +158,11 @@ const SearchBox: React.FC = () => {
                       key={result.eip}
                       value={result.eip}
                       onClick={() =>
-                        EIPhandleSearchResultClick(result.eip, result.category)
+                        EIPhandleSearchResultClick(result.eip, result.repo)
                       }
                       className={"py-2"}
                     >
-                      {result.category === "ERC"
-                        ? "ERC"
-                        : result.category === "RIP"
-                        ? "RIP"
-                        : "EIP"}{" "}
-                      Number: {result.eip}
+                      {result.repo.toUpperCase()} Number: {result.eip}
                     </option>
                   ))}
                 </select>

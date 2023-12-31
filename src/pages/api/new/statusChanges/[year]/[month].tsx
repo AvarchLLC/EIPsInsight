@@ -77,6 +77,7 @@ export default async (req: Request, res: Response) => {
     const EipstatusChanges = await EipStatusChange.aggregate([
       {
         $match: {
+          eip: { $nin: ["7212"] },
           changeDate: { $gte: startDate, $lte: endDate },
           category: {
             $ne: "ERC",
@@ -110,6 +111,14 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
+    const eipFinal = EipstatusChanges.map((item: any) => {
+      return { ...item, repo: "eip" };
+    });
+
+    const ripFinal = RipstatusChanges.map((item: any) => {
+      return { ...item, repo: "rip" };
+    });
+
     if (yearNum === 2023 && monthNum === 10) {
       const FrozenErcStatusChanges = await EipStatusChange.aggregate([
         {
@@ -126,10 +135,14 @@ export default async (req: Request, res: Response) => {
           },
         },
       ]);
+
+      const ercFrozenFinal = FrozenErcStatusChanges.map((item: any) => {
+        return { ...item, repo: "erc" };
+      });
       res.json({
-        eip: EipstatusChanges,
-        erc: FrozenErcStatusChanges,
-        rip: RipstatusChanges,
+        eip: eipFinal,
+        erc: ercFrozenFinal,
+        rip: ripFinal,
       });
     } else if (yearNum < 2023 || (yearNum === 2023 && monthNum <= 11)) {
       const FrozenErcStatusChanges = await EipStatusChange.aggregate([
@@ -148,6 +161,10 @@ export default async (req: Request, res: Response) => {
         },
       ]);
 
+      const ercFrozenFinal = FrozenErcStatusChanges.map((item: any) => {
+        return { ...item, repo: "erc" };
+      });
+
       const ErcstatusChanges = await ErcStatusChange.aggregate([
         { $match: { changeDate: { $gte: startDate, $lte: endDate } } },
         {
@@ -159,10 +176,14 @@ export default async (req: Request, res: Response) => {
         },
       ]);
 
+      const ercFinal = ErcstatusChanges.map((item: any) => {
+        return { ...item, repo: "erc" };
+      });
+
       res.json({
-        eip: EipstatusChanges,
-        erc: [...ErcstatusChanges, ...FrozenErcStatusChanges],
-        rip: RipstatusChanges,
+        eip: eipFinal,
+        erc: [...ercFinal, ...ercFrozenFinal],
+        rip: ripFinal,
       });
     } else {
       const ErcstatusChanges = await ErcStatusChange.aggregate([
@@ -175,11 +196,11 @@ export default async (req: Request, res: Response) => {
           },
         },
       ]);
-      res.json({
-        eip: EipstatusChanges,
-        erc: ErcstatusChanges,
-        rip: RipstatusChanges,
+
+      const ercFinal = ErcstatusChanges.map((item: any) => {
+        return { ...item, repo: "erc" };
       });
+      res.json({ eip: eipFinal, erc: ercFinal, rip: ripFinal });
     }
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });

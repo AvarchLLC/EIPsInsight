@@ -32,11 +32,38 @@ const ERCMdFiles =
 const RIPMdFiles =
   mongoose.models.RipMdFiles || mongoose.model("RipMdFiles", mdFilesSchema);
 
+// export default async (req: Request, res: Response) => {
+// const EIPResult = await EIPMdFiles.aggregate([
+//   {
+//     $sort: {
+//       _id: 1, // Sort by status in ascending order
+//     },
+//   },
+// ]).catch((error: any) => {
+//   console.error("Error retrieving EIPs:", error);
+//   res.status(500).json({ error: "Internal server error" });
+// });
+
+//   const ERCResult = await ERCMdFiles.aggregate([
+//     {
+//       $sort: {
+//         _id: 1, // Sort by status in ascending order
+//       },
+//     },
+//   ]).catch((error: any) => {
+//     console.error("Error retrieving EIPs:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   });
+
+//   res.json({ eip: EIPResult, erc: ERCResult });
+// };
+
 export default async (req: Request, res: Response) => {
   try {
     const eipResult = await EIPMdFiles.aggregate([
       {
         $match: {
+          eip: { $nin: ["7212"] },
           category: { $nin: ["ERC", "ERCs"] },
         },
       },
@@ -47,6 +74,10 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
+    const eipModified = eipResult.map((item: any) => {
+      return { ...item, repo: "eip" };
+    });
+
     const ercResult = await ERCMdFiles.aggregate([
       {
         $sort: {
@@ -54,6 +85,10 @@ export default async (req: Request, res: Response) => {
         },
       },
     ]);
+
+    const ercModified = ercResult.map((item: any) => {
+      return { ...item, repo: "erc" };
+    });
 
     const ripResult = await RIPMdFiles.aggregate([
       {
@@ -63,7 +98,11 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    res.json({ eip: eipResult, erc: ercResult, rip: ripResult });
+    const ripModified = ripResult.map((item: any) => {
+      return { ...item, repo: "rip" };
+    });
+
+    res.json({ eip: eipModified, erc: ercModified, rip: ripModified });
   } catch (error: any) {
     console.error("Error retrieving EIPs:", error.message);
     res.status(500).json({ error: "Internal server error" });

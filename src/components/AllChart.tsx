@@ -107,6 +107,7 @@ const categoryBorder: string[] = [
 interface APIResponse {
   eip: EIP[];
   erc: EIP[];
+  rip: EIP[];
 }
 
 interface ChartProps {

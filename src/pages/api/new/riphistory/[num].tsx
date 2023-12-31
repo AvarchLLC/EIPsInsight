@@ -45,7 +45,7 @@ const eipHistorySchema = new mongoose.Schema({
   message: { type: String },
 });
 
-const RipHistory =
+const ErcHistory =
   mongoose.models.RipHistory || mongoose.model("RipHistory", eipHistorySchema);
 
 export default async (req: Request, res: Response) => {
@@ -54,12 +54,12 @@ export default async (req: Request, res: Response) => {
 
   try {
     if (isNaN(eipNumber)) {
-      return res.status(400).json({ message: "Invalid EIP number" });
+      return res.status(400).json({ message: "Invalid RIP number" });
     }
 
-    const ripHistory = await RipHistory.find({ eip: eipNumber });
+    const ercHistory = await ErcHistory.find({ eip: eipNumber });
 
-    res.json(ripHistory);
+    res.json({ ...ercHistory, repo: "rip" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });

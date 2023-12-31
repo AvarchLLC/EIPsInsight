@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Box, Icon, useColorModeValue, Text } from "@chakra-ui/react";
+import DateTime from "@/components/DateTime";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -34,20 +36,14 @@ interface EIP {
   __v: number;
 }
 
-interface APIResponse {
-  eip: EIP[];
-  erc: EIP[];
-  rip: EIP[];
-}
-
-const DashboardDonut = () => {
-  const [data, setData] = useState<APIResponse>();
+const RIPStatusDonut = () => {
+  const [data, setData] = useState<EIP[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData);
+        setData(jsonData.rip);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -55,36 +51,35 @@ const DashboardDonut = () => {
 
     fetchData();
   }, []);
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data.rip)) || [];
 
   const dat = [
     {
       status: "Final",
-      value: allData.filter((item) => item.status === "Final").length,
+      value: data.filter((item) => item.status === "Final").length,
     },
     {
       status: "Draft",
-      value: allData.filter((item) => item.status === "Draft").length,
+      value: data.filter((item) => item.status === "Draft").length,
     },
     {
       status: "Review",
-      value: allData.filter((item) => item.status === "Review").length,
+      value: data.filter((item) => item.status === "Review").length,
     },
     {
       status: "Last Call",
-      value: allData.filter((item) => item.status === "Last Call").length,
+      value: data.filter((item) => item.status === "Last Call").length,
     },
     {
       status: "Living",
-      value: allData.filter((item) => item.status === "Living").length,
+      value: data.filter((item) => item.status === "Living").length,
     },
     {
       status: "Stagnant",
-      value: allData.filter((item) => item.status === "Stagnant").length,
+      value: data.filter((item) => item.status === "Stagnant").length,
     },
     {
       status: "Withdrawn",
-      value: allData.filter((item) => item.status === "Withdrawn").length,
+      value: data.filter((item) => item.status === "Withdrawn").length,
     },
   ];
   const Area = dynamic(
@@ -149,11 +144,28 @@ const DashboardDonut = () => {
     },
   };
 
+  const bg = useColorModeValue("#f6f6f7", "#171923");
   return (
     <>
-      <Area {...config} />
+      <Box bg={bg} borderRadius="0.55rem">
+        <a href="/erctable">
+          <Text
+            fontSize="2xl"
+            fontWeight="bold"
+            color="#30A0E0"
+            marginX="6"
+            paddingY={4}
+          >
+            {` Status - [${data.length}]`}
+          </Text>
+        </a>
+        <Area {...config} />
+        <Box className={"w-full"}>
+          <DateTime />
+        </Box>
+      </Box>
     </>
   );
 };
 
-export default DashboardDonut;
+export default RIPStatusDonut;

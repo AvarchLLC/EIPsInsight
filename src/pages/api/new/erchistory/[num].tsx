@@ -59,7 +59,7 @@ export default async (req: Request, res: Response) => {
 
     const ercHistory = await ErcHistory.find({ eip: eipNumber });
 
-    res.json(ercHistory);
+    res.json({ ...ercHistory, repo: "erc" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });

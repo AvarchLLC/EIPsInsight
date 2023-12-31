@@ -58,6 +58,7 @@ interface EIP {
 interface APIResponse {
   eip: EIP[];
   erc: EIP[];
+  rip: EIP[];
 }
 
 const Dashboard = () => {
@@ -80,7 +81,7 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
-  const allData: EIP[] = data?.eip.concat(data?.erc) || [];
+  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
 
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
