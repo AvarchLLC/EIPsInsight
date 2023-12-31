@@ -93,6 +93,8 @@ const Insi = () => {
           setData(jsonData.erc);
         } else if (type === "eip") {
           setData(jsonData.eip);
+        } else if (type === "rip") {
+          setData(jsonData.rip);
         } else {
           setData(jsonData.eip);
         }

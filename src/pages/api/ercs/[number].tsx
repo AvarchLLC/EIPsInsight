@@ -35,7 +35,7 @@ export default async (req: Request, res: Response) => {
   ERCMdFiles.findOne({ eip: eipNumber })
     .then((eip: any) => {
       if (eip) {
-        res.json(eip);
+        res.json({ ...eip, repo: "erc" });
       } else {
         res.status(404).json({ error: "EIP not found" });
       }

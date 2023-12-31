@@ -52,8 +52,12 @@ const Navbar: React.FC = () => {
       label: "Insight",
       children: [
         {
-          label: "2023",
+          label: "2024",
           children: getMonthsTillCurrentYear(),
+        },
+        {
+          label: "2023",
+          children: getMonthsTillYear(2023),
         },
         {
           label: "2022",
