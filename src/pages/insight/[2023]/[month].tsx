@@ -218,9 +218,9 @@ const Month = () => {
                     <p className={"text-2xl"}>
                       There is no data available for this month. Would you like
                       to see{" "}
-                      <NextLink href={`/insight/${year}/${prevMonth}`}>
+                      <NextLink href={`/insight/2023/12`}>
                         <span className={"text-blue-400 font-bold"}>
-                          {prevMonthName} {year}
+                          December 2023
                         </span>
                       </NextLink>{" "}
                       insights?
