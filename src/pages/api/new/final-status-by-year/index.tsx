@@ -55,12 +55,16 @@ const EipStatusChange =
 const ErcStatusChange =
   mongoose.models.ErcStatusChange ||
   mongoose.model("ErcStatusChange", statusChangeSchema, "ercstatuschanges");
+const RipStatusChange =
+  mongoose.models.RipStatusChange ||
+  mongoose.model("RipStatusChange", statusChangeSchema, "ripstatuschanges");
 
 export default async (req: Request, res: Response) => {
   try {
     const EipfinalStatusByYear = await EipStatusChange.aggregate([
       {
         $match: {
+          eip: { $nin: ["7212"] },
           category: { $nin: ["ERC", "ERCs", "Standards Track - ERC"] },
         },
       },
@@ -182,9 +186,66 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
+    const RipfinalStatusByYear = await RipStatusChange.aggregate([
+      {
+        $match: { changeDate: { $gte: new Date("2023-11-01T00:00:00.000Z") } },
+      },
+      {
+        $sort: { eip: 1, changeDate: 1 }, // Sort by EIP and change date
+      },
+      {
+        $group: {
+          _id: { year: { $year: "$changeDate" }, eip: "$eip" },
+          lastStatus: { $last: "$toStatus" },
+          eipTitle: { $last: "$title" },
+          eipCategory: { $last: "$category" }, // Include the category field
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.year",
+          statusChanges: {
+            $push: {
+              eip: "$_id.eip",
+              lastStatus: "$lastStatus",
+              eipTitle: "$eipTitle",
+              eipCategory: "$eipCategory", // Include the category field
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id",
+          statusChanges: 1,
+        },
+      },
+      {
+        $sort: { year: 1 },
+      },
+    ]);
+
+    const eipFinal = EipfinalStatusByYear.map((item: any) => {
+      return { ...item, repo: "eip" };
+    });
+
+    const ercFinal = ErcfinalStatusByYear.map((item: any) => {
+      return { ...item, repo: "erc" };
+    });
+
+    const ercFrozenFinal = FrozenErcData.map((item: any) => {
+      return { ...item, repo: "erc" };
+    });
+
+    const ripFinal = RipfinalStatusByYear.map((item: any) => {
+      return { ...item, repo: "rip" };
+    });
+
     res.json({
-      eip: EipfinalStatusByYear,
-      erc: [...ErcfinalStatusByYear, ...FrozenErcData],
+      eip: eipFinal,
+      erc: [...ercFinal, ...ercFrozenFinal],
+      rip: ripFinal,
     });
   } catch (error) {
     console.log("Error:", error);

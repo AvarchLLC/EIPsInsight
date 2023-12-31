@@ -59,7 +59,7 @@ export default async (req: Request, res: Response) => {
 
     const eipHistory = await EipHistory.find({ eip: eipNumber });
 
-    res.json(eipHistory);
+    res.json({ ...eipHistory, repo: "eip" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });

@@ -19,6 +19,7 @@ interface EIP {
   deadline: string;
   requires: string;
   unique_ID: number;
+  repo: string;
   __v: number;
 }
 
@@ -63,7 +64,7 @@ const SearchBox: React.FC = () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setEipData(jsonData.eip.concat(jsonData.erc));
+        setEipData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -157,12 +158,11 @@ const SearchBox: React.FC = () => {
                       key={result.eip}
                       value={result.eip}
                       onClick={() =>
-                        EIPhandleSearchResultClick(result.eip, result.category)
+                        EIPhandleSearchResultClick(result.eip, result.repo)
                       }
                       className={"py-2"}
                     >
-                      {result.category === "ERC" ? "ERC" : "EIP"} Number:{" "}
-                      {result.eip}
+                      {result.repo.toUpperCase()} Number: {result.eip}
                     </option>
                   ))}
                 </select>

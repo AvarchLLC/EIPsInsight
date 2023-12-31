@@ -80,6 +80,7 @@ interface EIP {
 interface GrpahsProps {
   eip: EIP[];
   erc: EIP[];
+  rip: EIP[];
 }
 
 interface EIP2 {
@@ -96,6 +97,7 @@ interface EIP2 {
   requires: string;
   unique_ID: number;
   __v: number;
+  repo: string;
 }
 
 interface FormattedEIP {
@@ -168,6 +170,8 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
           setData2(jsonData.eip);
         } else if (type === "ERCs") {
           setData2(jsonData.erc);
+        } else if (type === "RIPs") {
+          setData(jsonData.rip);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -189,6 +193,8 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
           setTypeData(jsonData.eip);
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
+        } else if (type === "RIPs" && jsonData.erc) {
+          setTypeData(jsonData.rip);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -203,6 +209,8 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
       setTypeData(data?.eip || []);
     } else if (type === "ERCs") {
       setTypeData(data?.erc || []);
+    } else if (type === "RIPs") {
+      setTypeData(data?.rip || []);
     }
   });
 
@@ -270,7 +278,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
   );
   if (type === "ERCs") {
     filteredData = formattedData;
-  } else {
+  } else if (type === "EIPs") {
     filteredData = formattedData.filter(
       (item: any) => item.category !== "ERCs"
     );
