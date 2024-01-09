@@ -1,27 +1,14 @@
-import AllLayout from "@/components/Layout";
-import React, { useEffect, useState, useRef } from "react";
+"use client";
+import React, { useEffect, useRef, useState, WheelEventHandler } from "react";
 import { usePathname } from "next/navigation";
-import Header from "@/components/Header";
-import {
-  Badge,
-  Box,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  Wrap,
-  WrapItem,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, useColorModeValue } from "@chakra-ui/react";
+
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import Header from "@/components/Header";
 import { motion } from "framer-motion";
-import Prog from "@/components/Prog";
+import LoaderComponent from "./Loader";
 
 interface EIP {
   _id: string;
@@ -39,80 +26,62 @@ interface EIP {
   __v: number;
 }
 
-const getStatus = (status: string) => {
-  switch (status) {
-    case "Draft":
-      return "Draft";
-    case "Final" || "Accepted" || "Superseded":
-      return "Final";
-    case "Last Call":
-      return "Last Call";
-    case "Withdrawn" || "Abandoned" || "Rejected":
-      return "Withdrawn";
-    case "Review":
-      return "Review";
-    case "Living" || "Active":
-      return "Living";
-    case "Stagnant":
-      return "Stagnant";
-    default:
-      return "Final";
-  }
-};
-
-interface ContentData {
-  content: string;
-}
-
-const EIPMD = () => {
-  const [con, setcon] = useState<ContentData | undefined>(undefined);
-
-  const pathname = usePathname();
-  const pathnameParts = pathname ? pathname.split("/") : [];
-  const part = pathnameParts[1] || "";
-  const number = part.split("-")[1];
-  const cat = part.split("-")[0];
-  const [data, setData] = useState<EIP | null>(null); // Set initial state as null
-
-  const bg = useColorModeValue("#f6f6f7", "#171923");
-
-  const fetchContent = async () => {
-    try {
-      if (cat === "erc") {
-        const response = await fetch(`/api/new/erccontent/${number}`);
-        const jsonD = await response.json();
-        setcon(jsonD);
-      } else {
-        const response = await fetch(`/api/new/eipcontent/${number}`);
-        const jsonD = await response.json();
-        setcon(jsonD);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+export default function EIPMD() {
+  let number = "";
+  let cat = "";
+  const path = usePathname();
+  const pathArray = path?.split("/") || [];
+  number = pathArray[1]?.split("-")[1] || "1";
+  cat = pathArray[1]?.split("-")[0] || "eip";
+  const [content, setContent] = useState("");
+  const [data, setData] = useState<EIP>();
+  const [repo, setRepo] = useState("eip");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (cat === "erc") {
-          const response = await fetch(`/api/ercs/${number}`);
-          const jsonData = await response.json();
-          console.log(jsonData);
-          setData(jsonData);
-        } else {
-          const response = await fetch(`/api/eips/${number}`);
-          const jsonData = await response.json();
-          setData(jsonData);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+    const fetchContent = async () => {
+      if (cat === "erc") {
+        const res = await fetch(`/api/new/erccontent/${number}`);
+        const resData = await res.json();
+        setContent(resData._doc.content);
+        setRepo(resData.repo);
+      } else if (cat === "rip") {
+        const res = await fetch(`/api/new/ripcontent/${number}`);
+        const resData = await res.json();
+        setContent(resData._doc.content);
+        setRepo(resData.repo);
+      } else {
+        const res = await fetch(`/api/new/eipcontent/${number}`);
+        const resData = await res.json();
+        setContent(resData._doc.content);
+        setRepo(resData.repo);
       }
     };
-
-    fetchData();
+    const fetchEIP = async () => {
+      if (cat === "erc") {
+        const res = await fetch(`/api/ercs/${number}`);
+        const resData = await res.json();
+        setData(resData._doc);
+        setIsLoading(false);
+      } else if (cat === "rip") {
+        const res = await fetch(`/api/rips/${number}`);
+        const resData = await res.json();
+        setData(resData._doc);
+        setIsLoading(false);
+      } else {
+        const res = await fetch(`/api/eips/${number}`);
+        const resData = await res.json();
+        setData(resData._doc);
+        setIsLoading(false);
+      }
+    };
     fetchContent();
-  }, [number]); // Add thirdPart as a dependency to re-fetch data when it changes
+    fetchEIP();
+  }, [number]);
+
+  const bg = useColorModeValue("#f6f6f7", "#171923");
+  const createdDate = new Date(data?.created || "") || "";
+  const deadlineDate = new Date(data?.deadline || "") || "";
   const [currentIndex, setCurrentIndex] = useState(0);
   const authorRef = useRef<HTMLDivElement | null>(null);
   const authors = data?.author.split(",") || [];
@@ -124,30 +93,25 @@ const EIPMD = () => {
     );
   };
 
-  const date = new Date(data?.created || "") || "";
-
-  function getStatusColor(status: string) {
-    switch (status) {
-      case "Draft":
-        return "#eab308";
-      case "Final" || "Accepted" || "Superseded":
-        return "#3b82f6";
-      case "Last Call":
-        return "#22c55e";
-      case "Withdrawn" || "Abandoned" || "Rejected":
-        return "#ef4444";
-      case "Review":
-        return "#eab308";
-      case "Living" || "Active":
-        return "#171923";
-      case "Stagnant":
-        return "#ef4444";
-      default:
-        return "#171923";
-    }
-  }
-
-  return (
+  return isLoading ? (
+    <>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Your loader component */}
+          <LoaderComponent />
+        </motion.div>
+      </Box>
+    </>
+  ) : (
     <>
       <Box
         paddingBottom={{ lg: "10", sm: "10", base: "10" }}
@@ -155,14 +119,11 @@ const EIPMD = () => {
         paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
         marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
       >
-        <Box paddingBottom={8}>
-          <Header
-            title={`${data?.category === "ERC" ? "ERC" : "EIP"} - ${data?.eip}`}
-            subtitle={`${data?.title}`}
-          />
-        </Box>
-
-        <Box display={"grid"} gridTemplateColumns={"1fr 1fr"} gap={10}>
+        <Header
+          title={`${repo.toUpperCase()} - ${data?.eip}`}
+          subtitle={data?.title || ""}
+        />
+        <Box className="grid grid-cols-2 pt-8">
           <Box
             bg={bg}
             rounded={"0.55rem"}
@@ -171,18 +132,18 @@ const EIPMD = () => {
             className={"overflow-y-auto max-h-[50rem]"}
           >
             <ReactMarkdown
-              children={con?.content || ""}
+              children={content || ""}
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeRaw]}
               components={{
                 h2: ({ node, ...props }) => (
                   <h2
                     style={{
-                      fontSize: "17px",
+                      fontSize: "2.5rem",
                       fontWeight: "bold",
                       color: `#339af0`,
                       // borderBottom: `2px solid #339af0`,
-                      borderLeft: `4px solid #339af0`,
+
                       display: "inline-block",
                     }}
                     className="my-3 px-2 rounded-sm"
@@ -192,11 +153,9 @@ const EIPMD = () => {
                 h1: ({ node, ...props }) => (
                   <h2
                     style={{
-                      fontSize: "22px",
+                      fontSize: "3rem",
                       fontWeight: "bold",
                       color: `#339af0`,
-                      borderBottom: `2px solid #339af0`,
-                      borderLeft: `4px solid #339af0`,
                       display: "inline-block",
                     }}
                     className="my-3 px-2 rounded-sm"
@@ -206,11 +165,9 @@ const EIPMD = () => {
                 h3: ({ node, ...props }) => (
                   <h2
                     style={{
-                      fontSize: "17px",
+                      fontSize: "2rem",
                       fontWeight: "bold",
                       color: `#339af0`,
-                      // borderBottom: `2px solid #339af0`,
-                      borderLeft: `4px solid #339af0`,
                       display: "inline-block",
                     }}
                     className="my-3 px-2 rounded-sm"
@@ -218,54 +175,26 @@ const EIPMD = () => {
                     {props.children}
                   </h2>
                 ),
+                p: ({ node, ...props }) => (
+                  <p
+                    style={{
+                      fontSize: "1.2rem",
+                      display: "inline-block",
+                    }}
+                    className="my-3 px-2 rounded-sm"
+                  >
+                    {props.children}
+                  </p>
+                ),
               }}
             />
           </Box>
 
-          <Box display={"grid"} gridTemplateColumns={"1fr 1fr"} gap={10}>
-            <Box className={"space-y-6"}>
-              <Box
-                bg={bg}
-                className={"px-8 py-4 rounded-xl border-[2px] border-white"}
-              >
-                <h2 className="text-lg font-semibold text-center">
-                  {data?.type}
-                </h2>
-              </Box>
-              <Box
-                bg={bg}
-                className={"px-8 py-4 rounded-xl border-[2px] border-white"}
-              >
-                <h2 className="text-lg font-semibold text-center">
-                  {data?.category}
-                </h2>
-              </Box>
-              <Box
-                bg={bg}
-                className={"px-8 py-4 rounded-xl border-[2px] border-white"}
-              >
-                <h2 className="text-lg font-semibold text-center flex justify-center w-full space-x-4">
-                  <p>Created:</p>
-                  <p>
-                    {date.getDate()}-{getMonth(date.getMonth())}-
-                    {date.getFullYear()}
-                  </p>
-                </h2>
-              </Box>
-              <Box
-                bg={getStatusColor(data?.status || "")}
-                className={`px-8 py-4 rounded-xl border-[2px] border-white`}
-              >
-                <h2 className="text-lg font-semibold text-center">
-                  {data?.status}
-                </h2>
-              </Box>
-            </Box>
-
+          <div className="flex flex-col space-y-8 w-full items-center">
             <Box className="mx-auto" onWheel={handleScroll}>
               <div
                 ref={authorRef}
-                className="w-80 h-80 overflow-y-auto border p-2 rounded-lg shadow-md"
+                className="w-full h-80 overflow-y-auto border p-2 rounded-lg shadow-md"
               >
                 {authors.map((author, index) => (
                   <div
@@ -282,12 +211,123 @@ const EIPMD = () => {
                 ))}
               </div>
             </Box>
-          </Box>
+
+            <div>
+              {data?.type !== "Meta" && data?.type !== "Living" ? (
+                <div className="flex gap-5">
+                  <Box
+                    bg={bg}
+                    className={
+                      "px-8 py-4 rounded-xl border-[2px] border-white w-[20rem]"
+                    }
+                  >
+                    <h2 className="text-lg font-semibold text-center">
+                      {data?.type}
+                    </h2>
+                  </Box>
+                  <Box
+                    bg={bg}
+                    className={
+                      "px-8 py-4 rounded-xl border-[2px] border-white w-[20rem]"
+                    }
+                  >
+                    <h2 className="text-lg font-semibold text-center">
+                      {data?.category}
+                    </h2>
+                  </Box>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="flex gap-5">
+              <Box
+                bg={getStatusColor(data?.status || "")}
+                className={`px-8 py-4 rounded-xl border-[2px] border-white w-[20rem]`}
+              >
+                <h2 className="text-lg font-semibold text-center">
+                  {data?.status}
+                </h2>
+              </Box>
+
+              {data?.status !== "Last Call" && (
+                <Box
+                  bg={bg}
+                  className={
+                    "px-8 py-4 rounded-xl border-[2px] border-white w-[20rem]"
+                  }
+                >
+                  <h2 className="text-lg font-semibold text-center flex justify-center w-full space-x-4">
+                    <p>Created:</p>
+                    <p>
+                      {createdDate.getDate()}-{getMonth(createdDate.getMonth())}
+                      -{createdDate.getFullYear()}
+                    </p>
+                  </h2>
+                </Box>
+              )}
+
+              {data?.status === "Last Call" && (
+                <Box
+                  bg={bg}
+                  className={
+                    "px-8 py-4 rounded-xl border-[2px] border-white w-[20rem]"
+                  }
+                >
+                  <h2 className="text-lg font-semibold text-center flex justify-center w-full space-x-4">
+                    <p>Created:</p>
+                    <p>
+                      {deadlineDate.getDate()}-
+                      {getMonth(deadlineDate.getMonth())}-
+                      {deadlineDate.getFullYear()}
+                    </p>
+                  </h2>
+                </Box>
+              )}
+            </div>
+
+            <div>
+              {data?.discussion && (
+                <Box
+                  bg={bg}
+                  className={
+                    "px-8 py-4 rounded-xl border-[2px] border-white w-[20rem]"
+                  }
+                >
+                  <a href={data?.discussion} target="_blank">
+                    <h2 className="text-lg font-semibold text-center">
+                      Discussion Link
+                    </h2>
+                  </a>
+                </Box>
+              )}
+            </div>
+          </div>
         </Box>
       </Box>
     </>
   );
-};
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case "Draft":
+      return "#eab308";
+    case "Final" || "Accepted" || "Superseded":
+      return "#3b82f6";
+    case "Last Call":
+      return "#22c55e";
+    case "Withdrawn" || "Abandoned" || "Rejected":
+      return "#ef4444";
+    case "Review":
+      return "#eab308";
+    case "Living" || "Active":
+      return "#171923";
+    case "Stagnant":
+      return "#ef4444";
+    default:
+      return "#171923";
+  }
+}
 
 function getMonth(month: number) {
   switch (month) {
@@ -317,4 +357,3 @@ function getMonth(month: number) {
       return "December";
   }
 }
-export default EIPMD;

@@ -260,17 +260,21 @@ const InsightTable: React.FC<TabProps> = ({
   const convertAndDownloadCSV = () => {
     if (filteredData && filteredData.length > 0) {
       const headers = Object.keys(filteredData[0]);
-      headers.push("Commit Link");
-      headers.push("EIP Link");
+      // headers.push("Commit Link");
+      headers.push(`${Tabletype.toUpperCase()} Link`);
       const csvRows = filteredData.map((item) => {
         const values = Object.values(item);
-        const commitLink = `https://github.com/ethereum/${
+        // const commitLink = `https://github.com/ethereum/${
+        //   Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
+        // }/commits/master/${
+        //   Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
+        // }/${Tabletype}-${item.eip}.md`;
+        const eipLink = `github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
-        }/commits/master/${
+        }/blob/master/${
           Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
         }/${Tabletype}-${item.eip}.md`;
-        const eipLink = `github.com/ethereum/EIPs/blob/master/EIPS/eip-${item.eip}.md`;
-        values.push(commitLink);
+        // values.push(commitLink);
         values.push(eipLink);
         return values
           .map((value) =>
