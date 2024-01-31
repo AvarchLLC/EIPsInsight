@@ -207,6 +207,8 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
                   ? "/erctable"
                   : type === "EIP"
                   ? "/eiptable"
+                  : type === "RIP"
+                  ? "/riptable"
                   : "/alltable"
               }
             >

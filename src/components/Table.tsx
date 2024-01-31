@@ -163,8 +163,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
           setData(jsonData.erc);
         } else if (type === "Total") {
           setData(jsonData.eip.concat(jsonData.erc));
-        } else {
-          setData(jsonData.eip.concat(jsonData.erc));
+        } else if (type === "RIP") {
+          setData(jsonData.rip);
         }
         setIsLoading(false); // Set isLoading to false after data is fetched
 
@@ -267,9 +267,13 @@ const Table: React.FC<TableProps> = ({ type }) => {
         selectedMonthRange.start === "" &&
         selectedMonthRange.end === ""
       ) {
-        a.download = `All_EIPs.csv`;
+        a.download = `All_${type.toUpperCase()}s.csv`;
       } else {
-        a.download = `EIP_${selectedStatus}_${selectedCategory}_${selectedMonthRange.start}_${selectedMonthRange.end}_${selectedYearRange.start}_${selectedYearRange.end}.csv`;
+        a.download = `${type.toUpperCase()}_${selectedStatus}_${selectedCategory}_${
+          selectedMonthRange.start
+        }_${selectedMonthRange.end}_${selectedYearRange.start}_${
+          selectedYearRange.end
+        }.csv`;
       }
       document.body.appendChild(a);
       a.click();
