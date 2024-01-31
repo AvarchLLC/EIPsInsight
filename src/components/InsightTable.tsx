@@ -269,7 +269,7 @@ const InsightTable: React.FC<TabProps> = ({
         // }/commits/master/${
         //   Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
         // }/${Tabletype}-${item.eip}.md`;
-        const eipLink = `github.com/ethereum/${
+        const eipLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
         }/blob/master/${
           Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"

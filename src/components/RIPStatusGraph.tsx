@@ -140,7 +140,7 @@ const RIPStatusGraph = () => {
         paddingX={6}
         borderRadius={"0.55rem"}
       >
-        <NextLink href={"/erctable"}>
+        <NextLink href={"/riptable"}>
           <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
             RIP - [{data.length}]
           </Text>

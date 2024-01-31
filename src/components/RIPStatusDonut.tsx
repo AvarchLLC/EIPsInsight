@@ -148,7 +148,7 @@ const RIPStatusDonut = () => {
   return (
     <>
       <Box bg={bg} borderRadius="0.55rem">
-        <a href="/erctable">
+        <a href="/riptable">
           <Text
             fontSize="2xl"
             fontWeight="bold"
