@@ -13,6 +13,7 @@ import Banner from "@/components/NewsBanner";
 import StackedColumnChart from "@/components/DraftBarChart";
 import NextLink from "next/link";
 import InsightDoughnut from "@/components/InsightDoughnut";
+import InsightSummary from "@/components/InsightSummaryTable";
 interface StatusChange {
   _id: string;
   count: number;
@@ -155,7 +156,6 @@ const Month = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Your loader component */}
             <LoaderComponent />
           </motion.div>
         </Box>
@@ -177,7 +177,8 @@ const Month = () => {
                 <Header title={getMonthName(Number(month))} subtitle={year} />
               </NextLink>
 
-              <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold pb-8">
+              <InsightSummary />
+              {/* <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold pb-8">
                 <button
                   onClick={() => {
                     setTypeData(data?.eip || []);
@@ -246,7 +247,7 @@ const Month = () => {
                     <InsightDoughnut data={typeData} />
                   </Box>
                 </Box>
-              )}
+              )} */}
 
               <Text
                 fontSize="3xl"
