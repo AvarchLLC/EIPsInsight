@@ -118,8 +118,8 @@ const InsightTable: React.FC<TabProps> = ({
           setData(jsonData.eip);
         } else if (Tabletype === "rip") {
           setData(jsonData.rip);
-        } else {
-          setData(jsonData.eip);
+        } else if (Tabletype === "all") {
+          setData(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip));
         }
         setIsLoading(false);
       } catch (error) {
