@@ -426,7 +426,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip}>
-                      <Link href={`/EIPS/${item.eip}`}>
+                      <Link href={`/eip-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -439,7 +439,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip}>
-                      <Link href={`/EIPS/${item.eip}`}>
+                      <Link href={`/eip-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -457,7 +457,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/EIPS/${item.eip}`}
+                        href={`/eip-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"

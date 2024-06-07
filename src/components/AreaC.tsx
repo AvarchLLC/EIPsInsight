@@ -319,7 +319,11 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
       }}
       className=" ease-in duration-200"
     >
-      <NextLink href={`/tableStatus/${selectedStatus}`}>
+      <NextLink
+        href={`/tableStatus/${
+          type === "EIPs" ? "eip" : type === "ERCs" ? "erc" : "rip"
+        }/${selectedStatus}`}
+      >
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
           {`Status: ${selectedStatus} - [${
             data2.filter((item) => item.status === selectedStatus).length

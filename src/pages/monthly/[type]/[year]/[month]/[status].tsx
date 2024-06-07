@@ -3,8 +3,6 @@ import AllLayout from "@/components/Layout";
 import { Box, Button } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
-import { DownloadIcon } from "@chakra-ui/icons";
-import TableCatStat from "@/components/TableCatStat";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
