@@ -61,6 +61,7 @@ interface EIP {
   requires: string;
   unique_ID: number;
   __v: number;
+  repo: string;
 }
 
 import "@coreui/coreui/dist/css/coreui.min.css";
@@ -162,7 +163,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
         } else if (type === "ERC") {
           setData(jsonData.erc);
         } else if (type === "Total") {
-          setData(jsonData.eip.concat(jsonData.erc));
+          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         } else if (type === "RIP") {
           setData(jsonData.rip);
         }
@@ -193,7 +194,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
   });
 
   const filteredData = data.map((item: any) => {
-    const { eip, title, author, status, type, category } = item;
+    const { eip, title, author, status, type, category, repo } = item;
     return {
       eip,
       title,
@@ -201,6 +202,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
       status,
       type,
       category,
+      repo,
     };
   });
   const filteredDataWithMergedYearsAndMonths = filteredData.map(
@@ -454,7 +456,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip}>
-                      <Link href={`/EIPS/${item.eip}`}>
+                      <Link href={`${item.repo}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -467,7 +469,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip}>
-                      <Link href={`/EIPS/${item.eip}`}>
+                      <Link href={`${item.repo}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -485,7 +487,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/EIPS/${item.eip}`}
+                        href={`${item.repo}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
@@ -558,6 +560,14 @@ const Table: React.FC<TableProps> = ({ type }) => {
                           </Badge>
                         </WrapItem>
                       </Wrap>
+                    </td>
+                  ),
+                  repo: (item: any) => (
+                    <td
+                      key={item.eip}
+                      className={isDarkMode ? "text-white" : "text-black"}
+                    >
+                      {item.repo.toUpperCase()}S
                     </td>
                   ),
                   mergedYear: (item: any) => (

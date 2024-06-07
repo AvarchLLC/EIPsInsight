@@ -100,6 +100,7 @@ const categoryColors: string[] = [
   "rgb(153, 102, 255)",
   "rgb(255, 99, 255)",
   "rgb(50, 205, 50)",
+  "rgb(255, 255,255)",
   "rgb(255, 0, 0)",
   "rgb(0, 128, 0)",
 ];
@@ -122,6 +123,7 @@ interface AreaCProps {
 interface APIResponse {
   eip: EIP[];
   erc: EIP[];
+  rip: EIP[];
 }
 
 const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
@@ -135,7 +137,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc));
+        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);

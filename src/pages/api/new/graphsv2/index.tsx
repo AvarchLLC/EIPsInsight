@@ -53,6 +53,10 @@ const ErcStatusChange =
   mongoose.models.ErcStatusChange ||
   mongoose.model("ErcStatusChange", statusChangeSchema, "ercstatuschanges");
 
+const RipStatusChange =
+  mongoose.models.RipStatusChange ||
+  mongoose.model("RipStatusChange", statusChangeSchema, "ripstatuschanges");
+
 export default async (req: Request, res: Response) => {
   try {
     const eipResult = await EipStatusChange.aggregate([
@@ -104,6 +108,7 @@ export default async (req: Request, res: Response) => {
               date: `${changedYear}-${changedMonth}`,
               count,
               eips,
+              repo: "eip",
             });
             return acc;
           }, [])
@@ -162,6 +167,7 @@ export default async (req: Request, res: Response) => {
               date: `${changedYear}-${changedMonth}`,
               count,
               eips,
+              repo: "erc",
             });
             return acc;
           }, [])
@@ -220,6 +226,65 @@ export default async (req: Request, res: Response) => {
               date: `${changedYear}-${changedMonth}`,
               count,
               eips,
+              repo: "erc",
+            });
+            return acc;
+          }, [])
+          .sort((a: { date: number }, b: { date: number }) =>
+            a.date > b.date ? 1 : -1
+          ),
+      })
+    );
+
+    const ripResult = await RipStatusChange.aggregate([
+      { $match: { changeDate: { $gte: new Date("2023-11-01") } } },
+      {
+        $group: {
+          _id: {
+            status: "$status",
+            category: "RIP",
+            changedYear: { $year: "$changeDate" },
+            changedMonth: { $month: "$changeDate" },
+          },
+          count: { $sum: 1 },
+          eips: { $push: "$$ROOT" },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.status",
+          eips: {
+            $push: {
+              category: "RIP",
+              changedYear: "$_id.changedYear",
+              changedMonth: "$_id.changedMonth",
+              count: "$count",
+              eips: "$eips",
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          _id: 1,
+        },
+      },
+    ]);
+
+    const RIPformattedResult = ripResult.map(
+      (group: { _id: any; eips: any[] }) => ({
+        status: group._id,
+        eips: group.eips
+          .reduce((acc, eipGroup) => {
+            const { changedYear, changedMonth, count, eips } = eipGroup;
+            acc.push({
+              category: "RIP",
+              month: changedMonth,
+              year: changedYear,
+              date: `${changedYear}-${changedMonth}`,
+              count,
+              eips,
+              repo: "rip",
             });
             return acc;
           }, [])
@@ -232,6 +297,7 @@ export default async (req: Request, res: Response) => {
     res.json({
       eip: formattedResult,
       erc: [...ERCformattedResult, ...formattedFrozenErcResult],
+      rip: RIPformattedResult,
     });
   } catch (error: any) {
     console.error("Error retrieving EIPs:", error.message);
