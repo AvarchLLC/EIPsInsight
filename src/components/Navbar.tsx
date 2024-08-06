@@ -49,19 +49,6 @@ const Navbar: React.FC = () => {
       href: `/rip`,
     },
     {
-      label: "Tools",
-      children: [
-        {
-          label: "PRs And Issues",
-          href: `/prsAndIssues`,
-        },
-        {
-          label: "Editors Review",
-          href: `/editorsReview`,
-        },
-      ],
-    },
-    {
       label: "Insight",
       children: [
         {
@@ -307,46 +294,9 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
-                    {navItem.children && navItem.label === "Tools" && (
-                      <PopoverContent
-                        border={0}
-                        boxShadow={"xl"}
-                        bg={popoverContentBgColor}
-                        p={4}
-                        rounded={"xl"}
-                        minW={"sm"}
-                        className={"overflow-y-auto"}
-                        maxH={"900px"}
-                      >
-                        <Stack direction={"column"} spacing={2}>
-                          {navItem.children.map((child) => (
-                            <Box
-                              _hover={{
-                                bg: useColorModeValue("pink.50", "gray.900"),
-                              }}
-                              p={2}
-                              rounded={"md"}
-                              role={"group"}
-                            >
-                              <Text
-                                transition={"all .3s ease"}
-                                _groupHover={{ color: "pink.400" }}
-                                fontWeight={500}
-                              >
-                                <NextLink href={`${child.href}`}>
-                                  {child.label}
-                                </NextLink>
-                              </Text>
-                            </Box>
-                          ))}
-                        </Stack>
-                      </PopoverContent>
-                    )}
-
                     {navItem.children &&
                       navItem.label !== "Insight" &&
-                      navItem.label !== "More" &&
-                      navItem.label !== "Tools" && (
+                      navItem.label !== "More" && (
                         <PopoverContent
                           border={0}
                           boxShadow={"xl"}
@@ -359,10 +309,7 @@ const Navbar: React.FC = () => {
                         >
                           <Stack direction={"row"} spacing={5} ml={6} pl={4}>
                             {navItem.children.map((child) => (
-                              <>
-                                <DesktopSubNav key={child.label} {...child} />
-                                <p>hello</p>
-                              </>
+                              <DesktopSubNav key={child.label} {...child} />
                             ))}
                           </Stack>
                         </PopoverContent>
