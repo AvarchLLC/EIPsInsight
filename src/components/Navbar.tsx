@@ -52,8 +52,8 @@ const Navbar: React.FC = () => {
       label: "Tools",
       children: [
         {
-          label: "PRs And Issues",
-          href: `/prsAndIssues`,
+          label: "Open and Close Prs",
+          href: `/openClosePr`,
         },
         {
           label: "Editors Review",
