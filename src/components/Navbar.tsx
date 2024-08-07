@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
       children: [
         {
           label: "Open and Close Prs",
-          href: `/openClosePr`,
+          href: `/openClosePrs`,
         },
         {
           label: "Editors Review",
