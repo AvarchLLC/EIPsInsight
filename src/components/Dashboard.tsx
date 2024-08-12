@@ -51,6 +51,7 @@ interface EIP {
   discussion: string;
   deadline: string;
   requires: string;
+  repo: string;
   unique_ID: number;
   __v: number;
 }
