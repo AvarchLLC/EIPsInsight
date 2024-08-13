@@ -48,6 +48,19 @@ const Navbar: React.FC = () => {
       label: "RIP",
       href: `/rip`,
     },
+     {
+      label: "Tools",
+      children: [
+        {
+          label: "Open and Close Prs",
+          href: `/openClosePrs`,
+        },
+        {
+          label: "Editors Review",
+          href: `/editorsReview`,
+        },
+      ],
+    },
     {
       label: "Insight",
       children: [
