@@ -114,6 +114,8 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
       };
     });
 
+    console.log(filteredData);
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   return (
@@ -160,7 +162,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/${cat === "ERC" ? "erc" : "eip"}-${item.eip}`}
+                        href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
@@ -178,7 +180,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/${cat === "ERC" ? "erc" : "eip"}-${item.eip}`}
+                        href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"

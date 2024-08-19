@@ -456,7 +456,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip}>
-                      <Link href={`${item.repo}-${item.eip}`}>
+                     <Link href={`/${type === "ERC" ? "ercs/erc" : type === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -469,7 +469,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip}>
-                      <Link href={`${item.repo}-${item.eip}`}>
+                      <Link href={`/${type === "ERC" ? "ercs/erc" : type === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -487,7 +487,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`${item.repo}-${item.eip}`}
+                        href={`${item.repo}s/${item.repo}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
