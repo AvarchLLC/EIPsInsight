@@ -308,26 +308,7 @@ export default function EIPMD() {
   );
 }
 
-function getStatusColor(status: string) {
-  switch (status) {
-    case "Draft":
-      return "#eab308";
-    case "Final" || "Accepted" || "Superseded":
-      return "#3b82f6";
-    case "Last Call":
-      return "#22c55e";
-    case "Withdrawn" || "Abandoned" || "Rejected":
-      return "#ef4444";
-    case "Review":
-      return "#eab308";
-    case "Living" || "Active":
-      return "#171923";
-    case "Stagnant":
-      return "#ef4444";
-    default:
-      return "#171923";
-  }
-}
+
 
 function getMonth(month: number) {
   switch (month) {
