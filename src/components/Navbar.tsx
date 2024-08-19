@@ -33,34 +33,43 @@ interface NavItem {
 const Navbar: React.FC = () => {
   const NAV_ITEMS: Array<NavItem> = [
     {
-      label: "All",
-      href: `/all`,
+      label:"Pectra",
+      href:`/pectra`
     },
     {
-      label: "EIP",
-      href: `/eip`,
+      label:"All-EIPS",
+      children:[
+        {
+          label: "All",
+          href: `/all`,
+        },
+        {
+          label: "EIP",
+          href: `/eip`,
+        },
+        {
+          label: "ERC",
+          href: `/erc`,
+        },
+        {
+          label: "RIP",
+          href: `/rip`,
+        },
+      ],
     },
     {
-      label: "ERC",
-      href: `/erc`,
-    },
-    {
-      label: "RIP",
-      href: `/rip`,
-    },
-     {
       label: "Tools",
       children: [
         {
-          label: "Open and Close Prs",
-          href: `/openClosePrs`,
+          label: "Open and Close PRs",
+          href: `/openClosePRs`,
         },
         {
           label: "Editors Review",
           href: `/editorsReview`,
         },
       ],
-    },
+    },    
     {
       label: "Insight",
       children: [
@@ -224,7 +233,7 @@ const Navbar: React.FC = () => {
                   mt={5}
                   className="font-bold hover:opacity-25 cursor-pointer ease-in duration-150"
                 >
-                  EIPs Insights
+                  EIPs Insight
                 </Text>
               </NextLink>
             </Box>
@@ -307,9 +316,83 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
+                  {navItem.children && navItem.label === "All-EIPS" && (
+                      <PopoverContent
+                        border={0}
+                        boxShadow={"xl"}
+                        bg={popoverContentBgColor}
+                        p={4}
+                        rounded={"xl"}
+                        minW={"sm"}
+                        className={"overflow-y-auto"}
+                        maxH={"900px"}
+                      >
+                        <Stack direction={"column"} spacing={2}>
+                          {navItem.children.map((child) => (
+                            <Box
+                              _hover={{
+                                bg: useColorModeValue("pink.50", "gray.900"),
+                              }}
+                              p={2}
+                              rounded={"md"}
+                              role={"group"}
+                            >
+                              <Text
+                                transition={"all .3s ease"}
+                                _groupHover={{ color: "pink.400" }}
+                                fontWeight={500}
+                              >
+                                <NextLink href={`${child.href}`}>
+                                  {child.label}
+                                </NextLink>
+                              </Text>
+                            </Box>
+                          ))}
+                        </Stack>
+                      </PopoverContent>
+                    )}
+
+                   {navItem.children && navItem.label === "Tools" && (
+                      <PopoverContent
+                        border={0}
+                        boxShadow={"xl"}
+                        bg={popoverContentBgColor}
+                        p={4}
+                        rounded={"xl"}
+                        minW={"sm"}
+                        className={"overflow-y-auto"}
+                        maxH={"900px"}
+                      >
+                        <Stack direction={"column"} spacing={2}>
+                          {navItem.children.map((child) => (
+                            <Box
+                              _hover={{
+                                bg: useColorModeValue("pink.50", "gray.900"),
+                              }}
+                              p={2}
+                              rounded={"md"}
+                              role={"group"}
+                            >
+                              <Text
+                                transition={"all .3s ease"}
+                                _groupHover={{ color: "pink.400" }}
+                                fontWeight={500}
+                              >
+                                <NextLink href={`${child.href}`}>
+                                  {child.label}
+                                </NextLink>
+                              </Text>
+                            </Box>
+                          ))}
+                        </Stack>
+                      </PopoverContent>
+                    )}
+
                     {navItem.children &&
                       navItem.label !== "Insight" &&
-                      navItem.label !== "More" && (
+                      navItem.label !== "More" && 
+                      navItem.label !=="All-EIPS" &&
+                      navItem.label !=="Tools" &&(
                         <PopoverContent
                           border={0}
                           boxShadow={"xl"}
@@ -476,7 +559,7 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                        {navItem.children && navItem.label === "More" && (
+                        {navItem.children && navItem.label === "More"  && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
