@@ -386,7 +386,7 @@ const Table = () => {
               ),
               Number: (item : any) => (
                 <td>
-                  <Link href={`/EIP-${item.Number}`}>
+                  <Link href={`/eips/eip-${item.Number}`}>
                     <div>
                       <label className="relative cursor-pointer">
                         <div
@@ -436,7 +436,7 @@ const Table = () => {
                   }}
                   className="hover:text-[#1c7ed6]"
                 >
-                  <Link href={`/EIP-${item.Number}`} className="hover:text-[#1c7ed6] text-[13px]">
+                  <Link href={`/eips/eip-${item.Number}`} className="hover:text-[#1c7ed6] text-[13px]">
                     {item.Title}
                   </Link>
                 </td>
