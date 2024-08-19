@@ -23,11 +23,12 @@ import createMDXPlugin from "@next/mdx";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import remarkHighlight from "remark-highlight.js";
+import withTM from 'next-transpile-modules';
 
 const withMDX = createMDXPlugin({
   extension: /\.mdx$/,
   options: {
-    // These options apply to .mdx fles only
+    // These options apply to .mdx files only
     providerImportSource: "@mdx-js/react",
     rehypePlugins: [],
     remarkPlugins: [remarkGfm, remarkHighlight],
@@ -37,24 +38,25 @@ const withMDX = createMDXPlugin({
 const withMarkdown = createMDXPlugin({
   extension: /\.md$/,
   options: {
-    // These options apply to .md fles only
+    // These options apply to .md files only
     providerImportSource: "@mdx-js/react",
     rehypePlugins: [],
     remarkPlugins: [remarkGfm, remarkHighlight],
   },
 });
 
-const nextConfig = withMDX(
-  withMarkdown({
-    compiler: {
-      styledComponents: true,
-    },
-    pageExtensions: ["mdx", "md", "tsx", "ts"],
-    poweredByHeader: false,
-    // reactStrictMode: true,
-    trailingSlash: false,
-  })
-);
+const nextConfig = {
+  compiler: {
+    styledComponents: true,
+  },
+  pageExtensions: ["mdx", "md", "tsx", "ts"],
+  poweredByHeader: false,
+  // reactStrictMode: true,
+  trailingSlash: false,
+};
 
-export default nextConfig;
-// export default withMDX(nextConfig);
+export default withTM(['react-syntax-highlighter'])(
+  withMDX(
+    withMarkdown(nextConfig)
+  )
+);
