@@ -105,14 +105,23 @@ const SearchBox: React.FC = () => {
     }
   };
 
-  const EIPhandleSearchResultClick = (
-    selectedEIPNumber: string,
-    type: string
-  ) => {
-    if (type === "ERC") window.location.href = `/erc-${selectedEIPNumber}`;
-    else window.location.href = `/eip-${selectedEIPNumber}`;
+  const EIPhandleSearchResultClick = (selectedEIPNumber: string, type: string) => {
+    console.log(selectedEIPNumber);
+    console.log(type);
+  
+    if (type === "erc") {
+      window.location.href = `/ercs/erc-${selectedEIPNumber}`;
+    } else if (type === "rip") {
+      window.location.href = `/rips/rip-${selectedEIPNumber}`;
+    } else if (type === "eip") {
+      window.location.href = `/eips/eip-${selectedEIPNumber}`;
+    } else {
+      console.error("Unknown type: ", type);
+    }
+  
     return selectedEIPNumber;
   };
+  
 
   return (
     <>
