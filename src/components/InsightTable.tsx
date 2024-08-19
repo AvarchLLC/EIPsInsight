@@ -362,7 +362,7 @@ const InsightTable: React.FC<TabProps> = ({
               scopedColumns={{
                 sr: (item: any) => (
                   <td key={item.eip}>
-                    <Link href={`/${Tabletype}-${item.eip}`}>
+                    <Link href={`/${Tabletype}s/${Tabletype}-${item.eip}`}>
                       <Wrap>
                         <WrapItem>
                           <Badge colorScheme={getStatusColor(item.status)}>
@@ -375,7 +375,7 @@ const InsightTable: React.FC<TabProps> = ({
                 ),
                 eip: (item: any) => (
                   <td key={item.eip}>
-                    <Link href={`/${Tabletype}-${item.eip}`}>
+                    <Link href={`/${Tabletype}s/${Tabletype}-${item.eip}`}>
                       <Wrap>
                         <WrapItem>
                           <Badge colorScheme={getStatusColor(item.status)}>
@@ -393,7 +393,7 @@ const InsightTable: React.FC<TabProps> = ({
                     className="hover:text-[#1c7ed6]"
                   >
                     <Link
-                      href={`/${Tabletype}-${item.eip}`}
+                      href={`/${Tabletype}s/${Tabletype}-${item.eip}`}
                       className={
                         isDarkMode
                           ? "hover:text-[#1c7ed6] text-[13px] text-white"
