@@ -298,7 +298,7 @@ const Dashboard = () => {
                 </Box>
               </div>
 
-              <Box className={"lg:grid grid-cols-2 hidden pb-20"}>
+              {/* <Box className={"lg:grid grid-cols-2 hidden pb-20"}>
                 <div className={"pl-8"}>
                   <BoyGirl />
                 </div>
@@ -323,7 +323,34 @@ const Dashboard = () => {
                     </NextLink>
                   </div>
                 </div>
-              </Box>
+              </Box> */}
+
+              {/* <Box className={"lg:grid grid-cols-2 hidden pb-20"}>
+                <div className={"pl-8"}>
+                  <BoyGirl />
+                </div>
+
+                <div className={" flex justify-center items-center"}>
+                  <div className={"pt-24 space-y-6"}>
+                    <h1 className={"text-5xl font-bold"}>
+                      What is <span className="text-blue-400">an EIP</span>?
+                    </h1>
+                    <p className={"text-3xl max-w-xl"}>
+                      EIP is a design document providing information to the
+                      Ethereum community or describing a new feature or
+                      improvement for the{" "}
+                      <span className="text-blue-400">Ethereum blockchain</span>
+                      .
+                    </p>
+                    <NextLink href={"/resources"}>
+                      <span className="text-blue-400 text-xl flex space-x-5">
+                        Learn More{" "}
+                        <BsArrowUpRight className={"pt-2"} size={25} />
+                      </span>
+                    </NextLink>
+                  </div>
+                </div>
+              </Box> */}
 
               <FlexBetween>
                 <Box id={"1"}>
@@ -353,86 +380,67 @@ const Dashboard = () => {
               gap={"6"}
               marginTop={"20px"}
             >
-              <div className="grid grid-cols-3 grid-rows-2 gap-6">
-                <StatBox
-                  title="Core EIPs"
-                  value={
-                    allData.filter((item) => item.category === "Core").length
-                  }
-                  description={
-                    "Core EIPs describe changes to the Ethereum protocol."
-                  }
-                  icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
-                  url="core"
-                />
+              
+              <div className="grid grid-cols-2 gap-6">
+  <div className="col-span-2">
+    <StatBox
+      title="Meta EIPs"
+      value={allData.filter((item) => item.type === "Meta").length}
+      description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
+      icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+      url="meta"
+    />
+  </div>
 
-                <StatBox
-                  title="ERCs"
-                  value={
-                    allData.filter((item) => item.category === "ERC").length
-                  }
-                  description={
-                    "ERCs describe application-level standards for the Ethereum ecosystem."
-                  }
-                  icon={
-                    <Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />
-                  }
-                  url="erc"
-                />
+  <StatBox
+    title="Core EIPs"
+    value={allData.filter((item) => item.category === "Core").length}
+    description="Core EIPs describe changes to the Ethereum protocol."
+    icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
+    url="core"
+  />
 
-                <StatBox
-                  title="Networking EIPs"
-                  value={
-                    allData.filter((item) => item.category === "Networking")
-                      .length
-                  }
-                  description={
-                    "Networking EIPs describe changes to the Ethereum network protocol."
-                  }
-                  icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
-                  url="networking"
-                />
+  <StatBox
+    title="ERCs"
+    value={allData.filter((item) => item.category === "ERC").length}
+    description="ERCs describe application-level standards for the Ethereum ecosystem."
+    icon={<Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />}
+    url="erc"
+  />
 
-                <StatBox
-                  title="Interface EIPs"
-                  value={
-                    allData.filter((item) => item.category === "Interface")
-                      .length
-                  }
-                  description={
-                    "Interface EIPs describe changes to the Ethereum client API."
-                  }
-                  icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
-                  url="interface"
-                />
+  <StatBox
+    title="Networking EIPs"
+    value={allData.filter((item) => item.category === "Networking").length}
+    description="Networking EIPs describe changes to the Ethereum network protocol."
+    icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
+    url="networking"
+  />
 
-                <StatBox
-                  title="Informational EIPs"
-                  value={
-                    allData.filter((item) => item.type === "Informational")
-                      .length
-                  }
-                  description={
-                    "Informational EIPs describe other changes to the Ethereum ecosystem."
-                  }
-                  icon={
-                    <Icon as={Clipboard} fontSize={{ lg: "15", sm: "10" }} />
-                  }
-                  url="informational"
-                />
+  <StatBox
+    title="Interface EIPs"
+    value={allData.filter((item) => item.category === "Interface").length}
+    description="Interface EIPs describe changes to the Ethereum client API."
+    icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
+    url="interface"
+  />
 
-                <StatBox
-                  title="Meta EIPs"
-                  value={allData.filter((item) => item.type === "Meta").length}
-                  description={
-                    "Meta EIPs describe changes to the EIP process, or other non-optional changes."
-                  }
-                  icon={
-                    <Icon as={Briefcase} fontSize={{ lg: "15", sm: "10" }} />
-                  }
-                  url="meta"
-                />
-              </div>
+  <StatBox
+    title="Informational EIPs"
+    value={allData.filter((item) => item.type === "Informational").length}
+    description="Informational EIPs describe other changes to the Ethereum ecosystem."
+    icon={<Icon as={Clipboard} fontSize={{ base: "10", lg: "15" }} />}
+    url="informational"
+  />
+
+  <StatBox
+    title="RIPs"
+    value={allData.filter((item) => item.repo === "rip").length}
+    description="RIPs describe changes to the RIP process, or other non-optional changes."
+    icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+    url="rip"
+  />
+</div>
+
               <Box
                 as={motion.div}
                 initial={{ opacity: 0, y: -20 }}
@@ -462,6 +470,7 @@ const Dashboard = () => {
                 <DashboardDonut />
               </Box>
             </Box>
+
           </motion.div>
         )}
       </Box>
