@@ -55,115 +55,204 @@ const All = () => {
 
   const pectraData = [
     {
+      
       eip: "7600",
       title: "Hardfork Meta - Pectra",
       author: "Tim Beiko (@timbeiko)",
-    },
+      link: "https://eipsinsight.com/eips/eip-7600",
+      type: "Meta",
+      category: "Meta",
+      discussion: "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205",
+  },
     {
         eip: "2537",
         title: "Precompile for BLS12-381 curve operations",
         author: "Alex Vlasov (@shamatar), Kelly Olson (@ineffectualproperty), Alex Stokes (@ralexstokes), Antonio Sanso (@asanso)",
+        link: "https://eipsinsight.com/eips/eip-2537",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip2537-bls12-precompile-discussion-thread/4187"
       },
       {
         eip: "2935",
         title: "Serve historical block hashes from state",
         author: "Vitalik Buterin (@vbuterin), Tomasz Stanczak (@tkstanczak), Guillaume Ballet (@gballet), Gajinder Singh (@g11tech), Tanishq Jasoria (@tanishqjasoria), Ignacio Hagopian (@jsign), Jochem Brouwer (@jochem-brouwer)",
+        link: "https://eipsinsight.com/eips/eip-2935",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-2935-save-historical-block-hashes-in-state/4565"
       },
       {
         eip: "6110",
         title: "Supply validator deposits on chain",
         author: "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo), Peter Davies (@petertdavies)",
+        link: "https://eipsinsight.com/eips/eip-6110",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-6110-supply-validator-deposits-on-chain/12072"
       },
       {
         eip: "7002",
         title: "Execution layer triggerable withdrawals",
         author: "Danny Ryan (@djrtwo), Mikhail Kalinin (@mkalinin), Ansgar Dietrichs (@adietrichs), Hsiao-Wei Wang (@hwwhww), lightclient (@lightclient)",
+        link: "https://eipsinsight.com/eips/eip-7002",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7002-execution-layer-triggerable-exits/14195"
       },
       {
         eip: "7251",
         title: "Increase the MAX_EFFECTIVE_BALANCE",
         author: "mike (@michaelneuder), Francesco (@fradamt), dapplion (@dapplion), Mikhail (@mkalinin), Aditya (@adiasg), Justin (@justindrake), lightclient (@lightclient)",
+        link: "https://eipsinsight.com/eips/eip-2251",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982"
       },
       {
         eip: "7549",
         title: "Move committee index outside Attestation",
         author: "dapplion (@dapplion)",
+        link: "https://eipsinsight.com/eips/eip-7549",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
       },
       {
         eip: "7594",
         title: "PeerDAS - Peer Data Availability Sampling",
         author: "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
+        link: "https://eipsinsight.com/eips/eip-7594",
+        type:"Standards Track",
+        category:"Networking",
+        discussion:"https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
       },
       {
         eip: "7685",
         title: "General purpose execution layer requests",
         author: "lightclient (@lightclient)",
+        link: "https://eipsinsight.com/eips/eip-7685",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7685-general-purpose-execution-layer-requests/19668"
       },
       {
         eip: "7702",
         title: "Set EOA account code",
         author: "Vitalik Buterin (@vbuterin), Sam Wilson (@SamWilsn), Ansgar Dietrichs (@adietrichs), Matt Garnett (@lightclient)",
+        link: "https://eipsinsight.com/eips/eip-7702",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-set-eoa-account-code-for-one-transaction/19923"
       },
       {
         eip: "7692",
         title: "EVM Object Format (EOFv1) Meta",
         author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz), Danno Ferrin (@shemnon)",
+        link: "https://eipsinsight.com/eips/eip-7692",
+        type:"Meta",
+        category:"Meta",
+        discussion:"https://ethereum-magicians.org/t/eip-7692-evm-object-format-eof-meta/19686"
       },
       {
         eip: "663",
         title: "SWAPN, DUPN and EXCHANGE instructions",
         author: "Alex Beregszaszi (@axic), Charles Cooper (@charles-cooper), Danno Ferrin (@shemnon)",
+        link: "https://eipsinsight.com/eips/eip-2537",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-663-unlimited-swap-and-dup-instructions/3346"
       },
       {
           eip: "3540",
           title: "EOF - EVM Object Format v1",
           author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Matt Garnett (@lightclient)",
-        },
+          link: "https://eipsinsight.com/eips/eip-3540",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/evm-object-format-eof/5727"
+      },
         {
           eip: "3670",
           title: "EOF - Code Validation",
           author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-        },
+          link: "https://eipsinsight.com/eips/eip-3670",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693"
+      },
         {
           eip: "4200",
           title: "EOF - Static relative jumps",
           author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-        },
+          link: "https://eipsinsight.com/eips/eip-4200",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-3920-static-relative-jumps/7108"
+      },
         {
           eip: "4750",
           title: "EOF - Functions",
           author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
-        },
+          link: "https://eipsinsight.com/eips/eip-4750",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
+      },
         {
           eip: "5450",
           title: "EOF - Stack Validation",
           author: "Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic), Danno Ferrin (@shemnon)",
-        },
+          link: "https://eipsinsight.com/eips/eip-5450",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-5450-eof-stack-validation/10410"
+      },
         {
           eip: "6206",
           title: "EOF - JUMPF and non-returning functions",
           author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Matt Garnett (@lightclient)",
-        },
+          link: "https://eipsinsight.com/eips/eip-6206",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
+      },
         {
           eip: "7069",
           title: "Revamped CALL instructions",
           author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Danno Ferrin (@shemnon), Andrei Maiboroda (@gumb0), Charles Cooper (@charles-cooper)",
-        },
+          link: "https://eipsinsight.com/eips/eip-7069",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-revamped-call-instructions/14432"
+      },
         {
           eip: "7480",
           title: "EOF - Data section access instructions",
           author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
-        },
+          link: "https://eipsinsight.com/eips/eip-7480",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7480-eof-data-instructions/15414"
+      },
         {
           eip: "7620",
           title: "EOF Contract Creation",
           author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz)",
-        },
+          link: "https://eipsinsight.com/eips/eip-7620",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7620-eof-contract-creation-instructions/18625"
+      },
         {
           eip: "7698",
           title: "EOF - Creation transaction",
           author: "Piotr Dobaczewski (@pdobacz), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic)",
-        },
+          link: "https://eipsinsight.com/eips/eip-7698",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7698-eof-creation-transaction/19784"
+      },
   ];
   return (
     <>
@@ -223,6 +312,28 @@ const All = () => {
           </Text>
 
           <UnorderedList spacing={3} pl={8}>
+          <ListItem>
+    <Text fontSize="2xl">
+      August 2024: Tests for Devnet 3 (
+      <NLink href=" https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0">
+        <Text as="span" color="blue.500" textDecor="underline">
+          Specs
+        </Text>
+      </NLink>
+      )
+    </Text>
+  </ListItem>
+          <ListItem>
+    <Text fontSize="2xl">
+      August 2024: Launched Pectra Devnet 3 (
+      <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-3">
+        <Text as="span" color="blue.500" textDecor="underline">
+          Specs
+        </Text>
+      </NLink>
+      )
+    </Text>
+  </ListItem>
   <ListItem>
     <Text fontSize="2xl">
       July 2024: Launched Pectra Devnet 2 (
