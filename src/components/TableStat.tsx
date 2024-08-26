@@ -36,6 +36,7 @@ interface EIP {
   deadline: string;
   requires: string;
   unique_ID: number;
+  repo: string;
   __v: number;
 }
 
@@ -136,7 +137,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
 
   const filteredData = data
     .map((item: any) => {
-      const { eip, title, author, status, type, category } = item;
+      const { eip, title, author, status, type, category,repo } = item;
       return {
         eip,
         title,
@@ -144,6 +145,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
         status,
         type,
         category,
+        repo,
       };
     })
     .filter((item: any) => item.status === cat);
@@ -258,7 +260,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
             scopedColumns={{
               "#": (item: any) => (
                 <td key={item.eip}>
-                  <Link href={`/EIPS/${item.eip}`}>
+                  <Link href={`/${item.repo}s/${item.repo}-${item.eip}`}>
                     <Wrap>
                       <WrapItem>
                         <Badge colorScheme={getStatusColor(item.status)}>
@@ -271,7 +273,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
               ),
               eip: (item: any) => (
                 <td key={item.eip}>
-                  <Link href={`/EIPS/${item.eip}`}>
+                  <Link href={`/${item.repo}s/${item.repo}-${item.eip}`}>
                     <Wrap>
                       <WrapItem>
                         <Badge colorScheme={getStatusColor(item.status)}>
@@ -289,7 +291,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
                   className="hover:text-[#1c7ed6]"
                 >
                   <Link
-                    href={`/EIPS/${item.eip}`}
+                    href={`/${item.repo}s/${item.repo}-${item.eip}`}
                     className={
                       isDarkMode
                         ? "hover:text-[#1c7ed6] text-[13px] text-white"

@@ -338,3 +338,22 @@ function getMonth(month: number) {
       return "December";
   }
 }
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "Living":
+      return "blue";
+    case "Final":
+      return "blue";
+    case "Stagnant":
+      return "purple";
+    case "Draft":
+      return "orange";
+    case "Withdrawn":
+      return "red";
+    case "Last Call":
+      return "yellow";
+    default:
+      return "gray";
+  }
+};

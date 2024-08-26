@@ -125,8 +125,16 @@ const DashboardDonut = () => {
         },
       },
     },
-    color: (datum: { status: string }) => statusColorMap[datum.status], 
+    color: (datum: any) => {
+      // Type guard to check if datum has the status property
+      if ('status' in datum) {
+        return statusColorMap[datum.status];
+      }
+      return '#000'; // Fallback color if status is not present
+    },
   };
+  
+  
 
   return (
     <>

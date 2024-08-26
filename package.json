@@ -24,14 +24,14 @@
     "@mdx-js/react": "^3.0.0",
     "@mui/material": "^5.14.1",
     "@mui/x-data-grid": "^6.10.1",
-    "@next/mdx": "^14.0.3",
+    "@next/mdx": "^14.2.5",
     "@octokit/rest": "^19.0.13",
     "@tanstack/react-table": "^8.10.7",
     "@types/mdx": "^2.0.10",
     "@types/node": "20.3.1",
     "@types/react": "18.2.12",
     "@types/react-dom": "18.2.5",
-    "autoprefixer": "10.4.14",
+    "autoprefixer": "^10.4.20",
     "axios": "^1.4.0",
     "chart.js": "^4.3.0",
     "cheerio": "^1.0.0-rc.12",
@@ -51,8 +51,10 @@
     "next-mdx-remote": "^4.4.1",
     "next-redux-wrapper": "^8.1.0",
     "next-transpile-modules": "^10.0.1",
+    "null-loader": "^4.0.1",
     "octokit": "^2.1.0",
-    "postcss": "8.4.24",
+    "postcss": "^8.4.24",
+    "postcss-loader": "^8.1.1",
     "react": "18.2.0",
     "react-awesome-slider": "^4.1.0",
     "react-awesome-slider-fc": "^1.0.0",
@@ -78,7 +80,7 @@
     "styled-components": "^6.0.2",
     "swiper": "^10.0.3",
     "tailwind-merge": "^2.0.0",
-    "tailwindcss": "3.3.2",
+    "tailwindcss": "^3.4.10",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.1.3",
     "typewriter-effect": "^2.21.0"
@@ -88,6 +90,8 @@
     "@types/react-copy-to-clipboard": "^5.0.7",
     "@types/react-slick": "^0.23.12",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "@types/react-table": "^7.7.14"
+    "@types/react-table": "^7.7.14",
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0"
   }
 }

@@ -20,9 +20,10 @@ import {
   VStack,
   Spinner,
   Heading,
+  Button,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { Markdown } from "@/components/MarkdownRIP";
+import { Markdown } from "@/components/MarkdownEIP";
 import Header from "@/components/Header";
 import LoaderComponent from "@/components/Loader";
 
@@ -42,18 +43,33 @@ interface EipMetadataJson {
 const TestComponent = () => {
   const path = usePathname();
   const pathArray = path?.split("/") || [];
-  const RIPNo = extracteipno(pathArray);
+  const RIPNo = extractRIPNo(pathArray);
   const [markdownFileURL, setMarkdownFileURL] = useState<string>("");
   const [metadataJson, setMetadataJson] = useState<EipMetadataJson>();
   const [markdown, setMarkdown] = useState<string>("");
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{ status: string; date: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const bg = useColorModeValue("#f6f6f7", "#171923");
+  const [isDataNotFound, setIsDataNotFound] = useState(false);
   
+  useEffect(() => {
+    if (RIPNo) {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(`/api/new/ercshistory/${RIPNo}`);
+          const jsonData = await response.json();
+          const statusWithDates = extractLastStatusDates(jsonData);
+          setData(statusWithDates);
+          console.log(statusWithDates);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
 
+      fetchData();
+    }
+  }, [RIPNo]);
 
-  const fetchRIPData = useCallback(async () => {
+  const fetchEIPData = useCallback(async () => {
     if (!RIPNo) return;
 
     let _markdownFileURL = `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${RIPNo}.md`;
@@ -65,9 +81,17 @@ const TestComponent = () => {
       );
 
       const { metadata, markdown: _markdown } = extractMetadata(eipMarkdownRes);
+      const metadataJson = convertMetadataToJson(metadata);
 
-      setMetadataJson(convertMetadataToJson(metadata));
-      setMarkdown(_markdown);
+      // Check if necessary fields are missing
+      if (!metadataJson?.author || !metadataJson?.created) {
+        setIsDataNotFound(true);
+      } else {
+        setMetadataJson(metadataJson);
+        setMarkdown(_markdown);
+        setIsDataNotFound(false);
+      }
+
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching ERC data:", error);
@@ -76,11 +100,9 @@ const TestComponent = () => {
 
   useEffect(() => {
     if (RIPNo) {
-      fetchRIPData();
+      fetchEIPData();
     }
-  }, [fetchRIPData, RIPNo]);
-
-  // Status order definition
+  }, [fetchEIPData, RIPNo]);
   const statusOrder = [
     "Draft",
     "Review",
@@ -91,16 +113,16 @@ const TestComponent = () => {
     "Final",
   ];
 
-  // Define color schemes for light and dark mode
   const boxBg = useColorModeValue("gray.100", "gray.700");
   const boxTextColor = useColorModeValue("gray.800", "gray.200");
   const statusColor = useColorModeValue("blue.600", "cyan.400");
   const dateColor = useColorModeValue("gray.600", "gray.300");
   const boxShadow = useColorModeValue("md", "dark-lg");
 
+
   return (
     <>
-      {isLoading ? ( // Show loader while data is loading
+      {isLoading ? (
         <Box
           display="flex"
           justifyContent="center"
@@ -115,6 +137,33 @@ const TestComponent = () => {
             <LoaderComponent />
           </motion.div>
         </Box>
+      ) : isDataNotFound ? (
+        <AllLayout>
+        <Box
+          textAlign="center"
+          py={6}
+          px={6}
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+        >
+          <Heading size="lg" mb={4}>
+            RIP Not Found
+          </Heading>
+          <Text color="gray.500" fontSize="xl" mb={6}>
+            This RIP might not exist or could be an EIP or ERC. Please check again.
+          </Text>
+          <Button
+            colorScheme="blue"
+            size="lg"
+            onClick={() => (window.location.href = "/")}
+          >
+            Return to Home
+          </Button>
+        </Box>
+        </AllLayout>
       ) : (
         <AllLayout>
           <motion.div
@@ -128,36 +177,16 @@ const TestComponent = () => {
               paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
               marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
             >
-              <Header title={`RIP- ${RIPNo}`} subtitle={metadataJson?.title || ""} />
-              <Box overflowX={"auto"}>
+              <Header
+                title={`RIP- ${RIPNo}`}
+                subtitle={metadataJson?.title || ""}
+              />
+              <Box overflowX="auto">
                 <Table variant="simple">
                   <Thead>
                     <Tr>
                       <Th>Authors</Th>
-                      <Td>
-                        {metadataJson?.author && (
-                          <Box
-                            maxH="10rem"
-                            overflowY={"auto"}
-                            p="2px"
-                            sx={{
-                              "::-webkit-scrollbar": {
-                                w: "10px",
-                              },
-                              "::-webkit-scrollbar-track ": {
-                                bg: "gray.400",
-                                rounded: "md",
-                              },
-                              "::-webkit-scrollbar-thumb": {
-                                bg: "gray.500",
-                                rounded: "md",
-                              },
-                            }}
-                          >
-                            {metadataJson.author.join(", ")}
-                          </Box>
-                        )}
-                      </Td>
+                      <Td>{metadataJson?.author?.join(", ")}</Td>
                     </Tr>
                     <Tr>
                       <Th>Created</Th>
@@ -169,7 +198,7 @@ const TestComponent = () => {
                         <Td>
                           <Link
                             href={metadataJson["discussions-to"]}
-                            color={"blue.400"}
+                            color="blue.400"
                             isExternal
                           >
                             {metadataJson["discussions-to"]}
@@ -178,25 +207,26 @@ const TestComponent = () => {
                       </Tr>
                     )}
 
-                    {metadataJson?.requires && metadataJson.requires.length > 0 && (
-                      <Tr>
-                        <Th>Requires</Th>
-                        <Td>
-                          <HStack>
-                            {metadataJson.requires.map((req, i) => (
-                              <NLink key={i} href={`/eips/eip-${req}`}>
-                                <Text
-                                  color={"blue.400"}
-                                  _hover={{ textDecor: "underline" }}
-                                >
-                                  {"EIP"}-{req}
-                                </Text>
-                              </NLink>
-                            ))}
-                          </HStack>
-                        </Td>
-                      </Tr>
-                    )}
+                    {metadataJson?.requires &&
+                      metadataJson.requires.length > 0 && (
+                        <Tr>
+                          <Th>Requires</Th>
+                          <Td>
+                            <HStack>
+                              {metadataJson.requires.map((req, i) => (
+                                <NLink key={i} href={`/eips/eip-${req}`}>
+                                  <Text
+                                    color="blue.400"
+                                    _hover={{ textDecor: "underline" }}
+                                  >
+                                    {"EIP"}-{req}
+                                  </Text>
+                                </NLink>
+                              ))}
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      )}
                     {metadataJson?.status && (
                       <Tr>
                         <Th>Status</Th>
@@ -211,25 +241,15 @@ const TestComponent = () => {
                     )}
                     {metadataJson?.category && (
                       <Tr>
-                        <Th>Category</Th>
+                        <Th>category</Th>
                         <Td>{metadataJson?.category}</Td>
                       </Tr>
                     )}
-                    {/* {metadataJson?.title?.includes("Hardfork Meta") && (
-                      <Tr>
-                        <Th>Network upgrade</Th>
-                        <Td>
-                          {metadataJson?.title
-                            .split("Hardfork Meta:")[1]
-                            ?.trim()
-                            .replace(/"$/, "")}
-                        </Td>
-                      </Tr>
-                    )} */}
                   </Thead>
                 </Table>
               </Box>
               <br />
+              
               <Container maxW="1200px" mx="auto">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -248,13 +268,34 @@ const TestComponent = () => {
   );
 };
 
+const extractRIPNo = (data: any) => {
+  return data[2]?.split("-")[1];
+};
+
+const extractLastStatusDates = (data: any) => {
+  const statusDates: Record<string, string> = {};
+
+  Object.keys(data).forEach((key) => {
+    let laststatus = "";
+    if (key !== "repo") {
+      const { status, mergedDate } = data[key];
+      if (status === "unknown") {
+        return;
+      }
+      if (laststatus !== status) {
+        statusDates[status] = mergedDate;
+      }
+      laststatus = status;
+    }
+  });
+
+  return Object.keys(statusDates).map((status) => ({
+    status,
+    date: statusDates[status],
+  }));
+};
 
 
-const extracteipno=(data:any)=>{
- return data[2]?.split("-")[1];
-}
-
-// Helper functions to extract and convert metadata remain unchanged
 export const extractMetadata = (text: string) => {
   const regex = /(--|---)\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)/;
   const match = text.match(regex);
@@ -279,7 +320,7 @@ export const convertMetadataToJson = (metadataText: string): EipMetadataJson => 
   lines.forEach((line) => {
     const [key, value] = line.split(/: (.+)/);
     if (key && value) {
-      if (key.trim() === "erc") {
+      if (key.trim() === "rip") {
         jsonObject[key.trim()] = parseInt(value.trim());
       } else if (key.trim() === "requires") {
         jsonObject[key.trim()] = value.split(",").map((v) => parseInt(v));

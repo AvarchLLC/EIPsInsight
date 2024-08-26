@@ -93,7 +93,7 @@ const Meta = () => {
             </FlexBetween>
             <Box mt={2}>
               <p className="text-gray-500 italic">
-                * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count is 33 instead of 32 for Meta EIPs.
+                * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can be varied by 1.
               </p>
             </Box>
             <TableStatus cat="Meta" />

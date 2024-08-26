@@ -20,6 +20,7 @@ import {
   VStack,
   Spinner,
   Heading,
+  Button,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { Markdown } from "@/components/MarkdownEIP";
@@ -46,8 +47,53 @@ const TestComponent = () => {
   const [markdownFileURL, setMarkdownFileURL] = useState<string>("");
   const [metadataJson, setMetadataJson] = useState<EipMetadataJson>();
   const [markdown, setMarkdown] = useState<string>("");
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{ status: string; date: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDataNotFound, setIsDataNotFound] = useState(false);
+
+  const networkUpgrades: Record<string, number[]> = {
+    Homestead: [2, 7, 8, 606],
+    "Spurious Dragon": [155, 160, 161, 170, 7],
+    "Tangerine Whistle": [150, 608],
+    Byzantium: [100, 140, 196, 197, 198, 211, 214, 649, 658, 609],
+    "DAO Fork": [779],
+    Constantinople: [145, 1014, 1052, 1234, 1283, 1013],
+    Istanbul: [152, 1108, 1344, 1884, 2028, 2200, 1679],
+    Petersburg: [2726, 1283], // Removed is represented but can add more logic if needed
+    "Muir Glacier": [2384, 2387],
+    "Backfill - Berlin to Shapella": [7568, 2070, 2982, 6122, 6953],
+    Dencun: [1153, 4788, 4844, 5656, 6780, 7044, 7045, 7514, 7516, 7569],
+    Pectra: [
+      2537, 2935, 6110, 7002, 7251, 7549, 7685, 7702, 663, 3540, 3670, 4200,
+      4750, 5450, 6206, 7069, 7480, 7620, 7698, 7600, 7692,
+    ],
+    "Ethereum ProgPoW": [1057, 1588],
+    Osaka: [7607],
+    "Beacon Chain Launch": [2982],
+    Berlin: [2565, 2929, 2718, 2930, 2070],
+    London: [1559, 3198, 3529, 3541, 3554],
+    "Arrow Glacier": [4345],
+    "Gray Glacier": [5133],
+    Paris: [3675, 4399],
+    Shapella: [6953, 6122],
+    Shanghai: [3651, 3855, 3860, 4895, 6049],
+  };
+  
+  const getNetworkUpgrades = (eipNo: number) => {
+    console.log("eip:", eipNo);
+  
+    const matchedUpgrades = Object.entries(networkUpgrades)
+      .filter(([_, eipNos]) => eipNos.map(Number).includes(Number(eipNo)))
+      .map(([upgradeName]) => upgradeName);
+  
+    const formattedUpgrades = matchedUpgrades.join(", "); // Join the labels with a comma and space
+    console.log("Matched Network Upgrade Labels:", formattedUpgrades);
+    
+    return formattedUpgrades;
+  };
+
+  const networkUpgradeLabels = getNetworkUpgrades(eipNo);
+  console.log("Matched Network Upgrade Labels:", networkUpgradeLabels); 
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
   
@@ -81,9 +127,17 @@ const TestComponent = () => {
       );
 
       const { metadata, markdown: _markdown } = extractMetadata(eipMarkdownRes);
+      const metadataJson = convertMetadataToJson(metadata);
 
-      setMetadataJson(convertMetadataToJson(metadata));
-      setMarkdown(_markdown);
+      // Check if necessary fields are missing
+      if (!metadataJson?.author || !metadataJson?.created) {
+        setIsDataNotFound(true);
+      } else {
+        setMetadataJson(metadataJson);
+        setMarkdown(_markdown);
+        setIsDataNotFound(false);
+      }
+
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching EIP data:", error);
@@ -95,8 +149,6 @@ const TestComponent = () => {
       fetchEIPData();
     }
   }, [fetchEIPData, eipNo]);
-
-  // Status order definition
   const statusOrder = [
     "Draft",
     "Review",
@@ -107,16 +159,16 @@ const TestComponent = () => {
     "Final",
   ];
 
-  // Define color schemes for light and dark mode
   const boxBg = useColorModeValue("gray.100", "gray.700");
   const boxTextColor = useColorModeValue("gray.800", "gray.200");
   const statusColor = useColorModeValue("blue.600", "cyan.400");
   const dateColor = useColorModeValue("gray.600", "gray.300");
   const boxShadow = useColorModeValue("md", "dark-lg");
 
+
   return (
     <>
-      {isLoading ? ( // Show loader while data is loading
+      {isLoading ? (
         <Box
           display="flex"
           justifyContent="center"
@@ -131,6 +183,33 @@ const TestComponent = () => {
             <LoaderComponent />
           </motion.div>
         </Box>
+      ) : isDataNotFound ? (
+        <AllLayout>
+        <Box
+          textAlign="center"
+          py={6}
+          px={6}
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+        >
+          <Heading size="lg" mb={4}>
+            EIP Not Found
+          </Heading>
+          <Text color="gray.500" fontSize="xl" mb={6}>
+            This EIP might not exist or could be an ERC or an RIP. Please check again.
+          </Text>
+          <Button
+            colorScheme="blue"
+            size="lg"
+            onClick={() => (window.location.href = "/")}
+          >
+            Return to Home
+          </Button>
+        </Box>
+        </AllLayout>
       ) : (
         <AllLayout>
           <motion.div
@@ -144,36 +223,16 @@ const TestComponent = () => {
               paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
               marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
             >
-              <Header title={`EIP- ${eipNo}`} subtitle={metadataJson?.title || ""} />
-              <Box overflowX={"auto"}>
+              <Header
+                title={`EIP- ${eipNo}`}
+                subtitle={metadataJson?.title || ""}
+              />
+              <Box overflowX="auto">
                 <Table variant="simple">
                   <Thead>
                     <Tr>
                       <Th>Authors</Th>
-                      <Td>
-                        {metadataJson?.author && (
-                          <Box
-                            maxH="10rem"
-                            overflowY={"auto"}
-                            p="2px"
-                            sx={{
-                              "::-webkit-scrollbar": {
-                                w: "10px",
-                              },
-                              "::-webkit-scrollbar-track ": {
-                                bg: "gray.400",
-                                rounded: "md",
-                              },
-                              "::-webkit-scrollbar-thumb": {
-                                bg: "gray.500",
-                                rounded: "md",
-                              },
-                            }}
-                          >
-                            {metadataJson.author.join(", ")}
-                          </Box>
-                        )}
-                      </Td>
+                      <Td>{metadataJson?.author?.join(", ")}</Td>
                     </Tr>
                     <Tr>
                       <Th>Created</Th>
@@ -185,7 +244,7 @@ const TestComponent = () => {
                         <Td>
                           <Link
                             href={metadataJson["discussions-to"]}
-                            color={"blue.400"}
+                            color="blue.400"
                             isExternal
                           >
                             {metadataJson["discussions-to"]}
@@ -194,25 +253,26 @@ const TestComponent = () => {
                       </Tr>
                     )}
 
-                    {metadataJson?.requires && metadataJson.requires.length > 0 && (
-                      <Tr>
-                        <Th>Requires</Th>
-                        <Td>
-                          <HStack>
-                            {metadataJson.requires.map((req, i) => (
-                              <NLink key={i} href={`/eips/eip-${req}`}>
-                                <Text
-                                  color={"blue.400"}
-                                  _hover={{ textDecor: "underline" }}
-                                >
-                                  {"EIP"}-{req}
-                                </Text>
-                              </NLink>
-                            ))}
-                          </HStack>
-                        </Td>
-                      </Tr>
-                    )}
+                    {metadataJson?.requires &&
+                      metadataJson.requires.length > 0 && (
+                        <Tr>
+                          <Th>Requires</Th>
+                          <Td>
+                            <HStack>
+                              {metadataJson.requires.map((req, i) => (
+                                <NLink key={i} href={`/eips/eip-${req}`}>
+                                  <Text
+                                    color="blue.400"
+                                    _hover={{ textDecor: "underline" }}
+                                  >
+                                    {"EIP"}-{req}
+                                  </Text>
+                                </NLink>
+                              ))}
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      )}
                     {metadataJson?.status && (
                       <Tr>
                         <Th>Status</Th>
@@ -227,21 +287,16 @@ const TestComponent = () => {
                     )}
                     {metadataJson?.category && (
                       <Tr>
-                        <Th>Category</Th>
+                        <Th>category</Th>
                         <Td>{metadataJson?.category}</Td>
                       </Tr>
                     )}
-                    {/* {metadataJson?.title?.includes("Hardfork Meta") && (
+                     {networkUpgradeLabels && (
                       <Tr>
-                        <Th>Network upgrade</Th>
-                        <Td>
-                          {metadataJson?.title
-                            .split("Hardfork Meta:")[1]
-                            ?.trim()
-                            .replace(/"$/, "")}
-                        </Td>
+                        <Th>Network Upgrade</Th>
+                        <Td>{networkUpgradeLabels}</Td>
                       </Tr>
-                    )} */}
+                    )}
                   </Thead>
                 </Table>
               </Box>
@@ -260,56 +315,66 @@ const TestComponent = () => {
                     Status Timeline
                   </Heading>
                   <HStack w="100%" spacing={6} align="center">
-                    {data
-                      .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
-                      .sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status))
-                      .map((item, index, sortedData) => {
-                        const currentDate = new Date(item.date);
-                        const nextItem = sortedData[index + 1];
-                        const nextDate = nextItem ? new Date(nextItem.date) : null;
+                  {data
+  .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
+  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
+  .map((item, index, sortedData) => {
+    const currentDate = new Date(item.date);
+    const nextItem = sortedData[index + 1];
+    const nextDate = nextItem ? new Date(nextItem.date) : null;
 
-                        // Calculate positive day difference
-                        const dayDifference = nextDate
-                          ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
-                          : null;
+    // Calculate positive day difference
+    const dayDifference = nextDate
+      ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
+      : null;
 
-                        return (
-                          <React.Fragment key={index}>
-                            <VStack align="center">
-                              {/* Status and Date */}
-                              <Box
-                                p="5"
-                                bg={useColorModeValue("white", "gray.800")}
-                                borderRadius="md"
-                                boxShadow={useColorModeValue("md", "dark-lg")}
-                                textAlign="center"
-                              >
-                                <Text fontWeight="bold" color={statusColor}>
-                                  {item.status}
-                                </Text>
-                                <Text color={dateColor}>
-                                  {currentDate.toLocaleDateString("en-US", {
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
-                                  })}
-                                </Text>
-                              </Box>
-                            </VStack>
+    return (
+      <React.Fragment key={index}>
+        <VStack align="center">
+          {/* Status and Date */}
+          <Box
+            p="5"
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="md"
+            boxShadow={useColorModeValue("md", "dark-lg")}
+            textAlign="center"
+          >
+            <Text fontWeight="bold" color={statusColor}>
+              {item.status}
+            </Text>
+            <Text color={dateColor}>
+              {currentDate.toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </Text>
+          </Box>
+        </VStack>
 
-                            {/* Dotted line and days difference */}
-                            {nextItem && (
-                              <VStack align="center">
-                                <Box h="1px" w="80px" borderBottom="1px dashed" borderColor="gray.400" />
-                                <Text color="gray.500" fontSize="sm">
-                                  {dayDifference} days
-                                </Text>
-                                <Box h="1px" w="80px" borderBottom="1px dashed" borderColor="gray.400" />
-                              </VStack>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
+        {/* Arrow design and days difference */}
+        {nextItem && (
+          <VStack align="center" spacing={1}>
+            <Box h="1px" w="80px" borderBottom="1px solid" borderColor="gray.400" position="relative">
+              {/* Arrow pointing forward */}
+              <Box
+                position="absolute"
+                right="-10px"
+                top="-4px"
+                borderTop="5px solid transparent"
+                borderBottom="5px solid transparent"
+                borderLeft="10px solid gray"
+              />
+            </Box>
+            <Text color="gray.500" fontSize="sm">
+              {dayDifference} days
+            </Text>
+          </VStack>
+        )}
+      </React.Fragment>
+    );
+  })}
+
                   </HStack>
 
 
@@ -334,7 +399,10 @@ const TestComponent = () => {
   );
 };
 
-// Extract last status dates function remains unchanged
+const extracteipno = (data: any) => {
+  return data[2]?.split("-")[1];
+};
+
 const extractLastStatusDates = (data: any) => {
   const statusDates: Record<string, string> = {};
 
@@ -358,11 +426,7 @@ const extractLastStatusDates = (data: any) => {
   }));
 };
 
-const extracteipno=(data:any)=>{
- return data[2]?.split("-")[1];
-}
 
-// Helper functions to extract and convert metadata remain unchanged
 export const extractMetadata = (text: string) => {
   const regex = /(--|---)\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)/;
   const match = text.match(regex);
