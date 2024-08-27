@@ -19,6 +19,8 @@ const getCat = (cat: string) => {
       return "Core";
     case "ERC":
       return "ERCs";
+    case "RIP":
+      return "RIPs";
     case "Networking":
       return "Networking";
     case "Interface":
@@ -69,6 +71,7 @@ interface EIP {
   discussion: string;
   deadline: string;
   requires: string;
+  repo:string;
   unique_ID: number;
   __v: number;
 }
@@ -146,12 +149,25 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
 
   const transformedData = data.flatMap((item) => {
     const year = new Date(item.created).getFullYear();
-    return {
-      category: getCat(item.category),
-      year: year,
-      value: 1,
-    };
+  
+    if (item.repo === 'rip') {
+      // If the repo is 'rip', set category to 'rip'
+      return {
+        category: 'RIPs',
+        year: year,
+        value: 1,
+      };
+    } else {
+      // For non-rip items, apply getCat function
+      return {
+        category: getCat(item.category),
+        year: year,
+        value: 1,
+      };
+    }
   });
+  
+
 
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Column),
@@ -170,13 +186,13 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     areaStyle: { fillOpacity: 0.6 },
     legend: { position: "top-right" as const },
     smooth: true,
-    label: {
-      position: "middle",
-      style: {
-        fill: "#FFFFFF",
-        opacity: 0.6,
-      },
-    } as any,
+    // label: {
+    //   position: "middle",
+    //   style: {
+    //     fill: "#FFFFFF",
+    //     opacity: 0.6,
+    //   },
+    // } as any,
   };
 
   return (

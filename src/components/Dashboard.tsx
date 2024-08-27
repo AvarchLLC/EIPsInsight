@@ -38,6 +38,7 @@ import Banner from "@/components/NewsBanner";
 import SearchBox from "@/components/SearchBox";
 import BoyGirl from "@/components/BoyGirl";
 import AllChart from "./AllChart";
+import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 
 interface EIP {
   _id: string;
@@ -325,23 +326,25 @@ const Dashboard = () => {
                 </div>
               </Box> */}
 
-              {/* <Box className={"lg:grid grid-cols-2 hidden pb-20"}>
-                <div className={"pl-8"}>
-                  <BoyGirl />
+              <Box className={"lg:grid grid-cols-2 hidden pb-20"}>
+                <div>
+                <BoyGirl />
                 </div>
 
                 <div className={" flex justify-center items-center"}>
-                  <div className={"pt-24 space-y-6"}>
+                  <div className={"justify-center items-center space-y-6"}>
                     <h1 className={"text-5xl font-bold"}>
-                      What is <span className="text-blue-400">an EIP</span>?
+                      What is <span className="text-blue-400">EIPInsight</span>?
                     </h1>
-                    <p className={"text-3xl max-w-xl"}>
-                      EIP is a design document providing information to the
-                      Ethereum community or describing a new feature or
-                      improvement for the{" "}
-                      <span className="text-blue-400">Ethereum blockchain</span>
-                      .
-                    </p>
+                    <p className={"text-xl max-w-xl"}>
+                    EIPsInsight is specialized in toolings designed to provide clear,
+                     visual insights into the activity of Ethereum Improvement Proposal (EIP), Ethereum Request for Comments (ERCs), 
+                     and Rollup Improvement Proposals (RIPs) over a specified period. Data provided is used for tracking the progress and
+                      workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
+                    </p >
+                    <p className={"text-xl max-w-xl"}>
+                      Our mission is to empower editors, developers, stakeholders, and the broader Ethereum community with the knowledge 
+                      and tools necessary to understand and engage with the ongoing evolution of the Ethereum Standards.</p>
                     <NextLink href={"/resources"}>
                       <span className="text-blue-400 text-xl flex space-x-5">
                         Learn More{" "}
@@ -350,7 +353,7 @@ const Dashboard = () => {
                     </NextLink>
                   </div>
                 </div>
-              </Box> */}
+              </Box>
 
               <FlexBetween>
                 <Box id={"1"}>
