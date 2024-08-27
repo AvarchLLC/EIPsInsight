@@ -59,7 +59,7 @@ const TestComponent = () => {
     "DAO Fork": [779],
     Constantinople: [145, 1014, 1052, 1234, 1283, 1013],
     Istanbul: [152, 1108, 1344, 1884, 2028, 2200, 1679],
-    Petersburg: [2726, 1283], // Removed is represented but can add more logic if needed
+    Petersburg: [2726, 1283], 
     "Muir Glacier": [2384, 2387],
     "Backfill - Berlin to Shapella": [7568, 2070, 2982, 6122, 6953],
     Dencun: [1153, 4788, 4844, 5656, 6780, 7044, 7045, 7514, 7516, 7569],
@@ -86,7 +86,7 @@ const TestComponent = () => {
       .filter(([_, eipNos]) => eipNos.map(Number).includes(Number(eipNo)))
       .map(([upgradeName]) => upgradeName);
   
-    const formattedUpgrades = matchedUpgrades.join(", "); // Join the labels with a comma and space
+    const formattedUpgrades = matchedUpgrades.join(", "); 
     console.log("Matched Network Upgrade Labels:", formattedUpgrades);
     
     return formattedUpgrades;
@@ -129,7 +129,7 @@ const TestComponent = () => {
       const { metadata, markdown: _markdown } = extractMetadata(eipMarkdownRes);
       const metadataJson = convertMetadataToJson(metadata);
 
-      // Check if necessary fields are missing
+      
       if (!metadataJson?.author || !metadataJson?.created) {
         setIsDataNotFound(true);
       } else {
@@ -323,7 +323,7 @@ const TestComponent = () => {
     const nextItem = sortedData[index + 1];
     const nextDate = nextItem ? new Date(nextItem.date) : null;
 
-    // Calculate positive day difference
+    
     const dayDifference = nextDate
       ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
       : null;
@@ -404,27 +404,27 @@ const extracteipno = (data: any) => {
 };
 
 const extractLastStatusDates = (data: any) => {
-  const statusDates: Record<string, string> = {};
+  const statusDates: { status: string; date: string }[] = [];
+  let laststatus = "";
+  const sortedData = Object.keys(data)
+    .filter((key) => key !== "repo") 
+    .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
 
-  Object.keys(data).forEach((key) => {
-    let laststatus = "";
-    if (key !== "repo") {
-      const { status, mergedDate } = data[key];
-      if (status === "unknown") {
-        return;
-      }
-      if (laststatus !== status) {
-        statusDates[status] = mergedDate;
-      }
-      laststatus = status;
+  sortedData.forEach((key) => {
+    const { status, mergedDate } = data[key];
+    if (status === "unknown") {
+      return;
     }
+    if (laststatus !== status) {
+      statusDates.push({ status, date: mergedDate });
+    }
+
+    laststatus = status;
   });
 
-  return Object.keys(statusDates).map((status) => ({
-    status,
-    date: statusDates[status],
-  }));
+  return statusDates;
 };
+
 
 
 export const extractMetadata = (text: string) => {
