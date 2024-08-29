@@ -36,7 +36,7 @@ export default async (req: Request, res: Response) => {
     var allprnumbers = [];
     try {
         const prDetails = await PrDetails.find({},{prNumber : 1,_id : 0});
-        // console.log(prDetails);
+        console.log(prDetails);
        
         // Return the PR details as JSON response
         // for(prnum in prDetails){

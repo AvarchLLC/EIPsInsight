@@ -336,16 +336,13 @@ const Dashboard = () => {
                     <h1 className={"text-5xl font-bold"}>
                       What is <span className="text-blue-400">EIPInsight</span>?
                     </h1>
-                    <p className={"text-xl max-w-xl"}>
+                    <p className={"text-xl max-w-xl text-justify"}>
                     EIPsInsight is specialized in toolings designed to provide clear,
                      visual insights into the activity of Ethereum Improvement Proposal (EIP), Ethereum Request for Comments (ERCs), 
                      and Rollup Improvement Proposals (RIPs) over a specified period. Data provided is used for tracking the progress and
                       workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
                     </p >
-                    <p className={"text-xl max-w-xl"}>
-                      Our mission is to empower editors, developers, stakeholders, and the broader Ethereum community with the knowledge 
-                      and tools necessary to understand and engage with the ongoing evolution of the Ethereum Standards.</p>
-                    <NextLink href={"/resources"}>
+                    <NextLink href={"https://hackmd.io/@etherworldco/ry-GMuCEh"}>
                       <span className="text-blue-400 text-xl flex space-x-5">
                         Learn More{" "}
                         <BsArrowUpRight className={"pt-2"} size={25} />

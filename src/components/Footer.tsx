@@ -130,6 +130,7 @@ export default function LargeWithAppLinksAndSocial() {
               <NextLink href={'/status'}>Status</NextLink>
               <NextLink href={`/insight/${year}/${getMonth(monthName)}`}>{monthName} {year} Insights</NextLink>
               <NextLink href={'/resources'}>Resources</NextLink>
+              <NextLink href={'https://github.com/AvarchLLC/EIPsInsight/issues'}>Found a bug? Report here!</NextLink>
             </Stack>
 
             <Stack

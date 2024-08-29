@@ -1,6 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Chart from "chart.js/auto";
-import DateTime from "@/components/DateTime";
 import {
   Box,
   Button,
@@ -8,10 +7,17 @@ import {
   Input,
   Spinner,
   Heading,
-  List,
-  ListItem,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
   Link,
+  Collapse,
+  Icon,
 } from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import AllLayout from "@/components/Layout";
 
 const GITHUB_API_URL = 'https://api.github.com/search/issues';
@@ -29,17 +35,27 @@ type PR = {
 };
 
 const GitHubPRTracker: React.FC = () => {
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  const today = new Date();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+  
+  const [startDate, setStartDate] = useState<string>(firstDayOfMonth);
+  const [endDate, setEndDate] = useState<string>(today.toISOString().slice(0, 10));
   const [loading, setLoading] = useState<boolean>(false);
-  const [prs, setPrs] = useState<{ [key: string]: { created: PR[], closed: PR[] } }>({});
+  const [activeTab, setActiveTab] = useState<'PRs' | 'Issues'>('PRs');
+  const [showDropdown, setShowDropdown] = useState<{ [key: string]: { created: boolean, closed: boolean } }>({});
+  const [data, setData] = useState<{ [key: string]: { created: PR[], closed: PR[] } }>({});
   const chartRefs = useRef<{ [key: string]: HTMLCanvasElement | null }>({});
+  const chartInstances = useRef<{ [key: string]: Chart | undefined }>({}); // Track chart instances
 
-  const fetchAllPRs = async (repo: string, dateType: string, startDate: string, endDate: string): Promise<PR[]> => {
-    let allPRs: PR[] = [];
+  useEffect(() => {
+    fetchData(); // Fetch data on component mount
+  }, []);
+
+  const fetchAllData = async (repo: string, dateType: string, startDate: string, endDate: string): Promise<PR[]> => {
+    let allData: PR[] = [];
     let page = 1;
-    let perPage = 100;
-    let query = `repo:${repo} is:pr ${dateType}:${startDate}..${endDate}`;
+    const perPage = 100;
+    let query = `repo:${repo} is:${activeTab.toLowerCase().slice(0, -1)} ${dateType}:${startDate}..${endDate}`;
     if (dateType === 'closed') {
       query += ' is:closed';
     }
@@ -54,12 +70,13 @@ const GitHubPRTracker: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error(`Error fetching PRs for ${repo}:`, errorData);
+        console.error(`Error fetching ${activeTab} for ${repo}:`, errorData);
         throw new Error(`GitHub API returned status ${response.status}`);
       }
 
       const data = await response.json();
-      allPRs = allPRs.concat(data.items || []);
+      allData = allData.concat(data.items || []);
+      console.log(allData.length);
 
       if (data.items.length < perPage) {
         break;
@@ -68,10 +85,10 @@ const GitHubPRTracker: React.FC = () => {
       page++;
     }
 
-    return allPRs;
+    return allData;
   };
 
-  const fetchPRs = async () => {
+  const fetchData = async () => {
     if (!startDate || !endDate) {
       alert('Please select both start and end dates.');
       return;
@@ -79,39 +96,42 @@ const GitHubPRTracker: React.FC = () => {
 
     setLoading(true);
 
-    const newPrs: { [key: string]: { created: PR[], closed: PR[] } } = {};
-    
+    const newData: { [key: string]: { created: PR[], closed: PR[] } } = {};
+
     for (const { name, repo } of REPOS) {
       try {
-        const createdPRs = await fetchAllPRs(repo, 'created', startDate, endDate);
-        const closedPRs = await fetchAllPRs(repo, 'closed', startDate, endDate);
+        const createdData = await fetchAllData(repo, 'created', startDate, endDate);
+        const closedData = await fetchAllData(repo, 'closed', startDate, endDate);
 
-        newPrs[name] = { created: createdPRs, closed: closedPRs };
+        newData[name] = { created: createdData, closed: closedData };
       } catch (error) {
-        console.error(`Failed to fetch PRs for ${repo}:`, error);
-        alert(`Failed to fetch PRs for ${repo}. Please check the console for details.`);
+        console.error(`Failed to fetch ${activeTab} for ${repo}:`, error);
+        alert(`Failed to fetch ${activeTab} for ${repo}. Please check the console for details.`);
       }
     }
 
-    setPrs(newPrs);
+    setData(newData);
     setLoading(false);
 
     for (const { name } of REPOS) {
-      updateChart(name, newPrs[name]?.created.length || 0, newPrs[name]?.closed.length || 0);
-      updateUI(name, 'created', newPrs[name]?.created || []);
-      updateUI(name, 'closed', newPrs[name]?.closed || []);
+      updateChart(name, newData[name]?.created.length || 0, newData[name]?.closed.length || 0);
     }
   };
 
   const updateChart = (repoName: string, createdCount: number, closedCount: number) => {
     const ctx = chartRefs.current[repoName]?.getContext('2d');
     if (ctx) {
-      new Chart(ctx, {
+      // Destroy the existing chart instance before creating a new one
+      if (chartInstances.current[repoName]) {
+        chartInstances.current[repoName]?.destroy();
+      }
+
+      chartInstances.current[repoName] = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: ['Created', 'Closed'],
           datasets: [{
-            label: `${repoName} PRs`,
+            label: `${repoName} ${activeTab}`,
             data: [createdCount, closedCount],
             backgroundColor: ['#36a2eb', '#ff6384']
           }]
@@ -128,98 +148,140 @@ const GitHubPRTracker: React.FC = () => {
     }
   };
 
-  const updateUI = (repoName: string, type: string, prs: PR[]) => {
-    const countElement = document.getElementById(`${repoName}-${type}-count`);
-    const listElement = document.getElementById(`${repoName}-${type}-list`);
-
-    if (countElement) {
-      countElement.textContent = `(${prs.length})`;
-    }
-
-    if (listElement) {
-      listElement.innerHTML = '';
-
-      prs.forEach(pr => {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `<a href="${pr.html_url}" target="_blank">#${pr.number} - ${pr.title}</a>`;
-        listElement.appendChild(listItem);
-      });
-    }
+  const toggleDropdown = (repoName: string, section: 'created' | 'closed') => {
+    setShowDropdown((prevState) => ({
+      ...prevState,
+      [repoName]: {
+        created: section === 'created' ? !prevState[repoName]?.created : false,
+        closed: section === 'closed' ? !prevState[repoName]?.closed : false,
+      },
+    }));
   };
-  return (
-    <AllLayout>
-      <Box paddingLeft={20} paddingRight={20} marginTop={20} marginBottom={10}>
-  <Heading
-    size="xl"
-    marginTop={30}
-    marginBottom={10}
-    textAlign="center"
-    style={{
-      color: '#42a5f5', // Color matching the heading in the image
-      fontSize: '2.5rem', // Adjust size if necessary to match the image
-      fontWeight: 'bold' // Assuming bold weight based on the image
-    }}
-  >
-    EIPs and ERCs Open & Closed PRs
-  </Heading>
-  <Heading as="label" htmlFor="monthFilter" size="md">
-  How to Use:
-</Heading>
-<ol>
-  <li>Filter by date to get the open and closed PRs for EIPs and ERCs.</li>
-</ol>
-</Box>
-      <Box minHeight="100vh" padding={20}>
-  <Flex gap={4} direction="row" alignItems="center">
-    <Input
-      type="date"
-      value={startDate}
-      onChange={(e) => setStartDate(e.target.value)}
-    />
-    <Input
-      type="date"
-      value={endDate}
-      onChange={(e) => setEndDate(e.target.value)}
-    />
-    <Button onClick={fetchPRs} disabled={loading}>
-      {loading ? <Spinner size="sm" /> : 'Fetch PRs'}
-    </Button>
-  </Flex>
-  {/* {loading && <Spinner size="sm" />} */}
-  <Flex direction="column" mt={8}>
-    <Flex gap={4} direction="row" mb={8}>
-      {REPOS.map(({ name }) => (
-        <Box key={name} flex="1">
-          <Heading size="md" textTransform="uppercase" marginBottom={4}>
-            {name} PRs
-          </Heading>
-          <Heading size="md" textTransform="uppercase" marginBottom={4}>
-            
-          </Heading>
-          <canvas ref={(el) => (chartRefs.current[name] = el)} id={`${name}-chart`} />
-          <Box>
-            <DateTime />
-          </Box>
-        </Box>
-      ))}
-    </Flex>
-    <Flex gap={4} direction="row">
-      {REPOS.map(({ name }) => (
-        <Box key={name} flex="1">
-          <Box>
-            <Heading size="sm">Created PRs <span id={`${name}-created-count`}></span></Heading>
-            <List id={`${name}-created-list`}></List>
-          </Box>
-          <Box mt={4}>
-            <Heading size="sm">Closed PRs <span id={`${name}-closed-count`}></span></Heading>
-            <List id={`${name}-closed-list`}></List>
-          </Box>
-        </Box>
-      ))}
-    </Flex>
-  </Flex>
-</Box>
+  
 
+  const renderTable = (repoName: string, section: 'created' | 'closed') => (
+    <Table variant="striped" colorScheme="teal">
+      <Thead>
+        <Tr>
+          <Th>#</Th>
+          <Th>PR Number</Th>
+          <Th>Title</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {data[repoName]?.[section]?.map((item, index) => (
+          <Tr key={item.number}>
+            <Td>{index + 1}</Td>
+            <Td>
+              <Link href={item.html_url} target="_blank">
+                #{item.number}
+              </Link>
+            </Td>
+            <Td>{item.title}</Td>
+          </Tr>
+        ))}
+      </Tbody>
+    </Table>
+  );
+
+  return (
+   < AllLayout>
+      <Box paddingLeft={20} paddingRight={20} marginTop={20} marginBottom={10}>
+        <Heading
+          size="xl"
+          marginTop={30}
+          marginBottom={10}
+          textAlign="center"
+          style={{
+            color: '#42a5f5',
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+          }}
+        >
+          EIPs and ERCs PRs & Issues
+        </Heading>
+        <Flex gap={4} justify="center" mt={4} mb={8}>
+          <Button
+            onClick={() => setActiveTab('PRs')}
+            bg={activeTab === 'PRs' ? 'blue.500' : 'gray.300'}
+            color={activeTab === 'PRs' ? 'white' : 'black'}
+          >
+            PRs
+          </Button>
+          <Button
+            onClick={() => setActiveTab('Issues')}
+            bg={activeTab === 'Issues' ? 'blue.500' : 'gray.300'}
+            color={activeTab === 'Issues' ? 'white' : 'black'}
+          >
+            Issues
+          </Button>
+        </Flex>
+        <Flex gap={4} align="center">
+          <Input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <Input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+          <Button onClick={fetchData} disabled={loading}>
+            {loading ? <Spinner size="sm" /> : `Fetch ${activeTab}`}
+          </Button>
+        </Flex>
+
+        <Box mt={8} textAlign="center">
+          {/* First Graph */}
+          <Box display="flex" justifyContent="center" mt={8}>
+            <Box width="50%">
+              <canvas ref={(el) => (chartRefs.current['EIPs'] = el)} />
+            </Box>
+          </Box>
+
+          <Flex justify="space-between" mt={4}>
+            <Heading size="md">Created PRs: {data['EIPs']?.created.length || 0}</Heading>
+            <Heading size="md">Closed PRs: {data['EIPs']?.closed.length || 0}</Heading>
+          </Flex>
+          <Flex justify="space-between" mt={4}>
+            <Button onClick={() => toggleDropdown('EIPs', 'created')}>
+              {showDropdown['EIPs']?.created ? <Icon as={ChevronDownIcon} /> : <Icon as={ChevronRightIcon} />}
+              Show Created PRs
+            </Button>
+            <Button onClick={() => toggleDropdown('EIPs', 'closed')}>
+              {showDropdown['EIPs']?.closed ? <Icon as={ChevronDownIcon} /> : <Icon as={ChevronRightIcon} />}
+              Show Closed PRs
+            </Button>
+          </Flex>
+          <Collapse in={showDropdown['EIPs']?.created}>{renderTable('EIPs', 'created')}</Collapse>
+          <Collapse in={showDropdown['EIPs']?.closed}>{renderTable('EIPs', 'closed')}</Collapse>
+
+          {/* Second Graph */}
+          <Box display="flex" justifyContent="center" mt={8}>
+            <Box width="50%">
+              <canvas ref={(el) => (chartRefs.current['ERCs'] = el)} />
+            </Box>
+          </Box>
+
+          <Flex justify="space-between" mt={4}>
+            <Heading size="md">Created PRs: {data['ERCs']?.created.length || 0}</Heading>
+            <Heading size="md">Closed PRs: {data['ERCs']?.closed.length || 0}</Heading>
+          </Flex>
+          <Flex justify="space-between" mt={4}>
+            <Button onClick={() => toggleDropdown('ERCs', 'created')}>
+              {showDropdown['ERCs']?.created ? <Icon as={ChevronDownIcon} /> : <Icon as={ChevronRightIcon} />}
+              Show Created PRs
+            </Button>
+            <Button onClick={() => toggleDropdown('ERCs', 'closed')}>
+              {showDropdown['ERCs']?.closed ? <Icon as={ChevronDownIcon} /> : <Icon as={ChevronRightIcon} />}
+              Show Closed PRs
+            </Button>
+          </Flex>
+          <Collapse in={showDropdown['ERCs']?.created}>{renderTable('ERCs', 'created')}</Collapse>
+          <Collapse in={showDropdown['ERCs']?.closed}>{renderTable('ERCs', 'closed')}</Collapse>
+        </Box>
+      </Box>
     </AllLayout>
   );
 };
