@@ -246,7 +246,7 @@ const Month = () => {
                   <Box>
                     <InsightDoughnut data={typeData} />
                   </Box>
-                </Box>
+                </Box>`
               )} */}
 
               <Text

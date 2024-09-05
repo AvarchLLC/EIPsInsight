@@ -1,289 +1,530 @@
-import React, { useState, useRef, useEffect } from "react";
-import Chart from "chart.js/auto";
+import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
-  Input,
   Spinner,
   Heading,
+  Select,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Checkbox,
   Table,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
-  Link,
-  Collapse,
-  Icon,
+  useDisclosure,
+  IconButton,
+  HStack
 } from "@chakra-ui/react";
-import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
 
-const GITHUB_API_URL = 'https://api.github.com/search/issues';
-const REPOS = [
-  { name: 'EIPs', repo: 'ethereum/EIPs' },
-  { name: 'ERCs', repo: 'ethereum/ERCs' }
-];
+const getYears = () => {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: currentYear - 2019 }, (_, i) => currentYear - i); // Assuming you want data from 2020 onwards
+};
 
-const GITHUB_API_KEY = process.env.NEXT_PUBLIC_ACCESS_TOKEN;
+const getMonths = (year) => {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth(); // 0-indexed (0 = January, 11 = December)
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  return year === currentYear ? months.slice(0, currentMonth + 1) : months;
+};
+
+// Dynamic import for Ant Design's Column chart
+const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
+
+const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails'];
+const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails'];
 
 type PR = {
-  number: number;
-  title: string;
-  html_url: string;
+  prNumber: number;
+  prTitle: string;
+  created_at: Date;
+  closed_at: Date | null;
+  merged_at: Date | null;
+};
+
+type Issue = {
+  IssueNumber: number;
+  IssueTitle: string;
+  state: string;
+  created_at: Date;
+  closed_at: Date | null;
 };
 
 const GitHubPRTracker: React.FC = () => {
-  const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
-  
-  const [startDate, setStartDate] = useState<string>(firstDayOfMonth);
-  const [endDate, setEndDate] = useState<string>(today.toISOString().slice(0, 10));
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'PRs' | 'Issues'>('PRs');
-  const [showDropdown, setShowDropdown] = useState<{ [key: string]: { created: boolean, closed: boolean } }>({});
-  const [data, setData] = useState<{ [key: string]: { created: PR[], closed: PR[] } }>({});
-  const chartRefs = useRef<{ [key: string]: HTMLCanvasElement | null }>({});
-  const chartInstances = useRef<{ [key: string]: Chart | undefined }>({}); // Track chart instances
+  const [selectedRepo, setSelectedRepo] = useState<string>('EIPs');
+  const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
+  // const [selectedYear, setSelectedYear] = useState(null);
+  // const [selectedMonth, setSelectedMonth] = useState(null);
+  const [data, setData] = useState<{
+    PRs: { [key: string]: { created: PR[], closed: PR[], merged: PR[] } };
+    Issues: { [key: string]: { created: Issue[], closed: Issue[] } };
+  }>({ PRs: {}, Issues: {} });
+
+  // const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [showCategory, setShowCategory] = useState<{ [key: string]: boolean }>({
+    created: true,
+    closed: true,
+    merged: true,
+  });
 
   useEffect(() => {
-    fetchData(); // Fetch data on component mount
-  }, []);
+    fetchData();
+  }, [activeTab, selectedRepo]);
 
-  const fetchAllData = async (repo: string, dateType: string, startDate: string, endDate: string): Promise<PR[]> => {
-    let allData: PR[] = [];
-    let page = 1;
-    const perPage = 100;
-    let query = `repo:${repo} is:${activeTab.toLowerCase().slice(0, -1)} ${dateType}:${startDate}..${endDate}`;
-    if (dateType === 'closed') {
-      query += ' is:closed';
+  const fetchPRData = async () => {
+    try {
+      const [eipsData, ercsData] = await Promise.all(
+        PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+      );
+
+      const selectedData = selectedRepo === 'EIPs' ? eipsData : ercsData;
+      const transformedData = transformPRData(selectedData);
+
+      setData(prevData => ({
+        ...prevData,
+        PRs: transformedData
+      }));
+    } catch (error) {
+      console.error("Failed to fetch PR data:", error);
     }
+  };
 
-    while (true) {
-      const response = await fetch(`${GITHUB_API_URL}?q=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`, {
-        headers: {
-          'Authorization': `token ${GITHUB_API_KEY}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
+  const fetchIssueData = async () => {
+    try {
+      const [eipsData, ercsData] = await Promise.all(
+        ISSUE_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error(`Error fetching ${activeTab} for ${repo}:`, errorData);
-        throw new Error(`GitHub API returned status ${response.status}`);
-      }
+      const selectedData = selectedRepo === 'EIPs' ? eipsData : ercsData;
+      const transformedData = transformIssueData(selectedData);
 
-      const data = await response.json();
-      allData = allData.concat(data.items || []);
-      console.log(allData.length);
-
-      if (data.items.length < perPage) {
-        break;
-      }
-
-      page++;
+      setData(prevData => ({
+        ...prevData,
+        Issues: transformedData
+      }));
+    } catch (error) {
+      console.error("Failed to fetch Issues data:", error);
     }
-
-    return allData;
   };
 
   const fetchData = async () => {
-    if (!startDate || !endDate) {
-      alert('Please select both start and end dates.');
-      return;
-    }
-
     setLoading(true);
-
-    const newData: { [key: string]: { created: PR[], closed: PR[] } } = {};
-
-    for (const { name, repo } of REPOS) {
-      try {
-        const createdData = await fetchAllData(repo, 'created', startDate, endDate);
-        const closedData = await fetchAllData(repo, 'closed', startDate, endDate);
-
-        newData[name] = { created: createdData, closed: closedData };
-      } catch (error) {
-        console.error(`Failed to fetch ${activeTab} for ${repo}:`, error);
-        alert(`Failed to fetch ${activeTab} for ${repo}. Please check the console for details.`);
-      }
+    if (activeTab === 'PRs') {
+      await fetchPRData();
+    } else if (activeTab === 'Issues') {
+      await fetchIssueData();
     }
-
-    setData(newData);
     setLoading(false);
-
-    for (const { name } of REPOS) {
-      updateChart(name, newData[name]?.created.length || 0, newData[name]?.closed.length || 0);
-    }
   };
 
-  const updateChart = (repoName: string, createdCount: number, closedCount: number) => {
-    const ctx = chartRefs.current[repoName]?.getContext('2d');
-    if (ctx) {
-      // Destroy the existing chart instance before creating a new one
-      if (chartInstances.current[repoName]) {
-        chartInstances.current[repoName]?.destroy();
+  const transformPRData = (data: PR[]): { [key: string]: { created: PR[], closed: PR[], merged: PR[] } } => {
+    const monthYearData: { [key: string]: { created: PR[], closed: PR[], merged: PR[] } } = {};
+
+    data.forEach(pr => {
+      const createdDate = pr.created_at ? new Date(pr.created_at) : null;
+      const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
+      const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
+
+      if (createdDate) {
+        const key = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [] };
+        monthYearData[key].created.push(pr);
       }
 
-      chartInstances.current[repoName] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Created', 'Closed'],
-          datasets: [{
-            label: `${repoName} ${activeTab}`,
-            data: [createdCount, closedCount],
-            backgroundColor: ['#36a2eb', '#ff6384']
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
+      if (closedDate && !mergedDate) {
+        const key = `${closedDate.getFullYear()}-${String(closedDate.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [] };
+        monthYearData[key].closed.push(pr);
+      }
+
+      if (mergedDate) {
+        const key = `${mergedDate.getFullYear()}-${String(mergedDate.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [] };
+        monthYearData[key].merged.push(pr);
+      }
+    });
+
+    return monthYearData;
   };
 
-  const toggleDropdown = (repoName: string, section: 'created' | 'closed') => {
-    setShowDropdown((prevState) => ({
-      ...prevState,
-      [repoName]: {
-        created: section === 'created' ? !prevState[repoName]?.created : false,
-        closed: section === 'closed' ? !prevState[repoName]?.closed : false,
-      },
-    }));
+  const transformIssueData = (data: Issue[]): { [key: string]: { created: Issue[], closed: Issue[] } } => {
+    const monthYearData: { [key: string]: { created: Issue[], closed: Issue[] } } = {};
+
+    data.forEach(issue => {
+      const createdDate = new Date(issue.created_at);
+      const key = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}`;
+      if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [] };
+      monthYearData[key].created.push(issue);
+
+      if (issue.closed_at) {
+        const closedDate = new Date(issue.closed_at);
+        const closedKey = `${closedDate.getFullYear()}-${String(closedDate.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthYearData[closedKey]) monthYearData[closedKey] = { created: [], closed: [] };
+        monthYearData[closedKey].closed.push(issue);
+      }
+    });
+
+    return monthYearData;
+  };
+
+  const getYears = () => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 10 }, (_, i) => currentYear - i);
+  };
+
+  const getMonths = () => [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const renderTable = (year: string, month: string, type: 'PRs' | 'Issues') => {
+    const dataToUse = type === 'PRs' ? data.PRs : data.Issues;
+    const key = `${year}-${String(getMonths().indexOf(month) + 1).padStart(2, '0')}`;
+    const items = dataToUse[key] || (type === 'PRs' ? { created: [], closed: [], merged: [] } : { created: [], closed: [] });
+  
+    return (
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>Number</Th>
+            <Th>Title</Th>
+            {type === 'PRs' ? (
+              <>
+                <Th>State</Th>
+                <Th>Created At</Th>
+                <Th>Closed At</Th>
+                <Th>Merged At</Th>
+              </>
+            ) : (
+              <>
+                <Th>State</Th>
+                <Th>Created Date</Th>
+                <Th>Closed Date</Th>
+              </>
+            )}
+            <Th>Link</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' && items.merged.length === 0) ? (
+            <Tr>
+              <Td colSpan={type === 'PRs' ? 6 : 5} textAlign="center">No Data Available</Td>
+            </Tr>
+          ) : (
+            <>
+              {/* Render Created Items */}
+              {showCategory.created && items.created.map((item) => (
+                <Tr key={`created-${item.prNumber || item.IssueNumber}`}>
+                  <Td>{item.prNumber || item.IssueNumber}</Td>
+                  <Td>{item.prTitle || item.IssueTitle}</Td>
+                  {type === 'PRs' ? (
+                    <>
+                      <Td>Created</Td>
+                      <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                      <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                      <Td>{item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-'}</Td>
+                      <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
+                      <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber||item.IssueNumber}`} target="_blank">Pull Request</a>
+                    </button></Td>
+                    </>
+                  ) : (
+                    <>
+                      <Td>{item.state}</Td>
+                      <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                      <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                      <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
+                      <a href={`https://github.com/ethereum/${selectedRepo}/issue/${item.prNumber||item.IssueNumber}`} target="_blank">Issue</a>
+                    </button></Td>
+                    </>
+                  )}
+                </Tr>
+              ))}
+  
+              {/* Render Closed Items */}
+              {showCategory.closed && items.closed.map((item) => (
+                <Tr key={`closed-${item.prNumber || item.IssueNumber}`}>
+                  <Td>{item.prNumber || item.IssueNumber}</Td>
+                  <Td>{item.prTitle || item.IssueTitle}</Td>
+                  {type === 'PRs' ? (
+                    <>
+                      <Td>Closed</Td>
+                      <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                      <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                      <Td>{item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-'}</Td>
+                      <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
+                      <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber||item.IssueNumber}`} target="_blank">Pull Request</a>
+                    </button></Td>
+                    </>
+                  ) : (
+                    <>
+                      <Td>{item.state}</Td>
+                      <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                      <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                      <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
+                      <a href={`https://github.com/ethereum/${selectedRepo}/issue/${item.prNumber||item.IssueNumber}`} target="_blank">Issue</a>
+                    </button></Td>
+                    </>
+                  )}
+                </Tr>
+              ))}
+  
+              {/* Render Merged Items (only for PRs) */}
+              {showCategory.merged && type === 'PRs' && items.merged.map((item) => (
+                <Tr key={`merged-${item.prNumber || item.IssueNumber}`}>
+                  <Td>{item.prNumber || '-'}</Td>
+                  <Td>{item.prTitle || '-'}</Td>
+                  <Td>Merged</Td>
+                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-'}</Td>
+                  <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
+                      <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber||item.IssueNumber}`} target="_blank">Pull Request</a>
+                    </button></Td>
+                </Tr>
+              ))}
+            </>
+          )}
+        </Tbody>
+      </Table>
+    );
   };
   
+  
 
-  const renderTable = (repoName: string, section: 'created' | 'closed') => (
-    <Table variant="striped" colorScheme="teal">
-      <Thead>
-        <Tr>
-          <Th>#</Th>
-          <Th>PR Number</Th>
-          <Th>Title</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {data[repoName]?.[section]?.map((item, index) => (
-          <Tr key={item.number}>
-            <Td>{index + 1}</Td>
-            <Td>
-              <Link href={item.html_url} target="_blank">
-                #{item.number}
-              </Link>
-            </Td>
-            <Td>{item.title}</Td>
-          </Tr>
-        ))}
-      </Tbody>
-    </Table>
-  );
+  const renderChart = () => {
+    const dataToUse = activeTab === 'PRs' ? data.PRs : data.Issues;
+
+    // Transform data for chart rendering
+    const transformedData = Object.keys(dataToUse).flatMap(monthYear => {
+      const items = dataToUse[monthYear];
+      return [
+        ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
+        ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: items.merged?.length || 0 }] : []),
+        ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: items.closed.length }] : [])
+      ];
+    });
+
+    // Sort data by monthYear in ascending order
+    const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+
+    const config = {
+      data: sortedData,
+      xField: "monthYear",
+      yField: "count",
+      colorField: "type",
+      seriesField: "type",
+      isGroup: true,
+      columnStyle: {
+        radius: [20, 20, 0, 0],
+      },
+      slider: {
+        start: 0,
+        end: 1,
+      },
+      legend: { position: "top-right" as const },
+      smooth: true,
+      label: {
+        position: "middle" as const,
+        style: {
+          fill: "#FFFFFF",
+          opacity: 0.6,
+        },
+      },
+    };
+
+    return <Column {...config} />;
+  };
 
   return (
-   < AllLayout>
-      <Box paddingLeft={20} paddingRight={20} marginTop={20} marginBottom={10}>
-        <Heading
-          size="xl"
-          marginTop={30}
-          marginBottom={10}
-          textAlign="center"
-          style={{
-            color: '#42a5f5',
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-          }}
-        >
-          EIPs and ERCs PRs & Issues
-        </Heading>
-        <Flex gap={4} justify="center" mt={4} mb={8}>
-          <Button
-            onClick={() => setActiveTab('PRs')}
-            bg={activeTab === 'PRs' ? 'blue.500' : 'gray.300'}
-            color={activeTab === 'PRs' ? 'white' : 'black'}
+    loading ? (
+      <LoaderComponent />
+    ) : (
+      <AllLayout>
+        <Box paddingLeft={20} paddingRight={20} marginTop={20} marginBottom={10}>
+          <Heading
+            size="xl"
+            marginTop={30}
+            marginBottom={10}
+            textAlign="center"
+            style={{
+              color: '#42a5f5',
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+            }}
           >
-            PRs
-          </Button>
-          <Button
-            onClick={() => setActiveTab('Issues')}
-            bg={activeTab === 'Issues' ? 'blue.500' : 'gray.300'}
-            color={activeTab === 'Issues' ? 'white' : 'black'}
-          >
-            Issues
-          </Button>
-        </Flex>
-        <Flex gap={4} align="center">
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <Input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-          <Button onClick={fetchData} disabled={loading}>
-            {loading ? <Spinner size="sm" /> : `Fetch ${activeTab}`}
-          </Button>
-        </Flex>
-
-        <Box mt={8} textAlign="center">
-          {/* First Graph */}
-          <Box display="flex" justifyContent="center" mt={8}>
-            <Box width="50%">
-              <canvas ref={(el) => (chartRefs.current['EIPs'] = el)} />
-            </Box>
-          </Box>
-
-          <Flex justify="space-between" mt={4}>
-            <Heading size="md">Created PRs: {data['EIPs']?.created.length || 0}</Heading>
-            <Heading size="md">Closed PRs: {data['EIPs']?.closed.length || 0}</Heading>
-          </Flex>
-          <Flex justify="space-between" mt={4}>
-            <Button onClick={() => toggleDropdown('EIPs', 'created')}>
-              {showDropdown['EIPs']?.created ? <Icon as={ChevronDownIcon} /> : <Icon as={ChevronRightIcon} />}
-              Show Created PRs
+            EIPs and ERCs PRs & Issues
+          </Heading>
+          <Flex gap={4} justify="center" mt={4} mb={8}>
+            <Button
+              onClick={() => setActiveTab('PRs')}
+              bg={activeTab === 'PRs' ? 'blue.500' : 'gray.300'}
+              color={activeTab === 'PRs' ? 'white' : 'black'}
+            >
+              PRs
             </Button>
-            <Button onClick={() => toggleDropdown('EIPs', 'closed')}>
-              {showDropdown['EIPs']?.closed ? <Icon as={ChevronDownIcon} /> : <Icon as={ChevronRightIcon} />}
-              Show Closed PRs
+            <Button
+              onClick={() => setActiveTab('Issues')}
+              bg={activeTab === 'Issues' ? 'blue.500' : 'gray.300'}
+              color={activeTab === 'Issues' ? 'white' : 'black'}
+            >
+              Issues
             </Button>
           </Flex>
-          <Collapse in={showDropdown['EIPs']?.created}>{renderTable('EIPs', 'created')}</Collapse>
-          <Collapse in={showDropdown['EIPs']?.closed}>{renderTable('EIPs', 'closed')}</Collapse>
-
-          {/* Second Graph */}
-          <Box display="flex" justifyContent="center" mt={8}>
-            <Box width="50%">
-              <canvas ref={(el) => (chartRefs.current['ERCs'] = el)} />
-            </Box>
-          </Box>
-
-          <Flex justify="space-between" mt={4}>
-            <Heading size="md">Created PRs: {data['ERCs']?.created.length || 0}</Heading>
-            <Heading size="md">Closed PRs: {data['ERCs']?.closed.length || 0}</Heading>
+          <Flex justify="center" mb={8}>
+            <Select
+              value={selectedRepo}
+              onChange={(e) => setSelectedRepo(e.target.value)}
+              width="200px"
+            >
+              <option value="EIPs">EIPs</option>
+              <option value="ERCs">ERCs</option>
+            </Select>
           </Flex>
-          <Flex justify="space-between" mt={4}>
-            <Button onClick={() => toggleDropdown('ERCs', 'created')}>
-              {showDropdown['ERCs']?.created ? <Icon as={ChevronDownIcon} /> : <Icon as={ChevronRightIcon} />}
-              Show Created PRs
-            </Button>
-            <Button onClick={() => toggleDropdown('ERCs', 'closed')}>
-              {showDropdown['ERCs']?.closed ? <Icon as={ChevronDownIcon} /> : <Icon as={ChevronRightIcon} />}
-              Show Closed PRs
-            </Button>
-          </Flex>
-          <Collapse in={showDropdown['ERCs']?.created}>{renderTable('ERCs', 'created')}</Collapse>
-          <Collapse in={showDropdown['ERCs']?.closed}>{renderTable('ERCs', 'closed')}</Collapse>
         </Box>
-      </Box>
-    </AllLayout>
-  );
+        <Box>{renderChart()}</Box>
+  
+        <Flex justify="center" mb={8}>
+          <Checkbox
+            isChecked={showCategory.created}
+            onChange={() => setShowCategory((prev) => ({ ...prev, created: !prev.created }))}
+            mr={4}
+          >
+            Show Created PRs/Issues
+          </Checkbox>
+          <Checkbox
+            isChecked={showCategory.closed}
+            onChange={() => setShowCategory((prev) => ({ ...prev, closed: !prev.closed }))}
+            mr={4}
+          >
+            Show Closed PRs/Issues
+          </Checkbox>
+          {activeTab === 'PRs' && (
+            <Checkbox
+              isChecked={showCategory.merged}
+              onChange={() => setShowCategory((prev) => ({ ...prev, merged: !prev.merged }))}
+              mr={4}
+            >
+              Show Merged PRs
+            </Checkbox>
+          )}
+        </Flex>
+  
+        <Box>
+          {/* View More Button */}
+          <Flex justify="center" mb={8}>
+            <Button colorScheme="blue" onClick={toggleDropdown}>
+              {showDropdown ? 'Hide' : 'View More'}
+            </Button>
+          </Flex>
+  
+          {/* Dropdowns for Year and Month Selection */}
+          {showDropdown && (
+            <Box mb={8} display="flex" justifyContent="center">
+              <HStack spacing={4}>
+                {/* Year Selection */}
+                <Menu>
+                  <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                    {selectedYear ? `Year: ${selectedYear}` : 'Select Year'}
+                  </MenuButton>
+                  <MenuList>
+                    {getYears().map((year) => (
+                      <MenuItem
+                        key={year}
+                        onClick={() => {
+                          setSelectedYear(year.toString());
+                          setSelectedMonth(null); // Reset month when a new year is selected
+                        }}
+                      >
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+  
+                {/* Month Selection */}
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<ChevronDownIcon />}
+                    colorScheme="blue"
+                    isDisabled={!selectedYear} // Disable if no year is selected
+                  >
+                    {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
+                  </MenuButton>
+                  <MenuList>
+                    {selectedYear && getMonths(selectedYear).map((month, index) => (
+                      <MenuItem key={index} onClick={() => setSelectedMonth(month)}>
+                        {month}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+              </HStack>
+            </Box>
+          )}
+        </Box>
+  
+        {selectedYear && selectedMonth && (
+          <Box mt={8}>
+            {renderTable(selectedYear, selectedMonth, activeTab)}
+          </Box>
+        )}
+      </AllLayout>
+    )
+  );  
 };
 
 export default GitHubPRTracker;
+

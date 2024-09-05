@@ -24,7 +24,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/resources/index.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/resources/index.jsx", "src/pages/api/eipsprdetails"],
   "exclude": ["node_modules"]
 }
 

@@ -1,838 +1,350 @@
-import React, { useState, useEffect, useRef } from "react";
-import Chart, { ChartItem } from "chart.js/auto";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { Box, Flex, Heading, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text  } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
-import DateTime from "@/components/DateTime";
-import {
-  Input,
-  Box,
-  Button,
-  Flex,
-  Spacer,
-  TableContainer,
-  Table,
-  TableCaption,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
-  Td,
-  Tfoot,
-  CardBody,
-  Stack,
-  StackDivider,
-  Card,
-  CardHeader,
-  Heading,
-  Text,
-  Link,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import { ArrowRight } from "react-feather";
-import Eip from "../api/time-to-final/[eip]";
+import LoaderComponent from "@/components/Loader";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
-const defaultHandles = [
-  "axic",
-  "gcolvin",
-  "lightclient",
-  "SamWilsn",
-  "xinbenlv",
-  "g11tech"
-];
-const token = process.env.NEXT_PUBLIC_ACCESS_TOKEN;
 
-type EIPsReview = {
-  title: string;
-  url: string;
-  date: string;
-  html_url: string;
-  closed_at: string;
+// Dynamic import for Ant Design's Column chart
+const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
+
+const API_ENDPOINTS = {
+  eips: '/api/editorsprseips',
+  ercs: '/api/editorsprsercs'
 };
 
-type ERCsReview = {
-  title: string;
-  url: string;
-  date: string;
-  html_url: string;
-  closed_at: string;
-};
-
-// reivews will be an array where first item will be the array of EIPs reviews and second item will be the array of ERCs reviews
-type Reviews = EIPsReview[] | ERCsReview[];
-
-type DefaultEipReview = {
-  title: string;
-  url: string;
-  date: string;
-};
-
-type DefaultErcReview = {
-  title: string;
-  url: string;
-  date: string;
-};
-
-const GitHubPRTracker = () => {
-  const [reviewsCount, setReviewsCount] = useState<[Number[], Number[]]>();
-  const [randomEipsReviews, setRandomEipsReviews] = useState<
-    Array<DefaultEipReview>
-  >([]);
-  const [randomErcsReviews, setRandomErcsReviews] = useState<
-    Array<DefaultErcReview>
-  >([]);
-  const [reviewsTitle, setReviewsTitle] = useState<string>("");
-  const defaultChartRef = useRef<HTMLCanvasElement>(null);
-  const handleChartRef = useRef<HTMLCanvasElement>(null);
-  const [handle, setHandle] = useState<string>("");
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [handleReviewsCount, setHandleReviewsCount] =
-    useState<[Number[], Number[]]>();
-  const [randomChart, setRandomChart] =
-    useState<Chart<"bar", Number[], string>>();
-  const [dynamicChart, setDynamicChart] =
-    useState<Chart<"bar", Number[], string>>();
-  const bg = useColorModeValue("#171923", "#171923");
-
-  // const showRandomReviews = async () => {
-  //   let eipRandomReviews: Array<DefaultEipReview> = [];
-  //   let ercRandomReviews: Array<DefaultErcReview> = [];
-  //   let randomHandle =
-  //     defaultHandles[Math.floor(Math.random() * defaultHandles.length)];
-
-  //   const reviewsEIPs = await fetchAllReviews(
-  //     randomHandle,
-  //     "",
-  //     "",
-  //     "ethereum/EIPs"
-  //   );
-  //   const reviewsERCs = await fetchAllReviews(
-  //     randomHandle,
-  //     "",
-  //     "",
-  //     "ethereum/ERCs"
-  //   );
-
-  //   reviewsEIPs.forEach((review) => {
-  //     eipRandomReviews.push({
-  //       title: review.title,
-  //       url: review.html_url,
-  //       date: new Date(review.closed_at).toLocaleString(),
-  //     });
-  //   });
-
-  //   reviewsERCs.forEach((review) => {
-  //     ercRandomReviews.push({
-  //       title: review.title,
-  //       url: review.html_url,
-  //       date: new Date(review.closed_at).toLocaleString(),
-  //     });
-  //   });
-
-  //   setRandomEipsReviews(eipRandomReviews);
-  //   setRandomErcsReviews(ercRandomReviews);
-  //   setReviewsTitle(
-  //     `Total Reviews by ${randomHandle}: ${reviewsEIPs.length} (EIPs), ${reviewsERCs.length} (ERCs)`
-  //   );
-  // };
-
-  const updateDefaultReviewCounts = async () => {
-    const reviewCountsEIPs: Number[] = await Promise.all(
-      defaultHandles.map((handle) => fetchReviewCount(handle, "ethereum/EIPs"))
-    );
-    const reviewCountsERCs: Number[] = await Promise.all(
-      defaultHandles.map((handle) => fetchReviewCount(handle, "ethereum/ERCs"))
-    );
-
-    const ctx = defaultChartRef?.current?.getContext("2d") as ChartItem;
-
-    if (randomChart) {
-      randomChart.destroy();
-    }
-
-    let chart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: defaultHandles,
-        datasets: [
-          {
-            label: "Number of Reviews (EIPs)",
-            data: reviewCountsEIPs,
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            borderColor: "rgba(75, 192, 192, 1)",
-            borderWidth: 1,
-          },
-          {
-            label: "Number of Reviews (ERCs)",
-            data: reviewCountsERCs,
-            backgroundColor: "rgba(255, 159, 64, 0.2)",
-            borderColor: "rgba(255, 159, 64, 1)",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
-    });
-
-    setReviewsCount([reviewCountsEIPs, reviewCountsERCs]);
-    setRandomChart(chart);
-  };
-
-  const fetchReviewCount = async (handle: string, repo: string) => {
-    const response = await fetch(
-      `https://api.github.com/search/issues?q=is:pr reviewed-by:${handle} repo:${repo}`,
-      {
-        headers: {
-          Accept: "application/vnd.github.v3+json",
-          Authorization: `token ${token}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      window.location.reload();
-    }
-
-    const data = await response.json();
-
-    return data.total_count;
-  };
-
-  const fetchAllReviews = async (
-    handle: string,
-    startDate: string,
-    endDate: string,
-    repo: string
-  ) => {
-    let query = `is:pr reviewed-by:${handle} repo:${repo}`;
-    if (startDate) {
-      query += ` created:>=${startDate}`;
-    }
-    if (endDate) {
-      query += ` updated:<=${endDate}`;
-    }
-
-    let page = 1;
-    let perPage = 100;
-    let reviews: Reviews = [];
-    let moreResults = true;
-
-    while (moreResults) {
-      const response = await fetch(
-        `https://api.github.com/search/issues?q=${encodeURIComponent(
-          query
-        )}&page=${page}&per_page=${perPage}`,
-        {
-          headers: {
-            Accept: "application/vnd.github.v3+json",
-            Authorization: `token ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        window.location.reload();
-      }
-
-      let data = await response.json();
-      reviews = reviews.concat(data.items);
-      moreResults = data.total_count != reviews.length;
-      page++;
-    }
-
-    return reviews;
-  };
-
-  const onSubmitForm = async () => {
-    if (handle.length == 0) {
-      alert("Please enter a valid github handle");
-    }
-    if (startDate.length == 0) {
-      alert("Please enter a valid start date");
-    }
-    if (endDate.length == 0) {
-      alert("Please enter a valid end date");
-    }
-
-    let eipRandomReviews: Array<DefaultEipReview> = [];
-    let ercRandomReviews: Array<DefaultErcReview> = [];
-
-    const reviewsEIPs = await fetchAllReviews(
-      handle,
-      startDate,
-      endDate,
-      "ethereum/EIPs"
-    );
-    const reviewsERCs = await fetchAllReviews(
-      handle,
-      startDate,
-      endDate,
-      "ethereum/ERCs"
-    );
-
-    reviewsEIPs.forEach((review) => {
-      eipRandomReviews.push({
-        title: review.title,
-        url: review.html_url,
-        date: new Date(review.closed_at).toLocaleString(),
-      });
-    });
-
-    reviewsERCs.forEach((review) => {
-      ercRandomReviews.push({
-        title: review.title,
-        url: review.html_url,
-        date: new Date(review.closed_at).toLocaleString(),
-      });
-    });
-
-    setRandomEipsReviews(eipRandomReviews);
-    setRandomErcsReviews(ercRandomReviews);
-    setReviewsTitle(
-      `Total Reviews by ${handle}: ${reviewsEIPs.length} (EIPs), ${reviewsERCs.length} (ERCs)`
-    );
-
-    const reviewCountsEIPs: Number[] = await Promise.all(
-      defaultHandles.map((handle) =>
-        fetchReviewCountBetweenDates(
-          handle,
-          "ethereum/EIPs",
-          startDate,
-          endDate
-        )
-      )
-    );
-    const reviewCountsERCs: Number[] = await Promise.all(
-      defaultHandles.map((handle) =>
-        fetchReviewCountBetweenDates(
-          handle,
-          "ethereum/ERCs",
-          startDate,
-          endDate
-        )
-      )
-    );
-
-    const ctx = handleChartRef?.current?.getContext("2d") as ChartItem;
-
-    // destory the canvas if already exists
-    if (dynamicChart) {
-      dynamicChart.destroy();
-    }
-
-    const chart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: defaultHandles,
-        datasets: [
-          {
-            label: "Number of Reviews (EIPs)",
-            data: reviewCountsEIPs,
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            borderColor: "rgba(75, 192, 192, 1)",
-            borderWidth: 1,
-          },
-          {
-            label: "Number of Reviews (ERCs)",
-            data: reviewCountsERCs,
-            backgroundColor: "rgba(255, 159, 64, 0.2)",
-            borderColor: "rgba(255, 159, 64, 1)",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
-    });
-
-    setHandleReviewsCount([reviewCountsEIPs, reviewCountsERCs]);
-    setDynamicChart(chart);
-  };
-
-  const fetchReviewCountBetweenDates = async (
-    handle: string,
-    repo: string,
-    startDate: string,
-    endDate: string
-  ) => {
-    let query = `is:pr reviewed-by:${handle} repo:${repo}`;
-    if (startDate) {
-      query += ` created:>=${startDate}`;
-    }
-    if (endDate) {
-      query += ` updated:<=${endDate}`;
-    }
-
-    const response = await fetch(
-      `https://api.github.com/search/issues?q=${encodeURIComponent(query)}`,
-      {
-        headers: {
-          Accept: "application/vnd.github.v3+json",
-          Authorization: `token ${token}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      alert(response.statusText);
-      window.location.reload();
-    }
-
-    const data = await response.json();
-
-    return data.total_count;
-  };
+const ReviewTracker = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [data, setData] = useState<any[]>([]);
+  const [showReviewer, setShowReviewer] = useState<{ [key: string]: boolean }>({});
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'eips' | 'ercs'>('eips'); // Added active tab state
 
   useEffect(() => {
-    updateDefaultReviewCounts();
-    // showRandomReviews();
-  }, []);
-
-  function downloadCSV(
-    data: DefaultEipReview[] | DefaultErcReview[],
-    filename: string
-  ) {
-    let csvFileData: string = "Title,URL,Date\n";
-
-    data.forEach((review) => {
-      Object.values(review).forEach((value, index) => {
-        // Check if the value includes a comma or a quote
-        if (value.includes(",") || value.includes('"')) {
-          // Escape double quotes by doubling them
-          value = `"${value.replace(/"/g, '""')}"`;
-        }
-
-        if (index === 2) {
-          csvFileData += `${value}\n`;
-        } else {
-          csvFileData += `${value},`;
-        }
-      });
-    });
-
-    const blob = new Blob([csvFileData], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click(); // Uncomment this to actually trigger the download
-  }
-
-  const categoryColors: string[] = [
-    "rgb(255, 99, 132)",
-    "rgb(255, 159, 64)",
-    "rgb(255, 205, 86)",
-    "rgb(75, 192, 192)",
-    "rgb(54, 162, 235)",
-    "rgb(153, 102, 255)",
-    "rgb(255, 99, 255)",
-    "rgb(50, 205, 50)",
-    "rgb(255, 0, 0)",
-    "rgb(0, 128, 0)",
-  ];
-
-  // have to convert this reviesCount to [{handle: "axic", value: 10, category: "EIPs"}, {handle: "axic", value: 10, category: "ERCs"}]
-  let reviewsData: { handle: string; value: number; category: string }[] = [];
-  if (reviewsCount) {
-    reviewsCount[0].forEach((count, index) => {
-      reviewsData.push({
-        handle: defaultHandles[index],
-        value: count as number,
-        category: "EIPs",
-      });
-    });
-
-    reviewsCount[1].forEach((count, index) => {
-      reviewsData.push({
-        handle: defaultHandles[index],
-        value: count as number,
-        category: "ERCs",
-      });
-    });
-  }
-
-  // have to convert handle reviews count to [{handle: "axic", value: 10, category: "EIPs"}, {handle: "axic", value: 10, category: "ERCs"}]
-  let handleReviewsData: { handle: string; value: number; category: string }[] =
-    [];
-  if (handleReviewsCount) {
-    handleReviewsCount[0].forEach((count, index) => {
-      handleReviewsData.push({
-        handle: defaultHandles[index],
-        value: count as number,
-        category: "EIPs",
-      });
-    });
-
-    handleReviewsCount[1].forEach((count, index) => {
-      handleReviewsData.push({
-        handle: defaultHandles[index],
-        value: count as number,
-        category: "ERCs",
-      });
-    });
-  }
-
-  const config = {
-    data: reviewsData,
-    xField: "handle",
-    yField: "value",
-    color: categoryColors,
-    seriesField: "category",
-    isStack: true,
-    areaStyle: { fillOpacity: 0.6 },
-    legend: { position: "top-right" as const },
-    smooth: true,
-    label: {
-      position: "middle",
-      style: {
-        fill: "#FFFFFF",
-        opacity: 0.6,
-      },
-    } as any,
+    fetchData();
+    resetReviewerList(); // Reset reviewers when switching tabs
+  }, [activeTab]); // Fetch data and reset reviewers when the active tab changes
+  
+  const resetReviewerList = () => {
+    setShowReviewer({}); // Clear previous reviewers list when switching tabs
   };
-
-  const config2 = {
-    data: handleReviewsData,
-    xField: "handle",
-    yField: "value",
-    color: categoryColors,
-    seriesField: "category",
-    isStack: true,
-    areaStyle: { fillOpacity: 0.6 },
-    legend: { position: "top-right" as const },
-    smooth: true,
-    label: {
-      position: "middle",
-      style: {
-        fill: "#FFFFFF",
-        opacity: 0.6,
-      },
-    } as any,
-  };
-
-  const Area = dynamic(
-    () => import("@ant-design/plots").then((item) => item.Column),
-    {
-      ssr: false,
+  
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const endpoint = API_ENDPOINTS[activeTab];
+      const response = await fetch(endpoint);
+      const responseData = await response.json();
+  
+      const flattenResponse = (response: any) => {
+        return Object.entries(response).flatMap(([reviewer, reviews]: [string, any[]]) =>
+          reviews.map(review => ({ ...review, reviewer }))
+        );
+      };
+  
+      const newData = flattenResponse(responseData);
+      const reviewers = Array.from(new Set(newData.map(review => review.reviewer)));
+      const initialShowReviewer = reviewers.reduce(
+        (acc, reviewer) => ({ ...acc, [reviewer]: true }),
+        {}
+      );
+      
+      setShowReviewer(initialShowReviewer); // Set reviewer list after fetching data
+  
+      const transformedData = transformData(newData, initialShowReviewer);
+      setData(transformedData);
+    } catch (error) {
+      console.error("Failed to fetch review data:", error);
     }
-  );
+    setLoading(false);
+  };
+  
+
+  const transformData = (data: any[], rev: any[]): any[] => {
+    const monthYearData: { [key: string]: { [reviewer: string]: { monthYear: string, reviewer: string, count: number, prs: any[] } } } = {};
+
+    data.forEach(review => {
+      const reviewDate = new Date(review.reviewDate || review.created_at || review.closed_at || review.merged_at);
+      if (isNaN(reviewDate.getTime())) {
+        console.error("Invalid date format for review:", review);
+        return;
+      }
+
+      const key = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, '0')}`;
+      const reviewer = review.reviewer;
+
+      if (!monthYearData[key]) {
+        monthYearData[key] = {};
+      }
+
+      if (!monthYearData[key][reviewer]) {
+        monthYearData[key][reviewer] = { monthYear: key, reviewer: reviewer, count: 0, prs: [] };
+      }
+
+      // Avoid counting duplicate records
+      const isDuplicate = monthYearData[key][reviewer].prs.some(pr => pr.prNumber === review.prNumber);
+      if (!isDuplicate) {
+        monthYearData[key][reviewer].count += 1;
+        monthYearData[key][reviewer].prs.push(review);
+      }
+    });
+
+    const result = Object.entries(monthYearData).flatMap(([monthYear, reviewers]) =>
+      Object.values(reviewers).filter(item => rev[item.reviewer])
+    );
+
+    return result;
+  };
+
+  const transformAndGroupData = (data: any[]) => {
+    const groupedData = data.reduce((acc, item) => {
+      const { monthYear, reviewer, count, prs } = item;
+      if (!acc[monthYear]) {
+        acc[monthYear] = {};
+      }
+      if (!acc[monthYear][reviewer]) {
+        acc[monthYear][reviewer] = { monthYear, reviewer, count: 0, prs: [] };
+      }
+      acc[monthYear][reviewer].count += count;
+      acc[monthYear][reviewer].prs = [...acc[monthYear][reviewer].prs, ...prs];
+      return acc;
+    }, {} as { [key: string]: { [reviewer: string]: { monthYear: string, reviewer: string, count: number, prs: any[] } } });
+
+    return Object.entries(groupedData).flatMap(([monthYear, reviewers]) =>
+      Object.values(reviewers)
+    );
+  };
+
+  const renderChart = () => {
+    const dataToUse = data;
+    const transformedData = transformAndGroupData(dataToUse);
+    const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+
+    const config = {
+      data: sortedData,
+      xField: "monthYear",
+      yField: "count",
+      colorField: "reviewer",
+      seriesField: "reviewer",
+      isGroup: true,
+      columnStyle: {
+        radius: [20, 20, 0, 0],
+      },
+      slider: {
+        start: 0,
+        end: 1,
+      },
+      legend: { position: "top-right" as const },
+      smooth: true,
+      label: {
+        position: "middle" as const,
+        style: {
+          fill: "#FFFFFF",
+          opacity: 0.6,
+        },
+      },
+    };
+
+    return <Column {...config} />;
+  };
+
+  const toggleDropdown = () => setShowDropdown(prev => !prev);
+
+  const getYears = () => {
+    const years = Array.from(new Set(data.map(item => item.monthYear.split('-')[0])));
+    return years.sort((a, b) => b.localeCompare(a));
+  };
+
+  const getMonths = (year: string) => {
+    const months = Array.from(new Set(data.filter(item => item.monthYear.startsWith(year)).map(item => item.monthYear.split('-')[1])));
+    return months.sort((a, b) => parseInt(a) - parseInt(b));
+  };
+
+  const renderTable = (year: string, month: string, reviewerFilter: any) => {
+    const filteredData = data
+      .filter(item => item.monthYear === `${year}-${month}`)
+      .filter(item => reviewerFilter[item.reviewer])
+      .flatMap(item => item.prs)
+      .reduce((acc: any[], pr) => {
+        if (!acc.some(existingPr => existingPr.prNumber === pr.prNumber)) {
+          acc.push(pr);
+        }
+        return acc;
+      }, []);
+
+    return (
+      <Box mt={8}>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>PR Number</Th>
+              <Th>Title</Th>
+              <Th>Reviewed By</Th>
+              <Th>Review Date</Th>
+              <Th>Created Date</Th>
+              <Th>Closed Date</Th>
+              <Th>Merged Date</Th>
+              <Th>Status</Th>
+              <Th>Link</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {filteredData.map(pr => {
+              const status = pr.merged_at
+                ? 'Merged'
+                : pr.closed_at
+                ? 'Closed'
+                : 'Open';
+
+              return (
+                <Tr key={pr.prNumber}>
+                  <Td>{pr.prNumber}</Td>
+                  <Td>{pr.prTitle}</Td>
+                  <Td>{pr.reviewer}</Td>
+                  <Td>{pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-'}</Td>
+                  <Td>{pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{status}</Td>
+                  <Td>
+                  <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
+                      <a href={`https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`} target="_blank">Pull Request</a>
+                    </button></Td>
+                  </Td>
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+      </Box>
+    );
+  };
 
   return (
-    <AllLayout>
-      <Box paddingLeft={20} paddingRight={20} marginTop={20} marginBottom={10}>
-  <Heading
-    size="xl"
-    marginTop={30}
-    marginBottom={10}
-    textAlign="center"
-    style={{
-      color: '#42a5f5', // Color matching the heading in the image
-      fontSize: '2.5rem', // Adjust size if necessary to match the image
-      fontWeight: 'bold' // Assuming bold weight based on the image
-    }}
-  >
-    EIP Editor's Review tracker 
-  </Heading>
-  <Heading as="label" htmlFor="monthFilter" size="md">
-  How to Use:
-</Heading>
-<ol>
-  <li>1. The default chart shows total reviews by editors.</li>
-  <li>2. Click "TOTAL REVIEW BY EDITORS" to view the detailed table.</li>
-  <li>3. Click on any editor's name in the table to see their specific review data on GitHub.</li>
-  <li>4. A chart for reviews of all the Editors between two dates will appear after using filter between two dates. </li>
-  <li>e.g.- "Enter Editor Github Handle" - axic </li>
-</ol>
-
-</Box>
-
-      <Box minHeight={"100vh"}>
-        <Flex gap={30} direction={"row"} padding={20}>
-          <Input
-            placeholder="Enter Editor Github handle"
-            onChange={(e) => {
-              setHandle(e.target.value);
-            }}
-            value={handle}
-          />
-          <Input
-            type="date"
-            w={300}
-            onChange={(e) => {
-              setStartDate(e.target.value.toString());
-            }}
-            value={startDate}
-          />
-          <Input
-            type="date"
-            w={300}
-            onChange={(e) => {
-              setEndDate(e.target.value.toString());
-            }}
-          />
-          <Button
-            onClick={async () => {
-              await onSubmitForm();
-            }}
-          >
-            Search
-          </Button>
-        </Flex>
-
-        <Flex
-          direction={"row"}
-          height={400}
-          width={"100%"}
-          paddingLeft={20}
-          paddingRight={20}
-          gap={5}
-          alignItems={"center"}
-          justifyContent={"center"}
-        >
-          <Box
-            bgColor={bg}
-            marginTop={"2rem"}
-            p="0.5rem"
-            borderRadius="0.35rem"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            height={400}
-            overflowX="auto"
-            overflowY="hidden"
-            as={motion.div}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 } as any}
-            className="hover: cursor-pointer ease-in duration-200 h-max"
-          >
-            <Link href={"#table-data"}>
-              <Heading size="md" textTransform="uppercase" marginBottom={4}>
-                Total Review by Editors
-              </Heading>
-            </Link>
-            <Area {...config} />
-            <Box>
-              <DateTime />
-            </Box>
-          </Box>
-
-          {handleReviewsCount && (
-            <Box
-              bgColor={bg}
-              marginTop={"2rem"}
-              p="0.5rem"
-              borderRadius="0.35rem"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-              height={400}
-              overflowX="auto"
-              overflowY="hidden"
-              as={motion.div}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 } as any}
-              className="hover: cursor-pointer ease-in duration-200 h-max"
-            >
-              <Heading size="md" textTransform="uppercase" marginBottom={4}>
-                Review by Editors
-              </Heading>
-              <Area {...config2} />
-              <Box>
-                <DateTime />
-              </Box>
-            </Box>
-          )}
-        </Flex>
-
-        <Box
-          paddingLeft={20}
-          paddingRight={20}
-          marginTop={20}
-          marginBottom={10}
-        >
-          <Heading size="xl" marginTop={30} marginBottom={10}>
-            {reviewsTitle}
-          </Heading>
-
-          <Flex
-            flexDirection={"row"}
-            gap={5}
-            alignItems={"end"}
-            justifyContent={"end"}
-            marginTop={5}
+    loading ? (
+      <LoaderComponent />
+    ) : (
+      <AllLayout>
+        <Box padding={8} margin={8}>
+          <Heading
+            size="xl"
             marginBottom={10}
-          >
-            {randomEipsReviews.length > 0 && (
-              <Button
-                onClick={() => {
-                  downloadCSV(randomEipsReviews, "EIPs.csv");
-                }}
-              >
-                Download EIPs.csv
-              </Button>
-            )}
+            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Reviews Tracker</Heading>
 
-            {randomErcsReviews.length > 0 && (
-              <Button
-                onClick={() => {
-                  downloadCSV(randomErcsReviews, "ERCs.csv");
-                }}
-              >
-                Download ERCs.csv
-              </Button>
-            )}
-          </Flex>
+<Flex justify="center" mb={8}>
+        <Button colorScheme="blue" onClick={() => setActiveTab('eips')} isActive={activeTab === 'eips'}>
+          EIPs
+        </Button>
+        <Button colorScheme="blue" onClick={() => setActiveTab('ercs')} isActive={activeTab === 'ercs'} ml={4}>
+          ERCs
+        </Button>
+      </Flex>
 
-          {randomEipsReviews.length > 0 && (
-            <Card>
-              <CardHeader>
-                <Heading size="md" textTransform="uppercase">
-                  EIPs
-                </Heading>
-              </CardHeader>
-              <CardBody>
-                <Stack divider={<StackDivider />} spacing="4">
-                  {randomEipsReviews.map((review, index) => (
-                    <Box key={index}>
-                      <Text pt="2" fontSize="sm">
-                        {index + 1}. {review.title} {"Reviewed On"}{" "}
-                        {review.date}
-                      </Text>
-                      <Link href={review.url} target="_blank">
-                        <Flex>
-                          <Text color={"blu"}>Link</Text> <ArrowRight />
-                        </Flex>
-                      </Link>
-                    </Box>
-                  ))}
-                </Stack>
-              </CardBody>
-            </Card>
-          )}
+      <Box>{renderChart()}</Box>
 
-          {randomErcsReviews.length > 0 && (
-            <Card marginTop={10}>
-              <CardHeader>
-                <Heading size="md" textTransform="uppercase">
-                  ERCs
-                </Heading>
-              </CardHeader>
-              <CardBody>
-                <Stack divider={<StackDivider />} spacing="4">
-                  {randomErcsReviews.map((review, index) => (
-                    <Box key={index}>
-                      <Text pt="2" fontSize="sm">
-                        {index + 1}. {review.title} {"Reviewed On"}
-                        {review.date}
-                      </Text>
-                      <Link href={review.url} target="_blank">
-                        <Flex>
-                          <Text>Link</Text> <ArrowRight />
-                        </Flex>
-                      </Link>
-                    </Box>
-                  ))}
-                </Stack>
-              </CardBody>
-            </Card>
-          )}
-        </Box>
-
-        <Box
-  paddingLeft={20}
-  paddingRight={20}
-  marginTop={20}
-  marginBottom={10}
-  id="table-data"
->
-  {reviewsCount && (
-    <TableContainer>
-      <Table variant={"striped"}>
-        <TableCaption>Total EIPs By Github Handle</TableCaption>
-        <Thead>
-          <Tr>
-            <Th>Github Handle</Th>
-            <Th>Number of Reviews</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {reviewsCount[0].map((count, index) => (
-            <Tr key={index}>
-              <Td>
-                <a
-                  href={`https://github.com/ethereum/EIPs/pulls?q=is%3Apr+reviewed-by%3A${defaultHandles[index]}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {defaultHandles[index]}
-                </a>
-              </Td>
-              <Td isNumeric>{count as React.ReactNode}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    </TableContainer>
-  )}
-</Box>
-
-<Box
-  paddingLeft={20}
-  paddingRight={20}
-  marginTop={20}
-  marginBottom={10}
->
-  {reviewsCount && (
-    <TableContainer>
-      <Table variant={"striped"}>
-        <TableCaption>Total ERCs By Github Handle</TableCaption>
-        <Thead>
-          <Tr>
-            <Th>Github Handle</Th>
-            <Th>Number of Reviews</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {reviewsCount[1].map((count, index) => (
-            <Tr key={index}>
-              <Td>
-                <a
-                  href={`https://github.com/ethereum/ERCs/pulls?q=is%3Apr+reviewed-by%3A${defaultHandles[index]}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {defaultHandles[index]}
-                </a>
-              </Td>
-              <Td isNumeric>{count as React.ReactNode}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    </TableContainer>
-  )}
-</Box>
-
+      <Box mt={2}>
+        <Text color="gray.500" fontStyle="italic" textAlign="center">
+          *Note: Reviews can be tracked only if the editor has commented in the conversation.*
+        </Text>
       </Box>
-    </AllLayout>
-  );
-};
+      <br/>
 
-export default GitHubPRTracker;
+      <Flex justify="center" mb={8}>
+        <Button colorScheme="blue" onClick={toggleDropdown}>
+          {showDropdown ? 'Hide' : 'View More'}
+        </Button>
+      </Flex>
+
+      {showDropdown && (
+        <Box mb={8} display="flex" justifyContent="center">
+          <HStack spacing={4}>
+            {/* Year Selection */}
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedYear ? `Year: ${selectedYear}` : 'Select Year'}
+              </MenuButton>
+              <MenuList>
+                {getYears().map((year) => (
+                  <MenuItem
+                    key={year}
+                    onClick={() => {
+                      setSelectedYear(year);
+                      setSelectedMonth(null); // Reset month when a new year is selected
+                    }}
+                  >
+                    {year}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            {/* Month Selection */}
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                colorScheme="blue"
+                isDisabled={!selectedYear} // Disable if no year is selected
+              >
+                {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
+              </MenuButton>
+              <MenuList>
+                {selectedYear && getMonths(selectedYear).map((month, index) => (
+                  <MenuItem key={index} onClick={() => setSelectedMonth(month)}>
+                    {month}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            {/* Reviewer Selection */}
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                colorScheme="blue"
+                isDisabled={!selectedMonth} // Disable if no month is selected
+              >
+                Reviewers
+              </MenuButton>
+              <MenuList>
+                {Object.keys(showReviewer).map(reviewer => (
+                  <MenuItem key={reviewer}>
+                    <Checkbox
+                      isChecked={showReviewer[reviewer]}
+                      onChange={(e) => setShowReviewer({
+                        ...showReviewer,
+                        [reviewer]: e.target.checked,
+                      })}
+                    >
+                      {reviewer}
+                    </Checkbox>
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+          </HStack>
+        </Box>
+      )}
+
+      {selectedYear && selectedMonth && (
+        <Box mt={8}>
+          {renderTable(selectedYear, selectedMonth, showReviewer)}
+        </Box>
+      )}
+    </Box>
+  </AllLayout>
+)
+); };
+
+export default ReviewTracker;
