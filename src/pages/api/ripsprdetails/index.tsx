@@ -28,14 +28,14 @@ mongoose.connect(process.env.MONGODB_URI, {
         mergeDate: { type: Date },
     });
     
-    const PrDetails = mongoose.models.PrDetails ||  mongoose.model('eipprdetails', prDetailsSchema);
+    const PrDetails = mongoose.models.PrDetails ||  mongoose.model('ripprdetails', prDetailsSchema);
 
 
 
 export default async (req: Request, res: Response) => {
     var allprnumbers = [];
     try {
-        const prDetails = await PrDetails.find({},{prNumber : 1,_id : 0});
+        const prDetails = await PrDetails.find({},{prNumber : 1, prTitle:1 ,_id : 0});
         console.log(prDetails);
        
         // Return the PR details as JSON response
