@@ -44,7 +44,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         <title>EIPs Insights</title>
         <link rel="icon" href="/eipFavicon.png" />
       </Head>
-      <ColorModeScript initialColorMode="dark" />
+      <ColorModeScript initialColorMode="light" />
       <Providers>
         <Navbar />
         {/*<Banner />*/}
