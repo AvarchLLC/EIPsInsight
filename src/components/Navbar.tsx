@@ -61,12 +61,12 @@ const Navbar: React.FC = () => {
       label: "Tools",
       children: [
         {
-          label: "PRs & Issues",
-          href: `/PrsAndIssues`,
+          label: "Github Analytics",
+          href: `/Analytics`,
         },
         {
-          label: "Editors Review",
-          href: `/editorsReview`,
+          label: "Reviewers",
+          href: `/Reviewers`,
         },
       ],
     },    
@@ -509,7 +509,7 @@ const Navbar: React.FC = () => {
                     variant="outline"
                     colorScheme="blue"
                     size="md"
-                    icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
+                    icon={useColorModeValue( <SunIcon />, <MoonIcon />)}
                     onClick={toggleColorMode}
                   />
                 </Stack>

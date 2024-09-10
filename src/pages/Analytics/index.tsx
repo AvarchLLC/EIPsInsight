@@ -19,27 +19,13 @@ import {
   Tr,
   Th,
   Td,
+  Text,
   useDisclosure,
   IconButton,
   HStack
 } from "@chakra-ui/react";
 import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
-
-const getYears = () => {
-  const currentYear = new Date().getFullYear();
-  return Array.from({ length: currentYear - 2019 }, (_, i) => currentYear - i); // Assuming you want data from 2020 onwards
-};
-
-const getMonths = (year) => {
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth(); // 0-indexed (0 = January, 11 = December)
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-  return year === currentYear ? months.slice(0, currentMonth + 1) : months;
-};
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -195,9 +181,16 @@ const GitHubPRTracker: React.FC = () => {
   ];
 
   const renderTable = (year: string, month: string, type: 'PRs' | 'Issues') => {
+    // Data based on type (PRs or Issues)
     const dataToUse = type === 'PRs' ? data.PRs : data.Issues;
+    
+    // Format the month-year key for data lookup
     const key = `${year}-${String(getMonths().indexOf(month) + 1).padStart(2, '0')}`;
-    const items = dataToUse[key] || (type === 'PRs' ? { created: [], closed: [], merged: [] } : { created: [], closed: [] });
+  
+    // Default data structure for PRs or Issues
+    const items = dataToUse[key] || (type === 'PRs'
+      ? { created: [] as PR[], closed: [] as PR[], merged: [] as PR[] }
+      : { created: [] as Issue[], closed: [] as Issue[] });
   
     return (
       <Table variant="simple">
@@ -215,113 +208,29 @@ const GitHubPRTracker: React.FC = () => {
             ) : (
               <>
                 <Th>State</Th>
-                <Th>Created Date</Th>
-                <Th>Closed Date</Th>
+                <Th>Created At</Th>
+                <Th>Closed At</Th>
               </>
             )}
             <Th>Link</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' && items.merged.length === 0) ? (
+        {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
             <Tr>
               <Td colSpan={type === 'PRs' ? 6 : 5} textAlign="center">No Data Available</Td>
             </Tr>
           ) : (
             <>
               {/* Render Created Items */}
-              {showCategory.created && items.created.map((item) => (
-                <Tr key={`created-${item.prNumber || item.IssueNumber}`}>
-                  <Td>{item.prNumber || item.IssueNumber}</Td>
-                  <Td>{item.prTitle || item.IssueTitle}</Td>
-                  {type === 'PRs' ? (
-                    <>
-                      <Td>Created</Td>
-                      <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                      <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                      <Td>{item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-'}</Td>
-                      <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                      <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber||item.IssueNumber}`} target="_blank">Pull Request</a>
-                    </button></Td>
-                    </>
-                  ) : (
-                    <>
-                      <Td>{item.state}</Td>
-                      <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                      <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                      <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                      <a href={`https://github.com/ethereum/${selectedRepo}/issue/${item.prNumber||item.IssueNumber}`} target="_blank">Issue</a>
-                    </button></Td>
-                    </>
-                  )}
-                </Tr>
-              ))}
-  
-              {/* Render Closed Items */}
-              {showCategory.closed && items.closed.map((item) => (
-                <Tr key={`closed-${item.prNumber || item.IssueNumber}`}>
-                  <Td>{item.prNumber || item.IssueNumber}</Td>
-                  <Td>{item.prTitle || item.IssueTitle}</Td>
-                  {type === 'PRs' ? (
-                    <>
-                      <Td>Closed</Td>
-                      <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                      <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                      <Td>{item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-'}</Td>
-                      <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                      <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber||item.IssueNumber}`} target="_blank">Pull Request</a>
-                    </button></Td>
-                    </>
-                  ) : (
-                    <>
-                      <Td>{item.state}</Td>
-                      <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                      <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                      <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                      <a href={`https://github.com/ethereum/${selectedRepo}/issue/${item.prNumber||item.IssueNumber}`} target="_blank">Issue</a>
-                    </button></Td>
-                    </>
-                  )}
-                </Tr>
-              ))}
-  
-              {/* Render Merged Items (only for PRs) */}
-              {showCategory.merged && type === 'PRs' && items.merged.map((item) => (
-                <Tr key={`merged-${item.prNumber || item.IssueNumber}`}>
-                  <Td>{item.prNumber || '-'}</Td>
-                  <Td>{item.prTitle || '-'}</Td>
-                  <Td>Merged</Td>
+              {showCategory.created && items.created.map((item: PR | Issue) => (
+                <Tr key={`created-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`}>
+                  <Td>{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+                  <Td>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+                  <Td>Created</Td>
                   <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
                   <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-'}</Td>
+                  {type === 'PRs' && <Td>{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
                   <Td><button style={{
                       backgroundColor: '#428bca',
                       color: '#ffffff',
@@ -330,8 +239,44 @@ const GitHubPRTracker: React.FC = () => {
                       cursor: 'pointer',
                       borderRadius: '5px',
                     }}>
-                      <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber||item.IssueNumber}`} target="_blank">Pull Request</a>
+                    <a href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} target="_blank">
+                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
+                    </a>
                     </button></Td>
+                </Tr>
+              ))}
+  
+              {/* Render Closed Items */}
+              {showCategory.closed && items.closed.map((item: PR | Issue) => (
+                <Tr key={`closed-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`}>
+                  <Td>{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+                  <Td>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+                  <Td>Closed</Td>
+                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                  {type === 'PRs' && <Td>{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+                  <Td>
+                    <a href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} target="_blank">
+                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
+                    </a>
+                  </Td>
+                </Tr>
+              ))}
+  
+              {/* Render Merged Items (only for PRs) */}
+              {showCategory.merged && type === 'PRs' && (items as { merged: PR[] }).merged.map((item: PR) => (
+                <Tr key={`merged-${item.prNumber}`}>
+                  <Td>{item.prNumber}</Td>
+                  <Td>{item.prTitle}</Td>
+                  <Td>Merged</Td>
+                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
+                  <Td>
+                    <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber}`} target="_blank">
+                      Pull Request
+                    </a>
+                  </Td>
                 </Tr>
               ))}
             </>
@@ -339,6 +284,94 @@ const GitHubPRTracker: React.FC = () => {
         </Tbody>
       </Table>
     );
+  };
+  
+  
+  
+  const convertToCSV = (filteredData: any, type: 'PRs' | 'Issues') => {
+    const csvRows = [];
+  
+    const headers = type === 'PRs'
+      ? ['Number', 'Title', 'State', 'Created At', 'Closed At', 'Merged At', 'Link']
+      : ['Number', 'Title', 'State', 'Created At', 'Closed At', 'Link'];
+  
+    // Add headers to CSV rows
+    csvRows.push(headers.join(','));
+  
+    // Combine created and closed arrays for PRs and Issues
+    const items = type === 'PRs'
+      ? [...filteredData.created, ...filteredData.closed, ...filteredData.merged]
+      : [...filteredData.created, ...filteredData.closed];
+  
+    // Add data to CSV rows
+    items.forEach((item: PR | Issue) => {
+      const row = type === 'PRs'
+        ? [
+            (item as PR).prNumber,
+            (item as PR).prTitle,
+            item.closed_at ? 'Closed' : 'Created',
+            new Date(item.created_at).toLocaleDateString(),
+            item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+            (item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-',
+            `https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${(item as PR).prNumber}`
+          ].join(',')
+        : [
+            (item as Issue).IssueNumber,
+            (item as Issue).IssueTitle,
+            item.closed_at ? 'Closed' : 'Created',
+            new Date(item.created_at).toLocaleDateString(),
+            item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+            `https://github.com/ethereum/${selectedRepo}/issues/${(item as Issue).IssueNumber}`
+          ].join(',');
+  
+      csvRows.push(row);
+    });
+  
+    return csvRows.join('\n');
+  };
+  
+  const handleDownload = () => {
+    if (!selectedYear || !selectedMonth) {
+      alert('Please select a year and month.');
+      return;
+    }
+  
+    const key = `${selectedYear}-${String(getMonths().indexOf(selectedMonth) + 1).padStart(2, '0')}`;
+    const filteredData = activeTab === 'PRs' ? data.PRs[key] : data.Issues[key];
+  
+    if (!filteredData || (filteredData.created.length === 0 && filteredData.closed.length === 0)) {
+      alert('No data available for the selected month.');
+      return;
+    }
+  
+    // Combine arrays and pass them to the CSV function
+    const combinedData = activeTab === 'PRs'
+      ? {
+          created: filteredData.created,
+          closed: filteredData.closed,
+          merged: 'merged' in filteredData ? filteredData.merged : [],
+        }
+      : {
+          created: filteredData.created,
+          closed: filteredData.closed
+        };
+  
+    downloadCSV(combinedData, activeTab);
+  };
+  
+  
+  const downloadCSV = (data: any, type: 'PRs' | 'Issues') => {
+    const csv = convertToCSV(data, type);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+  
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `${type}-${selectedYear}-${selectedMonth}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
   
   
@@ -351,9 +384,10 @@ const GitHubPRTracker: React.FC = () => {
       const items = dataToUse[monthYear];
       return [
         ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
-        ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: items.merged?.length || 0 }] : []),
+        ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? items.merged?.length || 0 : 0 }] : []),
         ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: items.closed.length }] : [])
       ];
+      
     });
 
     // Sort data by monthYear in ascending order
@@ -392,36 +426,34 @@ const GitHubPRTracker: React.FC = () => {
       <LoaderComponent />
     ) : (
       <AllLayout>
-        <Box paddingLeft={20} paddingRight={20} marginTop={20} marginBottom={10}>
+        <Box padding={8} margin={8}>
           <Heading
             size="xl"
-            marginTop={30}
             marginBottom={10}
             textAlign="center"
-            style={{
-              color: '#42a5f5',
-              fontSize: '2.5rem',
-              fontWeight: 'bold',
-            }}
+            style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold' }}
           >
-            EIPs and ERCs PRs & Issues
+            Github Analytics
           </Heading>
-          <Flex gap={4} justify="center" mt={4} mb={8}>
+  
+          <Flex justify="center" mb={8}>
             <Button
+              colorScheme="blue"
               onClick={() => setActiveTab('PRs')}
-              bg={activeTab === 'PRs' ? 'blue.500' : 'gray.300'}
-              color={activeTab === 'PRs' ? 'white' : 'black'}
+              isActive={activeTab === 'PRs'}
+              mr={4}
             >
               PRs
             </Button>
             <Button
+              colorScheme="blue"
               onClick={() => setActiveTab('Issues')}
-              bg={activeTab === 'Issues' ? 'blue.500' : 'gray.300'}
-              color={activeTab === 'Issues' ? 'white' : 'black'}
+              isActive={activeTab === 'Issues'}
             >
               Issues
             </Button>
           </Flex>
+  
           <Flex justify="center" mb={8}>
             <Select
               value={selectedRepo}
@@ -432,59 +464,55 @@ const GitHubPRTracker: React.FC = () => {
               <option value="ERCs">ERCs</option>
             </Select>
           </Flex>
-        </Box>
-        <Box>{renderChart()}</Box>
   
-        <Flex justify="center" mb={8}>
-          <Checkbox
-            isChecked={showCategory.created}
-            onChange={() => setShowCategory((prev) => ({ ...prev, created: !prev.created }))}
-            mr={4}
-          >
-            Show Created PRs/Issues
-          </Checkbox>
-          <Checkbox
-            isChecked={showCategory.closed}
-            onChange={() => setShowCategory((prev) => ({ ...prev, closed: !prev.closed }))}
-            mr={4}
-          >
-            Show Closed PRs/Issues
-          </Checkbox>
-          {activeTab === 'PRs' && (
+          <Box>{renderChart()}</Box>
+  
+          <Flex justify="center" mb={8}>
             <Checkbox
-              isChecked={showCategory.merged}
-              onChange={() => setShowCategory((prev) => ({ ...prev, merged: !prev.merged }))}
+              isChecked={showCategory.created}
+              onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
               mr={4}
             >
-              Show Merged PRs
+              Show Created PRs/Issues
             </Checkbox>
-          )}
-        </Flex>
+            <Checkbox
+              isChecked={showCategory.closed}
+              onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
+              mr={4}
+            >
+              Show Closed PRs/Issues
+            </Checkbox>
+            {activeTab === 'PRs' && (
+              <Checkbox
+                isChecked={showCategory.merged}
+                onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
+                mr={4}
+              >
+                Show Merged PRs
+              </Checkbox>
+            )}
+          </Flex>
   
-        <Box>
-          {/* View More Button */}
           <Flex justify="center" mb={8}>
             <Button colorScheme="blue" onClick={toggleDropdown}>
               {showDropdown ? 'Hide' : 'View More'}
             </Button>
           </Flex>
   
-          {/* Dropdowns for Year and Month Selection */}
           {showDropdown && (
             <Box mb={8} display="flex" justifyContent="center">
               <HStack spacing={4}>
-                {/* Year Selection */}
                 <Menu>
                   <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
                     {selectedYear ? `Year: ${selectedYear}` : 'Select Year'}
                   </MenuButton>
                   <MenuList>
-                    {getYears().map((year) => (
+                    {getYears().map(year => (
                       <MenuItem
                         key={year}
                         onClick={() => {
                           setSelectedYear(year.toString());
-                          setSelectedMonth(null); // Reset month when a new year is selected
+                          setSelectedMonth(null);
                         }}
                       >
                         {year}
@@ -493,18 +521,17 @@ const GitHubPRTracker: React.FC = () => {
                   </MenuList>
                 </Menu>
   
-                {/* Month Selection */}
                 <Menu>
                   <MenuButton
                     as={Button}
                     rightIcon={<ChevronDownIcon />}
                     colorScheme="blue"
-                    isDisabled={!selectedYear} // Disable if no year is selected
+                    isDisabled={!selectedYear}
                   >
                     {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
                   </MenuButton>
                   <MenuList>
-                    {selectedYear && getMonths(selectedYear).map((month, index) => (
+                    {selectedYear && getMonths().map((month, index) => (
                       <MenuItem key={index} onClick={() => setSelectedMonth(month)}>
                         {month}
                       </MenuItem>
@@ -514,16 +541,29 @@ const GitHubPRTracker: React.FC = () => {
               </HStack>
             </Box>
           )}
-        </Box>
   
-        {selectedYear && selectedMonth && (
-          <Box mt={8}>
-            {renderTable(selectedYear, selectedMonth, activeTab)}
-          </Box>
-        )}
+          {selectedYear && selectedMonth && (
+                  <Box mt={8}>
+                    {/* Download CSV section */}
+                    <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
+                      <Text fontSize="lg" marginBottom={4}>
+                        You can download the data here:
+                      </Text>
+                      <Button colorScheme="blue" onClick={handleDownload}>Download CSV</Button>
+                    </Box>
+                  </Box>
+              )}
+  
+          {selectedYear && selectedMonth && (
+            <Box mt={8}>
+              {renderTable(selectedYear, selectedMonth, activeTab)}
+            </Box>
+          )}
+        </Box>
       </AllLayout>
     )
-  );  
+  );
+  
 };
 
 export default GitHubPRTracker;

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Box, Flex, Heading, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text  } from "@chakra-ui/react";
+import { Box, Flex, Heading, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
 import LoaderComponent from "@/components/Loader";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-
+import { CSVLink } from "react-csv";
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -21,7 +21,45 @@ const ReviewTracker = () => {
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'eips' | 'ercs'>('eips'); // Added active tab state
+  const [activeTab, setActiveTab] = useState<'eips' | 'ercs'>('eips'); 
+  const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
+
+  // Function to generate CSV data
+  type PR = {
+    prNumber: number;
+    prTitle: string;
+    reviewDate?: string;
+    created_at?: string;
+    closed_at?: string;
+    merged_at?: string;
+  };
+
+  const generateCSVData = () => {
+    if (!selectedYear || !selectedMonth) {
+      console.error('Year and Month must be selected to generate CSV');
+      return;
+    }
+  
+    const filteredData = data
+      .filter(item => item.monthYear === `${selectedYear}-${selectedMonth}`)
+      .filter(item => showReviewer[item.reviewer]);
+  
+    const csv = filteredData.flatMap(item =>
+      item.prs.map((pr: PR) => ({
+        PR_Number: pr.prNumber,
+        Title: pr.prTitle,
+        Reviewer: item.reviewer,
+        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+        Link: `https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`,
+      }))
+    );
+  
+    setCsvData(csv); // Update the state with the generated CSV data
+  };
 
   useEffect(() => {
     fetchData();
@@ -39,11 +77,12 @@ const ReviewTracker = () => {
       const response = await fetch(endpoint);
       const responseData = await response.json();
   
-      const flattenResponse = (response: any) => {
-        return Object.entries(response).flatMap(([reviewer, reviews]: [string, any[]]) =>
+      const flattenResponse = (response: Record<string, any[]>) => {
+        return Object.entries(response).flatMap(([reviewer, reviews]) =>
           reviews.map(review => ({ ...review, reviewer }))
         );
       };
+      
   
       const newData = flattenResponse(responseData);
       const reviewers = Array.from(new Set(newData.map(review => review.reviewer)));
@@ -63,27 +102,39 @@ const ReviewTracker = () => {
   };
   
 
-  const transformData = (data: any[], rev: any[]): any[] => {
-    const monthYearData: { [key: string]: { [reviewer: string]: { monthYear: string, reviewer: string, count: number, prs: any[] } } } = {};
-
+  const transformData = (
+    data: any[], 
+    rev: { [key: string]: boolean } // Assuming `rev` is an object where keys are reviewer names
+  ): any[] => {
+    const monthYearData: {
+      [key: string]: { 
+        [reviewer: string]: { 
+          monthYear: string, 
+          reviewer: string, 
+          count: number, 
+          prs: any[] 
+        } 
+      } 
+    } = {};
+  
     data.forEach(review => {
       const reviewDate = new Date(review.reviewDate || review.created_at || review.closed_at || review.merged_at);
       if (isNaN(reviewDate.getTime())) {
         console.error("Invalid date format for review:", review);
         return;
       }
-
+  
       const key = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, '0')}`;
       const reviewer = review.reviewer;
-
+  
       if (!monthYearData[key]) {
         monthYearData[key] = {};
       }
-
+  
       if (!monthYearData[key][reviewer]) {
-        monthYearData[key][reviewer] = { monthYear: key, reviewer: reviewer, count: 0, prs: [] };
+        monthYearData[key][reviewer] = { monthYear: key, reviewer, count: 0, prs: [] };
       }
-
+  
       // Avoid counting duplicate records
       const isDuplicate = monthYearData[key][reviewer].prs.some(pr => pr.prNumber === review.prNumber);
       if (!isDuplicate) {
@@ -91,36 +142,65 @@ const ReviewTracker = () => {
         monthYearData[key][reviewer].prs.push(review);
       }
     });
-
-    const result = Object.entries(monthYearData).flatMap(([monthYear, reviewers]) =>
-      Object.values(reviewers).filter(item => rev[item.reviewer])
+  
+    const result = Object.entries(monthYearData).flatMap(([monthYear, reviewers]) => 
+      Object.values(reviewers).filter((item: { reviewer: string }) => rev[item.reviewer])
     );
-
+  
     return result;
   };
+  
 
-  const transformAndGroupData = (data: any[]) => {
-    const groupedData = data.reduce((acc, item) => {
-      const { monthYear, reviewer, count, prs } = item;
-      if (!acc[monthYear]) {
-        acc[monthYear] = {};
-      }
-      if (!acc[monthYear][reviewer]) {
-        acc[monthYear][reviewer] = { monthYear, reviewer, count: 0, prs: [] };
-      }
-      acc[monthYear][reviewer].count += count;
-      acc[monthYear][reviewer].prs = [...acc[monthYear][reviewer].prs, ...prs];
-      return acc;
-    }, {} as { [key: string]: { [reviewer: string]: { monthYear: string, reviewer: string, count: number, prs: any[] } } });
+// Define types for clarity
+interface ReviewData {
+  monthYear: string;
+  reviewer: string;
+  count: number;
+  prs: any[];
+}
 
-    return Object.entries(groupedData).flatMap(([monthYear, reviewers]) =>
-      Object.values(reviewers)
-    );
+type GroupedData = {
+  [monthYear: string]: {
+    [reviewer: string]: ReviewData;
   };
+};
+
+const transformAndGroupData = (data: any[]): ReviewData[] => {
+  const groupedData: GroupedData = data.reduce((acc, item) => {
+    const { monthYear, reviewer, count, prs } = item;
+    
+    if (!acc[monthYear]) {
+      acc[monthYear] = {};
+    }
+    
+    if (!acc[monthYear][reviewer]) {
+      acc[monthYear][reviewer] = { monthYear, reviewer, count: 0, prs: [] };
+    }
+    
+    acc[monthYear][reviewer].count += count;
+    acc[monthYear][reviewer].prs = [...acc[monthYear][reviewer].prs, ...prs];
+    
+    return acc;
+  }, {} as GroupedData);
+
+  return Object.entries(groupedData).flatMap(([monthYear, reviewers]) =>
+    Object.values(reviewers) // TypeScript should now infer this correctly
+  );
+};
+
+  
+  
 
   const renderChart = () => {
     const dataToUse = data;
-    const transformedData = transformAndGroupData(dataToUse);
+    const filteredData = dataToUse.filter(item =>
+      Object.keys(showReviewer)
+        .filter(reviewer => showReviewer[reviewer]) // Only checked reviewers
+        .includes(item.reviewer) // Assuming 'reviewer' is a key in your data
+    );
+  
+    // Transform and sort the filtered data
+    const transformedData = transformAndGroupData(filteredData);
     const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
 
     const config = {
@@ -241,7 +321,50 @@ const ReviewTracker = () => {
             marginBottom={10}
             textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Reviews Tracker</Heading>
 
-<Flex justify="center" mb={8}>
+
+<Box
+  padding={4}
+  bg={useColorModeValue("blue.50", "gray.700")}
+  borderRadius="md"
+  marginBottom={8}
+>
+  <Heading
+    as="h3"
+    size="lg"
+    marginBottom={4}
+    color={useColorModeValue("#3182CE", "blue.300")}
+  >
+    How to Use the Reviews Tracker
+  </Heading>
+  <Text
+    fontSize="md"
+    marginBottom={2}
+    color={useColorModeValue("gray.800", "gray.200")}
+  >
+    <strong>Default View:</strong> Initially, the graph displays all the data about monthly pull requests (PRs)
+    reviewed by every reviewer. This gives you a comprehensive overview of the reviews for all months and reviewers.
+  </Text>
+  <Text
+    fontSize="md"
+    marginBottom={2}
+    color={useColorModeValue("gray.800", "gray.200")}
+  >
+    <strong>Viewing Data for a Specific Month:</strong> To focus on data from a particular month, click on the
+    "View More" button. Then, select the desired year and month using the dropdown menus. The table and graph will
+    update to show only the data for that specific month.
+  </Text>
+  <Text
+    fontSize="md"
+    color={useColorModeValue("gray.800", "gray.200")}
+  >
+    <strong>Filtering by Reviewers:</strong> You can further refine the data by selecting or unselecting specific
+    reviewers from the checkbox list. This will filter the chart and table to display data only for the chosen
+    reviewers, allowing you to focus on individual contributions.
+  </Text>
+</Box>
+
+
+      <Flex justify="center" mb={8}>
         <Button colorScheme="blue" onClick={() => setActiveTab('eips')} isActive={activeTab === 'eips'}>
           EIPs
         </Button>
@@ -336,6 +459,29 @@ const ReviewTracker = () => {
           </HStack>
         </Box>
       )}
+      {selectedYear && selectedMonth && (
+          <Box mt={8}>
+            {/* Download CSV section */}
+            <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
+              <Text fontSize="lg" marginBottom={4}>
+                You can download the data here:
+              </Text>
+              <CSVLink 
+                data={csvData.length ? csvData : []} // Prevent download if data is not ready
+                filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
+                onClick={(e:any) => {
+                  generateCSVData();
+                  if (csvData.length === 0) {
+                    e.preventDefault(); // Prevent download if CSV data is empty
+                    console.error("CSV data is empty or not generated correctly.");
+                  }
+                }}
+              >
+                <Button colorScheme="blue">Download CSV</Button>
+              </CSVLink>
+            </Box>
+          </Box>
+      )}
 
       {selectedYear && selectedMonth && (
         <Box mt={8}>
@@ -346,5 +492,9 @@ const ReviewTracker = () => {
   </AllLayout>
 )
 ); };
+
+
+
+
 
 export default ReviewTracker;

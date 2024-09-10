@@ -3,16 +3,12 @@ import mongoose from 'mongoose';
 
 // Ensure the database connection is established only once
 if (mongoose.connection.readyState === 0) {
-    mongoose.connect(process.env.MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-        .then(() => {
-            console.log('Connected to the database');
-        })
-        .catch((error: any) => {
-            console.error('Error connecting to the database:', error.message);
-        });
+    if (typeof process.env.MONGODB_URI === 'string') {
+        mongoose.connect(process.env.MONGODB_URI);
+      } else {
+        // Handle the case where the environment variable is not defined
+        console.error('MONGODB_URI environment variable is not defined');
+      }
 }
 
 // Schema for issue details

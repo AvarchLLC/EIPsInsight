@@ -2,16 +2,14 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
 // Connect to the MongoDB database
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => {
-        console.log('Connected to the database');
-    })
-    .catch((error: any) => {
-        console.error('Error connecting to the database:', error.message);
-    });
+if (mongoose.connection.readyState === 0) {
+    if (typeof process.env.MONGODB_URI === 'string') {
+        mongoose.connect(process.env.MONGODB_URI);
+      } else {
+        // Handle the case where the environment variable is not defined
+        console.error('MONGODB_URI environment variable is not defined');
+      }
+}
 
 // Define the Issue schema
 const IssueDetailsSchema = new mongoose.Schema({
