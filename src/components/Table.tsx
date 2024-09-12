@@ -340,7 +340,9 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       Download Reports
                     </Button>
                   </Box>
+                 
                 </PopoverTrigger>
+                <br/>
 
                 <PopoverContent className={"px-4"}>
                   <div className={"space-y-10 py-4"}>
@@ -452,11 +454,83 @@ const Table: React.FC<TableProps> = ({ type }) => {
                 tableProps={{
                   hover: true,
                   responsive: true,
+                  style: {
+                    borderRadius: "0.55rem", // Add rounded corners
+                    overflow: "hidden",      // Ensure the border-radius is applied cleanly
+                  },
                 }}
+                columns={[
+                  {
+                    key: '#',
+                    label: '#',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', 
+                      color: isDarkMode ? 'white' : 'black',              
+                      fontWeight: 'bold',                                  
+                      padding: '12px',                                     
+                      borderTopLeftRadius: "0.55rem",                      
+                    }
+                  },
+                  {
+                    key: 'eip',
+                    label: 'EIP',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'title',
+                    label: 'Title',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'author',
+                    label: 'Author',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'type',
+                    label: 'Type',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'category',
+                    label: 'Category',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'status',
+                    label: 'Status',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                      padding: '12px',                                     
+                      borderTopRightRadius: "0.55rem",   
+                    }
+                  },]}
                 scopedColumns={{
                   "#": (item: any) => (
-                    <td key={item.eip}>
-                     <Link href={`/${type === "ERC" ? "ercs/erc" : type === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                      <Link href={`/eips/eip-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -468,8 +542,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
                     </td>
                   ),
                   eip: (item: any) => (
-                    <td key={item.eip}>
-                      <Link href={`/${type === "ERC" ? "ercs/erc" : type === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                      <Link href={`eips/eip-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -483,11 +557,11 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   title: (item: any) => (
                     <td
                       key={item.eip}
-                      style={{ fontWeight: "bold", height: "100%" }}
+                      style={{ fontWeight: "bold", height: "100%",  backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`${item.repo}s/${item.repo}-${item.eip}`}
+                        href={`/eips/eip-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
@@ -499,7 +573,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                     </td>
                   ),
                   author: (it: any) => (
-                    <td key={it.author}>
+                    <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
                         {factorAuthor(it.author).map(
                           (item: any, index: any) => {
@@ -539,6 +613,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                     <td
                       key={item.eip}
                       className={isDarkMode ? "text-white" : "text-black"}
+                      style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                     >
                       {item.type}
                     </td>
@@ -547,12 +622,13 @@ const Table: React.FC<TableProps> = ({ type }) => {
                     <td
                       key={item.eip}
                       className={isDarkMode ? "text-white" : "text-black"}
+                      style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                     >
                       {item.category}
                     </td>
                   ),
                   status: (item: any) => (
-                    <td key={item.eip}>
+                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <Wrap>
                         <WrapItem>
                           <Badge colorScheme={getStatusColor(item.status)}>
@@ -562,39 +638,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       </Wrap>
                     </td>
                   ),
-                  repo: (item: any) => (
-                    <td
-                      key={item.eip}
-                      className={isDarkMode ? "text-white" : "text-black"}
-                    >
-                      {item.repo.toUpperCase()}S
-                    </td>
-                  ),
-                  mergedYear: (item: any) => (
-                    <td key={item.eip}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>
-                            {" "}
-                            {item.mergedYear}
-                          </Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </td>
-                  ),
-                  mergedMonth: (item: any) => (
-                    <td key={item.eip}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>
-                            {" "}
-                            {item.mergedMonth}
-                          </Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </td>
-                  ),
                 }}
+                
               />
             </>
           )}

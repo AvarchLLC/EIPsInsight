@@ -97,7 +97,7 @@ const Meta = () => {
               </p>
             </Box>
             <TableStatus cat="Meta" />
-            <LineStatus cat="Meta" />
+            {/* <LineStatus cat="Meta" /> */}
           </Box>
         </motion.div>
       )}

@@ -17,7 +17,7 @@ function Logo() {
     })
     return (
         <>
-            <Image src={isDarkMode ? logo : logoDark} width={50} height={50} alt={'logo'}/>
+            <Image src={isDarkMode ? logo : logoDark} width={50} height={50} alt={'logo'} priority/>
         </>
     );
 }

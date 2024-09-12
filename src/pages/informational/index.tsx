@@ -92,7 +92,7 @@ const Info = () => {
               />
             </FlexBetween>
             <TableStatus cat="Informational" />
-            <LineStatus cat="Informational" />
+            {/* <LineStatus cat="Informational" /> */}
           </Box>
         </motion.div>
       )}

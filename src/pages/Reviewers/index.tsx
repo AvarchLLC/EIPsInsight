@@ -334,7 +334,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
     marginBottom={4}
     color={useColorModeValue("#3182CE", "blue.300")}
   >
-    How to Use the Reviews Tracker
+    How to Use the Reviews Tracker?
   </Heading>
   <Text
     fontSize="md"
@@ -438,7 +438,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
                 colorScheme="blue"
                 isDisabled={!selectedMonth} // Disable if no month is selected
               >
-                Reviewers
+                Reviewers Tracker
               </MenuButton>
               <MenuList>
                 {Object.keys(showReviewer).map(reviewer => (
@@ -463,7 +463,9 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
           <Box mt={8}>
             {/* Download CSV section */}
             <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-              <Text fontSize="lg" marginBottom={4}>
+              <Text fontSize="lg"
+    marginBottom={2}
+    color={useColorModeValue("gray.800", "gray.200")}>
                 You can download the data here:
               </Text>
               <CSVLink 

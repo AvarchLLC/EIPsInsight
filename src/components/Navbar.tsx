@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
           href: `/Analytics`,
         },
         {
-          label: "Reviewers",
+          label: "Reviewers Tracker",
           href: `/Reviewers`,
         },
       ],
@@ -509,7 +509,7 @@ const Navbar: React.FC = () => {
                     variant="outline"
                     colorScheme="blue"
                     size="md"
-                    icon={useColorModeValue( <SunIcon />, <MoonIcon />)}
+                    icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
                     onClick={toggleColorMode}
                   />
                 </Stack>
