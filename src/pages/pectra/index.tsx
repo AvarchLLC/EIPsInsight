@@ -291,7 +291,7 @@ const All = () => {
         </NLink>.
 
         EIP-7600: Hardfork Meta - Pectra was created to provide an updated list of proposals for the Network Upgrade. You can read about them&nbsp;
-        <NLink href={`https://eipsinsight.com/pectra`}>
+        <NLink href={`https://eips.ethereum.org/EIPS/eip-7600`}>
           <Text as={"span"} color="blue.500" textDecor={"underline"}>
             here
           </Text>
