@@ -168,7 +168,7 @@ const Dashboard = () => {
                         <Box>
                           <NextLink href={"/home#1"}>
                             <Button
-                              colorScheme="blue"
+                              colorScheme="white"
                               variant={"outline"}
                               fontSize={{
                                 lg: "14px",

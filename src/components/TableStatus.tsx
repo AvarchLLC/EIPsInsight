@@ -12,7 +12,7 @@ import {
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Spinner } from "@chakra-ui/react";
+import { Spinner, useColorMode } from "@chakra-ui/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/react";
 
 const statusArr = [
@@ -104,6 +104,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const { colorMode } = useColorMode();
   const [mergedData, setMergedData] = useState<
     { mergedYear: string; mergedMonth: string }[]
   >([]);
@@ -157,17 +158,19 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
     fetchData();
   }, []);
 
+  const bg = useColorModeValue("#f6f6f7", "#171923");
+  
   useEffect(() => {
     if (bg === "#f6f6f7") {
       setIsDarkMode(false);
     } else {
       setIsDarkMode(true);
     }
-  });
+  },[bg]);
 
   const filteredData = data
     .map((item: any) => {
-      const { eip, title, author, status, type, category } = item;
+      const { eip, title, author, status, type, category, mergedYear, mergedMonth } = item;
       return {
         eip,
         title,
@@ -175,6 +178,8 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
         status,
         type,
         category,
+        mergedYear,
+        mergedMonth
       };
     })
     .filter((item: any) => item.category === cat);
@@ -183,8 +188,6 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
     (item, index) => ({
       "#": (index + 1).toString(), // Add the sr number
       ...item,
-      mergedYear: mergedData[index]?.mergedYear || "", // Replace '' with a default value if needed
-      mergedMonth: mergedData[index]?.mergedMonth || "", // Replace '' with a default value if needed
     })
   );
 
@@ -205,7 +208,6 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
       !selectedCategory || item.category === selectedCategory;
     return isYearInRange && isMonthInRange && isStatusMatch && isCategoryMatch;
   });
-  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
     if (DataForFilter && DataForFilter.length > 0) {
@@ -299,6 +301,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                 <PopoverTrigger>
                   <Box>
                     <Button
+                    
                       colorScheme="blue"
                       variant="outline"
                       fontSize={"14px"}
@@ -311,7 +314,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                     </Button>
                   </Box>
                 </PopoverTrigger>
-
+                <br/>
                 <PopoverContent className={"px-4"}>
                   <div className={"space-y-10 py-4"}>
                     <Select
@@ -408,7 +411,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                   </div>
                 </PopoverContent>
               </Popover>
-
+              
               <CSmartTable
                 items={filteredDataWithMergedYearsAndMonths.sort(
                   (a, b) => parseInt(a["#"]) - parseInt(b["#"])
@@ -422,10 +425,82 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                 tableProps={{
                   hover: true,
                   responsive: true,
+                  style: {
+                    borderRadius: "0.55rem", // Add rounded corners
+                    overflow: "hidden",      // Ensure the border-radius is applied cleanly
+                  },
                 }}
+                columns={[
+                  {
+                    key: '#',
+                    label: '#',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', 
+                      color: isDarkMode ? 'white' : 'black',              
+                      fontWeight: 'bold',                                  
+                      padding: '12px',                                     
+                      borderTopLeftRadius: "0.55rem",                      
+                    }
+                  },
+                  {
+                    key: 'eip',
+                    label: 'EIP',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'title',
+                    label: 'Title',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'author',
+                    label: 'Author',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'type',
+                    label: 'Type',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'category',
+                    label: 'Category',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'status',
+                    label: 'Status',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                      padding: '12px',                                     
+                      borderTopRightRadius: "0.55rem",   
+                    }
+                  },]}
                 scopedColumns={{
                   "#": (item: any) => (
-                    <td key={item.eip}>
+                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <Link href={`/eips/eip-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
@@ -438,7 +513,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                     </td>
                   ),
                   eip: (item: any) => (
-                    <td key={item.eip}>
+                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <Link href={`eips/eip-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
@@ -453,7 +528,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                   title: (item: any) => (
                     <td
                       key={item.eip}
-                      style={{ fontWeight: "bold", height: "100%" }}
+                      style={{ fontWeight: "bold", height: "100%",  backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
@@ -469,7 +544,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                     </td>
                   ),
                   author: (it: any) => (
-                    <td key={it.author}>
+                    <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
                         {factorAuthor(it.author).map(
                           (item: any, index: any) => {
@@ -509,6 +584,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                     <td
                       key={item.eip}
                       className={isDarkMode ? "text-white" : "text-black"}
+                      style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                     >
                       {item.type}
                     </td>
@@ -517,12 +593,13 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                     <td
                       key={item.eip}
                       className={isDarkMode ? "text-white" : "text-black"}
+                      style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                     >
                       {item.category}
                     </td>
                   ),
                   status: (item: any) => (
-                    <td key={item.eip}>
+                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <Wrap>
                         <WrapItem>
                           <Badge colorScheme={getStatusColor(item.status)}>
@@ -532,31 +609,8 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       </Wrap>
                     </td>
                   ),
-                  mergedYear: (item: any) => (
-                    <td key={item.eip}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>
-                            {" "}
-                            {item.mergedYear}
-                          </Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </td>
-                  ),
-                  mergedMonth: (item: any) => (
-                    <td key={item.eip}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>
-                            {" "}
-                            {item.mergedMonth}
-                          </Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </td>
-                  ),
                 }}
+                
               />
             </>
           )}

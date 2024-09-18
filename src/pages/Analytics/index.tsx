@@ -22,7 +22,8 @@ import {
   Text,
   useDisclosure,
   IconButton,
-  HStack
+  HStack,
+  useColorModeValue
 } from "@chakra-ui/react";
 import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
@@ -255,11 +256,18 @@ const GitHubPRTracker: React.FC = () => {
                   <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
                   <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
                   {type === 'PRs' && <Td>{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-                  <Td>
+                  <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
                     <a href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} target="_blank">
                       {type === 'PRs' ? 'Pull Request' : 'Issue'}
                     </a>
-                  </Td>
+                    </button></Td>
                 </Tr>
               ))}
   
@@ -272,11 +280,19 @@ const GitHubPRTracker: React.FC = () => {
                   <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
                   <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
                   <Td>{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
-                  <Td>
+                  
+                  <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
                     <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber}`} target="_blank">
-                      Pull Request
+                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
                     </a>
-                  </Td>
+                    </button></Td>
                 </Tr>
               ))}
             </>
@@ -435,6 +451,50 @@ const GitHubPRTracker: React.FC = () => {
           >
             Github Analytics
           </Heading>
+
+          <Box
+  padding={4}
+  bg={useColorModeValue("blue.50", "gray.700")}
+  borderRadius="md"
+  marginBottom={8}
+>
+  <Heading
+    as="h3"
+    size="lg"
+    marginBottom={4}
+    color={useColorModeValue("#3182CE", "blue.300")}
+  >
+    How to Use the Github Analytics Tool?
+  </Heading>
+  <Text
+  fontSize="md"
+  marginBottom={2}
+  color={useColorModeValue("gray.800", "gray.200")}
+>
+  <strong>Visualizing Trends:</strong> Use the timeline to visualize trends in the number of created, closed, and merged pull requests (PRs) each month. Created PRs are those that have been newly opened. Closed PRs are those that have been closed but not merged, while merged PRs are those that have been both closed and merged.
+</Text>
+<Text
+  fontSize="md"
+  marginBottom={2}
+  color={useColorModeValue("gray.800", "gray.200")}
+>
+  <strong>Viewing Data for a Specific Month:</strong> To focus on a particular month, click the "View More" button. Then, select the desired year and month using the dropdown menus. The table and graph will update to show only the data for that specific month.
+</Text>
+<Text
+  fontSize="md"
+  marginBottom={2}
+  color={useColorModeValue("gray.800", "gray.200")}
+>
+  <strong>Customizing the Graph:</strong> You can choose to display specific data in the graph by selecting or deselecting checkboxes for created, closed, and merged PRs. This allows you to focus on the trends that matter most to you.
+</Text>
+<Text
+  fontSize="md"
+  color={useColorModeValue("gray.800", "gray.200")}
+>
+  <strong>Downloading Reports:</strong> Once you've selected your preferred data using "View More," you can download reports based on the filtered data for further analysis or record-keeping.
+</Text>
+
+</Box>
   
           <Flex justify="center" mb={8}>
             <Button
@@ -468,30 +528,31 @@ const GitHubPRTracker: React.FC = () => {
           <Box>{renderChart()}</Box>
   
           <Flex justify="center" mb={8}>
-            <Checkbox
-              isChecked={showCategory.created}
-              onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
-              mr={4}
-            >
-              Show Created PRs/Issues
-            </Checkbox>
-            <Checkbox
-              isChecked={showCategory.closed}
-              onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
-              mr={4}
-            >
-              Show Closed PRs/Issues
-            </Checkbox>
-            {activeTab === 'PRs' && (
-              <Checkbox
-                isChecked={showCategory.merged}
-                onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
-                mr={4}
-              >
-                Show Merged PRs
-              </Checkbox>
-            )}
-          </Flex>
+  <Checkbox
+    isChecked={showCategory.created}
+    onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
+    mr={4}
+  >
+    {activeTab === 'PRs' ? 'Show Created PRs' : 'Show Created Issues'}
+  </Checkbox>
+  <Checkbox
+    isChecked={showCategory.closed}
+    onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
+    mr={4}
+  >
+    {activeTab === 'PRs' ? 'Show Closed PRs' : 'Show Closed Issues'}
+  </Checkbox>
+  {activeTab === 'PRs' && (
+    <Checkbox
+      isChecked={showCategory.merged}
+      onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
+      mr={4}
+    >
+      Show Merged PRs
+    </Checkbox>
+  )}
+</Flex>
+
   
           <Flex justify="center" mb={8}>
             <Button colorScheme="blue" onClick={toggleDropdown}>
@@ -546,7 +607,9 @@ const GitHubPRTracker: React.FC = () => {
                   <Box mt={8}>
                     {/* Download CSV section */}
                     <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-                      <Text fontSize="lg" marginBottom={4}>
+                    <Text fontSize="lg"
+                    marginBottom={2}
+                    color={useColorModeValue("gray.800", "gray.200")}>
                         You can download the data here:
                       </Text>
                       <Button colorScheme="blue" onClick={handleDownload}>Download CSV</Button>
