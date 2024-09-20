@@ -319,7 +319,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
           <Heading
             size="xl"
             marginBottom={10}
-            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Reviews Tracker</Heading>
+            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Reviewers Tracker</Heading>
 
 
 <Box
@@ -334,7 +334,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
     marginBottom={4}
     color={useColorModeValue("#3182CE", "blue.300")}
   >
-    How to Use the Reviews Tracker?
+    How to Use the Reviewers Tracker?
   </Heading>
   <Text
     fontSize="md"
@@ -438,7 +438,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
                 colorScheme="blue"
                 isDisabled={!selectedMonth} // Disable if no month is selected
               >
-                Reviewers Tracker
+                Reviewers
               </MenuButton>
               <MenuList>
                 {Object.keys(showReviewer).map(reviewer => (

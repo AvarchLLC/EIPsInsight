@@ -206,7 +206,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`eips/eip-${item.eip}`}>
+                      <Link href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -224,7 +224,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/eips/eip-${item.eip}`}
+                        href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"

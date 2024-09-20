@@ -1,24 +1,23 @@
-import React,{useState, useEffect} from "react";
+import React from "react";
 import logoDark from '@/../public/EIPsInsightsDark.gif';
 import logo from '@/../public/EIPsInsights.gif';
 import Image from 'next/image';
-import {useColorModeValue} from "@chakra-ui/react";
+import { useColorModeValue } from "@chakra-ui/react";
 
 function Logo() {
-    const bg = useColorModeValue("#f6f6f7", "#171923");
-    const [isDarkMode, setIsDarkMode] = useState(false);
-    useEffect(() => {
-        if(bg === "#f6f6f7"){
-            setIsDarkMode(false);
-        }
-        else{
-            setIsDarkMode(true);
-        }
-    })
+    
+    const logoSrc = useColorModeValue( "/EIPsInsightsDark.gif", "/EIPsInsights.gif");
+
     return (
-        <>
-            <Image src={isDarkMode ? logo : logoDark} width={50} height={50} alt={'logo'} priority/>
-        </>
+        <Image
+    src={logoSrc}
+    width={50}
+    height={50}
+    alt="logo"
+    priority
+    style={{ color: 'inherit', backgroundColor: 'transparent' }}
+/>
+
     );
 }
 

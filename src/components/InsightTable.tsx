@@ -350,18 +350,102 @@ const InsightTable: React.FC<TabProps> = ({
             <CSmartTable
               items={filteredData.sort((a, b) => a.sr - b.sr)}
               activePage={1}
-              clickableRows
-              columnFilter
-              columnSorter
-              itemsPerPage={5}
-              pagination
-              tableProps={{
-                hover: true,
-                responsive: true,
-              }}
+                clickableRows
+                columnFilter
+                columnSorter
+                itemsPerPage={5}
+                pagination
+                tableProps={{
+                  hover: true,
+                  responsive: true,
+                  style: {
+                    borderRadius: "0.55rem", // Add rounded corners
+                    overflow: "hidden",      // Ensure the border-radius is applied cleanly
+                  },
+                }}
+                columns={[
+                  {
+                    key: 'sr',
+                    label: 'sr',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', 
+                      color: isDarkMode ? 'white' : 'black',              
+                      fontWeight: 'bold',                                  
+                      padding: '12px',                                     
+                      borderTopLeftRadius: "0.55rem",                      
+                    }
+                  },
+                  {
+                    key: 'eip',
+                    label: 'EIP',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'title',
+                    label: 'Title',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'author',
+                    label: 'Author',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'type',
+                    label: 'Type',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'category',
+                    label: 'Category',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'status',
+                    label: 'Status',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                      padding: '12px',                                     
+                      borderTopRightRadius: "0.55rem",   
+                    }
+                  },
+                  {
+                    key: 'commitLink',
+                    label: 'commitLink',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                      padding: '12px',                                     
+                      borderTopRightRadius: "0.55rem",   
+                    }
+                  },
+                  ]}
               scopedColumns={{
                 sr: (item: any) => (
-                  <td key={item.eip}>
+                  <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <Link href={`/${Tabletype}s/${Tabletype}-${item.eip}`}>
                       <Wrap>
                         <WrapItem>
@@ -374,7 +458,7 @@ const InsightTable: React.FC<TabProps> = ({
                   </td>
                 ),
                 eip: (item: any) => (
-                  <td key={item.eip}>
+                  <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <Link href={`/${Tabletype}s/${Tabletype}-${item.eip}`}>
                       <Wrap>
                         <WrapItem>
@@ -389,7 +473,7 @@ const InsightTable: React.FC<TabProps> = ({
                 title: (item: any) => (
                   <td
                     key={item.eip}
-                    style={{ fontWeight: "bold", height: "100%" }}
+                    style={{ fontWeight: "bold", height: "100%", backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                     className="hover:text-[#1c7ed6]"
                   >
                     <Link
@@ -405,7 +489,7 @@ const InsightTable: React.FC<TabProps> = ({
                   </td>
                 ),
                 author: (it: any) => (
-                  <td key={it.author}>
+                  <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <div>
                       {factorAuthor(it.author).map((item: any, index: any) => {
                         let t = item[item.length - 1].substring(
@@ -443,6 +527,7 @@ const InsightTable: React.FC<TabProps> = ({
                   <td
                     key={item.eip}
                     className={isDarkMode ? "text-white" : "text-black"}
+                    style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                   >
                     {item.type}
                   </td>
@@ -451,12 +536,13 @@ const InsightTable: React.FC<TabProps> = ({
                   <td
                     key={item.eip}
                     className={isDarkMode ? "text-white" : "text-black"}
+                    style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
                   >
                     {item.category}
                   </td>
                 ),
                 status: (item: any) => (
-                  <td key={item.eip}>
+                  <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <Wrap>
                       <WrapItem>
                         <Badge colorScheme={getStatusColor(item.status)}>
@@ -467,45 +553,13 @@ const InsightTable: React.FC<TabProps> = ({
                   </td>
                 ),
                 commitLink: (item: any) => (
-                  <td key={item.eip}>
+                  <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <Link href={item.commitLink} target="_blank">
                       <Button className="bg-blue-400">Commit</Button>
                     </Link>
                   </td>
                 ),
-                deadline: (item: any) => (
-                  <td key={item.eip}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>
-                          {item.deadline}
-                        </Badge>
-                      </WrapItem>
-                    </Wrap>
-                  </td>
-                ),
-                created: (item: any) => (
-                  <td key={item.eip}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>
-                          {item.created ? item.created.substring(0, 10) : ""}
-                        </Badge>
-                      </WrapItem>
-                    </Wrap>
-                  </td>
-                ),
-                changeDate: (item: any) => (
-                  <td key={item.eip}>
-                    <Wrap>
-                      <WrapItem>
-                        <Badge colorScheme={getStatusColor(item.status)}>
-                          {item.changeDate.substring(0, 10)}
-                        </Badge>
-                      </WrapItem>
-                    </Wrap>
-                  </td>
-                ),
+                
               }}
             />
           </>
