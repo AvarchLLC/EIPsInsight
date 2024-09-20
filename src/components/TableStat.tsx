@@ -333,7 +333,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/eips/eip-${item.eip}`}>
+                      <Link href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -346,7 +346,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`eips/eip-${item.eip}`}>
+                      <Link href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>

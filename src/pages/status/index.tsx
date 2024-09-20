@@ -96,7 +96,7 @@ const Status = () => {
           transition={{ duration: 0.5 }}
         >
           <Box
-            display={{ lg: "none", md: "block" }}
+           display={{ lg: "block", md: "block", sm: "block", base: "block" }}
             paddingBottom={{ lg: "10", sm: "10", base: "10" }}
             marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
             paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}

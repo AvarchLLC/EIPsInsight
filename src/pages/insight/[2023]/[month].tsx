@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
-import { Box, Grid, useColorModeValue, Text } from "@chakra-ui/react";
+import { Box, Grid, useColorModeValue, Text, Heading } from "@chakra-ui/react";
 import CustomBox from "@/components/CustomBox";
 import OtherBox from "@/components/OtherStats";
 import { PieC } from "@/components/InPie";
@@ -50,26 +50,26 @@ interface APIData {
   rip: StatusChange[];
 }
 
-const getStatus = (status: string) => {
-  switch (status) {
-    case "Draft":
-      return "Draft";
-    case "Final" || "Accepted" || "Superseded":
-      return "Final";
-    case "Last Call":
-      return "Last Call";
-    case "Withdrawn" || "Abandoned" || "Rejected":
-      return "Withdrawn";
-    case "Review":
-      return "Review";
-    case "Living" || "Active":
-      return "Living";
-    case "Stagnant":
-      return "Stagnant";
-    default:
-      return "Final";
-  }
-};
+// const getStatus = (status: string) => {
+//   switch (status) {
+//     case "Draft":
+//       return "Draft";
+//     case "Final" || "Accepted" || "Superseded":
+//       return "Final";
+//     case "Last Call":
+//       return "Last Call";
+//     case "Withdrawn" || "Abandoned" || "Rejected":
+//       return "Withdrawn";
+//     case "Review":
+//       return "Review";
+//     case "Living" || "Active":
+//       return "Living";
+//     case "Stagnant":
+//       return "Stagnant";
+//     default:
+//       return "Final";
+//   }
+// };
 
 function getMonthName(monthNumber: number): string {
   const date = new Date();
@@ -168,7 +168,7 @@ const Month = () => {
             transition={{ duration: 0.5 }}
           >
             <Box
-              paddingBottom={{ lg: "10", sm: "10", base: "10" }}
+              paddingBottom={{ lg: "5", sm: "5", base: "5" }}
               marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
               paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
               marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
@@ -176,6 +176,39 @@ const Month = () => {
               <NextLink href={`/insight/${year}/${month}`}>
                 <Header title={getMonthName(Number(month))} subtitle={year} />
               </NextLink>
+              <br/>
+              <Box
+    padding={4}
+    bg={useColorModeValue("blue.50", "gray.700")}
+    borderRadius="md"
+    marginBottom={8}
+  >
+    <Heading
+      as="h3"
+      size="lg"
+      marginBottom={4}
+      color={useColorModeValue("#3182CE", "blue.300")}
+    >
+      Understanding EIPS Insight Summary
+    </Heading>
+
+    <Text
+      fontSize="md"
+      marginBottom={2}
+      color={useColorModeValue("gray.800", "gray.200")}
+    >
+      <strong>Insight Summary:</strong> The numbers shown in the table represent the status changes or new drafts that appeared during a specific month. For a detailed view of this data, simply click on the numbers.
+    </Text>
+
+    <Text
+      fontSize="md"
+      marginBottom={2}
+      color={useColorModeValue("gray.800", "gray.200")}
+    >
+      <strong>Graph Breakdown:</strong> Each graph focuses on a specific status, such as "Draft" or "Final." Within each status, the columns show the data divided by individual categories, giving you a clear breakdown of how many EIPs from each category transitioned to that status.
+      </Text>
+  </Box>
+
 
               <InsightSummary />
               {/* <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold pb-8">

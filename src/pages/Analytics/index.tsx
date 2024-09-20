@@ -28,8 +28,10 @@ import {
 import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
 
+
 // Dynamic import for Ant Design's Column chart
-const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
+// const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
+const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualAxes), { ssr: false });
 
 const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails'];
 const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails'];
@@ -406,36 +408,55 @@ const GitHubPRTracker: React.FC = () => {
       
     });
 
+    const trendData = Object.keys(dataToUse).map(monthYear => {
+      const items = dataToUse[monthYear];
+      const totalActivity = items.created.length; // Count of created items for this monthYear
+
+      return {
+          monthYear,
+          OpeningTrend: totalActivity, // This should represent the correct trend data
+      };
+  });
+
     // Sort data by monthYear in ascending order
     const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+    const sortedTrendData = trendData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
 
     const config = {
-      data: sortedData,
-      xField: "monthYear",
-      yField: "count",
-      colorField: "type",
-      seriesField: "type",
-      isGroup: true,
-      columnStyle: {
-        radius: [20, 20, 0, 0],
+      data: [sortedData, sortedTrendData], // Provide both bar and trend data
+      xField: 'monthYear',
+      yField: ['count', 'OpeningTrend'], // Use dual axes: one for bars and one for the line
+      geometryOptions: [
+        {
+          geometry: 'column', // Bar chart
+          isGroup: true,
+          seriesField: 'type',
+          columnStyle: {
+            radius: [20, 20, 0, 0],
+          },
+        },
+        {
+          geometry: 'line', // Line chart for trend
+          smooth: true,
+          lineStyle: {
+            stroke: "#ff00ff", // Line color (e.g., magenta)
+            lineWidth: 4,
+          },
+          label: undefined,
       },
+      ],
+      
       slider: {
         start: 0,
         end: 1,
       },
-      legend: { position: "top-right" as const },
-      smooth: true,
-      label: {
-        position: "middle" as const,
-        style: {
-          fill: "#FFFFFF",
-          opacity: 0.6,
-        },
-      },
+      legend: { position: 'top-right' as const },
+      
     };
-
-    return <Column {...config} />;
+  
+    return <DualAxes {...config} />;
   };
+
 
   return (
     loading ? (
@@ -449,7 +470,7 @@ const GitHubPRTracker: React.FC = () => {
             textAlign="center"
             style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold' }}
           >
-            Github Analytics
+            GitHub Analytics
           </Heading>
 
           <Box
@@ -464,7 +485,7 @@ const GitHubPRTracker: React.FC = () => {
     marginBottom={4}
     color={useColorModeValue("#3182CE", "blue.300")}
   >
-    How to Use the Github Analytics Tool?
+    How to Use the GitHub Analytics Tool?
   </Heading>
   <Text
   fontSize="md"

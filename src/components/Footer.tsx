@@ -126,7 +126,6 @@ export default function LargeWithAppLinksAndSocial() {
             >
               <p className={'text-xl underline underline-offset-4 font-bold'}>Links</p>
               <NextLink href={'/all'}>All</NextLink>
-              <NextLink href={'/type'}>Type</NextLink>
               <NextLink href={'/status'}>Status</NextLink>
               <NextLink href={`/insight/${year}/${getMonth(monthName)}`}>{monthName} {year} Insights</NextLink>
               <NextLink href={'/resources'}>Resources</NextLink>
