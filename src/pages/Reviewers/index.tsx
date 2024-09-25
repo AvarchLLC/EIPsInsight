@@ -374,7 +374,11 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
       </Flex>
 
       <Box>{renderChart()}</Box>
-
+      <Box mt={2}>
+      <Text color="gray.500" fontStyle="italic" textAlign="center">
+          *Please note: The data is refreshed every 24 hours to ensure accuracy and up-to-date information*
+        </Text>
+        </Box>
       
       <br/>
 
