@@ -326,31 +326,36 @@ const Dashboard = () => {
                 </div>
               </Box> */}
 
-              <Box className={"lg:grid grid-cols-2 hidden pb-20"}>
-                <div>
-                <BoyGirl />
-                </div>
+<Box className={"grid grid-cols-1 lg:grid-cols-2 pb-20"}>
+ 
+  <div className="flex justify-center lg:justify-start items-center">
+    <BoyGirl />
+  </div>
 
-                <div className={" flex justify-center items-center"}>
-                  <div className={"justify-center items-center space-y-6"}>
-                    <h1 className={"text-5xl font-bold"}>
-                      What is <span className="text-blue-400">EIPInsight</span>?
-                    </h1>
-                    <p className={"text-xl max-w-xl text-justify"}>
-                    EIPsInsight is specialized in toolings designed to provide clear,
-                     visual insights into the activity of Ethereum Improvement Proposal (EIP), Ethereum Request for Comments (ERCs), 
-                     and Rollup Improvement Proposals (RIPs) over a specified period. Data provided is used for tracking the progress and
-                      workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
-                    </p >
-                    <NextLink href={"https://hackmd.io/@etherworldco/ry-GMuCEh"}>
-                      <span className="text-blue-400 text-xl flex space-x-5">
-                        Learn More{" "}
-                        <BsArrowUpRight className={"pt-2"} size={25} />
-                      </span>
-                    </NextLink>
-                  </div>
-                </div>
-              </Box>
+ 
+  <div className={"flex justify-center items-center"}>
+    <div className={"justify-center items-center space-y-6"}>
+      <h1 className={"text-5xl font-bold"}>
+        What is <span className="text-blue-400">EIPInsight</span>?
+      </h1>
+      <p className={"text-xl max-w-xl text-justify"}>
+        EIPsInsight is specialized in toolings designed to provide clear,
+        visual insights into the activity of Ethereum Improvement Proposal (EIP), 
+        Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) 
+        over a specified period. Data provided is used for tracking the progress and
+        workload distribution among EIP Editors, ensuring transparency and efficiency 
+        in the proposal review process.
+      </p>
+      <NextLink href={"https://hackmd.io/@etherworldco/ry-GMuCEh"}>
+        <span className="text-blue-400 text-xl flex space-x-5">
+          Learn More{" "}
+          <BsArrowUpRight className={"pt-2"} size={25} />
+        </span>
+      </NextLink>
+    </div>
+  </div>
+</Box>
+
 
               <FlexBetween>
                 <Box id={"1"}>

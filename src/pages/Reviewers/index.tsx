@@ -375,11 +375,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
 
       <Box>{renderChart()}</Box>
 
-      <Box mt={2}>
-        <Text color="gray.500" fontStyle="italic" textAlign="center">
-          *Note: Reviews can be tracked only if the editor has commented in the conversation.*
-        </Text>
-      </Box>
+      
       <br/>
 
       <Flex justify="center" mb={8}>

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 
-// Ensure the database connection is established only once
+// Connect to the MongoDB database
 if (mongoose.connection.readyState === 0) {
     if (typeof process.env.MONGODB_URI === 'string') {
         mongoose.connect(process.env.MONGODB_URI);
@@ -11,54 +11,53 @@ if (mongoose.connection.readyState === 0) {
       }
 }
 
-const prDetailsSchema = new mongoose.Schema({
-    prNumber: { type: Number, required: true },
-    prTitle: { type: String, required: true },
-    prDescription: { type: String },
-    labels: [String],
-    conversations: { type: Array },
-    numConversations: { type: Number },
-    participants: [String],
-    numParticipants: { type: Number },
-    commits: { type: Array },
-    numCommits: { type: Number },
-    filesChanged: [String],
-    numFilesChanged: { type: Number },
-    mergeDate: { type: Date },
-    createdAt: { type: Date, default: Date.now },
+// Define the Issue schema
+const IssueDetailsSchema = new mongoose.Schema({
+    issueNumber: { type: Number, required: true, unique: true },
+    issueTitle: { type: String, required: true },
+    issueDescription: { type: String },
+    labels: { type: [String] },
+    conversations: { type: [Object] },
+    numConversations: { type: Number, default: 0 },
+    participants: { type: [String] },
+    numParticipants: { type: Number, default: 0 },
+    state: { type: String, required: true },
+    createdAt: { type: Date, required: true },
     closedAt: { type: Date },
-    mergedAt: { type: Date }
+    updatedAt: { type: Date, required: true },
+    author: { type: String, required: true },
 });
 
-// Check if the model already exists
-const PrDetails = mongoose.models.AllEipsPrDetails || mongoose.model('AllEipsPrDetails', prDetailsSchema);
+// Check if the model exists or create it
+const IssueDetails = mongoose.models.AllErcsIssueDetails || mongoose.model('AllErcsIssueDetails', IssueDetailsSchema);
 
 export default async (req: Request, res: Response) => {
     try {
-        // Fetch only the required fields for performance optimization
-        const prDetails = await PrDetails.find({}).select('prNumber prTitle createdAt closedAt mergedAt').exec();
-
-        // Transform the data to include createdAt, closedAt, and mergedAt
-        const transformedDetails = prDetails.map((pr: any) => {
-            const { prNumber, prTitle, createdAt: created_at, closedAt: closed_at, mergedAt: merged_at } = pr;
+        // Fetch Issue details with selected fields
+        const issueDetails = await IssueDetails.find({}).select('issueNumber issueTitle createdAt closedAt state').exec();
+        
+        // Transform the data to include createdAt, closedAt, and state
+        const transformedDetails = issueDetails.map((issue: any) => {
+            const created_at = issue.createdAt;
+            const closed_at = issue.closedAt;
+            const state = issue.state;
 
             return {
-                prNumber,
-                prTitle,
+                IssueNumber: issue.issueNumber,
+                IssueTitle: issue.issueTitle,
                 created_at,
                 closed_at,
-                merged_at
-                // Include other fields as needed
+                state,
             };
         });
-
+        
         // Log the transformed details
         console.log(transformedDetails);
-
-        // Return the PR details as a JSON response
+        
+        // Return the Issue details as JSON response
         res.json(transformedDetails);
     } catch (error) {
-        console.error('Error:', error);
+        console.log('Error:', error);
         res.status(500).json({ error: 'Something went wrong' });
     }
 };
