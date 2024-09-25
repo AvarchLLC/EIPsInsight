@@ -2,16 +2,12 @@ import { Providers } from "@/app/providers";
 import React from "react";
 import LargeWithAppLinksAndSocial from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { Box, ColorModeScript } from "@chakra-ui/react";
+import { Box, ColorModeScript, Text, Link } from "@chakra-ui/react";
 import { Inter } from "next/font/google";
 import "../app/globals.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
-import Banner from "@/components/NewsBanner";
-import PageHelpful from "@/components/PageHelpful";
-import ViewsShare from "@/components/ViewsNShare";
-// import ViewsShare from "@/components/ViewsNShare";
 
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
@@ -47,12 +43,28 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
       <ColorModeScript initialColorMode="dark" />
       <Providers>
         <Navbar />
-        {/*<Banner />*/}
+
+        {/* New Section with Highlighted Background and Emojis */}
+        <Box 
+          bg="skyblue" 
+          color="white" 
+          py={4} 
+          textAlign="center"
+          fontWeight="bold"
+          fontSize="xl"
+        >
+          🚀 We have participated in the Gitcoin Octant Community Round 1! ❤️ Please support us here:{" "} 👉 
+          <Link 
+            href="https://explorer.gitcoin.co/#/round/10/66/40" 
+            isExternal 
+            textDecoration="underline"
+            color="white"
+          >
+           Link
+          </Link>
+        </Box>
+
         {children}
-        {/* <Box className={"flex justify-center mb-6"}>
-          <PageHelpful pageName={router ? router.split("/")[1] : ""} />
-        </Box> */}
-        {/* <ViewsShare path={`${router}`}/> */}
         <LargeWithAppLinksAndSocial />
       </Providers>
     </motion.div>

@@ -35,6 +35,10 @@ const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualA
 
 const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails'];
 const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails'];
+const API_ENDPOINTS = {
+  eips: '/api/editorsprseips',
+  ercs: '/api/editorsprsercs'
+}
 
 type PR = {
   prNumber: number;
@@ -42,7 +46,13 @@ type PR = {
   created_at: Date;
   closed_at: Date | null;
   merged_at: Date | null;
+  reviewDate: Date | null;
 };
+
+interface ReviewerData {
+  [reviewer: string]: PR[];
+}
+
 
 type Issue = {
   IssueNumber: number;
@@ -60,8 +70,8 @@ const GitHubPRTracker: React.FC = () => {
   // const [selectedYear, setSelectedYear] = useState(null);
   // const [selectedMonth, setSelectedMonth] = useState(null);
   const [data, setData] = useState<{
-    PRs: { [key: string]: { created: PR[], closed: PR[], merged: PR[] } };
-    Issues: { [key: string]: { created: Issue[], closed: Issue[] } };
+    PRs: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[], review:PR[] } };
+    Issues: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } };
   }>({ PRs: {}, Issues: {} });
 
   // const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -71,6 +81,8 @@ const GitHubPRTracker: React.FC = () => {
     created: true,
     closed: true,
     merged: true,
+    open:true,
+    review:true
   });
 
   useEffect(() => {
@@ -83,8 +95,36 @@ const GitHubPRTracker: React.FC = () => {
         PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
       );
 
+      const [eipsRes, ercsRes] = await Promise.all([
+        fetch(API_ENDPOINTS.eips),
+        fetch(API_ENDPOINTS.ercs),
+      ]);
+ 
+      const eipsReviewData = await eipsRes.json();
+      const ercsReviewData = await ercsRes.json();
+ 
+      // Determine which data to use based on selectedRepo
       const selectedData = selectedRepo === 'EIPs' ? eipsData : ercsData;
-      const transformedData = transformPRData(selectedData);
+      const selectedReviewData = selectedRepo === 'EIPs' ? eipsReviewData : ercsReviewData;
+      let combinedReviewData: PR[] = [];
+
+      if (selectedRepo === 'EIPs') {
+        // Processing for EIPs review data
+        Object.values(eipsReviewData as ReviewerData).forEach((reviewerArray: PR[]) => {
+          console.log("reviewed:",reviewerArray);
+          combinedReviewData.push(...reviewerArray);
+        });
+     
+      } else if (selectedRepo === 'ERCs') {
+        // Processing for ERCs review data
+        Object.values(ercsReviewData as ReviewerData).forEach((reviewerArray: PR[]) => {
+          combinedReviewData.push(...reviewerArray);
+        });
+      }
+ 
+      // Transform the PR and review data
+      let transformedData = transformPRData(selectedData,combinedReviewData);
+
 
       setData(prevData => ({
         ...prevData,
@@ -103,7 +143,7 @@ const GitHubPRTracker: React.FC = () => {
 
       const selectedData = selectedRepo === 'EIPs' ? eipsData : ercsData;
       const transformedData = transformIssueData(selectedData);
-
+      console.log(transformedData);
       setData(prevData => ({
         ...prevData,
         Issues: transformedData
@@ -123,8 +163,33 @@ const GitHubPRTracker: React.FC = () => {
     setLoading(false);
   };
 
-  const transformPRData = (data: PR[]): { [key: string]: { created: PR[], closed: PR[], merged: PR[] } } => {
-    const monthYearData: { [key: string]: { created: PR[], closed: PR[], merged: PR[] } } = {};
+  const transformPRData = (data: PR[], reviewData:PR[]): { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[], review:PR[] } } => {
+    const monthYearData: { [key: string]: { created: PR[], closed: PR[], merged: PR[] ,open:[], review:[]} } = {};
+    const incrementMonth = (date: Date) => {
+      const newDate = new Date(date);
+      newDate.setMonth(newDate.getMonth() + 1);
+      newDate.setDate(1); // Reset to the first day of the next month
+      return newDate;
+    };
+    const currentDate = new Date();
+
+    const addIfNotExists = (arr: PR[], pr: PR) => {
+   
+      // Check if the PR has a closing date, and if it is in the current month and year
+      const isClosedThisMonth = pr.closed_at &&
+        new Date(pr.closed_at).getFullYear() === currentDate.getFullYear() &&
+        new Date(pr.closed_at).getMonth() === currentDate.getMonth();
+        if (!isClosedThisMonth && !arr.some(existingPr => existingPr.prNumber === pr.prNumber)) {
+          arr.push(pr);
+        }
+    };
+    const addReview= (arr: PR[], pr: PR) => {
+      if (!arr.some(existingPr => existingPr.prNumber === pr.prNumber)) {
+        arr.push(pr);
+      }
+    };
+
+  
 
     data.forEach(pr => {
       const createdDate = pr.created_at ? new Date(pr.created_at) : null;
@@ -133,41 +198,118 @@ const GitHubPRTracker: React.FC = () => {
 
       if (createdDate) {
         const key = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [] };
-        monthYearData[key].created.push(pr);
+        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open:[], review:[] };
+        // monthYearData[key].created.push(pr);
+        addReview(monthYearData[key].created, pr);
       }
 
       if (closedDate && !mergedDate) {
         const key = `${closedDate.getFullYear()}-${String(closedDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [] };
-        monthYearData[key].closed.push(pr);
+        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open:[], review:[] };
+        // monthYearData[key].closed.push(pr);
+        addReview(monthYearData[key].closed, pr);
       }
 
       if (mergedDate) {
         const key = `${mergedDate.getFullYear()}-${String(mergedDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [] };
-        monthYearData[key].merged.push(pr);
+        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open:[], review:[] };
+        // monthYearData[key].merged.push(pr);
+        addReview(monthYearData[key].merged, pr);
+      }
+
+      if (createdDate) {
+        let openDate = new Date(createdDate); // Start from the creation date
+        let endDate = closedDate ? new Date(closedDate) : currentDate; // End at the close date or current date
+ 
+        // Exclude from "open" in the month it was closed
+        if (closedDate && openDate.toISOString().slice(0, 7) === closedDate.toISOString().slice(0, 7)) {
+          return; // Skip further processing for PRs closed in the same month
+        }
+ 
+        while (openDate <= endDate) {
+          const openKey = `${openDate.getFullYear()}-${String(openDate.getMonth() + 1).padStart(2, '0')}`;
+          if (!monthYearData[openKey]) monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review:[]};
+ 
+          // Add to "open" if not yet closed, avoiding duplicates
+          addIfNotExists(monthYearData[openKey].open, pr);
+ 
+          // Increment month
+          openDate = incrementMonth(openDate);
+        }
       }
     });
-
+    reviewData.forEach(pr=>{
+      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
+ 
+      if (reviewDate) {
+        const reviewKey = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthYearData[reviewKey]) monthYearData[reviewKey] = { created: [], closed: [], merged: [], open: [], review:[] };
+        addReview(monthYearData[reviewKey].review, pr);
+      }
+    });
+ 
     return monthYearData;
   };
 
-  const transformIssueData = (data: Issue[]): { [key: string]: { created: Issue[], closed: Issue[] } } => {
-    const monthYearData: { [key: string]: { created: Issue[], closed: Issue[] } } = {};
+  const transformIssueData = (data: Issue[]): { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } => {
+    const monthYearData: { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } = {};
+    
+    const incrementMonth = (date: Date) => {
+      const newDate = new Date(date);
+      newDate.setMonth(newDate.getMonth() + 1);
+      newDate.setDate(1); // Reset to the first day of the next month
+      return newDate;
+    };
+    const currentDate = new Date();
+
+    const addIfNotExists = (arr: Issue[], pr: Issue) => {
+   
+      // Check if the PR has a closing date, and if it is in the current month and year
+      const isClosedThisMonth = pr.closed_at &&
+        new Date(pr.closed_at).getFullYear() === currentDate.getFullYear() &&
+        new Date(pr.closed_at).getMonth() === currentDate.getMonth();
+        if (!isClosedThisMonth && !arr.some(existingPr => existingPr.IssueNumber === pr.IssueNumber)) {
+          arr.push(pr);
+        }
+    };
 
     data.forEach(issue => {
       const createdDate = new Date(issue.created_at);
       const key = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}`;
-      if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [] };
+      if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], open:[] };
       monthYearData[key].created.push(issue);
 
       if (issue.closed_at) {
         const closedDate = new Date(issue.closed_at);
         const closedKey = `${closedDate.getFullYear()}-${String(closedDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[closedKey]) monthYearData[closedKey] = { created: [], closed: [] };
+        if (!monthYearData[closedKey]) monthYearData[closedKey] = { created: [], closed: [], open:[] };
         monthYearData[closedKey].closed.push(issue);
       }
+
+      if (createdDate) {
+        let openDate = new Date(createdDate); // Start from the creation date
+        let endDate = issue.closed_at ? new Date(issue.closed_at) : currentDate; // End at the close date or current date
+    
+        // Check if closed_at is a valid date object
+        if (issue.closed_at && !isNaN(new Date(issue.closed_at).getTime())) {
+            // Exclude from "open" in the month it was closed
+            if (openDate.toISOString().slice(0, 7) === new Date(issue.closed_at).toISOString().slice(0, 7)) {
+                return; // Skip further processing for PRs closed in the same month
+            }
+        }
+    
+        while (openDate <= endDate) {
+            const openKey = `${openDate.getFullYear()}-${String(openDate.getMonth() + 1).padStart(2, '0')}`;
+            if (!monthYearData[openKey]) monthYearData[openKey] = { created: [], closed: [], open: [] };
+    
+            // Add to "open" if not yet closed, avoiding duplicates
+            addIfNotExists(monthYearData[openKey].open, issue);
+    
+            // Increment month
+            openDate = incrementMonth(openDate);
+        }
+    }
+         
     });
 
     return monthYearData;
@@ -297,6 +439,53 @@ const GitHubPRTracker: React.FC = () => {
                     </button></Td>
                 </Tr>
               ))}
+
+{showCategory.open && items.open.map((item: PR | Issue) => (
+                <Tr key={`open-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`}>
+                  <Td>{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+                  <Td>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+                  <Td>Open</Td>
+                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                  {type === 'PRs' && <Td>{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+                  <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
+                    <a href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} target="_blank">
+                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
+                    </a>
+                    </button></Td>
+                </Tr>
+              ))}
+
+{showCategory.review && type === 'PRs' && (items as { review: PR[] }).review.map((item: PR) => (
+                <Tr key={`open-${item.prNumber}`}>
+                  <Td>{item.prNumber}</Td>
+                  <Td>{item.prTitle}</Td>
+                  <Td>reviewed</Td>
+                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+                  <Td>{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
+                  
+                  <Td><button style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}>
+                    <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber}`} target="_blank">
+                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
+                    </a>
+                    </button></Td>
+                </Tr>
+              ))}
             </>
           )}
         </Tbody>
@@ -401,20 +590,21 @@ const GitHubPRTracker: React.FC = () => {
     const transformedData = Object.keys(dataToUse).flatMap(monthYear => {
       const items = dataToUse[monthYear];
       return [
-        ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
+        ...(showCategory.open ? [{ monthYear, type: 'Open', count: items.open.length }] : []),
         ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? items.merged?.length || 0 : 0 }] : []),
-        ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: items.closed.length }] : [])
+        ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: items.closed.length }] : []),
+        ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
       ];
       
     });
 
     const trendData = Object.keys(dataToUse).map(monthYear => {
       const items = dataToUse[monthYear];
-      const totalActivity = items.created.length; // Count of created items for this monthYear
+      const totalActivity = items.created.length; 
 
       return {
           monthYear,
-          OpeningTrend: totalActivity, // This should represent the correct trend data
+          Created: totalActivity, 
       };
   });
 
@@ -425,7 +615,7 @@ const GitHubPRTracker: React.FC = () => {
     const config = {
       data: [sortedData, sortedTrendData], // Provide both bar and trend data
       xField: 'monthYear',
-      yField: ['count', 'OpeningTrend'], // Use dual axes: one for bars and one for the line
+      yField: ['count', 'Created'], // Use dual axes: one for bars and one for the line
       geometryOptions: [
         {
           geometry: 'column', // Bar chart
@@ -442,7 +632,7 @@ const GitHubPRTracker: React.FC = () => {
             stroke: "#ff00ff", // Line color (e.g., magenta)
             lineWidth: 4,
           },
-          label: undefined,
+          color: '#ff00ff',
       },
       ],
       
@@ -492,8 +682,9 @@ const GitHubPRTracker: React.FC = () => {
   marginBottom={2}
   color={useColorModeValue("gray.800", "gray.200")}
 >
-  <strong>Visualizing Trends:</strong> Use the timeline to visualize trends in the number of created, closed, and merged pull requests (PRs) each month. Created PRs are those that have been newly opened. Closed PRs are those that have been closed but not merged, while merged PRs are those that have been both closed and merged.
+  <strong>Visualizing Trends:</strong> Use the timeline to visualize trends in the number of open, reviewed, created, closed, and merged pull requests (PRs) each month. Created PRs are those that have been newly opened. Closed PRs are those that have been closed but not merged, while merged PRs are those that have been both closed and merged. Open PRs represent the number of PRs that were still open during that month, while reviewed PRs are those that were reviewed in that month.
 </Text>
+
 <Text
   fontSize="md"
   marginBottom={2}
@@ -547,7 +738,13 @@ const GitHubPRTracker: React.FC = () => {
           </Flex>
   
           <Box>{renderChart()}</Box>
-  
+
+          <Box mt={2}>
+        <Text color="gray.500" fontStyle="italic" textAlign="center">
+          *Please note: The data is refreshed every 24 hours to ensure accuracy and up-to-date information*
+        </Text>
+      </Box>
+         
           <Flex justify="center" mb={8}>
   <Checkbox
     isChecked={showCategory.created}
@@ -556,6 +753,15 @@ const GitHubPRTracker: React.FC = () => {
   >
     {activeTab === 'PRs' ? 'Show Created PRs' : 'Show Created Issues'}
   </Checkbox>
+  
+    <Checkbox
+      isChecked={showCategory.open}
+      onChange={() => setShowCategory(prev => ({ ...prev, open: !prev.open }))}
+      mr={4}
+    >
+      Show Open PRs
+    </Checkbox>
+  
   <Checkbox
     isChecked={showCategory.closed}
     onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
@@ -570,6 +776,15 @@ const GitHubPRTracker: React.FC = () => {
       mr={4}
     >
       Show Merged PRs
+    </Checkbox>
+  )}
+  {activeTab === 'PRs' && (
+    <Checkbox
+      isChecked={showCategory.review}
+      onChange={() => setShowCategory(prev => ({ ...prev, review: !prev.review }))}
+      mr={4}
+    >
+      Show Reviewed PRs
     </Checkbox>
   )}
 </Flex>
@@ -651,4 +866,3 @@ const GitHubPRTracker: React.FC = () => {
 };
 
 export default GitHubPRTracker;
-
