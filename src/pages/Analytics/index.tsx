@@ -33,11 +33,12 @@ import AllLayout from "@/components/Layout";
 // const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualAxes), { ssr: false });
 
-const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails'];
-const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails'];
+const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails','/api/ripsprdetails'];
+const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails', '/api/ripsissuedetails'];
 const API_ENDPOINTS = {
   eips: '/api/editorsprseips',
-  ercs: '/api/editorsprsercs'
+  ercs: '/api/editorsprsercs',
+  rips: '/api/editorsprsrips'
 }
 
 type PR = {
@@ -91,36 +92,55 @@ const GitHubPRTracker: React.FC = () => {
 
   const fetchPRData = async () => {
     try {
-      const [eipsData, ercsData] = await Promise.all(
+      const [eipsData, ercsData,ripsData] = await Promise.all(
         PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
       );
 
-      const [eipsRes, ercsRes] = await Promise.all([
+      // Fetch data from all three repositories: EIPs, ERCs, RIPs
+      const [eipsRes, ercsRes, ripsRes] = await Promise.all([
         fetch(API_ENDPOINTS.eips),
         fetch(API_ENDPOINTS.ercs),
+        fetch(API_ENDPOINTS.rips), // Add the RIPs fetch here
       ]);
- 
+
       const eipsReviewData = await eipsRes.json();
       const ercsReviewData = await ercsRes.json();
- 
+      const ripsReviewData = await ripsRes.json(); // Parse RIPs response
+
       // Determine which data to use based on selectedRepo
-      const selectedData = selectedRepo === 'EIPs' ? eipsData : ercsData;
-      const selectedReviewData = selectedRepo === 'EIPs' ? eipsReviewData : ercsReviewData;
+      let selectedData;
+      let selectedReviewData;
+      if (selectedRepo === 'EIPs') {
+        selectedData = eipsData;
+        selectedReviewData = eipsReviewData;
+      } else if (selectedRepo === 'ERCs') {
+        selectedData = ercsData;
+        selectedReviewData = ercsReviewData;
+      } else if (selectedRepo === 'RIPs') {
+        selectedData = ripsData; // Assuming ripsData is available
+        selectedReviewData = ripsReviewData;
+      }
+
       let combinedReviewData: PR[] = [];
 
+      // Process review data based on the selected repository
       if (selectedRepo === 'EIPs') {
         // Processing for EIPs review data
         Object.values(eipsReviewData as ReviewerData).forEach((reviewerArray: PR[]) => {
-          console.log("reviewed:",reviewerArray);
           combinedReviewData.push(...reviewerArray);
         });
-     
       } else if (selectedRepo === 'ERCs') {
         // Processing for ERCs review data
         Object.values(ercsReviewData as ReviewerData).forEach((reviewerArray: PR[]) => {
           combinedReviewData.push(...reviewerArray);
         });
+      } else if (selectedRepo === 'RIPs') {
+        // Processing for RIPs review data
+        Object.values(ripsReviewData as ReviewerData).forEach((reviewerArray: PR[]) => {
+          combinedReviewData.push(...reviewerArray);
+        });
       }
+
  
       // Transform the PR and review data
       let transformedData = transformPRData(selectedData,combinedReviewData);
@@ -137,12 +157,22 @@ const GitHubPRTracker: React.FC = () => {
 
   const fetchIssueData = async () => {
     try {
-      const [eipsData, ercsData] = await Promise.all(
+      const [eipsData, ercsData, ripsData] = await Promise.all(
         ISSUE_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
       );
 
-      const selectedData = selectedRepo === 'EIPs' ? eipsData : ercsData;
-      const transformedData = transformIssueData(selectedData);
+      let selectedData;
+    if (selectedRepo === 'EIPs') {
+      selectedData = eipsData;
+    } else if (selectedRepo === 'ERCs') {
+      selectedData = ercsData;
+    } else if (selectedRepo === 'RIPs') {
+      selectedData = ripsData;
+    }
+
+    // Transform the selected data
+    const transformedData = transformIssueData(selectedData);
+    console.log(transformedData);
       console.log(transformedData);
       setData(prevData => ({
         ...prevData,
@@ -169,6 +199,7 @@ const GitHubPRTracker: React.FC = () => {
       const newDate = new Date(date);
       newDate.setMonth(newDate.getMonth() + 1);
       newDate.setDate(1); // Reset to the first day of the next month
+      newDate.setHours(0, 0, 0, 0);
       return newDate;
     };
     const currentDate = new Date();
@@ -192,6 +223,8 @@ const GitHubPRTracker: React.FC = () => {
   
 
     data.forEach(pr => {
+
+      
       const createdDate = pr.created_at ? new Date(pr.created_at) : null;
       const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
       const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
@@ -228,6 +261,11 @@ const GitHubPRTracker: React.FC = () => {
  
         while (openDate <= endDate) {
           const openKey = `${openDate.getFullYear()}-${String(openDate.getMonth() + 1).padStart(2, '0')}`;
+          if(pr.prNumber==8914){
+            console.log("open key for 8914:",openKey)
+            console.log(openDate)
+            console.log("end date:",endDate)
+          }
           if (!monthYearData[openKey]) monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review:[]};
  
           // Add to "open" if not yet closed, avoiding duplicates
@@ -235,6 +273,9 @@ const GitHubPRTracker: React.FC = () => {
  
           // Increment month
           openDate = incrementMonth(openDate);
+          if(pr.prNumber==8914){
+            console.log(openDate)
+          }
         }
       }
     });
@@ -258,6 +299,7 @@ const GitHubPRTracker: React.FC = () => {
       const newDate = new Date(date);
       newDate.setMonth(newDate.getMonth() + 1);
       newDate.setDate(1); // Reset to the first day of the next month
+      newDate.setHours(0, 0, 0, 0);
       return newDate;
     };
     const currentDate = new Date();
@@ -300,6 +342,7 @@ const GitHubPRTracker: React.FC = () => {
     
         while (openDate <= endDate) {
             const openKey = `${openDate.getFullYear()}-${String(openDate.getMonth() + 1).padStart(2, '0')}`;
+            
             if (!monthYearData[openKey]) monthYearData[openKey] = { created: [], closed: [], open: [] };
     
             // Add to "open" if not yet closed, avoiding duplicates
@@ -734,6 +777,7 @@ const GitHubPRTracker: React.FC = () => {
             >
               <option value="EIPs">EIPs</option>
               <option value="ERCs">ERCs</option>
+              <option value="RIPs">RIPs</option>
             </Select>
           </Flex>
   

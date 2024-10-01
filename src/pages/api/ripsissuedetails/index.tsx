@@ -29,7 +29,7 @@ const IssueDetailsSchema = new mongoose.Schema({
 });
 
 // Check if the model exists or create it
-const IssueDetails = mongoose.models.AllEipsIssueDetails || mongoose.model('AllEipsIssueDetails', IssueDetailsSchema);
+const IssueDetails = mongoose.models.AllRipsIssueDetails || mongoose.model('AllRipsIssueDetails', IssueDetailsSchema);
 
 export default async (req: Request, res: Response) => {
     try {

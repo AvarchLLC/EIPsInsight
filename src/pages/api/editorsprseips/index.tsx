@@ -126,7 +126,7 @@ export default async (req: Request, res: Response) => {
         });
 
         // Log the grouped details by reviewer
-        console.log(resultByReviewer);
+        // console.log(resultByReviewer);
 
         // Return the PR details grouped by each reviewer as a JSON response
         res.json(resultByReviewer);

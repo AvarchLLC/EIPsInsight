@@ -53,7 +53,7 @@ export default async (req: Request, res: Response) => {
         });
 
         // Log the transformed details
-        console.log(transformedDetails);
+        
 
         // Return the PR details as a JSON response
         res.json(transformedDetails);
