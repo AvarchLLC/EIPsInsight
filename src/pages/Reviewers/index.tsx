@@ -11,7 +11,8 @@ const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column)
 
 const API_ENDPOINTS = {
   eips: '/api/editorsprseips',
-  ercs: '/api/editorsprsercs'
+  ercs: '/api/editorsprsercs',
+  rips: '/api/editorsprsrips'
 };
 
 const ReviewTracker = () => {
@@ -21,7 +22,7 @@ const ReviewTracker = () => {
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'eips' | 'ercs'>('eips'); 
+  const [activeTab, setActiveTab] = useState<'eips' | 'ercs' | 'rips'>('eips');
   const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
 
   // Function to generate CSV data
@@ -370,6 +371,9 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
         </Button>
         <Button colorScheme="blue" onClick={() => setActiveTab('ercs')} isActive={activeTab === 'ercs'} ml={4}>
           ERCs
+        </Button>
+        <Button colorScheme="blue" onClick={() => setActiveTab('rips')} isActive={activeTab === 'rips'} ml={4}>
+          RIPs
         </Button>
       </Flex>
 

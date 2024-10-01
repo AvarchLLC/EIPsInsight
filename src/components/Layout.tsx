@@ -45,7 +45,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         <Navbar />
 
         {/* New Section with Highlighted Background and Emojis */}
-        <Box 
+        {/* <Box 
           bg="skyblue" 
           color="white" 
           py={4} 
@@ -62,7 +62,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
           >
            Link
           </Link>
-        </Box>
+        </Box> */}
 
         {children}
         <LargeWithAppLinksAndSocial />

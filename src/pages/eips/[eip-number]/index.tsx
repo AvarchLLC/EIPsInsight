@@ -16,6 +16,7 @@ import {
   Td,
   Link,
   HStack,
+  Flex,
   Text,
   VStack,
   Spinner,
@@ -307,79 +308,85 @@ const TestComponent = () => {
                 transition={{ duration: 0.8 }}
               >
                 <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="10">
-                  <Heading
-                    size="md"
-                    mb="4"
-                    color={"#30A0E0"}
-                  >
-                    Status Timeline
-                  </Heading>
-                  <HStack w="100%" spacing={6} align="center">
-                  {data
-  .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
-  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
-  .map((item, index, sortedData) => {
-    const currentDate = new Date(item.date);
-    const nextItem = sortedData[index + 1];
-    const nextDate = nextItem ? new Date(nextItem.date) : null;
+  <Heading size="md" mb="4" color={"#30A0E0"}>
+    Status Timeline
+  </Heading>
 
-    
-    const dayDifference = nextDate
-      ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
-      : null;
+  {/* Use Flex with flexWrap="wrap" to create new lines when the content overflows */}
+  <Flex w="100%" gap={6} align="center" flexWrap="wrap">
+    {data
+      .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
+      .map((item, index, sortedData) => {
+        const currentDate = new Date(item.date);
+        const nextItem = sortedData[index + 1];
+        const nextDate = nextItem ? new Date(nextItem.date) : null;
 
-    return (
-      <React.Fragment key={index}>
-        <VStack align="center">
-          {/* Status and Date */}
-          <Box
-            p="5"
-            bg={useColorModeValue("white", "gray.800")}
-            borderRadius="md"
-            boxShadow={useColorModeValue("md", "dark-lg")}
-            textAlign="center"
-          >
-            <Text fontWeight="bold" color={statusColor}>
-              {item.status}
-            </Text>
-            <Text color={dateColor}>
-              {currentDate.toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </Text>
-          </Box>
-        </VStack>
+        // Calculate the day difference between current and next item
+        const dayDifference = nextDate
+          ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
+          : null;
 
-        {/* Arrow design and days difference */}
-        {nextItem && (
-          <VStack align="center" spacing={1}>
-            <Box h="1px" w="80px" borderBottom="1px solid" borderColor="gray.400" position="relative">
-              {/* Arrow pointing forward */}
+        return (
+          <React.Fragment key={index}>
+            {/* Status and Date */}
+            <VStack align="center" spacing={3} minW="120px" maxW="120px" mb={4}>
               <Box
-                position="absolute"
-                right="-10px"
-                top="-4px"
-                borderTop="5px solid transparent"
-                borderBottom="5px solid transparent"
-                borderLeft="10px solid gray"
-              />
-            </Box>
-            <Text color="gray.500" fontSize="sm">
-              {dayDifference} days
-            </Text>
-          </VStack>
-        )}
-      </React.Fragment>
-    );
-  })}
+                p="5"
+                bg={useColorModeValue("white", "gray.800")}
+                borderRadius="md"
+                boxShadow={useColorModeValue("md", "dark-lg")}
+                textAlign="center"
+                minH="80px"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+              >
+                <Text fontWeight="bold" color={statusColor}>
+                  {item.status}
+                </Text>
+                <Text color={dateColor}>
+                  {currentDate.toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </Text>
+              </Box>
+            </VStack>
 
-                  </HStack>
-
-
-
+            {/* Arrow design and days difference */}
+            {nextItem && (
+              <VStack align="center" spacing={1}>
+                <Box
+                  h="1px"
+                  w="80px"
+                  borderBottom="1px solid"
+                  borderColor="gray.400"
+                  position="relative"
+                >
+                  {/* Arrow pointing forward */}
+                  <Box
+                    position="absolute"
+                    right="-10px"
+                    top="-4px"
+                    borderTop="5px solid transparent"
+                    borderBottom="5px solid transparent"
+                    borderLeft="10px solid gray"
+                  />
                 </Box>
+                <Text color="gray.500" fontSize="sm">
+                  {dayDifference} days
+                </Text>
+              </VStack>
+            )}
+          </React.Fragment>
+        );
+      })}
+  </Flex>
+</Box>
+
+
               </motion.div>
               <Container maxW="1200px" mx="auto">
                 <motion.div

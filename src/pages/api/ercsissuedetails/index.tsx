@@ -52,7 +52,7 @@ export default async (req: Request, res: Response) => {
         });
         
         // Log the transformed details
-        console.log(transformedDetails);
+        // console.log(transformedDetails);
         
         // Return the Issue details as JSON response
         res.json(transformedDetails);

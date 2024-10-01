@@ -12,7 +12,7 @@ if (mongoose.connection.readyState === 0) {
 }
 
 // EIP Review Schema
-const ercReviewSchema = new mongoose.Schema({
+const ripReviewSchema = new mongoose.Schema({
     reviewerName: {
         type: String,
         required: true,
@@ -74,7 +74,7 @@ const ercReviewSchema = new mongoose.Schema({
 
 // Create EIPReviewDetails model
 // const EIPReviewDetails = mongoose.model('ERCReviewDetails', ercReviewSchema);
-const ERCReviewDetails = mongoose.models.ERCReviewDetails || mongoose.model('ERCReviewDetails', ercReviewSchema);
+const RIPReviewDetails = mongoose.models.RIPReviewDetails || mongoose.model('RIPReviewDetails', ripReviewSchema);
 
 
 // Controller logic to fetch and group PR review details by reviewer
@@ -92,7 +92,7 @@ export default async (req: Request, res: Response) => {
         });
 
         // Efficient MongoDB query to fetch review details
-        const eipReviews = await ERCReviewDetails.aggregate([
+        const eipReviews = await RIPReviewDetails.aggregate([
             { $match: { reviewerName: { $in: githubHandles } } },  // Filter by reviewerName
             { $unwind: "$reviews" },  // Unwind the reviews array
             {

@@ -1,52 +1,64 @@
 import { Request, Response } from 'express';
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => {
-        console.log('Connected to the database');
-    })
-    .catch((error: any) => {
-        console.error('Error connecting to the database:', error.message);
-    });
+// Ensure the database connection is established only once
+if (mongoose.connection.readyState === 0) {
+    if (typeof process.env.MONGODB_URI === 'string') {
+        mongoose.connect(process.env.MONGODB_URI);
+      } else {
+        // Handle the case where the environment variable is not defined
+        console.error('MONGODB_URI environment variable is not defined');
+      }
+}
 
-    const prDetailsSchema = new mongoose.Schema({
-        prNumber: { type: Number },
-        prTitle: { type: String },
-        prDescription: { type: String },
-        labels: { type: [String] },
-        conversations: { type: [Object] },
-        numConversations: { type: Number },
-        participants: { type: [String] },
-        numParticipants: { type: Number },
-        commits: { type: [Object] },
-        numCommits: { type: Number },
-        filesChanged: { type: [String] },
-        numFilesChanged: { type: Number },
-        mergeDate: { type: Date },
-    });
-    
-    const PrDetails = mongoose.models.PrDetails ||  mongoose.model('ripprdetails', prDetailsSchema);
+const prDetailsSchema = new mongoose.Schema({
+    prNumber: { type: Number, required: true },
+    prTitle: { type: String, required: true },
+    prDescription: { type: String },
+    labels: [String],
+    conversations: { type: Array },
+    numConversations: { type: Number },
+    participants: [String],
+    numParticipants: { type: Number },
+    commits: { type: Array },
+    numCommits: { type: Number },
+    filesChanged: [String],
+    numFilesChanged: { type: Number },
+    mergeDate: { type: Date },
+    createdAt: { type: Date, default: Date.now },
+    closedAt: { type: Date },
+    mergedAt: { type: Date }
+});
 
-
+// Check if the model already exists
+const PrDetails = mongoose.models.AllRipsPrDetails || mongoose.model('AllRipsPrDetails', prDetailsSchema);
 
 export default async (req: Request, res: Response) => {
-    var allprnumbers = [];
     try {
-        const prDetails = await PrDetails.find({},{prNumber : 1, prTitle:1 ,_id : 0});
-        console.log(prDetails);
-       
-        // Return the PR details as JSON response
-        // for(prnum in prDetails){
-        //     allprnumbers.push(prnum.prNumber)
-        // }
-        res.json(prDetails);
+        // Fetch only the required fields for performance optimization
+        const prDetails = await PrDetails.find({}).select('prNumber prTitle createdAt closedAt mergedAt').exec();
+
+        // Transform the data to include createdAt, closedAt, and mergedAt
+        const transformedDetails = prDetails.map((pr: any) => {
+            const { prNumber, prTitle, createdAt: created_at, closedAt: closed_at, mergedAt: merged_at } = pr;
+
+            return {
+                prNumber,
+                prTitle,
+                created_at,
+                closed_at,
+                merged_at
+                // Include other fields as needed
+            };
+        });
+
+        // Log the transformed details
+        // console.log(transformedDetails);
+
+        // Return the PR details as a JSON response
+        res.json(transformedDetails);
     } catch (error) {
-        console.log('Error:', error);
+        console.error('Error:', error);
         res.status(500).json({ error: 'Something went wrong' });
     }
 };
-
-

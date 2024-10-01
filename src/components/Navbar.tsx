@@ -87,23 +87,23 @@ const Navbar: React.FC = () => {
         },
         {
           label: "2021",
-          children: getMonthsTillYear(2022),
+          children: getMonthsTillYear(2021),
         },
         {
           label: "2020",
-          children: getMonthsTillYear(2022),
+          children: getMonthsTillYear(2020),
         },
         {
           label: "2019",
-          children: getMonthsTillYear(2022),
+          children: getMonthsTillYear(2019),
         },
         {
           label: "2018",
-          children: getMonthsTillYear(2022),
+          children: getMonthsTillYear(2018),
         },
         {
           label: "2017",
-          children: getMonthsTillYear(2022),
+          children: getMonthsTillYear(2017),
         },
         {
           label: "2016",
