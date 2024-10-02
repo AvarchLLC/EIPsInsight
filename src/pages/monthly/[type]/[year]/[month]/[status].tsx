@@ -86,15 +86,30 @@ const Insi = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/statusChanges/${year}/${month}`);
+
+        const removeDuplicatePRs = (statusChangesArray: StatusChange[]): StatusChange[] => {
+          return statusChangesArray.map(item => {
+            const uniquePRs = item.statusChanges.filter(
+              (value, index, self) =>
+                index === self.findIndex(v => v.eip === value.eip)
+            );
+            return {
+              ...item,
+              statusChanges: uniquePRs,
+            };
+          });
+        };
+
         const jsonData = await response.json();
+        
         if (type === "erc") {
-          setData(jsonData.erc);
+          setData(removeDuplicatePRs(jsonData.erc));
         } else if (type === "eip") {
-          setData(jsonData.eip);
+          setData(removeDuplicatePRs(jsonData.eip));
         } else if (type === "rip") {
-          setData(jsonData.rip);
+          setData(removeDuplicatePRs(jsonData.rip));
         } else {
-          setData(jsonData.eip);
+          setData(removeDuplicatePRs(jsonData.eip));
         }
       } catch (error) {
         console.error("Error fetching data:", error);

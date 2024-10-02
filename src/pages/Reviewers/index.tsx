@@ -15,6 +15,8 @@ const API_ENDPOINTS = {
   rips: '/api/editorsprsrips'
 };
 
+type ShowReviewerType = { [key: string]: boolean }; 
+
 const ReviewTracker = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
@@ -323,46 +325,46 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
             textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Reviewers Tracker</Heading>
 
 
-<Box
-  padding={4}
-  bg={useColorModeValue("blue.50", "gray.700")}
-  borderRadius="md"
-  marginBottom={8}
->
-  <Heading
-    as="h3"
-    size="lg"
-    marginBottom={4}
-    color={useColorModeValue("#3182CE", "blue.300")}
-  >
-    How to Use the Reviewers Tracker?
-  </Heading>
-  <Text
-    fontSize="md"
-    marginBottom={2}
-    color={useColorModeValue("gray.800", "gray.200")}
-  >
-    <strong>Default View:</strong> Initially, the graph displays all the data about monthly pull requests (PRs)
-    reviewed by every reviewer. This gives you a comprehensive overview of the reviews for all months and reviewers.
-  </Text>
-  <Text
-    fontSize="md"
-    marginBottom={2}
-    color={useColorModeValue("gray.800", "gray.200")}
-  >
-    <strong>Viewing Data for a Specific Month:</strong> To focus on data from a particular month, click on the
-    "View More" button. Then, select the desired year and month using the dropdown menus. The table and graph will
-    update to show only the data for that specific month.
-  </Text>
-  <Text
-    fontSize="md"
-    color={useColorModeValue("gray.800", "gray.200")}
-  >
-    <strong>Filtering by Reviewers:</strong> You can further refine the data by selecting or unselecting specific
-    reviewers from the checkbox list. This will filter the chart and table to display data only for the chosen
-    reviewers, allowing you to focus on individual contributions.
-  </Text>
-</Box>
+      <Box
+        padding={4}
+        bg={useColorModeValue("blue.50", "gray.700")}
+        borderRadius="md"
+        marginBottom={8}
+      >
+        <Heading
+          as="h3"
+          size="lg"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          How to Use the Reviewers Tracker?
+        </Heading>
+        <Text
+          fontSize="md"
+          marginBottom={2}
+          color={useColorModeValue("gray.800", "gray.200")}
+        >
+          <strong>Default View:</strong> Initially, the graph displays all the data about monthly pull requests (PRs)
+          reviewed by every reviewer. This gives you a comprehensive overview of the reviews for all months and reviewers.
+        </Text>
+        <Text
+          fontSize="md"
+          marginBottom={2}
+          color={useColorModeValue("gray.800", "gray.200")}
+        >
+          <strong>Viewing Data for a Specific Month:</strong> To focus on data from a particular month, click on the
+          "View More" button. Then, select the desired year and month using the dropdown menus. The table and graph will
+          update to show only the data for that specific month.
+        </Text>
+        <Text
+          fontSize="md"
+          color={useColorModeValue("gray.800", "gray.200")}
+        >
+          <strong>Filtering by Reviewers:</strong> You can further refine the data by selecting or unselecting specific
+          reviewers from the checkbox list. This will filter the chart and table to display data only for the chosen
+          reviewers, allowing you to focus on individual contributions.
+        </Text>
+      </Box>
 
 
       <Flex justify="center" mb={8}>
@@ -406,7 +408,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
                     key={year}
                     onClick={() => {
                       setSelectedYear(year);
-                      setSelectedMonth(null); // Reset month when a new year is selected
+                      setSelectedMonth(null); 
                     }}
                   >
                     {year}
@@ -421,7 +423,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
                 colorScheme="blue"
-                isDisabled={!selectedYear} // Disable if no year is selected
+                isDisabled={!selectedYear} 
               >
                 {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
               </MenuButton>
@@ -435,24 +437,42 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
             </Menu>
 
             {/* Reviewer Selection */}
-            <Menu>
+            <Menu closeOnSelect={false}>
               <MenuButton
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
                 colorScheme="blue"
-                isDisabled={!selectedMonth} // Disable if no month is selected
+                isDisabled={!selectedMonth}
               >
                 Reviewers
               </MenuButton>
               <MenuList>
-                {Object.keys(showReviewer).map(reviewer => (
+              
+                <MenuItem 
+                  onClick={() => {
+                    const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
+                      acc[reviewer] = false;
+                      return acc;
+                    }, {} as ShowReviewerType); 
+                    setShowReviewer(updatedReviewers);
+                  }}
+                >
+                  <Text as="span" fontWeight="bold" textDecoration="underline">
+                    Remove All
+                  </Text>
+                </MenuItem>
+
+                
+                {Object.keys(showReviewer).map((reviewer: string) => (
                   <MenuItem key={reviewer}>
                     <Checkbox
                       isChecked={showReviewer[reviewer]}
-                      onChange={(e) => setShowReviewer({
-                        ...showReviewer,
-                        [reviewer]: e.target.checked,
-                      })}
+                      onChange={(e) =>
+                        setShowReviewer({
+                          ...showReviewer,
+                          [reviewer]: e.target.checked,
+                        })
+                      }
                     >
                       {reviewer}
                     </Checkbox>
@@ -473,12 +493,12 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
                 You can download the data here:
               </Text>
               <CSVLink 
-                data={csvData.length ? csvData : []} // Prevent download if data is not ready
+                data={csvData.length ? csvData : []} 
                 filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
                 onClick={(e:any) => {
                   generateCSVData();
                   if (csvData.length === 0) {
-                    e.preventDefault(); // Prevent download if CSV data is empty
+                    e.preventDefault(); 
                     console.error("CSV data is empty or not generated correctly.");
                   }
                 }}

@@ -82,6 +82,7 @@ interface EIP {
     date: string;
     count: number;
     category: string;
+    eips:any[];
   }[];
 }
 
@@ -137,6 +138,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
+        console.log(jsonData.eip)
         setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         setIsLoading(false);
       } catch (error) {
@@ -152,16 +154,30 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
   useEffect(() => {
     setIsChartReady(true);
   }, []);
-
+  
+  const removeDuplicatesFromEips = (eips: any[]) => {
+    const seen = new Set();
+    
+    return eips.filter((eip) => {
+      if (!seen.has(eip.eip)) {
+        seen.add(eip.eip); // Track seen eip numbers
+        return true;
+      }
+      return false; // Filter out duplicates
+    });
+  };
+  
   let filteredData = data.filter((item) => item.status === status);
 
-  const transformedData = filteredData.flatMap((item) =>
-    item.eips.map((eip) => ({
+  const transformedData = filteredData.flatMap((item) => {
+    console.log(item); // Log each item
+    return item.eips.map((eip) => ({
       category: getCat(eip.category),
       year: `${getMonthName(eip.month)} ${eip.year.toString()}`,
-      value: eip.count,
-    }))
-  );
+      value:removeDuplicatesFromEips(eip.eips).length
+    }));
+  });
+  
 
   const months = [
     "Jan",
