@@ -111,15 +111,29 @@ const InsightTable: React.FC<TabProps> = ({
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/statusChanges/${year}/${month}`);
+
+        const removeDuplicatePRs = (statusChangesArray: DataObject[]): DataObject[] => {
+          return statusChangesArray.map(item => {
+            const uniquePRs = item.statusChanges.filter(
+              (value, index, self) =>
+                index === self.findIndex(v => v.eip === value.eip)
+            );
+            return {
+              ...item,
+              statusChanges: uniquePRs,
+            };
+          });
+        };
+
         const jsonData = await response.json();
         if (Tabletype === "erc") {
-          setData(jsonData.erc);
+          setData(removeDuplicatePRs(jsonData.erc));
         } else if (Tabletype === "eip") {
-          setData(jsonData.eip);
+          setData(removeDuplicatePRs(jsonData.eip));
         } else if (Tabletype === "rip") {
-          setData(jsonData.rip);
+          setData(removeDuplicatePRs(jsonData.rip));
         } else if (Tabletype === "all") {
-          setData(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip));
+          setData(removeDuplicatePRs(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip)));
         }
         setIsLoading(false);
       } catch (error) {

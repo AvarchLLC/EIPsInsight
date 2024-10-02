@@ -69,9 +69,28 @@ export default function InsightSummary() {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/statusChanges/${year}/${month}`);
-        const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip));
-      } catch (error) {
+        const jsonData: APIData = await response.json();
+
+        const removeDuplicatePRs = (statusChangesArray: StatusChange[]): StatusChange[] => {
+          return statusChangesArray.map(item => {
+            const uniquePRs = item.statusChanges.filter(
+              (value, index, self) =>
+                index === self.findIndex(v => v.eip === value.eip)
+            );
+            return {
+              ...item,
+              statusChanges: uniquePRs,
+            };
+          });
+        };
+
+        const uniqueEip = removeDuplicatePRs(jsonData.eip);
+        console.log(uniqueEip)
+        const uniqueErc = removeDuplicatePRs(jsonData.erc);
+        const uniqueRip = removeDuplicatePRs(jsonData.rip);
+
+        setData(uniqueEip.concat(uniqueErc).concat(uniqueRip));
+      }  catch (error) {
         console.error("Error fetching data:", error);
       }
     };
@@ -125,9 +144,9 @@ export default function InsightSummary() {
     const statusData = data.filter((item) => item._id === status);
     return {
       _id: status,
-      eipCount: statusData.filter((item) => item.repo === "eip")[0]?.count || 0,
-      ercCount: statusData.filter((item) => item.repo === "erc")[0]?.count || 0,
-      ripCount: statusData.filter((item) => item.repo === "rip")[0]?.count || 0,
+      eipCount: statusData.filter((item) => item.repo === "eip")[0]?.statusChanges.length || 0,
+      ercCount: statusData.filter((item) => item.repo === "erc")[0]?.statusChanges.length || 0,
+      ripCount: statusData.filter((item) => item.repo === "rip")[0]?.statusChanges.length || 0,
     };
   });
 
