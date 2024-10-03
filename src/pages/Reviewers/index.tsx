@@ -259,56 +259,60 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
       }, []);
 
     return (
-      <Box mt={8}>
-        <Table variant="simple">
-          <Thead>
+      <Box mt={8} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
+        <Table variant="striped" colorScheme="blue">
+          <Thead bg="#2D3748">
             <Tr>
-              <Th>PR Number</Th>
-              <Th>Title</Th>
-              <Th>Reviewed By</Th>
-              <Th>Review Date</Th>
-              <Th>Created Date</Th>
-              <Th>Closed Date</Th>
-              <Th>Merged Date</Th>
-              <Th>Status</Th>
-              <Th>Link</Th>
+              <Th color="white" textAlign="center" borderTopLeftRadius="10px">PR Number</Th>
+              <Th color="white" textAlign="center">Title</Th>
+              <Th color="white" textAlign="center">Reviewed By</Th>
+              <Th color="white" textAlign="center">Review Date</Th>
+              <Th color="white" textAlign="center">Created Date</Th>
+              <Th color="white" textAlign="center">Closed Date</Th>
+              <Th color="white" textAlign="center">Merged Date</Th>
+              <Th color="white" textAlign="center">Status</Th>
+              <Th color="white" textAlign="center" borderTopRightRadius="10px">Link</Th>
             </Tr>
           </Thead>
-          <Tbody>
-            {filteredData.map(pr => {
-              const status = pr.merged_at
-                ? 'Merged'
-                : pr.closed_at
-                ? 'Closed'
-                : 'Open';
-
-              return (
-                <Tr key={pr.prNumber}>
-                  <Td>{pr.prNumber}</Td>
-                  <Td>{pr.prTitle}</Td>
-                  <Td>{pr.reviewer}</Td>
-                  <Td>{pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-'}</Td>
-                  <Td>{pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{status}</Td>
-                  <Td>
-                  <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                      <a href={`https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`} target="_blank">Pull Request</a>
-                    </button></Td>
-                  </Td>
-                </Tr>
-              );
-            })}
-          </Tbody>
         </Table>
+
+        <Box overflowY="auto" maxHeight="400px" borderBottomRadius="0" borderTopWidth="1px" borderTopColor="gray.200">
+          <Table variant="striped" colorScheme="blue">
+            <Tbody>
+              {filteredData.map(pr => {
+                const status = pr.merged_at
+                  ? 'Merged'
+                  : pr.closed_at
+                  ? 'Closed'
+                  : 'Open';
+
+                return (
+                  <Tr key={pr.prNumber}>
+                    <Td textAlign="center">{pr.prNumber}</Td>
+                    <Td textAlign="center">{pr.prTitle}</Td>
+                    <Td textAlign="center">{pr.reviewer}</Td>
+                    <Td textAlign="center">{pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-'}</Td>
+                    <Td textAlign="center">{pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-'}</Td>
+                    <Td textAlign="center">{pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-'}</Td>
+                    <Td textAlign="center">{pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-'}</Td>
+                    <Td textAlign="center">{status}</Td>
+                    <Td textAlign="center">
+                      <Button
+                        as="a"
+                        href={`https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`}
+                        target="_blank"
+                        colorScheme="blue"
+                        variant="solid"
+                      >
+                        Pull Request
+                      </Button>
+                    </Td>
+                  </Tr>
+                );
+              })}
+            </Tbody>
+          </Table>
+        </Box>
       </Box>
     );
   };
@@ -387,6 +391,53 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
         </Box>
       
       <br/>
+      <Flex justify="center" mb={8}>
+         {/* Reviewer Selection */}
+         <Menu closeOnSelect={false}>
+  <MenuButton
+    as={Button}
+    rightIcon={<ChevronDownIcon />}
+    colorScheme="blue"
+  >
+    Reviewers
+  </MenuButton>
+
+  {/* Make MenuList scrollable after 6 items */}
+  <MenuList maxHeight="200px" overflowY="auto">
+    <MenuItem
+      onClick={() => {
+        const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
+          acc[reviewer] = false;
+          return acc;
+        }, {} as ShowReviewerType); 
+        setShowReviewer(updatedReviewers);
+      }}
+    >
+      <Text as="span" fontWeight="bold" textDecoration="underline">
+        Remove All
+      </Text>
+    </MenuItem>
+
+    {Object.keys(showReviewer).map((reviewer: string) => (
+      <MenuItem key={reviewer}>
+        <Checkbox
+          isChecked={showReviewer[reviewer]}
+          onChange={(e) =>
+            setShowReviewer({
+              ...showReviewer,
+              [reviewer]: e.target.checked,
+            })
+          }
+        >
+          {reviewer}
+        </Checkbox>
+      </MenuItem>
+    ))}
+  </MenuList>
+</Menu>
+<br/>
+
+      </Flex>
 
       <Flex justify="center" mb={8}>
         <Button colorScheme="blue" onClick={toggleDropdown}>
@@ -436,50 +487,7 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
               </MenuList>
             </Menu>
 
-            {/* Reviewer Selection */}
-            <Menu closeOnSelect={false}>
-              <MenuButton
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
-                colorScheme="blue"
-                isDisabled={!selectedMonth}
-              >
-                Reviewers
-              </MenuButton>
-              <MenuList>
-              
-                <MenuItem 
-                  onClick={() => {
-                    const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
-                      acc[reviewer] = false;
-                      return acc;
-                    }, {} as ShowReviewerType); 
-                    setShowReviewer(updatedReviewers);
-                  }}
-                >
-                  <Text as="span" fontWeight="bold" textDecoration="underline">
-                    Remove All
-                  </Text>
-                </MenuItem>
 
-                
-                {Object.keys(showReviewer).map((reviewer: string) => (
-                  <MenuItem key={reviewer}>
-                    <Checkbox
-                      isChecked={showReviewer[reviewer]}
-                      onChange={(e) =>
-                        setShowReviewer({
-                          ...showReviewer,
-                          [reviewer]: e.target.checked,
-                        })
-                      }
-                    >
-                      {reviewer}
-                    </Checkbox>
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
           </HStack>
         </Box>
       )}

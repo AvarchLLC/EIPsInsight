@@ -381,28 +381,33 @@ const GitHubPRTracker: React.FC = () => {
       : { created: [] as Issue[], closed: [] as Issue[] });
   
     return (
-      <Table variant="simple">
-        <Thead>
+      <Box mt={8} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
+        <Table variant="striped" colorScheme="blue">
+        <Thead bg="#2D3748">
           <Tr>
-            <Th>Number</Th>
-            <Th>Title</Th>
+            <Th color="white" textAlign="center" borderTopLeftRadius="10px">Number</Th>
+            <Th color="white" textAlign="center">Title</Th>
             {type === 'PRs' ? (
               <>
-                <Th>State</Th>
-                <Th>Created At</Th>
-                <Th>Closed At</Th>
-                <Th>Merged At</Th>
+                <Th color="white" textAlign="center">State</Th>
+                <Th color="white" textAlign="center">Created At</Th>
+                <Th color="white" textAlign="center">Closed At</Th>
+                <Th color="white" textAlign="center">Merged At</Th>
               </>
             ) : (
               <>
-                <Th>State</Th>
-                <Th>Created At</Th>
-                <Th>Closed At</Th>
+                <Th color="white" textAlign="center">State</Th>
+                <Th color="white" textAlign="center">Created At</Th>
+                <Th color="white" textAlign="center">Closed At</Th>
               </>
             )}
-            <Th>Link</Th>
+            <Th color="white" textAlign="center" borderTopRightRadius="10px">Link</Th>
           </Tr>
         </Thead>
+        </Table>
+
+        <Box overflowY="auto" maxHeight="400px" borderBottomRadius="0" borderTopWidth="1px" borderTopColor="gray.200">
+        <Table variant="striped" colorScheme="blue">
         <Tbody>
         {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
             <Tr>
@@ -532,7 +537,9 @@ const GitHubPRTracker: React.FC = () => {
             </>
           )}
         </Tbody>
-      </Table>
+        </Table>
+        </Box>
+      </Box>
     );
   };
   
@@ -631,64 +638,111 @@ const GitHubPRTracker: React.FC = () => {
 
     // Transform data for chart rendering
     const transformedData = Object.keys(dataToUse).flatMap(monthYear => {
-      const items = dataToUse[monthYear];
-      return [
-        ...(showCategory.open ? [{ monthYear, type: 'Open', count: items.open.length }] : []),
-        ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? items.merged?.length || 0 : 0 }] : []),
-        ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: items.closed.length }] : []),
-        ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
-      ];
-      
+        const items = dataToUse[monthYear];
+        return [
+            ...(showCategory.open ? [{ monthYear, type: 'Open', count: items.open.length }] : []),
+            ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
+            ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
+            ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
+        ];
     });
 
-    const trendData = Object.keys(dataToUse).map(monthYear => {
-      const items = dataToUse[monthYear];
-      const totalActivity = items.created.length; 
+    // Find the maximum of absolute values for merged and closed
+    const mergedMax = Math.max(
+        ...transformedData
+            .filter(data => data.type === 'Merged')
+            .map(data => Math.abs(data.count))
+    );
+    const closedMax = Math.max(
+        ...transformedData
+            .filter(data => data.type === 'Closed')
+            .map(data => Math.abs(data.count))
+    );
 
-      return {
-          monthYear,
-          Created: totalActivity, 
-      };
-  });
+    // Get the minimum of merged and closed counts
+    const getmin = Math.max(mergedMax, closedMax) || 0;
+
+    // Prepare trend data for created category
+    const trendData = showCategory.created
+        ? Object.keys(dataToUse).map(monthYear => {
+            const items = dataToUse[monthYear]; // Move this line here
+            return {
+                monthYear,
+                Created: items.created.length + Math.abs(getmin),
+            };
+        })
+        : [];
+
+    // Determine y-axis min and max
+    const yAxisMin = Math.min(-closedMax, -mergedMax);
+    const yAxisMax = Math.max(0, Math.max(...trendData.map(data => data.Created)));
 
     // Sort data by monthYear in ascending order
     const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
     const sortedTrendData = trendData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
 
+    // Dual axes configuration
     const config = {
-      data: [sortedData, sortedTrendData], // Provide both bar and trend data
-      xField: 'monthYear',
-      yField: ['count', 'Created'], // Use dual axes: one for bars and one for the line
-      geometryOptions: [
-        {
-          geometry: 'column', // Bar chart
-          isGroup: true,
-          seriesField: 'type',
-          columnStyle: {
-            radius: [20, 20, 0, 0],
-          },
+        data: [sortedData, sortedTrendData], // Provide both bar and trend data
+        xField: 'monthYear',
+        yField: ['count', 'Created'], // Use dual axes: one for bars and one for the line
+        geometryOptions: [
+            {
+                geometry: 'column', // Bar chart for categories
+                isStack: true,
+                seriesField: 'type',
+                columnStyle: {
+                    radius: [0, 0, 0, 0],
+                },
+                tooltip: {
+                  fields: ['type', 'count'],
+                  formatter: ({ type, count }: { type: string; count: number }) => ({
+                      name: type,
+                      value: `${Math.abs(count)}`, // Adjust hover display for bar chart
+                  }),
+              },
+                
+            },
+            {
+                geometry: 'line', // Line chart for trend (Created)
+                smooth: true,
+                lineStyle: {
+                    stroke: "#ff00ff", // Magenta line color
+                    lineWidth: 2,
+                },
+                tooltip: {
+                  fields: ['monthYear', 'Created'],
+                  formatter: ({ monthYear, Created }: { monthYear: string; Created: number }) => ({
+                      name: 'Created',
+                      value: `${Created - getmin}`, // Adjust hover display for line chart
+                  }),
+              },
+              color: '#ff00ff',
+               
+            },
+        ],
+        yAxis: [
+            {
+                min: yAxisMin, // Set min for bar chart y-axis
+                max: 0, // Set max based on negative values
+            },
+            {
+                min:  yAxisMin, // Start from 0 for the trend line
+                max: yAxisMax, // Set max for trend line y-axis
+                
+            },
+        ],
+        slider: {
+            start: 0,
+            end: 1,
         },
-        {
-          geometry: 'line', // Line chart for trend
-          smooth: true,
-          lineStyle: {
-            stroke: "#ff00ff", // Line color (e.g., magenta)
-            lineWidth: 4,
-          },
-          color: '#ff00ff',
-      },
-      ],
-      
-      slider: {
-        start: 0,
-        end: 1,
-      },
-      legend: { position: 'top-right' as const },
-      
+        legend: { position: 'top-right' as const },
     };
-  
+
     return <DualAxes {...config} />;
-  };
+};
+
+
 
 
   return (
@@ -703,7 +757,7 @@ const GitHubPRTracker: React.FC = () => {
             textAlign="center"
             style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold' }}
           >
-            GitHub Analytics
+            Analytics
           </Heading>
 
           <Box
@@ -718,7 +772,7 @@ const GitHubPRTracker: React.FC = () => {
     marginBottom={4}
     color={useColorModeValue("#3182CE", "blue.300")}
   >
-    How to Use the GitHub Analytics Tool?
+    How to Use the Analytics Tool?
   </Heading>
   <Text
   fontSize="md"
@@ -785,7 +839,7 @@ const GitHubPRTracker: React.FC = () => {
 
           <Box mt={2}>
         <Text color="gray.500" fontStyle="italic" textAlign="center">
-          *Please note: The data is refreshed every 24 hours to ensure accuracy and up-to-date information*
+          *Note: The data is refreshed every 24 hours to ensure accuracy and up-to-date information*
         </Text>
       </Box>
          

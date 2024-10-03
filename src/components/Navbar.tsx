@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
       label: "Tools",
       children: [
         {
-          label: "Github Analytics",
+          label: "Analytics",
           href: `/Analytics`,
         },
         {
