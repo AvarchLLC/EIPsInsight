@@ -757,7 +757,7 @@ const GitHubPRTracker: React.FC = () => {
             textAlign="center"
             style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold' }}
           >
-            GitHub Analytics
+            Analytics
           </Heading>
 
           <Box
@@ -772,7 +772,7 @@ const GitHubPRTracker: React.FC = () => {
     marginBottom={4}
     color={useColorModeValue("#3182CE", "blue.300")}
   >
-    How to Use the GitHub Analytics Tool?
+    How to Use the Analytics Tool?
   </Heading>
   <Text
   fontSize="md"
