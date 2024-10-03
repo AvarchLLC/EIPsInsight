@@ -549,16 +549,31 @@ const GitHubPRTracker: React.FC = () => {
     const csvRows = [];
   
     const headers = type === 'PRs'
-      ? ['Number', 'Title', 'State', 'Created At', 'Closed At', 'Merged At', 'Link']
-      : ['Number', 'Title', 'State', 'Created At', 'Closed At', 'Link'];
+      ? ['Number', 'Title',  'Created At', 'Closed At', 'Merged At', 'Link']
+      : ['Number', 'Title', 'Created At', 'Closed At', 'Link'];
   
     // Add headers to CSV rows
     csvRows.push(headers.join(','));
-  
+     
+    console.log("filteredData",filteredData)
     // Combine created and closed arrays for PRs and Issues
     const items = type === 'PRs'
-      ? [...filteredData.created, ...filteredData.closed, ...filteredData.merged]
-      : [...filteredData.created, ...filteredData.closed];
+  ? [
+    ...(Array.isArray(filteredData.reviewed) && showCategory.review ? filteredData.reviewed : []),
+      ...(Array.isArray(filteredData.created) && showCategory.created ? filteredData.created : []),
+      ...(Array.isArray(filteredData.closed) && showCategory.closed ? filteredData.closed : []),
+      ...(Array.isArray(filteredData.merged) && showCategory.merged ? filteredData.merged : []),
+      ...(Array.isArray(filteredData.open) && showCategory.open ? filteredData.open : []),
+      // ...(Array.isArray(filteredData.review) && showCategory.review ? filteredData.review : [])
+    ]
+  : [
+      ...(Array.isArray(filteredData.created) && showCategory.created ? filteredData.created : []),
+      ...(Array.isArray(filteredData.closed) && showCategory.closed ? filteredData.closed : []),
+      ...(Array.isArray(filteredData.open) && showCategory.open ? filteredData.open : [])
+    ];
+    
+    console.log(items);
+
   
     // Add data to CSV rows
     items.forEach((item: PR | Issue) => {
@@ -566,7 +581,6 @@ const GitHubPRTracker: React.FC = () => {
         ? [
             (item as PR).prNumber,
             (item as PR).prTitle,
-            item.closed_at ? 'Closed' : 'Created',
             new Date(item.created_at).toLocaleDateString(),
             item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
             (item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-',
@@ -575,7 +589,6 @@ const GitHubPRTracker: React.FC = () => {
         : [
             (item as Issue).IssueNumber,
             (item as Issue).IssueTitle,
-            item.closed_at ? 'Closed' : 'Created',
             new Date(item.created_at).toLocaleDateString(),
             item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
             `https://github.com/ethereum/${selectedRepo}/issues/${(item as Issue).IssueNumber}`
@@ -600,6 +613,8 @@ const GitHubPRTracker: React.FC = () => {
       alert('No data available for the selected month.');
       return;
     }
+
+    console.log("review data:",filteredData);
   
     // Combine arrays and pass them to the CSV function
     const combinedData = activeTab === 'PRs'
@@ -607,10 +622,13 @@ const GitHubPRTracker: React.FC = () => {
           created: filteredData.created,
           closed: filteredData.closed,
           merged: 'merged' in filteredData ? filteredData.merged : [],
+          reviewed: 'review' in filteredData ? filteredData.review:[],
+          open:filteredData.open,
         }
       : {
           created: filteredData.created,
-          closed: filteredData.closed
+          closed: filteredData.closed,
+          open:filteredData.open,
         };
   
     downloadCSV(combinedData, activeTab);
@@ -649,16 +667,19 @@ const GitHubPRTracker: React.FC = () => {
 
     // Find the maximum of absolute values for merged and closed
     const mergedMax = Math.max(
-        ...transformedData
-            .filter(data => data.type === 'Merged')
-            .map(data => Math.abs(data.count))
-    );
-    const closedMax = Math.max(
-        ...transformedData
-            .filter(data => data.type === 'Closed')
-            .map(data => Math.abs(data.count))
-    );
-
+      0, // Default to 0 if no data is available
+      ...transformedData
+          .filter(data => data.type === 'Merged')
+          .map(data => Math.abs(data.count))
+  );
+  
+  const closedMax = Math.max(
+      0, // Default to 0 if no data is available
+      ...transformedData
+          .filter(data => data.type === 'Closed')
+          .map(data => Math.abs(data.count))
+  );
+  
     // Get the minimum of merged and closed counts
     const getmin = Math.max(mergedMax, closedMax) || 0;
 
@@ -725,10 +746,23 @@ const GitHubPRTracker: React.FC = () => {
             {
                 min: yAxisMin, // Set min for bar chart y-axis
                 max: 0, // Set max based on negative values
+                label: {
+                  formatter: () => '', // Completely hide labels
+              },
+              grid: {
+                  line: { style: { stroke: 'transparent' } }, // Hide grid lines
+              },
             },
             {
                 min:  yAxisMin, // Start from 0 for the trend line
                 max: yAxisMax, // Set max for trend line y-axis
+                label: {
+                  formatter: () => '', // Completely hide labels
+              },
+               
+              grid: {
+                  line: { style: { stroke: 'transparent' } }, // Hide grid lines
+              },
                 
             },
         ],

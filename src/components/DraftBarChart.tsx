@@ -15,6 +15,8 @@ const getCat = (cat: string) => {
       "Core" ||
       "core":
       return "Core";
+    case "RIP":
+      return "RIPs";
     case "ERC":
       return "ERCs";
     case "Networking":
@@ -138,7 +140,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        console.log(jsonData.eip)
+        console.log("rip data:",jsonData.rip);
         setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         setIsLoading(false);
       } catch (error) {
@@ -176,6 +178,28 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
       year: `${getMonthName(eip.month)} ${eip.year.toString()}`,
       value:removeDuplicatesFromEips(eip.eips).length
     }));
+  });
+  
+  const categories = [
+    "Core",
+    "Networking",
+    "Interface",
+    "Meta",
+    "Informational",
+    "ERCs",
+    "RIPs",
+  ];
+  
+  categories.forEach((category) => {
+    const hasCategory = transformedData.some((entry) => entry.category === category);
+  
+    if (!hasCategory) {
+      transformedData.push({
+        category: category,
+        year: "2024", 
+        value: 0,     
+      });
+    }
   });
   
 
