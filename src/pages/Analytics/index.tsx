@@ -717,6 +717,7 @@ const GitHubPRTracker: React.FC = () => {
                       value: `${Created - getmin}`, // Adjust hover display for line chart
                   }),
               },
+              color: '#ff00ff',
                
             },
         ],
