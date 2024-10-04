@@ -6,7 +6,7 @@ import remarkHighlight from "remark-highlight.js";
 const withMDX = createMDXPlugin({
   extension: /\.mdx$/,
   options: {
-    // These options apply to .mdx fles only
+    // These options apply to .mdx files only
     providerImportSource: "@mdx-js/react",
     rehypePlugins: [],
     remarkPlugins: [remarkGfm, remarkHighlight],
@@ -16,7 +16,7 @@ const withMDX = createMDXPlugin({
 const withMarkdown = createMDXPlugin({
   extension: /\.md$/,
   options: {
-    // These options apply to .md fles only
+    // These options apply to .md files only
     providerImportSource: "@mdx-js/react",
     rehypePlugins: [],
     remarkPlugins: [remarkGfm, remarkHighlight],
@@ -32,6 +32,22 @@ const nextConfig = withMDX(
     poweredByHeader: false,
     reactStrictMode: false,
     trailingSlash: false,
+    
+    // Add the redirects method here
+    async redirects() {
+      return [
+        {
+          source: '/reviewers',
+          destination: '/Reviewers',
+          permanent: true,
+        },
+        {
+          source: '/analyticss',
+          destination: '/Analytics',
+          permanent: true,
+        },
+      ];
+    },
   })
 );
 

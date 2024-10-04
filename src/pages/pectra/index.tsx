@@ -19,6 +19,7 @@ import SearchBox from "@/components/SearchBox";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import { motion } from "framer-motion";
 import PectraTable from "@/components/PectraTable";
+import { Table, Thead, Tbody, Tr, Th, Td, Link } from "@chakra-ui/react";
 
 const All = () => {
   const [selected, setSelected] = useState("Meta");
@@ -311,63 +312,103 @@ const All = () => {
             Devnets & Testnets
           </Text>
 
-          <UnorderedList spacing={3} pl={8}>
-          <ListItem>
-    <Text fontSize="2xl">
-      August 2024: Tests for Devnet 3 (
-      <NLink href=" https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0">
-        <Text as="span" color="blue.500" textDecor="underline">
+         
+
+<Table variant="striped" colorScheme="blue.500" size="lg" mt={4}>
+  <Thead>
+    <Tr>
+      <Th>Date</Th>
+      <Th>Devnet Spec</Th>
+    </Tr>
+  </Thead>
+  <Tbody>
+  <Tr>
+      <Td>October 2024</Td>
+      <Td>
+        Pectra Devnet 4 (
+        <Link
+          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-4"
+          color="blue.500"
+          textDecor="underline"
+        >
           Specs
-        </Text>
-      </NLink>
-      )
-    </Text>
-  </ListItem>
-          <ListItem>
-    <Text fontSize="2xl">
-      August 2024: Launched Pectra Devnet 3 (
-      <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-3">
-        <Text as="span" color="blue.500" textDecor="underline">
+        </Link>
+        )
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>August 2024</Td>
+      <Td>
+        Tests for Devnet 3 (
+        <Link
+          href="https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0"
+          color="blue.500"
+          textDecor="underline"
+        >
           Specs
-        </Text>
-      </NLink>
-      )
-    </Text>
-  </ListItem>
-  <ListItem>
-    <Text fontSize="2xl">
-      July 2024: Launched Pectra Devnet 2 (
-      <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-2">
-        <Text as="span" color="blue.500" textDecor="underline">
+        </Link>
+        )
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>August 2024</Td>
+      <Td>
+        Pectra Devnet 3 (
+        <Link
+          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-3"
+          color="blue.500"
+          textDecor="underline"
+        >
           Specs
-        </Text>
-      </NLink>
-      )
-    </Text>
-  </ListItem>
-  <ListItem>
-    <Text fontSize="2xl">
-      June 2024: Launched Pectra Devnet 1 (
-      <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-1">
-        <Text as="span" color="blue.500" textDecor="underline">
+        </Link>
+        )
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>July 2024</Td>
+      <Td>
+        Pectra Devnet 2 (
+        <Link
+          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-2"
+          color="blue.500"
+          textDecor="underline"
+        >
           Specs
-        </Text>
-      </NLink>
-      )
-    </Text>
-  </ListItem>
-  <ListItem>
-    <Text fontSize="2xl">
-      May 2024: Launched Pectra Devnet 0 (
-      <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-0">
-        <Text as="span" color="blue.500" textDecor="underline">
+        </Link>
+        )
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>June 2024</Td>
+      <Td>
+        Pectra Devnet 1 (
+        <Link
+          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-1"
+          color="blue.500"
+          textDecor="underline"
+        >
           Specs
-        </Text>
-      </NLink>
-      )
-    </Text>
-  </ListItem>
-</UnorderedList>
+        </Link>
+        )
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>May 2024</Td>
+      <Td>
+        Pectra Devnet 0 (
+        <Link
+          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-0"
+          color="blue.500"
+          textDecor="underline"
+        >
+          Specs
+        </Link>
+        )
+      </Td>
+    </Tr>
+  </Tbody>
+</Table>
+
 
 
         </Box>
