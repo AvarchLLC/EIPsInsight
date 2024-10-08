@@ -326,35 +326,40 @@ const Dashboard = () => {
                 </div>
               </Box> */}
 
-<Box className={"grid grid-cols-1 lg:grid-cols-2 pb-20"}>
- 
-  <div className="flex justify-center lg:justify-start items-center">
-    <BoyGirl />
+<Box className="grid grid-cols-1 lg:grid-cols-2 pb-20 gap-8 lg:gap-16">
+  {/* Left Side - YouTube Video */}
+  <div className="flex justify-center lg:justify-center items-center">
+    <iframe
+      width="560"
+      height="315"
+      src="https://www.youtube.com/embed/AyidVR6X6J8?start=8"
+      title="YouTube video"
+      frameBorder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    ></iframe>
   </div>
 
- 
-  <div className={"flex justify-center items-center"}>
-    <div className={"justify-center items-center space-y-6"}>
-      <h1 className={"text-5xl font-bold"}>
+  {/* Right Side - EIPInsight Info */}
+  <div className="flex justify-center items-center">
+    <div className="text-center max-w-xl space-y-6">
+      <h1 className="text-5xl font-bold">
         What is <span className="text-blue-400">EIPInsight</span>?
       </h1>
-      <p className={"text-xl max-w-xl text-justify"}>
-        EIPsInsight is specialized in toolings designed to provide clear,
-        visual insights into the activity of Ethereum Improvement Proposal (EIP), 
-        Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) 
-        over a specified period. Data provided is used for tracking the progress and
-        workload distribution among EIP Editors, ensuring transparency and efficiency 
-        in the proposal review process.
+      <p className="text-xl text-justify">
+        EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposal (EIP), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period. Data provided is used for tracking the progress and workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
       </p>
-      <NextLink href={"https://hackmd.io/@etherworldco/ry-GMuCEh"}>
-        <span className="text-blue-400 text-xl flex space-x-5">
-          Learn More{" "}
-          <BsArrowUpRight className={"pt-2"} size={25} />
+      <NextLink href="/resources">
+        <span className="text-blue-400 text-xl flex items-center space-x-2">
+          Learn More <BsArrowUpRight className="pt-1" size={25} />
         </span>
       </NextLink>
     </div>
   </div>
 </Box>
+
+
+
 
 
               <FlexBetween>
@@ -390,7 +395,7 @@ const Dashboard = () => {
   <div className="col-span-2">
     <StatBox
       title="Meta EIPs"
-      value={allData.filter((item) => item.type === "Meta").length}
+      value={new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size}
       description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
       icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
       url="meta"
@@ -399,7 +404,11 @@ const Dashboard = () => {
 
   <StatBox
     title="Core EIPs"
-    value={allData.filter((item) => item.category === "Core").length}
+    value={data?.eip.filter(
+      (item) =>
+        item.type === "Standards Track" &&
+        item.category === "Core"
+    ).length ||0}
     description="Core EIPs describe changes to the Ethereum protocol."
     icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
     url="core"
@@ -407,7 +416,7 @@ const Dashboard = () => {
 
   <StatBox
     title="ERCs"
-    value={allData.filter((item) => item.category === "ERC").length}
+    value={new Set(allData.filter((item) => item.category === "ERC").map((item) => item.eip)).size}
     description="ERCs describe application-level standards for the Ethereum ecosystem."
     icon={<Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />}
     url="erc"
@@ -415,7 +424,7 @@ const Dashboard = () => {
 
   <StatBox
     title="Networking EIPs"
-    value={allData.filter((item) => item.category === "Networking").length}
+    value={new Set(allData.filter((item) => item.category === "Networking").map((item) => item.eip)).size}
     description="Networking EIPs describe changes to the Ethereum network protocol."
     icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
     url="networking"
@@ -423,7 +432,7 @@ const Dashboard = () => {
 
   <StatBox
     title="Interface EIPs"
-    value={allData.filter((item) => item.category === "Interface").length}
+    value={new Set(allData.filter((item) => item.category === "Interface").map((item) => item.eip)).size}
     description="Interface EIPs describe changes to the Ethereum client API."
     icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
     url="interface"
@@ -431,7 +440,7 @@ const Dashboard = () => {
 
   <StatBox
     title="Informational EIPs"
-    value={allData.filter((item) => item.type === "Informational").length}
+    value={new Set(allData.filter((item) => item.type === "Informational").map((item) => item.eip)).size}
     description="Informational EIPs describe other changes to the Ethereum ecosystem."
     icon={<Icon as={Clipboard} fontSize={{ base: "10", lg: "15" }} />}
     url="informational"
@@ -439,7 +448,7 @@ const Dashboard = () => {
 
   <StatBox
     title="RIPs"
-    value={allData.filter((item) => item.repo === "rip").length}
+    value={new Set(allData.filter((item) => item.repo === "rip").map((item) => item.eip)).size}
     description="RIPs describe changes to the RIP process, or other non-optional changes."
     icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
     url="rip"
@@ -469,7 +478,7 @@ const Dashboard = () => {
                     marginRight="6"
                     paddingBottom={6}
                   >
-                    {`Status - [${allData.length}]`}
+                  {`Status - [${allData.length}]`}
                   </Text>
                 </NextLink>
                 <DashboardDonut />

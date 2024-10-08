@@ -68,6 +68,10 @@ const Navbar: React.FC = () => {
           label: "Reviewers Tracker",
           href: `/Reviewers`,
         },
+        {
+              label: "Boards",
+              href: `/boards`,
+        },
       ],
     },    
     {

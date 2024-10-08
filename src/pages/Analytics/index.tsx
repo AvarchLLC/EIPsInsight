@@ -223,73 +223,76 @@ const GitHubPRTracker: React.FC = () => {
   
 
     data.forEach(pr => {
-
-      
       const createdDate = pr.created_at ? new Date(pr.created_at) : null;
       const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
       const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
-
+  
+      // Handle created date
       if (createdDate) {
-        const key = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open:[], review:[] };
-        // monthYearData[key].created.push(pr);
-        addReview(monthYearData[key].created, pr);
+          const key = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open: [], review: [] };
+          addReview(monthYearData[key].created, pr);
       }
-
+  
+      // Handle closed date (only if not merged)
       if (closedDate && !mergedDate) {
-        const key = `${closedDate.getFullYear()}-${String(closedDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open:[], review:[] };
-        // monthYearData[key].closed.push(pr);
-        addReview(monthYearData[key].closed, pr);
+          const key = `${closedDate.getUTCFullYear()}-${String(closedDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open: [], review: [] };
+          addReview(monthYearData[key].closed, pr);
       }
-
+  
+      // Handle merged date
       if (mergedDate) {
-        const key = `${mergedDate.getFullYear()}-${String(mergedDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open:[], review:[] };
-        // monthYearData[key].merged.push(pr);
-        addReview(monthYearData[key].merged, pr);
+          const key = `${mergedDate.getUTCFullYear()}-${String(mergedDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open: [], review: [] };
+          addReview(monthYearData[key].merged, pr);
       }
-
+  
+      // Handle open PRs
       if (createdDate) {
-        let openDate = new Date(createdDate); // Start from the creation date
-        let endDate = closedDate ? new Date(closedDate) : currentDate; // End at the close date or current date
- 
-        // Exclude from "open" in the month it was closed
-        if (closedDate && openDate.toISOString().slice(0, 7) === closedDate.toISOString().slice(0, 7)) {
-          return; // Skip further processing for PRs closed in the same month
-        }
- 
-        while (openDate <= endDate) {
-          const openKey = `${openDate.getFullYear()}-${String(openDate.getMonth() + 1).padStart(2, '0')}`;
-          if(pr.prNumber==8914){
-            console.log("open key for 8914:",openKey)
-            console.log(openDate)
-            console.log("end date:",endDate)
+          let openDate = new Date(createdDate); // Start from the creation date
+          let createdconstant= new Date(createdDate);
+          let endDate = closedDate 
+              ? new Date(closedDate.getUTCFullYear(), closedDate.getUTCMonth(), 1) 
+              : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth()+1, 1); // Set to the 1st of the current month
+  
+          // Loop through each month the PR was open
+          while (openDate <= endDate) { // Only count until the start of the closed month or current month
+              const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+  
+              if (!monthYearData[openKey]) {
+                  monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review: [] };
+              }
+  
+              // Only add to "open" if the PR was open on the 1st of the month
+              const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
+              if (!(openDate.getUTCFullYear() === createdconstant.getUTCFullYear() && openDate.getUTCMonth() === createdconstant.getUTCMonth())) {
+                if (firstOfMonth <= openDate && (!closedDate || firstOfMonth < closedDate)) {
+                    addIfNotExists(monthYearData[openKey].open, pr);
+                }
+            }
+  
+              // Increment month
+              openDate = incrementMonth(openDate);
           }
-          if (!monthYearData[openKey]) monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review:[]};
- 
-          // Add to "open" if not yet closed, avoiding duplicates
-          addIfNotExists(monthYearData[openKey].open, pr);
- 
-          // Increment month
-          openDate = incrementMonth(openDate);
-          if(pr.prNumber==8914){
-            console.log(openDate)
-          }
-        }
       }
-    });
-    reviewData.forEach(pr=>{
+  });
+  
+  // Process reviews
+  reviewData.forEach(pr => {
       const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
- 
+  
       if (reviewDate) {
-        const reviewKey = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[reviewKey]) monthYearData[reviewKey] = { created: [], closed: [], merged: [], open: [], review:[] };
-        addReview(monthYearData[reviewKey].review, pr);
+          const reviewKey = `${reviewDate.getUTCFullYear()}-${String(reviewDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          if (!monthYearData[reviewKey]) {
+              monthYearData[reviewKey] = { created: [], closed: [], merged: [], open: [], review: [] };
+          }
+          addReview(monthYearData[reviewKey].review, pr);
       }
-    });
- 
-    return monthYearData;
+  });
+  
+  return monthYearData;
+  
   };
 
   const transformIssueData = (data: Issue[]): { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } => {
@@ -317,43 +320,55 @@ const GitHubPRTracker: React.FC = () => {
 
     data.forEach(issue => {
       const createdDate = new Date(issue.created_at);
-      const key = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}`;
-      if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], open:[] };
-      monthYearData[key].created.push(issue);
-
-      if (issue.closed_at) {
-        const closedDate = new Date(issue.closed_at);
-        const closedKey = `${closedDate.getFullYear()}-${String(closedDate.getMonth() + 1).padStart(2, '0')}`;
-        if (!monthYearData[closedKey]) monthYearData[closedKey] = { created: [], closed: [], open:[] };
-        monthYearData[closedKey].closed.push(issue);
+      const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
+      
+      if (!monthYearData[createdKey]) {
+          monthYearData[createdKey] = { created: [], closed: [], open: [] };
       }
-
-      if (createdDate) {
-        let openDate = new Date(createdDate); // Start from the creation date
-        let endDate = issue.closed_at ? new Date(issue.closed_at) : currentDate; // End at the close date or current date
-    
-        // Check if closed_at is a valid date object
-        if (issue.closed_at && !isNaN(new Date(issue.closed_at).getTime())) {
-            // Exclude from "open" in the month it was closed
-            if (openDate.toISOString().slice(0, 7) === new Date(issue.closed_at).toISOString().slice(0, 7)) {
-                return; // Skip further processing for PRs closed in the same month
-            }
-        }
-    
-        while (openDate <= endDate) {
-            const openKey = `${openDate.getFullYear()}-${String(openDate.getMonth() + 1).padStart(2, '0')}`;
-            
-            if (!monthYearData[openKey]) monthYearData[openKey] = { created: [], closed: [], open: [] };
-    
-            // Add to "open" if not yet closed, avoiding duplicates
-            addIfNotExists(monthYearData[openKey].open, issue);
-    
-            // Increment month
-            openDate = incrementMonth(openDate);
-        }
-    }
-         
-    });
+      monthYearData[createdKey].created.push(issue);
+  
+      if (issue.closed_at) {
+          const closedDate = new Date(issue.closed_at);
+          const closedKey = `${closedDate.getUTCFullYear()}-${String(closedDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          
+          if (!monthYearData[closedKey]) {
+              monthYearData[closedKey] = { created: [], closed: [], open: [] };
+          }
+          monthYearData[closedKey].closed.push(issue);
+      }
+  
+      // Set openDate to the creation date and endDate to the 1st of the closed month or current month
+      let openDate = new Date(createdDate);
+      let createdConstant = new Date(createdDate); // Store the creation date separately
+      let endDate = issue.closed_at 
+          ? new Date(new Date(issue.closed_at).getUTCFullYear(), new Date(issue.closed_at).getUTCMonth(), 1) 
+          : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Include the current month
+      
+      // Loop through each month the issue was open
+      while (openDate <= endDate) { // Open until the start of the closed month or current month
+          const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+      
+          if (!monthYearData[openKey]) {
+              monthYearData[openKey] = { created: [], closed: [], open: [] };
+          }
+      
+          // Check if the issue was still open on the 1st of the month
+          const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
+          
+          // Skip if the openDate corresponds to the created month
+          if (!(openDate.getUTCFullYear() === createdConstant.getUTCFullYear() && openDate.getUTCMonth() === createdConstant.getUTCMonth())) {
+              if (firstOfMonth <= openDate && (!issue.closed_at || firstOfMonth < new Date(issue.closed_at))) {
+                  // Add to open only if it's still open on the first of that month
+                  addIfNotExists(monthYearData[openKey].open, issue);
+              }
+          }
+      
+          // Move to the next month
+          openDate = incrementMonth(openDate);
+      }
+      
+  });
+  
 
     return monthYearData;
   };
@@ -380,8 +395,92 @@ const GitHubPRTracker: React.FC = () => {
       ? { created: [] as PR[], closed: [] as PR[], merged: [] as PR[] }
       : { created: [] as Issue[], closed: [] as Issue[] });
   
+
+      const createdCount = items.created.length;
+  const closedCount = items.closed.length;
+  const openCount = items.open.length;
+
+  // Conditionally calculate for PR-specific categories
+  const mergedCount = type === 'PRs' ? (items as { merged: PR[] }).merged.length : 0;
+  const reviewCount = type === 'PRs' ? (items as { review: PR[] }).review.length : 0;
+
+
     return (
       <Box mt={8} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
+        <Flex
+        wrap="wrap"
+        justify="space-around"
+        bg="gray.700" // Darker background for dark mode
+        p={4}
+        mb={4}
+        borderRadius="md"
+        boxShadow="md"
+      >
+        <Box
+          textAlign="center"
+          p={2}
+          flex="1 1 150px"
+          bg="gray.800" // Dark background
+          color="white" // Visible text color for dark mode
+          borderRadius="md"
+          boxShadow="sm"
+          m={2} // Add margin for space between boxes
+        >
+          Created ({createdCount})
+        </Box>
+        <Box
+          textAlign="center"
+          p={2}
+          flex="1 1 150px"
+          bg="gray.800"
+          color="white"
+          borderRadius="md"
+          boxShadow="sm"
+          m={2}
+        >
+          Closed ({closedCount})
+        </Box>
+        <Box
+          textAlign="center"
+          p={2}
+          flex="1 1 150px"
+          bg="gray.800"
+          color="white"
+          borderRadius="md"
+          boxShadow="sm"
+          m={2}
+        >
+          Open ({openCount})
+        </Box>
+        {type === 'PRs' && (
+          <>
+            <Box
+              textAlign="center"
+              p={2}
+              flex="1 1 150px"
+              bg="gray.800"
+              color="white"
+              borderRadius="md"
+              boxShadow="sm"
+              m={2}
+            >
+              Merged ({mergedCount})
+            </Box>
+            {/* <Box
+              textAlign="center"
+              p={2}
+              flex="1 1 150px"
+              bg="gray.800"
+              color="white"
+              borderRadius="md"
+              boxShadow="sm"
+              m={2}
+            >
+              Review ({reviewCount})
+            </Box> */}
+          </>
+        )}
+      </Flex>
         <Table variant="striped" colorScheme="blue">
         <Thead bg="#2D3748">
           <Tr>
@@ -511,7 +610,7 @@ const GitHubPRTracker: React.FC = () => {
                 </Tr>
               ))}
 
-{showCategory.review && type === 'PRs' && (items as { review: PR[] }).review.map((item: PR) => (
+{/* {showCategory.review && type === 'PRs' && (items as { review: PR[] }).review.map((item: PR) => (
                 <Tr key={`open-${item.prNumber}`}>
                   <Td>{item.prNumber}</Td>
                   <Td>{item.prTitle}</Td>
@@ -533,7 +632,7 @@ const GitHubPRTracker: React.FC = () => {
                     </a>
                     </button></Td>
                 </Tr>
-              ))}
+              ))} */}
             </>
           )}
         </Tbody>
@@ -661,7 +760,7 @@ const GitHubPRTracker: React.FC = () => {
             ...(showCategory.open ? [{ monthYear, type: 'Open', count: items.open.length }] : []),
             ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
             ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
-            ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
+            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
         ];
     });
 
@@ -689,7 +788,7 @@ const GitHubPRTracker: React.FC = () => {
             const items = dataToUse[monthYear]; // Move this line here
             return {
                 monthYear,
-                Created: items.created.length + Math.abs(getmin),
+                Created: items.created.length + (activeTab === 'PRs' ? Math.abs(getmin) : Math.abs(closedMax)),
             };
         })
         : [];
@@ -813,7 +912,7 @@ const GitHubPRTracker: React.FC = () => {
   marginBottom={2}
   color={useColorModeValue("gray.800", "gray.200")}
 >
-  <strong>Visualizing Trends:</strong> Use the timeline to visualize trends in the number of open, reviewed, created, closed, and merged pull requests (PRs) each month. Created PRs are those that have been newly opened. Closed PRs are those that have been closed but not merged, while merged PRs are those that have been both closed and merged. Open PRs represent the number of PRs that were still open during that month, while reviewed PRs are those that were reviewed in that month.
+  <strong>Visualizing Trends:</strong> Use the timeline to visualize trends in the number of created, closed, merged and open pull requests (PRs) each month. Created PRs are those that have been newly opened. Closed PRs are those that have been closed but not merged, while merged PRs are those that have been both closed and merged. Open PRs represent the number of PRs that were still open during the start of that month.
 </Text>
 
 <Text
@@ -883,7 +982,7 @@ const GitHubPRTracker: React.FC = () => {
     onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
     mr={4}
   >
-    {activeTab === 'PRs' ? 'Show Created PRs' : 'Show Created Issues'}
+    {activeTab === 'PRs' ? 'Created PRs' : 'Created Issues'}
   </Checkbox>
   
     <Checkbox
@@ -891,7 +990,7 @@ const GitHubPRTracker: React.FC = () => {
       onChange={() => setShowCategory(prev => ({ ...prev, open: !prev.open }))}
       mr={4}
     >
-      Show Open PRs
+      Open PRs
     </Checkbox>
   
   <Checkbox
@@ -899,7 +998,7 @@ const GitHubPRTracker: React.FC = () => {
     onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
     mr={4}
   >
-    {activeTab === 'PRs' ? 'Show Closed PRs' : 'Show Closed Issues'}
+    {activeTab === 'PRs' ? 'Closed PRs' : 'Closed Issues'}
   </Checkbox>
   {activeTab === 'PRs' && (
     <Checkbox
@@ -907,10 +1006,10 @@ const GitHubPRTracker: React.FC = () => {
       onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
       mr={4}
     >
-      Show Merged PRs
+      Merged PRs
     </Checkbox>
   )}
-  {activeTab === 'PRs' && (
+  {/* {activeTab === 'PRs' && (
     <Checkbox
       isChecked={showCategory.review}
       onChange={() => setShowCategory(prev => ({ ...prev, review: !prev.review }))}
@@ -918,7 +1017,7 @@ const GitHubPRTracker: React.FC = () => {
     >
       Show Reviewed PRs
     </Checkbox>
-  )}
+  )} */}
 </Flex>
 
   
