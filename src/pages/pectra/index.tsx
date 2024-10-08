@@ -300,6 +300,7 @@ const All = () => {
         </Text>
         </NLink>. - Pectra was created to provide an updated list of proposals for the Network Upgrade.&nbsp;
         <NLink href={`#carousel-section`}>
+
           <Text as={"span"} color="blue.500" textDecor={"underline"}>
            view more
           </Text>
