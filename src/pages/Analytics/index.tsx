@@ -757,7 +757,7 @@ const GitHubPRTracker: React.FC = () => {
     const transformedData = Object.keys(dataToUse).flatMap(monthYear => {
         const items = dataToUse[monthYear];
         return [
-            ...(showCategory.open ? [{ monthYear, type: 'Open', count: items.open.length }] : []),
+            ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
             ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
             ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
             // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
@@ -783,19 +783,19 @@ const GitHubPRTracker: React.FC = () => {
     const getmin = Math.max(mergedMax, closedMax) || 0;
 
     // Prepare trend data for created category
-    const trendData = showCategory.created
+    const trendData = showCategory.open
         ? Object.keys(dataToUse).map(monthYear => {
             const items = dataToUse[monthYear]; // Move this line here
             return {
                 monthYear,
-                Created: items.created.length + (activeTab === 'PRs' ? Math.abs(getmin) : Math.abs(closedMax)),
+                Open: items.open.length + (activeTab === 'PRs' ? Math.abs(getmin) : Math.abs(closedMax)),
             };
         })
         : [];
 
     // Determine y-axis min and max
     const yAxisMin = Math.min(-closedMax, -mergedMax);
-    const yAxisMax = Math.max(0, Math.max(...trendData.map(data => data.Created)));
+    const yAxisMax = Math.max(0, Math.max(...trendData.map(data => data.Open)));
 
     // Sort data by monthYear in ascending order
     const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
@@ -805,7 +805,7 @@ const GitHubPRTracker: React.FC = () => {
     const config = {
         data: [sortedData, sortedTrendData], // Provide both bar and trend data
         xField: 'monthYear',
-        yField: ['count', 'Created'], // Use dual axes: one for bars and one for the line
+        yField: ['count', 'Open'], // Use dual axes: one for bars and one for the line
         geometryOptions: [
             {
                 geometry: 'column', // Bar chart for categories
@@ -831,10 +831,10 @@ const GitHubPRTracker: React.FC = () => {
                     lineWidth: 2,
                 },
                 tooltip: {
-                  fields: ['monthYear', 'Created'],
-                  formatter: ({ monthYear, Created }: { monthYear: string; Created: number }) => ({
-                      name: 'Created',
-                      value: `${Created - getmin}`, // Adjust hover display for line chart
+                  fields: ['monthYear', 'Open'],
+                  formatter: ({ monthYear, Open }: { monthYear: string; Open: number }) => ({
+                      name: 'Open',
+                      value: `${Open - getmin}`, // Adjust hover display for line chart
                   }),
               },
               color: '#ff00ff',

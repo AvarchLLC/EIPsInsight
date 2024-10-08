@@ -171,10 +171,10 @@ import {
                         color: "#E2E8F0", 
                     }}
                   >
-                    <Td style={{ textAlign: "center", color: "#fff" }}>
+                    <Td style={{ textAlign: "center",  color: useColorModeValue("black", "white"), }}>
                       {index + 1}
                     </Td>
-                    <Td style={{ textAlign: "center", color: "#fff" }}>
+                    <Td style={{ textAlign: "center",  color: useColorModeValue("black", "white"), }}>
                       {extractPrNumber(item.url)}
                     </Td>
                     <Td style={{ textAlign: "center" }}>
