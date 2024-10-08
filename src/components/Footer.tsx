@@ -116,7 +116,7 @@ export default function LargeWithAppLinksAndSocial() {
               <h2 className={'text-xl'}>Build With <span> 💙 </span> by&nbsp; <NextLink href={'https://avarch.org'} target={'_blank'}>Avarch</NextLink></h2>
               <div className={'flex space-x-5'}>
                 <Text className={'text-lg font-bold'}>Join us: </Text>
-                <NextLink href={'https://github.com/Avarch-org/EIPUI'} target={'_blank'}><BsGithub  size={25} className={'hover:scale-125 duration-200'}/></NextLink>
+                <NextLink href={'https://github.com/AvarchLLC/EIPsInsight'} target={'_blank'}><BsGithub  size={25} className={'hover:scale-125 duration-200'}/></NextLink>
                 <NextLink href={'https://discord.gg/tUXgfV822C'} target={'_blank'}><BsDiscord size={25} className={'hover:scale-125 duration-200'}/></NextLink>
               </div>
             </Stack>
@@ -140,8 +140,8 @@ export default function LargeWithAppLinksAndSocial() {
               <Text className={'text-xl font-bold'}>Follow Us</Text>
 
               <div className={'flex space-x-10'}>
-                <NextLink href={'https://twitter.com/ether_world'} target={'_blank'}><BsTwitter size={25} className={'hover:scale-125 duration-200'}/></NextLink>
-                <NextLink href={'https://www.instagram.com/etherworld.co/?hl=en'} target={'_blank'}><BsInstagram size={25} className={'hover:scale-125 duration-200'}/></NextLink>
+                <NextLink href={'https://twitter.com/TeamAvarch'} target={'_blank'}><BsTwitter size={25} className={'hover:scale-125 duration-200'}/></NextLink>
+                {/* <NextLink href={'https://www.instagram.com/etherworld.co/?hl=en'} target={'_blank'}><BsInstagram size={25} className={'hover:scale-125 duration-200'}/></NextLink> */}
                 <NextLink href={'https://www.youtube.com/channel/UCnceAY-vAQsO8TgGAj5SGFA'} target={'_blank'}><BsYoutube size={25} className={'hover:scale-125 duration-200'}/></NextLink>
                 <NextLink href={'https://www.linkedin.com/company/avarch-llc/'} target={'_blank'}><BsLinkedin size={25} className={'hover:scale-125 duration-200'}/></NextLink>
                 <NextLink href={'https://etherworld.co'} target={'_blank'}><BsNewspaper size={25} className={'hover:scale-125 duration-200'}/></NextLink>

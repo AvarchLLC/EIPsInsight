@@ -10,7 +10,8 @@ import {
   List,
   UnorderedList,
   ListItem,
-  Heading
+  Heading,
+  Grid
 } from "@chakra-ui/react";
 import NLink from "next/link";
 import CatTable from "@/components/CatTable";
@@ -20,6 +21,9 @@ import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import { motion } from "framer-motion";
 import PectraTable from "@/components/PectraTable";
 import { Table, Thead, Tbody, Tr, Th, Td, Link } from "@chakra-ui/react";
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import Image from "next/image";
 
 const All = () => {
   const [selected, setSelected] = useState("Meta");
@@ -155,105 +159,105 @@ const All = () => {
         category:"Meta",
         discussion:"https://ethereum-magicians.org/t/eip-7692-evm-object-format-eof-meta/19686"
       },
-      {
-        eip: "663",
-        title: "SWAPN, DUPN and EXCHANGE instructions",
-        author: "Alex Beregszaszi (@axic), Charles Cooper (@charles-cooper), Danno Ferrin (@shemnon)",
-        link: "https://eipsinsight.com/eips/eip-2537",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-663-unlimited-swap-and-dup-instructions/3346"
-      },
-      {
-          eip: "3540",
-          title: "EOF - EVM Object Format v1",
-          author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Matt Garnett (@lightclient)",
-          link: "https://eipsinsight.com/eips/eip-3540",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/evm-object-format-eof/5727"
-      },
-        {
-          eip: "3670",
-          title: "EOF - Code Validation",
-          author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-          link: "https://eipsinsight.com/eips/eip-3670",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693"
-      },
-        {
-          eip: "4200",
-          title: "EOF - Static relative jumps",
-          author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-          link: "https://eipsinsight.com/eips/eip-4200",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-3920-static-relative-jumps/7108"
-      },
-        {
-          eip: "4750",
-          title: "EOF - Functions",
-          author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
-          link: "https://eipsinsight.com/eips/eip-4750",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
-      },
-        {
-          eip: "5450",
-          title: "EOF - Stack Validation",
-          author: "Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic), Danno Ferrin (@shemnon)",
-          link: "https://eipsinsight.com/eips/eip-5450",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-5450-eof-stack-validation/10410"
-      },
-        {
-          eip: "6206",
-          title: "EOF - JUMPF and non-returning functions",
-          author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Matt Garnett (@lightclient)",
-          link: "https://eipsinsight.com/eips/eip-6206",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
-      },
-        {
-          eip: "7069",
-          title: "Revamped CALL instructions",
-          author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Danno Ferrin (@shemnon), Andrei Maiboroda (@gumb0), Charles Cooper (@charles-cooper)",
-          link: "https://eipsinsight.com/eips/eip-7069",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-revamped-call-instructions/14432"
-      },
-        {
-          eip: "7480",
-          title: "EOF - Data section access instructions",
-          author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
-          link: "https://eipsinsight.com/eips/eip-7480",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7480-eof-data-instructions/15414"
-      },
-        {
-          eip: "7620",
-          title: "EOF Contract Creation",
-          author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz)",
-          link: "https://eipsinsight.com/eips/eip-7620",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7620-eof-contract-creation-instructions/18625"
-      },
-        {
-          eip: "7698",
-          title: "EOF - Creation transaction",
-          author: "Piotr Dobaczewski (@pdobacz), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic)",
-          link: "https://eipsinsight.com/eips/eip-7698",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7698-eof-creation-transaction/19784"
-      },
+      // {
+      //   eip: "663",
+      //   title: "SWAPN, DUPN and EXCHANGE instructions",
+      //   author: "Alex Beregszaszi (@axic), Charles Cooper (@charles-cooper), Danno Ferrin (@shemnon)",
+      //   link: "https://eipsinsight.com/eips/eip-2537",
+      //   type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-663-unlimited-swap-and-dup-instructions/3346"
+      // },
+      // {
+      //     eip: "3540",
+      //     title: "EOF - EVM Object Format v1",
+      //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Matt Garnett (@lightclient)",
+      //     link: "https://eipsinsight.com/eips/eip-3540",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/evm-object-format-eof/5727"
+      // },
+      //   {
+      //     eip: "3670",
+      //     title: "EOF - Code Validation",
+      //     author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
+      //     link: "https://eipsinsight.com/eips/eip-3670",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693"
+      // },
+      //   {
+      //     eip: "4200",
+      //     title: "EOF - Static relative jumps",
+      //     author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
+      //     link: "https://eipsinsight.com/eips/eip-4200",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-3920-static-relative-jumps/7108"
+      // },
+      //   {
+      //     eip: "4750",
+      //     title: "EOF - Functions",
+      //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
+      //     link: "https://eipsinsight.com/eips/eip-4750",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
+      // },
+      //   {
+      //     eip: "5450",
+      //     title: "EOF - Stack Validation",
+      //     author: "Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic), Danno Ferrin (@shemnon)",
+      //     link: "https://eipsinsight.com/eips/eip-5450",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-5450-eof-stack-validation/10410"
+      // },
+      //   {
+      //     eip: "6206",
+      //     title: "EOF - JUMPF and non-returning functions",
+      //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Matt Garnett (@lightclient)",
+      //     link: "https://eipsinsight.com/eips/eip-6206",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
+      // },
+      //   {
+      //     eip: "7069",
+      //     title: "Revamped CALL instructions",
+      //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Danno Ferrin (@shemnon), Andrei Maiboroda (@gumb0), Charles Cooper (@charles-cooper)",
+      //     link: "https://eipsinsight.com/eips/eip-7069",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-revamped-call-instructions/14432"
+      // },
+      //   {
+      //     eip: "7480",
+      //     title: "EOF - Data section access instructions",
+      //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
+      //     link: "https://eipsinsight.com/eips/eip-7480",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-7480-eof-data-instructions/15414"
+      // },
+      //   {
+      //     eip: "7620",
+      //     title: "EOF Contract Creation",
+      //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz)",
+      //     link: "https://eipsinsight.com/eips/eip-7620",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-7620-eof-contract-creation-instructions/18625"
+      // },
+      //   {
+      //     eip: "7698",
+      //     title: "EOF - Creation transaction",
+      //     author: "Piotr Dobaczewski (@pdobacz), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic)",
+      //     link: "https://eipsinsight.com/eips/eip-7698",
+      //     type:"Standards Track",
+      //   category:"Core",
+      //   discussion:"https://ethereum-magicians.org/t/eip-7698-eof-creation-transaction/19784"
+      // },
   ];
   return (
     <>
@@ -290,125 +294,139 @@ const All = () => {
             Pectra Devnet - 0
           </Text>
         </NLink>.
-
-        EIP-7600: Hardfork Meta - Pectra was created to provide an updated list of proposals for the Network Upgrade. You can read about them&nbsp;
-        <NLink href={`https://eips.ethereum.org/EIPS/eip-7600`}>
+        <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
           <Text as={"span"} color="blue.500" textDecor={"underline"}>
-            here
+         EIP-7600: Hardfork Meta
+        </Text>
+        </NLink>. - Pectra was created to provide an updated list of proposals for the Network Upgrade.&nbsp;
+        <NLink href={`#carousel-section`}>
+
+          <Text as={"span"} color="blue.500" textDecor={"underline"}>
+           view more
           </Text>
         </NLink>.
       </Text>
 
 
-          <Text
-           as={motion.div}
-           initial={{ opacity: 0, y: -20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.5 } as any}
-           fontSize={{base: "xl",md:"2xl", lg: "4xl"}}
-           fontWeight="bold"
-           color="#30A0E0"
-          >
-            Devnets & Testnets
-          </Text>
+      <Grid
+  templateColumns={{ base: "1fr", md: "1fr 1fr" }} // Stack vertically on small screens
+  gap={6}
+  p={6}
+>
+  {/* Left Side - Motion Text and Table */}
+  <Box>
+    <Text
+      as={motion.div}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      fontSize={{ base: "xl", md: "2xl", lg: "4xl" }}
+      fontWeight="bold"
+      color="#30A0E0"
+    >
+      Devnets & Testnets
+    </Text>
 
-         
-
-<Table variant="striped" colorScheme="blue.500" size="lg" mt={4}>
+    <Table
+  variant="striped"
+  colorScheme="blue"
+  size="lg"
+  mt={4}
+  style={{ border: "1px solid black", borderRadius: "md", boxShadow: "md", width: "100%" }}
+>
   <Thead>
-    <Tr>
-      <Th>Date</Th>
-      <Th>Devnet Spec</Th>
+    <Tr style={{ border: "1px solid black" }}>
+      <Th style={{ border: "1px solid black" }}>Date</Th>
+      <Th style={{ border: "1px solid black" }}>Devnet Spec</Th>
     </Tr>
   </Thead>
   <Tbody>
-  <Tr>
-      <Td>October 2024</Td>
-      <Td>
-        Pectra Devnet 4 (
-        <Link
-          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-4"
-          color="blue.500"
-          textDecor="underline"
-        >
-          Specs
-        </Link>
-        )
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>August 2024</Td>
-      <Td>
-        Tests for Devnet 3 (
-        <Link
-          href="https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0"
-          color="blue.500"
-          textDecor="underline"
-        >
-          Specs
-        </Link>
-        )
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>August 2024</Td>
-      <Td>
-        Pectra Devnet 3 (
-        <Link
-          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-3"
-          color="blue.500"
-          textDecor="underline"
-        >
-          Specs
-        </Link>
-        )
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>July 2024</Td>
-      <Td>
-        Pectra Devnet 2 (
-        <Link
-          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-2"
-          color="blue.500"
-          textDecor="underline"
-        >
-          Specs
-        </Link>
-        )
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>June 2024</Td>
-      <Td>
-        Pectra Devnet 1 (
-        <Link
-          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-1"
-          color="blue.500"
-          textDecor="underline"
-        >
-          Specs
-        </Link>
-        )
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>May 2024</Td>
-      <Td>
-        Pectra Devnet 0 (
-        <Link
-          href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-0"
-          color="blue.500"
-          textDecor="underline"
-        >
-          Specs
-        </Link>
-        )
-      </Td>
-    </Tr>
+    {[
+      {
+        date: "October 2024",
+        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-4",
+        specText: "Pectra Devnet 4 (Specs)",
+      },
+      {
+        date: "August 2024",
+        specLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
+        specText: "Tests for Devnet 3 (Specs)",
+        additionalLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
+        additionalText: "Pectra Devnet 3 (Specs)",
+      },
+      {
+        date: "July 2024",
+        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-2",
+        specText: "Pectra Devnet 2 (Specs)",
+      },
+      {
+        date: "June 2024",
+        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-1",
+        specText: "Pectra Devnet 1 (Specs)",
+      },
+      {
+        date: "May 2024",
+        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
+        specText: "Pectra Devnet 0 (Specs)",
+      },
+    ].map((item, index) => (
+      <Tr style={{ border: "1px solid black" }} key={index}>
+        <Td style={{ border: "1px solid black" }}>{item.date}</Td>
+        <Td style={{ border: "1px solid black" }}>
+          <Link href={item.specLink} color="blue.500" textDecor="underline" isExternal>
+            {item.specText}
+          </Link>
+          {item.additionalLink && (
+            <>
+              ,{" "}
+              <Link href={item.additionalLink} color="blue.500" textDecor="underline" isExternal>
+                {item.additionalText}
+              </Link>
+            </>
+          )}
+        </Td>
+      </Tr>
+    ))}
   </Tbody>
 </Table>
 
+  </Box>
+
+  {/* Right Side - YouTube Video */}
+  <Box
+    border="2px solid" // Adds a solid border
+    borderColor="blue.500" // Border color
+    borderRadius="lg" // Rounded corners
+    display="flex"
+    justifyContent="center" // Centers the video horizontally
+    alignItems="center" // Centers the video vertically
+    width="100%" // Full width to fit the grid cell
+    height="100%" // Full height to fit the grid cell
+    padding="4" // Padding around the iframe
+    // backgroundColor="gray.800" // Background color for the box
+  >
+    <Box
+      position="relative"
+      width="100%"
+      height="0"
+      paddingBottom="56.25%" // Aspect ratio for a 16:9 video
+    >
+      <iframe
+        width="100%"
+        height="100%"
+        src="https://www.youtube.com/embed/YuEA-jE2Z8c?start=201"
+        title="YouTube video"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        style={{
+          position: "absolute", // Keeps the video inside the box
+          top: 0,
+          left: 0,
+        }}
+      ></iframe>
+    </Box>
+  </Box>
+</Grid>
 
 
         </Box>
@@ -420,6 +438,53 @@ const All = () => {
             </Box>
           }
         </Box>
+        <Box className="w-1/2 mx-auto" id="carousel-section"> {/* Width set to 50% of the screen */}
+  <Carousel showThumbs={false} autoPlay infiniteLoop >
+    <a
+      href="https://www.youtube.com/watch?v=YuEA-jE2Z8c&list=PLZmWIkdMcWY5ymDvUCjRLjWGIpCsn8yV8&index=2&t=201s"
+      target="_blank"
+    >
+      <iframe
+        width="100%" // Set to fill the width of the Box
+        height="350" // Set a specific height for the iframe
+        src="https://www.youtube.com/embed/YuEA-jE2Z8c"
+        title="Blog 1"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </a>
+    <a
+      href="https://www.youtube.com/watch?v=pyfKM_hOKaM&list=PLZmWIkdMcWY4IsrNbjEO3qfREoV-OX4zF&index=22&t=218s"
+      target="_blank"
+    >
+      <iframe
+        width="100%"
+        height="350"
+        src="https://www.youtube.com/embed/pyfKM_hOKaM"
+        title="Blog 2"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </a>
+    <a
+      href="https://www.youtube.com/playlist?list=PL4cwHXAawZxqOHV_F40AJbzcl8b6tG8xw"
+      target="_blank"
+    >
+      <iframe
+        width="100%"
+        height="350"
+        src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxqOHV_F40AJbzcl8b6tG8xw"
+        title="Blog 3"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </a>
+  </Carousel>
+</Box>
+
         </motion.div>
       </AllLayout>
     </>
