@@ -314,6 +314,7 @@ const All = () => {
        Currently, the testing team is working on Pectra Devnet 3 and has finalized the specifications for Devnet 4. Specs 
        and other details can be followed below.
         <NLink href={`#carousel-section`}>
+
           <Text as={"span"} color="blue.500" textDecor={"underline"}>
            view more
           </Text>
