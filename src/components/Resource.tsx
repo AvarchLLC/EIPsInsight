@@ -82,44 +82,130 @@ const Resource = () => {
     Featured Blogs
   </Text>
   <Box className="w-3/4 mx-auto"> {/* Width set to 75% of the screen */}
-    <Carousel showThumbs={false} autoPlay infiniteLoop>
-      <a
-        href="https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
-        target="_blank"
-      >
-        <Image
-          src="/resources1.jpg"
-          alt="Blog 1"
-          layout="responsive"
-          width={100}
-          height={50}
-        />
-      </a>
-      <a
-        href="https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
-        target="_blank"
-      >
-        <Image
-          src="/resources2.jpg"
-          alt="Blog 2"
-          layout="responsive"
-          width={100}
-          height={50}
-        />
-      </a>
-      <a
-        href="https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
-        target="_blank"
-      >
-        <Image
-          src="/resources3.jpg"
-          alt="Blog 3"
-          layout="responsive"
-          width={100}
-          height={50}
-        />
-      </a>
-    </Carousel>
+  <Carousel showThumbs={false} autoPlay infiniteLoop>
+  <a
+    href="https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
+    target="_blank"
+  >
+    <Image
+      src="/resources1.jpg"
+      alt="Blog 1"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+  <a
+    href="https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
+    target="_blank"
+  >
+    <Image
+      src="/resources2.jpg"
+      alt="Blog 2"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+  <a
+    href="https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
+    target="_blank"
+  >
+    <Image
+      src="/resources3.jpg"
+      alt="Blog 3"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+  <a
+    href="https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
+    target="_blank"
+  >
+    <Image
+      src="/resources7.png" // Replace with the appropriate image source
+      alt="Blog 7"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+  <a
+    href="https://etherworld.co/2024/01/09/eip-7045/"
+    target="_blank"
+  >
+    <Image
+      src="/resources9.jpg" // Replace with the appropriate image source
+      alt="Blog 9"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+  <a
+    href="https://etherworld.co/2024/01/08/eip-1153-and-transient-storage/"
+    target="_blank"
+  >
+    <Image
+      src="/resources10.png" // Replace with the appropriate image source
+      alt="Blog 10"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+  <a
+    href="https://etherworld.co/2023/11/15/eip-5656-mcopy-an-efficient-evm-instruction/"
+    target="_blank"
+  >
+    <Image
+      src="/resources12.png" // Replace with the appropriate image source
+      alt="Blog 10"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+  {/* <a
+    href="https://etherworld.co/2023/11/13/eip-4844-explored-the-future-of-shard-blob-transactions-in-ethereum/"
+    target="_blank"
+  >
+    <Image
+      src="/resources13.jpg" // Replace with the appropriate image source
+      alt="Blog 10"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a> */}
+  <a
+    href="https://etherworld.co/2023/01/06/eip-721-non-fungible-token-standard/"
+    target="_blank"
+  >
+    <Image
+      src="/resources14.png" // Replace with the appropriate image source
+      alt="Blog 10"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+  <a
+    href="https://etherworld.co/2022/12/13/transient-storage-for-beginners/"
+    target="_blank"
+  >
+    <Image
+      src="/resources15.jpg" // Replace with the appropriate image source
+      alt="Blog 10"
+      layout="responsive"
+      width={100}
+      height={50}
+    />
+  </a>
+ 
+</Carousel>
+
   </Box>
 </Box>
 
