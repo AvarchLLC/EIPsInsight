@@ -23,10 +23,12 @@ import {
   useDisclosure,
   IconButton,
   HStack,
+  Collapse,
   useColorModeValue
 } from "@chakra-ui/react";
 import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
+import {ChevronUpIcon } from "@chakra-ui/icons";
 
 
 // Dynamic import for Ant Design's Column chart
@@ -68,6 +70,9 @@ const GitHubPRTracker: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'PRs' | 'Issues'>('PRs');
   const [selectedRepo, setSelectedRepo] = useState<string>('EIPs');
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
+  const [show, setShow] = useState(false);
+
+  const toggleCollapse = () => setShow(!show);
   // const [selectedYear, setSelectedYear] = useState(null);
   // const [selectedMonth, setSelectedMonth] = useState(null);
   const [data, setData] = useState<{
@@ -153,6 +158,19 @@ const GitHubPRTracker: React.FC = () => {
     } catch (error) {
       console.error("Failed to fetch PR data:", error);
     }
+  };
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(prev => prev === category ? null : category); // Toggle selection
+    setShowCategory({
+      created: category === 'created',
+      open: category === 'open',
+      closed: category === 'closed',
+      merged: category === 'merged',
+      // review: category === 'review' // Uncomment if review category is enabled
+    });
   };
 
   const fetchIssueData = async () => {
@@ -250,32 +268,51 @@ const GitHubPRTracker: React.FC = () => {
   
       // Handle open PRs
       if (createdDate) {
-          let openDate = new Date(createdDate); // Start from the creation date
-          let createdconstant= new Date(createdDate);
-          let endDate = closedDate 
-              ? new Date(closedDate.getUTCFullYear(), closedDate.getUTCMonth(), 1) 
-              : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth()+1, 1); // Set to the 1st of the current month
-  
-          // Loop through each month the PR was open
-          while (openDate <= endDate) { // Only count until the start of the closed month or current month
-              const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-  
-              if (!monthYearData[openKey]) {
-                  monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review: [] };
-              }
-  
-              // Only add to "open" if the PR was open on the 1st of the month
-              const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
-              if (!(openDate.getUTCFullYear() === createdconstant.getUTCFullYear() && openDate.getUTCMonth() === createdconstant.getUTCMonth())) {
-                if (firstOfMonth <= openDate && (!closedDate || firstOfMonth < closedDate)) {
-                    addIfNotExists(monthYearData[openKey].open, pr);
-                }
-            }
-  
-              // Increment month
-              openDate = incrementMonth(openDate);
-          }
-      }
+        let createdDateObj = new Date(createdDate);
+        let createdYear = createdDateObj.getUTCFullYear();
+        let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
+    
+        // Initialize endDate based on closedDate or currentDate
+let endDate;
+if (closedDate) {
+    let closedDateObj = new Date(closedDate);
+    endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
+} else {
+    endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
+}
+
+// Initialize openDate starting from the created date
+let openDate = new Date(createdYear, createdMonth, 1);
+
+// Debugging: Log the initial values
+console.log(`Created Date: ${createdDateObj}`);
+console.log(`End Date: ${endDate}`);
+console.log(`Starting Open Date: ${openDate}`);
+
+// Loop through each month the PR was open
+while (openDate < endDate) {
+    const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+
+    // Initialize monthYearData for the current month key if not already present
+    if (!monthYearData[openKey]) {
+        monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review: [] };
+    }
+
+    // Debugging: Log the current state
+    console.log(`Adding PR to month: ${openKey}`);
+
+    // Add the PR to the open array for this month
+    addIfNotExists(monthYearData[openKey].open, pr);
+
+    // Increment to the next month
+    openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
+
+    // Debugging: Log the updated openDate
+    console.log(`Updated Open Date: ${openDate}`);
+}
+
+    }
+    
   });
   
   // Process reviews
@@ -407,27 +444,64 @@ const GitHubPRTracker: React.FC = () => {
 
     return (
       <Box mt={8} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
-        <Flex
-        wrap="wrap"
-        justify="space-around"
-        bg="gray.700" // Darker background for dark mode
-        p={4}
-        mb={4}
+      <Flex
+      wrap="wrap"
+      justify="space-around"
+      bg="gray.700" // Darker background for dark mode
+      p={4}
+      mb={4}
+      borderRadius="md"
+      boxShadow="md"
+    >
+      <Box
+        textAlign="center"
+        p={2}
+        flex="1 1 150px"
+        bg="gray.800" // Dark background
+        color="white" // Visible text color for dark mode
         borderRadius="md"
-        boxShadow="md"
+        boxShadow="sm"
+        m={2} // Add margin for space between boxes
+        border={selectedCategory === 'created' ? '2px solid lightblue' : 'none'} // Highlight when selected
+        onClick={() => handleCategoryClick('created')}
+        cursor="pointer"
       >
-        <Box
-          textAlign="center"
-          p={2}
-          flex="1 1 150px"
-          bg="gray.800" // Dark background
-          color="white" // Visible text color for dark mode
-          borderRadius="md"
-          boxShadow="sm"
-          m={2} // Add margin for space between boxes
-        >
-          Created ({createdCount})
-        </Box>
+        Created ({createdCount})
+      </Box>
+
+      <Box
+        textAlign="center"
+        p={2}
+        flex="1 1 150px"
+        bg="gray.800"
+        color="white"
+        borderRadius="md"
+        boxShadow="sm"
+        m={2}
+        border={selectedCategory === 'open' ? '2px solid lightblue' : 'none'}
+        onClick={() => handleCategoryClick('open')}
+        cursor="pointer"
+      >
+        Open ({openCount})
+      </Box>
+
+      <Box
+        textAlign="center"
+        p={2}
+        flex="1 1 150px"
+        bg="gray.800"
+        color="white"
+        borderRadius="md"
+        boxShadow="sm"
+        m={2}
+        border={selectedCategory === 'closed' ? '2px solid lightblue' : 'none'}
+        onClick={() => handleCategoryClick('closed')}
+        cursor="pointer"
+      >
+        Closed ({closedCount})
+      </Box>
+
+      {type === 'PRs' && (
         <Box
           textAlign="center"
           p={2}
@@ -437,76 +511,33 @@ const GitHubPRTracker: React.FC = () => {
           borderRadius="md"
           boxShadow="sm"
           m={2}
+          border={selectedCategory === 'merged' ? '2px solid lightblue' : 'none'}
+          onClick={() => handleCategoryClick('merged')}
+          cursor="pointer"
         >
-          Closed ({closedCount})
+          Merged ({mergedCount})
         </Box>
-        <Box
-          textAlign="center"
-          p={2}
-          flex="1 1 150px"
-          bg="gray.800"
-          color="white"
-          borderRadius="md"
-          boxShadow="sm"
-          m={2}
-        >
-          Open ({openCount})
-        </Box>
-        {type === 'PRs' && (
-          <>
-            <Box
-              textAlign="center"
-              p={2}
-              flex="1 1 150px"
-              bg="gray.800"
-              color="white"
-              borderRadius="md"
-              boxShadow="sm"
-              m={2}
-            >
-              Merged ({mergedCount})
-            </Box>
-            {/* <Box
-              textAlign="center"
-              p={2}
-              flex="1 1 150px"
-              bg="gray.800"
-              color="white"
-              borderRadius="md"
-              boxShadow="sm"
-              m={2}
-            >
-              Review ({reviewCount})
-            </Box> */}
-          </>
-        )}
-      </Flex>
+      )}
+    </Flex>
+    <Box overflowY="auto" maxHeight="700px" borderBottomRadius="0" borderTopWidth="1px" borderTopColor="gray.200">
         <Table variant="striped" colorScheme="blue">
         <Thead bg="#2D3748">
           <Tr>
-            <Th color="white" textAlign="center" borderTopLeftRadius="10px">Number</Th>
-            <Th color="white" textAlign="center">Title</Th>
-            {type === 'PRs' ? (
-              <>
-                <Th color="white" textAlign="center">State</Th>
-                <Th color="white" textAlign="center">Created At</Th>
-                <Th color="white" textAlign="center">Closed At</Th>
-                <Th color="white" textAlign="center">Merged At</Th>
-              </>
-            ) : (
-              <>
-                <Th color="white" textAlign="center">State</Th>
-                <Th color="white" textAlign="center">Created At</Th>
-                <Th color="white" textAlign="center">Closed At</Th>
-              </>
-            )}
-            <Th color="white" textAlign="center" borderTopRightRadius="10px">Link</Th>
-          </Tr>
+      <Th color="white" textAlign="center" borderTopLeftRadius="10px" minWidth="6rem">Number</Th>
+      <Th color="white" textAlign="center" minWidth="20rem">Title</Th>
+      <Th color="white" textAlign="center" minWidth="6rem">State</Th>
+      <Th color="white" textAlign="center" minWidth="6rem">Created At</Th>
+      <Th color="white" textAlign="center" minWidth="6rem">Closed At</Th>
+      {type === 'PRs' && (
+        <Th color="white" textAlign="center" minWidth="6rem">Merged At</Th>
+      )}
+      <Th color="white" textAlign="center" borderTopRightRadius="10px" minWidth="10rem">Link</Th>
+    </Tr>
         </Thead>
         </Table>
 
-        <Box overflowY="auto" maxHeight="400px" borderBottomRadius="0" borderTopWidth="1px" borderTopColor="gray.200">
-        <Table variant="striped" colorScheme="blue">
+        
+        <Table variant="striped" colorScheme="gray">
         <Tbody>
         {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
             <Tr>
@@ -638,7 +669,7 @@ const GitHubPRTracker: React.FC = () => {
         </Tbody>
         </Table>
         </Box>
-      </Box>
+        </Box>
     );
   };
   
@@ -894,49 +925,112 @@ const GitHubPRTracker: React.FC = () => {
           </Heading>
 
           <Box
-  padding={4}
-  bg={useColorModeValue("blue.50", "gray.700")}
-  borderRadius="md"
-  marginBottom={8}
->
-  <Heading
-    as="h3"
-    size="lg"
-    marginBottom={4}
-    color={useColorModeValue("#3182CE", "blue.300")}
-  >
-    How to Use the Analytics Tool?
-  </Heading>
-  <Text
-  fontSize="md"
-  marginBottom={2}
-  color={useColorModeValue("gray.800", "gray.200")}
->
-  <strong>Visualizing Trends:</strong> Use the timeline to visualize trends in the number of created, closed, merged and open pull requests (PRs) each month. Created PRs are those that have been newly opened. Closed PRs are those that have been closed but not merged, while merged PRs are those that have been both closed and merged. Open PRs represent the number of PRs that were still open during the start of that month.
-</Text>
+      padding={4}
+      bg={useColorModeValue("blue.50", "gray.700")}
+      borderRadius="md"
+      marginBottom={8}
+    >
+      <Flex justify="space-between" align="center">
+        <Heading
+          as="h3"
+          size="lg"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          What does this tool do?
+        </Heading>
+        <IconButton
+          onClick={toggleCollapse}
+          icon={show ? <ChevronUpIcon /> : <ChevronDownIcon />}
+          variant="ghost"
+          aria-label="Toggle Instructions"
+        />
+      </Flex>
 
-<Text
-  fontSize="md"
-  marginBottom={2}
-  color={useColorModeValue("gray.800", "gray.200")}
->
-  <strong>Viewing Data for a Specific Month:</strong> To focus on a particular month, click the "View More" button. Then, select the desired year and month using the dropdown menus. The table and graph will update to show only the data for that specific month.
-</Text>
-<Text
-  fontSize="md"
-  marginBottom={2}
-  color={useColorModeValue("gray.800", "gray.200")}
->
-  <strong>Customizing the Graph:</strong> You can choose to display specific data in the graph by selecting or deselecting checkboxes for created, closed, and merged PRs. This allows you to focus on the trends that matter most to you.
-</Text>
-<Text
-  fontSize="md"
-  color={useColorModeValue("gray.800", "gray.200")}
->
-  <strong>Downloading Reports:</strong> Once you've selected your preferred data using "View More," you can download reports based on the filtered data for further analysis or record-keeping.
-</Text>
+      <Collapse in={show}>
+        <Text
+          fontSize="md"
+          marginBottom={2}
+          color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
+        >
+          This tool aims to automate the process of tracking PRs and issues in
+          GitHub repositories, providing visualizations and reports to
+          streamline project management. The default view utilizes the timeline
+          to observe trends in the number of Created, Closed, Merged, and Open
+          PRs/Issues at the end of each month.
+        </Text>
 
-</Box>
+        <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          How can I view data for a specific month?
+        </Heading>
+        <Text
+          fontSize="md"
+          marginBottom={2}
+          color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
+        >
+          To focus on a specific month, click the View More button and choose
+          the desired Year and Month from the dropdown menus. The table and
+          graph will then update to display data exclusively for that selected
+          month.
+        </Text>
+
+        <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          How to customize the chart?
+        </Heading>
+        <Text
+          fontSize="md"
+          marginBottom={2}
+          color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
+        >
+          To customize the chart, you can adjust the timeline scroll bar to
+          display data for a specific month/year. Additionally, you can tailor
+          the graph by selecting or deselecting checkboxes for Created, Closed,
+          Merged, and Open PRs/Issues, allowing you to focus on the trends that
+          are most relevant to you.
+        </Text>
+
+        <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          How to download reports?
+        </Heading>
+        <Text
+          fontSize="md"
+          color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
+        >
+          After selecting your preferred data using the View More option, you
+          can download reports based on the filtered data for further analysis
+          or record-keeping. Simply click the download button to export the
+          data in your chosen format.
+        </Text>
+      </Collapse>
+
+      {/* {!show && (
+        <Flex justify="center" align="center" marginTop={4}>
+          <Text color={useColorModeValue("#3182CE", "blue.300")} cursor="pointer" onClick={toggleCollapse}>
+            View Instructions
+          </Text>
+          <ChevronDownIcon color={useColorModeValue("#3182CE", "blue.300")} />
+        </Flex>
+      )} */}
+    </Box>
   
           <Flex justify="center" mb={8}>
             <Button
@@ -972,7 +1066,10 @@ const GitHubPRTracker: React.FC = () => {
 
           <Box mt={2}>
         <Text color="gray.500" fontStyle="italic" textAlign="center">
-          *Note: The data is refreshed every 24 hours to ensure accuracy and up-to-date information*
+          *Note: The data is updated daily at 15:00 UTC to maintain accuracy and provide the most current information.*
+        </Text>
+        <Text color="gray.500" fontStyle="italic" textAlign="center">
+          *Note: The data related to the number of PRs might vary when compared to official github repository due to factors like deleted PRs.*
         </Text>
       </Box>
          

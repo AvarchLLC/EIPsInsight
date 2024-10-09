@@ -279,26 +279,40 @@ const All = () => {
            initial={{ opacity: 0, y: -20 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.5 } as any}
-           fontSize={{base: "2xl",md:"2xl", lg: "6xl"}}
+           fontSize={{base: "4xl",md:"4xl", lg: "6xl"}}
            fontWeight="bold"
            color="#30A0E0"
           >
             Pectra Upgrade
           </Text>
       <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
-        The upcoming Pectra upgrade for Ethereum, expected in late 2024, will focus on improving EL-CL communication, staking design, and enhancing everyday transactions.
-
-        At the recent interop meetup in Kenya, Ethereum developers made significant progress in implementing and refining key technical details for these improvements. They also launched&nbsp;
-        <NLink href={`https://notes.ethereum.org/@ethpandaops/pectra-devnet-0`}>
+      Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
+      collectively known as 
+      <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
           <Text as={"span"} color="blue.500" textDecor={"underline"}>
-            Pectra Devnet - 0
-          </Text>
-        </NLink>.
-        <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
-          <Text as={"span"} color="blue.500" textDecor={"underline"}>
-         EIP-7600: Hardfork Meta
+         Pectra
         </Text>
-        </NLink>. - Pectra was created to provide an updated list of proposals for the Network Upgrade.&nbsp;
+      </NLink>. This upgrade will involve significant changes to both the 
+      <NLink href={`https://www.youtube.com/watch?v=nJ57mkttCH0`}>
+          <Text as={"span"} color="blue.500" textDecor={"underline"}>
+          Execution and Consensus layers
+        </Text>
+      </NLink>
+     on the mainnet. Given the complexities 
+      of testing and the scope of changes, including over 20
+      <NLink href={`https://www.youtube.com/watch?v=AyidVR6X6J8`}>
+          <Text as={"span"} color="blue.500" textDecor={"underline"}>
+          Ethereum Improvement Proposals (EIPs)
+        </Text>
+      </NLink>, 
+       the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
+       now been shifted to the upcoming <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
+          <Text as={"span"} color="blue.500" textDecor={"underline"}>
+          Fusaka
+        </Text>
+      </NLink>(a combination of Fulu and Osaka) upgrade. 
+       Currently, the testing team is working on Pectra Devnet 3 and has finalized the specifications for Devnet 4. Specs 
+       and other details can be followed below.
         <NLink href={`#carousel-section`}>
           <Text as={"span"} color="blue.500" textDecor={"underline"}>
            view more
@@ -327,7 +341,7 @@ const All = () => {
 
     <Table
   variant="striped"
-  colorScheme="blue"
+  colorScheme="gray"
   size="lg"
   mt={4}
   style={{ border: "1px solid black", borderRadius: "md", boxShadow: "md", width: "100%" }}
@@ -347,10 +361,10 @@ const All = () => {
       },
       {
         date: "August 2024",
-        specLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
-        specText: "Tests for Devnet 3 (Specs)",
-        additionalLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
-        additionalText: "Pectra Devnet 3 (Specs)",
+        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
+        specText: "Pectra Devnet 3 (Specs)",
+        additionalLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
+        additionalText: "Tests Specs",
       },
       {
         date: "July 2024",
@@ -412,7 +426,7 @@ const All = () => {
       <iframe
         width="100%"
         height="100%"
-        src="https://www.youtube.com/embed/YuEA-jE2Z8c?start=201"
+        src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxqOHV_F40AJbzcl8b6tG8xw"
         title="YouTube video"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -434,54 +448,165 @@ const All = () => {
           {
             <Box>
               <PectraTable PectraData={pectraData}/>
+              <br/>
+              <Text
+           as={motion.div}
+           initial={{ opacity: 0, y: -20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.5 } as any}
+           fontSize={{base: "4xl",md:"4xl", lg: "6xl"}}
+           fontWeight="bold"
+           color="#30A0E0"
+          >
+            Related Videos
+          </Text>
             </Box>
           }
         </Box>
-        <Box className="w-1/2 mx-auto" id="carousel-section"> {/* Width set to 50% of the screen */}
-  <Carousel showThumbs={false} autoPlay infiniteLoop >
+       
+        <Box className="w-3/4 mx-auto" id="carousel-section"> {/* Width set to 50% of the screen */}
+        
+        <Carousel 
+  showThumbs={false} 
+  autoPlay 
+  infiniteLoop 
+  showStatus={false} // Hides the status (dots)
+  showIndicators={false} // Hides the indicators (dots)
+  centerMode // Enables center mode to show multiple items
+  centerSlidePercentage={40} // Ensures 3 items are visible at a time
+>
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', margin: '0 10px' }}>
     <a
       href="https://www.youtube.com/watch?v=YuEA-jE2Z8c&list=PLZmWIkdMcWY5ymDvUCjRLjWGIpCsn8yV8&index=2&t=201s"
       target="_blank"
+      style={{ textDecoration: 'none' }}
     >
       <iframe
-        width="100%" // Set to fill the width of the Box
-        height="350" // Set a specific height for the iframe
+        style={{ width: '100%', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/YuEA-jE2Z8c"
         title="Blog 1"
-        frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       ></iframe>
     </a>
+  </div>
+
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px',  margin: '0 10px'}}>
     <a
       href="https://www.youtube.com/watch?v=pyfKM_hOKaM&list=PLZmWIkdMcWY4IsrNbjEO3qfREoV-OX4zF&index=22&t=218s"
       target="_blank"
+      style={{ textDecoration: 'none' }}
     >
       <iframe
-        width="100%"
-        height="350"
+        style={{ width: '100%', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/pyfKM_hOKaM"
         title="Blog 2"
-        frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       ></iframe>
     </a>
+  </div>
+
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', margin: '0 10px'}}>
     <a
-      href="https://www.youtube.com/playlist?list=PL4cwHXAawZxqOHV_F40AJbzcl8b6tG8xw"
+      href="https://www.youtube.com/playlist?list=PL4cwHXAawZxpnKFDl1KzGOKqwux5JaLlv"
       target="_blank"
+      style={{ textDecoration: 'none' }}
     >
       <iframe
-        width="100%"
-        height="350"
-        src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxqOHV_F40AJbzcl8b6tG8xw"
-        title="Blog 3"
-        frameBorder="0"
+        style={{ width: '100%', height: '300px', border: 'none' }}
+        src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpnKFDl1KzGOKqwux5JaLlv"
+        title="Playlist 1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       ></iframe>
     </a>
-  </Carousel>
+  </div>
+
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', margin: '0 10px' }}>
+    <a
+      href="https://www.youtube.com/playlist?list=PL4cwHXAawZxpok0smGmq-dFGVHQzW84a2"
+      target="_blank"
+      style={{ textDecoration: 'none' }}
+    >
+      <iframe
+        style={{ width: '100%',  height: '300px', border: 'none' }}
+        src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpok0smGmq-dFGVHQzW84a2"
+        title="Playlist 2"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </a>
+  </div>
+
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', margin: '0 10px' }}>
+    <a
+      href="https://www.youtube.com/watch?v=nJ57mkttCH0"
+      target="_blank"
+      style={{ textDecoration: 'none' }}
+    >
+      <iframe
+        style={{ width: '100%', height: '300px', border: 'none' }}
+        src="https://www.youtube.com/embed/nJ57mkttCH0"
+        title="Video 1"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </a>
+  </div>
+
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', margin: '0 10px' }}>
+    <a
+      href="https://youtu.be/0tEcFa9J5TM"
+      target="_blank"
+      style={{ textDecoration: 'none' }}
+    >
+      <iframe
+        style={{ width: '100%',  height: '300px', border: 'none' }}
+        src="https://www.youtube.com/embed/0tEcFa9J5TM"
+        title="Video 2"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </a>
+  </div>
+
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', margin: '0 10px' }}>
+    <a
+      href="https://youtu.be/sIr6XX8yR8o"
+      target="_blank"
+      style={{ textDecoration: 'none' }}
+    >
+      <iframe
+        style={{ width: '100%',  height: '300px', border: 'none' }}
+        src="https://www.youtube.com/embed/sIr6XX8yR8o"
+        title="Video 3"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </a>
+  </div>
+
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', margin: '0 10px' }}>
+    <a
+      href="https://youtu.be/B69btfxKVks"
+      target="_blank"
+      style={{ textDecoration: 'none' }}
+    >
+      <iframe
+        style={{ width: '100%',  height: '300px', border: 'none' }}
+        src="https://www.youtube.com/embed/B69btfxKVks"
+        title="Video 4"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </a>
+  </div>
+</Carousel>
+
+
+<br/>
+
 </Box>
 
         </motion.div>

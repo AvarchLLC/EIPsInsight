@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Box, Flex, Heading, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
+import { Box, Flex, Heading, IconButton, Collapse, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
 import LoaderComponent from "@/components/Loader";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { CSVLink } from "react-csv";
+import {ChevronUpIcon } from "@chakra-ui/icons";
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -26,6 +27,9 @@ const ReviewTracker = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'eips' | 'ercs' | 'rips'>('eips');
   const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
+  const [show, setShow] = useState(true);
+
+  const toggleCollapse = () => setShow(!show);
 
   // Function to generate CSV data
   type PR = {
@@ -329,46 +333,91 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
             textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Reviewers Tracker</Heading>
 
 
-      <Box
-        padding={4}
-        bg={useColorModeValue("blue.50", "gray.700")}
-        borderRadius="md"
-        marginBottom={8}
-      >
+<Box
+      padding={4}
+      bg={useColorModeValue("blue.50", "gray.700")}
+      borderRadius="md"
+      marginBottom={8}
+    >
+      <Flex justify="space-between" align="center">
         <Heading
           as="h3"
           size="lg"
           marginBottom={4}
           color={useColorModeValue("#3182CE", "blue.300")}
         >
-          How to Use the Reviewers Tracker?
+          What does this tool do?
+        </Heading>
+        <IconButton
+          onClick={toggleCollapse}
+          icon={show ? <ChevronUpIcon /> : <ChevronDownIcon />}
+          variant="ghost"
+          aria-label="Toggle Instructions"
+        />
+      </Flex>
+
+      <Collapse in={show}>
+        <Text
+          fontSize="md"
+          marginBottom={2}
+          color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
+        >
+          This tool provides a comprehensive overview of all EIP editor reviews
+          conducted to date. It displays the total number of reviews each month
+          for each editor, allowing you to easily track and analyze review
+          activity across different months and editors.
+        </Text>
+
+        <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          How can I view data for a specific Month?
         </Heading>
         <Text
           fontSize="md"
           marginBottom={2}
           color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
         >
-          <strong>Default View:</strong> Initially, the graph displays all the data about monthly pull requests (PRs)
-          reviewed by every reviewer. This gives you a comprehensive overview of the reviews for all months and reviewers.
+          To view data for a specific month, you can use the timeline scroll bar
+          or click the View More button. From there, select the desired Year and
+          Month using the dropdown menus, and the table and graph will
+          automatically update to display data for that selected month.
         </Text>
+
+        <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          How can I view data for a specific EIP Editor?
+        </Heading>
         <Text
           fontSize="md"
-          marginBottom={2}
           color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
         >
-          <strong>Viewing Data for a Specific Month:</strong> To focus on data from a particular month, click on the
-          "View More" button. Then, select the desired year and month using the dropdown menus. The table and graph will
-          update to show only the data for that specific month.
+          You can refine the data by selecting or deselecting specific editors
+          from the checkbox list. This will filter the chart and table to show
+          data only for the selected editors, enabling you to focus on
+          individual contributions.
         </Text>
-        <Text
-          fontSize="md"
-          color={useColorModeValue("gray.800", "gray.200")}
-        >
-          <strong>Filtering by Reviewers:</strong> You can further refine the data by selecting or unselecting specific
-          reviewers from the checkbox list. This will filter the chart and table to display data only for the chosen
-          reviewers, allowing you to focus on individual contributions.
-        </Text>
-      </Box>
+      </Collapse>
+
+      {/* {!show && (
+        <Flex justify="center" align="center" marginTop={4}>
+          <Text color={useColorModeValue("#3182CE", "blue.300")} cursor="pointer" onClick={toggleCollapse}>
+            View Instructions
+          </Text>
+          <ChevronDownIcon color={useColorModeValue("#3182CE", "blue.300")} />
+        </Flex>
+      )} */}
+    </Box>
 
 
       <Flex justify="center" mb={8}>
