@@ -285,41 +285,42 @@ const All = () => {
           >
             Pectra Upgrade
           </Text>
-      <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
-      Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
-      collectively known as 
-      <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
-          <Text as={"span"} color="blue.500" textDecor={"underline"}>
-         Pectra
-        </Text>
-      </NLink>. This upgrade will involve significant changes to both the 
-      <NLink href={`https://www.youtube.com/watch?v=nJ57mkttCH0`}>
-          <Text as={"span"} color="blue.500" textDecor={"underline"}>
-          Execution and Consensus layers
-        </Text>
-      </NLink>
-     on the mainnet. Given the complexities 
-      of testing and the scope of changes, including over 20
-      <NLink href={`https://www.youtube.com/watch?v=AyidVR6X6J8`}>
-          <Text as={"span"} color="blue.500" textDecor={"underline"}>
-          Ethereum Improvement Proposals (EIPs)
-        </Text>
-      </NLink>, 
-       the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
-       now been shifted to the upcoming <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
-          <Text as={"span"} color="blue.500" textDecor={"underline"}>
-          Fusaka
-        </Text>
-      </NLink>(a combination of Fulu and Osaka) upgrade. 
-       Currently, the testing team is working on Pectra Devnet 3 and has finalized the specifications for Devnet 4. Specs 
-       and other details can be followed below.
-        <NLink href={`#carousel-section`}>
-
-          <Text as={"span"} color="blue.500" textDecor={"underline"}>
-           view more
-          </Text>
-        </NLink>.
+          <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
+  Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
+  collectively known as{" "}
+  <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
+      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+        Pectra
       </Text>
+  </NLink>. This upgrade will involve significant changes to both the{" "}
+  <NLink href={`https://www.youtube.com/watch?v=nJ57mkttCH0`}>
+      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+        Execution and Consensus layers
+      </Text>
+  </NLink>{" "}
+  on the mainnet. Given the complexities 
+  of testing and the scope of changes, including over 20{" "}
+  <NLink href={`https://www.youtube.com/watch?v=AyidVR6X6J8`}>
+      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+        Ethereum Improvement Proposals (EIPs)
+      </Text>
+  </NLink>, 
+  the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
+  now been shifted to the upcoming{" "}
+  <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
+      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+        Fusaka
+      </Text>
+  </NLink>(a combination of Fulu and Osaka) upgrade. 
+  Currently, the testing team is working on Pectra Devnet 3 and has finalized the specifications for Devnet 4. Specs 
+  and other details can be followed below.{" "}
+  <NLink href={`#carousel-section`}>
+      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+        View more
+      </Text>
+  </NLink>.
+</Text>
+
 
 
       <Grid

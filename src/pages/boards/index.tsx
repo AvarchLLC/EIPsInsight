@@ -98,7 +98,7 @@ import {
           marginBottom={4}
           color={useColorModeValue("#3182CE", "blue.300")}
         >
-          What is EIP Board?
+        EIP Board FAQ
         </Heading>
         <Box
         bg="blue" // Gray background
@@ -115,6 +115,14 @@ import {
       </Flex>
 
       <Collapse in={show}>
+      <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          What is EIP Board?
+        </Heading>
         <Text
           fontSize="md"
           marginBottom={2}
