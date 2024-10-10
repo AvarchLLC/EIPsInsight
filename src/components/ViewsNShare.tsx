@@ -25,36 +25,36 @@ const ViewsShare: React.FC<ViewsShareProps> = ({ path }) => {
   const [viewCount, setViewCount] = useState(0);
 
   useEffect(() => {
-    // Fetch the view count from the API route
-    fetch("/api/viewCount")
+    // Increment and fetch the view count from the API
+    fetch(`/api/viewCount?path=${path}`)
       .then((response) => response.json())
-      .then((data) => setViewCount(data.viewCount));
-  }, []);
+      .then((data) => setViewCount(data.viewCount))
+      .catch((error) => console.error("Failed to fetch view count:", error));
+  }, [path]); // Fetch count whenever path changes
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const twitterShareLink = `https://twitter.com/intent/tweet?url=${shareLink}`;
+
   return (
-    <>
-      <div className={"flex justify-center w-full"}>
-        <Box className={"flex space-x-8 rounded-full px-8 py-4 my-3"} bg={bg}>
-          <div className={"flex space-x-4"}>
-            <AiFillEye size={25} />
-            <span>9157</span>
+    <div className="flex justify-center w-full">
+      <Box className="flex space-x-8 rounded-full px-8 py-4 my-3" bg={bg}>
+        <div className="flex space-x-4">
+          <AiFillEye size={25} />
+          <span>{viewCount}</span> {/* Display the updated view count */}
+        </div>
+        <button onClick={handleCopyClick}>
+          <div className="hover:110 duration-200">
+            <BsFillShareFill size={25} />
           </div>
-          <button onClick={handleCopyClick}>
-            <div className={"hover:110 duration-200"}>
-              <BsFillShareFill size={25} />
-            </div>
-          </button>
-          <NextLink href={`${twitterShareLink}`}>
-            <div className={"hover:110 duration-200"}>
-              <BsTwitter size={25} />
-            </div>
-          </NextLink>
-        </Box>
-      </div>
-    </>
+        </button>
+        <NextLink href={twitterShareLink}>
+          <div className="hover:110 duration-200">
+            <BsTwitter size={25} />
+          </div>
+        </NextLink>
+      </Box>
+    </div>
   );
 };
 

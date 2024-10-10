@@ -710,7 +710,7 @@ while (openDate < endDate) {
       const row = type === 'PRs'
         ? [
             (item as PR).prNumber,
-            (item as PR).prTitle,
+            `"${(item as PR).prTitle}"`,  // Wrap title in quotes
             new Date(item.created_at).toLocaleDateString(),
             item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
             (item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-',
@@ -718,14 +718,15 @@ while (openDate < endDate) {
           ].join(',')
         : [
             (item as Issue).IssueNumber,
-            (item as Issue).IssueTitle,
+            `"${(item as Issue).IssueTitle}"`,  // Wrap title in quotes
             new Date(item.created_at).toLocaleDateString(),
             item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
             `https://github.com/ethereum/${selectedRepo}/issues/${(item as Issue).IssueNumber}`
           ].join(',');
-  
+    
       csvRows.push(row);
     });
+    
   
     return csvRows.join('\n');
   };
@@ -939,12 +940,18 @@ while (openDate < endDate) {
         >
           What does this tool do?
         </Heading>
+        <Box
+        bg="blue" // Gray background
+        borderRadius="md" // Rounded corners
+        padding={2} // Padding inside the box
+      >
         <IconButton
           onClick={toggleCollapse}
           icon={show ? <ChevronUpIcon /> : <ChevronDownIcon />}
           variant="ghost"
           aria-label="Toggle Instructions"
         />
+      </Box>
       </Flex>
 
       <Collapse in={show}>

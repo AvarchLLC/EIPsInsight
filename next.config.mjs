@@ -61,6 +61,12 @@ const nextConfig = withMDX(
           permanent: true,
           has: [{ type: 'header', key: 'x-original-path', value: '/ANALYTICS' }]
         },
+        {
+          source: '/BOARDS',
+          destination: '/boards',
+          permanent: true,
+          has: [{ type: 'header', key: 'x-original-path', value: '/BOARDS' }]
+        },
       ];
     }
   })

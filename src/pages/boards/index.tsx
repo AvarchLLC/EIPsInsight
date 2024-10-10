@@ -100,12 +100,18 @@ import {
         >
           What is EIP Board?
         </Heading>
+        <Box
+        bg="blue" // Gray background
+        borderRadius="md" // Rounded corners
+        padding={2} // Padding inside the box
+      >
         <IconButton
           onClick={toggleCollapse}
           icon={show ? <ChevronUpIcon /> : <ChevronDownIcon />}
           variant="ghost"
           aria-label="Toggle Instructions"
         />
+      </Box>
       </Flex>
 
       <Collapse in={show}>

@@ -6,6 +6,7 @@ import LoaderComponent from "@/components/Loader";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { CSVLink } from "react-csv";
 import {ChevronUpIcon } from "@chakra-ui/icons";
+import { Line } from '@ant-design/charts';  // Import the Line chart component
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -195,48 +196,49 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
   );
 };
 
-  
-  
 
-  const renderChart = () => {
-    const dataToUse = data;
-    const filteredData = dataToUse.filter(item =>
-      Object.keys(showReviewer)
-        .filter(reviewer => showReviewer[reviewer]) // Only checked reviewers
-        .includes(item.reviewer) // Assuming 'reviewer' is a key in your data
-    );
+
+const renderChart = () => {
+  const dataToUse = data;
   
-    // Transform and sort the filtered data
-    const transformedData = transformAndGroupData(filteredData);
-    const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+  // Filter the data to only include checked reviewers
+  const filteredData = dataToUse.filter(item =>
+    Object.keys(showReviewer)
+      .filter(reviewer => showReviewer[reviewer]) // Only checked reviewers
+      .includes(item.reviewer) // Assuming 'reviewer' is a key in your data
+  );
 
-    const config = {
-      data: sortedData,
-      xField: "monthYear",
-      yField: "count",
-      colorField: "reviewer",
-      seriesField: "reviewer",
-      isGroup: true,
-      columnStyle: {
-        radius: [20, 20, 0, 0],
-      },
-      slider: {
-        start: 0,
-        end: 1,
-      },
-      legend: { position: "top-right" as const },
-      smooth: true,
-      label: {
-        position: "middle" as const,
-        style: {
-          fill: "#FFFFFF",
-          opacity: 0.6,
-        },
-      },
-    };
+  // Transform and sort the filtered data
+  const transformedData = transformAndGroupData(filteredData);
+  const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
 
-    return <Column {...config} />;
+  const config = {
+    data: sortedData,
+    xField: "monthYear",               // X-axis will represent the month and year
+    yField: "count",                   // Y-axis will represent the count
+    seriesField: "reviewer",            // Each line represents a different reviewer
+    smooth: true,                      // Smooth the lines for better visualization
+    slider: {
+      start: 0,
+      end: 1,
+    },
+    legend: { position: "top-right" as const },  // Position of the legend
+    lineStyle: {
+      lineWidth: 2,                   // Customize line thickness
+    },
+    // label: {
+    //   position: "middle" as const,    // Label inside the line
+    //   style: {
+    //     fill: "#FFFFFF",
+    //     opacity: 0.6,
+    //   },
+    // },
   };
+
+  // Use the Line chart component instead of Column
+  return <Line {...config} />;
+};
+
 
   const toggleDropdown = () => setShowDropdown(prev => !prev);
 
@@ -348,12 +350,18 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
         >
           What does this tool do?
         </Heading>
+        <Box
+        bg="blue" // Gray background
+        borderRadius="md" // Rounded corners
+        padding={2} // Padding inside the box
+      >
         <IconButton
           onClick={toggleCollapse}
           icon={show ? <ChevronUpIcon /> : <ChevronDownIcon />}
           variant="ghost"
           aria-label="Toggle Instructions"
         />
+      </Box>
       </Flex>
 
       <Collapse in={show}>
@@ -464,6 +472,19 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
     >
       <Text as="span" fontWeight="bold" textDecoration="underline">
         Remove All
+      </Text>
+    </MenuItem>
+    <MenuItem
+      onClick={() => {
+        const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
+          acc[reviewer] = true;
+          return acc;
+        }, {} as ShowReviewerType); 
+        setShowReviewer(updatedReviewers);
+      }}
+    >
+      <Text as="span" fontWeight="bold" textDecoration="underline">
+        Select All
       </Text>
     </MenuItem>
 
