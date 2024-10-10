@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation";
 import AllLayout from "@/components/Layout";
 import Dashboard from "@/components/Dashboard"
 import Head from "next/head"
+import ViewsShare from "@/components/ViewsNShare";
 
 
 const Dasboard = () => {
@@ -59,7 +60,7 @@ const Dasboard = () => {
                 </title>
             </Head>
       <Dashboard/>
-    
+      <ViewsShare path={'/home'}/>
     </AllLayout>
   );
 };
