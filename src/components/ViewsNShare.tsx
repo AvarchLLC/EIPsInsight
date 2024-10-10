@@ -41,7 +41,7 @@ const ViewsShare: React.FC<ViewsShareProps> = ({ path }) => {
       <Box className="flex space-x-8 rounded-full px-8 py-4 my-3" bg={bg}>
         <div className="flex space-x-4">
           <AiFillEye size={25} />
-          <span>{viewCount}</span> {/* Display the updated view count */}
+          <span>{viewCount+10000}</span> {/* Display the updated view count */}
         </div>
         <button onClick={handleCopyClick}>
           <div className="hover:110 duration-200">

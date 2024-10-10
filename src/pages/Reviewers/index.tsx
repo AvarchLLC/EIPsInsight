@@ -6,7 +6,7 @@ import LoaderComponent from "@/components/Loader";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { CSVLink } from "react-csv";
 import {ChevronUpIcon } from "@chakra-ui/icons";
-import { Line } from '@ant-design/charts';  // Import the Line chart component
+// import { Line } from '@ant-design/charts';  // Import the Line chart component
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -28,7 +28,7 @@ const ReviewTracker = () => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'eips' | 'ercs' | 'rips'>('eips');
   const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
 
   const toggleCollapse = () => setShow(!show);
 
@@ -200,8 +200,6 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
 
 const renderChart = () => {
   const dataToUse = data;
-  
-  // Filter the data to only include checked reviewers
   const filteredData = dataToUse.filter(item =>
     Object.keys(showReviewer)
       .filter(reviewer => showReviewer[reviewer]) // Only checked reviewers
@@ -214,31 +212,31 @@ const renderChart = () => {
 
   const config = {
     data: sortedData,
-    xField: "monthYear",               // X-axis will represent the month and year
-    yField: "count",                   // Y-axis will represent the count
-    seriesField: "reviewer",            // Each line represents a different reviewer
-    smooth: true,                      // Smooth the lines for better visualization
+    xField: "monthYear",
+    yField: "count",
+    colorField: "reviewer",
+    seriesField: "reviewer",
+    isGroup: true,
+    columnStyle: {
+      radius: [20, 20, 0, 0],
+    },
     slider: {
       start: 0,
       end: 1,
     },
-    legend: { position: "top-right" as const },  // Position of the legend
-    lineStyle: {
-      lineWidth: 2,                   // Customize line thickness
+    legend: { position: "top-right" as const },
+    smooth: true,
+    label: {
+      position: "middle" as const,
+      style: {
+        fill: "#FFFFFF",
+        opacity: 0.6,
+      },
     },
-    // label: {
-    //   position: "middle" as const,    // Label inside the line
-    //   style: {
-    //     fill: "#FFFFFF",
-    //     opacity: 0.6,
-    //   },
-    // },
   };
 
-  // Use the Line chart component instead of Column
-  return <Line {...config} />;
+  return <Column {...config} />;
 };
-
 
   const toggleDropdown = () => setShowDropdown(prev => !prev);
 
@@ -347,8 +345,7 @@ const renderChart = () => {
           size="lg"
           marginBottom={4}
           color={useColorModeValue("#3182CE", "blue.300")}
-        >
-          What does this tool do?
+        > Reviewers Tracker FAQ
         </Heading>
         <Box
         bg="blue" // Gray background
@@ -365,6 +362,14 @@ const renderChart = () => {
       </Flex>
 
       <Collapse in={show}>
+      <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          What does this tool do?
+        </Heading>
         <Text
           fontSize="md"
           marginBottom={2}

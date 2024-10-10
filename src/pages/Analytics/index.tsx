@@ -938,7 +938,7 @@ while (openDate < endDate) {
           marginBottom={4}
           color={useColorModeValue("#3182CE", "blue.300")}
         >
-          What does this tool do?
+         Analytics FAQ
         </Heading>
         <Box
         bg="blue" // Gray background
@@ -955,6 +955,14 @@ while (openDate < endDate) {
       </Flex>
 
       <Collapse in={show}>
+      <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          What does this tool do?
+        </Heading>
         <Text
           fontSize="md"
           marginBottom={2}
