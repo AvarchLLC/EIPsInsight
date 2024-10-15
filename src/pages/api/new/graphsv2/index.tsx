@@ -46,16 +46,16 @@ const statusChangeSchema = new mongoose.Schema({
   },
 });
 const EipStatusChange =
-  mongoose.models.EipStatusChange ||
-  mongoose.model("EipStatusChange", statusChangeSchema, "eipstatuschanges");
+  mongoose.models.EipStatusChange2 ||
+  mongoose.model("EipStatusChange2", statusChangeSchema, "eipstatuschange2");
 
 const ErcStatusChange =
-  mongoose.models.ErcStatusChange ||
-  mongoose.model("ErcStatusChange", statusChangeSchema, "ercstatuschanges");
+  mongoose.models.ErcStatusChange2 ||
+  mongoose.model("ErcStatusChange2", statusChangeSchema, "ercstatuschange2");
 
 const RipStatusChange =
-  mongoose.models.RipStatusChange ||
-  mongoose.model("RipStatusChange", statusChangeSchema, "ripstatuschanges");
+  mongoose.models.RipStatusChange2 ||
+  mongoose.model("RipStatusChange2", statusChangeSchema, "ripstatuschange2");
 
 export default async (req: Request, res: Response) => {
   try {
