@@ -1,0 +1,16 @@
+[package]
+name = "eip-board"
+version = "0.1.0"
+edition = "2021"
+license = "MPL-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+askama = "0.12.1"
+chrono = "0.4.38"
+eipw-preamble = "0.1.0"
+octocrab = { git = "https://github.com/XAMPPRocky/octocrab.git", rev = "1addb73fba36420d50cb5587d10a42b3743ae596" }
+regex = "1.10.4"
+reqwest = "0.12.4"
+tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread"] }

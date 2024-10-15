@@ -941,17 +941,22 @@ while (openDate < endDate) {
          Analytics FAQ
         </Heading>
         <Box
-        bg="blue" // Gray background
-        borderRadius="md" // Rounded corners
-        padding={2} // Padding inside the box
-      >
-        <IconButton
-          onClick={toggleCollapse}
-          icon={show ? <ChevronUpIcon /> : <ChevronDownIcon />}
-          variant="ghost"
-          aria-label="Toggle Instructions"
-        />
-      </Box>
+  bg="blue" // Gray background
+  borderRadius="md" // Rounded corners
+  padding={2} // Padding inside the box
+>
+  <IconButton
+    onClick={toggleCollapse}
+    icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+    variant="ghost"
+    aria-label="Toggle Instructions"
+    _hover={{ bg: 'blue' }} // Maintain background color on hover
+    _active={{ bg: 'blue' }} // Maintain background color when active
+    _focus={{ boxShadow: 'none' }} // Remove focus outline
+  />
+</Box>
+
+
       </Flex>
 
       <Collapse in={show}>

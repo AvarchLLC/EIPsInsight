@@ -66,9 +66,9 @@ const Resource = () => {
     </Text>
     <Text className="text-xl text-left text-justify">
       EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of 
-      <a href="https://github.com/ethereum/EIPs" className="underline" target="_blank" style={{ color: "lightblue" }}> Ethereum Improvement Proposal (EIP)</a>, 
-      <a href="https://github.com/ethereum/ERCs" className="underline" target="_blank" style={{ color: "lightblue" }}> Ethereum Request for Comments (ERCs)</a>, and 
-      <a href="https://github.com/ethereum/RIPs" className="underline" target="_blank" style={{ color: "lightblue" }}> Rollup Improvement Proposals (RIPs)</a> over a specified period. 
+      <a href="https://github.com/ethereum/EIPs" className="underline" target="_blank" style={{ color: "blue" }}> Ethereum Improvement Proposal (EIP)</a>, 
+      <a href="https://github.com/ethereum/ERCs" className="underline" target="_blank" style={{ color: "blue" }}> Ethereum Request for Comments (ERCs)</a>, and 
+      <a href="https://github.com/ethereum/RIPs" className="underline" target="_blank" style={{ color: "blue" }}> Rollup Improvement Proposals (RIPs)</a> over a specified period. 
       Data provided is used for tracking the progress and workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
     </Text>
 
@@ -82,129 +82,220 @@ const Resource = () => {
     Featured Blogs
   </Text>
   <Box className="w-3/4 mx-auto"> {/* Width set to 75% of the screen */}
-  <Carousel showThumbs={false} autoPlay infiniteLoop>
-  <a
-    href="https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
-    target="_blank"
-  >
-    <Image
-      src="/resources1.jpg"
-      alt="Blog 1"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
-  <a
-    href="https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
-    target="_blank"
-  >
-    <Image
-      src="/resources2.jpg"
-      alt="Blog 2"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
-  <a
-    href="https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
-    target="_blank"
-  >
-    <Image
-      src="/resources3.jpg"
-      alt="Blog 3"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
-  <a
-    href="https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
-    target="_blank"
-  >
-    <Image
-      src="/resources7.png" // Replace with the appropriate image source
-      alt="Blog 7"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
-  <a
-    href="https://etherworld.co/2024/01/09/eip-7045/"
-    target="_blank"
-  >
-    <Image
-      src="/resources9.jpg" // Replace with the appropriate image source
-      alt="Blog 9"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
-  <a
-    href="https://etherworld.co/2024/01/08/eip-1153-and-transient-storage/"
-    target="_blank"
-  >
-    <Image
-      src="/resources10.png" // Replace with the appropriate image source
-      alt="Blog 10"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
-  <a
-    href="https://etherworld.co/2023/11/15/eip-5656-mcopy-an-efficient-evm-instruction/"
-    target="_blank"
-  >
-    <Image
-      src="/resources12.png" // Replace with the appropriate image source
-      alt="Blog 10"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
-  {/* <a
-    href="https://etherworld.co/2023/11/13/eip-4844-explored-the-future-of-shard-blob-transactions-in-ethereum/"
-    target="_blank"
-  >
-    <Image
-      src="/resources13.jpg" // Replace with the appropriate image source
-      alt="Blog 10"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a> */}
-  <a
-    href="https://etherworld.co/2023/01/06/eip-721-non-fungible-token-standard/"
-    target="_blank"
-  >
-    <Image
-      src="/resources14.png" // Replace with the appropriate image source
-      alt="Blog 10"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
-  <a
-    href="https://etherworld.co/2022/12/13/transient-storage-for-beginners/"
-    target="_blank"
-  >
-    <Image
-      src="/resources15.jpg" // Replace with the appropriate image source
-      alt="Blog 10"
-      layout="responsive"
-      width={100}
-      height={50}
-    />
-  </a>
- 
+  <Carousel 
+  showThumbs={false} 
+  autoPlay 
+  infiniteLoop 
+  showStatus={false} 
+  showIndicators={false} 
+  centerMode 
+  centerSlidePercentage={40}
+  renderArrowPrev={(onClickHandler, hasPrev, label) =>
+    hasPrev && (
+      <button
+        type="button"
+        onClick={onClickHandler}
+        title={label}
+        style={{
+          position: 'absolute',
+          zIndex: 2,
+          top: 'calc(50% - 15px)',
+          left: '0',
+          width: '30px',
+          height: '30px',
+          background: 'rgba(0, 0, 0, 0.5)',
+          border: 'none',
+          color: 'white',
+          fontSize: '20px',
+          cursor: 'pointer',
+          borderRadius: '50%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          opacity: 1
+        }}
+      >
+        &#10094;
+      </button>
+    )
+  }
+  renderArrowNext={(onClickHandler, hasNext, label) =>
+    hasNext && (
+      <button
+        type="button"
+        onClick={onClickHandler}
+        title={label}
+        style={{
+          position: 'absolute',
+          zIndex: 2,
+          top: 'calc(50% - 15px)',
+          right: '0',
+          width: '30px',
+          height: '30px',
+          background: 'rgba(0, 0, 0, 0.5)',
+          border: 'none',
+          color: 'white',
+          fontSize: '20px',
+          cursor: 'pointer',
+          borderRadius: '50%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          opacity: 1
+        }}
+      >
+        &#10095;
+      </button>
+    )
+  }
+>
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources1.jpg"
+        alt="Blog 1"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
+
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources2.jpg"
+        alt="Blog 2"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
+
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources3.jpg"
+        alt="Blog 3"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
+
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources7.png"
+        alt="Blog 7"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
+
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2024/01/09/eip-7045/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources9.jpg"
+        alt="Blog 9"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
+
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2024/01/08/eip-1153-and-transient-storage/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources10.png"
+        alt="Blog 10"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
+
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2023/11/15/eip-5656-mcopy-an-efficient-evm-instruction/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources12.png"
+        alt="Blog 12"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
+
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2023/01/06/eip-721-non-fungible-token-standard/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources14.png"
+        alt="Blog 14"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
+
+  <div style={{ padding: '0 10px' }}>
+    <a
+      href="https://etherworld.co/2022/12/13/transient-storage-for-beginners/"
+      target="_blank"
+      style={{ display: 'block', textAlign: 'center' }}
+    >
+      <Image
+        src="/resources15.jpg"
+        alt="Blog 15"
+        width={500} 
+        height={300}
+        style={{ width: '100%', height: '250px', objectFit: 'cover' }}
+      />
+    </a>
+  </div>
 </Carousel>
+
+
+
 
   </Box>
 </Box>
@@ -238,8 +329,8 @@ const Resource = () => {
     </ul>
 
     <Text className="text-xl text-left mt-6 text-justify">
-      At EIPsInsight, we believe in the power of open-source collaboration and the continuous improvement of the Ethereum network.  
-      <a href="https://x.com/TeamAvarch" className="underline" target="_blank" style={{ color: "lightblue" }}>Join us</a> in exploring the future of Ethereum, one proposal at a time.
+      At EIPsInsight, we believe in the power of open-source collaboration and the continuous improvement of the Ethereum network.{" "}  
+      <a href="https://x.com/TeamAvarch" className="underline" target="_blank" style={{ color: "blue" }}>Join us</a> in exploring the future of Ethereum, one proposal at a time.
     </Text>
   </Box>
 </Box>

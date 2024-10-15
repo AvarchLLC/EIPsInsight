@@ -472,10 +472,68 @@ const All = () => {
   showThumbs={false} 
   autoPlay 
   infiniteLoop 
-  showStatus={false} // Hides the status (dots)
-  showIndicators={false} // Hides the indicators (dots)
-  centerMode // Enables center mode to show multiple items
-  centerSlidePercentage={40} // Ensures 3 items are visible at a time
+  showStatus={false} 
+  showIndicators={false} 
+  centerMode 
+  centerSlidePercentage={40}
+  renderArrowPrev={(onClickHandler, hasPrev, label) =>
+    hasPrev && (
+      <button
+        type="button"
+        onClick={onClickHandler}
+        title={label}
+        style={{
+          position: 'absolute',
+          zIndex: 2,
+          top: 'calc(50% - 15px)',
+          left: '0',
+          width: '30px',
+          height: '30px',
+          background: 'rgba(0, 0, 0, 0.5)',
+          border: 'none',
+          color: 'white',
+          fontSize: '20px',
+          cursor: 'pointer',
+          borderRadius: '50%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          opacity: 1
+        }}
+      >
+        &#10094;
+      </button>
+    )
+  }
+  renderArrowNext={(onClickHandler, hasNext, label) =>
+    hasNext && (
+      <button
+        type="button"
+        onClick={onClickHandler}
+        title={label}
+        style={{
+          position: 'absolute',
+          zIndex: 2,
+          top: 'calc(50% - 15px)',
+          right: '0',
+          width: '30px',
+          height: '30px',
+          background: 'rgba(0, 0, 0, 0.5)',
+          border: 'none',
+          color: 'white',
+          fontSize: '20px',
+          cursor: 'pointer',
+          borderRadius: '50%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          opacity: 1
+        }}
+      >
+        &#10095;
+      </button>
+    )
+  }
 >
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', margin: '0 10px' }}>
     <a
