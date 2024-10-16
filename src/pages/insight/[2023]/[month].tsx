@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
-import { Box, Grid, useColorModeValue, Text, Heading } from "@chakra-ui/react";
+import { 
+  Box, 
+  Grid, 
+  useColorModeValue, 
+  Text, 
+  Heading, 
+  useDisclosure,
+  IconButton,
+  Flex,
+  Collapse,
+} from "@chakra-ui/react";
 import CustomBox from "@/components/CustomBox";
 import OtherBox from "@/components/OtherStats";
 import { PieC } from "@/components/InPie";
@@ -14,6 +24,8 @@ import StackedColumnChart from "@/components/DraftBarChart";
 import NextLink from "next/link";
 import InsightDoughnut from "@/components/InsightDoughnut";
 import InsightSummary from "@/components/InsightSummaryTable";
+import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+
 interface StatusChange {
   _id: string;
   count: number;
@@ -82,6 +94,11 @@ const Month = () => {
   const [data, setData] = useState<APIData>(); // Set initial state as an empty array
   const [type, setType] = useState("EIPs"); // Set initial state as an empty array
   const path = usePathname();
+
+  const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
+  const [show, setShow] = useState(false);
+
+  const toggleCollapse = () => setShow(!show);
 
   let year = "";
   let month = "";
@@ -183,15 +200,35 @@ const Month = () => {
     borderRadius="md"
     marginBottom={8}
   >
-    <Heading
-      as="h3"
-      size="lg"
-      marginBottom={4}
-      color={useColorModeValue("#3182CE", "blue.300")}
-    >
-      Understanding EIPS Insight Summary
-    </Heading>
 
+    <Flex justify="space-between" align="center">
+        <Heading
+          as="h3"
+          size="lg"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          EIPS Insight FAQ
+        </Heading>
+        <Box
+  bg="blue" // Gray background
+  borderRadius="md" // Rounded corners
+  padding={2} // Padding inside the box
+>
+  <IconButton
+    onClick={toggleCollapse}
+    icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+    variant="ghost"
+    aria-label="Toggle Instructions"
+    _hover={{ bg: 'blue' }} // Maintain background color on hover
+    _active={{ bg: 'blue' }} // Maintain background color when active
+    _focus={{ boxShadow: 'none' }} // Remove focus outline
+  />
+</Box>
+
+
+      </Flex>
+      <Collapse in={show}>
     <Text
       fontSize="md"
       marginBottom={2}
@@ -207,6 +244,7 @@ const Month = () => {
     >
       <strong>Graph Breakdown:</strong> Each graph focuses on a specific status, such as "Draft" or "Final." Within each status, the columns show the data divided by individual categories, giving you a clear breakdown of how many EIPs from each category transitioned to that status.
       </Text>
+      </Collapse>
   </Box>
 
 

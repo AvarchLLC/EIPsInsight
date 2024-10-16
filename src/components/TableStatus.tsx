@@ -59,6 +59,7 @@ interface EIP {
   discussion: string;
   deadline: string;
   requires: string;
+  repo:string;
   unique_ID: number;
   __v: number;
 }
@@ -137,7 +138,11 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
         const jsonData = await response.json();
         if (cat === "ERC") {
           setData(jsonData.erc);
-        } else {
+        } 
+        else if( cat==="Meta"){
+          setData(jsonData.eip.concat(jsonData.erc));
+        }
+        else {
           setData(jsonData.eip);
         }
         setIsLoading(false); // Set isLoading to false after data is fetched
@@ -170,13 +175,14 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
 
   const filteredData = data
     .map((item: any) => {
-      const { eip, title, author, status, type, category, mergedYear, mergedMonth } = item;
+      const { eip, title, author, status, type, category, mergedYear, mergedMonth, repo } = item;
       return {
         eip,
         title,
         author,
         status,
         type,
+        repo,
         category,
         mergedYear,
         mergedMonth
@@ -501,7 +507,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${cat === "ERC"|| item.repo==='erc' ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -514,7 +520,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${cat === "ERC" || item.repo==='erc'? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -532,7 +538,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/eips/eip-${item.eip}`}
+                        href={`/${cat === "ERC" || item.repo==='erc'? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"

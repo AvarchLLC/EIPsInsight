@@ -226,13 +226,13 @@ const renderChart = () => {
     },
     legend: { position: "top-right" as const },
     smooth: true,
-    label: {
-      position: "middle" as const,
-      style: {
-        fill: "#FFFFFF",
-        opacity: 0.6,
-      },
-    },
+    // label: {
+    //   position: "middle" as const,
+    //   style: {
+    //     fill: "#FFFFFF",
+    //     opacity: 0.6,
+    //   },
+    // },
   };
 
   return <Column {...config} />;

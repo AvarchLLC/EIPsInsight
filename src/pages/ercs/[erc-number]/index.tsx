@@ -73,6 +73,11 @@ const TestComponent = () => {
     if (!ercNo) return;
 
     let _markdownFileURL = `https://raw.githubusercontent.com/ethereum/ERCs/master/ERCS/erc-${ercNo}.md`;
+
+    if(ercNo==='1'){
+      _markdownFileURL = `https://raw.githubusercontent.com/ethereum/ERCs/master/ERCS/eip-${ercNo}.md`;
+    }
+
     setMarkdownFileURL(_markdownFileURL);
 
     try {
