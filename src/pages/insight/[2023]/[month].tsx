@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
-import { Box, Grid, useColorModeValue, Text, Heading } from "@chakra-ui/react";
+import { 
+  Box, 
+  Grid, 
+  useColorModeValue, 
+  Text, 
+  Heading, 
+  useDisclosure,
+  IconButton,
+  Flex,
+  Collapse,
+} from "@chakra-ui/react";
 import CustomBox from "@/components/CustomBox";
 import OtherBox from "@/components/OtherStats";
 import { PieC } from "@/components/InPie";
@@ -14,6 +24,9 @@ import StackedColumnChart from "@/components/DraftBarChart";
 import NextLink from "next/link";
 import InsightDoughnut from "@/components/InsightDoughnut";
 import InsightSummary from "@/components/InsightSummaryTable";
+import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import InsightStats from "@/components/InsightStats";
+
 interface StatusChange {
   _id: string;
   count: number;
@@ -82,6 +95,11 @@ const Month = () => {
   const [data, setData] = useState<APIData>(); // Set initial state as an empty array
   const [type, setType] = useState("EIPs"); // Set initial state as an empty array
   const path = usePathname();
+
+  const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
+  const [show, setShow] = useState(false);
+
+  const toggleCollapse = () => setShow(!show);
 
   let year = "";
   let month = "";
@@ -183,15 +201,35 @@ const Month = () => {
     borderRadius="md"
     marginBottom={8}
   >
-    <Heading
-      as="h3"
-      size="lg"
-      marginBottom={4}
-      color={useColorModeValue("#3182CE", "blue.300")}
-    >
-      Understanding EIPS Insight Summary
-    </Heading>
 
+    <Flex justify="space-between" align="center">
+        <Heading
+          as="h3"
+          size="lg"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          EIPS Insight FAQ
+        </Heading>
+        <Box
+  bg="blue" // Gray background
+  borderRadius="md" // Rounded corners
+  padding={2} // Padding inside the box
+>
+  <IconButton
+    onClick={toggleCollapse}
+    icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+    variant="ghost"
+    aria-label="Toggle Instructions"
+    _hover={{ bg: 'blue' }} // Maintain background color on hover
+    _active={{ bg: 'blue' }} // Maintain background color when active
+    _focus={{ boxShadow: 'none' }} // Remove focus outline
+  />
+</Box>
+
+
+      </Flex>
+      <Collapse in={show}>
     <Text
       fontSize="md"
       marginBottom={2}
@@ -207,80 +245,13 @@ const Month = () => {
     >
       <strong>Graph Breakdown:</strong> Each graph focuses on a specific status, such as "Draft" or "Final." Within each status, the columns show the data divided by individual categories, giving you a clear breakdown of how many EIPs from each category transitioned to that status.
       </Text>
+      </Collapse>
   </Box>
 
 
               <InsightSummary />
-              {/* <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold pb-8">
-                <button
-                  onClick={() => {
-                    setTypeData(data?.eip || []);
-                    setType("EIPs");
-                  }}
-                  className={
-                    type === "EIPs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
-                  }
-                >
-                  EIPs Insight
-                </button>
-                <button
-                  onClick={() => {
-                    setTypeData(data?.erc || []);
-                    setType("ERCs");
-                  }}
-                  className={
-                    type === "ERCs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
-                  }
-                >
-                  ERCs Insight
-                </button>
-                <button
-                  onClick={() => {
-                    setTypeData(data?.rip || []);
-                    setType("RIPs");
-                  }}
-                  className={
-                    type === "RIPs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
-                  }
-                >
-                  RIPs Insight
-                </button>
-              </Box>
-              {typeData.length === 0 ? (
-                <>
-                  <Box paddingY={8}>
-                    <p className={"text-2xl"}>
-                      There is no data available for this month. Would you like
-                      to see{" "}
-                      <NextLink href={`/insight/2023/12`}>
-                        <span className={"text-blue-400 font-bold"}>
-                          December 2023
-                        </span>
-                      </NextLink>{" "}
-                      insights?
-                    </p>
-                  </Box>
-                </>
-              ) : (
-                <Box
-                  className={
-                    "justify-center gap-8 w-full grid grid-cols-2 mt-8"
-                  }
-                >
-                  <Box>
-                    <CustomBox
-                      type={type}
-                      data={typeData}
-                      per={total}
-                      year={year}
-                      month={month}
-                    />
-                  </Box>
-                  <Box>
-                    <InsightDoughnut data={typeData} />
-                  </Box>
-                </Box>`
-              )} */}
+              {/* Defining the stats table here */}
+              {/* <InsightStats/> */}
 
               <Text
                 fontSize="3xl"

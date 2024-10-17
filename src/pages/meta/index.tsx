@@ -36,7 +36,7 @@ const Meta = () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData.eip);
+        setData(jsonData.eip.concat(jsonData.erc));
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -91,11 +91,11 @@ const Meta = () => {
                 subtitle="Meta EIPs describe changes to the EIP process, or other non optional changes."
               />
             </FlexBetween>
-            <Box mt={2}>
+            {/* <Box mt={2}>
               <p className="text-gray-500 italic">
                 * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can be varied by 1.
               </p>
-            </Box>
+            </Box> */}
             <TableStatus cat="Meta" />
             {/* <LineStatus cat="Meta" /> */}
           </Box>

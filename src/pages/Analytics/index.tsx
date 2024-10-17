@@ -853,7 +853,19 @@ while (openDate < endDate) {
                       value: `${Math.abs(count)}`, // Adjust hover display for bar chart
                   }),
               },
-                
+              color: (datum: any) => {
+                switch (datum.type) {
+                    case 'Closed':
+                        return '#ff4d4d'; // Soft red
+                    case 'Merged':
+                        return '#4caf50'; // Balanced green
+                    case 'Created':
+                        return '#2196f3'; // Medium blue
+                    default:
+                        return 'defaultColor';
+                }
+            }
+              
             },
             {
                 geometry: 'line', // Line chart for trend (Created)

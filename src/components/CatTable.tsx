@@ -45,6 +45,7 @@ interface EIP {
   discussion: string;
   deadline: string;
   requires: string;
+  repo:string;
   unique_ID: number;
   __v: number;
 }
@@ -56,10 +57,11 @@ interface TabProps {
 
 interface TableProps {
   cat: string;
+  repo:string;
   status: string;
 }
 
-const CatTable: React.FC<TableProps> = ({ cat, status }) => {
+const CatTable: React.FC<TableProps> = ({ cat, status, repo }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -106,11 +108,12 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
   const filteredData = data
     .filter((item) => item.category === cat && item.status === status)
     .map((item) => {
-      const { eip, title, author } = item;
+      const { eip, title, author, repo } = item;
       return {
         eip,
         title,
         author,
+        repo,
       };
     });
 
@@ -193,7 +196,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/eips/eip-${item.eip}`}>
+                      <Link href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -206,7 +209,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -224,7 +227,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}
+                        href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
