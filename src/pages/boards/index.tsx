@@ -132,8 +132,7 @@ import {
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          The table below lists all Open Pull Requests (till date) in order of wait
-          time (longest wait first).
+          The table below lists all Open Pull Requests (till date) in a order such that it uses oldest author interaction after the most recent editor response.
         </Text>
         <Text
           fontSize="md"
@@ -245,7 +244,7 @@ import {
   boxShadow="md"
   maxHeight="900px"
 >
-  <Table variant="striped" colorScheme="gray" size="lg" mt={4} borderRadius="md" boxShadow="md" width="100%">
+  <Table variant="striped" colorScheme="blue" size="lg" mt={4} borderRadius="md" boxShadow="md" width="100%">
     <Thead bg="#171923">
       <Tr>
         <Th textAlign="center" borderTopLeftRadius="10px" minWidth="6rem" color="white">

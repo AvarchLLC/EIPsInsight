@@ -25,6 +25,7 @@ import NextLink from "next/link";
 import InsightDoughnut from "@/components/InsightDoughnut";
 import InsightSummary from "@/components/InsightSummaryTable";
 import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import InsightStats from "@/components/InsightStats";
 
 interface StatusChange {
   _id: string;
@@ -249,76 +250,8 @@ const Month = () => {
 
 
               <InsightSummary />
-              {/* <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold pb-8">
-                <button
-                  onClick={() => {
-                    setTypeData(data?.eip || []);
-                    setType("EIPs");
-                  }}
-                  className={
-                    type === "EIPs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
-                  }
-                >
-                  EIPs Insight
-                </button>
-                <button
-                  onClick={() => {
-                    setTypeData(data?.erc || []);
-                    setType("ERCs");
-                  }}
-                  className={
-                    type === "ERCs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
-                  }
-                >
-                  ERCs Insight
-                </button>
-                <button
-                  onClick={() => {
-                    setTypeData(data?.rip || []);
-                    setType("RIPs");
-                  }}
-                  className={
-                    type === "RIPs" ? "bg-blue-400 px-4 py-2 rounded-xl" : ""
-                  }
-                >
-                  RIPs Insight
-                </button>
-              </Box>
-              {typeData.length === 0 ? (
-                <>
-                  <Box paddingY={8}>
-                    <p className={"text-2xl"}>
-                      There is no data available for this month. Would you like
-                      to see{" "}
-                      <NextLink href={`/insight/2023/12`}>
-                        <span className={"text-blue-400 font-bold"}>
-                          December 2023
-                        </span>
-                      </NextLink>{" "}
-                      insights?
-                    </p>
-                  </Box>
-                </>
-              ) : (
-                <Box
-                  className={
-                    "justify-center gap-8 w-full grid grid-cols-2 mt-8"
-                  }
-                >
-                  <Box>
-                    <CustomBox
-                      type={type}
-                      data={typeData}
-                      per={total}
-                      year={year}
-                      month={month}
-                    />
-                  </Box>
-                  <Box>
-                    <InsightDoughnut data={typeData} />
-                  </Box>
-                </Box>`
-              )} */}
+              {/* Defining the stats table here */}
+              {/* <InsightStats/> */}
 
               <Text
                 fontSize="3xl"
