@@ -57,11 +57,11 @@ interface TabProps {
 
 interface TableProps {
   cat: string;
-  repo:string;
+  // repo:string;
   status: string;
 }
 
-const CatTable: React.FC<TableProps> = ({ cat, status, repo }) => {
+const CatTable: React.FC<TableProps> = ({ cat, status }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);

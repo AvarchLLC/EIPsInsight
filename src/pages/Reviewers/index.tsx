@@ -6,10 +6,14 @@ import LoaderComponent from "@/components/Loader";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { CSVLink } from "react-csv";
 import {ChevronUpIcon } from "@chakra-ui/icons";
+import DateTime from "@/components/DateTime";
+// import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
+const Bar = dynamic(() => import("@ant-design/plots").then(mod => mod.Bar), { ssr: false });
+
 
 const API_ENDPOINTS = {
   eips: '/api/editorsprseips',
@@ -173,6 +177,141 @@ type GroupedData = {
   };
 };
 
+interface PRData {
+  monthYear: string;
+  prs: { reviewer: string; prCount: number }[];
+}
+
+interface LeaderboardChartsProps {
+  data: PRData[];
+  selectedYear: string;
+  selectedMonth: string;
+  renderTable: (year: string, month: string) => JSX.Element;
+}
+
+const getYearlyData = (data: PRData[]) => {
+  const yearlyData: Record<string, number> = data
+    .filter(item => {
+      // Extract the year from 'monthYear' and check if it falls between 2015 and 2024
+      const itemYear = parseInt(item.monthYear.split('-')[0], 10);
+      return itemYear >= 2015 && itemYear <= 2024;
+    })
+    .flatMap(item => item.prs)
+    .reduce((acc, item) => {
+      acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+  // Sort the data by PR counts in decreasing order
+  const sortedYearlyData = Object.entries(yearlyData)
+    .sort(([, a], [, b]) => b - a) // Sort by count in decreasing order
+    .reduce((acc, [reviewer, count]) => {
+      acc[reviewer] = count;
+      return acc;
+    }, {} as Record<string, number>);
+
+  console.log("Combined data from 2015 to 2024:", sortedYearlyData);
+  return sortedYearlyData;
+};
+
+
+// Function to filter PR data for the selected month and year
+const getMonthlyData = (data: PRData[], year: string, month: string) => {
+  const monthlyData: Record<string, number> = data
+    .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)
+    .flatMap(item => item.prs)
+    .reduce((acc, item) => {
+      acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const sortedMonthlyData = Object.entries(monthlyData)
+    .sort(([, a], [, b]) => b - a) // Sort by count in decreasing order
+    .reduce((acc, [reviewer, count]) => {
+      acc[reviewer] = count;
+      return acc;
+    }, {} as Record<string, number>);
+
+  console.log("Year 2024, month 10:", sortedMonthlyData);
+  return sortedMonthlyData;
+};
+
+// Function to format data into chart-friendly format
+const formatChartData = (rawData: Record<string, number>) => {
+  return Object.entries(rawData).map(([reviewer, count]) => ({
+    reviewer,
+    count,
+  }));
+};
+
+// Function to configure the Bar chart
+// Initialize a global or shared map for reviewer colors
+const reviewerColorsMap: Record<string, string> = {};
+
+const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => {
+  return {
+    data: chartData,
+    xField: "count",
+    yField: "reviewer",
+    color: (datum: any) => reviewerColorsMap[(datum as { reviewer: string }).reviewer],
+    barWidthRatio: 0.8,
+    label: {
+      position: "middle" as const,
+      style: { fill: "#FFFFFF", opacity: 0.7 },
+    },
+    yAxis: {
+      label: {
+        formatter: (reviewer: string) => reviewer, // Display reviewer names on Y-axis
+      },
+    },
+    annotations: chartData.map((datum) => ({
+      type: 'html',
+      position: { count: datum.count, reviewer: datum.reviewer }, // Correcting position
+      html: `
+        <div style="text-align: center;">
+          <img src="https://github.com/${datum.reviewer}.png?size=24" 
+               style="margin-left:1px; width: 24px; height: 24px; border-radius: 50%;" />
+        </div>
+      `,
+      offsetY: -12, // Adjust the vertical position to place above the bar
+    })),
+  };
+};
+
+
+
+
+// // Function to render Leaderboard Charts
+const renderCharts = (data: PRData[], selectedYear: string, selectedMonth: string) => {
+  const yearlyData = getYearlyData(data);
+  const monthlyData = getMonthlyData(data, selectedYear, selectedMonth);
+
+  const yearlyChartData = formatChartData(yearlyData);
+  const monthlyChartData = formatChartData(monthlyData);
+
+  return (
+    <Box padding="2rem">
+      <Flex direction={{ base: "column", md: "row" }} justifyContent="space-between">
+        {/* Yearly Leaderboard Chart */}
+        <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+          <Heading size="md" marginBottom="0.5rem">
+          {`${activeTab.toLocaleUpperCase()} Overall Leaderboard`}
+          </Heading>
+          <Bar {...getBarChartConfig(yearlyChartData)} />
+        </Box>
+
+        {/* Monthly Leaderboard Chart */}
+        <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+          <Heading size="md" marginBottom="0.5rem">
+            {`${activeTab.toLocaleUpperCase()} Leaderboard for ${selectedMonth.padStart(2, '0')}-${selectedYear}`}
+          </Heading>
+          <Bar {...getBarChartConfig(monthlyChartData)} />
+        </Box>
+      </Flex>
+    </Box>
+  );
+};
+
 const transformAndGroupData = (data: any[]): ReviewData[] => {
   const groupedData: GroupedData = data.reduce((acc, item) => {
     const { monthYear, reviewer, count, prs } = item;
@@ -196,47 +335,66 @@ const transformAndGroupData = (data: any[]): ReviewData[] => {
   );
 };
 
-
+type ReviewDatum = {
+  monthYear: string;
+  count: number;
+  reviewer: string;
+};
 
 const renderChart = () => {
-  const dataToUse = data;
+  const dataToUse = data; // Assuming 'data' is accessible in the scope
   const filteredData = dataToUse.filter(item =>
-    Object.keys(showReviewer)
-      .filter(reviewer => showReviewer[reviewer]) // Only checked reviewers
-      .includes(item.reviewer) // Assuming 'reviewer' is a key in your data
+    Object.keys(showReviewer) // Get the list of reviewers from showReviewer
+      .filter(reviewer => showReviewer[reviewer]) // Only include checked reviewers
+      .includes(item.reviewer) // Check if the item reviewer is in the list of checked reviewers
   );
 
-  // Transform and sort the filtered data
-  const transformedData = transformAndGroupData(filteredData);
-  const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
-
-  const config = {
-    data: sortedData,
-    xField: "monthYear",
-    yField: "count",
-    colorField: "reviewer",
-    seriesField: "reviewer",
-    isGroup: true,
-    columnStyle: {
-      radius: [20, 20, 0, 0],
-    },
-    slider: {
-      start: 0,
-      end: 1,
-    },
-    legend: { position: "top-right" as const },
-    smooth: true,
-    // label: {
-    //   position: "middle" as const,
-    //   style: {
-    //     fill: "#FFFFFF",
-    //     opacity: 0.6,
-    //   },
-    // },
+  const generateDistinctColor = (index: number, total: number) => {
+    const hue = (index * (360 / total)) % 360;  // Golden angle for better color distribution
+    return `hsl(${hue}, 85%, 50%)`; // High saturation and medium brightness for vibrancy
   };
 
+  // Assign colors if not already assigned
+  const reviewers = Array.from(new Set(filteredData.map(item => item.reviewer)));
+  const totalReviewers = reviewers.length;
+  filteredData.forEach((item, index) => {
+    if (!reviewerColorsMap[item.reviewer]) {
+      // Assign a new color only if the reviewer doesn't already have one
+      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
+    }
+  });
+
+  // Transform and group the filtered data based on your business logic
+  const transformedData = transformAndGroupData(filteredData);
+
+  // Sort the transformed data by monthYear
+  const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+
+  // Chart configuration
+  const config = {
+    data: sortedData as ReviewDatum[], // Ensure sortedData matches the expected type
+    xField: "monthYear", // X-axis field
+    yField: "count", // Y-axis field
+    color: (datum: any) => reviewerColorsMap[(datum as ReviewDatum).reviewer], // Typecast datum to ReviewDatum
+    seriesField: "reviewer", // Field for series grouping
+    isGroup: true, // Grouping behavior
+    columnStyle: {
+      radius: [20, 20, 0, 0], // Rounded corners
+    },
+    slider: {
+      start: 0, // Start of the slider
+      end: 1, // End of the slider
+    },
+    legend: { position: "top-right" as const }, // Legend position
+    smooth: true, // Smooth transition
+  };
+
+  // Render the Column chart with the provided config
   return <Column {...config} />;
 };
+
+
+
 
   const toggleDropdown = () => setShowDropdown(prev => !prev);
 
@@ -250,76 +408,108 @@ const renderChart = () => {
     return months.sort((a, b) => parseInt(a) - parseInt(b));
   };
 
+  
+
   const renderTable = (year: string, month: string, reviewerFilter: any) => {
     const filteredData = data
-      .filter(item => item.monthYear === `${year}-${month}`)
-      .filter(item => reviewerFilter[item.reviewer])
-      .flatMap(item => item.prs)
-      .reduce((acc: any[], pr) => {
-        if (!acc.some(existingPr => existingPr.prNumber === pr.prNumber)) {
-          acc.push(pr);
-        }
-        return acc;
-      }, []);
+        .filter(item => item.monthYear === `${year}-${month}`)
+        .filter(item => reviewerFilter[item.reviewer])
+        .flatMap(item => item.prs)
+        .reduce((acc: any[], pr) => {
+            if (!acc.some(existingPr => existingPr.prNumber === pr.prNumber)) {
+                acc.push(pr);
+            }
+            return acc;
+        }, []);
 
     return (
-      <Box mt={8} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
-        <Table variant="striped" colorScheme="blue">
-          <Thead bg="#2D3748">
-            <Tr>
-              <Th color="white" textAlign="center" borderTopLeftRadius="10px">PR Number</Th>
-              <Th color="white" textAlign="center">Title</Th>
-              <Th color="white" textAlign="center">Reviewed By</Th>
-              <Th color="white" textAlign="center">Review Date</Th>
-              <Th color="white" textAlign="center">Created Date</Th>
-              <Th color="white" textAlign="center">Closed Date</Th>
-              <Th color="white" textAlign="center">Merged Date</Th>
-              <Th color="white" textAlign="center">Status</Th>
-              <Th color="white" textAlign="center" borderTopRightRadius="10px">Link</Th>
-            </Tr>
-          </Thead>
-        </Table>
+        <Box mt={8} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
+            <Table variant="striped" colorScheme="blue" >
+                <Thead bg="#2D3748">
+                    <Tr>
+                        <Th color="white" textAlign="center" verticalAlign="middle"  borderTopLeftRadius="10px">
+                            PR Number
+                        </Th>
+                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                            Title
+                        </Th>
+                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                            Reviewed By
+                        </Th>
+                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                            Review Date
+                        </Th>
+                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                            Created Date
+                        </Th>
+                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                            Closed Date
+                        </Th>
+                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                            Merged Date
+                        </Th>
+                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                            Status
+                        </Th>
+                        <Th color="white" textAlign="center" verticalAlign="middle"  borderTopRightRadius="10px">
+                            Link
+                        </Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {filteredData.map((pr, index) => {
+                        const status = pr.merged_at
+                            ? 'Merged'
+                            : pr.closed_at
+                                ? 'Closed'
+                                : 'Open';
 
-        <Box overflowY="auto" maxHeight="400px" borderBottomRadius="0" borderTopWidth="1px" borderTopColor="gray.200">
-          <Table variant="striped" colorScheme="blue">
-            <Tbody>
-              {filteredData.map(pr => {
-                const status = pr.merged_at
-                  ? 'Merged'
-                  : pr.closed_at
-                  ? 'Closed'
-                  : 'Open';
-
-                return (
-                  <Tr key={pr.prNumber}>
-                    <Td textAlign="center">{pr.prNumber}</Td>
-                    <Td textAlign="center">{pr.prTitle}</Td>
-                    <Td textAlign="center">{pr.reviewer}</Td>
-                    <Td textAlign="center">{pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-'}</Td>
-                    <Td textAlign="center">{pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-'}</Td>
-                    <Td textAlign="center">{pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-'}</Td>
-                    <Td textAlign="center">{pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-'}</Td>
-                    <Td textAlign="center">{status}</Td>
-                    <Td textAlign="center">
-                      <Button
-                        as="a"
-                        href={`https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`}
-                        target="_blank"
-                        colorScheme="blue"
-                        variant="solid"
-                      >
-                        Pull Request
-                      </Button>
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
+                        return (
+                            <Tr key={pr.prNumber}> {/* Set border for rows */}
+                                <Td textAlign="center" verticalAlign="middle"  width="100px">
+                                    {pr.prNumber}
+                                </Td>
+                                <Td textAlign="center" verticalAlign="middle"  style={{ wordWrap: 'break-word', maxWidth: '200px' }}>
+                                    {pr.prTitle}
+                                </Td>
+                                <Td textAlign="center" verticalAlign="middle" >
+                                    {pr.reviewer}
+                                </Td>
+                                <Td textAlign="center" verticalAlign="middle" >
+                                    {pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-'}
+                                </Td>
+                                <Td textAlign="center" verticalAlign="middle" >
+                                    {pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-'}
+                                </Td>
+                                <Td textAlign="center" verticalAlign="middle" >
+                                    {pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-'}
+                                </Td>
+                                <Td textAlign="center" verticalAlign="middle" >
+                                    {pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-'}
+                                </Td>
+                                <Td textAlign="center" verticalAlign="middle" >
+                                    {status}
+                                </Td>
+                                <Td textAlign="center" verticalAlign="middle">
+                                    <Button
+                                        as="a"
+                                        href={`https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`}
+                                        target="_blank"
+                                        colorScheme="blue"
+                                        variant="solid"
+                                    >
+                                        Pull Request
+                                    </Button>
+                                </Td>
+                            </Tr>
+                        );
+                    })}
+                </Tbody>
+            </Table>
         </Box>
-      </Box>
     );
-  };
+};
+
 
   return (
     loading ? (
@@ -330,7 +520,7 @@ const renderChart = () => {
           <Heading
             size="xl"
             marginBottom={10}
-            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Reviewers Tracker</Heading>
+            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Editors Tracker</Heading>
 
 
 <Box
@@ -345,7 +535,7 @@ const renderChart = () => {
           size="lg"
           marginBottom={4}
           color={useColorModeValue("#3182CE", "blue.300")}
-        > Reviewers Tracker FAQ
+        > Editors Tracker FAQ
         </Heading>
         <Box
   bg="blue" // Gray background
@@ -448,80 +638,89 @@ const renderChart = () => {
         </Button>
       </Flex>
 
-      <Box>{renderChart()}</Box>
-      <Box mt={2}>
+      <Box padding={"2rem"} borderRadius={"0.55rem"}>
+            {renderChart()}
+            <Box className={"w-full"}>
+              <DateTime />
+            </Box>
+          </Box>
+      <Box>
       <Text color="gray.500" fontStyle="italic" textAlign="center">
           *Please note: The data is refreshed every 24 hours to ensure accuracy and up-to-date information*
         </Text>
-        </Box>
+      </Box>
       
       <br/>
       <Flex justify="center" mb={8}>
          {/* Reviewer Selection */}
+         <HStack spacing={4}>
          <Menu closeOnSelect={false}>
-  <MenuButton
-    as={Button}
-    rightIcon={<ChevronDownIcon />}
-    colorScheme="blue"
-  >
-    Reviewers
-  </MenuButton>
+          <MenuButton
+            as={Button}
+            rightIcon={<ChevronDownIcon />}
+            colorScheme="blue"
+            size="md" 
+            width="150px"
+          >
+            Reviewers
+          </MenuButton>
 
-  {/* Make MenuList scrollable after 6 items */}
-  <MenuList maxHeight="200px" overflowY="auto">
-    <MenuItem
-      onClick={() => {
-        const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
-          acc[reviewer] = false;
-          return acc;
-        }, {} as ShowReviewerType); 
-        setShowReviewer(updatedReviewers);
-      }}
-    >
-      <Text as="span" fontWeight="bold" textDecoration="underline">
-        Remove All
-      </Text>
-    </MenuItem>
-    <MenuItem
-      onClick={() => {
-        const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
-          acc[reviewer] = true;
-          return acc;
-        }, {} as ShowReviewerType); 
-        setShowReviewer(updatedReviewers);
-      }}
-    >
-      <Text as="span" fontWeight="bold" textDecoration="underline">
-        Select All
-      </Text>
-    </MenuItem>
+          {/* Make MenuList scrollable after 6 items */}
+          <MenuList maxHeight="200px" overflowY="auto">
+            <MenuItem
+              onClick={() => {
+                const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
+                  acc[reviewer] = false;
+                  return acc;
+                }, {} as ShowReviewerType); 
+                setShowReviewer(updatedReviewers);
+              }}
+            >
+              <Text as="span" fontWeight="bold" textDecoration="underline">
+                Remove All
+              </Text>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
+                  acc[reviewer] = true;
+                  return acc;
+                }, {} as ShowReviewerType); 
+                setShowReviewer(updatedReviewers);
+              }}
+            >
+              <Text as="span" fontWeight="bold" textDecoration="underline">
+                Select All
+              </Text>
+            </MenuItem>
 
-    {Object.keys(showReviewer).map((reviewer: string) => (
-      <MenuItem key={reviewer}>
-        <Checkbox
-          isChecked={showReviewer[reviewer]}
-          onChange={(e) =>
-            setShowReviewer({
-              ...showReviewer,
-              [reviewer]: e.target.checked,
-            })
-          }
-        >
-          {reviewer}
-        </Checkbox>
-      </MenuItem>
-    ))}
-  </MenuList>
-</Menu>
-<br/>
+            {Object.keys(showReviewer).map((reviewer: string) => (
+              <MenuItem key={reviewer}>
+                <Checkbox
+                  isChecked={showReviewer[reviewer]}
+                  onChange={(e) =>
+                    setShowReviewer({
+                      ...showReviewer,
+                      [reviewer]: e.target.checked,
+                    })
+                  }
+                >
+                  {reviewer}
+                </Checkbox>
+              </MenuItem>
+            ))}
+          </MenuList>
+        </Menu>
 
-      </Flex>
-
-      <Flex justify="center" mb={8}>
-        <Button colorScheme="blue" onClick={toggleDropdown}>
+        <Button size="md" width="150px" colorScheme="blue" onClick={toggleDropdown}>
           {showDropdown ? 'Hide' : 'View More'}
         </Button>
+        </HStack>
+        <br/>
+         
       </Flex>
+
+      
 
       {showDropdown && (
         <Box mb={8} display="flex" justifyContent="center">
@@ -597,6 +796,7 @@ const renderChart = () => {
 
       {selectedYear && selectedMonth && (
         <Box mt={8}>
+          {renderCharts(data, selectedYear, selectedMonth)}
           {renderTable(selectedYear, selectedMonth, showReviewer)}
         </Box>
       )}
