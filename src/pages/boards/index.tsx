@@ -21,6 +21,7 @@ import {
   import AllLayout from "@/components/Layout";
   import axios from "axios";
   import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+  import { DownloadIcon } from "@chakra-ui/icons";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {
@@ -55,6 +56,66 @@ import {
   
       fetchData();
     }, []);
+
+    const handleDownload = () => {
+      
+      // Check the active tab and fetch the appropriate data
+      const filteredData = activeTab === 'EIPs' ? eipData : ercData;
+    
+      if (!filteredData || filteredData.length === 0) {
+        alert(`No data available for the selected month in ${activeTab}.`);
+        return;
+      }
+    
+      console.log(`Data for download in ${activeTab}:`, filteredData);
+    
+      // Pass the filtered data and active tab (EIPs or ERCs) to the CSV function
+      downloadCSV(filteredData, activeTab);
+    };
+
+    const downloadCSV = (data: any, type: string) => {
+      const csv = convertToCSV(data, type);
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+    
+      const a = document.createElement('a');
+      a.setAttribute('hidden', '');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `${type}-board-data.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
+    const convertToCSV = (filteredData: any, type: string) => { 
+      const csvRows = [];
+    
+      // Define the headers for the CSV: Serial Number, PR Number, URL
+      const headers = ['Serial Number', 'PR Number', 'URL'];
+    
+      // Add headers to CSV rows
+      csvRows.push(headers.join(','));
+    
+      // Combine arrays for EIPs or ERCs
+      const items = [
+        ...(Array.isArray(filteredData) ? filteredData : [])
+      ];
+    
+      // Add data to CSV rows
+      items.forEach((item: any, index: number) => {
+        const prNumber = extractPrNumber(item.url); // Extract the PR number from the URL
+        const row = [
+          index + 1,          // Serial Number
+          prNumber,           // PR Number
+          item.url            // URL
+        ].join(',');
+    
+        csvRows.push(row);
+      });
+    
+      return csvRows.join('\n');
+    };
+    
   
     if (isLoading) {
       return (
@@ -227,9 +288,22 @@ import {
           boxShadow="lg"
           bg="#171923" // Dark mode background
         >
-          <Heading as="h2" size="lg" mt={4} mb={4} textAlign="center" color="#fff">
-            {activeTab} BOARD ({activeTab === 'EIPs' ? eipData.length : ercData.length})
-          </Heading>
+         <Flex justify="space-between" align="center" p={4}>
+    <Heading as="h2" size="lg" color="#fff">
+      {activeTab} BOARD ({activeTab === 'EIPs' ? eipData.length : ercData.length})
+    </Heading>
+    <Button
+      colorScheme="blue"
+      variant="outline"
+      fontSize={"14px"}
+      fontWeight={"bold"}
+      padding={"8px 20px"}
+      onClick={handleDownload}
+    >
+      <DownloadIcon marginEnd={"1.5"} />
+      Download Reports
+    </Button>
+  </Flex>
 
   
           {/* Scrollable Table */}
@@ -333,7 +407,7 @@ import {
     </LI>{' '}
     and{' '}
     <LI href="/Reviewers" color="blue.300" isExternal>
-      Reviewers Tracker
+      Editors Tracker
     </LI>.
   </Text>
 </Box>

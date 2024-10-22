@@ -26,6 +26,7 @@ import {
   Collapse,
   useColorModeValue
 } from "@chakra-ui/react";
+import DateTime from "@/components/DateTime";
 import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
 import {ChevronUpIcon } from "@chakra-ui/icons";
@@ -71,6 +72,7 @@ const GitHubPRTracker: React.FC = () => {
   const [selectedRepo, setSelectedRepo] = useState<string>('EIPs');
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
   const [show, setShow] = useState(false);
+  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const toggleCollapse = () => setShow(!show);
   // const [selectedYear, setSelectedYear] = useState(null);
@@ -188,10 +190,15 @@ const GitHubPRTracker: React.FC = () => {
       selectedData = ripsData;
     }
 
+    // if(selectedRepo === 'EIPs'){
+    //   const eip = eipsData.find(eip => eip.IssueNumber === 8913);
+    //   console.log(eip);
+    // }
+
     // Transform the selected data
     const transformedData = transformIssueData(selectedData);
-    console.log(transformedData);
-      console.log(transformedData);
+    // console.log(transformedData);
+    //   console.log(transformedData);
       setData(prevData => ({
         ...prevData,
         Issues: transformedData
@@ -238,12 +245,22 @@ const GitHubPRTracker: React.FC = () => {
       }
     };
 
-  
+    const processedPRs = new Set();
 
     data.forEach(pr => {
+      if (!processedPRs.has(pr.prNumber)) {
       const createdDate = pr.created_at ? new Date(pr.created_at) : null;
       const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
       const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
+      
+      processedPRs.add(pr.prNumber);
+
+      // if(pr.prNumber===639 || pr.prNumber===664){
+      //   console.log(pr.prNumber)
+      //   console.log("created date: ",createdDate);
+      //   console.log("Closed date: ", closedDate);
+      //   console.log("Merged date: ", mergedDate);
+      // }
   
       // Handle created date
       if (createdDate) {
@@ -272,46 +289,34 @@ const GitHubPRTracker: React.FC = () => {
         let createdYear = createdDateObj.getUTCFullYear();
         let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
     
-        // Initialize endDate based on closedDate or currentDate
-let endDate;
-if (closedDate) {
-    let closedDateObj = new Date(closedDate);
-    endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
-} else {
-    endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
-}
+              // Initialize endDate based on closedDate or currentDate
+      let endDate;
+      if (closedDate) {
+          let closedDateObj = new Date(closedDate);
+          endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
+      } else {
+          endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
+      }
 
-// Initialize openDate starting from the created date
-let openDate = new Date(createdYear, createdMonth, 1);
+      // Initialize openDate starting from the created date
+      let openDate = new Date(createdYear, createdMonth, 1);
 
-// Debugging: Log the initial values
-console.log(`Created Date: ${createdDateObj}`);
-console.log(`End Date: ${endDate}`);
-console.log(`Starting Open Date: ${openDate}`);
+      while (openDate < endDate) {
+          const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          // Initialize monthYearData for the current month key if not already present
+          if (!monthYearData[openKey]) {
+              monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review: [] };
+          }
+          // Add the PR to the open array for this month
+          addIfNotExists(monthYearData[openKey].open, pr);
 
-// Loop through each month the PR was open
-while (openDate < endDate) {
-    const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          // Increment to the next month
+          openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
 
-    // Initialize monthYearData for the current month key if not already present
-    if (!monthYearData[openKey]) {
-        monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review: [] };
-    }
-
-    // Debugging: Log the current state
-    console.log(`Adding PR to month: ${openKey}`);
-
-    // Add the PR to the open array for this month
-    addIfNotExists(monthYearData[openKey].open, pr);
-
-    // Increment to the next month
-    openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
-
-    // Debugging: Log the updated openDate
-    console.log(`Updated Open Date: ${openDate}`);
-}
+      }
 
     }
+  }
     
   });
   
@@ -333,6 +338,7 @@ while (openDate < endDate) {
   };
 
   const transformIssueData = (data: Issue[]): { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } => {
+   
     const monthYearData: { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } = {};
     
     const incrementMonth = (date: Date) => {
@@ -354,9 +360,20 @@ while (openDate < endDate) {
           arr.push(pr);
         }
     };
+    const processedIssues = new Set();
 
     data.forEach(issue => {
+      if (!processedIssues.has(issue.IssueNumber)) {
+        
+        processedIssues.add(issue.IssueNumber);
       const createdDate = new Date(issue.created_at);
+      const closedDate = issue.closed_at ? new Date(issue.closed_at) : null;
+      if(issue.IssueNumber==8978 || issue.IssueNumber===8982){
+        console.log("issue: ",issue.IssueNumber)
+        console.log("created date: ",createdDate);
+        console.log(issue);
+        
+      }
       const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
       
       if (!monthYearData[createdKey]) {
@@ -375,35 +392,68 @@ while (openDate < endDate) {
       }
   
       // Set openDate to the creation date and endDate to the 1st of the closed month or current month
-      let openDate = new Date(createdDate);
-      let createdConstant = new Date(createdDate); // Store the creation date separately
-      let endDate = issue.closed_at 
-          ? new Date(new Date(issue.closed_at).getUTCFullYear(), new Date(issue.closed_at).getUTCMonth(), 1) 
-          : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Include the current month
+      // let openDate = new Date(createdDate);
+      // let createdConstant = new Date(createdDate); // Store the creation date separately
+      // let endDate = issue.closed_at 
+      //     ? new Date(new Date(issue.closed_at).getUTCFullYear(), new Date(issue.closed_at).getUTCMonth(), 1) 
+      //     : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Include the current month
       
-      // Loop through each month the issue was open
-      while (openDate <= endDate) { // Open until the start of the closed month or current month
+      // // Loop through each month the issue was open
+      // while (openDate <= endDate) { // Open until the start of the closed month or current month
+      //     const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+      
+      //     if (!monthYearData[openKey]) {
+      //         monthYearData[openKey] = { created: [], closed: [], open: [] };
+      //     }
+      
+      //     // Check if the issue was still open on the 1st of the month
+      //     const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
+          
+      //     // Skip if the openDate corresponds to the created month
+      //     if (!(openDate.getUTCFullYear() === createdConstant.getUTCFullYear() && openDate.getUTCMonth() === createdConstant.getUTCMonth())) {
+      //         if (firstOfMonth <= openDate && (!issue.closed_at || firstOfMonth < new Date(issue.closed_at))) {
+      //             // Add to open only if it's still open on the first of that month
+      //             addIfNotExists(monthYearData[openKey].open, issue);
+      //         }
+      //     }
+      
+      //     // Move to the next month
+      //     openDate = incrementMonth(openDate);
+      // }
+
+      if (createdDate) {
+        let createdDateObj = new Date(createdDate);
+        let createdYear = createdDateObj.getUTCFullYear();
+        let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
+    
+              // Initialize endDate based on closedDate or currentDate
+      let endDate;
+      if (closedDate) {
+          let closedDateObj = new Date(closedDate);
+          endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
+      } else {
+          endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
+      }
+
+      // Initialize openDate starting from the created date
+      let openDate = new Date(createdYear, createdMonth, 1);
+
+      while (openDate < endDate) {
           const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-      
+          // Initialize monthYearData for the current month key if not already present
           if (!monthYearData[openKey]) {
               monthYearData[openKey] = { created: [], closed: [], open: [] };
           }
-      
-          // Check if the issue was still open on the 1st of the month
-          const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
-          
-          // Skip if the openDate corresponds to the created month
-          if (!(openDate.getUTCFullYear() === createdConstant.getUTCFullYear() && openDate.getUTCMonth() === createdConstant.getUTCMonth())) {
-              if (firstOfMonth <= openDate && (!issue.closed_at || firstOfMonth < new Date(issue.closed_at))) {
-                  // Add to open only if it's still open on the first of that month
-                  addIfNotExists(monthYearData[openKey].open, issue);
-              }
-          }
-      
-          // Move to the next month
-          openDate = incrementMonth(openDate);
+          // Add the PR to the open array for this month
+          addIfNotExists(monthYearData[openKey].open, issue);
+
+          // Increment to the next month
+          openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
+
       }
-      
+
+    }
+    }
   });
   
 
@@ -519,156 +569,209 @@ while (openDate < endDate) {
         </Box>
       )}
     </Flex>
-    <Box overflowY="auto" maxHeight="700px" borderBottomRadius="0" borderTopWidth="1px" borderTopColor="gray.200">
-        <Table variant="striped" colorScheme="blue">
-        <Thead bg="#2D3748">
-          <Tr>
-      <Th color="white" textAlign="center" borderTopLeftRadius="10px" minWidth="6rem">Number</Th>
-      <Th color="white" textAlign="center" minWidth="20rem">Title</Th>
-      <Th color="white" textAlign="center" minWidth="6rem">State</Th>
-      <Th color="white" textAlign="center" minWidth="6rem">Created At</Th>
-      <Th color="white" textAlign="center" minWidth="6rem">Closed At</Th>
-      {type === 'PRs' && (
-        <Th color="white" textAlign="center" minWidth="6rem">Merged At</Th>
-      )}
-      <Th color="white" textAlign="center" borderTopRightRadius="10px" minWidth="10rem">Link</Th>
-    </Tr>
-        </Thead>
-        </Table>
+    <Box 
+  overflowY="auto" 
+  maxHeight="700px" 
+  borderBottomRadius="0" 
+  borderTopWidth="1px" 
+  borderTopColor="gray.200"
+>
+  <Table variant="striped" colorScheme="blue">
+    <Thead bg="#2D3748">
+      <Tr>
+        <Th 
+          color="white" 
+          textAlign="center" 
+          borderTopLeftRadius="10px" 
+          minWidth="6rem"
+        >
+          Number
+        </Th>
+        <Th 
+          color="white" 
+          textAlign="center" 
+          minWidth="20rem"
+          whiteSpace="normal" // Allow wrapping
+          overflow="hidden"   // Prevent overflow
+          textOverflow="ellipsis" // Add ellipsis for overflowed text
+        >
+          Title
+        </Th>
+        <Th 
+          color="white" 
+          textAlign="center" 
+          minWidth="6rem" 
+        >
+          State
+        </Th>
+        <Th 
+          color="white" 
+          textAlign="center" 
+          minWidth="6rem" 
+        >
+          Created At
+        </Th>
+        <Th 
+          color="white" 
+          textAlign="center" 
+          minWidth="6rem" 
+          
+        >
+          Closed At
+        </Th>
+        {type === 'PRs' && (
+          <Th 
+            color="white" 
+            textAlign="center" 
+            minWidth="6rem" 
+          >
+            Merged At
+          </Th>
+        )}
+        <Th 
+          color="white" 
+          textAlign="center" 
+          minWidth="10rem"
+        >
+          Link
+        </Th>
+      </Tr>
+    </Thead>
+  
 
-        
-        <Table variant="striped" colorScheme="gray">
-        <Tbody>
-        {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
-            <Tr>
-              <Td colSpan={type === 'PRs' ? 6 : 5} textAlign="center">No Data Available</Td>
+  
+    <Tbody>
+      {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
+        <Tr>
+          <Td colSpan={type === 'PRs' ? 6 : 5} textAlign="center">No Data Available</Td>
+        </Tr>
+      ) : (
+        <>
+          {/* Render Created Items */}
+          {showCategory.created && items.created.map((item: PR | Issue) => (
+            <Tr key={`created-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
+              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td style={{ wordWrap: 'break-word', maxWidth: '200px' }}>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td textAlign="center" verticalAlign="middle">Created</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+              <Td>
+                <button style={{
+                  backgroundColor: '#428bca',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '10px 20px',
+                  cursor: 'pointer',
+                  borderRadius: '5px',
+                }}>
+                  <a 
+                    href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {type === 'PRs' ? 'Pull Request' : 'Issue'}
+                  </a>
+                </button>
+              </Td>
             </Tr>
-          ) : (
-            <>
-              {/* Render Created Items */}
-              {showCategory.created && items.created.map((item: PR | Issue) => (
-                <Tr key={`created-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`}>
-                  <Td>{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-                  <Td>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-                  <Td>Created</Td>
-                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                  {type === 'PRs' && <Td>{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-                  <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                    <a href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} target="_blank">
-                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
-                    </a>
-                    </button></Td>
-                </Tr>
-              ))}
-  
-              {/* Render Closed Items */}
-              {showCategory.closed && items.closed.map((item: PR | Issue) => (
-                <Tr key={`closed-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`}>
-                  <Td>{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-                  <Td>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-                  <Td>Closed</Td>
-                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                  {type === 'PRs' && <Td>{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-                  <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                    <a href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} target="_blank">
-                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
-                    </a>
-                    </button></Td>
-                </Tr>
-              ))}
-  
-              {/* Render Merged Items (only for PRs) */}
-              {showCategory.merged && type === 'PRs' && (items as { merged: PR[] }).merged.map((item: PR) => (
-                <Tr key={`merged-${item.prNumber}`}>
-                  <Td>{item.prNumber}</Td>
-                  <Td>{item.prTitle}</Td>
-                  <Td>Merged</Td>
-                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
-                  
-                  <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                    <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber}`} target="_blank">
-                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
-                    </a>
-                    </button></Td>
-                </Tr>
-              ))}
+          ))}
 
-{showCategory.open && items.open.map((item: PR | Issue) => (
-                <Tr key={`open-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`}>
-                  <Td>{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-                  <Td>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-                  <Td>Open</Td>
-                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                  {type === 'PRs' && <Td>{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-                  <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                    <a href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} target="_blank">
-                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
-                    </a>
-                    </button></Td>
-                </Tr>
-              ))}
+          {/* Render Closed Items */}
+          {showCategory.closed && items.closed.map((item: PR | Issue) => (
+            <Tr key={`closed-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
+              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td textAlign="center" verticalAlign="middle">Closed</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+              <Td>
+                <button style={{
+                  backgroundColor: '#428bca',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '10px 20px',
+                  cursor: 'pointer',
+                  borderRadius: '5px',
+                }}>
+                  <a 
+                    href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {type === 'PRs' ? 'Pull Request' : 'Issue'}
+                  </a>
+                </button>
+              </Td>
+            </Tr>
+          ))}
 
-{/* {showCategory.review && type === 'PRs' && (items as { review: PR[] }).review.map((item: PR) => (
-                <Tr key={`open-${item.prNumber}`}>
-                  <Td>{item.prNumber}</Td>
-                  <Td>{item.prTitle}</Td>
-                  <Td>reviewed</Td>
-                  <Td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-                  <Td>{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
-                  
-                  <Td><button style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}>
-                    <a href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber}`} target="_blank">
-                      {type === 'PRs' ? 'Pull Request' : 'Issue'}
-                    </a>
-                    </button></Td>
-                </Tr>
-              ))} */}
-            </>
-          )}
-        </Tbody>
-        </Table>
-        </Box>
+          {/* Render Merged Items (only for PRs) */}
+          {showCategory.merged && type === 'PRs' && (items as { merged: PR[] }).merged.map((item: PR) => (
+            <Tr key={`merged-${item.prNumber}`} borderWidth="1px" borderColor="gray.200">
+              <Td textAlign="center" verticalAlign="middle">{item.prNumber}</Td>
+              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{item.prTitle}</Td>
+              <Td textAlign="center" verticalAlign="middle">Merged</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
+              <Td>
+                <button style={{
+                  backgroundColor: '#428bca',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '10px 20px',
+                  cursor: 'pointer',
+                  borderRadius: '5px',
+                }}>
+                  <a 
+                    href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber}`} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {type === 'PRs' ? 'Pull Request' : 'Issue'}
+                  </a>
+                </button>
+              </Td>
+            </Tr>
+          ))}
+
+          {/* Render Open Items */}
+          {showCategory.open && items.open.map((item: PR | Issue) => (
+            <Tr key={`open-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
+              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td textAlign="center" verticalAlign="middle">Open</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+              <Td>
+                <button style={{
+                  backgroundColor: '#428bca',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '10px 20px',
+                  cursor: 'pointer',
+                  borderRadius: '5px',
+                }}>
+                  <a 
+                    href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {type === 'PRs' ? 'Pull Request' : 'Issue'}
+                  </a>
+                </button>
+              </Td>
+            </Tr>
+          ))}
+        </>
+      )}
+    </Tbody>
+  </Table>
+</Box>
+
         </Box>
     );
   };
@@ -1094,7 +1197,12 @@ while (openDate < endDate) {
             </Select>
           </Flex>
   
-          <Box>{renderChart()}</Box>
+          <Box padding={"2rem"} borderRadius={"0.55rem"}>
+            {renderChart()}
+            <Box className={"w-full"}>
+              <DateTime />
+            </Box>
+          </Box>
 
           <Box mt={2}>
         <Text color="gray.500" fontStyle="italic" textAlign="center">

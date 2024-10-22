@@ -63,6 +63,25 @@ interface APIData {
   rip: StatusChange[];
 }
 
+type PR = {
+  prNumber: number;
+  prTitle: string;
+  created_at: Date;
+  closed_at: Date | null;
+  merged_at: Date | null;
+};
+
+type Issue = {
+  IssueNumber: number;
+  IssueTitle: string;
+  state: string;
+  created_at: Date;
+  closed_at: Date | null;
+};
+
+const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails', '/api/ripsprdetails'];
+const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails', '/api/ripsissuedetails'];
+
 // const getStatus = (status: string) => {
 //   switch (status) {
 //     case "Draft":
@@ -109,6 +128,7 @@ const Month = () => {
     year = pathParts[2];
     month = pathParts[3];
   }
+
 
   const [typeData, setTypeData] = useState<StatusChange[]>([]);
   useEffect(() => {
