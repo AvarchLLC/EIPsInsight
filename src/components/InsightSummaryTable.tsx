@@ -177,6 +177,7 @@ export default function InsightSummary() {
   const transformPRData = (data: PR[], requiredkey: string): { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[] } } => {
     const monthYearData: { [key: string]: { created: PR[], closed: PR[], merged: PR[] ,open:[]} } = {};
     const res: { [key: string]: { created: PR[], closed: PR[], merged: PR[] ,open:[]} } = {};
+    const processedPRs = new Set();
     const incrementMonth = (date: Date) => {
       const newDate = new Date(date);
       newDate.setMonth(newDate.getMonth() + 1);
@@ -205,9 +206,12 @@ export default function InsightSummary() {
   
 
     data.forEach(pr => {
+      if (!processedPRs.has(pr.prNumber)) {
       const createdDate = pr.created_at ? new Date(pr.created_at) : null;
       const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
       const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
+
+      processedPRs.add(pr.prNumber);
   
       // Handle created date
       if (createdDate) {
@@ -236,46 +240,34 @@ export default function InsightSummary() {
         let createdYear = createdDateObj.getUTCFullYear();
         let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
     
-        // Initialize endDate based on closedDate or currentDate
-let endDate;
-if (closedDate) {
-    let closedDateObj = new Date(closedDate);
-    endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
-} else {
-    endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
-}
+              // Initialize endDate based on closedDate or currentDate
+      let endDate;
+      if (closedDate) {
+          let closedDateObj = new Date(closedDate);
+          endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
+      } else {
+          endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
+      }
 
-// Initialize openDate starting from the created date
-let openDate = new Date(createdYear, createdMonth, 1);
+      // Initialize openDate starting from the created date
+      let openDate = new Date(createdYear, createdMonth, 1);
 
-// Debugging: Log the initial values
-// console.log(`Created Date: ${createdDateObj}`);
-// console.log(`End Date: ${endDate}`);
-// console.log(`Starting Open Date: ${openDate}`);
+      while (openDate < endDate) {
+          const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          // Initialize monthYearData for the current month key if not already present
+          if (!monthYearData[openKey]) {
+              monthYearData[openKey] = { created: [], closed: [], merged: [], open: [] };
+          }
+          // Add the PR to the open array for this month
+          addIfNotExists(monthYearData[openKey].open, pr);
 
-// Loop through each month the PR was open
-while (openDate < endDate) {
-    const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+          // Increment to the next month
+          openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
 
-    // Initialize monthYearData for the current month key if not already present
-    if (!monthYearData[openKey]) {
-        monthYearData[openKey] = { created: [], closed: [], merged: [], open: []};
-    }
-
-    // Debugging: Log the current state
-    // console.log(`Adding PR to month: ${openKey}`);
-
-    // Add the PR to the open array for this month
-    addIfNotExists(monthYearData[openKey].open, pr);
-
-    // Increment to the next month
-    openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
-
-    // Debugging: Log the updated openDate
-    // console.log(`Updated Open Date: ${openDate}`);
-}
+      }
 
     }
+  }
     
   });
   
@@ -294,8 +286,10 @@ while (openDate < endDate) {
   };
 
   const transformIssueData = (data: Issue[], requiredkey: string): { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } => {
+   
     const monthYearData: { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } = {};
     const res: { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } = {};
+    
     const incrementMonth = (date: Date) => {
       const newDate = new Date(date);
       newDate.setMonth(newDate.getMonth() + 1);
@@ -315,9 +309,20 @@ while (openDate < endDate) {
           arr.push(pr);
         }
     };
+    const processedIssues = new Set();
 
     data.forEach(issue => {
+      if (!processedIssues.has(issue.IssueNumber)) {
+        
+        processedIssues.add(issue.IssueNumber);
       const createdDate = new Date(issue.created_at);
+      const closedDate = issue.closed_at ? new Date(issue.closed_at) : null;
+      if(issue.IssueNumber==8978 || issue.IssueNumber===8982){
+        console.log("issue: ",issue.IssueNumber)
+        console.log("created date: ",createdDate);
+        console.log(issue);
+        
+      }
       const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
       
       if (!monthYearData[createdKey]) {
@@ -336,42 +341,76 @@ while (openDate < endDate) {
       }
   
       // Set openDate to the creation date and endDate to the 1st of the closed month or current month
-      let openDate = new Date(createdDate);
-      let createdConstant = new Date(createdDate); // Store the creation date separately
-      let endDate = issue.closed_at 
-          ? new Date(new Date(issue.closed_at).getUTCFullYear(), new Date(issue.closed_at).getUTCMonth(), 1) 
-          : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Include the current month
+      // let openDate = new Date(createdDate);
+      // let createdConstant = new Date(createdDate); // Store the creation date separately
+      // let endDate = issue.closed_at 
+      //     ? new Date(new Date(issue.closed_at).getUTCFullYear(), new Date(issue.closed_at).getUTCMonth(), 1) 
+      //     : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Include the current month
       
-      // Loop through each month the issue was open
-      while (openDate <= endDate) { // Open until the start of the closed month or current month
+      // // Loop through each month the issue was open
+      // while (openDate <= endDate) { // Open until the start of the closed month or current month
+      //     const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+      
+      //     if (!monthYearData[openKey]) {
+      //         monthYearData[openKey] = { created: [], closed: [], open: [] };
+      //     }
+      
+      //     // Check if the issue was still open on the 1st of the month
+      //     const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
+          
+      //     // Skip if the openDate corresponds to the created month
+      //     if (!(openDate.getUTCFullYear() === createdConstant.getUTCFullYear() && openDate.getUTCMonth() === createdConstant.getUTCMonth())) {
+      //         if (firstOfMonth <= openDate && (!issue.closed_at || firstOfMonth < new Date(issue.closed_at))) {
+      //             // Add to open only if it's still open on the first of that month
+      //             addIfNotExists(monthYearData[openKey].open, issue);
+      //         }
+      //     }
+      
+      //     // Move to the next month
+      //     openDate = incrementMonth(openDate);
+      // }
+
+      if (createdDate) {
+        let createdDateObj = new Date(createdDate);
+        let createdYear = createdDateObj.getUTCFullYear();
+        let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
+    
+              // Initialize endDate based on closedDate or currentDate
+      let endDate;
+      if (closedDate) {
+          let closedDateObj = new Date(closedDate);
+          endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
+      } else {
+          endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
+      }
+
+      // Initialize openDate starting from the created date
+      let openDate = new Date(createdYear, createdMonth, 1);
+
+      while (openDate < endDate) {
           const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-      
+          // Initialize monthYearData for the current month key if not already present
           if (!monthYearData[openKey]) {
               monthYearData[openKey] = { created: [], closed: [], open: [] };
           }
-      
-          // Check if the issue was still open on the 1st of the month
-          const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
-          
-          // Skip if the openDate corresponds to the created month
-          if (!(openDate.getUTCFullYear() === createdConstant.getUTCFullYear() && openDate.getUTCMonth() === createdConstant.getUTCMonth())) {
-              if (firstOfMonth <= openDate && (!issue.closed_at || firstOfMonth < new Date(issue.closed_at))) {
-                  // Add to open only if it's still open on the first of that month
-                  addIfNotExists(monthYearData[openKey].open, issue);
-              }
-          }
-      
-          // Move to the next month
-          openDate = incrementMonth(openDate);
+          // Add the PR to the open array for this month
+          addIfNotExists(monthYearData[openKey].open, issue);
+
+          // Increment to the next month
+          openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
+
       }
-      
+
+    }
+    }
   });
   
+
   if (monthYearData[requiredkey]) {
-    res[requiredkey] = monthYearData[requiredkey];
-  }
-    // return monthYearData;
-    return res;
+      res[requiredkey] = monthYearData[requiredkey];
+    }
+      // return monthYearData;
+      return res;
   };
 
 
