@@ -30,9 +30,10 @@ const ReviewTracker = () => {
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'eips' | 'ercs' | 'rips'>('eips');
+  const [activeTab, setActiveTab] = useState<'eips' | 'ercs' | 'rips' |'all'>('all');
   const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
   const [show, setShow] = useState(false);
+  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const toggleCollapse = () => setShow(!show);
 
@@ -82,36 +83,61 @@ const ReviewTracker = () => {
     setShowReviewer({}); // Clear previous reviewers list when switching tabs
   };
   
-  const fetchData = async () => {
-    setLoading(true);
+  const flattenResponse = (response: Record<string, any[]>) => {
+    return Object.entries(response).flatMap(([reviewer, reviews]) =>
+      reviews.map(review => ({ ...review, reviewer }))
+    );
+  };
+  
+  const fetchHelper = async (activeTab: string): Promise<any[]> => { // Return type can be adjusted as needed
     try {
-      const endpoint = API_ENDPOINTS[activeTab];
+      const endpoint = API_ENDPOINTS[activeTab as keyof typeof API_ENDPOINTS];
       const response = await fetch(endpoint);
       const responseData = await response.json();
   
-      const flattenResponse = (response: Record<string, any[]>) => {
-        return Object.entries(response).flatMap(([reviewer, reviews]) =>
-          reviews.map(review => ({ ...review, reviewer }))
-        );
-      };
-      
-  
       const newData = flattenResponse(responseData);
-      const reviewers = Array.from(new Set(newData.map(review => review.reviewer)));
+      return newData; // Return the flattened data
+    } catch (error) {
+      console.error("Failed to fetch review data:", error);
+      return []; // Return an empty array on error
+    }
+  };
+  
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      let combinedData: any[] = []; // Initialize an empty array for combined data
+  
+      if (activeTab !== 'all') {
+        combinedData = await fetchHelper(activeTab); // Fetch data for the selected tab
+      } else {
+        // Fetch data for all tabs and combine the results
+        const [eipsData, ercsData, ripsData] = await Promise.all([
+          fetchHelper('eips'),
+          fetchHelper('ercs'),
+          fetchHelper('rips')
+        ]);
+        combinedData = [...eipsData, ...ercsData, ...ripsData]; // Combine the results
+      }
+  
+      // Process the combined data
+      const reviewers = Array.from(new Set(combinedData.map(review => review.reviewer)));
       const initialShowReviewer = reviewers.reduce(
         (acc, reviewer) => ({ ...acc, [reviewer]: true }),
         {}
       );
-      
-      setShowReviewer(initialShowReviewer); // Set reviewer list after fetching data
   
-      const transformedData = transformData(newData, initialShowReviewer);
+      setShowReviewer(initialShowReviewer); // Set reviewer visibility state
+  
+      const transformedData = transformData(combinedData, initialShowReviewer);
       setData(transformedData);
     } catch (error) {
-      console.error("Failed to fetch review data:", error);
+      console.error("Error during data fetch:", error);
+    } finally {
+      setLoading(false); // Ensure loading state is set to false in all cases
     }
-    setLoading(false);
   };
+  
   
 
   const transformData = (
@@ -216,7 +242,7 @@ const getYearlyData = (data: PRData[]) => {
 
 
 // Function to filter PR data for the selected month and year
-const getMonthlyData = (data: PRData[], year: string, month: string) => {
+const getMonthlyData = (data: PRData[], year: string|null, month: string) => {
   const monthlyData: Record<string, number> = data
     .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)
     .flatMap(item => item.prs)
@@ -282,35 +308,55 @@ const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => 
 
 
 // // Function to render Leaderboard Charts
-const renderCharts = (data: PRData[], selectedYear: string, selectedMonth: string) => {
+const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   const yearlyData = getYearlyData(data);
-  const monthlyData = getMonthlyData(data, selectedYear, selectedMonth);
+  
+  let monthlyChartData: any; // Declare monthlyChartData
+  if (selectedMonth != null) {
+    const monthlyData = getMonthlyData(data, selectedYear, selectedMonth);
+    monthlyChartData = formatChartData(monthlyData); // Assign to the declared variable
+  }
 
   const yearlyChartData = formatChartData(yearlyData);
-  const monthlyChartData = formatChartData(monthlyData);
 
   return (
     <Box padding="2rem">
-      <Flex direction={{ base: "column", md: "row" }} justifyContent="space-between">
-        {/* Yearly Leaderboard Chart */}
-        <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-          <Heading size="md" marginBottom="0.5rem">
-          {`${activeTab.toLocaleUpperCase()} Overall Leaderboard`}
-          </Heading>
-          <Bar {...getBarChartConfig(yearlyChartData)} />
-        </Box>
-
-        {/* Monthly Leaderboard Chart */}
-        <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-          <Heading size="md" marginBottom="0.5rem">
-            {`${activeTab.toLocaleUpperCase()} Leaderboard for ${selectedMonth.padStart(2, '0')}-${selectedYear}`}
-          </Heading>
-          <Bar {...getBarChartConfig(monthlyChartData)} />
-        </Box>
-      </Flex>
+      {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
+          <Flex direction={{ base: "column", md: "row" }} justifyContent="space-between">
+          {/* Yearly Leaderboard Chart */}
+          <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+            <Heading size="md" marginBottom="0.5rem" color="black">
+              {`Editors Leaderboard`}
+            </Heading>
+            <Bar {...getBarChartConfig(yearlyChartData)} />
+          </Box>
+  
+          {/* Monthly Leaderboard Chart */}
+          {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
+            <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+              <Heading size="md" marginBottom="0.5rem" color="black">
+                {`Editors Leaderboard for ${selectedMonth.padStart(2, '0')}-${selectedYear}`}
+              </Heading>
+              <Bar {...getBarChartConfig(monthlyChartData)} />
+            </Box>
+          )}
+        </Flex>
+        )}
+      {!selectedMonth && ( // Check if monthlyChartData is defined
+          <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
+          {/* Yearly Leaderboard Chart */}
+          <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+            <Heading size="md" marginBottom="0.5rem" color="black">
+              {`Editors Leaderboard`}
+            </Heading>
+            <Bar {...getBarChartConfig(yearlyChartData)} />
+          </Box>
+        </Flex>
+        )}
     </Box>
   );
 };
+
 
 const transformAndGroupData = (data: any[]): ReviewData[] => {
   const groupedData: GroupedData = data.reduce((acc, item) => {
@@ -424,8 +470,8 @@ const renderChart = () => {
 
     return (
         <Box mt={8} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
-            <Table variant="striped" colorScheme="blue" >
-                <Thead bg="#2D3748">
+            <Table >
+                <Thead bg="black">
                     <Tr>
                         <Th color="white" textAlign="center" verticalAlign="middle"  borderTopLeftRadius="10px">
                             PR Number
@@ -456,6 +502,8 @@ const renderChart = () => {
                         </Th>
                     </Tr>
                 </Thead>
+                </Table>
+                <Table variant="striped" colorScheme="gray" >
                 <Tbody>
                     {filteredData.map((pr, index) => {
                         const status = pr.merged_at
@@ -493,7 +541,7 @@ const renderChart = () => {
                                 <Td textAlign="center" verticalAlign="middle">
                                     <Button
                                         as="a"
-                                        href={`https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`}
+                                        href={`https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`}
                                         target="_blank"
                                         colorScheme="blue"
                                         variant="solid"
@@ -520,7 +568,7 @@ const renderChart = () => {
           <Heading
             size="xl"
             marginBottom={10}
-            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Editors Tracker</Heading>
+            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Editors Leaderboard</Heading>
 
 
 <Box
@@ -535,7 +583,7 @@ const renderChart = () => {
           size="lg"
           marginBottom={4}
           color={useColorModeValue("#3182CE", "blue.300")}
-        > Editors Tracker FAQ
+        > Editors Leaderboard FAQ
         </Heading>
         <Box
   bg="blue" // Gray background
@@ -627,7 +675,10 @@ const renderChart = () => {
 
 
       <Flex justify="center" mb={8}>
-        <Button colorScheme="blue" onClick={() => setActiveTab('eips')} isActive={activeTab === 'eips'}>
+      <Button colorScheme="blue" onClick={() => setActiveTab('all')} isActive={activeTab === 'all'}>
+          ALL
+        </Button>
+        <Button colorScheme="blue" onClick={() => setActiveTab('eips')} isActive={activeTab === 'eips'} ml={4}>
           EIPs
         </Button>
         <Button colorScheme="blue" onClick={() => setActiveTab('ercs')} isActive={activeTab === 'ercs'} ml={4}>
@@ -639,10 +690,33 @@ const renderChart = () => {
       </Flex>
 
       <Box padding={"2rem"} borderRadius={"0.55rem"}>
+      <Box
+            bgColor={bg}
+            padding="2rem"
+            borderRadius="0.55rem"
+            _hover={{
+              border: "1px",
+              borderColor: "#30A0E0",
+            }}
+          >
+          <Box className={"w-full"}>
             {renderChart()}
+            <DateTime />
+          </Box></Box>
+          <br/><br/>
+          <Box
+            bgColor={bg}
+            padding="2rem"
+            borderRadius="0.55rem"
+            _hover={{
+              border: "1px",
+              borderColor: "#30A0E0",
+            }}
+          >
             <Box className={"w-full"}>
+              {renderCharts(data, selectedYear, selectedMonth)}
               <DateTime />
-            </Box>
+            </Box></Box>
           </Box>
       <Box>
       <Text color="gray.500" fontStyle="italic" textAlign="center">
@@ -651,9 +725,10 @@ const renderChart = () => {
       </Box>
       
       <br/>
-      <Flex justify="center" mb={8}>
+     
+      <Flex justify="center">
+      <HStack spacing={4}>
          {/* Reviewer Selection */}
-         <HStack spacing={4}>
          <Menu closeOnSelect={false}>
           <MenuButton
             as={Button}
@@ -715,16 +790,13 @@ const renderChart = () => {
         <Button size="md" width="150px" colorScheme="blue" onClick={toggleDropdown}>
           {showDropdown ? 'Hide' : 'View More'}
         </Button>
-        </HStack>
+       
         <br/>
-         
-      </Flex>
-
-      
 
       {showDropdown && (
-        <Box mb={8} display="flex" justifyContent="center">
-          <HStack spacing={4}>
+        <HStack spacing={4}>
+        <Box display="flex" justifyContent="center" gap="1rem">
+          
             {/* Year Selection */}
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
@@ -763,43 +835,48 @@ const renderChart = () => {
                 ))}
               </MenuList>
             </Menu>
-
-
-          </HStack>
         </Box>
+        </HStack>
       )}
-      {selectedYear && selectedMonth && (
-          <Box mt={8}>
-            {/* Download CSV section */}
-            <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-              <Text fontSize="lg"
-    marginBottom={2}
-    color={useColorModeValue("gray.800", "gray.200")}>
-                You can download the data here:
-              </Text>
-              <CSVLink 
-                data={csvData.length ? csvData : []} 
-                filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
-                onClick={(e:any) => {
-                  generateCSVData();
-                  if (csvData.length === 0) {
-                    e.preventDefault(); 
-                    console.error("CSV data is empty or not generated correctly.");
-                  }
-                }}
-              >
-                <Button colorScheme="blue">Download CSV</Button>
-              </CSVLink>
-            </Box>
-          </Box>
-      )}
+       </HStack>
+      </Flex>
 
-      {selectedYear && selectedMonth && (
-        <Box mt={8}>
-          {renderCharts(data, selectedYear, selectedMonth)}
-          {renderTable(selectedYear, selectedMonth, showReviewer)}
-        </Box>
-      )}
+      {showDropdown && ( 
+        <>
+      
+            {selectedYear && selectedMonth && (
+                <Box mt={8}>
+                  {/* Download CSV section */}
+                  <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
+                    <Text fontSize="lg"
+                      marginBottom={2}
+                      color={useColorModeValue("gray.800", "gray.200")}>
+                      You can download the data here:
+                    </Text>
+                    <CSVLink 
+                      data={csvData.length ? csvData : []} 
+                      filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
+                      onClick={(e:any) => {
+                        generateCSVData();
+                        if (csvData.length === 0) {
+                          e.preventDefault(); 
+                          console.error("CSV data is empty or not generated correctly.");
+                        }
+                      }}
+                    >
+                      <Button colorScheme="blue">Download CSV</Button>
+                    </CSVLink>
+                  </Box>
+                </Box>
+            )}
+
+            {selectedYear && selectedMonth && (
+              <Box mt={8}>
+                {renderTable(selectedYear, selectedMonth, showReviewer)}
+              </Box>
+            )}
+    </>
+    )}
     </Box>
   </AllLayout>
 )

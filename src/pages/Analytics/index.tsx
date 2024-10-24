@@ -45,6 +45,7 @@ const API_ENDPOINTS = {
 }
 
 type PR = {
+  repo:string;
   prNumber: number;
   prTitle: string;
   created_at: Date;
@@ -59,6 +60,7 @@ interface ReviewerData {
 
 
 type Issue = {
+  repo:string;
   IssueNumber: number;
   IssueTitle: string;
   state: string;
@@ -69,7 +71,7 @@ type Issue = {
 const GitHubPRTracker: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'PRs' | 'Issues'>('PRs');
-  const [selectedRepo, setSelectedRepo] = useState<string>('EIPs');
+  const [selectedRepo, setSelectedRepo] = useState<string>('All');
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -99,68 +101,82 @@ const GitHubPRTracker: React.FC = () => {
 
   const fetchPRData = async () => {
     try {
-      const [eipsData, ercsData,ripsData] = await Promise.all(
+      // Fetch PR data from all three repositories: EIPs, ERCs, RIPs
+      const [eipsData, ercsData, ripsData] = await Promise.all(
         PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
       );
-
-      // Fetch data from all three repositories: EIPs, ERCs, RIPs
+  
+      // Fetch review data for each repository
       const [eipsRes, ercsRes, ripsRes] = await Promise.all([
         fetch(API_ENDPOINTS.eips),
         fetch(API_ENDPOINTS.ercs),
-        fetch(API_ENDPOINTS.rips), // Add the RIPs fetch here
+        fetch(API_ENDPOINTS.rips),
       ]);
-
+  
       const eipsReviewData = await eipsRes.json();
       const ercsReviewData = await ercsRes.json();
-      const ripsReviewData = await ripsRes.json(); // Parse RIPs response
-
-      // Determine which data to use based on selectedRepo
-      let selectedData;
-      let selectedReviewData;
-      if (selectedRepo === 'EIPs') {
-        selectedData = eipsData;
-        selectedReviewData = eipsReviewData;
-      } else if (selectedRepo === 'ERCs') {
-        selectedData = ercsData;
-        selectedReviewData = ercsReviewData;
-      } else if (selectedRepo === 'RIPs') {
-        selectedData = ripsData; // Assuming ripsData is available
-        selectedReviewData = ripsReviewData;
-      }
-
+      const ripsReviewData = await ripsRes.json();
+  
+      // Ensure review data is an object
       let combinedReviewData: PR[] = [];
-
-      // Process review data based on the selected repository
+  
+      let transformedData: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open: PR[], review: PR[] } } = {};
+  
+      // Selection logic for single repositories
       if (selectedRepo === 'EIPs') {
-        // Processing for EIPs review data
-        Object.values(eipsReviewData as ReviewerData).forEach((reviewerArray: PR[]) => {
-          combinedReviewData.push(...reviewerArray);
-        });
+        transformedData = transformPRData(eipsData, combinedReviewData);
       } else if (selectedRepo === 'ERCs') {
-        // Processing for ERCs review data
-        Object.values(ercsReviewData as ReviewerData).forEach((reviewerArray: PR[]) => {
-          combinedReviewData.push(...reviewerArray);
-        });
+        transformedData = transformPRData(ercsData, combinedReviewData);
       } else if (selectedRepo === 'RIPs') {
-        // Processing for RIPs review data
-        Object.values(ripsReviewData as ReviewerData).forEach((reviewerArray: PR[]) => {
-          combinedReviewData.push(...reviewerArray);
-        });
+        transformedData = transformPRData(ripsData, combinedReviewData);
+        
+      } else {
+        // When all repos are selected, transform and combine the data
+  
+        const eipsTransformed = transformPRData(eipsData, combinedReviewData);
+        const ercsTransformed = transformPRData(ercsData, combinedReviewData);
+        const ripsTransformed = transformPRData(ripsData, combinedReviewData);
+        console.log(ripsTransformed);
+  
+        // Combine the transformed data for each month/year key
+        const combineData = (source: any, target: any) => {
+          Object.keys(source).forEach(key => {
+            if (!target[key]) {
+              target[key] = {
+                created: [],
+                closed: [],
+                merged: [],
+                open: [],
+                review: []
+              };
+            }
+            target[key].created.push(...source[key].created);
+            target[key].closed.push(...source[key].closed);
+            target[key].merged.push(...source[key].merged);
+            target[key].open.push(...source[key].open);
+            target[key].review.push(...source[key].review);
+          });
+        };
+  
+        // Start with the transformed EIPs data and merge in ERCs and RIPs
+        combineData(eipsTransformed, transformedData);
+        combineData(ercsTransformed, transformedData);
+        combineData(ripsTransformed, transformedData);
       }
 
- 
-      // Transform the PR and review data
-      let transformedData = transformPRData(selectedData,combinedReviewData);
-
-
+      // console.log(transformedData);
+  
+      // Update state with the combined data
       setData(prevData => ({
         ...prevData,
-        PRs: transformedData
+        PRs: transformedData,
       }));
     } catch (error) {
       console.error("Failed to fetch PR data:", error);
     }
   };
+  
+
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -177,36 +193,60 @@ const GitHubPRTracker: React.FC = () => {
 
   const fetchIssueData = async () => {
     try {
+      // Fetch issue data from all three repositories: EIPs, ERCs, RIPs
       const [eipsData, ercsData, ripsData] = await Promise.all(
         ISSUE_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
       );
+  
+      let transformedData: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } } = {};
+  
+      // Selection logic for single repositories
+      if (selectedRepo === 'EIPs') {
+        transformedData = transformIssueData(eipsData);
+      } else if (selectedRepo === 'ERCs') {
+        transformedData = transformIssueData(ercsData);
+      } else if (selectedRepo === 'RIPs') {
+        transformedData = transformIssueData(ripsData);
+      } else {
+        // When all repos are selected, transform and combine the data
+        const eipsTransformed = transformIssueData(eipsData);
+        const ercsTransformed = transformIssueData(ercsData);
+        const ripsTransformed = transformIssueData(ripsData);
 
-      let selectedData;
-    if (selectedRepo === 'EIPs') {
-      selectedData = eipsData;
-    } else if (selectedRepo === 'ERCs') {
-      selectedData = ercsData;
-    } else if (selectedRepo === 'RIPs') {
-      selectedData = ripsData;
-    }
-
-    // if(selectedRepo === 'EIPs'){
-    //   const eip = eipsData.find(eip => eip.IssueNumber === 8913);
-    //   console.log(eip);
-    // }
-
-    // Transform the selected data
-    const transformedData = transformIssueData(selectedData);
-    // console.log(transformedData);
-    //   console.log(transformedData);
+        
+  
+        // Combine the transformed data for each month/year key
+        const combineIssueData = (source: any, target: any) => {
+          Object.keys(source).forEach(key => {
+            if (!target[key]) {
+              target[key] = {
+                created: [],
+                closed: [],
+                open: [],
+              };
+            }
+            target[key].created.push(...source[key].created);
+            target[key].closed.push(...source[key].closed);
+            target[key].open.push(...source[key].open);
+          });
+        };
+  
+        // Start with the transformed EIPs data and merge in ERCs and RIPs
+        combineIssueData(eipsTransformed, transformedData);
+        combineIssueData(ercsTransformed, transformedData);
+        combineIssueData(ripsTransformed, transformedData);
+      }
+  
+      // Update state with the combined data
       setData(prevData => ({
         ...prevData,
-        Issues: transformedData
+        Issues: transformedData,
       }));
     } catch (error) {
       console.error("Failed to fetch Issues data:", error);
     }
   };
+  
 
   const fetchData = async () => {
     setLoading(true);
@@ -576,7 +616,7 @@ const GitHubPRTracker: React.FC = () => {
   borderTopWidth="1px" 
   borderTopColor="gray.200"
 >
-  <Table variant="striped" colorScheme="blue">
+  <Table variant="striped" colorScheme="gray">
     <Thead bg="#2D3748">
       <Tr>
         <Th 
@@ -666,7 +706,7 @@ const GitHubPRTracker: React.FC = () => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    href={`https://github.com/ethereum/${(item as PR).repo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -726,7 +766,7 @@ const GitHubPRTracker: React.FC = () => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${selectedRepo}/pull/${item.prNumber}`} 
+                    href={`https://github.com/ethereum/${(item as PR).repo}/pull/${item.prNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -756,7 +796,7 @@ const GitHubPRTracker: React.FC = () => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    href={`https://github.com/ethereum/${(item as PR).repo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1191,17 +1231,27 @@ const GitHubPRTracker: React.FC = () => {
               onChange={(e) => setSelectedRepo(e.target.value)}
               width="200px"
             >
+              <option value="All">All</option>
               <option value="EIPs">EIPs</option>
               <option value="ERCs">ERCs</option>
               <option value="RIPs">RIPs</option>
             </Select>
           </Flex>
-  
+          <Box
+            bgColor={bg}
+            padding="2rem"
+            borderRadius="0.55rem"
+            _hover={{
+              border: "1px",
+              borderColor: "#30A0E0",
+            }}
+          >
           <Box padding={"2rem"} borderRadius={"0.55rem"}>
             {renderChart()}
             <Box className={"w-full"}>
               <DateTime />
             </Box>
+          </Box>
           </Box>
 
           <Box mt={2}>
@@ -1212,6 +1262,7 @@ const GitHubPRTracker: React.FC = () => {
           *Note: The data related to the number of PRs might vary when compared to official github repository due to factors like deleted PRs.*
         </Text>
       </Box>
+      <br/>
          
           <Flex justify="center" mb={8}>
   <Checkbox
@@ -1320,12 +1371,16 @@ const GitHubPRTracker: React.FC = () => {
                     </Box>
                   </Box>
               )}
-  
-          {selectedYear && selectedMonth && (
-            <Box mt={8}>
-              {renderTable(selectedYear, selectedMonth, activeTab)}
-            </Box>
-          )}
+               {showDropdown && ( 
+                <>
+          
+                  {selectedYear && selectedMonth && (
+                    <Box mt={8}>
+                      {renderTable(selectedYear, selectedMonth, activeTab)}
+                    </Box>
+                  )}
+                </>
+                )}
         </Box>
       </AllLayout>
     )
