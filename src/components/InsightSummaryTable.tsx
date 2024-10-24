@@ -513,7 +513,7 @@ export default function InsightSummary() {
               <Th>EIP</Th>
               <Th>ERC</Th>
               <Th>RIP</Th>
-              <Th isNumeric>Total</Th>
+              {/* <Th isNumeric>Total</Th> */}
             </Tr>
           </Thead>
           <Tbody>
@@ -549,9 +549,9 @@ export default function InsightSummary() {
                         {item.ripCount}
                       </a>
                     </Td>
-                    <Td isNumeric>
+                    {/* <Td isNumeric>
                       {item.eipCount + item.ercCount + item.ripCount}
-                    </Td>
+                    </Td> */}
                   </Tr>
                 </>
               );
@@ -561,28 +561,28 @@ export default function InsightSummary() {
               <Td>{prData.EIPs.open}</Td>
               <Td>{prData.ERCs.open}</Td>
               <Td>{prData.RIPs.open}</Td>
-              <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td>
+              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
             </Tr>
             <Tr>
               <Td>Merged PRs</Td>
               <Td>{prData.EIPs.merged}</Td>
               <Td>{prData.ERCs.merged}</Td>
               <Td>{prData.RIPs.merged}</Td>
-              <Td isNumeric>{prData.EIPs.merged+prData.ERCs.merged+prData.RIPs.merged}</Td>
+              {/* <Td isNumeric>{prData.EIPs.merged+prData.ERCs.merged+prData.RIPs.merged}</Td> */}
             </Tr>
             <Tr>
               <Td>Open Issues</Td>
               <Td>{issueData.EIPs.open}</Td>
               <Td>{issueData.ERCs.open}</Td>
               <Td>{issueData.RIPs.open}</Td>
-              <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td>
+              {/* <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td> */}
             </Tr>
             <Tr>
               <Td>Closed Issues</Td>
               <Td>{issueData.EIPs.closed}</Td>
               <Td>{issueData.ERCs.closed}</Td>
               <Td>{issueData.RIPs.closed}</Td>
-              <Td isNumeric>{issueData.EIPs.closed+issueData.ERCs.closed+issueData.RIPs.closed}</Td>
+              {/* <Td isNumeric>{issueData.EIPs.closed+issueData.ERCs.closed+issueData.RIPs.closed}</Td> */}
             </Tr>
             
           </Tbody>

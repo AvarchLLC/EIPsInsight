@@ -115,6 +115,7 @@ export default async (req: Request, res: Response) => {
 
             // Add review details to the respective reviewer
             resultByReviewer[reviewerName].push({
+                repo:"ERCs",
                 prNumber,
                 prTitle,
                 created_at,

@@ -147,35 +147,25 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     fetchData();
   }, []);
 
-  interface TransformedData {
-    category: string;
-    year: number;
-    value: number;
-  }
-  
-  const transformedData = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData = data.flatMap((item) => {
     const year = new Date(item.created).getFullYear();
-    const category = item.repo === 'rip' ? 'RIPs' : getCat(item.category);
   
-    // Check if a record for the same category and year already exists
-    const existingEntry = acc.find((entry) => entry.year === year && entry.category === category);
-  
-    if (existingEntry) {
-      // If it exists, increment the value
-      existingEntry.value += 1;
-    } else {
-      // Otherwise, create a new entry
-      acc.push({
-        category: category,
+    if (item.repo === 'rip') {
+      // If the repo is 'rip', set category to 'rip'
+      return {
+        category: 'RIPs',
         year: year,
         value: 1,
-      });
+      };
+    } else {
+      // For non-rip items, apply getCat function
+      return {
+        category: getCat(item.category),
+        year: year,
+        value: 1,
+      };
     }
-  
-    return acc;
-  }, []);
-  
-  
+  });
   
 
 
@@ -186,110 +176,62 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     }
   );
 
-  console.log(transformedData);
+  // const config = {
+  //   data: transformedData,
+  //   xField: "year",
+  //   yField: "value",
+  //   color: categoryColors,
+  //   seriesField: "category",
+  //   isStack: true,
+  //   areaStyle: { fillOpacity: 0.6 },
+  //   legend: { position: "top-right" as const },
+  //   smooth: true,
+  //   // label: {
+  //   //   position: "middle",
+  //   //   style: {
+  //   //     fill: "#FFFFFF",
+  //   //     opacity: 0.6,
+  //   //   },
+  //   // } as any,
+  // };
 
   const config = {
-    data: transformedData,
+    data: transformedData, // Ensure sortedData matches the expected type
     xField: "year",
     yField: "value",
-    interactions: [{ type: "element-selected" }, { type: "element-active" }],
-    statistic: {
-      title: false as const,
-      content: {
-        style: {
-          whiteSpace: "pre-wrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        },
-      },
-    },
-    slider: {
-      start: 0,
-      end: 1,
-  },
     color: categoryColors,
-    seriesField: "category",
-    isStack: true,
-    areaStyle: { fillOpacity: 0.6 },
-    legend: { position: "top-right" as const },
-    smooth: true,
-    // label: {
-    //   position: "middle",
-    //   style: {
-    //     fill: "#FFFFFF",
-    //     opacity: 0.6,
-    //   },
-    // } as any,
-    
+    seriesField: "category", // Field for series grouping
+    isStack: true, // Grouping behavior
+    // columnStyle: {
+    //   radius: [20, 20, 0, 0], // Rounded corners
+    // },
+    slider: {
+      start: 0, // Start of the slider
+      end: 1, // End of the slider
+    },
+    legend: { position: "top-right" as const }, // Legend position
+    smooth: true, // Smooth transition
   };
-  
-  
-  
 
   return (
     <>
       {isLoading ? ( // Show loader while data is loading
         <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="200px"
+          // display="flex"
+          // justifyContent="center"
+          // alignItems="center"
+          // height="200px"
         >
           <Spinner />
         </Box>
       ) : (
         <>
-          <Box
-            bgColor={bg}
-            paddingX="0.5rem"
-            borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
-          >
-            <NextLink
-              href={
-                type === "ERC"
-                  ? "/erctable"
-                  : type === "EIP"
-                  ? "/eiptable"
-                  : type === "RIP"
-                  ? "/riptable"
-                  : "/alltable"
-              }
-            >
-              <Text
-                fontSize="2xl"
-                fontWeight="bold"
-                color="#30A0E0"
-                className="text-left"
-                paddingY={4}
-                paddingLeft={4}
-                display="flex"
-                flexDirection="column"
-              >
-                {`${type} - [${data.length}]`}
-              </Text>
-            </NextLink>
-            <Box
-            width={"100%"}       // Make the container full width
-            minWidth={"100px"}  // Set a minimum width
-            height={400}
-            overflowX="auto"     // Enable horizontal scrolling if necessary
-            overflowY="hidden"
-            as={motion.div}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            // transition={{ duration: 0.5 }}
-          >
-            <Area {...config} />
-            <Box className={"w-full"}>
-              <DateTime />
+            <Box mt={8}>
+              <Area {...config} />
+              <Box className={"w-full"}>
+                <DateTime />
+             </Box>
             </Box>
-          </Box>
-
-          </Box>
         </>
       )}
     </>

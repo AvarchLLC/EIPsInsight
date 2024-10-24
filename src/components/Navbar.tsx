@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
           href: `/Analytics`,
         },
         {
-          label: "Editors Tracker",
+          label: "Editors Leaderboard",
           href: `/Reviewers`,
         },
         {

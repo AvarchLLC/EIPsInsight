@@ -13,6 +13,7 @@ import {
     Text,
     Flex,
     Button,
+    useColorMode,
     useColorModeValue,
     Collapse,
     IconButton,
@@ -22,6 +23,7 @@ import {
   import axios from "axios";
   import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
   import { DownloadIcon } from "@chakra-ui/icons";
+import Comments from "@/components/comments";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {
@@ -86,6 +88,8 @@ import {
       a.click();
       document.body.removeChild(a);
     };
+
+
 
     const convertToCSV = (filteredData: any, type: string) => { 
       const csvRows = [];
@@ -280,139 +284,150 @@ import {
         </Flex>
   
         {/* Heading based on active tab */}
-        <Box
+        {/* <Box
           ml={2}
           mr={2}
           border="1px solid #e2e8f0"
           borderRadius="10px 10px 10px 10px"
           boxShadow="lg"
           bg="#171923" // Dark mode background
+        > */}
+           <Flex justify="space-between" align="center" p={4}>
+        <Heading as="h2" size="lg" color={useColorModeValue("#3182CE", "blue.300")}>
+          {activeTab} BOARD ({activeTab === 'EIPs' ? eipData.length : ercData.length})
+        </Heading>
+        <Button
+          colorScheme="blue"
+          variant="outline"
+          fontSize={"14px"}
+          fontWeight={"bold"}
+          padding={"8px 20px"}
+          onClick={handleDownload}
         >
-         <Flex justify="space-between" align="center" p={4}>
-    <Heading as="h2" size="lg" color="#fff">
-      {activeTab} BOARD ({activeTab === 'EIPs' ? eipData.length : ercData.length})
-    </Heading>
-    <Button
-      colorScheme="blue"
-      variant="outline"
-      fontSize={"14px"}
-      fontWeight={"bold"}
-      padding={"8px 20px"}
-      onClick={handleDownload}
-    >
-      <DownloadIcon marginEnd={"1.5"} />
-      Download Reports
-    </Button>
-  </Flex>
+          <DownloadIcon marginEnd={"1.5"} />
+          Download Reports
+        </Button>
+      </Flex>
 
   
           {/* Scrollable Table */}
           <TableContainer
-  minHeight="500px"
-  overflowY="auto"
-  overflowX="auto"
-  borderWidth="1px"
-  borderRadius="md"
-  bg="#1A202C" // Dark mode table background
-  p={4}
-  boxShadow="md"
-  maxHeight="900px"
->
-  <Table variant="striped" colorScheme="blue" size="lg" mt={4} borderRadius="md" boxShadow="md" width="100%">
-    <Thead bg="#171923">
-      <Tr>
-        <Th textAlign="center" borderTopLeftRadius="10px" minWidth="6rem" color="white">
-          Serial Number
-        </Th>
-        <Th textAlign="center" minWidth="10rem" color="white">
-          PR Number
-        </Th>
-        <Th textAlign="center" borderTopRightRadius="10px" minWidth="10rem" color="white">
-          PR Link
-        </Th>
-      </Tr>
-    </Thead>
-    
-    <Tbody>
-  {displayedData.length === 0 ? (
-    <Tr>
-      <Td colSpan={3} textAlign="center" color="white">
-        No Data Available
-      </Td>
-    </Tr>
-  ) : (
-    displayedData.map((item: any, index: number) => (
-      <Tr key={item._id}>
-        <Td textAlign="center">
-          <Box
-            bg="gray.600" // Box background color
-            color="white" // Text color
-            borderRadius="md" // Rounded corners
-            paddingX={2} // Horizontal padding
-            paddingY={1} // Vertical padding
-            display="inline-block" // Ensures the box wraps tightly around the content
-          >
-            {index + 1}
-          </Box>
-        </Td>
-        <Td textAlign="center">
-          <Box
-            bg="gray.600" // Box background color
-            color="white" // Text color
-            borderRadius="md" // Rounded corners
-            paddingX={2} // Horizontal padding
-            paddingY={1} // Vertical padding
-            display="inline-block" // Ensures the box wraps tightly around the content
-          >
-            {extractPrNumber(item.url)}
-          </Box>
-        </Td>
-        <Td textAlign="center">
-          <button
-            style={{
-              backgroundColor: '#428bca',
-              color: '#ffffff',
-              border: 'none',
-              padding: '10px 20px',
-              cursor: 'pointer',
-              borderRadius: '5px',
-            }}
-          >
-            <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ color: '#ffffff', textDecoration: 'none' }}>
-              View PR
-            </a>
-          </button>
-        </Td>
-      </Tr>
-    ))
-  )}
-</Tbody>
+          minHeight="500px"
+          overflowY="auto"
+          overflowX="auto"
+          borderWidth="1px"
+          borderRadius="md"
+          p={4}
+          boxShadow="md"
+          maxHeight="900px"
+        >
+          <Table variant="striped" colorScheme="gray" size="lg" mt={4} borderRadius="md" boxShadow="md" width="100%">
+            <Thead bg="#171923">
+              <Tr>
+                <Th textAlign="center" borderTopLeftRadius="10px" minWidth="6rem" color="white">
+                  Serial Number
+                </Th>
+                <Th textAlign="center" minWidth="10rem" color="white">
+                  PR Number
+                </Th>
+                <Th textAlign="center" borderTopRightRadius="10px" minWidth="10rem" color="white">
+                  PR Link
+                </Th>
+              </Tr>
+            </Thead>
+            
+            <Tbody>
+          {displayedData.length === 0 ? (
+            <Tr>
+              <Td colSpan={3} textAlign="center" color="white">
+                No Data Available
+              </Td>
+            </Tr>
+          ) : (
+            displayedData.map((item: any, index: number) => (
+              <Tr key={item._id}>
+                <Td textAlign="center">
+                  <Box
+                    bg="gray.600" // Box background color
+                    color="white" // Text color
+                    borderRadius="md" // Rounded corners
+                    paddingX={2} // Horizontal padding
+                    paddingY={1} // Vertical padding
+                    display="inline-block" // Ensures the box wraps tightly around the content
+                  >
+                    {index + 1}
+                  </Box>
+                </Td>
+                <Td textAlign="center">
+                  <Box
+                    bg="gray.600" // Box background color
+                    color="white" // Text color
+                    borderRadius="md" // Rounded corners
+                    paddingX={2} // Horizontal padding
+                    paddingY={1} // Vertical padding
+                    display="inline-block" // Ensures the box wraps tightly around the content
+                  >
+                    {extractPrNumber(item.url)}
+                  </Box>
+                </Td>
+                <Td textAlign="center">
+                  <button
+                    style={{
+                      backgroundColor: '#428bca',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                    }}
+                  >
+                    <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ color: '#ffffff', textDecoration: 'none' }}>
+                      View PR
+                    </a>
+                  </button>
+                </Td>
+              </Tr>
+            ))
+          )}
+        </Tbody>
 
-  </Table>
-</TableContainer>
+          </Table>
+        </TableContainer>
 
 
-        </Box>
+
+        {/* </Box> */}
+
+        
+
         <Box
-  bg="gray.700" // Background color for the box
-  color="white" // Text color
-  borderRadius="md" // Rounded corners
-  padding={4} // Padding inside the box
-  marginTop={4} // Margin above the box
->
-  <Text>
-    For other details, check{' '}
-    <LI href="/Analytics" color="blue.300" isExternal>
-      PRs Analytics
-    </LI>{' '}
-    and{' '}
-    <LI href="/Reviewers" color="blue.300" isExternal>
-      Editors Tracker
-    </LI>.
-  </Text>
-</Box>
+          bg={useColorModeValue("blue.50", "gray.700")} // Background color for the box
+          color="black" // Text color
+          borderRadius="md" // Rounded corners
+          padding={4} // Padding inside the box
+          marginTop={4} // Margin above the box
+        >
+          <Text>
+            For other details, check{' '}
+            <LI href="/Analytics" color="blue" isExternal>
+              PRs Analytics
+            </LI>{' '}
+            and{' '}
+            <LI href="/Reviewers" color="blue" isExternal>
+              Editors Leaderboard
+            </LI>.
+          </Text>
         </Box>
-      </AllLayout>
+       
+        <Box>
+          <br/>
+        <hr></hr>
+        <br/>
+        <Text fontSize="3xl" fontWeight="bold">Comments</Text>
+          <Comments/>
+        </Box>
+      </Box>
+              </AllLayout>
     );
   };
   

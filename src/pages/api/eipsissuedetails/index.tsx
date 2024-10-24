@@ -43,6 +43,7 @@ export default async (req: Request, res: Response) => {
             const state = issue.state;
 
             return {
+                repo:'EIPs',
                 IssueNumber: issue.issueNumber,
                 IssueTitle: issue.issueTitle,
                 created_at,

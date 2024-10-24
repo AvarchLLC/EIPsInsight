@@ -37,6 +37,7 @@ import Table from "./Table";
 import Banner from "@/components/NewsBanner";
 import SearchBox from "@/components/SearchBox";
 import BoyGirl from "@/components/BoyGirl";
+import BoyGirl2 from "@/components/BoyGirl2";
 import AllChart from "./AllChart";
 import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 
@@ -219,9 +220,15 @@ const Dashboard = () => {
                         </Box>
                       </Stack>
                     </Stack>
-                    <AllChart type="Total" />
+                    <BoyGirl2/>
+                    {/* <AllChart type="Total" /> */}
                   </Box>
+                  <br/><br/><br/>
+                  <AllChart type="Total" />
                 </div>
+                
+                {/* <AllChart type="Total" /> */}
+                
                 <div className="lg:hidden block">
                   <Text
                     className="text-5xl text-center pb-5 sm:text-6xl md:text-7xl"
@@ -230,32 +237,30 @@ const Dashboard = () => {
                   >
                     Ethereum <br /> Improvement <br /> Proposal <br /> Insights
                   </Text>
-                  <AllChart type="Total" />
-
-                  <Stack direction={"row"} spacing={"6"} paddingTop={"20"}>
+                  <Stack direction={"row"} spacing={"6"} paddingTop={"20"} justifyContent={"center"}>
                     <Box>
                       <NextLink href={"/home#1"}>
-                        <Button
-                          colorScheme="blue"
-                          variant={"outline"}
-                          fontSize={{
-                            lg: "14px",
-                            md: "12px",
-                            sm: "12px",
-                            base: "10px",
-                          }}
-                          fontWeight={"bold"}
-                          padding={{
-                            lg: "10px 20px",
-                            md: "5px 10px",
-                            sm: "5px 10px",
-                            base: "5px 10px",
-                          }}
-                          rightIcon={<BsArrowUpRight />}
-                          bgColor={"#30A0E0"}
-                        >
-                          Dashboard
-                        </Button>
+                            <Button
+                              colorScheme="white"
+                              variant={"outline"}
+                              fontSize={{
+                                lg: "14px",
+                                md: "12px",
+                                sm: "12px",
+                                base: "10px",
+                              }}
+                              fontWeight={"bold"}
+                              padding={{
+                                lg: "10px 20px",
+                                md: "5px 10px",
+                                sm: "5px 10px",
+                                base: "5px 10px",
+                              }}
+                              rightIcon={<BsArrowUpRight />}
+                              bgColor={"#30A0E0"}
+                            >
+                              Dashboard
+                            </Button>
                       </NextLink>
                     </Box>
 
@@ -285,6 +290,8 @@ const Dashboard = () => {
                       </NextLink>
                     </Box>
                   </Stack>
+                  <br/><br/>
+                  <AllChart type="Total" />
                 </div>
               </Box>
 

@@ -27,6 +27,7 @@ import InsightSummary from "@/components/InsightSummaryTable";
 import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import InsightStats from "@/components/InsightStats";
 
+
 interface StatusChange {
   _id: string;
   count: number;
@@ -63,45 +64,6 @@ interface APIData {
   rip: StatusChange[];
 }
 
-type PR = {
-  prNumber: number;
-  prTitle: string;
-  created_at: Date;
-  closed_at: Date | null;
-  merged_at: Date | null;
-};
-
-type Issue = {
-  IssueNumber: number;
-  IssueTitle: string;
-  state: string;
-  created_at: Date;
-  closed_at: Date | null;
-};
-
-const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails', '/api/ripsprdetails'];
-const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails', '/api/ripsissuedetails'];
-
-// const getStatus = (status: string) => {
-//   switch (status) {
-//     case "Draft":
-//       return "Draft";
-//     case "Final" || "Accepted" || "Superseded":
-//       return "Final";
-//     case "Last Call":
-//       return "Last Call";
-//     case "Withdrawn" || "Abandoned" || "Rejected":
-//       return "Withdrawn";
-//     case "Review":
-//       return "Review";
-//     case "Living" || "Active":
-//       return "Living";
-//     case "Stagnant":
-//       return "Stagnant";
-//     default:
-//       return "Final";
-//   }
-// };
 
 function getMonthName(monthNumber: number): string {
   const date = new Date();
@@ -128,41 +90,6 @@ const Month = () => {
     year = pathParts[2];
     month = pathParts[3];
   }
-
-
-  const [typeData, setTypeData] = useState<StatusChange[]>([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/statusChanges/${year}/${month}`);
-        const jsonData = await response.json();
-        setData(jsonData);
-        if (type === "EIPs" && jsonData.eip) {
-          setTypeData(jsonData.eip);
-        } else if (type === "ERCs" && jsonData.erc) {
-          setTypeData(jsonData.erc);
-        } else if (type === "RIPs" && jsonData.rip) {
-          setTypeData(jsonData.rip);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, [year, month]);
-
-  // useEffect(() => {
-  //   if (typeData.length === 0) {
-  //     setIsResEmpty(true);
-  //   } else {
-  //     setIsResEmpty(false);
-  //   }
-  // });
-  let total = 0;
-  typeData.map((item) => {
-    total = total + item.count;
-  });
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -357,9 +284,11 @@ const Month = () => {
                 <StackedColumnChart status="Withdrawn" />
               </Box>
             </Box>
+           
           </motion.div>
         </>
       )}
+
     </AllLayout>
   );
 };

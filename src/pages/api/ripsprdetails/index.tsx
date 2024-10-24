@@ -43,6 +43,7 @@ export default async (req: Request, res: Response) => {
             const { prNumber, prTitle, createdAt: created_at, closedAt: closed_at, mergedAt: merged_at } = pr;
 
             return {
+                repo:'RIPs',
                 prNumber,
                 prTitle,
                 created_at,
