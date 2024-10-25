@@ -81,7 +81,7 @@ export default function InsightSummary() {
   if (path) {
     const pathParts = path.split("/");
     year = pathParts[2];
-    month = pathParts[3];
+    month = pathParts[3].padStart(2, '0');
   }
 
   const key = `${year}-${month}`; // Combine year and month for the key
@@ -501,7 +501,7 @@ export default function InsightSummary() {
 
   return (
     <>
-      <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
+      <Text fontSize="7xl" fontWeight="bold" color="blue.400" textAlign="center" paddingTop={8} paddingLeft={8}>
         Summary
       </Text>
       <TableContainer bg={bg} padding={4} rounded={"xl"} marginTop={8}>
@@ -564,11 +564,32 @@ export default function InsightSummary() {
               {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
             </Tr>
             <Tr>
+              <Td>Created PRs</Td>
+              <Td>{prData.EIPs.created}</Td>
+              <Td>{prData.ERCs.created}</Td>
+              <Td>{prData.RIPs.created}</Td>
+              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
+            </Tr>
+            <Tr>
+              <Td>Closed PRs</Td>
+              <Td>{prData.EIPs.closed}</Td>
+              <Td>{prData.ERCs.closed}</Td>
+              <Td>{prData.RIPs.closed}</Td>
+              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
+            </Tr>
+            <Tr>
               <Td>Merged PRs</Td>
               <Td>{prData.EIPs.merged}</Td>
               <Td>{prData.ERCs.merged}</Td>
               <Td>{prData.RIPs.merged}</Td>
               {/* <Td isNumeric>{prData.EIPs.merged+prData.ERCs.merged+prData.RIPs.merged}</Td> */}
+            </Tr>
+            <Tr>
+              <Td>Created Issues</Td>
+              <Td>{issueData.EIPs.created}</Td>
+              <Td>{issueData.ERCs.created}</Td>
+              <Td>{issueData.RIPs.created}</Td>
+              {/* <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td> */}
             </Tr>
             <Tr>
               <Td>Open Issues</Td>

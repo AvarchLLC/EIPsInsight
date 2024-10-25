@@ -279,6 +279,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
             overflowX="auto"     // Enable horizontal scrolling if necessary
             overflowY="hidden"
             as={motion.div}
+            padding={"2 rem"}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             // transition={{ duration: 0.5 }}

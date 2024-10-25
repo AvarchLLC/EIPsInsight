@@ -563,7 +563,7 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                        {navItem.children && navItem.label === "More"  && (
+                        {navItem.children && (navItem.label === "More" || navItem.label === "Tools") && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -604,7 +604,8 @@ const Navbar: React.FC = () => {
 
                         {navItem.children &&
                           navItem.label !== "Insight" &&
-                          navItem.label !== "More" && (
+                          navItem.label !== "More" &&
+                          navItem.label !== "Tools" && (
                             <PopoverContent
                               border={0}
                               boxShadow={"xl"}

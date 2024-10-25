@@ -71,7 +71,7 @@ type Issue = {
 const GitHubPRTracker: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'PRs' | 'Issues'>('PRs');
-  const [selectedRepo, setSelectedRepo] = useState<string>('All');
+  const [selectedRepo, setSelectedRepo] = useState<string>('EIPs');
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -1032,12 +1032,8 @@ const GitHubPRTracker: React.FC = () => {
             {
                 min: yAxisMin, // Set min for bar chart y-axis
                 max: 0, // Set max based on negative values
-                label: {
-                  formatter: () => '', // Completely hide labels
-              },
-              grid: {
-                  line: { style: { stroke: 'transparent' } }, // Hide grid lines
-              },
+                
+              
             },
             {
                 min:  yAxisMin, // Start from 0 for the trend line
@@ -1129,11 +1125,8 @@ const GitHubPRTracker: React.FC = () => {
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          This tool aims to automate the process of tracking PRs and issues in
-          GitHub repositories, providing visualizations and reports to
-          streamline project management. The default view utilizes the timeline
-          to observe trends in the number of Created, Closed, Merged, and Open
-          PRs/Issues at the end of each month.
+          This tool aims to automate the process of tracking PRs and issues in GitHub repositories, providing visualizations and reports to streamline project management.
+          The default view utilizes the timeline to observe trends in the number of Created, Closed, Merged, and Open PRs/Issues at the end of each month.
         </Text>
 
         <Heading
@@ -1150,10 +1143,8 @@ const GitHubPRTracker: React.FC = () => {
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          To focus on a specific month, click the View More button and choose
-          the desired Year and Month from the dropdown menus. The table and
-          graph will then update to display data exclusively for that selected
-          month.
+          To focus on a specific month, click the View More button and choose the desired Year and Month from the dropdown menus. 
+          The table and graph will then update to display data exclusively for that selected month.
         </Text>
 
         <Heading
@@ -1170,11 +1161,9 @@ const GitHubPRTracker: React.FC = () => {
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          To customize the chart, you can adjust the timeline scroll bar to
-          display data for a specific month/year. Additionally, you can tailor
-          the graph by selecting or deselecting checkboxes for Created, Closed,
-          Merged, and Open PRs/Issues, allowing you to focus on the trends that
-          are most relevant to you.
+          To customize the chart, you can adjust the timeline scroll bar to display data for a specific month/year. 
+          Additionally, you can tailor the graph by selecting or deselecting checkboxes for Created, Closed, Merged, and Open PRs/Issues, 
+          allowing you to focus on the trends that are most relevant to you.
         </Text>
 
         <Heading
@@ -1190,10 +1179,8 @@ const GitHubPRTracker: React.FC = () => {
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          After selecting your preferred data using the View More option, you
-          can download reports based on the filtered data for further analysis
-          or record-keeping. Simply click the download button to export the
-          data in your chosen format.
+          After selecting your preferred data using the View More option, you can download reports based on the filtered data for further analysis or record-keeping. 
+          Simply click the download button to export the data in your chosen format.
         </Text>
       </Collapse>
 
@@ -1297,15 +1284,7 @@ const GitHubPRTracker: React.FC = () => {
       Merged PRs
     </Checkbox>
   )}
-  {/* {activeTab === 'PRs' && (
-    <Checkbox
-      isChecked={showCategory.review}
-      onChange={() => setShowCategory(prev => ({ ...prev, review: !prev.review }))}
-      mr={4}
-    >
-      Show Reviewed PRs
-    </Checkbox>
-  )} */}
+  
 </Flex>
 
   

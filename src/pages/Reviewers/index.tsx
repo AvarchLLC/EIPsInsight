@@ -26,7 +26,9 @@ type ShowReviewerType = { [key: string]: boolean };
 const ReviewTracker = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
-  const [showReviewer, setShowReviewer] = useState<{ [key: string]: boolean }>({});
+  // const [showReviewer, setShowReviewer] = useState<{ [key: string]: boolean }>({});
+  const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
+  const [reviewers, setReviewers] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -36,6 +38,65 @@ const ReviewTracker = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const toggleCollapse = () => setShow(!show);
+
+  const fetchReviewers = async (): Promise<string[]> => {
+    try {
+      const response = await fetch(
+        "https://raw.githubusercontent.com/ethereum/EIPs/master/config/eip-editors.yml"
+      );
+      const text = await response.text();
+  
+      // Match unique reviewers using a regex to handle YAML structure
+      const matches = text.match(/-\s(\w+)/g);
+      const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
+  
+      return reviewers;
+    } catch (error) {
+      console.error("Error fetching reviewers:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    fetchReviewers().then((uniqueReviewers) => {
+      setReviewers(uniqueReviewers);
+      const initialShowReviewer = uniqueReviewers.reduce(
+        (acc, reviewer) => ({ ...acc, [reviewer]: false }),
+        {} as ShowReviewerType
+      );
+      setShowReviewer(initialShowReviewer);
+    });
+  }, []);
+
+  const selectAllReviewers = () => {
+    const updatedReviewers = Object.keys(showReviewer).reduce(
+      (acc, reviewer) => ({ ...acc, [reviewer]: true }),
+      {} as ShowReviewerType
+    );
+    setShowReviewer(updatedReviewers);
+  };
+
+  // Function to deselect all reviewers
+  const deselectAllReviewers = () => {
+    const updatedReviewers = Object.keys(showReviewer).reduce(
+      (acc, reviewer) => ({ ...acc, [reviewer]: false }),
+      {} as ShowReviewerType
+    );
+    setShowReviewer(updatedReviewers);
+  };
+
+  // Function to select only the active reviewers from the list
+  const selectActiveReviewers = () => {
+    const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
+      acc[reviewer] = reviewers.includes(reviewer);
+      return acc;
+    }, {} as ShowReviewerType);
+  
+    setShowReviewer(updatedReviewers);
+  };
+  
+  
+
 
   // Function to generate CSV data
   type PR = {
@@ -617,10 +678,8 @@ const renderChart = () => {
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          This tool provides a comprehensive overview of all EIP editor reviews
-          conducted to date. It displays the total number of reviews each month
-          for each editor, allowing you to easily track and analyze review
-          activity across different months and editors.
+          This tool provides a comprehensive overview of all EIP editor reviews conducted to date. 
+          It displays the total number of reviews each month for each editor, allowing you to easily track and analyze review activity across different months and editors.
         </Text>
 
         <Heading
@@ -637,10 +696,8 @@ const renderChart = () => {
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          To view data for a specific month, you can use the timeline scroll bar
-          or click the View More button. From there, select the desired Year and
-          Month using the dropdown menus, and the table and graph will
-          automatically update to display data for that selected month.
+          To view data for a specific month, you can use the timeline scroll bar or click the View More button. 
+          From there, select the desired Year and Month using the dropdown menus, and the table and graph will automatically update to display data for that selected month.
         </Text>
 
         <Heading
@@ -656,10 +713,8 @@ const renderChart = () => {
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          You can refine the data by selecting or deselecting specific editors
-          from the checkbox list. This will filter the chart and table to show
-          data only for the selected editors, enabling you to focus on
-          individual contributions.
+          You can refine the data by selecting or deselecting specific editors from the checkbox list. 
+          This will filter the chart and table to show data only for the selected editors, enabling you to focus on individual contributions.
         </Text>
       </Collapse>
 
@@ -699,12 +754,14 @@ const renderChart = () => {
               borderColor: "#30A0E0",
             }}
           >
-          <Box className={"w-full"}>
-            {renderChart()}
-            <DateTime />
-          </Box></Box>
-          <br/><br/>
-          <Box
+              <Box className={"w-full"}>
+                {renderCharts(data, selectedYear, selectedMonth)}
+                <DateTime />
+            </Box>
+            </Box>
+            <br/><br/>
+          </Box>
+      <Box
             bgColor={bg}
             padding="2rem"
             borderRadius="0.55rem"
@@ -713,11 +770,11 @@ const renderChart = () => {
               borderColor: "#30A0E0",
             }}
           >
-            <Box className={"w-full"}>
-              {renderCharts(data, selectedYear, selectedMonth)}
-              <DateTime />
-            </Box></Box>
-          </Box>
+          <Box className={"w-full"}>
+            {renderChart()}
+            <DateTime />
+          </Box></Box>
+          
       <Box>
       <Text color="gray.500" fontStyle="italic" textAlign="center">
           *Please note: The data is refreshed every 24 hours to ensure accuracy and up-to-date information*
@@ -730,62 +787,56 @@ const renderChart = () => {
       <HStack spacing={4}>
          {/* Reviewer Selection */}
          <Menu closeOnSelect={false}>
-          <MenuButton
-            as={Button}
-            rightIcon={<ChevronDownIcon />}
-            colorScheme="blue"
-            size="md" 
-            width="150px"
-          >
-            Reviewers
-          </MenuButton>
+      <MenuButton
+        as={Button}
+        rightIcon={<ChevronDownIcon />}
+        colorScheme="blue"
+        size="md"
+        width="150px"
+      >
+        Reviewers
+      </MenuButton>
 
-          {/* Make MenuList scrollable after 6 items */}
-          <MenuList maxHeight="200px" overflowY="auto">
-            <MenuItem
-              onClick={() => {
-                const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
-                  acc[reviewer] = false;
-                  return acc;
-                }, {} as ShowReviewerType); 
-                setShowReviewer(updatedReviewers);
-              }}
-            >
-              <Text as="span" fontWeight="bold" textDecoration="underline">
-                Remove All
-              </Text>
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                const updatedReviewers = Object.keys(showReviewer).reduce((acc: ShowReviewerType, reviewer: string) => {
-                  acc[reviewer] = true;
-                  return acc;
-                }, {} as ShowReviewerType); 
-                setShowReviewer(updatedReviewers);
-              }}
-            >
-              <Text as="span" fontWeight="bold" textDecoration="underline">
-                Select All
-              </Text>
-            </MenuItem>
+      <MenuList maxHeight="200px" overflowY="auto">
+        {/* Deselect all reviewers */}
+        <MenuItem onClick={deselectAllReviewers}>
+          <Text as="span" fontWeight="bold" textDecoration="underline">
+            Remove All
+          </Text>
+        </MenuItem>
 
-            {Object.keys(showReviewer).map((reviewer: string) => (
-              <MenuItem key={reviewer}>
-                <Checkbox
-                  isChecked={showReviewer[reviewer]}
-                  onChange={(e) =>
-                    setShowReviewer({
-                      ...showReviewer,
-                      [reviewer]: e.target.checked,
-                    })
-                  }
-                >
-                  {reviewer}
-                </Checkbox>
-              </MenuItem>
-            ))}
-          </MenuList>
-        </Menu>
+        {/* Select all reviewers */}
+        <MenuItem onClick={selectAllReviewers}>
+          <Text as="span" fontWeight="bold" textDecoration="underline">
+            Select All
+          </Text>
+        </MenuItem>
+
+        {/* Select only active reviewers */}
+        <MenuItem onClick={selectActiveReviewers}>
+          <Text as="span" fontWeight="bold" textDecoration="underline">
+            Select Active
+          </Text>
+        </MenuItem>
+
+        {/* Render each reviewer with a checkbox */}
+        {Object.keys(showReviewer).map((reviewer) => (
+          <MenuItem key={reviewer}>
+            <Checkbox
+              isChecked={showReviewer[reviewer]}
+              onChange={(e) =>
+                setShowReviewer({
+                  ...showReviewer,
+                  [reviewer]: e.target.checked,
+                })
+              }
+            >
+              {reviewer}
+            </Checkbox>
+          </MenuItem>
+        ))}
+      </MenuList>
+    </Menu>
 
         <Button size="md" width="150px" colorScheme="blue" onClick={toggleDropdown}>
           {showDropdown ? 'Hide' : 'View More'}

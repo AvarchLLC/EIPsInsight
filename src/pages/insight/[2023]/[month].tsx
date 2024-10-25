@@ -26,7 +26,9 @@ import InsightDoughnut from "@/components/InsightDoughnut";
 import InsightSummary from "@/components/InsightSummaryTable";
 import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import InsightStats from "@/components/InsightStats";
-
+import InsightsLeaderboard from "@/components/InsightsLeaderboard";
+import InsightsOpenPrsIssues from "@/components/InsightOpenPrsIssues";
+import InsightsAllStats from "@/components/InsitghtAllstats";
 
 interface StatusChange {
   _id: string;
@@ -196,7 +198,43 @@ const Month = () => {
   </Box>
 
 
-              <InsightSummary />
+  {/* <Box
+  display="flex" 
+  justifyContent="space-between" 
+  padding="2rem"
+  bgColor={bg}
+  borderRadius="0.55rem"
+  _hover={{
+    border: "1px",
+    borderColor: "#30A0E0",
+  }}
+>
+  
+  <Box flex="1" marginRight="1rem">
+    <InsightSummary /> 
+  </Box>
+
+  
+  <Box flex="1" display="flex" flexDirection="column" justifyContent="space-between">
+   
+    <Box
+      bgColor={bg}
+      padding="1rem"
+    >
+      <InsightsLeaderboard /> 
+    </Box>
+
+   
+    <Box
+    >
+      <InsightsOpenPrsIssues /> 
+    </Box>
+  </Box>
+</Box> */}
+<InsightsAllStats/>
+
+
+
               {/* Defining the stats table here */}
               {/* <InsightStats/> */}
 

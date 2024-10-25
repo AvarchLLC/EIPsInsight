@@ -40,6 +40,7 @@ import BoyGirl from "@/components/BoyGirl";
 import BoyGirl2 from "@/components/BoyGirl2";
 import AllChart from "./AllChart";
 import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
+import ToolsSection from "./AvailableTools";
 
 interface EIP {
   _id: string;
@@ -144,7 +145,7 @@ const Dashboard = () => {
               <Box
                 id={"hero"}
                 paddingTop={{ lg: "12", base: "6" }}
-                paddingBottom={{ lg: "24", base: "32" }}
+                paddingBottom={{ lg: "6", base: "6" }}
               >
                 <div className="lg:block hidden">
                   <Box
@@ -294,6 +295,17 @@ const Dashboard = () => {
                   <AllChart type="Total" />
                 </div>
               </Box>
+
+              {/* <div className="py-8"> */}
+                {/* <Box
+                  className={
+                    "w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
+                  }
+                  bgColor={bg}
+                > */}
+                 <ToolsSection/>
+                {/* </Box> */}
+              {/* </div> */}
 
               <div className="py-8">
                 <Box
