@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import Logo from './Logo';
 
 const LoaderComponent = () => {
   return (
@@ -9,21 +8,31 @@ const LoaderComponent = () => {
         className="relative w-24 h-24 rounded-full bg-gray-300 overflow-hidden"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 1, repeat: Infinity, repeatType: "loop" }} // Slower scale transition
       >
         <motion.div
           className="absolute top-0 left-0 w-full h-full bg-blue-300"
           initial={{ width: 0 }}
           animate={{ width: '100%' }}
-          transition={{ duration: 1, delay: 0.3 }}
+          transition={{
+            duration: 1, // Slower width transition
+            delay: 0.3,
+            repeat: Infinity,
+            repeatType: "loop",
+            ease: "easeInOut" // Optional: adds an easing effect to the animation
+          }}
         />
-        <Logo />
       </motion.div>
       <motion.p
         className="text-white mt-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
+        transition={{
+          duration: 1, // Slower text opacity transition
+          delay: 0.3,
+          repeat: Infinity,
+          repeatType: "reverse" // Makes the text fade in and out
+        }}
       >
         Loading Experience...
       </motion.p>
