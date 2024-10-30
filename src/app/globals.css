@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.chakra-ui-dark body {
+    background: linear-gradient(135deg, #1a202c, #2d3748) !important;
+  }
+  
+  .chakra-ui-light body {
+    background: linear-gradient(135deg, #f7fafc, #e2e8f0) !important;
+  }

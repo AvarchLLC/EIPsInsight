@@ -35,6 +35,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         },
       }}
       className={`${mont.className} base-page-size`}
+      
     >
       <Head>
         <title>EIPs Insights</title>

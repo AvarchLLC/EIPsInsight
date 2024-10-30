@@ -188,6 +188,10 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
       range: [0, 1],
       tickCount: 5,
     },
+    isGroup: true,
+    columnStyle: {
+      radius: [20, 20, 0, 0],
+    },
     areaStyle: { fillOpacity: 0.6 },
     legend: { position: "top-right" },
     line: {
