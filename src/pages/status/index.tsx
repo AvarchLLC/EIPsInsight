@@ -13,13 +13,14 @@ import {
   PopoverTrigger,
   Text,
 } from "@chakra-ui/react";
-import CBoxStatus from "@/components/CBoxStatus";
+import CBoxStatus from "@/components/CBoxStatus2";
 import Donut from "@/components/Donut";
 import DonutStatus from "@/components/DonutStatus";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
-import StackedColumnChart from "@/components/StackedBarChart";
+// import StackedColumnChart from "@/components/StackedBarChart";
+import StackedColumnChart from "@/components/DraftBarChart2";
 import { PieC } from "@/components/InPie";
 import AreaStatus from "@/components/AreaStatus";
 import Banner from "@/components/NewsBanner";
@@ -42,9 +43,64 @@ interface EIP {
   __v: number;
 }
 
+interface APIResponse {
+  eip: EIP[];
+  erc: EIP[];
+  rip: EIP[];
+}
+
 const Status = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]);
+
+  const [data2, setData2] = useState<APIResponse>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/all`);
+        const jsonData = await response.json();
+        setData2(jsonData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const allData: EIP[] = data2?.eip.concat(data2?.erc.concat(data2?.rip)) || [];
+
+  const dat = [
+    {
+      status: "Draft",
+      value: allData.filter((item) => item.status === "Draft").length,
+    },
+    {
+      status: "Review",
+      value: allData.filter((item) => item.status === "Review").length,
+    },
+    {
+      status: "Last Call",
+      value: allData.filter((item) => item.status === "Last Call").length,
+    },
+    {
+      status: "Living",
+      value: allData.filter((item) => item.status === "Living").length,
+    },
+    {
+      status: "Stagnant",
+      value: allData.filter((item) => item.status === "Stagnant").length,
+    },
+    {
+      status: "Withdrawn",
+      value: allData.filter((item) => item.status === "Withdrawn").length,
+    },
+    {
+      status: "Final",
+      value: allData.filter((item) => item.status === "Final").length,
+    },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,90 +170,130 @@ const Status = () => {
             </Text>
 
             <AreaStatus type={"EIPs"} />
-            <AreaC type={"EIPs"} />
+            <br/>
+            {/* <AreaC type={"EIPs"} /> */}
 
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Draft -{" "}
               <NextLink href={`/tableStatus/Draft`}>
                 {" "}
-                [ {data.filter((item) => item.status === "Draft").length} ]
+                [ {allData.filter((item) => item.status === "Draft").length} ]
               </NextLink>
             </Text>
 
             <Box>
-              <StackedColumnChart type={"EIPs"} status="Draft" />
-              <CBoxStatus status={"Draft"} type={"EIPs"} />
+              {/* <StackedColumnChart type={"EIPs"} status="Draft" /> */}
+              <Box paddingTop={"8"}>
+                <StackedColumnChart status="Draft" />
+              </Box>
+              <CBoxStatus status={"Draft"} />
             </Box>
-
+              
+            <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Review -{" "}
               <NextLink href={`/tableStatus/Review`}>
                 {" "}
-                [ {data.filter((item) => item.status === "Review").length} ]
+                [ {allData.filter((item) => item.status === "Review").length} ]
               </NextLink>
             </Text>
 
             <Box>
-              <StackedColumnChart type={"EIPs"} status="Review" />
-              <CBoxStatus status={"Review"} type={"EIPs"} />
+              {/* <StackedColumnChart type={"EIPs"} status="Review" /> */}
+              <Box paddingY={"8"}>
+                <StackedColumnChart status="Review" />
+              </Box>
+              <CBoxStatus status={"Review"}/>
             </Box>
-
+            
+            <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Last Call -
               <NextLink href={`/tableStatus/LastCall`}>
                 {" "}
-                [ {
-                  data.filter((item) => item.status === "Last Call").length
+                [ {allData.filter((item) => item.status ===  "Last Call").length
                 } ]{" "}
               </NextLink>
             </Text>
 
             <Box>
-              <StackedColumnChart type={"EIPs"} status="Last Call" />
-              <CBoxStatus status={"Last Call"} type={"EIPs"} />
+              {/* <StackedColumnChart type={"EIPs"} status="Last Call" /> */}
+              <Box paddingY={"8"}>
+                <StackedColumnChart status="Last Call" />
+              </Box>
+              <CBoxStatus status={"Last Call"} />
             </Box>
-
+            
+            <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Living -
               <NextLink href={`/tableStatus/Living`}>
                 {" "}
-                [ {data.filter((item) => item.status === "Living").length} ]
+                [ {allData.filter((item) => item.status === "Living").length} ]
               </NextLink>
             </Text>
 
             <Box>
-              <StackedColumnChart type={"EIPs"} status="Living" />
-              <CBoxStatus status={"Living"} type={"EIPs"} />
+              {/* <StackedColumnChart type={"EIPs"} status="Living" /> */}
+              <Box paddingY={"8"}>
+                <StackedColumnChart status="Living" />
+              </Box>
+              <CBoxStatus status={"Living"} />
+            </Box>
+            
+            <br/>
+            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+              Final -
+              <NextLink href={`/tableStatus/Final`}>
+                {" "}
+                [ {allData.filter((item) => item.status === "Final").length
+                } ]{" "}
+              </NextLink>
+            </Text>
+
+            <Box>
+              {/* <StackedColumnChart type={"EIPs"} status="Stagnant" /> */}
+              <Box paddingY={"8"}>
+                <StackedColumnChart status="Final" />
+              </Box>
+              <CBoxStatus status={"Final"}/>
             </Box>
 
+            
+            <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Stagnant -
               <NextLink href={`/tableStatus/Stagnant`}>
                 {" "}
-                [ {
-                  data.filter((item) => item.status === "Stagnant").length
+                [ {allData.filter((item) => item.status === "Stagnant").length
                 } ]{" "}
               </NextLink>
             </Text>
 
             <Box>
-              <StackedColumnChart type={"EIPs"} status="Stagnant" />
-              <CBoxStatus status={"Stagnant"} type={"EIPs"} />
+              {/* <StackedColumnChart type={"EIPs"} status="Stagnant" /> */}
+              <Box paddingY={"8"}>
+                <StackedColumnChart status="Stagnant" />
+              </Box>
+              <CBoxStatus status={"Stagnant"}/>
             </Box>
-
+            
+            <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Withdrawn -
               <NextLink href={`/tableStatus/Withdrawn`}>
                 {" "}
-                [ {
-                  data.filter((item) => item.status === "Withdrawn").length
+                [ {allData.filter((item) => item.status ===  "Withdrawn").length
                 } ]{" "}
               </NextLink>
             </Text>
 
             <Box>
-              <StackedColumnChart type={"EIPs"} status="Withdrawn" />
-              <CBoxStatus status={"Withdrawn"} type={"EIPs"} />
+              {/* <StackedColumnChart type={"EIPs"} status="Withdrawn" /> */}
+              <Box paddingY={"8"}>
+                <StackedColumnChart status="Withdrawn" />
+              </Box>
+              <CBoxStatus status={"Withdrawn"} />
             </Box>
           </Box>
         </motion.div>

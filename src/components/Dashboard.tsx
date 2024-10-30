@@ -38,6 +38,7 @@ import Banner from "@/components/NewsBanner";
 import SearchBox from "@/components/SearchBox";
 import BoyGirl from "@/components/BoyGirl";
 import BoyGirl2 from "@/components/BoyGirl2";
+import BoyGirl3 from "@/components/BoyGirl3";
 import AllChart from "./AllChart";
 import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 import ToolsSection from "./AvailableTools";
@@ -69,6 +70,12 @@ const Dashboard = () => {
   const [data, setData] = useState<APIResponse>(); // Set initial state as an empty array
   const [isLoading, setIsLoading] = useState(true); // Loader state
   const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  const textColorLight = "#2C3E50"; // Darker color for better visibility in light mode
+  const textColorDark = "#F5F5F5"; // Light color for dark mode
+  const bgGradientLight = "linear(to-r, #2980B9, #3498DB)"; // Clear gradient for better visibility in light mode
+  const bgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)"; 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -153,24 +160,36 @@ const Dashboard = () => {
                     gridTemplateColumns={{ lg: "2fr 1fr" }}
                   >
                     <Stack direction={"column"}>
-                      <Text
-                        color={"#30A0E0"}
-                        fontWeight={"bold"}
-                        fontSize={{
-                          lg: "7xl",
-                          md: "5xl",
-                          sm: "3xl",
-                          base: "xl",
-                        }}
+                      <Box
+                      // bg="rgba(0, 0, 0, 0.5)"
+                      borderRadius="md" // Rounded corners
+                      padding={4} // Padding around the text
+                      paddingLeft="6"
+                      // boxShadow="md" 
+                      maxWidth="550px"
                       >
-                        Ethereum <br /> Improvement <br /> Proposal <br />{" "}
-                        Insights
-                      </Text>
+                      <Text
+      color={useColorModeValue(textColorLight, textColorDark)} // Switch color based on mode
+      fontWeight={"bold"}
+      bgGradient={useColorModeValue(bgGradientLight, bgGradientDark)} // Optional: add a gradient background
+      bgClip="text" // Optional: clip background to the text
+      fontSize={{
+        lg: "6xl",
+        md: "5xl",
+        sm: "3xl",
+        base: "xl",
+      }}
+    >
+      Ethereum <br /> Improvement <br /> Proposal <br /> Insights
+    </Text>
+                      </Box>
+                      <br/>
+                      
                       <Stack direction={"row"} spacing={"6"}>
                         <Box>
                           <NextLink href={"/home#1"}>
                             <Button
-                              colorScheme="white"
+                              color="#F5F5F5"
                               variant={"outline"}
                               fontSize={{
                                 lg: "14px",
@@ -198,11 +217,11 @@ const Dashboard = () => {
                             href={`/insight/${year}/${getMonth(monthName)}`}
                           >
                             <Button
-                              colorScheme="blue"
+                              color="#F5F5F5"
                               variant={"outline"}
                               fontSize={{
                                 lg: "14px",
-                                md: "12px",
+                                md: "10px",
                                 sm: "12px",
                                 base: "10px",
                               }}
@@ -214,6 +233,7 @@ const Dashboard = () => {
                                 base: "5px 10px",
                               }}
                               rightIcon={<BsGraphUp />}
+                              bgColor={"#30A0E0"}
                             >
                               {monthName} {year} Insights
                             </Button>
@@ -221,11 +241,19 @@ const Dashboard = () => {
                         </Box>
                       </Stack>
                     </Stack>
-                    <BoyGirl2/>
+                    {/* <BoyGirl2/> */}
+                    <BoyGirl3/>
                     {/* <AllChart type="Total" /> */}
                   </Box>
                   <br/><br/><br/>
+                  <Box
+                      bg="rgba(0, 0, 0, 0.5)"
+                      borderRadius="md" // Rounded corners
+                      padding={4} // Padding around the text
+                      boxShadow="md" 
+                      >
                   <AllChart type="Total" />
+                  </Box>
                 </div>
                 
                 {/* <AllChart type="Total" /> */}
@@ -233,8 +261,10 @@ const Dashboard = () => {
                 <div className="lg:hidden block">
                   <Text
                     className="text-5xl text-center pb-5 sm:text-6xl md:text-7xl"
-                    color={"#30A0E0"}
                     fontWeight={"bold"}
+                    color={useColorModeValue(textColorLight, textColorDark)} 
+                    bgGradient={useColorModeValue(bgGradientLight, bgGradientDark)} 
+                    bgClip="text" 
                   >
                     Ethereum <br /> Improvement <br /> Proposal <br /> Insights
                   </Text>
@@ -345,49 +375,62 @@ const Dashboard = () => {
                 </div>
               </Box> */}
 
-<Box className="grid grid-cols-1 lg:grid-cols-2 pb-20 gap-8 lg:gap-16">
-  {/* Left Side - YouTube Video */}
-  <div className="flex justify-center lg:justify-center items-center">
-    <iframe
-      width="560"
-      height="315"
-      src="https://www.youtube.com/embed/AyidVR6X6J8?start=8"
-      title="YouTube video"
-      frameBorder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowFullScreen
-    ></iframe>
-  </div>
+                <Box className="grid grid-cols-1 lg:grid-cols-2 pb-20 gap-8 lg:gap-16"
+                bg="rgba(0, 0, 0, 0.5)"
+                borderRadius="md" // Rounded corners
+                padding={9} 
+                boxShadow="md" 
+                marginTop={4}>
+                  {/* Left Side - YouTube Video */}
+                  <div className="flex justify-center lg:justify-center items-center">
+                    <iframe
+                      width="560"
+                      height="315"
+                      src="https://www.youtube.com/embed/AyidVR6X6J8?start=8"
+                      title="YouTube video"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
 
-  {/* Right Side - EIPInsight Info */}
-  <div className="flex justify-center items-center">
-    <div className="text-center max-w-xl space-y-6">
-      <h1 className="text-5xl font-bold">
-        What is <span className="text-blue-400">EIPInsight</span>?
-      </h1>
-      <p className="text-xl text-justify">
-        EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposal (EIP), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period. Data provided is used for tracking the progress and workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
-      </p>
-      <NextLink href="/resources">
-        <span className="text-blue-400 text-xl flex items-center space-x-2">
-          Learn More <BsArrowUpRight className="pt-1" size={25} />
-        </span>
-      </NextLink>
-    </div>
-  </div>
+                  {/* Right Side - EIPInsight Info */}
+                  <div className="flex justify-center items-center">
+                    <div className="text-center max-w-xl space-y-6">
+                    <h1 className="text-5xl font-bold">
+                    <span className="text-gray-200">What is</span> <span className="text-blue-400">EIPInsight</span><span className="text-gray-200">?</span>
+                    </h1>
+                    <p className="text-xl text-justify text-gray-200"> {/* Change to smoke white */}
+                      EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposal (EIP), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period. Data provided is used for tracking the progress and workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
+                    </p>
+                    <NextLink href="/resources">
+                      <span className="text-blue-400 text-xl flex items-center space-x-2">
+                        Learn More <BsArrowUpRight className="pt-1" size={25} />
+                      </span>
+                    </NextLink>
+
+                    </div>
+                  </div>
+                </Box>
+                <br/>
+                </motion.div>
+                <br/>
+
+                <Box
+                      bg="rgba(0, 0, 0, 0.5)"
+                      borderRadius="md" // Rounded corners
+                      padding={6} // Padding around the text
+                      boxShadow="md" 
+                      >
+              <FlexBetween>
+          
+              <Box id={"1"} color={"rgba(255, 255, 255, 0.7)"} >
+  <Header
+    title="DASHBOARD"
+    subtitle="Welcome to the dashboard"
+  />
 </Box>
 
-
-
-
-
-              <FlexBetween>
-                <Box id={"1"}>
-                  <Header
-                    title="DASHBOARD"
-                    subtitle="Welcome to the dashboard"
-                  />
-                </Box>
                 <Box>
                   {/*<Button*/}
                   {/*    colorScheme="blue"*/}
@@ -401,7 +444,6 @@ const Dashboard = () => {
                   {/*</Button>*/}
                 </Box>
               </FlexBetween>
-            </motion.div>
 
             <Box
               display="grid"
@@ -411,68 +453,68 @@ const Dashboard = () => {
             >
               
               <div className="grid grid-cols-2 gap-6">
-  <div className="col-span-2">
-    <StatBox
-      title="Meta EIPs"
-      value={new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size}
-      description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
-      icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
-      url="meta"
-    />
-  </div>
+                <div className="col-span-2">
+                  <StatBox
+                    title="Meta EIPs"
+                    value={new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size}
+                    description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
+                    icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+                    url="meta"
+                  />
+                </div>
 
-  <StatBox
-    title="Core EIPs"
-    value={data?.eip.filter(
-      (item) =>
-        item.type === "Standards Track" &&
-        item.category === "Core"
-    ).length ||0}
-    description="Core EIPs describe changes to the Ethereum protocol."
-    icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
-    url="core"
-  />
+                <StatBox
+                  title="Core EIPs"
+                  value={data?.eip.filter(
+                    (item) =>
+                      item.type === "Standards Track" &&
+                      item.category === "Core"
+                  ).length ||0}
+                  description="Core EIPs describe changes to the Ethereum protocol."
+                  icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="core"
+                />
 
-  <StatBox
-    title="ERCs"
-    value={new Set(allData.filter((item) => item.category === "ERC").map((item) => item.eip)).size}
-    description="ERCs describe application-level standards for the Ethereum ecosystem."
-    icon={<Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />}
-    url="erc"
-  />
+                <StatBox
+                  title="ERCs"
+                  value={new Set(allData.filter((item) => item.category === "ERC").map((item) => item.eip)).size}
+                  description="ERCs describe application-level standards for the Ethereum ecosystem."
+                  icon={<Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="erc"
+                />
 
-  <StatBox
-    title="Networking EIPs"
-    value={new Set(allData.filter((item) => item.category === "Networking").map((item) => item.eip)).size}
-    description="Networking EIPs describe changes to the Ethereum network protocol."
-    icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
-    url="networking"
-  />
+                <StatBox
+                  title="Networking EIPs"
+                  value={new Set(allData.filter((item) => item.category === "Networking").map((item) => item.eip)).size}
+                  description="Networking EIPs describe changes to the Ethereum network protocol."
+                  icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="networking"
+                />
 
-  <StatBox
-    title="Interface EIPs"
-    value={new Set(allData.filter((item) => item.category === "Interface").map((item) => item.eip)).size}
-    description="Interface EIPs describe changes to the Ethereum client API."
-    icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
-    url="interface"
-  />
+                <StatBox
+                  title="Interface EIPs"
+                  value={new Set(allData.filter((item) => item.category === "Interface").map((item) => item.eip)).size}
+                  description="Interface EIPs describe changes to the Ethereum client API."
+                  icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="interface"
+                />
 
-  <StatBox
-    title="Informational EIPs"
-    value={new Set(allData.filter((item) => item.type === "Informational").map((item) => item.eip)).size}
-    description="Informational EIPs describe other changes to the Ethereum ecosystem."
-    icon={<Icon as={Clipboard} fontSize={{ base: "10", lg: "15" }} />}
-    url="informational"
-  />
+                <StatBox
+                  title="Informational EIPs"
+                  value={new Set(allData.filter((item) => item.type === "Informational").map((item) => item.eip)).size}
+                  description="Informational EIPs describe other changes to the Ethereum ecosystem."
+                  icon={<Icon as={Clipboard} fontSize={{ base: "10", lg: "15" }} />}
+                  url="informational"
+                />
 
-  <StatBox
-    title="RIPs"
-    value={new Set(allData.filter((item) => item.repo === "rip").map((item) => item.eip)).size}
-    description="RIPs describe changes to the RIP process, or other non-optional changes."
-    icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
-    url="rip"
-  />
-</div>
+                <StatBox
+                  title="RIPs"
+                  value={new Set(allData.filter((item) => item.repo === "rip").map((item) => item.eip)).size}
+                  description="RIPs describe changes to the RIP process, or other non-optional changes."
+                  icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+                  url="rip"
+                />
+              </div>
 
               <Box
                 as={motion.div}
@@ -503,10 +545,13 @@ const Dashboard = () => {
                 <DashboardDonut />
               </Box>
             </Box>
+            </Box>
+          
 
           </motion.div>
         )}
       </Box>
+
     </>
   );
 };

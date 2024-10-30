@@ -93,6 +93,7 @@ async function fetchLastCreatedYearAndMonthFromAPI(
   eipNumber: number
 ): Promise<{ mergedYear: string; mergedMonth: string } | null> {
   try {
+     console.group("request recieved")
     const apiUrl = `/api/new/eipshistory/${eipNumber}`;
     const response = await fetch(apiUrl);
 
@@ -106,6 +107,12 @@ async function fetchLastCreatedYearAndMonthFromAPI(
       const lastElement = data[0];
       const lastElementCreatedYear = lastElement.mergedYear;
       const lastElementCreatedMonth = lastElement.mergedMonth;
+
+      // if(eipNumber===1053){
+        console.log("testing data:");
+        console.log(lastElementCreatedYear)
+        console.log(lastElementCreatedMonth);
+      // }
       return {
         mergedYear: lastElementCreatedYear,
         mergedMonth: lastElementCreatedMonth,
@@ -170,13 +177,156 @@ const Table: React.FC<TableProps> = ({ type }) => {
         setIsLoading(false); // Set isLoading to false after data is fetched
 
         // Fetch merged years and months for each item
-        const mergedDataPromises = jsonData.map((item: any) =>
-          fetchLastCreatedYearAndMonthFromAPI(item.eip)
-        );
+        const mergedDataValues = [];
+        const jsonData2=jsonData.eip;
+        const jsonData3=jsonData.erc;
+        const jsonData4=jsonData.rip;
+        console.log(jsonData2)
 
-        // Wait for all promises to resolve
-        const mergedDataValues = await Promise.all(mergedDataPromises);
+        interface EIPData {
+          _id: string;
+          eip: string;
+          title: string;
+          author: string;
+          status: string;
+          type: string;
+          category: string;
+          created: string;
+          discussion: string;
+          deadline: string;
+          requires: string;
+          commitSha: string;
+          commitDate: string;
+          mergedDate: string;
+          prNumber: number;
+          closedDate: string;
+          changes: number;
+          insertions: number;
+          deletions: number | null;
+          mergedDay: number;
+          mergedMonth: number;
+          mergedYear: number;
+          createdMonth: number;
+          createdYear: number;
+          previousdeadline: string;
+          newdeadline: string;
+          message: string;
+          __v: number;
+        }
+        
+        // const mergedDataValues: { mergedYear: string; mergedMonth: string }[] = [];
+        
+        for (const item of jsonData2) {
+          try {
+            const apiUrl = `/api/new/eipshistory/${item.eip}`;
+            const response = await fetch(apiUrl);
+            console.log("Fetching data for EIP:", item.eip);
+        
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        
+            const data = await response.json();
+        
+            // Check if data is an object and has properties
+            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+              const values = Object.values(data);
+            const secondToLastElement = values[values.length - 2] as EIPData; // Take the second-to-last
+
+            // Check if mergedYear and mergedMonth are defined before accessing them
+            const mergedYear = secondToLastElement.mergedYear !== undefined ? secondToLastElement.mergedYear.toString() : "";
+            const mergedMonth = secondToLastElement.mergedMonth !== undefined ? secondToLastElement.mergedMonth.toString() : "";
+
+            mergedDataValues.push({
+              mergedYear,
+              mergedMonth,
+            });
+              console.log("Merged data added:", mergedYear, mergedMonth);
+            } else {
+              console.error(`No data found for EIP: ${item.eip}`);
+              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
+            }
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
+          }
+        }
+        
+        
+
+        for (const item of jsonData3) {
+          try {
+            const apiUrl = `/api/new/erchistory/${item.eip}`;
+            const response = await fetch(apiUrl);
+            console.log("Fetching data for EIP:", item.eip);
+        
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        
+            const data = await response.json();
+        
+            // Check if data is an object and has properties
+            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+              const values = Object.values(data);
+            const secondToLastElement = values[values.length - 2] as EIPData; // Take the second-to-last
+
+            // Check if mergedYear and mergedMonth are defined before accessing them
+            const mergedYear = secondToLastElement.mergedYear !== undefined ? secondToLastElement.mergedYear.toString() : "";
+            const mergedMonth = secondToLastElement.mergedMonth !== undefined ? secondToLastElement.mergedMonth.toString() : "";
+
+            mergedDataValues.push({
+              mergedYear,
+              mergedMonth,
+            });
+              console.log("Merged data added:", mergedYear, mergedMonth);
+            }else {
+              console.error(`No data found for EIP: ${item.eip}`);
+              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
+            }
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
+          }
+        }
+
+        for (const item of jsonData4) {
+          try {
+            const apiUrl = `/api/new/riphistory/${item.eip}`;
+            const response = await fetch(apiUrl);
+            console.log("Fetching data for EIP:", item.eip);
+        
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        
+            const data = await response.json();
+        
+            // Check if data is an object and has properties
+            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+              const values = Object.values(data);
+            const secondToLastElement = values[values.length - 2] as EIPData; // Take the second-to-last
+
+            // Check if mergedYear and mergedMonth are defined before accessing them
+            const mergedYear = secondToLastElement.mergedYear !== undefined ? secondToLastElement.mergedYear.toString() : "";
+            const mergedMonth = secondToLastElement.mergedMonth !== undefined ? secondToLastElement.mergedMonth.toString() : "";
+
+            mergedDataValues.push({
+              mergedYear,
+              mergedMonth,
+            });
+              console.log("Merged data added:", mergedYear, mergedMonth);
+            }else {
+              console.error(`No data found for EIP: ${item.eip}`);
+              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
+            }
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
+          }
+        }
         setMergedData(mergedDataValues);
+
       } catch (error) {
         console.error("Error fetching data:", error);
         setIsLoading(false); // Set isLoading to false if there's an error
@@ -184,6 +334,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
     };
     fetchData();
   }, []);
+
+  
 
   useEffect(() => {
     if (bg === "#f6f6f7") {
@@ -213,6 +365,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
       mergedMonth: mergedData[index]?.mergedMonth || "", // Replace '' with a default value if needed
     })
   );
+
+  console.log("filtered data:", filteredDataWithMergedYearsAndMonths)
 
   const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
     const isYearInRange =
