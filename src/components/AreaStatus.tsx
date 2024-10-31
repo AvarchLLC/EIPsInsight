@@ -32,7 +32,7 @@ interface AreaProps {
 }
 
 const Area = dynamic(
-  (): any => import("@ant-design/plots").then((item) => item.Area),
+  (): any => import("@ant-design/plots").then((item) => item.Column),
   {
     ssr: false,
   }

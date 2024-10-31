@@ -3,6 +3,7 @@ import AllLayout from "@/components/Layout";
 import Header from "@/components/Header";
 import {
   Box,
+  Flex,
   Grid,
   Popover,
   PopoverArrow,
@@ -22,7 +23,7 @@ import LoaderComponent from "@/components/Loader";
 // import StackedColumnChart from "@/components/StackedBarChart";
 import StackedColumnChart from "@/components/DraftBarChart2";
 import { PieC } from "@/components/InPie";
-import AreaStatus from "@/components/AreaStatus";
+import AreaStatus from "@/components/AreaStatus2";
 import Banner from "@/components/NewsBanner";
 import NextLink from "next/link";
 import AreaC from "@/components/AreaC";
@@ -169,7 +170,7 @@ const Status = () => {
               Draft vs Final
             </Text>
 
-            <AreaStatus type={"EIPs"} />
+            <AreaStatus/>
             <br/>
             {/* <AreaC type={"EIPs"} /> */}
 
@@ -181,13 +182,17 @@ const Status = () => {
               </NextLink>
             </Text>
 
-            <Box>
-              {/* <StackedColumnChart type={"EIPs"} status="Draft" /> */}
-              <Box paddingTop={"8"}>
-                <StackedColumnChart status="Draft" />
-              </Box>
-              <CBoxStatus status={"Draft"} />
+            <Box paddingTop={"8"}>
+               <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
+                <Box flex="1">
+                  <StackedColumnChart status="Draft" />
+                </Box>
+                <Box flex="1">
+                  <CBoxStatus status="Draft" />
+                </Box>
+              </Flex>
             </Box>
+            
               
             <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
@@ -198,12 +203,15 @@ const Status = () => {
               </NextLink>
             </Text>
 
-            <Box>
-              {/* <StackedColumnChart type={"EIPs"} status="Review" /> */}
-              <Box paddingY={"8"}>
-                <StackedColumnChart status="Review" />
-              </Box>
-              <CBoxStatus status={"Review"}/>
+            <Box paddingTop={"8"}>
+               <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
+                <Box flex="1">
+                  <StackedColumnChart status="Review" />
+                </Box>
+                <Box flex="1">
+                  <CBoxStatus status="Review" />
+                </Box>
+              </Flex>
             </Box>
             
             <br/>
@@ -216,30 +224,17 @@ const Status = () => {
               </NextLink>
             </Text>
 
-            <Box>
-              {/* <StackedColumnChart type={"EIPs"} status="Last Call" /> */}
-              <Box paddingY={"8"}>
-                <StackedColumnChart status="Last Call" />
-              </Box>
-              <CBoxStatus status={"Last Call"} />
+            <Box paddingTop={"8"}>
+               <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
+                <Box flex="1">
+                  <StackedColumnChart status="Last Call" />
+                </Box>
+                <Box flex="1">
+                  <CBoxStatus status="Last Call" />
+                </Box>
+              </Flex>
             </Box>
             
-            <br/>
-            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Living -
-              <NextLink href={`/tableStatus/Living`}>
-                {" "}
-                [ {allData.filter((item) => item.status === "Living").length} ]
-              </NextLink>
-            </Text>
-
-            <Box>
-              {/* <StackedColumnChart type={"EIPs"} status="Living" /> */}
-              <Box paddingY={"8"}>
-                <StackedColumnChart status="Living" />
-              </Box>
-              <CBoxStatus status={"Living"} />
-            </Box>
             
             <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
@@ -251,12 +246,15 @@ const Status = () => {
               </NextLink>
             </Text>
 
-            <Box>
-              {/* <StackedColumnChart type={"EIPs"} status="Stagnant" /> */}
-              <Box paddingY={"8"}>
-                <StackedColumnChart status="Final" />
-              </Box>
-              <CBoxStatus status={"Final"}/>
+            <Box paddingTop={"8"}>
+               <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
+                <Box flex="1">
+                  <StackedColumnChart status="Final" />
+                </Box>
+                <Box flex="1">
+                  <CBoxStatus status="Final" />
+                </Box>
+              </Flex>
             </Box>
 
             
@@ -270,12 +268,15 @@ const Status = () => {
               </NextLink>
             </Text>
 
-            <Box>
-              {/* <StackedColumnChart type={"EIPs"} status="Stagnant" /> */}
-              <Box paddingY={"8"}>
-                <StackedColumnChart status="Stagnant" />
-              </Box>
-              <CBoxStatus status={"Stagnant"}/>
+            <Box paddingTop={"8"}>
+               <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
+                <Box flex="1">
+                  <StackedColumnChart status="Stagnant" />
+                </Box>
+                <Box flex="1">
+                  <CBoxStatus status="Stagnant" />
+                </Box>
+              </Flex>
             </Box>
             
             <br/>
@@ -288,13 +289,37 @@ const Status = () => {
               </NextLink>
             </Text>
 
-            <Box>
-              {/* <StackedColumnChart type={"EIPs"} status="Withdrawn" /> */}
-              <Box paddingY={"8"}>
-                <StackedColumnChart status="Withdrawn" />
-              </Box>
-              <CBoxStatus status={"Withdrawn"} />
+            <Box paddingTop={"8"}>
+               <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
+                <Box flex="1">
+                  <StackedColumnChart status="Withdrawn" />
+                </Box>
+                <Box flex="1">
+                  <CBoxStatus status="Withdrawn" />
+                </Box>
+              </Flex>
             </Box>
+
+            <br/>
+            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+              Living -
+              <NextLink href={`/tableStatus/Living`}>
+                {" "}
+                [ {allData.filter((item) => item.status === "Living").length} ]
+              </NextLink>
+            </Text>
+
+            <Box paddingTop={"8"}>
+               <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
+                <Box flex="1">
+                  <StackedColumnChart status="Living" />
+                </Box>
+                <Box flex="1">
+                  <CBoxStatus status="Living" />
+                </Box>
+              </Flex>
+            </Box>
+
           </Box>
         </motion.div>
       )}

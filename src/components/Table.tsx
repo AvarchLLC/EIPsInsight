@@ -230,12 +230,14 @@ const Table: React.FC<TableProps> = ({ type }) => {
         
             // Check if data is an object and has properties
             if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data);
-            const secondToLastElement = values[values.length - 2] as EIPData; // Take the second-to-last
+              const values = Object.values(data as Record<string, EIPData>)
+              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
+          
+            const firstElement = values[0] as EIPData; 
 
             // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = secondToLastElement.mergedYear !== undefined ? secondToLastElement.mergedYear.toString() : "";
-            const mergedMonth = secondToLastElement.mergedMonth !== undefined ? secondToLastElement.mergedMonth.toString() : "";
+            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
+            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
 
             mergedDataValues.push({
               mergedYear,
@@ -268,12 +270,14 @@ const Table: React.FC<TableProps> = ({ type }) => {
         
             // Check if data is an object and has properties
             if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data);
-            const secondToLastElement = values[values.length - 2] as EIPData; // Take the second-to-last
+              const values = Object.values(data as Record<string, EIPData>)
+              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
+          
+            const firstElement = values[0] as EIPData; 
 
             // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = secondToLastElement.mergedYear !== undefined ? secondToLastElement.mergedYear.toString() : "";
-            const mergedMonth = secondToLastElement.mergedMonth !== undefined ? secondToLastElement.mergedMonth.toString() : "";
+            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
+            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
 
             mergedDataValues.push({
               mergedYear,
@@ -304,12 +308,14 @@ const Table: React.FC<TableProps> = ({ type }) => {
         
             // Check if data is an object and has properties
             if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data);
-            const secondToLastElement = values[values.length - 2] as EIPData; // Take the second-to-last
+              const values = Object.values(data as Record<string, EIPData>)
+              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
+          
+            const firstElement = values[0] as EIPData; 
 
             // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = secondToLastElement.mergedYear !== undefined ? secondToLastElement.mergedYear.toString() : "";
-            const mergedMonth = secondToLastElement.mergedMonth !== undefined ? secondToLastElement.mergedMonth.toString() : "";
+            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
+            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
 
             mergedDataValues.push({
               mergedYear,

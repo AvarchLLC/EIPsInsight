@@ -14,7 +14,7 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link, size, layout }) =>
   const cardHeight = size === "large" ? { base: "350px", md: "525px" } : { base: "200px", md: "250px" };
 
   const flexDirection: { base: 'column' | 'column-reverse'; md: 'row' | 'row-reverse' | 'column' | 'column-reverse' } = {
-    base: "column-reverse", // imageBottom layout for small screens
+    base: "column-reverse",
     md: layout === "imageLeft" ? "row" :
         layout === "imageBottom" ? "column-reverse" :
         layout === "imageTop" ? "column" :
@@ -27,7 +27,7 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link, size, layout }) =>
         border="2px solid"
         borderColor="#30A0E0"
         borderRadius="xl"
-        p={4}
+        p={10}  // Apply padding to the entire card
         height={cardHeight}
         display="flex"
         flexDirection={flexDirection}
@@ -42,6 +42,7 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link, size, layout }) =>
         }}
         textAlign="center"
         color="#30A0E0"
+        overflow="hidden"
       >
         <Image 
           src={imageSrc} 
@@ -50,13 +51,20 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link, size, layout }) =>
           mb={{ base: 4, md: layout === "imageBottom" ? 4 : 0 }} 
           mr={{ md: layout === "imageRight" ? 4 : 0 }} 
         />
-        <Text fontSize={{ base: "lg", md: "2xl" }} fontWeight="bold">
+        <Text 
+          fontSize={{ base: "lg", md: "2xl" }} 
+          fontWeight="bold"
+          maxWidth="100%" 
+          overflowWrap="break-word" 
+          padding={6}
+        >
           {label}
         </Text>
       </Box>
     </Link>
   );
 };
+
 
 const ToolsSection: FC = () => {
   const headingColorLight = "#333";
@@ -120,7 +128,7 @@ const ToolsSection: FC = () => {
     </Grid>
     <ToolCard 
       imageSrc="/DashboardCard5.png" 
-      label="Status" 
+      label="EIPs Status" 
       link="/status" 
       size="small" 
       layout="imageLeft" 
