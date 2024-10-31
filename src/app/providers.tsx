@@ -13,7 +13,7 @@ const theme = extendTheme({
   styles: {
     global: (props: StyleFunctionProps) => {
       const pathname = usePathname(); // Get the current path
-      const isHomePage = pathname === '/home';
+      const isHomePage = true;
 
       // Determine the background based on pathname and color mode
       const background = isHomePage

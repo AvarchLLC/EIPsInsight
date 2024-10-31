@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Box, Text, useColorModeValue } from '@chakra-ui/react';
 import React from 'react';
+import { usePathname } from 'next/navigation'; // Import usePathname from next/navigation
 
 interface HeaderProps {
   title: string;
@@ -15,6 +16,15 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
   const headingBgGradientLight = "linear(to-r, #30A0E0, #ffffff)";  // Updated light mode gradient
   const headingBgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)"; // Dark mode gradient
 
+  // Use usePathname to get the current pathname
+  const pathname = usePathname(); // Get current path
+
+  // Determine which gradient to use for light mode based on the current pathname
+  const effectiveHeadingBgGradientLight =
+    pathname === "/home"
+      ? headingBgGradientLight
+      : "linear-gradient(to right, #007BB8, #003B5C)"; // Use dark gradient if not on /home
+
   return (
     <Box>
       <Text
@@ -25,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
         fontSize={{ base: "2xl", md: "2xl", lg: "6xl" }}
         fontWeight="bold"
         color={useColorModeValue(headingColorLight, headingColorDark)} // Dynamic color
-        bgGradient={useColorModeValue(headingBgGradientLight, headingBgGradientDark)} // Dynamic gradient
+        bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)} // Dynamic gradient
         bgClip="text" // Clip gradient to text
       >
         {title}

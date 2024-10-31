@@ -115,8 +115,23 @@ const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
     }
     return acc;
   }, [] as { category: string; year: number; value: number }[]);
+  
+  const allRows=["CORE", "META", "Informational","Networking","Interface","ERCs","RIPs"]
+
+  allRows.forEach(category => {
+    transformedData.forEach(data => {
+      const existing = rows.find((row) => row.category.toLowerCase() === category.toLowerCase() && row.year === data.year);
+      if (!existing) {
+        rows.push({ category, year: data.year, value: 0 });
+      }
+    });
+  });
 
   const total = rows.reduce((sum, row) => sum + row.value, 0);
+  const numRows = rows.length + 15;
+  const rowHeight = 40; // Assuming each row has a height of 40px
+  const maxHeight = `${numRows * rowHeight}px`;
+
 
   const downloadCSV = () => {
     const csvRows = [
@@ -179,18 +194,23 @@ const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
         </Box>
       ) : (
         <Box
-          bgColor={bg}
-          marginTop={"2rem"}
-          p="1rem 1rem"
-          borderRadius="0.55rem"
-          overflowX="auto"
-          _hover={{ border: "1px", borderColor: "#30A0E0" }}
-          maxH={windowSize.width > 768 ? "50%" : "100%"}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="ease-in duration-200"
+        bgColor={bg}
+        // marginTop={"0.7rem"}
+        p="1.5rem" // Uniform padding or use px/rem as needed
+        pt="1.5rem"
+        pb="1.5rem"
+        borderRadius="0.55rem"
+        overflowX="auto"
+        _hover={{
+          border: "1px",
+          borderColor: "#30A0E0",
+        }}
+        maxH={maxHeight}
+        as={motion.div}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 } as any}
+        className="ease-in duration-200"
         >
           <Box className={"flex w-full gap-10"}>
             <Select
@@ -220,12 +240,13 @@ const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
         </Button>
 
           </Box>
+          <br/>
 
           <TableContainer>
             <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
               <Thead>
                 <Tr>
-                  <Th minW="50px">Type - Category</Th>
+                  <Th minW="50px">Category</Th>
                   <Th minW="200px">Numbers</Th>
                   <Th minW="200px">Percentage</Th>
                 </Tr>

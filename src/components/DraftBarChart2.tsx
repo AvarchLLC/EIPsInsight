@@ -260,10 +260,10 @@ categories.forEach((category) => {
     //   radius: [20, 20, 0, 0],
     // },
     areaStyle: { fillOpacity: 0.6 },
-    slider: {
-      start: 0,
-      end: 1,
-    },
+    // slider: {
+    //   start: 0,
+    //   end: 1,
+    // },
     legend: { position: "top-right" as const },
     smooth: true,
     
