@@ -47,6 +47,8 @@ const API_ENDPOINTS = {
 type PR = {
   repo:string;
   prNumber: number;
+  key:string;
+  tag:string;
   prTitle: string;
   created_at: Date;
   closed_at: Date | null;
@@ -61,6 +63,8 @@ interface ReviewerData {
 
 type Issue = {
   repo:string;
+  key:string;
+  tag:string;
   IssueNumber: number;
   IssueTitle: string;
   state: string;
@@ -270,7 +274,13 @@ const GitHubPRTracker: React.FC = () => {
     const currentDate = new Date();
 
     const addIfNotExists = (arr: PR[], pr: PR) => {
-   
+
+      if(pr.prNumber===9011){
+        console.log("test");
+        console.log(pr.prNumber)
+        console.log(arr);
+      }
+  
       // Check if the PR has a closing date, and if it is in the current month and year
       const isClosedThisMonth = pr.closed_at &&
         new Date(pr.closed_at).getFullYear() === currentDate.getFullYear() &&
@@ -295,7 +305,9 @@ const GitHubPRTracker: React.FC = () => {
       
       processedPRs.add(pr.prNumber);
 
-      // if(pr.prNumber===639 || pr.prNumber===664){
+    
+
+      // if(pr.prNumber===9011 || pr.prNumber===9010){
       //   console.log(pr.prNumber)
       //   console.log("created date: ",createdDate);
       //   console.log("Closed date: ", closedDate);
@@ -340,22 +352,48 @@ const GitHubPRTracker: React.FC = () => {
 
       // Initialize openDate starting from the created date
       let openDate = new Date(createdYear, createdMonth, 1);
+      if(pr.prNumber===9011 || pr.prNumber===9010){
+        console.log(pr.prNumber)
+        console.log("created date: ",createdDate);
+        console.log("open date: ", openDate);
+        console.log("closed date: ", endDate);
+      }
+  
 
       while (openDate < endDate) {
-          const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-          // Initialize monthYearData for the current month key if not already present
-          if (!monthYearData[openKey]) {
-              monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review: [] };
-          }
-          // Add the PR to the open array for this month
-          addIfNotExists(monthYearData[openKey].open, pr);
-
-          // Increment to the next month
-          openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
-
-      }
+        // Before incrementing, log the current state
+        const currentYear = openDate.getFullYear();
+        const currentMonth = String(openDate.getMonth() + 1).padStart(2, '0'); // Correctly format month
+        
+        const openKey = `${currentYear}-${currentMonth}`;
+    
+        // Debug log statements
+        if (pr.prNumber === 9011) {
+          console.log(currentMonth);
+            console.log(`PR Number: ${pr.prNumber}`);
+            console.log(`Created Date: ${pr.created_at}`);
+            console.log(`Open Date: ${openDate}`);
+            console.log(`Closed Date: ${pr.closed_at}`);
+            console.log(`Generated Key: ${openKey}`); // Key generated before incrementing month
+        }
+    
+        // Initialize monthYearData for the current month key if not already present
+        if (!monthYearData[openKey]) {
+            monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review: [] };
+        }
+    
+        // Add the PR to the open array for this month
+        addIfNotExists(monthYearData[openKey].open, pr);
+    
+        // Increment to the next month (update the date first, then create the key)
+        openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
+        openDate.setUTCDate(1); // Set the date to the first of the new month
+    }
+    
+    
 
     }
+    // console.log(monthYearData['2024-11'].open);
   }
     
   });
@@ -431,68 +469,80 @@ const GitHubPRTracker: React.FC = () => {
           monthYearData[closedKey].closed.push(issue);
       }
   
-      // Set openDate to the creation date and endDate to the 1st of the closed month or current month
-      // let openDate = new Date(createdDate);
-      // let createdConstant = new Date(createdDate); // Store the creation date separately
-      // let endDate = issue.closed_at 
-      //     ? new Date(new Date(issue.closed_at).getUTCFullYear(), new Date(issue.closed_at).getUTCMonth(), 1) 
-      //     : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Include the current month
-      
-      // // Loop through each month the issue was open
-      // while (openDate <= endDate) { // Open until the start of the closed month or current month
-      //     const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-      
-      //     if (!monthYearData[openKey]) {
-      //         monthYearData[openKey] = { created: [], closed: [], open: [] };
-      //     }
-      
-      //     // Check if the issue was still open on the 1st of the month
-      //     const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
-          
-      //     // Skip if the openDate corresponds to the created month
-      //     if (!(openDate.getUTCFullYear() === createdConstant.getUTCFullYear() && openDate.getUTCMonth() === createdConstant.getUTCMonth())) {
-      //         if (firstOfMonth <= openDate && (!issue.closed_at || firstOfMonth < new Date(issue.closed_at))) {
-      //             // Add to open only if it's still open on the first of that month
-      //             addIfNotExists(monthYearData[openKey].open, issue);
-      //         }
-      //     }
-      
-      //     // Move to the next month
-      //     openDate = incrementMonth(openDate);
-      // }
 
-      if (createdDate) {
-        let createdDateObj = new Date(createdDate);
-        let createdYear = createdDateObj.getUTCFullYear();
-        let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
+    //   if (createdDate) {
+    //     let createdDateObj = new Date(createdDate);
+    //     let createdYear = createdDateObj.getUTCFullYear();
+    //     let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
     
-              // Initialize endDate based on closedDate or currentDate
-      let endDate;
-      if (closedDate) {
-          let closedDateObj = new Date(closedDate);
-          endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
-      } else {
-          endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
-      }
+    //           // Initialize endDate based on closedDate or currentDate
+    //   let endDate;
+    //   if (closedDate) {
+    //       let closedDateObj = new Date(closedDate);
+    //       endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
+    //   } else {
+    //       endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
+    //   }
 
-      // Initialize openDate starting from the created date
-      let openDate = new Date(createdYear, createdMonth, 1);
+    //   // Initialize openDate starting from the created date
+    //   let openDate = new Date(createdYear, createdMonth, 1);
 
-      while (openDate < endDate) {
-          const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-          // Initialize monthYearData for the current month key if not already present
-          if (!monthYearData[openKey]) {
-              monthYearData[openKey] = { created: [], closed: [], open: [] };
-          }
-          // Add the PR to the open array for this month
-          addIfNotExists(monthYearData[openKey].open, issue);
+    //   while (openDate < endDate) {
+    //       const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
+    //       // Initialize monthYearData for the current month key if not already present
+    //       if (!monthYearData[openKey]) {
+    //           monthYearData[openKey] = { created: [], closed: [], open: [] };
+    //       }
+    //       // Add the PR to the open array for this month
+    //       addIfNotExists(monthYearData[openKey].open, issue);
 
-          // Increment to the next month
-          openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
+    //       // Increment to the next month
+    //       openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
+    //       openDate.setUTCDate(1); // Set the date to the first of the new month
+    //   }
 
-      }
-
+    // }
+    if (createdDate) {
+      let createdDateObj = new Date(createdDate);
+      let createdYear = createdDateObj.getUTCFullYear();
+      let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
+  
+            // Initialize endDate based on closedDate or currentDate
+    let endDate;
+    if (closedDate) {
+        let closedDateObj = new Date(closedDate);
+        endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
+    } else {
+        endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
     }
+
+    // Initialize openDate starting from the created date
+    let openDate = new Date(createdYear, createdMonth, 1);
+ 
+
+
+    while (openDate < endDate) {
+      // Before incrementing, log the current state
+      const currentYear = openDate.getFullYear();
+      const currentMonth = String(openDate.getMonth() + 1).padStart(2, '0'); // Correctly format month
+      
+      const openKey = `${currentYear}-${currentMonth}`;
+
+      if (!monthYearData[openKey]) {
+          monthYearData[openKey] = { created: [], closed: [], open: [] };
+      }
+  
+      // Add the PR to the open array for this month
+      addIfNotExists(monthYearData[openKey].open, issue);
+  
+      // Increment to the next month (update the date first, then create the key)
+      openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
+      openDate.setUTCDate(1); // Set the date to the first of the new month
+  }
+  
+  
+
+  }
     }
   });
   
@@ -873,6 +923,66 @@ const GitHubPRTracker: React.FC = () => {
   
     return csvRows.join('\n');
   };
+
+  const convertToCSV2 = (filteredData: any, type: 'PRs' | 'Issues') => {
+    const csvRows = [];
+  
+    // Add `Key` and `Tag` headers to the existing ones
+    const headers = type === 'PRs'
+      ? ['Key', 'Tag', 'Number', 'Title', 'Created At', 'Closed At', 'Merged At', 'Link']
+      : ['Key', 'Tag', 'Number', 'Title', 'Created At', 'Closed At', 'Link'];
+  
+    // Add headers to CSV rows
+    csvRows.push(headers.join(','));
+  
+    console.log("filteredData", filteredData);
+  
+    // Combine created and closed arrays for PRs and Issues
+    const items = type === 'PRs'
+      ? [
+          ...(Array.isArray(filteredData.reviewed) && showCategory.review ? filteredData.reviewed : []),
+          ...(Array.isArray(filteredData.created) && showCategory.created ? filteredData.created : []),
+          ...(Array.isArray(filteredData.closed) && showCategory.closed ? filteredData.closed : []),
+          ...(Array.isArray(filteredData.merged) && showCategory.merged ? filteredData.merged : []),
+          ...(Array.isArray(filteredData.open) && showCategory.open ? filteredData.open : [])
+        ]
+      : [
+          ...(Array.isArray(filteredData.created) && showCategory.created ? filteredData.created : []),
+          ...(Array.isArray(filteredData.closed) && showCategory.closed ? filteredData.closed : []),
+          ...(Array.isArray(filteredData.open) && showCategory.open ? filteredData.open : [])
+        ];
+  
+    console.log(items);
+  
+    // Add data to CSV rows
+    items.forEach((item: PR | Issue & { key: string; tag: string }) => {
+      const row = type === 'PRs'
+        ? [
+            item.key, // Add `key`
+            item.tag, // Add `tag`
+            (item as PR).prNumber,
+            `"${(item as PR).prTitle}"`,  // Wrap title in quotes
+            new Date(item.created_at).toLocaleDateString(),
+            item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+            (item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-',
+            `https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${(item as PR).prNumber}`
+          ].join(',')
+        : [
+            item.key, // Add `key`
+            item.tag, // Add `tag`
+            (item as Issue).IssueNumber,
+            `"${(item as Issue).IssueTitle}"`,  // Wrap title in quotes
+            new Date(item.created_at).toLocaleDateString(),
+            item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+            `https://github.com/ethereum/${selectedRepo}/issues/${(item as Issue).IssueNumber}`
+          ].join(',');
+  
+      csvRows.push(row);
+    });
+  
+    return csvRows.join('\n');
+  };
+  
   
   const handleDownload = () => {
     if (!selectedYear || !selectedMonth) {
@@ -907,6 +1017,69 @@ const GitHubPRTracker: React.FC = () => {
   
     downloadCSV(combinedData, activeTab);
   };
+
+  const handleDownload2 = () => {
+    // Initialize combined data arrays for PRs and Issues separately
+    const combinedPRData = {
+      created: [] as Array<PR & { key: string; tag: string }>,
+      closed: [] as Array<PR & { key: string; tag: string }>,
+      merged: [] as Array<PR & { key: string; tag: string }>,
+      reviewed: [] as Array<PR & { key: string; tag: string }>,
+      open: [] as Array<PR & { key: string; tag: string }>
+    };
+  
+    const combinedIssueData = {
+      created: [] as Array<Issue & { key: string; tag: string }>,
+      closed: [] as Array<Issue & { key: string; tag: string }>,
+      open: [] as Array<Issue & { key: string; tag: string }>
+    };
+  
+    // Determine if we're handling PRs or Issues
+    const allData = activeTab === 'PRs' ? data.PRs : data.Issues;
+  
+    // Iterate over all keys in the selected dataset (PRs or Issues)
+    Object.keys(allData).forEach((key) => {
+      const currentData = allData[key];
+  
+      if (activeTab === 'PRs') {
+        // Add each record with 'key' and 'tag' to combinedPRData
+        combinedPRData.created.push(...(currentData as { created: PR[] }).created.map(item => ({ ...item, key, tag: 'created' })));
+        combinedPRData.closed.push(...(currentData as { closed: PR[] }).closed.map(item => ({ ...item, key, tag: 'closed' })));
+        combinedPRData.open.push(...(currentData as { open: PR[] }).open.map(item => ({ ...item, key, tag: 'open' })));
+        combinedPRData.merged.push(...((currentData as { merged: PR[] }).merged || []).map(item => ({ ...item, key, tag: 'merged' })));
+        combinedPRData.reviewed.push(...((currentData as { review: PR[] }).review || []).map(item => ({ ...item, key, tag: 'reviewed' })));
+      } else {
+        // Add each record with 'key' and 'tag' to combinedIssueData
+        combinedIssueData.created.push(...(currentData as { created: Issue[] }).created.map(item => ({ ...item, key, tag: 'created' })));
+        combinedIssueData.closed.push(...(currentData as { closed: Issue[] }).closed.map(item => ({ ...item, key, tag: 'closed' })));
+        combinedIssueData.open.push(...(currentData as { open: Issue[] }).open.map(item => ({ ...item, key, tag: 'open' })));
+      }
+    });
+  
+    // Check if there's data to download
+    const noData =
+      activeTab === 'PRs'
+        ? combinedPRData.created.length === 0 &&
+          combinedPRData.closed.length === 0 &&
+          combinedPRData.open.length === 0 &&
+          combinedPRData.merged.length === 0 &&
+          combinedPRData.reviewed.length === 0
+        : combinedIssueData.created.length === 0 &&
+          combinedIssueData.closed.length === 0 &&
+          combinedIssueData.open.length === 0;
+  
+    if (noData) {
+      alert('No data available.');
+      return;
+    }
+  
+    console.log("Combined data with keys and tags:", activeTab === 'PRs' ? combinedPRData : combinedIssueData);
+  
+    // Pass the appropriate combined data to the CSV download function
+    downloadCSV2(activeTab === 'PRs' ? combinedPRData : combinedIssueData, activeTab);
+  };
+  
+  
   
   
   const downloadCSV = (data: any, type: 'PRs' | 'Issues') => {
@@ -918,6 +1091,20 @@ const GitHubPRTracker: React.FC = () => {
     a.setAttribute('hidden', '');
     a.setAttribute('href', url);
     a.setAttribute('download', `${type}-${selectedYear}-${selectedMonth}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const downloadCSV2 = (data: any, type: 'PRs' | 'Issues') => {
+    const csv = convertToCSV2(data, type);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+  
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `${type}_since_2015.csv`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1234,6 +1421,13 @@ const GitHubPRTracker: React.FC = () => {
             }}
           >
           <Box padding={"2rem"} borderRadius={"0.55rem"}>
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color="black">
+            {`Analytics (Monthly, since 2015)`}
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <Button colorScheme="blue" onClick={handleDownload2}>Download CSV</Button>
+        </Flex>
             {renderChart()}
             <Box className={"w-full"}>
               <DateTime />
