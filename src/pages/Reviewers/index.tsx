@@ -135,6 +135,28 @@ const ReviewTracker = () => {
     setCsvData(csv); // Update the state with the generated CSV data
   };
 
+  const generateCSVData2 = () => {
+  
+    const filteredData = data
+      .filter(item => showReviewer[item.reviewer]);
+  
+    const csv = filteredData.flatMap(item =>
+      item.prs.map((pr: PR) => ({
+        PR_Number: pr.prNumber,
+        Title: pr.prTitle,
+        Reviewer: item.reviewer,
+        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+        Link: `https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`,
+      }))
+    );
+  
+    setCsvData(csv); // Update the state with the generated CSV data
+  };
+
   useEffect(() => {
     fetchData();
     resetReviewerList(); // Reset reviewers when switching tabs
@@ -380,42 +402,90 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 
   const yearlyChartData = formatChartData(yearlyData);
 
-  return (
-    <Box padding="2rem">
-      {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
-          <Flex direction={{ base: "column", md: "row" }} justifyContent="space-between">
-          {/* Yearly Leaderboard Chart */}
-          <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-            <Heading size="md" marginBottom="0.5rem" color="black">
-              {`Editors Leaderboard`}
-            </Heading>
-            <Bar {...getBarChartConfig(yearlyChartData)} />
-          </Box>
+  return( 
+  <Box padding="2rem">
+  {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
+    <Flex direction={{ base: "column", md: "row" }} justifyContent="space-between">
+      {/* Yearly Leaderboard Chart */}
+      <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color="black">
+            {`Editors Leaderboard (PRs reviewed since 2015)`}
+          </Heading>
+          <CSVLink 
+            data={csvData.length ? csvData : []} 
+            filename={`reviews_data_since_2015.csv`} 
+            onClick={(e:any) => {
+              generateCSVData2();
+              if (csvData.length === 0) {
+                e.preventDefault(); 
+                console.error("CSV data is empty or not generated correctly.");
+              }
+            }}
+          >
+            <Button colorScheme="blue">Download CSV</Button>
+          </CSVLink>
+        </Flex>
+        <br/>
+        <Bar {...getBarChartConfig(yearlyChartData)} />
+      </Box>
+
+      {/* Monthly Leaderboard Chart */}
+      <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color="black">
+            {`Editors Leaderboard (Monthly)`}
+          </Heading>
+          <CSVLink 
+            data={csvData.length ? csvData : []} 
+            filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
+            onClick={(e:any) => {
+              generateCSVData();
+              if (csvData.length === 0) {
+                e.preventDefault(); 
+                console.error("CSV data is empty or not generated correctly.");
+              }
+            }}
+          >
+            <Button colorScheme="blue">Download CSV</Button>
+          </CSVLink>
+        </Flex>
+        <br/>
+        <Bar {...getBarChartConfig(monthlyChartData)} />
+      </Box>
+    </Flex>
+  )}
   
-          {/* Monthly Leaderboard Chart */}
-          {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
-            <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-              <Heading size="md" marginBottom="0.5rem" color="black">
-                {`Editors Leaderboard for ${selectedMonth.padStart(2, '0')}-${selectedYear}`}
-              </Heading>
-              <Bar {...getBarChartConfig(monthlyChartData)} />
-            </Box>
-          )}
+  {!selectedMonth && ( // Check if monthlyChartData is defined
+    <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
+      {/* Yearly Leaderboard Chart */}
+      <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color="black">
+            {`Editors Leaderboard`}
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <CSVLink 
+            data={csvData.length ? csvData : []} 
+            filename={`reviews_data_since_2015.csv`} 
+            onClick={(e:any) => {
+              generateCSVData2();
+              if (csvData.length === 0) {
+                e.preventDefault(); 
+                console.error("CSV data is empty or not generated correctly.");
+              }
+            }}
+          >
+            <Button colorScheme="blue">Download CSV</Button>
+          </CSVLink>
         </Flex>
-        )}
-      {!selectedMonth && ( // Check if monthlyChartData is defined
-          <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
-          {/* Yearly Leaderboard Chart */}
-          <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-            <Heading size="md" marginBottom="0.5rem" color="black">
-              {`Editors Leaderboard`}
-            </Heading>
-            <Bar {...getBarChartConfig(yearlyChartData)} />
-          </Box>
-        </Flex>
-        )}
-    </Box>
-  );
+        <br/>
+        <Bar {...getBarChartConfig(yearlyChartData)} />
+      </Box>
+    </Flex>
+  )}
+</Box>
+)
 };
 
 
@@ -744,8 +814,9 @@ const renderChart = () => {
         </Button>
       </Flex>
 
-      <Box padding={"2rem"} borderRadius={"0.55rem"}>
-      <Box
+      {!selectedMonth && (
+        <Box padding="2rem" borderRadius="0.55rem">
+          <Box
             bgColor={bg}
             padding="2rem"
             borderRadius="0.55rem"
@@ -754,13 +825,16 @@ const renderChart = () => {
               borderColor: "#30A0E0",
             }}
           >
-              <Box className={"w-full"}>
-                {renderCharts(data, selectedYear, selectedMonth)}
-                <DateTime />
+            <Box className="w-full">
+              {renderCharts(data, selectedYear, selectedMonth)}
+              <DateTime />
             </Box>
-            </Box>
-            <br/><br/>
           </Box>
+          <br />
+          <br />
+        </Box>
+      )}
+
       <Box
             bgColor={bg}
             padding="2rem"
@@ -771,6 +845,25 @@ const renderChart = () => {
             }}
           >
           <Box className={"w-full"}>
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color="black">
+            {`Editors Leaderboard (Monthly, since 2015)`}
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <CSVLink 
+            data={csvData.length ? csvData : []} 
+            filename={`reviews_data_since_2015.csv`} 
+            onClick={(e:any) => {
+              generateCSVData2();
+              if (csvData.length === 0) {
+                e.preventDefault(); 
+                console.error("CSV data is empty or not generated correctly.");
+              }
+            }}
+          >
+            <Button colorScheme="blue">Download CSV</Button>
+          </CSVLink>
+        </Flex>
             {renderChart()}
             <DateTime />
           </Box></Box>
@@ -891,6 +984,25 @@ const renderChart = () => {
       )}
        </HStack>
       </Flex>
+
+      {selectedMonth && (
+        <Box padding="2rem" borderRadius="0.55rem">
+          <Box
+            bgColor={bg}
+            padding="2rem"
+            borderRadius="0.55rem"
+            _hover={{
+              border: "1px",
+              borderColor: "#30A0E0",
+            }}
+          >
+            <Box className="w-full">
+              {renderCharts(data, selectedYear, selectedMonth)}
+              <DateTime />
+            </Box>
+          </Box>
+        </Box>
+      )}
 
       {showDropdown && ( 
         <>

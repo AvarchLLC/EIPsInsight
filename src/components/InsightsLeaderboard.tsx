@@ -328,7 +328,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
             {selectedYear && selectedMonth && monthlyChartData && (
                 <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
                     {/* Monthly Leaderboard Chart */}
-                    <Box width={{ base: "100%", md: "100%" }} minHeight="250px" padding="0.2rem">
+                    <Box width={{ base: "100%", md: "100%" }} minHeight="250px" paddingTop={10}>
                         <Bar {...getBarChartConfig(monthlyChartData)} />
                     </Box>
                 </Flex>
@@ -340,7 +340,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   
   return (
     <> <Link href="/Reviewers">
-      <Box className="w-full" minHeight="300px"> {/* Set min height for responsive scaling */}
+      <Box className="w-full" minHeight="300px" > {/* Set min height for responsive scaling */}
         {loading ? (
           <Flex 
           justifyContent="center" // Center horizontally

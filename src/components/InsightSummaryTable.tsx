@@ -99,10 +99,10 @@ export default function InsightSummary() {
     RIPs: { open: 0, created: 0, closed: 0 },
   });
 
-  useEffect(() => {
-    fetchPRData();
-    fetchIssueData();
-  }, [key]);
+  // useEffect(() => {
+  //   fetchPRData();
+  //   fetchIssueData();
+  // }, [key]);
 
   const fetchPRData = async () => {
     try {
@@ -501,7 +501,7 @@ export default function InsightSummary() {
 
   return (
     <>
-      <Text fontSize="7xl" fontWeight="bold" color="blue.400" textAlign="center" paddingTop={8} paddingLeft={8}>
+      <Text fontSize="3xl" fontWeight="bold" color="blue.400" textAlign="center" paddingTop={8} paddingLeft={8}>
         Summary
       </Text>
       <TableContainer bg={bg} padding={4} rounded={"xl"} marginTop={8}>
@@ -556,55 +556,55 @@ export default function InsightSummary() {
                 </>
               );
             })}
-            <Tr>
+            {/* <Tr>
               <Td>Open PRs</Td>
               <Td>{prData.EIPs.open}</Td>
               <Td>{prData.ERCs.open}</Td>
-              <Td>{prData.RIPs.open}</Td>
+              <Td>{prData.RIPs.open}</Td> */}
               {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            </Tr>
-            <Tr>
+            {/* </Tr> */}
+            {/* <Tr>
               <Td>Created PRs</Td>
               <Td>{prData.EIPs.created}</Td>
               <Td>{prData.ERCs.created}</Td>
-              <Td>{prData.RIPs.created}</Td>
+              <Td>{prData.RIPs.created}</Td> */}
               {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            </Tr>
-            <Tr>
+            {/* </Tr> */}
+            {/* <Tr>
               <Td>Closed PRs</Td>
               <Td>{prData.EIPs.closed}</Td>
               <Td>{prData.ERCs.closed}</Td>
-              <Td>{prData.RIPs.closed}</Td>
+              <Td>{prData.RIPs.closed}</Td> */}
               {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            </Tr>
-            <Tr>
+            {/* </Tr> */}
+            {/* <Tr>
               <Td>Merged PRs</Td>
               <Td>{prData.EIPs.merged}</Td>
               <Td>{prData.ERCs.merged}</Td>
-              <Td>{prData.RIPs.merged}</Td>
+              <Td>{prData.RIPs.merged}</Td> */}
               {/* <Td isNumeric>{prData.EIPs.merged+prData.ERCs.merged+prData.RIPs.merged}</Td> */}
-            </Tr>
-            <Tr>
+            {/* </Tr> */}
+            {/* <Tr>
               <Td>Created Issues</Td>
               <Td>{issueData.EIPs.created}</Td>
               <Td>{issueData.ERCs.created}</Td>
-              <Td>{issueData.RIPs.created}</Td>
+              <Td>{issueData.RIPs.created}</Td> */}
               {/* <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td> */}
-            </Tr>
-            <Tr>
+            {/* </Tr> */}
+            {/* <Tr>
               <Td>Open Issues</Td>
               <Td>{issueData.EIPs.open}</Td>
               <Td>{issueData.ERCs.open}</Td>
-              <Td>{issueData.RIPs.open}</Td>
+              <Td>{issueData.RIPs.open}</Td> */}
               {/* <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td> */}
-            </Tr>
-            <Tr>
+            {/* </Tr> */}
+            {/* <Tr>
               <Td>Closed Issues</Td>
               <Td>{issueData.EIPs.closed}</Td>
               <Td>{issueData.ERCs.closed}</Td>
-              <Td>{issueData.RIPs.closed}</Td>
+              <Td>{issueData.RIPs.closed}</Td> */}
               {/* <Td isNumeric>{issueData.EIPs.closed+issueData.ERCs.closed+issueData.RIPs.closed}</Td> */}
-            </Tr>
+            {/* </Tr> */}
             
           </Tbody>
         </Table>
