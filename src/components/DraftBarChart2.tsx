@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Spinner } from "@chakra-ui/react";
+import { Box, useColorModeValue, Spinner, Flex, Heading, Button } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import DateTime from "@/components/DateTime";
 import { motion } from "framer-motion";
@@ -75,6 +75,23 @@ interface MappedDataItem {
   value: number;
 }
 
+interface EIP2 {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+  repo: string;
+}
+
 interface EIP {
   status: string;
   eips: {
@@ -84,7 +101,7 @@ interface EIP {
     date: string;
     count: number;
     category: string;
-    eips:any[];
+    eips: EIP2[];
   }[];
 }
 
@@ -170,13 +187,15 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
   };
   
   let filteredData = data.filter((item) => item.status === status);
+  console.log("filtered data:", filteredData);
 
   const transformedData = filteredData.flatMap((item) => {
     console.log(item); // Log each item
     return item.eips.map((eip) => ({
       category: getCat(eip.category),
       year: ` ${eip.year.toString()}`,
-      value:removeDuplicatesFromEips(eip.eips).length
+      value:removeDuplicatesFromEips(eip.eips).length,
+      eips: removeDuplicatesFromEips(eip.eips)
     }));
   });
   
@@ -203,6 +222,7 @@ categories.forEach((category) => {
         category: category,
         year: year,
         value: 0,
+        eips:[]
       });
     }
   });
@@ -269,6 +289,51 @@ categories.forEach((category) => {
     
   };
 
+  const downloadData = () => {
+    // Filter data based on the selected status
+    let filteredData = data.filter((item) => item.status === status);
+    
+    // Transform the filtered data to get the necessary details
+    const transformedData = filteredData.flatMap((item) => {
+        return item.eips.flatMap((eip) => {
+            const category = getCat(eip.category); // Assuming this function returns a string
+            const year = eip.year.toString(); // Convert year to string
+            const uniqueEips = removeDuplicatesFromEips(eip.eips); // Assuming this returns an array of EIPs
+            return uniqueEips.map(({ eip }) => ({
+                category,
+                year,
+                eip, // Individual EIP
+            }));
+        });
+    });
+
+    // Define the CSV header
+    const header = "Category,Year,EIPs\n";
+  
+    // Prepare the CSV content
+    const csvContent = "data:text/csv;charset=utf-8,"
+        + header
+        + transformedData.map(({ category, year, eip }) => {
+            return `${category},${year},${eip}`; // Each EIP on a separate line
+        }).join("\n");
+  
+    // Check the generated CSV content before download
+    console.log("CSV Content:", csvContent);
+  
+    // Encode the CSV content for downloading
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${status}.csv`); // Name your CSV file here
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+};
+
+
+  
+  
+
   return (
     <>
       {isLoading ? (
@@ -291,6 +356,13 @@ categories.forEach((category) => {
         </>
       ) : (
         <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color="black">
+            {`${status}`}
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <Button colorScheme="blue" onClick={downloadData}>Download CSV</Button>
+        </Flex>
           <Area {...config} />
           <Box className={"w-full"}>
             <DateTime />

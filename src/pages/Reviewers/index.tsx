@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Box, Flex, Heading, IconButton, Collapse, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
+import { Box, Flex, Select,Heading, IconButton, Collapse, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
 import LoaderComponent from "@/components/Loader";
 import { ChevronDownIcon } from "@chakra-ui/icons";
@@ -29,6 +29,7 @@ const ReviewTracker = () => {
   // const [showReviewer, setShowReviewer] = useState<{ [key: string]: boolean }>({});
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
   const [reviewers, setReviewers] = useState<string[]>([]);
+  const [reviewerData, setReviewerData] = useState<any[]>([]);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -36,6 +37,7 @@ const ReviewTracker = () => {
   const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const [sliderValue, setSliderValue] = useState<number>(0);
 
   const toggleCollapse = () => setShow(!show);
 
@@ -55,6 +57,28 @@ const ReviewTracker = () => {
       console.error("Error fetching reviewers:", error);
       return [];
     }
+  };
+
+  const fetchReviewersData = async () => {
+    
+    try {
+      const response = await fetch('/api/editorsActivity'); // Replace with your API endpoint
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const reviewersData = await response.json();
+
+      // Transform the fetched data into the desired format
+      const formattedData = reviewersData.map((reviewer: any) => ({
+        reviewer: reviewer.reviewer,
+        startDate: reviewer.startDate,
+        endDate: reviewer.endDate || null // Ensure endDate is null if not provided
+      }));
+
+      setReviewerData(formattedData); // Store the structured reviewers data
+    } catch (error) {
+      console.error('Failed to fetch reviewers data:', error);
+    } 
   };
 
   useEffect(() => {
@@ -189,6 +213,23 @@ const ReviewTracker = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
+
+      const response = await fetch('/api/editorsActivity'); // Replace with your API endpoint
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const reviewersData = await response.json();
+
+      // Transform the fetched data into the desired format
+      const formattedData = reviewersData.map((reviewer: any) => ({
+        reviewer: reviewer.reviewer,
+        startDate: reviewer.startDate,
+        endDate: reviewer.endDate || null // Ensure endDate is null if not provided
+      }));
+
+      setReviewerData(formattedData);
+
+      console.log(formattedData)
       let combinedData: any[] = []; // Initialize an empty array for combined data
   
       if (activeTab !== 'all') {
@@ -212,7 +253,7 @@ const ReviewTracker = () => {
   
       setShowReviewer(initialShowReviewer); // Set reviewer visibility state
   
-      const transformedData = transformData(combinedData, initialShowReviewer);
+      const transformedData = transformData(combinedData, initialShowReviewer, formattedData);
       setData(transformedData);
     } catch (error) {
       console.error("Error during data fetch:", error);
@@ -225,7 +266,8 @@ const ReviewTracker = () => {
 
   const transformData = (
     data: any[], 
-    rev: { [key: string]: boolean } // Assuming `rev` is an object where keys are reviewer names
+    rev: { [key: string]: boolean },
+    formattedData:any[]
   ): any[] => {
     const monthYearData: {
       [key: string]: { 
@@ -240,29 +282,56 @@ const ReviewTracker = () => {
   
     data.forEach(review => {
       const reviewDate = new Date(review.reviewDate || review.created_at || review.closed_at || review.merged_at);
+      
       if (isNaN(reviewDate.getTime())) {
         console.error("Invalid date format for review:", review);
         return;
       }
-  
+    
       const key = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, '0')}`;
       const reviewer = review.reviewer;
-  
+    
       if (!monthYearData[key]) {
         monthYearData[key] = {};
       }
-  
-      if (!monthYearData[key][reviewer]) {
-        monthYearData[key][reviewer] = { monthYear: key, reviewer, count: 0, prs: [] };
-      }
-  
-      // Avoid counting duplicate records
-      const isDuplicate = monthYearData[key][reviewer].prs.some(pr => pr.prNumber === review.prNumber);
-      if (!isDuplicate) {
-        monthYearData[key][reviewer].count += 1;
-        monthYearData[key][reviewer].prs.push(review);
+    
+      // Check if the reviewer is present in reviewerData
+      const reviewerInfo = formattedData.find(r => r.reviewer === reviewer);
+      
+      if (reviewerInfo) {
+        // Check if reviewDate is within the timeline for the reviewer
+        const startDate = new Date(reviewerInfo.startDate);
+        const endDate = reviewerInfo.endDate ? new Date(reviewerInfo.endDate) : new Date(); // Consider current date if endDate is null
+    
+        if (reviewDate >= startDate && reviewDate <= endDate) {
+          // Proceed to add the review to monthYearData
+          if (!monthYearData[key][reviewer]) {
+            monthYearData[key][reviewer] = { monthYear: key, reviewer, count: 0, prs: [] };
+          }
+    
+          // Avoid counting duplicate records
+          const isDuplicate = monthYearData[key][reviewer].prs.some(pr => pr.prNumber === review.prNumber);
+          if (!isDuplicate) {
+            monthYearData[key][reviewer].count += 1;
+            monthYearData[key][reviewer].prs.push(review);
+          }
+        }
+      } else {
+        // If the reviewer is not in reviewerData, continue the process below
+        // (You can handle the logic for reviewers not found in reviewerData if needed)
+        if (!monthYearData[key][reviewer]) {
+          monthYearData[key][reviewer] = { monthYear: key, reviewer, count: 0, prs: [] };
+        }
+    
+        // Avoid counting duplicate records
+        const isDuplicate = monthYearData[key][reviewer].prs.some(pr => pr.prNumber === review.prNumber);
+        if (!isDuplicate) {
+          monthYearData[key][reviewer].count += 1;
+          monthYearData[key][reviewer].prs.push(review);
+        }
       }
     });
+    
   
     const result = Object.entries(monthYearData).flatMap(([monthYear, reviewers]) => 
       Object.values(reviewers).filter((item: { reviewer: string }) => rev[item.reviewer])
@@ -307,7 +376,10 @@ const getYearlyData = (data: PRData[]) => {
     })
     .flatMap(item => item.prs)
     .reduce((acc, item) => {
-      acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+      // Only count if the reviewer is shown
+      if (showReviewer[item.reviewer]) {
+        acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
 
@@ -330,7 +402,10 @@ const getMonthlyData = (data: PRData[], year: string|null, month: string) => {
     .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)
     .flatMap(item => item.prs)
     .reduce((acc, item) => {
-      acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+      // Only count if the reviewer is shown
+      if (showReviewer[item.reviewer]) {
+        acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
 
@@ -393,70 +468,11 @@ const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => 
 // // Function to render Leaderboard Charts
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   const yearlyData = getYearlyData(data);
-  
-  let monthlyChartData: any; // Declare monthlyChartData
-  if (selectedMonth != null) {
-    const monthlyData = getMonthlyData(data, selectedYear, selectedMonth);
-    monthlyChartData = formatChartData(monthlyData); // Assign to the declared variable
-  }
-
   const yearlyChartData = formatChartData(yearlyData);
 
   return( 
   <Box padding="2rem">
-  {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
-    <Flex direction={{ base: "column", md: "row" }} justifyContent="space-between">
-      {/* Yearly Leaderboard Chart */}
-      <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color="black">
-            {`Editors Leaderboard (PRs reviewed since 2015)`}
-          </Heading>
-          <CSVLink 
-            data={csvData.length ? csvData : []} 
-            filename={`reviews_data_since_2015.csv`} 
-            onClick={(e:any) => {
-              generateCSVData2();
-              if (csvData.length === 0) {
-                e.preventDefault(); 
-                console.error("CSV data is empty or not generated correctly.");
-              }
-            }}
-          >
-            <Button colorScheme="blue">Download CSV</Button>
-          </CSVLink>
-        </Flex>
-        <br/>
-        <Bar {...getBarChartConfig(yearlyChartData)} />
-      </Box>
-
-      {/* Monthly Leaderboard Chart */}
-      <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color="black">
-            {`Editors Leaderboard (Monthly)`}
-          </Heading>
-          <CSVLink 
-            data={csvData.length ? csvData : []} 
-            filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
-            onClick={(e:any) => {
-              generateCSVData();
-              if (csvData.length === 0) {
-                e.preventDefault(); 
-                console.error("CSV data is empty or not generated correctly.");
-              }
-            }}
-          >
-            <Button colorScheme="blue">Download CSV</Button>
-          </CSVLink>
-        </Flex>
-        <br/>
-        <Bar {...getBarChartConfig(monthlyChartData)} />
-      </Box>
-    </Flex>
-  )}
-  
-  {!selectedMonth && ( // Check if monthlyChartData is defined
+ 
     <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
       {/* Yearly Leaderboard Chart */}
       <Box width={{ base: "100%", md: "45%" }} padding="1rem">
@@ -483,7 +499,53 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         <Bar {...getBarChartConfig(yearlyChartData)} />
       </Box>
     </Flex>
+  
+</Box>
+)
+};
+
+
+const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
+  
+  
+  let monthlyChartData: any; // Declare monthlyChartData
+  if (selectedMonth != null) {
+    const monthlyData = getMonthlyData(data, selectedYear, selectedMonth);
+    monthlyChartData = formatChartData(monthlyData); // Assign to the declared variable
+  }
+
+  // const yearlyChartData = formatChartData(yearlyData);
+
+  return( 
+  <Box padding="2rem">
+  {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
+    <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
+    {/* Yearly Leaderboard Chart */}
+    <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+      <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+        <Heading size="md" color="black">
+            {`Editors Leaderboard (Monthly)`}
+          </Heading>
+          <CSVLink 
+            data={csvData.length ? csvData : []} 
+            filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
+            onClick={(e:any) => {
+              generateCSVData();
+              if (csvData.length === 0) {
+                e.preventDefault(); 
+                console.error("CSV data is empty or not generated correctly.");
+              }
+            }}
+          >
+            <Button colorScheme="blue">Download CSV</Button>
+          </CSVLink>
+        </Flex>
+        <br/>
+        <Bar {...getBarChartConfig(monthlyChartData)} />
+      </Box>
+    </Flex>
   )}
+  
 </Box>
 )
 };
@@ -559,8 +621,19 @@ const renderChart = () => {
       radius: [20, 20, 0, 0], // Rounded corners
     },
     slider: {
-      start: 0, // Start of the slider
+      start: sliderValue, // Set the start value from the state
       end: 1, // End of the slider
+      step: 0.01, // Define the step value for the slider
+      min: 0, // Minimum value for the slider
+      max: 1, // Maximum value for the slider
+      onChange: (value:any) => {
+        setSliderValue(value); // Update state when slider value changes
+      },
+      // Optionally handle when sliding stops
+      onAfterChange: (value:any) => {
+        // Perform any additional actions after the slider is changed
+        console.log('Slider moved to:', value);
+      },
     },
     legend: { position: "top-right" as const }, // Legend position
     smooth: true, // Smooth transition
@@ -799,7 +872,7 @@ const renderChart = () => {
     </Box>
 
 
-      <Flex justify="center" mb={8}>
+      {/* <Flex justify="center" mb={8}>
       <Button colorScheme="blue" onClick={() => setActiveTab('all')} isActive={activeTab === 'all'}>
           ALL
         </Button>
@@ -812,9 +885,27 @@ const renderChart = () => {
         <Button colorScheme="blue" onClick={() => setActiveTab('rips')} isActive={activeTab === 'rips'} ml={4}>
           RIPs
         </Button>
-      </Flex>
-
-      {!selectedMonth && (
+      </Flex> */}
+      <Flex justify="center" mb={8}>
+                <Select
+                  value={activeTab}
+                  onChange={(e) => setActiveTab(e.target.value as 'eips' | 'ercs' | 'rips' | 'all')}
+                  placeholder="Select an option"
+                  width="200px"
+                  borderColor="gray.700" // Darker border color
+                  color="gray.800" // Darker text color
+                  bg="white" // White background for the dropdown
+                  _placeholder={{ color: "gray.500" }} // Lighter color for placeholder
+                  _focus={{ borderColor: "gray.500", bg: "white" }} // Border color on focus
+                  _hover={{ borderColor: "gray.600" }} // Border color on hover
+                >
+                  <option value="all">ALL</option>
+                  <option value="eips">EIPs</option>
+                  <option value="ercs">ERCs</option>
+                  <option value="rips">RIPs</option>
+                </Select>
+              </Flex>
+     
         <Box padding="2rem" borderRadius="0.55rem">
           <Box
             bgColor={bg}
@@ -825,6 +916,9 @@ const renderChart = () => {
               borderColor: "#30A0E0",
             }}
           >
+
+        
+            
             <Box className="w-full">
               {renderCharts(data, selectedYear, selectedMonth)}
               <DateTime />
@@ -833,7 +927,7 @@ const renderChart = () => {
           <br />
           <br />
         </Box>
-      )}
+ 
 
       <Box
             bgColor={bg}
@@ -847,7 +941,7 @@ const renderChart = () => {
           <Box className={"w-full"}>
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
-            {`Editors Leaderboard (Monthly, since 2015)`}
+            {`PRs Reviewed (Monthly, since 2015)`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <CSVLink 
@@ -901,14 +995,14 @@ const renderChart = () => {
         {/* Select all reviewers */}
         <MenuItem onClick={selectAllReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
-            Select All
+          Emeritus Editors
           </Text>
         </MenuItem>
 
         {/* Select only active reviewers */}
         <MenuItem onClick={selectActiveReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
-            Select Active
+            Active Editors
           </Text>
         </MenuItem>
 
@@ -997,7 +1091,7 @@ const renderChart = () => {
             }}
           >
             <Box className="w-full">
-              {renderCharts(data, selectedYear, selectedMonth)}
+              {renderCharts2(data, selectedYear, selectedMonth)}
               <DateTime />
             </Box>
           </Box>

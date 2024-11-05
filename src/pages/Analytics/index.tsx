@@ -1399,18 +1399,7 @@ const GitHubPRTracker: React.FC = () => {
             </Button>
           </Flex>
   
-          <Flex justify="center" mb={8}>
-            <Select
-              value={selectedRepo}
-              onChange={(e) => setSelectedRepo(e.target.value)}
-              width="200px"
-            >
-              <option value="All">All</option>
-              <option value="EIPs">EIPs</option>
-              <option value="ERCs">ERCs</option>
-              <option value="RIPs">RIPs</option>
-            </Select>
-          </Flex>
+         
           <Box
             bgColor={bg}
             padding="2rem"
@@ -1423,19 +1412,35 @@ const GitHubPRTracker: React.FC = () => {
           <Box padding={"2rem"} borderRadius={"0.55rem"}>
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
-            {`Analytics (Monthly, since 2015)`}
+            {`Github PR Analytics (Monthly, since 2015)`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <Button colorScheme="blue" onClick={handleDownload2}>Download CSV</Button>
         </Flex>
+        <Flex justify="center" mb={8}>
+            <Select
+              value={selectedRepo}
+              onChange={(e) => setSelectedRepo(e.target.value)}
+              placeholder="Select an option"
+              width="200px"
+              borderColor="gray.700" // Darker border color
+              color="gray.800" // Darker text color
+              bg="white" // White background for the dropdown
+              _placeholder={{ color: "gray.500" }} // Lighter color for placeholder
+              _focus={{ borderColor: "gray.500", bg: "white" }} // Border color on focus
+              _hover={{ borderColor: "gray.600" }} // Border color on hover
+            >
+              <option value="All">All</option>
+              <option value="EIPs">EIPs</option>
+              <option value="ERCs">ERCs</option>
+              <option value="RIPs">RIPs</option>
+            </Select>
+          </Flex>
             {renderChart()}
             <Box className={"w-full"}>
               <DateTime />
             </Box>
-          </Box>
-          </Box>
-
-          <Box mt={2}>
+            <Box mt={2}>
         <Text color="gray.500" fontStyle="italic" textAlign="center">
           *Note: The data is updated daily at 15:00 UTC to maintain accuracy and provide the most current information.*
         </Text>
@@ -1480,7 +1485,11 @@ const GitHubPRTracker: React.FC = () => {
   )}
   
 </Flex>
+          </Box>
+          </Box>
 
+          
+<br/>
   
           <Flex justify="center" mb={8}>
             <Button colorScheme="blue" onClick={toggleDropdown}>

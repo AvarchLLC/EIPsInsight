@@ -143,7 +143,7 @@ const ToolsSection: FC = () => {
     minHeight={{ base: "0", lg: "auto" }} // Set to auto on larger screens
   >
     <ToolCard 
-      imageSrc="/DashboardCard4.png" 
+      imageSrc="/DashBoardCard4.png" 
       label="Did you Know" 
       link="/trivia" 
       size="large" 
