@@ -6,17 +6,14 @@ const mongoose = require('mongoose');
 
   
   // Create a model based on the schema
-
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => {
-        console.log('Connected to the database');
-    })
-    .catch((error: any) => {
-        console.error('Error connecting to the database:', error.message);
-    });
+if (mongoose.connection.readyState === 0) {
+    if (typeof process.env.MONGODB_URI === 'string') {
+        mongoose.connect(process.env.MONGODB_URI);
+    } else {
+        // Handle the case where the environment variable is not defined
+        console.error('MONGODB_URI environment variable is not defined');
+    }
+}
 
 
     const likeSchema = new mongoose.Schema({

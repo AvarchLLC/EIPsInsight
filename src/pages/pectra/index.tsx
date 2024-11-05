@@ -24,6 +24,7 @@ import { Table, Thead, Tbody, Tr, Th, Td, Link } from "@chakra-ui/react";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import Image from "next/image";
+import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 
 const All = () => {
   const [selected, setSelected] = useState("Meta");
@@ -321,6 +322,9 @@ const All = () => {
   </NLink>.
 </Text>
 
+<Box>
+  <NetworkUpgradesChart/>
+</Box>
 
 
       <Grid
