@@ -330,7 +330,7 @@ categories.forEach((category) => {
     document.body.removeChild(link);
 };
 
-
+const headingColor = useColorModeValue('black', 'white');
   
   
 
@@ -357,7 +357,7 @@ categories.forEach((category) => {
       ) : (
         <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color="black">
+          <Heading size="md" color={headingColor}>
             {`${status}`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}

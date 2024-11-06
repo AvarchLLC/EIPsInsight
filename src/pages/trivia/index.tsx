@@ -1,11 +1,11 @@
 import { Box, Heading, Text, Button } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
-
+import FactsSection from "@/components/TriviaContents";
 
 const UnderConstructionPage: React.FC = () => {
   return (
     <AllLayout>
-      <Box
+      {/* <Box
         textAlign="center"
         py={6}
         px={6}
@@ -28,6 +28,17 @@ const UnderConstructionPage: React.FC = () => {
         >
           Return to Home
         </Button>
+      </Box> */}
+      <Box
+       textAlign="center"
+       py={8}
+       px={8}
+       display="flex"
+       flexDirection="column"
+       justifyContent="center"
+      //  alignItems="center"
+       >
+        <FactsSection/>
       </Box>
     </AllLayout>
   );

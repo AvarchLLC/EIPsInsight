@@ -206,6 +206,10 @@ const Dashboard = () => {
                               }}
                               rightIcon={<BsArrowUpRight />}
                               bgColor={"#30A0E0"}
+                              _hover={{
+                                bgColor: useColorModeValue("#2B6CB0", "#4A5568"),
+                                color: useColorModeValue("white", "#F5F5F5"),
+                              }}
                             >
                               Dashboard
                             </Button>
@@ -234,6 +238,10 @@ const Dashboard = () => {
                               }}
                               rightIcon={<BsGraphUp />}
                               bgColor={"#30A0E0"}
+                              _hover={{
+                                bgColor: useColorModeValue("#2B6CB0", "#4A5568"),
+                                color: useColorModeValue("white", "#F5F5F5"),
+                              }}
                             >
                               {monthName} {year} Insights
                             </Button>
@@ -289,6 +297,10 @@ const Dashboard = () => {
                               }}
                               rightIcon={<BsArrowUpRight />}
                               bgColor={"#30A0E0"}
+                              _hover={{
+                                bgColor: useColorModeValue("#2B6CB0", "#4A5568"),
+                                color: useColorModeValue("white", "#F5F5F5"),
+                              }}
                             >
                               Dashboard
                             </Button>
@@ -314,6 +326,10 @@ const Dashboard = () => {
                             md: "5px 10px",
                             sm: "5px 10px",
                             base: "5px 10px",
+                          }}
+                          _hover={{
+                            bgColor: useColorModeValue("#2B6CB0", "#4A5568"),
+                            color: useColorModeValue("white", "#F5F5F5"),
                           }}
                         >
                           {monthName} {year} Insights
@@ -531,7 +547,7 @@ const Dashboard = () => {
                 }}
                 className="hover: cursor-pointer ease-in duration-200"
               >
-                <NextLink href="/all">
+                <NextLink href="/status">
                   <Text
                     fontSize="2xl"
                     fontWeight="bold"

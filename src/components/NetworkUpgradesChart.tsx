@@ -33,11 +33,15 @@ const rawData = [
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-214" },
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-649" },
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-658" },
-    // { date: "TBD", upgrade: "Cancun", eip: "EIP-1153" },
-    // { date: "TBD", upgrade: "Cancun", eip: "EIP-4788" },
-    // { date: "TBD", upgrade: "Cancun", eip: "EIP-4844" },
-    // { date: "TBD", upgrade: "Cancun", eip: "EIP-5656" },
-    // { date: "TBD", upgrade: "Cancun", eip: "EIP-6780" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-1153" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-4788" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-4844" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-5656" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-6780" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7044" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7045" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7514" },
+    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7516" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-145" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1014" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1052" },
@@ -59,21 +63,25 @@ const rawData = [
     { date: "2021-08-05", upgrade: "London", eip: "EIP-3541" },
     { date: "2021-08-05", upgrade: "London", eip: "EIP-3554" },
     { date: "2020-01-02", upgrade: "Muir Glacier", eip: "EIP-2384" },
-    { date: "2022-09-15", upgrade: "Paris", eip: "EIP-3675" },
-    { date: "2022-09-15", upgrade: "Paris", eip: "EIP-4399" },
     { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-145" },
     { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1014" },
     { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1052" },
     { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1234" },
-    { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3651" },
-    { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3855" },
-    { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3860" },
-    { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-4895" },
+    { date: "2023-04-12", upgrade: "Shapella", eip: "EIP-3651" },
+    { date: "2023-04-12", upgrade: "Shapella", eip: "EIP-3855" },
+    { date: "2023-04-12", upgrade: "Shapella", eip: "EIP-3860" },
+    { date: "2023-04-12", upgrade: "Shapella", eip: "EIP-4895" },
+    { date: "2023-04-12", upgrade: "Shapella", eip: "EIP-6049" },
     { date: "2016-11-22", upgrade: "Spurious Dragon", eip: "EIP-155" },
     { date: "2016-11-22", upgrade: "Spurious Dragon", eip: "EIP-160" },
     { date: "2016-11-22", upgrade: "Spurious Dragon", eip: "EIP-161" },
     { date: "2016-11-22", upgrade: "Spurious Dragon", eip: "EIP-170" },
-    { date: "2016-10-18", upgrade: "Tangerine Whistle", eip: "EIP-150" }
+    { date: "2016-10-18", upgrade: "Tangerine Whistle", eip: "EIP-150" },
+    { date: "2022-09-15", upgrade: "The Merge", eip: "EIP-4895" },
+    { date: "2022-09-15", upgrade: "The Merge", eip: "EIP-6049" },
+    { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "" },
+    { date: "2015-07-30", upgrade: "Frontier", eip: "" },
+    { date: "2021-10-21", upgrade: "Altair", eip: "" },
   ];
 
 // Transform data for charting and sort by date, ensuring TBD upgrades are last
@@ -83,7 +91,11 @@ const transformedData: UpgradeData[] = Object.values(
     if (!acc[key]) {
       acc[key] = { date, upgrade, count: 0 };
     }
-    acc[key].count += 1;
+    if (["Altair", "Frontier", "Frontier Thawing"].includes(upgrade)) {
+      acc[key].count = 0;
+    } else {
+      acc[key].count += 1;
+    }
     return acc;
   }, {} as Record<string, UpgradeData>)
 ).sort((a, b) => {
@@ -108,9 +120,12 @@ const downloadData = () => {
 
 // Function to generate distinct colors
 const generateDistinctColor = (index: number, total: number) => {
-  const hue = (2*index * (360 / total)) % 360;
-  return `hsl(${hue}, 85%, 50%)`;
+  const hue = (index * (360 / total)) % 360;
+  const saturation = 85 - (index % 2) * 15; // Alternates between 85% and 70%
+  const lightness = 60 - (index % 3) * 10; // Alternates between 60%, 50%, and 40%
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
+
 
 // Map to store colors for each unique upgrade
 const uniqueUpgrades = [...new Set(transformedData.map(data => data.upgrade))];
@@ -151,12 +166,12 @@ const NetworkUpgradesChart = () => {
     },
   };
 
-
+  const headingColor = useColorModeValue('black', 'white');
 
   return (
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color="black">
+         <Heading size="md" color={headingColor}>
             {`Network Upgrades`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}

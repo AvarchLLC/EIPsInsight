@@ -162,10 +162,7 @@ const Status = () => {
             <Header title="Status" subtitle="Your Roadway to Status"></Header>
 
             <Text
-              fontSize="xl"
-              fontWeight="bold"
-              color="#A020F0"
-              paddingTop={"8"}
+              fontSize="3xl" fontWeight="bold" color="#30A0E0"
             >
               Draft vs Final
             </Text>
