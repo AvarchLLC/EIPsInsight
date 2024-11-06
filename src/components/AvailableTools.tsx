@@ -128,8 +128,8 @@ const ToolsSection: FC = () => {
     </Grid>
     <ToolCard 
       imageSrc="/DashboardCard5.png" 
-      label="EIPs Status" 
-      link="/status" 
+      label="All EIPs" 
+      link="/all" 
       size="small" 
       layout="imageLeft" 
     />

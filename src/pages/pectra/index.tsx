@@ -25,6 +25,7 @@ import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import Image from "next/image";
 import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
+import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 
 const All = () => {
   const [selected, setSelected] = useState("Meta");
@@ -324,6 +325,10 @@ const All = () => {
 
 <Box>
   <NetworkUpgradesChart/>
+</Box>
+<br/>
+<Box>
+  <NetworkUpgradesChart2/>
 </Box>
 
 
