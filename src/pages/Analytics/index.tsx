@@ -43,6 +43,10 @@ const API_ENDPOINTS = {
   ercs: '/api/editorsprsercs',
   rips: '/api/editorsprsrips'
 }
+const NEW_ISSUE_ENDPOINTS = ['/api/Analyticsissueinfo/eips', '/api/Analyticsissueinfo/ercs', '/api/Analyticsissueinfo/rips'];
+const NEW_PR_ENDPOINTS = ['/api/AnalyticsInfo/eips', '/api/AnalyticsInfo/ercs', '/api/AnalyticsInfo/rips'];
+const ALL_ISSUE_ENDPOINTS = ['/api/Analyticsissueinfo/all'];
+const ALL_PR_ENDPOINTS = ['/api/AnalyticsInfo/all'];
 
 type PR = {
   repo:string;
@@ -75,7 +79,7 @@ type Issue = {
 const GitHubPRTracker: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'PRs' | 'Issues'>('PRs');
-  const [selectedRepo, setSelectedRepo] = useState<string>('EIPs');
+  const [selectedRepo, setSelectedRepo] = useState<string>('All');
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -105,80 +109,46 @@ const GitHubPRTracker: React.FC = () => {
 
   const fetchPRData = async () => {
     try {
-      // Fetch PR data from all three repositories: EIPs, ERCs, RIPs
-      const [eipsData, ercsData, ripsData] = await Promise.all(
-        PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
-      );
+      setLoading(true);
+      let transformedData = {};
   
-      // Fetch review data for each repository
-      const [eipsRes, ercsRes, ripsRes] = await Promise.all([
-        fetch(API_ENDPOINTS.eips),
-        fetch(API_ENDPOINTS.ercs),
-        fetch(API_ENDPOINTS.rips),
-      ]);
+      // Fetch data for each repository based on selectedRepo or all repos if selectedRepo is 'All'
+      if (selectedRepo === 'All') {
+        const [allDataRes] = await Promise.all(
+          ALL_PR_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+        );
   
-      const eipsReviewData = await eipsRes.json();
-      const ercsReviewData = await ercsRes.json();
-      const ripsReviewData = await ripsRes.json();
-  
-      // Ensure review data is an object
-      let combinedReviewData: PR[] = [];
-  
-      let transformedData: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open: PR[], review: PR[] } } = {};
-  
-      // Selection logic for single repositories
-      if (selectedRepo === 'EIPs') {
-        transformedData = transformPRData(eipsData, combinedReviewData);
-      } else if (selectedRepo === 'ERCs') {
-        transformedData = transformPRData(ercsData, combinedReviewData);
-      } else if (selectedRepo === 'RIPs') {
-        transformedData = transformPRData(ripsData, combinedReviewData);
-        
+        // Remove `_id` field from each month in all data response
+        transformedData = Object.fromEntries(
+          Object.entries(allDataRes).filter(([key]) => key !== '_id')
+        );
       } else {
-        // When all repos are selected, transform and combine the data
+        const [repoData] = await Promise.all(
+          NEW_PR_ENDPOINTS
+            .filter((_, index) => selectedRepo === ['EIPs', 'ERCs', 'RIPs'][index])
+            .map(endpoint => fetch(endpoint).then(res => res.json()))
+        );
   
-        const eipsTransformed = transformPRData(eipsData, combinedReviewData);
-        const ercsTransformed = transformPRData(ercsData, combinedReviewData);
-        const ripsTransformed = transformPRData(ripsData, combinedReviewData);
-        console.log(ripsTransformed);
-  
-        // Combine the transformed data for each month/year key
-        const combineData = (source: any, target: any) => {
-          Object.keys(source).forEach(key => {
-            if (!target[key]) {
-              target[key] = {
-                created: [],
-                closed: [],
-                merged: [],
-                open: [],
-                review: []
-              };
-            }
-            target[key].created.push(...source[key].created);
-            target[key].closed.push(...source[key].closed);
-            target[key].merged.push(...source[key].merged);
-            target[key].open.push(...source[key].open);
-            target[key].review.push(...source[key].review);
-          });
-        };
-  
-        // Start with the transformed EIPs data and merge in ERCs and RIPs
-        combineData(eipsTransformed, transformedData);
-        combineData(ercsTransformed, transformedData);
-        combineData(ripsTransformed, transformedData);
+        // Remove `_id` field from each month in repo-specific data response
+        transformedData = Object.fromEntries(
+          Object.entries(repoData).filter(([key]) => key !== '_id')
+        );
       }
-
-      // console.log(transformedData);
   
-      // Update state with the combined data
+      console.log(transformedData);
+  
+      // Update state with the transformed data, excluding `_id` fields
       setData(prevData => ({
         ...prevData,
         PRs: transformedData,
       }));
+
+      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch PR data:", error);
     }
   };
+  
   
 
 
@@ -197,69 +167,54 @@ const GitHubPRTracker: React.FC = () => {
 
   const fetchIssueData = async () => {
     try {
-      // Fetch issue data from all three repositories: EIPs, ERCs, RIPs
-      const [eipsData, ercsData, ripsData] = await Promise.all(
-        ISSUE_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
-      );
+      setLoading(true);
+      let transformedData = {};
   
-      let transformedData: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } } = {};
+      // Fetch data for each repository based on selectedRepo or all repos if selectedRepo is 'All'
+      if (selectedRepo === 'All') {
+        const [allDataRes] = await Promise.all(
+          ALL_ISSUE_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+        );
   
-      // Selection logic for single repositories
-      if (selectedRepo === 'EIPs') {
-        transformedData = transformIssueData(eipsData);
-      } else if (selectedRepo === 'ERCs') {
-        transformedData = transformIssueData(ercsData);
-      } else if (selectedRepo === 'RIPs') {
-        transformedData = transformIssueData(ripsData);
+        // Remove `_id` field from each month in all data response
+        transformedData = Object.fromEntries(
+          Object.entries(allDataRes[0]).filter(([key]) => key !== '_id')
+        );
       } else {
-        // When all repos are selected, transform and combine the data
-        const eipsTransformed = transformIssueData(eipsData);
-        const ercsTransformed = transformIssueData(ercsData);
-        const ripsTransformed = transformIssueData(ripsData);
-
-        
+        const [repoData] = await Promise.all(
+          NEW_ISSUE_ENDPOINTS
+            .filter((_, index) => selectedRepo === ['EIPs', 'ERCs', 'RIPs'][index])
+            .map(endpoint => fetch(endpoint).then(res => res.json()))
+        );
   
-        // Combine the transformed data for each month/year key
-        const combineIssueData = (source: any, target: any) => {
-          Object.keys(source).forEach(key => {
-            if (!target[key]) {
-              target[key] = {
-                created: [],
-                closed: [],
-                open: [],
-              };
-            }
-            target[key].created.push(...source[key].created);
-            target[key].closed.push(...source[key].closed);
-            target[key].open.push(...source[key].open);
-          });
-        };
-  
-        // Start with the transformed EIPs data and merge in ERCs and RIPs
-        combineIssueData(eipsTransformed, transformedData);
-        combineIssueData(ercsTransformed, transformedData);
-        combineIssueData(ripsTransformed, transformedData);
+        // Remove `_id` field from each month in repo-specific data response
+        transformedData = Object.fromEntries(
+          Object.entries(repoData).filter(([key]) => key !== '_id')
+        );
       }
   
-      // Update state with the combined data
+      console.log(transformedData);
+  
+      // Update state with the transformed data, excluding `_id` fields
       setData(prevData => ({
         ...prevData,
         Issues: transformedData,
       }));
+
+      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch Issues data:", error);
     }
   };
-  
 
   const fetchData = async () => {
-    setLoading(true);
+    // setLoading(true);
     if (activeTab === 'PRs') {
       await fetchPRData();
     } else if (activeTab === 'Issues') {
       await fetchIssueData();
     }
-    setLoading(false);
+    // setLoading(false);
   };
 
   const transformPRData = (data: PR[], reviewData:PR[]): { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[], review:PR[] } } => {
@@ -275,11 +230,11 @@ const GitHubPRTracker: React.FC = () => {
 
     const addIfNotExists = (arr: PR[], pr: PR) => {
 
-      if(pr.prNumber===9011){
-        console.log("test");
-        console.log(pr.prNumber)
-        console.log(arr);
-      }
+      // if(pr.prNumber===9011){
+      //   console.log("test");
+      //   console.log(pr.prNumber)
+      //   console.log(arr);
+      // }
   
       // Check if the PR has a closing date, and if it is in the current month and year
       const isClosedThisMonth = pr.closed_at &&
@@ -352,12 +307,12 @@ const GitHubPRTracker: React.FC = () => {
 
       // Initialize openDate starting from the created date
       let openDate = new Date(createdYear, createdMonth, 1);
-      if(pr.prNumber===9011 || pr.prNumber===9010){
-        console.log(pr.prNumber)
-        console.log("created date: ",createdDate);
-        console.log("open date: ", openDate);
-        console.log("closed date: ", endDate);
-      }
+      // if(pr.prNumber===9011 || pr.prNumber===9010){
+      //   console.log(pr.prNumber)
+      //   console.log("created date: ",createdDate);
+      //   console.log("open date: ", openDate);
+      //   console.log("closed date: ", endDate);
+      // }
   
 
       while (openDate < endDate) {
@@ -368,14 +323,14 @@ const GitHubPRTracker: React.FC = () => {
         const openKey = `${currentYear}-${currentMonth}`;
     
         // Debug log statements
-        if (pr.prNumber === 9011) {
-          console.log(currentMonth);
-            console.log(`PR Number: ${pr.prNumber}`);
-            console.log(`Created Date: ${pr.created_at}`);
-            console.log(`Open Date: ${openDate}`);
-            console.log(`Closed Date: ${pr.closed_at}`);
-            console.log(`Generated Key: ${openKey}`); // Key generated before incrementing month
-        }
+        // if (pr.prNumber === 9011) {
+        //   console.log(currentMonth);
+        //     console.log(`PR Number: ${pr.prNumber}`);
+        //     console.log(`Created Date: ${pr.created_at}`);
+        //     console.log(`Open Date: ${openDate}`);
+        //     console.log(`Closed Date: ${pr.closed_at}`);
+        //     console.log(`Generated Key: ${openKey}`); // Key generated before incrementing month
+        // }
     
         // Initialize monthYearData for the current month key if not already present
         if (!monthYearData[openKey]) {
@@ -446,12 +401,12 @@ const GitHubPRTracker: React.FC = () => {
         processedIssues.add(issue.IssueNumber);
       const createdDate = new Date(issue.created_at);
       const closedDate = issue.closed_at ? new Date(issue.closed_at) : null;
-      if(issue.IssueNumber==8978 || issue.IssueNumber===8982){
-        console.log("issue: ",issue.IssueNumber)
-        console.log("created date: ",createdDate);
-        console.log(issue);
+      // if(issue.IssueNumber==8978 || issue.IssueNumber===8982){
+      //   console.log("issue: ",issue.IssueNumber)
+      //   console.log("created date: ",createdDate);
+      //   console.log(issue);
         
-      }
+      // }
       const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
       
       if (!monthYearData[createdKey]) {
@@ -878,7 +833,7 @@ const GitHubPRTracker: React.FC = () => {
     // Add headers to CSV rows
     csvRows.push(headers.join(','));
      
-    console.log("filteredData",filteredData)
+    // console.log("filteredData",filteredData)
     // Combine created and closed arrays for PRs and Issues
     const items = type === 'PRs'
   ? [
@@ -895,7 +850,7 @@ const GitHubPRTracker: React.FC = () => {
       ...(Array.isArray(filteredData.open) && showCategory.open ? filteredData.open : [])
     ];
     
-    console.log(items);
+    // console.log(items);
 
   
     // Add data to CSV rows
@@ -935,7 +890,7 @@ const GitHubPRTracker: React.FC = () => {
     // Add headers to CSV rows
     csvRows.push(headers.join(','));
   
-    console.log("filteredData", filteredData);
+    // console.log("filteredData", filteredData);
   
     // Combine created and closed arrays for PRs and Issues
     const items = type === 'PRs'
@@ -952,7 +907,7 @@ const GitHubPRTracker: React.FC = () => {
           ...(Array.isArray(filteredData.open) && showCategory.open ? filteredData.open : [])
         ];
   
-    console.log(items);
+    // console.log(items);
   
     // Add data to CSV rows
     items.forEach((item: PR | Issue & { key: string; tag: string }) => {
@@ -998,7 +953,7 @@ const GitHubPRTracker: React.FC = () => {
       return;
     }
 
-    console.log("review data:",filteredData);
+    // console.log("review data:",filteredData);
   
     // Combine arrays and pass them to the CSV function
     const combinedData = activeTab === 'PRs'
@@ -1073,7 +1028,7 @@ const GitHubPRTracker: React.FC = () => {
       return;
     }
   
-    console.log("Combined data with keys and tags:", activeTab === 'PRs' ? combinedPRData : combinedIssueData);
+    // console.log("Combined data with keys and tags:", activeTab === 'PRs' ? combinedPRData : combinedIssueData);
   
     // Pass the appropriate combined data to the CSV download function
     downloadCSV2(activeTab === 'PRs' ? combinedPRData : combinedIssueData, activeTab);
@@ -1455,6 +1410,7 @@ const GitHubPRTracker: React.FC = () => {
     isChecked={showCategory.created}
     onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
     mr={4}
+    color="black"
   >
     {activeTab === 'PRs' ? 'Created PRs' : 'Created Issues'}
   </Checkbox>
@@ -1463,6 +1419,7 @@ const GitHubPRTracker: React.FC = () => {
       isChecked={showCategory.open}
       onChange={() => setShowCategory(prev => ({ ...prev, open: !prev.open }))}
       mr={4}
+      color="black"
     >
       Open PRs
     </Checkbox>
@@ -1471,6 +1428,7 @@ const GitHubPRTracker: React.FC = () => {
     isChecked={showCategory.closed}
     onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
     mr={4}
+    color="black"
   >
     {activeTab === 'PRs' ? 'Closed PRs' : 'Closed Issues'}
   </Checkbox>
@@ -1479,6 +1437,7 @@ const GitHubPRTracker: React.FC = () => {
       isChecked={showCategory.merged}
       onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
       mr={4}
+      color="black"
     >
       Merged PRs
     </Checkbox>

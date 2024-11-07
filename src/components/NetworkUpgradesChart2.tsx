@@ -16,9 +16,9 @@ interface AuthorData {
 const rawData = [
     { upgrade: "Arrow Glacier", eip: "EIP-4345", authors: ["Tim Beiko", "James Hancock", "Thomas Jay Rush"] },
     { upgrade: "Berlin", eip: "EIP-2565", authors: ["Kelly Olson", "Sean Gulley", "Simon Peffers", "Justin Drake", "Dankrad Feist"] },
-    { upgrade: "Berlin", eip: "EIP-2929", authors: ["Vitalik Buterin", "Martin Swende"] },
+    { upgrade: "Berlin", eip: "EIP-2929", authors: ["Vitalik Buterin", "Martin Holst Swende"] },
     { upgrade: "Berlin", eip: "EIP-2718", authors: ["Micah Zoltu"] },
-    { upgrade: "Berlin", eip: "EIP-2930", authors: ["Vitalik Buterin", "Martin Swende"] },
+    { upgrade: "Berlin", eip: "EIP-2930", authors: ["Vitalik Buterin", "Martin Holst Swende"] },
     { upgrade: "Byzantium", eip: "EIP-100", authors: ["Vitalik Buterin"] },
     { upgrade: "Byzantium", eip: "EIP-140", authors: ["Alex Beregszaszi", "Nikolai Mushegian"] },
     { upgrade: "Byzantium", eip: "EIP-196", authors: ["Christian Reitwiessner"] },
@@ -31,7 +31,7 @@ const rawData = [
     { upgrade: "Dencun", eip: "EIP-1153", authors: ["Alexey Akhunov", "Moody Salem"] },
     { upgrade: "Dencun", eip: "EIP-4788", authors: ["Alex Stokes", "Ansgar Dietrichs", "Danny Ryan", "Martin Holst Swende", "lightclient"] },
     { upgrade: "Dencun", eip: "EIP-4844", authors: ["Vitalik Buterin", "Dankrad Feist", "Diederik Loerakker", "George Kadianakis", "Matt Garnett", "Mofi Taiwo", "Ansgar Dietrichs"] },
-    { upgrade: "Dencun", eip: "EIP-5656", authors: ["Alex Beregszaszi", "Paul Dworzanski", "Jared Wasinger", "Casey Detrio", "Pawel Bylica", "Charles Cooper"] },
+    { upgrade: "Dencun", eip: "EIP-5656", authors: ["Alex Beregszaszi", "Paul Dworzanski", "Jared Wasinger", "Casey Detrio", "Paweł Bylica", "Charles Cooper"] },
     { upgrade: "Dencun", eip: "EIP-6780", authors: ["Guillaume Ballet", "Vitalik Buterin", "Dankrad Feist"] },
     { upgrade: "Dencun", eip: "EIP-7044", authors: ["Lion"] },
     { upgrade: "Dencun", eip: "EIP-7045", authors: ["Danny Ryan"] },
@@ -54,8 +54,8 @@ const rawData = [
     { upgrade: "Istanbul", eip: "EIP-2200", authors: ["Wei Tang"] },
     { upgrade: "London", eip: "EIP-1559", authors: ["Vitalik Buterin", "Eric Conner", "Rick Dudley", "Matthew Slipper", "Ian Norden", "Abdelhamid Bakhta"] },
     { upgrade: "London", eip: "EIP-3198", authors: ["Abdelhamid Bakhta", "Vitalik Buterin"] },
-    { upgrade: "London", eip: "EIP-3529", authors: ["Martin Swende", "Vitalik Buterin"] },
-    { upgrade: "London", eip: "EIP-3541", authors: ["Alex Beregszaszi", "Paweł Bylica", "Andrei Maiboroda", "Alexey Akhunov", "Christian Reitwiessner", "Martin Swende"] },
+    { upgrade: "London", eip: "EIP-3529", authors: ["Martin Holst Swende", "Vitalik Buterin"] },
+    { upgrade: "London", eip: "EIP-3541", authors: ["Alex Beregszaszi", "Paweł Bylica", "Andrei Maiboroda", "Alexey Akhunov", "Christian Reitwiessner", "Martin Holst Swende"] },
     { upgrade: "London", eip: "EIP-3554", authors: ["James Hancock"] },
     { upgrade: "Muir Glacier", eip: "EIP-2384", authors: ["Eric Conner"] },
     { upgrade: "The Merge", eip: "EIP-3675", authors: ["Mikhail Kalinin", "Danny Ryan", "Vitalik Buterin"] },
@@ -90,13 +90,14 @@ rawData.forEach(({ eip, authors }) => {
 
 const transformedData = Object.values(authorContributions).sort((a, b) => a.name.localeCompare(b.name));
 
-// CSV download function with updated headers and structure
 const downloadData = () => {
-  const header = "Author,Contribution Count,EIPs\n";
+  const header = "Author,Contribution Count,EIP\n";
   const csvContent = "data:text/csv;charset=utf-8," +
     header +
     transformedData.map(({ name, contributionCount, eips }) =>
-      `${name},${contributionCount},"${eips.join(", ")}"`
+      eips.map((eip, index) => 
+        `${index === 0 ? name : ''},${index === 0 ? contributionCount : ''},https://eipsinsight.com/eips/eip-${eip.replace('EIP-', '')}`
+      ).join("\n")
     ).join("\n");
 
   const encodedUri = encodeURI(csvContent);
@@ -107,6 +108,7 @@ const downloadData = () => {
   link.click();
   document.body.removeChild(link);
 };
+
 
 // Color generator function for consistency
 const generateDistinctColor = (index: number, total: number) => {

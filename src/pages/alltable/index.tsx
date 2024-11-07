@@ -89,7 +89,7 @@ const AllTable = () => {
           >
             <FlexBetween>
               <Header
-                title={`All EIPs & ERCs - [ ${data.length} ]`}
+                title={`All EIPs,ERCs & RIPs - [ ${data.length} ]`}
                 subtitle=""
               />
             </FlexBetween>

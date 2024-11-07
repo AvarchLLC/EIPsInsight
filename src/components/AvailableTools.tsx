@@ -56,7 +56,7 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link, size, layout }) =>
           fontWeight="bold"
           maxWidth="100%" 
           overflowWrap="break-word" 
-          padding={6}
+          
         >
           {label}
         </Text>

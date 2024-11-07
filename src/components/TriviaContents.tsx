@@ -57,7 +57,7 @@ const FactsSection: FC = () => {
 
   const facts = [
     { title: "📊 Over 1,700 EIPs submitted since launch.", content: "As of late 2024, there have been more than 1,700 EIPs submitted since the launch of the Ethereum network, though many are still in various stages of development, while some have been rejected or withdrawn." },
-    { title: "🏆 Only About 10% of EIPs Are Finalized", content: "Out of all the EIPs proposed, only about 10% ever reach the “Final” status. This is because the review process is thorough, and proposals often need significant community and developer support to be implemented." },
+    { title: "🏆 Only About 25% of EIPs Are Finalized", content: "Out of all the EIPs proposed, only about 25% ever reach the “Final” status. This is because the review process is thorough, and proposals often need significant community and developer support to be implemented." },
     { title: "📜 Meta EIPs Are the Smallest Category", content: "Meta EIPs, which cover processes, standards, or governance, make up the smallest proportion of all EIPs—less than 5%. Most EIPs are focused on standards (e.g., ERCs) or protocol changes." },
     { title: "👥 EIP-1 Has over 200 Contributors", content: "EIP-1, the very first EIP and the template for all future proposals, has been collaboratively updated and edited by more than 200 contributors to keep it relevant and accurate as the Ethereum ecosystem evolves." },
     { title: "🔢 Highest Numbered EIP", content: "The highest numbered EIP in the repository as of now is beyond 5,000, even though many proposals between EIP-1 and the highest number have been abandoned or withdrawn." },
