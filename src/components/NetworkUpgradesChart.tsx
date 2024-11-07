@@ -105,9 +105,10 @@ const transformedData: UpgradeData[] = Object.values(
 });
 
 const downloadData = () => {
-    const header = "Date,Network Upgrade,EIP Number\n";
+    const header = "Date,Network Upgrade,EIP link\n";
     const csvContent = "data:text/csv;charset=utf-8,"+header
-      + rawData.map(({ date, upgrade, eip }) => `${date},${upgrade},${eip}`).join("\n");
+      + rawData.map(({ date, upgrade, eip }) => `${date},${upgrade},https://eipsinsight.com/eips/eip-${eip.replace('EIP-', '')}`).join("\n");
+
   
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
