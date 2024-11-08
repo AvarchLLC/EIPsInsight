@@ -4,6 +4,7 @@ import {
   Box,
   useColorModeValue,
   Flex,
+  Text,
   Spinner,
   Link as LI
 } from "@chakra-ui/react";
@@ -225,140 +226,7 @@ const fetchPRData3 = async (year: string) => {
 
 
 
-  // const fetchPRData = async (year: string) => {
-  //   try {
-  //     // Fetch PR data from all three repositories: EIPs, ERCs, RIPs
-  //     const [eipsData, ercsData, ripsData] = await Promise.all(
-  //       PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
-  //     );
-  
-  //     // Fetch review data for each repository
-  //     const [eipsRes, ercsRes, ripsRes] = await Promise.all([
-  //       fetch(API_ENDPOINTS.eips),
-  //       fetch(API_ENDPOINTS.ercs),
-  //       fetch(API_ENDPOINTS.rips),
-  //     ]);
-  
-  //     const eipsReviewData = await eipsRes.json();
-  //     const ercsReviewData = await ercsRes.json();
-  //     const ripsReviewData = await ripsRes.json();
-  
-  //     // Initialize combined review data
-  //     let combinedReviewData: PR[] = [];
-  
-  //     // Transform data based on selected repository
-  //     let transformedData: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open: PR[], review: PR[] } } = {};
-  
-  //     if (selectedRepo === 'EIPs') {
-  //       transformedData = transformPRData(eipsData, combinedReviewData, year);
-  //     } else if (selectedRepo === 'ERCs') {
-  //       transformedData = transformPRData(ercsData, combinedReviewData, year);
-  //     } else if (selectedRepo === 'RIPs') {
-  //       transformedData = transformPRData(ripsData, combinedReviewData, year);
-  //     } else {
-  //       // When all repositories are selected, combine their data
-  //       const eipsTransformed = transformPRData(eipsData, combinedReviewData, year);
-  //       const ercsTransformed = transformPRData(ercsData, combinedReviewData, year);
-  //       const ripsTransformed = transformPRData(ripsData, combinedReviewData, year);
-  
-  //       const combineData = (source: any, target: any, ) => {
-  //           Object.keys(source).forEach(key => {
-  //             // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
-  //             const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
-              
-  //             if (year === yearString) {
-  //               if (!target[key]) {
-  //                 target[key] = { created: [], closed: [], merged: [], open: [], review: [] };
-  //               }
-  //               target[key].created.push(...source[key].created);
-  //               target[key].closed.push(...source[key].closed);
-  //               target[key].merged.push(...source[key].merged);
-  //               target[key].open.push(...source[key].open);
-  //               target[key].review.push(...source[key].review);
-  //             }
-  //           });
-  //         };
-          
-  
-  //       // Combine EIPs, ERCs, and RIPs data into one
-  //       combineData(eipsTransformed, transformedData);
-  //       combineData(ercsTransformed, transformedData);
-  //       combineData(ripsTransformed, transformedData);
-  //     }
-  
-  //     // Update the state with transformed PR data
-  //     setData(prevData => ({
-  //       ...prevData,
-  //       PRs: transformedData,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Failed to fetch PR data:", error);
-  //   }
-  // };
-  
-  
-  // const fetchIssueData = async (year:string) => {
-  //   try {
-  //     // Fetch issue data from all three repositories: EIPs, ERCs, RIPs
-  //     const [eipsData, ercsData, ripsData] = await Promise.all(
-  //       ISSUE_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
-  //     );
-  
-  //     let transformedData: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } } = {};
-  
-  //     // Selection logic for single repositories
-  //     if (selectedRepo === 'EIPs') {
-  //       transformedData = transformIssueData(eipsData,year);
-  //     } else if (selectedRepo === 'ERCs') {
-  //       transformedData = transformIssueData(ercsData,year);
-  //     } else if (selectedRepo === 'RIPs') {
-  //       transformedData = transformIssueData(ripsData,year);
-  //     } else {
-  //       // When all repos are selected, transform and combine the data
-  //       const eipsTransformed = transformIssueData(eipsData,year);
-  //       const ercsTransformed = transformIssueData(ercsData,year);
-  //       const ripsTransformed = transformIssueData(ripsData,year);
 
-        
-  
-  //       // Combine the transformed data for each month/year key
-  //       const combineIssueData = (source: any, target: any) => {
-  //           Object.keys(source).forEach(key => {
-  //               // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
-  //               const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
-                
-  //               if (year === yearString) {
-  //                   if (!target[key]) {
-  //                       target[key] = {
-  //                         created: [],
-  //                         closed: [],
-  //                         open: [],
-  //                       };
-  //                     }
-  //                     target[key].created.push(...source[key].created);
-  //                     target[key].closed.push(...source[key].closed);
-  //                     target[key].open.push(...source[key].open);
-  //               }
-  //             });
-  //       };
-  
-  //       // Start with the transformed EIPs data and merge in ERCs and RIPs
-  //       combineIssueData(eipsTransformed, transformedData);
-  //       combineIssueData(ercsTransformed, transformedData);
-  //       combineIssueData(ripsTransformed, transformedData);
-  //     }
-  
-  //     // Update state with the combined data
-  //     setData(prevData => ({
-  //       ...prevData,
-  //       Issues: transformedData,
-  //     }));
-  //   } catch (error) {
-  //     console.error("Failed to fetch Issues data:", error);
-  //   }
-  // };
-
-  // const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails', '/api/ripsissuedetails'];
 
   const fetchIssueData = async (year: string) => {
     try {
@@ -972,24 +840,47 @@ return <Line {...config} />;
 
   return (
        
-      <>
-      <LI href="/Analytics">
-        <Box padding={"1rem"} borderRadius={"0.55rem"}>
-        {loading ? (
-          <Flex 
-          justifyContent="center" // Center horizontally
-          alignItems="center" // Center vertically
-          height="100%" // Ensure it takes the full height
-          marginTop="10rem"
+    <>
+    {loading ? (
+      <></> // Return empty fragment when loading
+    ) : (
+      <Box
+        bgColor={bg}
+        padding="1rem"
+        borderRadius="0.55rem"
+        minHeight="400px" // Set minimum height
+        marginTop={{ base: "1rem", md: "1rem" }} // Margin for separation
+      >
+        <Text
+          color="#30A0E0"
+          fontSize="2xl"
+          fontWeight="bold"
+          textAlign="center"
+          marginBottom="0.5rem"
         >
-          <Spinner size="lg" /> {/* Centered Spinner */}
-        </Flex>
-        ) : (
-            renderChart()
-          )}
+          {`Open PRs and Issues (${selectedYear})`}
+        </Text>
+        <LI href="/Analytics">
+          <Box padding="1rem" borderRadius="0.55rem">
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
+              // marginTop="10rem"
+            >
+          {/* Centered Spinner */}
+            </Flex>
+            {renderChart()}
+          </Box>
+        </LI>
+        <Box className="w-full">
+          <DateTime />
         </Box>
-      </LI>
-      </>
+      </Box>
+    )}
+  </>
+  
+      
    
   );
   
