@@ -30,6 +30,7 @@ import DateTime from "@/components/DateTime";
 import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
 import {ChevronUpIcon } from "@chakra-ui/icons";
+import axios from "axios";
 
 
 // Dynamic import for Ant Design's Column chart
@@ -43,10 +44,6 @@ const API_ENDPOINTS = {
   ercs: '/api/editorsprsercs',
   rips: '/api/editorsprsrips'
 }
-const NEW_ISSUE_ENDPOINTS = ['/api/Analyticsissueinfo/eips', '/api/Analyticsissueinfo/ercs', '/api/Analyticsissueinfo/rips'];
-const NEW_PR_ENDPOINTS = ['/api/AnalyticsInfo/eips', '/api/AnalyticsInfo/ercs', '/api/AnalyticsInfo/rips'];
-const ALL_ISSUE_ENDPOINTS = ['/api/Analyticsissueinfo/all'];
-const ALL_PR_ENDPOINTS = ['/api/AnalyticsInfo/all'];
 
 type PR = {
   repo:string;
@@ -76,8 +73,17 @@ type Issue = {
   closed_at: Date | null;
 };
 
+interface ChartDataItem {
+  _id: string;
+  category: string;
+  monthYear: string;
+  type: 'Created' | 'Merged' | 'Closed' | 'Open' | 'Review';
+  count: number;
+}
 const GitHubPRTracker: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [loading2, setLoading2] = useState<boolean>(false);
+  const [loading3, setLoading3] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'PRs' | 'Issues'>('PRs');
   const [selectedRepo, setSelectedRepo] = useState<string>('All');
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
@@ -92,6 +98,12 @@ const GitHubPRTracker: React.FC = () => {
     Issues: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } };
   }>({ PRs: {}, Issues: {} });
 
+  const [downloaddata, setdownloadData] = useState<{
+    PRs: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[], review:PR[] } };
+    Issues: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } };
+  }>({ PRs: {}, Issues: {} });
+
+  const [chartdata, setchartData] = useState<ChartDataItem[] | undefined>([]);
   // const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
@@ -103,54 +115,37 @@ const GitHubPRTracker: React.FC = () => {
     review:true
   });
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   fetchData();
+  // }, [activeTab, selectedRepo]);
+
+
+  const fetchEndpoint = () => {
+    const baseUrl = '/api/AnalyticsCharts';
+    const tabPath = activeTab === 'PRs' ? 'prs' : 'issues';
+    const repoPath = selectedRepo.toLowerCase();
+    const endpoint = `${baseUrl}/${tabPath}/${repoPath}`;
+
+    return endpoint;
+};
+
+useEffect(() => {
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const endpoint = fetchEndpoint();
+            const response = await axios.get(endpoint);
+            setchartData(response.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     fetchData();
-  }, [activeTab, selectedRepo]);
-
-  const fetchPRData = async () => {
-    try {
-      setLoading(true);
-      let transformedData = {};
+}, [activeTab, selectedRepo]);
   
-      // Fetch data for each repository based on selectedRepo or all repos if selectedRepo is 'All'
-      if (selectedRepo === 'All') {
-        const [allDataRes] = await Promise.all(
-          ALL_PR_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
-        );
-  
-        // Remove `_id` field from each month in all data response
-        transformedData = Object.fromEntries(
-          Object.entries(allDataRes).filter(([key]) => key !== '_id')
-        );
-      } else {
-        const [repoData] = await Promise.all(
-          NEW_PR_ENDPOINTS
-            .filter((_, index) => selectedRepo === ['EIPs', 'ERCs', 'RIPs'][index])
-            .map(endpoint => fetch(endpoint).then(res => res.json()))
-        );
-  
-        // Remove `_id` field from each month in repo-specific data response
-        transformedData = Object.fromEntries(
-          Object.entries(repoData).filter(([key]) => key !== '_id')
-        );
-      }
-  
-      console.log(transformedData);
-  
-      // Update state with the transformed data, excluding `_id` fields
-      setData(prevData => ({
-        ...prevData,
-        PRs: transformedData,
-      }));
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Failed to fetch PR data:", error);
-    }
-  };
-  
-  
-
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -165,346 +160,9 @@ const GitHubPRTracker: React.FC = () => {
     });
   };
 
-  const fetchIssueData = async () => {
-    try {
-      setLoading(true);
-      let transformedData = {};
-  
-      // Fetch data for each repository based on selectedRepo or all repos if selectedRepo is 'All'
-      if (selectedRepo === 'All') {
-        const [allDataRes] = await Promise.all(
-          ALL_ISSUE_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
-        );
-  
-        // Remove `_id` field from each month in all data response
-        transformedData = Object.fromEntries(
-          Object.entries(allDataRes[0]).filter(([key]) => key !== '_id')
-        );
-      } else {
-        const [repoData] = await Promise.all(
-          NEW_ISSUE_ENDPOINTS
-            .filter((_, index) => selectedRepo === ['EIPs', 'ERCs', 'RIPs'][index])
-            .map(endpoint => fetch(endpoint).then(res => res.json()))
-        );
-  
-        // Remove `_id` field from each month in repo-specific data response
-        transformedData = Object.fromEntries(
-          Object.entries(repoData).filter(([key]) => key !== '_id')
-        );
-      }
-  
-      console.log(transformedData);
-  
-      // Update state with the transformed data, excluding `_id` fields
-      setData(prevData => ({
-        ...prevData,
-        Issues: transformedData,
-      }));
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Failed to fetch Issues data:", error);
-    }
-  };
-
-  const fetchData = async () => {
-    // setLoading(true);
-    if (activeTab === 'PRs') {
-      await fetchPRData();
-    } else if (activeTab === 'Issues') {
-      await fetchIssueData();
-    }
-    // setLoading(false);
-  };
-
-  const transformPRData = (data: PR[], reviewData:PR[]): { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[], review:PR[] } } => {
-    const monthYearData: { [key: string]: { created: PR[], closed: PR[], merged: PR[] ,open:[], review:[]} } = {};
-    const incrementMonth = (date: Date) => {
-      const newDate = new Date(date);
-      newDate.setMonth(newDate.getMonth() + 1);
-      newDate.setDate(1); // Reset to the first day of the next month
-      newDate.setHours(0, 0, 0, 0);
-      return newDate;
-    };
-    const currentDate = new Date();
-
-    const addIfNotExists = (arr: PR[], pr: PR) => {
-
-      // if(pr.prNumber===9011){
-      //   console.log("test");
-      //   console.log(pr.prNumber)
-      //   console.log(arr);
-      // }
-  
-      // Check if the PR has a closing date, and if it is in the current month and year
-      const isClosedThisMonth = pr.closed_at &&
-        new Date(pr.closed_at).getFullYear() === currentDate.getFullYear() &&
-        new Date(pr.closed_at).getMonth() === currentDate.getMonth();
-        if (!isClosedThisMonth && !arr.some(existingPr => existingPr.prNumber === pr.prNumber)) {
-          arr.push(pr);
-        }
-    };
-    const addReview= (arr: PR[], pr: PR) => {
-      if (!arr.some(existingPr => existingPr.prNumber === pr.prNumber)) {
-        arr.push(pr);
-      }
-    };
-
-    const processedPRs = new Set();
-
-    data.forEach(pr => {
-      if (!processedPRs.has(pr.prNumber)) {
-      const createdDate = pr.created_at ? new Date(pr.created_at) : null;
-      const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
-      const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
-      
-      processedPRs.add(pr.prNumber);
-
-    
-
-      // if(pr.prNumber===9011 || pr.prNumber===9010){
-      //   console.log(pr.prNumber)
-      //   console.log("created date: ",createdDate);
-      //   console.log("Closed date: ", closedDate);
-      //   console.log("Merged date: ", mergedDate);
-      // }
-  
-      // Handle created date
-      if (createdDate) {
-          const key = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
-          if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open: [], review: [] };
-          addReview(monthYearData[key].created, pr);
-      }
-  
-      // Handle closed date (only if not merged)
-      if (closedDate && !mergedDate) {
-          const key = `${closedDate.getUTCFullYear()}-${String(closedDate.getUTCMonth() + 1).padStart(2, '0')}`;
-          if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open: [], review: [] };
-          addReview(monthYearData[key].closed, pr);
-      }
-  
-      // Handle merged date
-      if (mergedDate) {
-          const key = `${mergedDate.getUTCFullYear()}-${String(mergedDate.getUTCMonth() + 1).padStart(2, '0')}`;
-          if (!monthYearData[key]) monthYearData[key] = { created: [], closed: [], merged: [], open: [], review: [] };
-          addReview(monthYearData[key].merged, pr);
-      }
-  
-      // Handle open PRs
-      if (createdDate) {
-        let createdDateObj = new Date(createdDate);
-        let createdYear = createdDateObj.getUTCFullYear();
-        let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
-    
-              // Initialize endDate based on closedDate or currentDate
-      let endDate;
-      if (closedDate) {
-          let closedDateObj = new Date(closedDate);
-          endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
-      } else {
-          endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
-      }
-
-      // Initialize openDate starting from the created date
-      let openDate = new Date(createdYear, createdMonth, 1);
-      // if(pr.prNumber===9011 || pr.prNumber===9010){
-      //   console.log(pr.prNumber)
-      //   console.log("created date: ",createdDate);
-      //   console.log("open date: ", openDate);
-      //   console.log("closed date: ", endDate);
-      // }
   
 
-      while (openDate < endDate) {
-        // Before incrementing, log the current state
-        const currentYear = openDate.getFullYear();
-        const currentMonth = String(openDate.getMonth() + 1).padStart(2, '0'); // Correctly format month
-        
-        const openKey = `${currentYear}-${currentMonth}`;
-    
-        // Debug log statements
-        // if (pr.prNumber === 9011) {
-        //   console.log(currentMonth);
-        //     console.log(`PR Number: ${pr.prNumber}`);
-        //     console.log(`Created Date: ${pr.created_at}`);
-        //     console.log(`Open Date: ${openDate}`);
-        //     console.log(`Closed Date: ${pr.closed_at}`);
-        //     console.log(`Generated Key: ${openKey}`); // Key generated before incrementing month
-        // }
-    
-        // Initialize monthYearData for the current month key if not already present
-        if (!monthYearData[openKey]) {
-            monthYearData[openKey] = { created: [], closed: [], merged: [], open: [], review: [] };
-        }
-    
-        // Add the PR to the open array for this month
-        addIfNotExists(monthYearData[openKey].open, pr);
-    
-        // Increment to the next month (update the date first, then create the key)
-        openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
-        openDate.setUTCDate(1); // Set the date to the first of the new month
-    }
-    
-    
-
-    }
-    // console.log(monthYearData['2024-11'].open);
-  }
-    
-  });
   
-  // Process reviews
-  reviewData.forEach(pr => {
-      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
-  
-      if (reviewDate) {
-          const reviewKey = `${reviewDate.getUTCFullYear()}-${String(reviewDate.getUTCMonth() + 1).padStart(2, '0')}`;
-          if (!monthYearData[reviewKey]) {
-              monthYearData[reviewKey] = { created: [], closed: [], merged: [], open: [], review: [] };
-          }
-          addReview(monthYearData[reviewKey].review, pr);
-      }
-  });
-  
-  return monthYearData;
-  
-  };
-
-  const transformIssueData = (data: Issue[]): { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } => {
-   
-    const monthYearData: { [key: string]: { created: Issue[], closed: Issue[], open:Issue[] } } = {};
-    
-    const incrementMonth = (date: Date) => {
-      const newDate = new Date(date);
-      newDate.setMonth(newDate.getMonth() + 1);
-      newDate.setDate(1); // Reset to the first day of the next month
-      newDate.setHours(0, 0, 0, 0);
-      return newDate;
-    };
-    const currentDate = new Date();
-
-    const addIfNotExists = (arr: Issue[], pr: Issue) => {
-   
-      // Check if the PR has a closing date, and if it is in the current month and year
-      const isClosedThisMonth = pr.closed_at &&
-        new Date(pr.closed_at).getFullYear() === currentDate.getFullYear() &&
-        new Date(pr.closed_at).getMonth() === currentDate.getMonth();
-        if (!isClosedThisMonth && !arr.some(existingPr => existingPr.IssueNumber === pr.IssueNumber)) {
-          arr.push(pr);
-        }
-    };
-    const processedIssues = new Set();
-
-    data.forEach(issue => {
-      if (!processedIssues.has(issue.IssueNumber)) {
-        
-        processedIssues.add(issue.IssueNumber);
-      const createdDate = new Date(issue.created_at);
-      const closedDate = issue.closed_at ? new Date(issue.closed_at) : null;
-      // if(issue.IssueNumber==8978 || issue.IssueNumber===8982){
-      //   console.log("issue: ",issue.IssueNumber)
-      //   console.log("created date: ",createdDate);
-      //   console.log(issue);
-        
-      // }
-      const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
-      
-      if (!monthYearData[createdKey]) {
-          monthYearData[createdKey] = { created: [], closed: [], open: [] };
-      }
-      monthYearData[createdKey].created.push(issue);
-  
-      if (issue.closed_at) {
-          const closedDate = new Date(issue.closed_at);
-          const closedKey = `${closedDate.getUTCFullYear()}-${String(closedDate.getUTCMonth() + 1).padStart(2, '0')}`;
-          
-          if (!monthYearData[closedKey]) {
-              monthYearData[closedKey] = { created: [], closed: [], open: [] };
-          }
-          monthYearData[closedKey].closed.push(issue);
-      }
-  
-
-    //   if (createdDate) {
-    //     let createdDateObj = new Date(createdDate);
-    //     let createdYear = createdDateObj.getUTCFullYear();
-    //     let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
-    
-    //           // Initialize endDate based on closedDate or currentDate
-    //   let endDate;
-    //   if (closedDate) {
-    //       let closedDateObj = new Date(closedDate);
-    //       endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
-    //   } else {
-    //       endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
-    //   }
-
-    //   // Initialize openDate starting from the created date
-    //   let openDate = new Date(createdYear, createdMonth, 1);
-
-    //   while (openDate < endDate) {
-    //       const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-    //       // Initialize monthYearData for the current month key if not already present
-    //       if (!monthYearData[openKey]) {
-    //           monthYearData[openKey] = { created: [], closed: [], open: [] };
-    //       }
-    //       // Add the PR to the open array for this month
-    //       addIfNotExists(monthYearData[openKey].open, issue);
-
-    //       // Increment to the next month
-    //       openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
-    //       openDate.setUTCDate(1); // Set the date to the first of the new month
-    //   }
-
-    // }
-    if (createdDate) {
-      let createdDateObj = new Date(createdDate);
-      let createdYear = createdDateObj.getUTCFullYear();
-      let createdMonth = createdDateObj.getUTCMonth(); // 0-indexed month
-  
-            // Initialize endDate based on closedDate or currentDate
-    let endDate;
-    if (closedDate) {
-        let closedDateObj = new Date(closedDate);
-        endDate = new Date(closedDateObj.getUTCFullYear(), closedDateObj.getUTCMonth() + 1, 1); // Set to the 1st of the month after closing
-    } else {
-        endDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Set to the 1st of the next month
-    }
-
-    // Initialize openDate starting from the created date
-    let openDate = new Date(createdYear, createdMonth, 1);
- 
-
-
-    while (openDate < endDate) {
-      // Before incrementing, log the current state
-      const currentYear = openDate.getFullYear();
-      const currentMonth = String(openDate.getMonth() + 1).padStart(2, '0'); // Correctly format month
-      
-      const openKey = `${currentYear}-${currentMonth}`;
-
-      if (!monthYearData[openKey]) {
-          monthYearData[openKey] = { created: [], closed: [], open: [] };
-      }
-  
-      // Add the PR to the open array for this month
-      addIfNotExists(monthYearData[openKey].open, issue);
-  
-      // Increment to the next month (update the date first, then create the key)
-      openDate.setUTCMonth(openDate.getUTCMonth() + 1); // Move to the first day of the next month
-      openDate.setUTCDate(1); // Set the date to the first of the new month
-  }
-  
-  
-
-  }
-    }
-  });
-  
-
-    return monthYearData;
-  };
-
   const getYears = () => {
     const currentYear = new Date().getFullYear();
     return Array.from({ length: 10 }, (_, i) => currentYear - i);
@@ -515,6 +173,126 @@ const GitHubPRTracker: React.FC = () => {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!selectedYear || !selectedMonth) return; // Ensure year and month are selected
+
+      setLoading2(true);
+
+      // Format the key to 'yyyy-mm' format
+      const key = `${selectedYear}-${String(getMonths().indexOf(selectedMonth) + 1).padStart(2, '0')}`;
+
+      // Define the API endpoint based on activeTab ('PRs' or 'Issues')
+      const endpoint =
+        activeTab === 'PRs'
+          ? `/api/AnalyticsData/prs/${selectedRepo.toLowerCase()}/${key}`
+          : `/api/AnalyticsData/issues/${selectedRepo.toLowerCase()}/${key}`;
+
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const result = await response.json();
+        // console.log(result)
+
+        const formattedData = result.reduce((acc: any, item: any) => {
+          const { monthYear, value } = item; // Access 'value' directly from the item
+          const { created, closed, merged, open, review } = value; // Destructure 'created', 'closed', etc. from 'value'
+        
+          // Structure the data based on the tab (PRs or Issues)
+          if (activeTab === 'PRs') {
+            if (!acc.PRs[monthYear]) {
+              acc.PRs[monthYear] = { created: [], closed: [], merged: [], open: [], review: [] };
+            }
+            acc.PRs[monthYear].created = created || [];
+            acc.PRs[monthYear].closed = closed || [];
+            acc.PRs[monthYear].merged = merged || [];
+            acc.PRs[monthYear].open = open || [];
+            acc.PRs[monthYear].review = review || [];
+          } else if (activeTab === 'Issues') {
+            if (!acc.Issues[monthYear]) {
+              acc.Issues[monthYear] = { created: [], closed: [], open: [] };
+            }
+            acc.Issues[monthYear].created = created || [];
+            acc.Issues[monthYear].closed = closed || [];
+            acc.Issues[monthYear].open = open || [];
+          }
+          return acc;
+        }, { PRs: {}, Issues: {} });
+
+        // Set the fetched and formatted data
+        setData(formattedData);
+        // console.log(formattedData); 
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading2(false); // Reset loading state after fetching
+      }
+    };
+
+    fetchData(); // Invoke the fetch function
+
+  }, [selectedRepo, selectedYear, selectedMonth, activeTab]);
+
+
+  useEffect(() => {
+    const fetchData2 = async () => {
+      setLoading3(true);
+      const endpoint =
+        activeTab === 'PRs'
+          ? `/api/AnalyticsData/prs/${selectedRepo.toLowerCase()}`
+          : `/api/AnalyticsData/issues/${selectedRepo.toLowerCase()}`;
+
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const result = await response.json();
+        console.log(result);
+
+        // Reduce the data by combining entries with the same monthYear
+        const formattedData = result.reduce((acc: any, item: any) => {
+          const { monthYear, value } = item; // Access 'value' directly from the item
+          const { created = [], closed = [], merged = [], open = [], review = [] } = value; // Destructure with defaults
+
+          if (activeTab === 'PRs') {
+            if (!acc.PRs[monthYear]) {
+              acc.PRs[monthYear] = { created: [], closed: [], merged: [], open: [], review: [] };
+            }
+            acc.PRs[monthYear].created.push(...created);
+            acc.PRs[monthYear].closed.push(...closed);
+            acc.PRs[monthYear].merged.push(...merged);
+            acc.PRs[monthYear].open.push(...open);
+            acc.PRs[monthYear].review.push(...review);
+          } else if (activeTab === 'Issues') {
+            if (!acc.Issues[monthYear]) {
+              acc.Issues[monthYear] = { created: [], closed: [], open: [] };
+            }
+            acc.Issues[monthYear].created.push(...created);
+            acc.Issues[monthYear].closed.push(...closed);
+            acc.Issues[monthYear].open.push(...open);
+          }
+          return acc;
+        }, { PRs: {}, Issues: {} });
+
+        // Set the fetched and formatted data
+        setdownloadData(formattedData); 
+        console.log(formattedData); // Debugging output
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading3(false); // Reset loading state after fetching
+      }
+    };
+
+    fetchData2();
+  }, [activeTab, selectedRepo]);
+
+
+  
+
   const renderTable = (year: string, month: string, type: 'PRs' | 'Issues') => {
     // Data based on type (PRs or Issues)
     const dataToUse = type === 'PRs' ? data.PRs : data.Issues;
@@ -524,17 +302,17 @@ const GitHubPRTracker: React.FC = () => {
   
     // Default data structure for PRs or Issues
     const items = dataToUse[key] || (type === 'PRs'
-      ? { created: [] as PR[], closed: [] as PR[], merged: [] as PR[] }
-      : { created: [] as Issue[], closed: [] as Issue[] });
+      ? { created: [] as PR[], closed: [] as PR[], merged: [] as PR[], open:[] as PR[] }
+      : { created: [] as Issue[], closed: [] as Issue[], open:[] as Issue[] });
   
 
       const createdCount = items.created.length;
-  const closedCount = items.closed.length;
-  const openCount = items.open.length;
+      const closedCount = items.closed.length;
+      const openCount = items.open.length;
 
-  // Conditionally calculate for PR-specific categories
-  const mergedCount = type === 'PRs' ? (items as { merged: PR[] }).merged.length : 0;
-  const reviewCount = type === 'PRs' ? (items as { review: PR[] }).review.length : 0;
+      // Conditionally calculate for PR-specific categories
+      const mergedCount = type === 'PRs' ? (items as { merged: PR[] }).merged.length : 0;
+      
 
 
     return (
@@ -561,7 +339,7 @@ const GitHubPRTracker: React.FC = () => {
         onClick={() => handleCategoryClick('created')}
         cursor="pointer"
       >
-        Created ({createdCount})
+        Created ({loading2 ? <Spinner size="sm" /> : createdCount})
       </Box>
 
       <Box
@@ -577,7 +355,7 @@ const GitHubPRTracker: React.FC = () => {
         onClick={() => handleCategoryClick('open')}
         cursor="pointer"
       >
-        Open ({openCount})
+        Open ({loading2 ? <Spinner size="sm" /> : openCount})
       </Box>
 
       <Box
@@ -593,7 +371,7 @@ const GitHubPRTracker: React.FC = () => {
         onClick={() => handleCategoryClick('closed')}
         cursor="pointer"
       >
-        Closed ({closedCount})
+        Closed ({loading2 ? <Spinner size="sm" /> : closedCount})
       </Box>
 
       {type === 'PRs' && (
@@ -610,7 +388,7 @@ const GitHubPRTracker: React.FC = () => {
           onClick={() => handleCategoryClick('merged')}
           cursor="pointer"
         >
-          Merged ({mergedCount})
+          Merged ({loading2 ? <Spinner size="sm" /> : mergedCount})
         </Box>
       )}
     </Flex>
@@ -990,7 +768,7 @@ const GitHubPRTracker: React.FC = () => {
     };
   
     // Determine if we're handling PRs or Issues
-    const allData = activeTab === 'PRs' ? data.PRs : data.Issues;
+    const allData = activeTab === 'PRs' ? downloaddata.PRs : downloaddata.Issues;
   
     // Iterate over all keys in the selected dataset (PRs or Issues)
     Object.keys(allData).forEach((key) => {
@@ -1068,30 +846,51 @@ const GitHubPRTracker: React.FC = () => {
   
 
   const renderChart = () => {
-    const dataToUse = activeTab === 'PRs' ? data.PRs : data.Issues;
+   // Assuming `chartData` is your data array
+// console.log(chartdata);
 
-    // Transform data for chart rendering
-    const transformedData = Object.keys(dataToUse).flatMap(monthYear => {
-        const items = dataToUse[monthYear];
-        return [
-            ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
-            ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
-            ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
-            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
-        ];
-    });
+const transformedData = Array.isArray(chartdata) // Check if chartdata is an array
+  ? chartdata.reduce<{
+      [key: string]: { [key: string]: number };
+    }>((acc, { monthYear, type, count }) => {
+      if (showCategory[type.toLowerCase()]) { // Ensure the category is selected
+        if (!acc[monthYear]) {
+          acc[monthYear] = {};
+        }
+        // Update the count for the current type
+        acc[monthYear][type] = (acc[monthYear][type] || 0) + count;
+      }
+      return acc;
+    }, {})
+  : {}; // If chartdata is not an array, return an empty object
+
+
+const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYear => {
+  const entry = transformedData![monthYear]; // Ensure that entry exists and is properly typed
+  return [
+    ...(showCategory.created ? [{ monthYear, type: 'Created', count: entry.Created || 0 }] : []),
+    ...(showCategory.merged ? [{ monthYear, type: 'Merged', count: entry.Merged || 0 }] : []),
+    ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: entry.Closed || 0 }] : []),
+  ];
+});
+
+
+
+
+// console.log(finalTransformedData);
+
 
     // Find the maximum of absolute values for merged and closed
     const mergedMax = Math.max(
       0, // Default to 0 if no data is available
-      ...transformedData
+      ...finalTransformedData
           .filter(data => data.type === 'Merged')
           .map(data => Math.abs(data.count))
   );
   
   const closedMax = Math.max(
       0, // Default to 0 if no data is available
-      ...transformedData
+      ...finalTransformedData
           .filter(data => data.type === 'Closed')
           .map(data => Math.abs(data.count))
   );
@@ -1099,103 +898,133 @@ const GitHubPRTracker: React.FC = () => {
     // Get the minimum of merged and closed counts
     const getmin = Math.max(mergedMax, closedMax) || 0;
 
-    // Prepare trend data for created category
     const trendData = showCategory.open
-        ? Object.keys(dataToUse).map(monthYear => {
-            const items = dataToUse[monthYear]; // Move this line here
-            return {
-                monthYear,
-                Open: items.open.length + (activeTab === 'PRs' ? Math.abs(getmin) : Math.abs(closedMax)),
-            };
-        })
-        : [];
+  ? Object.keys(transformedData || {}).map(monthYear => {
+      const entry = transformedData![monthYear]; // Ensure that entry exists and is properly typed
+
+      // Calculate the Open value based on transformedData and showCategory
+      const openCount = entry.Open || 0;
+
+      return {
+        monthYear,
+        Open: openCount + (activeTab === 'PRs' ? Math.abs(getmin) : Math.abs(closedMax)),
+      };
+    })
+  : [];
+
+  //   const trendData = showCategory.open
+  // ? chartdata?.map(item => {
+  //     // Ensure the item is defined and contains the necessary properties
+  //     const monthYear = item.monthYear;
+  //     const openCount = item.type === 'Open' ? item.count : 0; // Assuming 'Open' type for open PRs
+
+  //     // Ensure openCount is calculated correctly
+  //     const adjustedOpenCount = openCount + (activeTab === 'PRs' ? Math.abs(getmin) : Math.abs(closedMax));
+
+  //     return {
+  //       monthYear,
+  //       Open: adjustedOpenCount,
+  //     };
+  //   }) || [] // If chartdata is undefined, return an empty array
+  // : [];
+  
+
 
     // Determine y-axis min and max
     const yAxisMin = Math.min(-closedMax, -mergedMax);
-    const yAxisMax = Math.max(0, Math.max(...trendData.map(data => data.Open)));
+    // const yAxisMax = Math.max(0, Math.max(...trendData.map(data => data.Open)));
+    const yAxisMax = Math.max(
+      0, // Default to 0 if no data is available
+      ...trendData.map(data => Math.abs(data.Open)) // Use Open instead of type
+    );
+    
+    // console.log(yAxisMax); 
+    
 
     // Sort data by monthYear in ascending order
-    const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+    const sortedData = finalTransformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
     const sortedTrendData = trendData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+
+// Check if sortedTrendData has the correct structure
+// console.log(sortedTrendData);
 
     // Dual axes configuration
     const config = {
-        data: [sortedData, sortedTrendData], // Provide both bar and trend data
-        xField: 'monthYear',
-        yField: ['count', 'Open'], // Use dual axes: one for bars and one for the line
-        geometryOptions: [
-            {
-                geometry: 'column', // Bar chart for categories
-                isStack: true,
-                seriesField: 'type',
-                columnStyle: {
-                    radius: [0, 0, 0, 0],
-                },
-                tooltip: {
-                  fields: ['type', 'count'],
-                  formatter: ({ type, count }: { type: string; count: number }) => ({
-                      name: type,
-                      value: `${Math.abs(count)}`, // Adjust hover display for bar chart
-                  }),
+      data: [sortedData, sortedTrendData], // Provide both bar and trend data
+      xField: 'monthYear',
+      yField: ['count', 'Open'], // Use dual axes: one for bars and one for the line
+      geometryOptions: [
+          {
+              geometry: 'column', // Bar chart for categories
+              isStack: true,
+              seriesField: 'type',
+              columnStyle: {
+                  radius: [0, 0, 0, 0],
               },
-              color: (datum: any) => {
-                switch (datum.type) {
-                    case 'Closed':
-                        return '#ff4d4d'; // Soft red
-                    case 'Merged':
-                        return '#4caf50'; // Balanced green
-                    case 'Created':
-                        return '#2196f3'; // Medium blue
-                    default:
-                        return 'defaultColor';
-                }
-            }
+              tooltip: {
+                fields: ['type', 'count'],
+                formatter: ({ type, count }: { type: string; count: number }) => ({
+                    name: type,
+                    value: `${Math.abs(count)}`, // Adjust hover display for bar chart
+                }),
+            },
+            color: (datum: any) => {
+              switch (datum.type) {
+                  case 'Closed':
+                      return '#ff4d4d'; // Soft red
+                  case 'Merged':
+                      return '#4caf50'; // Balanced green
+                  case 'Created':
+                      return '#2196f3'; // Medium blue
+                  default:
+                      return 'defaultColor';
+              }
+          }
+            
+          },
+         {
+      geometry: 'line', // Line chart for trend (Open)
+      smooth: true,
+      lineStyle: {
+        stroke: '#ff00ff', // Magenta line color
+        lineWidth: 2,
+      },
+      tooltip: {
+        fields: ['monthYear', 'Open'], // Change to use 'Open'
+        formatter: ({ monthYear, Open }: { monthYear: string; Open: number }) => ({
+          name: 'Open',
+          value: `${Open - getmin}`, // Adjust hover display for line chart
+        }),
+      },
+      color: '#ff00ff',
+    },
+      ],
+      yAxis: [
+          {
+              min: yAxisMin, // Set min for bar chart y-axis
+              max: 0, // Set max based on negative values
               
+            
+          },
+          {
+              min:  yAxisMin, // Start from 0 for the trend line
+              max: yAxisMax, // Set max for trend line y-axis
+              label: {
+                formatter: () => '', // Completely hide labels
             },
-            {
-                geometry: 'line', // Line chart for trend (Created)
-                smooth: true,
-                lineStyle: {
-                    stroke: "#ff00ff", // Magenta line color
-                    lineWidth: 2,
-                },
-                tooltip: {
-                  fields: ['monthYear', 'Open'],
-                  formatter: ({ monthYear, Open }: { monthYear: string; Open: number }) => ({
-                      name: 'Open',
-                      value: `${Open - getmin}`, // Adjust hover display for line chart
-                  }),
-              },
-              color: '#ff00ff',
-               
+             
+            grid: {
+                line: { style: { stroke: 'transparent' } }, // Hide grid lines
             },
-        ],
-        yAxis: [
-            {
-                min: yAxisMin, // Set min for bar chart y-axis
-                max: 0, // Set max based on negative values
-                
               
-            },
-            {
-                min:  yAxisMin, // Start from 0 for the trend line
-                max: yAxisMax, // Set max for trend line y-axis
-                label: {
-                  formatter: () => '', // Completely hide labels
-              },
-               
-              grid: {
-                  line: { style: { stroke: 'transparent' } }, // Hide grid lines
-              },
-                
-            },
-        ],
-        slider: {
-            start: 0,
-            end: 1,
-        },
-        legend: { position: 'top-right' as const },
-    };
+          },
+      ],
+      slider: {
+          start: 0,
+          end: 1,
+      },
+      legend: { position: 'top-right' as const },
+  };
 
     return <DualAxes {...config} />;
 };
@@ -1370,7 +1199,9 @@ const GitHubPRTracker: React.FC = () => {
             {`Github PR Analytics (Monthly, since 2015)`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={handleDownload2}>Download CSV</Button>
+          <Button colorScheme="blue" onClick={handleDownload2} disabled={loading3}>
+            {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+          </Button>
         </Flex>
         <Flex justify="center" mb={8}>
             <Select
@@ -1410,7 +1241,6 @@ const GitHubPRTracker: React.FC = () => {
     isChecked={showCategory.created}
     onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
     mr={4}
-    color="black"
   >
     {activeTab === 'PRs' ? 'Created PRs' : 'Created Issues'}
   </Checkbox>
@@ -1419,7 +1249,6 @@ const GitHubPRTracker: React.FC = () => {
       isChecked={showCategory.open}
       onChange={() => setShowCategory(prev => ({ ...prev, open: !prev.open }))}
       mr={4}
-      color="black"
     >
       Open PRs
     </Checkbox>
@@ -1428,7 +1257,6 @@ const GitHubPRTracker: React.FC = () => {
     isChecked={showCategory.closed}
     onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
     mr={4}
-    color="black"
   >
     {activeTab === 'PRs' ? 'Closed PRs' : 'Closed Issues'}
   </Checkbox>
@@ -1437,7 +1265,6 @@ const GitHubPRTracker: React.FC = () => {
       isChecked={showCategory.merged}
       onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
       mr={4}
-      color="black"
     >
       Merged PRs
     </Checkbox>
@@ -1508,7 +1335,9 @@ const GitHubPRTracker: React.FC = () => {
                     color={useColorModeValue("gray.800", "gray.200")}>
                         You can download the data here:
                       </Text>
-                      <Button colorScheme="blue" onClick={handleDownload}>Download CSV</Button>
+                      <Button colorScheme="blue" onClick={handleDownload} disabled={loading2}>
+                        {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+                      </Button>
                     </Box>
                   </Box>
               )}
@@ -1517,7 +1346,7 @@ const GitHubPRTracker: React.FC = () => {
           
                   {selectedYear && selectedMonth && (
                     <Box mt={8}>
-                      {renderTable(selectedYear, selectedMonth, activeTab)}
+                     {renderTable(selectedYear, selectedMonth, activeTab)}
                     </Box>
                   )}
                 </>

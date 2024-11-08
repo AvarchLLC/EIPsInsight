@@ -21,6 +21,7 @@ type ShowReviewerType = { [key: string]: boolean };
 const InsightsLeaderboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
+  const [chart1data, setchart1Data] = useState<any[]>([]);
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
@@ -61,6 +62,57 @@ const InsightsLeaderboard = () => {
     }
   }, [path, selectedYear, selectedMonth]);
 
+  const fetchReviewers = async (): Promise<string[]> => {
+    try {
+      const response = await fetch(
+        "https://raw.githubusercontent.com/ethereum/EIPs/master/config/eip-editors.yml"
+      );
+      const text = await response.text();
+  
+      // Match unique reviewers using a regex to handle YAML structure
+      const matches = text.match(/-\s(\w+)/g);
+      const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
+  
+      return reviewers;
+    } catch (error) {
+      console.error("Error fetching reviewers:", error);
+      return [];
+    }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+
+      const endpoint =`/api/ReviewersCharts/chart/${activeTab.toLowerCase()}`
+
+      const response = await fetch(endpoint); // Replace with your API endpoint
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const formattedData: { monthYear: string; reviewer: string; count: number }[] = await response.json();
+      console.log(formattedData);
+    
+      // Extract unique reviewers from the formattedData
+      const reviewers = Array.from(new Set(formattedData.map(review => review.reviewer)));
+      
+      // Create the initial state for showing reviewers (set all to true by default)
+      const initialShowReviewer = reviewers.reduce(
+        (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
+        {}
+      );
+      console.log(initialShowReviewer)
+  
+      setShowReviewer(initialShowReviewer);
+     
+      setchart1Data(formattedData);
+    } catch (error) {
+      console.error("Error during data fetch:", error);
+    } finally {
+      setLoading(false); // Ensure loading state is set to false in all cases
+    }
+  };
+
   useEffect(() => {
     fetchData();
     resetReviewerList(); // Reset reviewers when switching tabs
@@ -70,109 +122,7 @@ const InsightsLeaderboard = () => {
     setShowReviewer({}); // Clear previous reviewers list when switching tabs
   };
   
-  const flattenResponse = (response: Record<string, any[]>) => {
-    return Object.entries(response).flatMap(([reviewer, reviews]) =>
-      reviews.map(review => ({ ...review, reviewer }))
-    );
-  };
-  
-  const fetchHelper = async (activeTab: string): Promise<any[]> => { // Return type can be adjusted as needed
-    try {
-      const endpoint = API_ENDPOINTS[activeTab as keyof typeof API_ENDPOINTS];
-      const response = await fetch(endpoint);
-      const responseData = await response.json();
-  
-      const newData = flattenResponse(responseData);
-      return newData; // Return the flattened data
-    } catch (error) {
-      console.error("Failed to fetch review data:", error);
-      return []; // Return an empty array on error
-    }
-  };
-  
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      let combinedData: any[] = []; // Initialize an empty array for combined data
-  
-      if (activeTab !== 'all') {
-        combinedData = await fetchHelper(activeTab); // Fetch data for the selected tab
-      } else {
-        // Fetch data for all tabs and combine the results
-        const [eipsData, ercsData, ripsData] = await Promise.all([
-          fetchHelper('eips'),
-          fetchHelper('ercs'),
-          fetchHelper('rips')
-        ]);
-        combinedData = [...eipsData, ...ercsData, ...ripsData]; // Combine the results
-      }
-  
-      // Process the combined data
-      const reviewers = Array.from(new Set(combinedData.map(review => review.reviewer)));
-      const initialShowReviewer = reviewers.reduce(
-        (acc, reviewer) => ({ ...acc, [reviewer]: true }),
-        {}
-      );
-  
-      setShowReviewer(initialShowReviewer); // Set reviewer visibility state
-  
-      const transformedData = transformData(combinedData, initialShowReviewer);
-      setData(transformedData);
-    } catch (error) {
-      console.error("Error during data fetch:", error);
-    } finally {
-      setLoading(false); // Ensure loading state is set to false in all cases
-    }
-  };
 
-  const transformData = (
-    data: any[], 
-    rev: { [key: string]: boolean } // Assuming `rev` is an object where keys are reviewer names
-  ): any[] => {
-    const monthYearData: {
-      [key: string]: { 
-        [reviewer: string]: { 
-          monthYear: string, 
-          reviewer: string, 
-          count: number, 
-          prs: any[] 
-        } 
-      } 
-    } = {};
-  
-    data.forEach(review => {
-      const reviewDate = new Date(review.reviewDate || review.created_at || review.closed_at || review.merged_at);
-      if (isNaN(reviewDate.getTime())) {
-        console.error("Invalid date format for review:", review);
-        return;
-      }
-  
-      const key = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, '0')}`;
-      const reviewer = review.reviewer;
-  
-      if (!monthYearData[key]) {
-        monthYearData[key] = {};
-      }
-  
-      if (!monthYearData[key][reviewer]) {
-        monthYearData[key][reviewer] = { monthYear: key, reviewer, count: 0, prs: [] };
-      }
-  
-      // Avoid counting duplicate records
-      const isDuplicate = monthYearData[key][reviewer].prs.some(pr => pr.prNumber === review.prNumber);
-      if (!isDuplicate) {
-        monthYearData[key][reviewer].count += 1;
-        monthYearData[key][reviewer].prs.push(review);
-      }
-    });
-  
-    const result = Object.entries(monthYearData).flatMap(([monthYear, reviewers]) => 
-      Object.values(reviewers).filter((item: { reviewer: string }) => rev[item.reviewer])
-    );
-  
-    return result;
-  };
-  
 
 // Define types for clarity
 interface ReviewData {
@@ -190,7 +140,8 @@ type GroupedData = {
 
 interface PRData {
   monthYear: string;
-  prs: { reviewer: string; prCount: number }[];
+  reviewer: string; 
+  count: number ;
 }
 
 interface LeaderboardChartsProps {
@@ -200,50 +151,30 @@ interface LeaderboardChartsProps {
   renderTable: (year: string, month: string) => JSX.Element;
 }
 
-const getYearlyData = (data: PRData[]) => {
-  const yearlyData: Record<string, number> = data
-    .filter(item => {
-      // Extract the year from 'monthYear' and check if it falls between 2015 and 2024
-      const itemYear = parseInt(item.monthYear.split('-')[0], 10);
-      return itemYear >= 2015 && itemYear <= 2024;
-    })
-    .flatMap(item => item.prs)
-    .reduce((acc, item) => {
-      acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
 
-  // Sort the data by PR counts in decreasing order
-  const sortedYearlyData = Object.entries(yearlyData)
-    .sort(([, a], [, b]) => b - a) // Sort by count in decreasing order
-    .reduce((acc, [reviewer, count]) => {
-      acc[reviewer] = count;
-      return acc;
-    }, {} as Record<string, number>);
-
-  console.log("Combined data from 2015 to 2024:", sortedYearlyData);
-  return sortedYearlyData;
-};
 
 
 // Function to filter PR data for the selected month and year
-const getMonthlyData = (data: PRData[], year: string|null, month: string) => {
+const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
   const monthlyData: Record<string, number> = data
-    .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)
-    .flatMap(item => item.prs)
+    .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)  // Filter by year and month
     .reduce((acc, item) => {
-      acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+      // Only count if the reviewer is shown
+      if (showReviewer[item.reviewer]) {
+        acc[item.reviewer] = (acc[item.reviewer] || 0) + item.count;  // Accumulate the count
+      }
       return acc;
     }, {} as Record<string, number>);
 
-    const sortedMonthlyData = Object.entries(monthlyData)
-    .sort(([, a], [, b]) => b - a) // Sort by count in decreasing order
+  // Sort reviewers by count in decreasing order
+  const sortedMonthlyData = Object.entries(monthlyData)
+    .sort(([, a], [, b]) => b - a)  // Sort by count in decreasing order
     .reduce((acc, [reviewer, count]) => {
       acc[reviewer] = count;
       return acc;
     }, {} as Record<string, number>);
 
-  console.log("Year 2024, month 10:", sortedMonthlyData);
+  console.log("Year:", year, "Month:", month, "Sorted Data:", sortedMonthlyData);
   return sortedMonthlyData;
 };
 
@@ -351,7 +282,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
           <Spinner size="lg" /> {/* Centered Spinner */}
         </Flex>
         ) : (
-          renderCharts(data, selectedYear, selectedMonth)
+          renderCharts(chart1data, selectedYear, selectedMonth)
         )}
       </Box>
       </Link>

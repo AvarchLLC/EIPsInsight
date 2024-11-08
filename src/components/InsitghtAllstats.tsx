@@ -78,27 +78,9 @@ const MyComponent = () => {
   </Flex>
   <br/>
   {/* Second Row: Open PRs and Issues */}
-  <Box
-    bgColor={bg}
-    padding="1rem"
-    borderRadius="0.55rem"
-    minHeight="400px" // Set minimum height
-    marginTop={{ base: "1rem", md: "1rem" }} // Margin for separation
-  >
-    <Text
-      color={"#30A0E0"}
-      fontSize="2xl"
-      fontWeight="bold"
-      textAlign="center"
-      marginBottom="0.5rem"
-    >
-      {`Open PRs and Issues (${year})`}
-    </Text>
-    <InsightsOpenPrsIssues /> {/* Second chart */}
-    <Box className={"w-full"}>
-              <DateTime />
-    </Box>
-  </Box>
+  
+    <InsightsOpenPrsIssues/> {/* Second chart */}
+    
 </Box>
 
   );

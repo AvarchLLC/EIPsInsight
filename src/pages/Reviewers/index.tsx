@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Box, Flex, Select,Heading, IconButton, Collapse, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Select,Heading, IconButton, Collapse, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
 import LoaderComponent from "@/components/Loader";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { CSVLink } from "react-csv";
 import {ChevronUpIcon } from "@chakra-ui/icons";
 import DateTime from "@/components/DateTime";
+import { motion } from "framer-motion";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -26,6 +27,8 @@ type ShowReviewerType = { [key: string]: boolean };
 const ReviewTracker = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
+  const [chart1data, setchart1Data] = useState<any[]>([]);
+  const [downloaddata, setdownloadData] = useState<any[]>([]);
   // const [showReviewer, setShowReviewer] = useState<{ [key: string]: boolean }>({});
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
   const [reviewers, setReviewers] = useState<string[]>([]);
@@ -59,27 +62,7 @@ const ReviewTracker = () => {
     }
   };
 
-  const fetchReviewersData = async () => {
-    
-    try {
-      const response = await fetch('/api/editorsActivity'); // Replace with your API endpoint
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const reviewersData = await response.json();
-
-      // Transform the fetched data into the desired format
-      const formattedData = reviewersData.map((reviewer: any) => ({
-        reviewer: reviewer.reviewer,
-        startDate: reviewer.startDate,
-        endDate: reviewer.endDate || null // Ensure endDate is null if not provided
-      }));
-
-      setReviewerData(formattedData); // Store the structured reviewers data
-    } catch (error) {
-      console.error('Failed to fetch reviewers data:', error);
-    } 
-  };
+  
 
   useEffect(() => {
     fetchReviewers().then((uniqueReviewers) => {
@@ -124,7 +107,9 @@ const ReviewTracker = () => {
 
   // Function to generate CSV data
   type PR = {
+    repo:string;
     prNumber: number;
+    reviewer:string;
     prTitle: string;
     reviewDate?: string;
     created_at?: string;
@@ -137,48 +122,45 @@ const ReviewTracker = () => {
       console.error('Year and Month must be selected to generate CSV');
       return;
     }
+
+    console.log(data)
   
     const filteredData = data
-      .filter(item => item.monthYear === `${selectedYear}-${selectedMonth}`)
-      .filter(item => showReviewer[item.reviewer]);
   
-    const csv = filteredData.flatMap(item =>
-      item.prs.map((pr: PR) => ({
+    const csv = data.map((pr: PR) => ({
         PR_Number: pr.prNumber,
         Title: pr.prTitle,
-        Reviewer: item.reviewer,
+        Reviewer: pr.reviewer,
         Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
         Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
         Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
         Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
         Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-        Link: `https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`,
+        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
       }))
-    );
+    ;
   
-    setCsvData(csv); // Update the state with the generated CSV data
+    setCsvData(csv); 
   };
 
   const generateCSVData2 = () => {
   
-    const filteredData = data
-      .filter(item => showReviewer[item.reviewer]);
+    const filteredData =downloaddata
   
-    const csv = filteredData.flatMap(item =>
-      item.prs.map((pr: PR) => ({
-        PR_Number: pr.prNumber,
-        Title: pr.prTitle,
-        Reviewer: item.reviewer,
-        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-        Link: `https://github.com/ethereum/${activeTab}/pull/${pr.prNumber}`,
-      }))
-    );
-  
-    setCsvData(csv); // Update the state with the generated CSV data
+    const csv = filteredData.map((pr: PR) => ({
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }))
+  ;
+
+    setCsvData(csv); 
   };
 
   useEffect(() => {
@@ -196,65 +178,38 @@ const ReviewTracker = () => {
     );
   };
   
-  const fetchHelper = async (activeTab: string): Promise<any[]> => { // Return type can be adjusted as needed
-    try {
-      const endpoint = API_ENDPOINTS[activeTab as keyof typeof API_ENDPOINTS];
-      const response = await fetch(endpoint);
-      const responseData = await response.json();
   
-      const newData = flattenResponse(responseData);
-      return newData; // Return the flattened data
-    } catch (error) {
-      console.error("Failed to fetch review data:", error);
-      return []; // Return an empty array on error
-    }
-  };
   
   const fetchData = async () => {
     setLoading(true);
     try {
 
-      const response = await fetch('/api/editorsActivity'); // Replace with your API endpoint
+      const endpoint =`/api/ReviewersCharts/chart/${activeTab.toLowerCase()}`
+
+      const response = await fetch(endpoint); // Replace with your API endpoint
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      const reviewersData = await response.json();
+      const formattedData: { monthYear: string; reviewer: string; count: number }[] = await response.json();
+      // console.log(formattedData);
+    
+      // Extract unique reviewers from the formattedData
+      // const reviewers = Array.from(new Set(formattedData.map(review => review.reviewer)));
 
-      // Transform the fetched data into the desired format
-      const formattedData = reviewersData.map((reviewer: any) => ({
-        reviewer: reviewer.reviewer,
-        startDate: reviewer.startDate,
-        endDate: reviewer.endDate || null // Ensure endDate is null if not provided
-      }));
+      // console.log("reviewers:",reviewers);
+      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu",];
 
-      setReviewerData(formattedData);
-
-      console.log(formattedData)
-      let combinedData: any[] = []; // Initialize an empty array for combined data
-  
-      if (activeTab !== 'all') {
-        combinedData = await fetchHelper(activeTab); // Fetch data for the selected tab
-      } else {
-        // Fetch data for all tabs and combine the results
-        const [eipsData, ercsData, ripsData] = await Promise.all([
-          fetchHelper('eips'),
-          fetchHelper('ercs'),
-          fetchHelper('rips')
-        ]);
-        combinedData = [...eipsData, ...ercsData, ...ripsData]; // Combine the results
-      }
-  
-      // Process the combined data
-      const reviewers = Array.from(new Set(combinedData.map(review => review.reviewer)));
-      const initialShowReviewer = reviewers.reduce(
-        (acc, reviewer) => ({ ...acc, [reviewer]: true }),
+      
+      // // Create the initial state for showing reviewers (set all to true by default)
+      const initialShowReviewer = githubHandles.reduce(
+        (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
         {}
       );
+      console.log(initialShowReviewer)
   
-      setShowReviewer(initialShowReviewer); // Set reviewer visibility state
-  
-      const transformedData = transformData(combinedData, initialShowReviewer, formattedData);
-      setData(transformedData);
+      setShowReviewer(initialShowReviewer);
+     
+      setchart1Data(formattedData);
     } catch (error) {
       console.error("Error during data fetch:", error);
     } finally {
@@ -346,7 +301,7 @@ interface ReviewData {
   monthYear: string;
   reviewer: string;
   count: number;
-  prs: any[];
+  PRs: any[];
 }
 
 type GroupedData = {
@@ -357,35 +312,36 @@ type GroupedData = {
 
 interface PRData {
   monthYear: string;
-  prs: { reviewer: string; prCount: number }[];
+  reviewer: string; 
+  count: number ;
 }
 
-interface LeaderboardChartsProps {
-  data: PRData[];
-  selectedYear: string;
-  selectedMonth: string;
-  renderTable: (year: string, month: string) => JSX.Element;
-}
+// interface LeaderboardChartsProps {
+//   data: PRData[];
+//   selectedYear: string;
+//   selectedMonth: string;
+//   renderTable: (year: string, month: string) => JSX.Element;
+// }
 
 const getYearlyData = (data: PRData[]) => {
+  // Initialize an accumulator to hold yearly data
   const yearlyData: Record<string, number> = data
     .filter(item => {
       // Extract the year from 'monthYear' and check if it falls between 2015 and 2024
       const itemYear = parseInt(item.monthYear.split('-')[0], 10);
       return itemYear >= 2015 && itemYear <= 2024;
     })
-    .flatMap(item => item.prs)
     .reduce((acc, item) => {
       // Only count if the reviewer is shown
       if (showReviewer[item.reviewer]) {
-        acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+        acc[item.reviewer] = (acc[item.reviewer] || 0) + item.count;  // Accumulate the count for each reviewer
       }
       return acc;
     }, {} as Record<string, number>);
 
-  // Sort the data by PR counts in decreasing order
+  // Sort the data by reviewer count in decreasing order
   const sortedYearlyData = Object.entries(yearlyData)
-    .sort(([, a], [, b]) => b - a) // Sort by count in decreasing order
+    .sort(([, a], [, b]) => b - a)  // Sort by count in decreasing order
     .reduce((acc, [reviewer, count]) => {
       acc[reviewer] = count;
       return acc;
@@ -397,26 +353,26 @@ const getYearlyData = (data: PRData[]) => {
 
 
 // Function to filter PR data for the selected month and year
-const getMonthlyData = (data: PRData[], year: string|null, month: string) => {
+const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
   const monthlyData: Record<string, number> = data
-    .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)
-    .flatMap(item => item.prs)
+    .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)  // Filter by year and month
     .reduce((acc, item) => {
       // Only count if the reviewer is shown
       if (showReviewer[item.reviewer]) {
-        acc[item.reviewer] = (acc[item.reviewer] || 0) + 1;
+        acc[item.reviewer] = (acc[item.reviewer] || 0) + item.count;  // Accumulate the count
       }
       return acc;
     }, {} as Record<string, number>);
 
-    const sortedMonthlyData = Object.entries(monthlyData)
-    .sort(([, a], [, b]) => b - a) // Sort by count in decreasing order
+  // Sort reviewers by count in decreasing order
+  const sortedMonthlyData = Object.entries(monthlyData)
+    .sort(([, a], [, b]) => b - a)  // Sort by count in decreasing order
     .reduce((acc, [reviewer, count]) => {
       acc[reviewer] = count;
       return acc;
     }, {} as Record<string, number>);
 
-  console.log("Year 2024, month 10:", sortedMonthlyData);
+  console.log("Year:", year, "Month:", month, "Sorted Data:", sortedMonthlyData);
   return sortedMonthlyData;
 };
 
@@ -492,7 +448,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
               }
             }}
           >
-            <Button colorScheme="blue">Download CSV</Button>
+            <Button colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
           </CSVLink>
         </Flex>
         <br/>
@@ -537,7 +493,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
               }
             }}
           >
-            <Button colorScheme="blue">Download CSV</Button>
+            <Button colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
           </CSVLink>
         </Flex>
         <br/>
@@ -553,18 +509,18 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
 
 const transformAndGroupData = (data: any[]): ReviewData[] => {
   const groupedData: GroupedData = data.reduce((acc, item) => {
-    const { monthYear, reviewer, count, prs } = item;
+    const { monthYear, reviewer, count } = item;
     
     if (!acc[monthYear]) {
       acc[monthYear] = {};
     }
     
     if (!acc[monthYear][reviewer]) {
-      acc[monthYear][reviewer] = { monthYear, reviewer, count: 0, prs: [] };
+      acc[monthYear][reviewer] = { monthYear, reviewer, count: 0 };
     }
     
     acc[monthYear][reviewer].count += count;
-    acc[monthYear][reviewer].prs = [...acc[monthYear][reviewer].prs, ...prs];
+    // acc[monthYear][reviewer].prs = [...acc[monthYear][reviewer].prs];
     
     return acc;
   }, {} as GroupedData);
@@ -581,7 +537,8 @@ type ReviewDatum = {
 };
 
 const renderChart = () => {
-  const dataToUse = data; // Assuming 'data' is accessible in the scope
+  const dataToUse = chart1data; // Assuming 'data' is accessible in the scope
+  console.log("data to use:",dataToUse)
   const filteredData = dataToUse.filter(item =>
     Object.keys(showReviewer) // Get the list of reviewers from showReviewer
       .filter(reviewer => showReviewer[reviewer]) // Only include checked reviewers
@@ -602,12 +559,15 @@ const renderChart = () => {
       reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
     }
   });
-
+  console.log("filtered data:", filteredData);
   // Transform and group the filtered data based on your business logic
   const transformedData = transformAndGroupData(filteredData);
+  console.log(transformedData);
 
   // Sort the transformed data by monthYear
   const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+
+  console.log("sorted data:", sortedData);
 
   // Chart configuration
   const config = {
@@ -649,28 +609,95 @@ const renderChart = () => {
   const toggleDropdown = () => setShowDropdown(prev => !prev);
 
   const getYears = () => {
-    const years = Array.from(new Set(data.map(item => item.monthYear.split('-')[0])));
-    return years.sort((a, b) => b.localeCompare(a));
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 10 }, (_, i) => currentYear - i);
   };
 
-  const getMonths = (year: string) => {
-    const months = Array.from(new Set(data.filter(item => item.monthYear.startsWith(year)).map(item => item.monthYear.split('-')[1])));
-    return months.sort((a, b) => parseInt(a) - parseInt(b));
-  };
-
+  const getMonths = () => [
+    '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'
+  ];
   
 
+  const [loading2,setLoading2]=useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!selectedYear || !selectedMonth) return; // Ensure year and month are selected
+
+      setLoading2(true);
+
+      // Format the key to 'yyyy-mm' format
+      const key = `${selectedYear}-${selectedMonth}`;
+
+      // Define the API endpoint based on activeTab ('PRs' or 'Issues')
+      const endpoint =`/api/ReviewersCharts/data/${activeTab.toLowerCase()}/${key}`
+        
+
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const result = await response.json();
+        // console.log(result)
+
+        console.log("result:",result[0].PRs);
+
+        setData(result[0].PRs)
+        // console.log(formattedData); 
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading2(false); // Reset loading state after fetching
+      }
+    };
+
+    fetchData(); // Invoke the fetch function
+
+  }, [selectedYear, selectedMonth, activeTab]);
+
+  const [loading3,setLoading3]=useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+     
+      setLoading3(true);
+      // Define the API endpoint based on activeTab ('PRs' or 'Issues')
+      const endpoint =`/api/ReviewersCharts/data/${activeTab.toLowerCase()}`
+        
+
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const result = await response.json();
+        // console.log(result)
+
+        const combinedPRs = (result as ReviewData[]).flatMap((item) => item.PRs || []);
+
+      console.log("Combined PRs:", combinedPRs);
+
+      // Set the combined PRs as download data
+      
+      setdownloadData(combinedPRs);
+        // console.log(formattedData); 
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading3(false); // Reset loading state after fetching
+      }
+    };
+
+    fetchData(); // Invoke the fetch function
+
+  }, [activeTab]);
+
   const renderTable = (year: string, month: string, reviewerFilter: any) => {
-    const filteredData = data
-        .filter(item => item.monthYear === `${year}-${month}`)
-        .filter(item => reviewerFilter[item.reviewer])
-        .flatMap(item => item.prs)
-        .reduce((acc: any[], pr) => {
-            if (!acc.some(existingPr => existingPr.prNumber === pr.prNumber)) {
-                acc.push(pr);
-            }
-            return acc;
-        }, []);
+    console.log(data);
+    const filteredData = data;
+
+        console.log("filtered data:",filteredData);
 
     return (
         <Box mt={8} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
@@ -768,6 +795,11 @@ const renderChart = () => {
       <LoaderComponent />
     ) : (
       <AllLayout>
+        {/* <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+            > */}
         <Box padding={8} margin={8}>
           <Heading
             size="xl"
@@ -920,7 +952,7 @@ const renderChart = () => {
         
             
             <Box className="w-full">
-              {renderCharts(data, selectedYear, selectedMonth)}
+              {renderCharts(chart1data, selectedYear, selectedMonth)}
               <DateTime />
             </Box>
           </Box>
@@ -955,7 +987,7 @@ const renderChart = () => {
               }
             }}
           >
-            <Button colorScheme="blue">Download CSV</Button>
+            <Button colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
           </CSVLink>
         </Flex>
             {renderChart()}
@@ -1045,7 +1077,7 @@ const renderChart = () => {
                   <MenuItem
                     key={year}
                     onClick={() => {
-                      setSelectedYear(year);
+                      setSelectedYear(year.toString());
                       setSelectedMonth(null); 
                     }}
                   >
@@ -1066,7 +1098,7 @@ const renderChart = () => {
                 {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
               </MenuButton>
               <MenuList>
-                {selectedYear && getMonths(selectedYear).map((month, index) => (
+                {selectedYear && getMonths().map((month, index) => (
                   <MenuItem key={index} onClick={() => setSelectedMonth(month)}>
                     {month}
                   </MenuItem>
@@ -1091,7 +1123,7 @@ const renderChart = () => {
             }}
           >
             <Box className="w-full">
-              {renderCharts2(data, selectedYear, selectedMonth)}
+              {renderCharts2(chart1data, selectedYear, selectedMonth)}
               <DateTime />
             </Box>
           </Box>
@@ -1121,7 +1153,7 @@ const renderChart = () => {
                         }
                       }}
                     >
-                      <Button colorScheme="blue">Download CSV</Button>
+                       <Button colorScheme="blue">{loading2 ? <Spinner size="sm" /> : "Download CSV"}</Button>
                     </CSVLink>
                   </Box>
                 </Box>
@@ -1135,6 +1167,7 @@ const renderChart = () => {
     </>
     )}
     </Box>
+    {/* </motion.div> */}
   </AllLayout>
 )
 ); };
