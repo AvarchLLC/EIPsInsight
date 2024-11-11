@@ -60,13 +60,11 @@ const MyComponent = () => {
       >
         <Text
           color={"#30A0E0"}
-          fontSize="2xl"
+          fontSize="3xl"
           fontWeight="bold"
           textAlign="center"
           // marginBottom="0.5rem"
           paddingTop={5}
-          width="100%"
-          wordWrap="break-word"
         >
           Editors Leaderboard
         </Text>
