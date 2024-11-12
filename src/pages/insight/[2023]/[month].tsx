@@ -12,22 +12,16 @@ import {
   Flex,
   Collapse,
 } from "@chakra-ui/react";
-import CustomBox from "@/components/CustomBox";
-import OtherBox from "@/components/OtherStats";
-import { PieC } from "@/components/InPie";
+
 import AllLayout from "@/components/Layout";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
-import EmptyInsight from "@/components/EmptyInsight";
-import Banner from "@/components/NewsBanner";
+
 import StackedColumnChart from "@/components/DraftBarChart";
 import NextLink from "next/link";
-import InsightDoughnut from "@/components/InsightDoughnut";
-import InsightSummary from "@/components/InsightSummaryTable";
+
 import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
-import InsightStats from "@/components/InsightStats";
-import InsightsLeaderboard from "@/components/InsightsLeaderboard";
-import InsightsOpenPrsIssues from "@/components/InsightOpenPrsIssues";
+
 import InsightsAllStats from "@/components/InsitghtAllstats";
 
 interface StatusChange {
@@ -66,6 +60,24 @@ interface APIData {
   rip: StatusChange[];
 }
 
+interface MappedDataItem {
+  category: string;
+  date: string;
+  value: number;
+}
+
+interface EIP {
+  status: string;
+  eips: {
+    status: string;
+    month: number;
+    year: number;
+    date: string;
+    count: number;
+    category: string;
+    eips:any[];
+  }[];
+}
 
 function getMonthName(monthNumber: number): string {
   const date = new Date();
@@ -75,8 +87,7 @@ function getMonthName(monthNumber: number): string {
 }
 
 const Month = () => {
-  const [data, setData] = useState<APIData>(); // Set initial state as an empty array
-  const [type, setType] = useState("EIPs"); // Set initial state as an empty array
+  const [data, setData] = useState<EIP[]>([]);
   const path = usePathname();
 
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
@@ -100,10 +111,35 @@ const Month = () => {
     const timeout = setTimeout(() => {
       setIsLoading(false);
     }, 2000);
-
     // Cleanup function
     return () => clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/graphsv2`);
+        const jsonData = await response.json();
+        console.log("rip data:",jsonData.rip);
+        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  let filteredData1 = data.filter((item) => item.status === "Draft");
+  let filteredData2 = data.filter((item) => item.status === "Review");
+  let filteredData3 = data.filter((item) => item.status === "Last Call");
+  let filteredData4 = data.filter((item) => item.status === "Living");
+  let filteredData5 = data.filter((item) => item.status === "Final");
+  let filteredData6 = data.filter((item) => item.status === "Stagnant");
+  let filteredData7 = data.filter((item) => item.status === "Withdrawn");
+
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const prevMonth = Number(month) - 1;
   const prevMonthName = getMonthName(prevMonth);
@@ -197,40 +233,6 @@ const Month = () => {
       </Collapse>
   </Box>
 
-
-  {/* <Box
-  display="flex" 
-  justifyContent="space-between" 
-  padding="2rem"
-  bgColor={bg}
-  borderRadius="0.55rem"
-  _hover={{
-    border: "1px",
-    borderColor: "#30A0E0",
-  }}
->
-  
-  <Box flex="1" marginRight="1rem">
-    <InsightSummary /> 
-  </Box>
-
-  
-  <Box flex="1" display="flex" flexDirection="column" justifyContent="space-between">
-   
-    <Box
-      bgColor={bg}
-      padding="1rem"
-    >
-      <InsightsLeaderboard /> 
-    </Box>
-
-   
-    <Box
-    >
-      <InsightsOpenPrsIssues /> 
-    </Box>
-  </Box>
-</Box> */}
 <InsightsAllStats/>
 
 
@@ -248,7 +250,7 @@ const Month = () => {
               </Text>
 
               <Box paddingTop={"8"}>
-                <StackedColumnChart status="Draft" />
+                <StackedColumnChart dataset={filteredData1} status="Draft" />
               </Box>
               <Text
                 fontSize="3xl"
@@ -259,7 +261,7 @@ const Month = () => {
                 Review
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart status="Review" />
+                <StackedColumnChart dataset={filteredData2} status="Review"/>
               </Box>
 
               <Text
@@ -271,7 +273,7 @@ const Month = () => {
                 Last Call
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart status="Last Call" />
+                <StackedColumnChart dataset={filteredData3} status="Last Call"/>
               </Box>
 
               <Text
@@ -283,7 +285,7 @@ const Month = () => {
                 Living
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart status="Living" />
+                <StackedColumnChart dataset={filteredData4} status="Living"/>
               </Box>
 
               <Text
@@ -295,7 +297,7 @@ const Month = () => {
                 Final
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart status="Final" />
+                <StackedColumnChart dataset={filteredData5} status="Final"/>
               </Box>
 
               <Text
@@ -307,7 +309,7 @@ const Month = () => {
                 Stagnant
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart status="Stagnant" />
+                <StackedColumnChart dataset={filteredData6} status="Stagnant"/>
               </Box>
 
               <Text
@@ -319,7 +321,7 @@ const Month = () => {
                 Withdrawn
               </Text>
               <Box paddingY={"8"}>
-                <StackedColumnChart status="Withdrawn" />
+                <StackedColumnChart dataset={filteredData7} status="Withdrawn"/>
               </Box>
             </Box>
            

@@ -39,7 +39,7 @@ import SearchBox from "@/components/SearchBox";
 import BoyGirl from "@/components/BoyGirl";
 import BoyGirl2 from "@/components/BoyGirl2";
 import BoyGirl3 from "@/components/BoyGirl3";
-import AllChart from "./AllChart";
+import AllChart from "./AllChart2";
 import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 import ToolsSection from "./AvailableTools";
 
@@ -51,7 +51,7 @@ interface EIP {
   status: string;
   type: string;
   category: string;
-  created: string;
+  created: Date;
   discussion: string;
   deadline: string;
   requires: string;
@@ -67,7 +67,12 @@ interface APIResponse {
 }
 
 const Dashboard = () => {
-  const [data, setData] = useState<APIResponse>(); // Set initial state as an empty array
+  const [data, setData] = useState<APIResponse>({
+    eip: [],
+    erc: [],
+    rip: [],
+  });
+  
   const [isLoading, setIsLoading] = useState(true); // Loader state
   const [isDarkMode, setIsDarkMode] = useState(false);
   
@@ -260,7 +265,7 @@ const Dashboard = () => {
                       padding={4} // Padding around the text
                       boxShadow="md" 
                       >
-                  <AllChart type="Total" />
+                  <AllChart type="Total" dataset={data}/>
                   </Box>
                 </div>
                 
@@ -338,7 +343,7 @@ const Dashboard = () => {
                     </Box>
                   </Stack>
                   <br/><br/>
-                  <AllChart type="Total" />
+                  <AllChart type="Total"  dataset={data}/>
                 </div>
               </Box>
 
@@ -558,7 +563,7 @@ const Dashboard = () => {
                   {`Status - [${allData.length}]`}
                   </Text>
                 </NextLink>
-                <DashboardDonut />
+                <DashboardDonut dataset={data} />
               </Box>
             </Box>
             </Box>

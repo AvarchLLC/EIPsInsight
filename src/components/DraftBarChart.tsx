@@ -121,7 +121,8 @@ const categoryBorder: string[] = [
 ];
 
 interface AreaCProps {
-  status: string;
+  dataset: EIP[];
+  status:string;
 }
 interface APIResponse {
   eip: EIP[];
@@ -129,34 +130,19 @@ interface APIResponse {
   rip: EIP[];
 }
 
-const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
+const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]);
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/graphsv2`);
-        const jsonData = await response.json();
-        console.log("rip data:",jsonData.rip);
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const [isChartReady, setIsChartReady] = useState(false);
 
   useEffect(() => {
+    setData(dataset);
     setIsChartReady(true);
+    setIsLoading(false);
   }, []);
   
   const removeDuplicatesFromEips = (eips: any[]) => {
@@ -171,7 +157,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
     });
   };
   
-  let filteredData = data.filter((item) => item.status === status);
+  let filteredData = dataset;
 
   const transformedData = filteredData.flatMap((item) => {
     console.log(item); // Log each item
@@ -272,7 +258,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
 
   const downloadData = () => {
     // Filter data based on the selected status
-    let filteredData = data.filter((item) => item.status === status);
+    let filteredData = dataset;
     
     // Transform the filtered data to get the necessary details
     const transformedData = filteredData.flatMap((item) => {

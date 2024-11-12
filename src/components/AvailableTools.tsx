@@ -46,7 +46,13 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link, size, layout }) =>
       >
         <Image 
           src={imageSrc} 
-          boxSize={size === "large" ? { base: "200px", md: "300px" } : { base: "120px", md: "180px" }} 
+          boxSize={
+            label === "Editors Leaderboard" 
+              ? { base: "100px", md: "150px" }  // Smaller size for "Editors Leaderboard"
+              : size === "large" 
+              ? { base: "200px", md: "300px" } 
+              : { base: "100px", md: "150px"  }
+          }
           objectFit="cover" 
           mb={{ base: 4, md: layout === "imageBottom" ? 4 : 0 }} 
           mr={{ md: layout === "imageRight" ? 4 : 0 }} 
@@ -55,11 +61,12 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link, size, layout }) =>
           fontSize={{ base: "lg", md: "2xl" }} 
           fontWeight="bold"
           maxWidth="100%" 
-          overflowWrap="break-word" 
-          
+          overflowWrap="break-word"
+          // pt={label === "Editors Leaderboard" ? 2 : 0}  // Add padding-top if label matches
         >
           {label}
         </Text>
+
       </Box>
     </Link>
   );
