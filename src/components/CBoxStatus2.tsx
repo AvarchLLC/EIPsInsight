@@ -45,6 +45,11 @@ const getCat = (cat: string) => {
   }
 };
 
+interface AreaCProps {
+  dataset: EIP[];
+  status:string;
+}
+
 interface EIP {
   status: string;
   eips: {
@@ -56,7 +61,7 @@ interface EIP {
   }[];
 }
 
-const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
+const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]);
   const windowSize = useWindowSize();
@@ -67,21 +72,21 @@ const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
   const years = Array.from(new Array(currentYear - 2014), (_, index) => index + 2015).reverse();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/graphsv2`);
-        const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+    // const fetchData = async () => {
+    //   try {
+    //     const response = await fetch(`/api/new/graphsv2`);
+    //     const jsonData = await response.json();
+        setData(dataset);
         setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
 
-    fetchData();
+    // fetchData();
   }, []);
 
-  let filteredData = data.filter((item) => item.status === status);
+  let filteredData = dataset;
 
   const removeDuplicatesFromEips = (eips: any[]) => {
     const seen = new Set();

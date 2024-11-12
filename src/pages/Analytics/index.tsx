@@ -1204,24 +1204,41 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
           </Button>
         </Flex>
         <Flex justify="center" mb={8}>
-            <Select
-              value={selectedRepo}
-              onChange={(e) => setSelectedRepo(e.target.value)}
-              placeholder="Select an option"
-              width="200px"
-              borderColor="gray.700" // Darker border color
-              color="gray.800" // Darker text color
-              bg="white" // White background for the dropdown
-              _placeholder={{ color: "gray.500" }} // Lighter color for placeholder
-              _focus={{ borderColor: "gray.500", bg: "white" }} // Border color on focus
-              _hover={{ borderColor: "gray.600" }} // Border color on hover
-            >
-              <option value="All">All</option>
-              <option value="EIPs">EIPs</option>
-              <option value="ERCs">ERCs</option>
-              <option value="RIPs">RIPs</option>
-            </Select>
-          </Flex>
+  <Menu>
+    <MenuButton
+      as={Button}
+      rightIcon={<ChevronDownIcon />}
+      colorScheme="blue"
+      size="md"
+      width="200px"
+    >
+      {selectedRepo || "Select an option"}
+    </MenuButton>
+
+    <MenuList maxHeight="200px" overflowY="auto">
+      {/* Option for All */}
+      <MenuItem onClick={() => setSelectedRepo('All')}>
+        All
+      </MenuItem>
+
+      {/* Option for EIPs */}
+      <MenuItem onClick={() => setSelectedRepo('EIPs')}>
+        EIPs
+      </MenuItem>
+
+      {/* Option for ERCs */}
+      <MenuItem onClick={() => setSelectedRepo('ERCs')}>
+        ERCs
+      </MenuItem>
+
+      {/* Option for RIPs */}
+      <MenuItem onClick={() => setSelectedRepo('RIPs')}>
+        RIPs
+      </MenuItem>
+    </MenuList>
+  </Menu>
+</Flex>
+
             {renderChart()}
             <Box className={"w-full"}>
               <DateTime />
@@ -1240,6 +1257,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
   <Checkbox
     isChecked={showCategory.created}
     onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
+    color="black"
     mr={4}
   >
     {activeTab === 'PRs' ? 'Created PRs' : 'Created Issues'}
@@ -1248,6 +1266,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     <Checkbox
       isChecked={showCategory.open}
       onChange={() => setShowCategory(prev => ({ ...prev, open: !prev.open }))}
+      color="black"
       mr={4}
     >
       Open PRs
@@ -1256,6 +1275,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
   <Checkbox
     isChecked={showCategory.closed}
     onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
+    color="black"
     mr={4}
   >
     {activeTab === 'PRs' ? 'Closed PRs' : 'Closed Issues'}
@@ -1264,6 +1284,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     <Checkbox
       isChecked={showCategory.merged}
       onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
+      color="black"
       mr={4}
     >
       Merged PRs

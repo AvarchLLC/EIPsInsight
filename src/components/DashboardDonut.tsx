@@ -33,21 +33,26 @@ interface APIResponse {
   rip: EIP[];
 }
 
-const DashboardDonut = () => {
+interface AreaCProps {
+  dataset: APIResponse;
+  // status:string;
+}
+
+const DashboardDonut: React.FC<AreaCProps> =({dataset}) => {
   const [data, setData] = useState<APIResponse>();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
-        setData(jsonData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    // const fetchData = async () => {
+    //   try {
+    //     const response = await fetch(`/api/new/all`);
+    //     const jsonData = await response.json();
+        setData(dataset);
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
 
-    fetchData();
+    // fetchData();
   }, []);
 
   const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];

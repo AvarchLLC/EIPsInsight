@@ -919,24 +919,41 @@ const renderChart = () => {
         </Button>
       </Flex> */}
       <Flex justify="center" mb={8}>
-                <Select
-                  value={activeTab}
-                  onChange={(e) => setActiveTab(e.target.value as 'eips' | 'ercs' | 'rips' | 'all')}
-                  placeholder="Select an option"
-                  width="200px"
-                  borderColor="gray.700" // Darker border color
-                  color="gray.800" // Darker text color
-                  bg="white" // White background for the dropdown
-                  _placeholder={{ color: "gray.500" }} // Lighter color for placeholder
-                  _focus={{ borderColor: "gray.500", bg: "white" }} // Border color on focus
-                  _hover={{ borderColor: "gray.600" }} // Border color on hover
-                >
-                  <option value="all">ALL</option>
-                  <option value="eips">EIPs</option>
-                  <option value="ercs">ERCs</option>
-                  <option value="rips">RIPs</option>
-                </Select>
-              </Flex>
+  <Menu>
+    <MenuButton
+      as={Button}
+      rightIcon={<ChevronDownIcon />}
+      colorScheme="blue"
+      size="md"
+      width="200px"
+    >
+      {activeTab ? activeTab.toUpperCase() : "Select an option"}
+    </MenuButton>
+
+    <MenuList maxHeight="200px" overflowY="auto">
+      {/* Option for all */}
+      <MenuItem onClick={() => setActiveTab('all')}>
+        ALL
+      </MenuItem>
+
+      {/* Option for EIPs */}
+      <MenuItem onClick={() => setActiveTab('eips')}>
+        EIPs
+      </MenuItem>
+
+      {/* Option for ERCs */}
+      <MenuItem onClick={() => setActiveTab('ercs')}>
+        ERCs
+      </MenuItem>
+
+      {/* Option for RIPs */}
+      <MenuItem onClick={() => setActiveTab('rips')}>
+        RIPs
+      </MenuItem>
+    </MenuList>
+  </Menu>
+</Flex>
+
      
         <Box padding="2rem" borderRadius="0.55rem">
           <Box
