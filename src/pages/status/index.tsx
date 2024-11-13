@@ -205,7 +205,7 @@ const Status = () => {
               Draft vs Final
             </Text>
 
-            <AreaStatus dataset={data3}/>
+            <AreaStatus/>
             <br/>
             {/* <AreaC type={"EIPs"} /> */}
 

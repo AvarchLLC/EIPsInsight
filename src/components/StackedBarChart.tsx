@@ -64,6 +64,7 @@ interface EIP {
     date: string;
     count: number;
     category: string;
+    eips:any[];
   }[];
 }
 
@@ -99,32 +100,37 @@ const categoryBorder: string[] = [
 ];
 
 interface AreaCProps {
+  dataset: APIResponse;
   status: string;
   type: string;
 }
 interface APIResponse {
   eip: EIP[];
   erc: EIP[];
+  rip: EIP[];
 }
 
-const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
+const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => {
   const [data, setData] = useState<APIResponse>();
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [isLoading, setIsLoading] = useState(true);
+  console.log(dataset);
+  console.log(status);
+  console.log(type);
 
   const [typeData, setTypeData] = useState<EIP[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/graphsv2`);
-        const jsonData = await response.json();
+        const jsonData = dataset;
         setData(jsonData);
         if (type === "EIPs" && jsonData.eip) {
           setTypeData(
             jsonData.eip.filter((item: any) => item.category !== "ERCs")
           );
+          console.log(jsonData.eip.filter((item: any) => item.category !== "ERCs"));
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
         }
@@ -135,7 +141,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
     };
 
     fetchData();
-  }, []);
+  }, [dataset]);
 
   useEffect(() => {
     if (type === "EIPs") {
@@ -152,6 +158,9 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
   }, []);
 
   const filteredData = typeData.filter((item) => item.status === status);
+  console.log(data);
+  console.log(typeData)
+  console.log(filteredData)
 
   const transformedData = filteredData
     .flatMap((item) =>
@@ -162,7 +171,8 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
       }))
     )
     .filter((item) => item.category !== "ERCs");
-
+    console.log(transformedData);
+  
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Column),
     {

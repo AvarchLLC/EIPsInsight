@@ -37,6 +37,8 @@ const All = () => {
   const [selected, setSelected] = useState("Meta");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [data, setData] = useState<EIP[]>([]);
+  const [data2, setData2] = useState<EIP[]>([]);
+  const [data3, setData3] = useState<EIP[]>([]);
   const [loading, setLoading] = useState(false); 
   
   
@@ -65,6 +67,17 @@ const All = () => {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
         setData(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip));
+        const alldata=jsonData.eip.concat(jsonData.erc).concat(jsonData.rip);
+        let filteredData = alldata
+        .filter((item:any) => item.category === selected);
+
+        setData2(filteredData);
+
+        let filteredData2 = alldata
+        .filter((item:any) => item.repo === 'rip');
+
+        setData3(filteredData2);
+
         setLoading(false);
         setIsLoading(false); // Set isLoading to false after data is fetched
       } catch (error) {
@@ -74,6 +87,13 @@ const All = () => {
     };
     fetchData();
   }, []);
+
+  useEffect(()=>{
+        let filteredData = data
+        .filter((item:any) => item.category === selected);
+
+        setData2(filteredData);
+  },[selected]);
 
   const handleDownload = () => {
     // Filter data based on the selected category
@@ -189,23 +209,23 @@ const All = () => {
 
           {selected === "RIP" ? (
             <Box>
-            <RipCatTable cat={selected} status={"Living"} />
-            <RipCatTable cat={selected} status={"Final"} />
-            <RipCatTable cat={selected} status={"Last Call"} />
-            <RipCatTable cat={selected} status={"Review"} />
-            <RipCatTable cat={selected} status={"Draft"} />
-            <RipCatTable cat={selected} status={"Withdrawn"} />
-            <RipCatTable cat={selected} status={"Stagnant"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Living"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Final"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Last Call"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Review"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Draft"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Withdrawn"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Stagnant"} />
           </Box>
           ) : (
             <Box>
-              <CatTable cat={selected} status={"Living"} />
-              <CatTable cat={selected} status={"Final"} />
-              <CatTable cat={selected} status={"Last Call"} />
-              <CatTable cat={selected} status={"Review"} />
-              <CatTable cat={selected} status={"Draft"} />
-              <CatTable cat={selected} status={"Withdrawn"} />
-              <CatTable cat={selected} status={"Stagnant"} />
+              <CatTable dataset={data2} cat={selected} status={"Living"} />
+              <CatTable dataset={data2} cat={selected} status={"Final"} />
+              <CatTable dataset={data2} cat={selected} status={"Last Call"} />
+              <CatTable dataset={data2} cat={selected} status={"Review"} />
+              <CatTable dataset={data2} cat={selected} status={"Draft"} />
+              <CatTable dataset={data2} cat={selected} status={"Withdrawn"} />
+              <CatTable dataset={data2} cat={selected} status={"Stagnant"} />
             </Box>
           )}
         </Box>

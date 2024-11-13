@@ -63,9 +63,11 @@ interface APIResponse {
 interface Data {
   eip: APIResponse[];
   erc: APIResponse[];
+  rip: APIResponse[];
 }
 
 interface CBoxProps {
+  dataset: Data;
   status: string;
   type: string;
 }
@@ -121,17 +123,16 @@ const getCat = (cat: string) => {
   }
 };
 
-const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
+const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
   const [data, setData] = useState<Data>();
-  const [selectedYear, setSelectedYear] = useState<number>(2023);
+  const [selectedYear, setSelectedYear] = useState<number>(2024);
   const [isLoading, setIsLoading] = useState(true);
   const [typeData, setTypeData] = useState<APIResponse[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/graphsv2`);
-        const jsonData = await response.json();
+        const jsonData = dataset;
         setData(jsonData);
         if (type === "EIPs" && jsonData.eip) {
           setTypeData(
@@ -150,7 +151,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
     };
 
     fetchData();
-  }, []);
+  }, [dataset]);
 
   useEffect(() => {
     if (type === "EIPs") {

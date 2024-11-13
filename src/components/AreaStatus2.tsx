@@ -31,24 +31,7 @@ const getCat = (cat: string) => {
       return "Core";
   }
 };
-// interface EIP {
-//     status: string;
-//     eips: {
-//       status: string;
-//       month: number;
-//       year: number;
-//       date: string;
-//       count: number;
-//       category: string;
-//       eips:any[];
-//     }[];
-//   }
-
-  interface AreaCProps {
-    dataset: EIP2[];
-  }
-  
-  interface EIP2 {
+interface EIP {
     status: string;
     eips: {
       status: string;
@@ -69,25 +52,24 @@ function getMonthName(month: number): string {
   return months[month - 1];
 }
 
-const StackedColumnChart: React.FC<AreaCProps> = ({ dataset})=> {
+const StackedColumnChart: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<EIP2[]>([]);
+  const [data, setData] = useState<EIP[]>([]);
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   useEffect(() => {
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await fetch(`/api/new/graphsv2`);
-    //     const jsonData = await response.json();
-        setData(dataset);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/graphsv2`);
+        const jsonData = await response.json();
+        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         setIsLoading(false);
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-
-    // fetchData();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
   }, []);
 
   const removeDuplicatesFromEips = (eips: any[]) => {
