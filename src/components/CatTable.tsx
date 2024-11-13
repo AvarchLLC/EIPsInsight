@@ -50,6 +50,12 @@ interface EIP {
   __v: number;
 }
 
+interface AreaCProps {
+  dataset: EIP[];
+  status:string;
+  cat:string;
+}
+
 import "@coreui/coreui/dist/css/coreui.min.css";
 interface TabProps {
   cat: string;
@@ -61,7 +67,7 @@ interface TableProps {
   status: string;
 }
 
-const CatTable: React.FC<TableProps> = ({ cat, status }) => {
+const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -70,6 +76,9 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
       setIsLoading(false);
     }, 2000);
   });
+  console.log(dataset);
+  console.log(status);
+  console.log(cat);
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
@@ -85,9 +94,9 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc));
+        // const response = await fetch(`/api/new/all`);
+        // const jsonData = await response.json();
+        setData(dataset);
         setIsLoading(false); // Set isLoading to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -105,8 +114,8 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
     }
   });
 
-  const filteredData = data
-    .filter((item) => item.category === cat && item.status === status)
+  const filteredData = dataset
+    .filter((item) =>item.category === cat && item.status === status)
     .map((item) => {
       const { eip, title, author, repo } = item;
       return {

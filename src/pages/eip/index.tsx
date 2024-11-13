@@ -13,23 +13,12 @@ import Table from "@/components/Table";
 import {
   Box,
   Grid,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
 import CBoxStatus from "@/components/CBoxStatus";
-import Donut from "@/components/Donut";
-import DonutStatus from "@/components/DonutStatus";
 import StackedColumnChart from "@/components/StackedBarChart";
-import { PieC } from "@/components/InPie";
 import AreaStatus from "@/components/AreaStatus";
-import Banner from "@/components/NewsBanner";
 import NextLink from "next/link";
 import AreaC from "@/components/AreaC";
 import EIPStatusDonut from "@/components/EIPStatusDonut";
@@ -50,6 +39,71 @@ interface EIP {
   unique_ID: number;
   __v: number;
 }
+
+interface EIP3 {
+  _id: string;
+  eip: string;
+  fromStatus: string;
+  toStatus: string;
+  title: string;
+  status: string;
+  author: string;
+  created: string;
+  changeDate: string;
+  type: string;
+  category: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  pr: number;
+  changedDay: number;
+  changedMonth: number;
+  changedYear: number;
+  createdMonth: number;
+  createdYear: number;
+  __v: number;
+}
+
+
+interface EIP2 {
+  status: string;
+  eips: {
+    status: string;
+    month: number;
+    year: number;
+    date: string;
+    count: number;
+    category: string;
+    eips:any[];
+  }[];
+}
+
+interface APIResponse {
+  eip: EIP2[];
+  erc: EIP2[];
+  rip: EIP2[];
+}
+
+interface EIPGroup {
+  category: string;
+  month: number;
+  year: number;
+  date: string;
+  count: number;
+  eips: EIP3[];
+}
+
+interface APIResponse2 {
+  status: string;
+  eips: EIPGroup[];
+}
+
+interface Data {
+  eip: APIResponse2[];
+  erc: APIResponse2[];
+  rip: APIResponse2[];
+}
+
 import OtherBox from "@/components/OtherStats";
 
 const getCat = (cat: string) => {
@@ -73,6 +127,8 @@ const getCat = (cat: string) => {
 
 const Type = () => {
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
+  const [data2, setData2] = useState<APIResponse>({eip:[],erc:[],rip:[]});
+  const [data3, setData3] = useState<Data>({eip:[],erc:[],rip:[]});
   const [isLoading, setIsLoading] = useState(true); // Loader state
   useEffect(() => {
     const fetchData = async () => {
@@ -89,6 +145,24 @@ const Type = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/graphsv2`);
+        const jsonData = await response.json();
+        setData2(jsonData);
+        setData3(jsonData);
+        setIsLoading(false); // Set loader state to false after data is fetched
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false); // Set loader state to false even if an error occurs
+      }
+    };
+
+    fetchData();
+  }, []);
+  
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   useEffect(() => {
@@ -201,9 +275,9 @@ const Type = () => {
                 </p>
               </Box>
               <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Draft"} />
+                <StackedColumnChart type={"EIPs"} status={"Draft"} dataset={data2}/>
 
-                <CBoxStatus status={"Draft"} type={"EIPs"} />
+                <CBoxStatus status={"Draft"} type={"EIPs"} dataset={data3}/>
               </Grid>
 
               <Box className={"group relative flex gap-3"}>
@@ -226,9 +300,9 @@ const Type = () => {
               </Box>
 
               <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Review"} />
+                <StackedColumnChart type={"EIPs"} status={"Review"} dataset={data2}/>
 
-                <CBoxStatus status={"Review"} type={"EIPs"} />
+                <CBoxStatus status={"Review"} type={"EIPs"} dataset={data3}/>
               </Grid>
 
               <Box className={"group relative flex gap-3"}>
@@ -253,9 +327,9 @@ const Type = () => {
               </Box>
 
               <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Last Call"} />
+                <StackedColumnChart type={"EIPs"} status={"Last Call"} dataset={data2}/>
 
-                <CBoxStatus status={"Last Call"} type={"EIPs"} />
+                <CBoxStatus status={"Last Call"} type={"EIPs"} dataset={data3}/>
               </Grid>
 
               <Box className={"group relative flex gap-3"}>
@@ -278,9 +352,9 @@ const Type = () => {
               </Box>
 
               <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Living"} />
+                <StackedColumnChart type={"EIPs"} status={"Living"} dataset={data2}/>
 
-                <CBoxStatus status={"Living"} type={"EIPs"} />
+                <CBoxStatus status={"Living"} type={"EIPs"} dataset={data3}/>
               </Grid>
 
               <Box className={"group relative flex gap-3"}>
@@ -303,9 +377,9 @@ const Type = () => {
               </Box>
 
               <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Final"} />
+                <StackedColumnChart type={"EIPs"} status={"Final"} dataset={data2}/>
 
-                <CBoxStatus status={"Final"} type={"EIPs"} />
+                <CBoxStatus status={"Final"} type={"EIPs"} dataset={data3}/>
               </Grid>
 
               <Box className={"group relative flex gap-3"}>
@@ -329,9 +403,9 @@ const Type = () => {
               </Box>
 
               <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Stagnant"} />
+                <StackedColumnChart type={"EIPs"} status={"Stagnant"} dataset={data2}/>
 
-                <CBoxStatus status={"Stagnant"} type={"EIPs"} />
+                <CBoxStatus status={"Stagnant"} type={"EIPs"} dataset={data3}/>
               </Grid>
 
               <Box className={"group relative flex gap-3"}>
@@ -356,9 +430,9 @@ const Type = () => {
               </Box>
 
               <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Withdrawn"} />
+                <StackedColumnChart type={"EIPs"} status={"Withdrawn"} dataset={data2}/>
 
-                <CBoxStatus status={"Withdrawn"} type={"EIPs"} />
+                <CBoxStatus status={"Withdrawn"} type={"EIPs"} dataset={data3}/>
               </Grid>
             </Box>
           </Box>

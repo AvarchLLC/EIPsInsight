@@ -64,14 +64,7 @@ interface EIP {
   repo: string;
 }
 
-import "@coreui/coreui/dist/css/coreui.min.css";
-import LoaderComponent from "./Loader";
-import { DownloadIcon } from "@chakra-ui/icons";
-interface TabProps {
-  cat: string;
-}
-
-interface FilterDataProps {
+interface EIPData {
   _id: string;
   eip: string;
   title: string;
@@ -83,60 +76,47 @@ interface FilterDataProps {
   discussion: string;
   deadline: string;
   requires: string;
-  unique_ID: number;
+  commitSha: string;
+  commitDate: string;
+  mergedDate: string;
+  prNumber: number;
+  closedDate: string;
+  changes: number;
+  insertions: number;
+  deletions: number | null;
+  mergedDay: number;
+  changedDay: number;
+  mergedMonth: number;
+  mergedYear: number;
+  changedMonth: number;
+  changedYear: number;
+  createdMonth: number;
+  createdYear: number;
+  previousdeadline: string;
+  newdeadline: string;
+  message: string;
+  repo:string;
   __v: number;
-  mergedYear: string;
-  mergedMonth: string;
 }
-
-async function fetchLastCreatedYearAndMonthFromAPI(
-  eipNumber: number
-): Promise<{ mergedYear: string; mergedMonth: string } | null> {
-  try {
-     console.group("request recieved")
-    const apiUrl = `/api/new/eipshistory/${eipNumber}`;
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (Array.isArray(data) && data.length > 0) {
-      const lastElement = data[0];
-      const lastElementCreatedYear = lastElement.mergedYear;
-      const lastElementCreatedMonth = lastElement.mergedMonth;
-
-      // if(eipNumber===1053){
-        console.log("testing data:");
-        console.log(lastElementCreatedYear)
-        console.log(lastElementCreatedMonth);
-      // }
-      return {
-        mergedYear: lastElementCreatedYear,
-        mergedMonth: lastElementCreatedMonth,
-      };
-    } else {
-      throw new Error("No data found or data format is invalid.");
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-}
+import "@coreui/coreui/dist/css/coreui.min.css";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 interface TableProps {
   type: string;
 }
 
+
 const Table: React.FC<TableProps> = ({ type }) => {
   const [data, setData] = useState<EIP[]>([]);
+  const [data2, setData2] = useState<EIPData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mergedData, setMergedData] = useState<
-    { mergedYear: string; mergedMonth: string }[]
-  >([]);
+  // const [mergedData, setMergedData] = useState<
+  //   { mergedYear: string; mergedMonth: string }[]
+  // >([]);
+  // const [changedData, setchangedData] = useState<
+  //   { changedYear: string; changedMonth: string }[]
+  // >([]);
   // const [dataForFilter, setDataForFilter] = useState<FilterDataProps[]>([]);
   const [selectedYearRange, setSelectedYearRange] = useState({
     start: "",
@@ -174,164 +154,49 @@ const Table: React.FC<TableProps> = ({ type }) => {
         } else if (type === "RIP") {
           setData(jsonData.rip);
         }
-        setIsLoading(false); // Set isLoading to false after data is fetched
 
-        // Fetch merged years and months for each item
-        const mergedDataValues = [];
-        const jsonData2=jsonData.eip;
-        const jsonData3=jsonData.erc;
-        const jsonData4=jsonData.rip;
-        console.log(jsonData2)
+        const response2 = await fetch(`/api/new/graphsv3`);
+        const jsonData5 = await response2.json();
 
-        interface EIPData {
-          _id: string;
-          eip: string;
-          title: string;
-          author: string;
-          status: string;
-          type: string;
-          category: string;
-          created: string;
-          discussion: string;
-          deadline: string;
-          requires: string;
-          commitSha: string;
-          commitDate: string;
-          mergedDate: string;
-          prNumber: number;
-          closedDate: string;
-          changes: number;
-          insertions: number;
-          deletions: number | null;
-          mergedDay: number;
-          mergedMonth: number;
-          mergedYear: number;
-          createdMonth: number;
-          createdYear: number;
-          previousdeadline: string;
-          newdeadline: string;
-          message: string;
-          __v: number;
-        }
-        
-        // const mergedDataValues: { mergedYear: string; mergedMonth: string }[] = [];
-        
-        for (const item of jsonData2) {
-          try {
-            const apiUrl = `/api/new/eipshistory/${item.eip}`;
-            const response = await fetch(apiUrl);
-            console.log("Fetching data for EIP:", item.eip);
-        
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
+        // Function to filter only the first occurrence of each unique entry based on eip ID and changeDate
+        function getEarliestEntries(data:any, key:any) {
+          const uniqueEntries:any = {};
+
+          data.forEach((entry:any) => {
+            const entryKey = entry[key];
+            
+            // If this is the first time we see this `key` or if the current entry's date is earlier, store it
+            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) < new Date(uniqueEntries[entryKey].changeDate)) {
+              uniqueEntries[entryKey] = entry;
             }
-        
-            const data = await response.json();
-        
-            // Check if data is an object and has properties
-            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data as Record<string, EIPData>)
-              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
-          
-            const firstElement = values[0] as EIPData; 
+          });
 
-            // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
-            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
-
-            mergedDataValues.push({
-              mergedYear,
-              mergedMonth,
-            });
-              console.log("Merged data added:", mergedYear, mergedMonth);
-            } else {
-              console.error(`No data found for EIP: ${item.eip}`);
-              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
-            }
-          } catch (error) {
-            console.error("Error fetching data:", error);
-            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
-          }
-        }
-        
-        
-
-        for (const item of jsonData3) {
-          try {
-            const apiUrl = `/api/new/erchistory/${item.eip}`;
-            const response = await fetch(apiUrl);
-            console.log("Fetching data for EIP:", item.eip);
-        
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-        
-            const data = await response.json();
-        
-            // Check if data is an object and has properties
-            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data as Record<string, EIPData>)
-              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
-          
-            const firstElement = values[0] as EIPData; 
-
-            // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
-            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
-
-            mergedDataValues.push({
-              mergedYear,
-              mergedMonth,
-            });
-              console.log("Merged data added:", mergedYear, mergedMonth);
-            }else {
-              console.error(`No data found for EIP: ${item.eip}`);
-              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
-            }
-          } catch (error) {
-            console.error("Error fetching data:", error);
-            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
-          }
+          return Object.values(uniqueEntries);
         }
 
-        for (const item of jsonData4) {
-          try {
-            const apiUrl = `/api/new/riphistory/${item.eip}`;
-            const response = await fetch(apiUrl);
-            console.log("Fetching data for EIP:", item.eip);
-        
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-        
-            const data = await response.json();
-        
-            // Check if data is an object and has properties
-            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data as Record<string, EIPData>)
-              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
-          
-            const firstElement = values[0] as EIPData; 
+        let filteredData:any;
 
-            // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
-            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
-
-            mergedDataValues.push({
-              mergedYear,
-              mergedMonth,
-            });
-              console.log("Merged data added:", mergedYear, mergedMonth);
-            }else {
-              console.error(`No data found for EIP: ${item.eip}`);
-              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
-            }
-          } catch (error) {
-            console.error("Error fetching data:", error);
-            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
-          }
+        if (type === "EIP") {
+          filteredData = getEarliestEntries(jsonData5.eip, 'eip');
+        } else if (type === "ERC") {
+          filteredData = getEarliestEntries(jsonData5.erc, 'eip');
+        } else if (type === "RIP") {
+          filteredData = getEarliestEntries(jsonData5.rip, 'eip');
+        } else if (type === "Total") {
+          // Concatenate filtered data for all types
+          filteredData = [
+            ...getEarliestEntries(jsonData5.eip, 'eip'),
+            ...getEarliestEntries(jsonData5.erc, 'eip'),
+            ...getEarliestEntries(jsonData5.rip, 'eip'),
+          ];
+          filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
+            entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
+          );          
         }
-        setMergedData(mergedDataValues);
+        console.log(filteredData);
+
+        setData2(filteredData);
+        setIsLoading(false);
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -351,8 +216,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
     }
   });
 
-  const filteredData = data.map((item: any) => {
-    const { eip, title, author, status, type, category, repo } = item;
+  const filteredData = data2.map((item: any) => {
+    const { eip, title, author, status, type, category, repo, changedMonth, changedYear } = item;
     return {
       eip,
       title,
@@ -360,30 +225,25 @@ const Table: React.FC<TableProps> = ({ type }) => {
       status,
       type,
       category,
+      changedMonth,
+      changedYear,
       repo,
     };
   });
-  const filteredDataWithMergedYearsAndMonths = filteredData.map(
-    (item, index) => ({
-      "#": (index + 1).toString(), // Add the sr number
-      ...item,
-      mergedYear: mergedData[index]?.mergedYear || "", // Replace '' with a default value if needed
-      mergedMonth: mergedData[index]?.mergedMonth || "", // Replace '' with a default value if needed
-    })
-  );
+  const filteredDataWithMergedYearsAndMonths = filteredData;
 
-  console.log("filtered data:", filteredDataWithMergedYearsAndMonths)
+  // console.log("filtered data:", filteredDataWithMergedYearsAndMonths)
 
   const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
     const isYearInRange =
       (!selectedYearRange.start ||
-        item.mergedYear >= selectedYearRange.start) &&
-      (!selectedYearRange.end || item.mergedYear <= selectedYearRange.end);
+        item.changedYear >= selectedYearRange.start) &&
+      (!selectedYearRange.end || item.changedYear <= selectedYearRange.end);
 
     const isMonthInRange =
       (!selectedMonthRange.start ||
-        item.mergedMonth >= selectedMonthRange.start) &&
-      (!selectedMonthRange.end || item.mergedMonth <= selectedMonthRange.end);
+        item.changedMonth >= selectedMonthRange.start) &&
+      (!selectedMonthRange.end || item.changedMonth <= selectedMonthRange.end);
 
     const isStatusMatch = !selectedStatus || item.status === selectedStatus;
 
@@ -602,9 +462,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
               </Popover>
 
               <CSmartTable
-                items={filteredDataWithMergedYearsAndMonths.sort(
-                  (a, b) => parseInt(a["#"]) - parseInt(b["#"])
-                )}
+                items={filteredDataWithMergedYearsAndMonths}
                 activePage={1}
                 clickableRows
                 columnFilter
@@ -620,17 +478,6 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   },
                 }}
                 columns={[
-                  {
-                    key: '#',
-                    label: '#',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', 
-                      color: isDarkMode ? 'white' : 'black',              
-                      fontWeight: 'bold',                                  
-                      padding: '12px',                                     
-                      borderTopLeftRadius: "0.55rem",                      
-                    }
-                  },
                   {
                     key: 'eip',
                     label: 'EIP',

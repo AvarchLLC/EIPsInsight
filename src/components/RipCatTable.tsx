@@ -59,8 +59,14 @@ import {
     cat: string;
     status: string;
   }
+
+  interface AreaCProps {
+    dataset: EIP[];
+    status:string;
+    cat:string;
+  }
   
-  const RipCatTable: React.FC<TableProps> = ({ cat, status }) => {
+  const RipCatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
     const [data, setData] = useState<EIP[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -69,6 +75,8 @@ import {
         setIsLoading(false);
       }, 2000);
     });
+
+    console.log(dataset);
   
     const factorAuthor = (data: any) => {
       let list = data.split(",");
@@ -84,9 +92,9 @@ import {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await fetch(`/api/new/all`);
-          const jsonData = await response.json();
-          setData(jsonData.rip);
+          // const response = await fetch(`/api/new/all`);
+          // const jsonData = await response.json();
+          setData(dataset);
           setIsLoading(false); // Set isLoading to false after data is fetched
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -104,7 +112,7 @@ import {
       }
     });
   
-    const filteredData = data
+    const filteredData = dataset
       .filter((item) => item.repo === "rip" && item.status === status)
       .map((item) => {
         const { eip, title, author } = item;

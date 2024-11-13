@@ -19,10 +19,11 @@ interface EIP {
   status: string;
   type: string;
   category: string;
-  created: string;
+  created: Date;
   discussion: string;
   deadline: string;
   requires: string;
+  repo: string;
   unique_ID: number;
   __v: number;
 }
