@@ -11,8 +11,8 @@ interface PrConversationsProps {
 interface PR {
     type: string;
     title: string;
-    url: string;
     state:string;
+    url: string;
     prDetails: {
         prNumber: number;
         prTitle: string;
@@ -23,12 +23,14 @@ interface PR {
         participants: string[];
         commits: Commit[];
     };
+    reviewComments: Conversation[];
 }
 
 interface Conversation {
     url: string;
     html_url: string;
     issue_url: string;
+    state:string;
     id: number;
     node_id: string;
     user: {
@@ -38,8 +40,8 @@ interface Conversation {
         node_id: string;
         avatar_url: string;
     };
-    created_at: string;
     submitted_at:string;
+    created_at: string;
     updated_at: string;
     author_association: string;
     body: string;
@@ -103,7 +105,7 @@ interface Parent {
 }
 
 
-const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
+const PrComments: React.FC<PrConversationsProps> = ({dataset}) => {
     const [data, setData] = useState<PR | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const bg = useColorModeValue('#f6f6f7', '#1F2937');
@@ -127,53 +129,64 @@ const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
                         </>
                     ):(
                         <>
-                            {
-                                data?.prDetails?.conversations.map(comment => (
-                                    <Box
-                                        className={'mx-8 mb-8 rounded-lg'}
-                                        paddingY={4}
-                                        paddingX={4}
-                                        bgColor={bg}
-                                    >
-                                        <Box
-                                            className={'flex justify-between'}
-                                        >
-                                            <Box
-                                                className={'flex space-x-4'}
-                                            >
-                                                <Box>
-                                                    <NextLink href={comment.user.html_url}>
-                                                        <img
-                                                            src={comment.user.avatar_url}
-                                                            alt={comment.user.login}
-                                                            className={'w-14 h-14 rounded-full hover:scale-110 duration-200'}
-                                                        />
-                                                    </NextLink>
-                                                </Box>
-                                                <Box>
-                                                    <Text className={'text-2xl font-bold'}>
-                                                        {comment.user.login}
-                                                    </Text>
-                                                    <Text className={'text-gray-400'}>
-                                                        {comment.author_association}
-                                                    </Text>
-                                                </Box>
+                            <Box>
+                        {data?.reviewComments?.length === 0 ? (
+                            <Box className={'mx-8 p-8'}
+                            display="flex" 
+                            justifyContent="center" 
+                            alignItems="center"
+                            >
+                            <Text className="text-2xl font-bold mt-2">No reviews yet!</Text>
+                            </Box>
+                        ) : (
+                            data?.reviewComments?.map((comment) => (
+                                <Box
+                                    key={comment.id}  // Make sure to add a unique key for each comment
+                                    className={'mx-8 mb-8 rounded-lg'}
+                                    paddingY={4}
+                                    paddingX={4}
+                                    bgColor={bg}
+                                >
+                                    <Box className={'flex justify-between'}>
+                                        <Box className={'flex space-x-4'}>
+                                            <Box>
+                                                <NextLink href={comment.user.html_url}>
+                                                    <img
+                                                        src={comment.user.avatar_url}
+                                                        alt={comment.user.login}
+                                                        className={'w-14 h-14 rounded-full hover:scale-110 duration-200'}
+                                                    />
+                                                </NextLink>
+                                            </Box>
+                                            <Box>
+                                                <Text className={'text-2xl font-bold'}>
+                                                    {comment.user.login}
+                                                </Text>
+                                                <Text className={'text-gray-400'}>
+                                                    {comment.state}
+                                                </Text>
                                             </Box>
                                         </Box>
-                                        <Box
-                                            className={'p-4 mx-8 mt-4 rounded-lg'}
-                                            bgColor={bg2}
-                                        >
-                                           <ReactMarkdown>
-                                                {comment.body.split('\r\n\r\n')[0]}
-                                            </ReactMarkdown>
-
+                                    </Box>
+                                    <Box className={'p-4 mx-8 mt-4 rounded-lg'} bgColor={bg2}>
+                                        <Box>
+                                            {comment.body.trim() === "" ? (
+                                                comment.state === "APPROVED" ? (
+                                                    <Text className="text-lg font-bold">{comment.user.login} approved the changes.</Text>
+                                                ) : comment.state === "COMMENTED" ? (
+                                                    <Text className="text-lg font-bold">{comment.user.login} reviewed the changes.</Text>
+                                                ) : null
+                                            ) : (
+                                                <ReactMarkdown>
+                                                    {comment.body.split('\r\n\r\n')[0]}
+                                                </ReactMarkdown>
+                                            )}
                                         </Box>
-                                        <Box
-                                        className={'mx-8'}
-                                        >
+                                    </Box>
+
+                                    <Box className={'mx-8'}>
                                         <Text className="text-sm font-bold mt-2">
-                                            {new Date(comment.created_at).toLocaleString('en-US', {
+                                            {new Date(comment.submitted_at).toLocaleString('en-US', {
                                                 weekday: 'long',    // "Monday"
                                                 year: 'numeric',    // "2024"
                                                 month: 'long',      // "November"
@@ -183,10 +196,12 @@ const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
                                                 hour12: true        // 12-hour format
                                             })}
                                         </Text>
-                                        </Box>
                                     </Box>
-                                ))
-                            }
+                                </Box>
+                            ))
+                        )}
+                    </Box>
+
                         </>
                     )
                 }
@@ -197,4 +212,4 @@ const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
     )
 }
 
-export default PrConversations;
+export default PrComments;
