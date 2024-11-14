@@ -9,15 +9,15 @@ import {
     WrapItem,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
-import { BiGitMerge } from 'react-icons/bi';
-import {usePathname} from "next/navigation";
+import { BiGitMerge, BiLockAlt, BiGitBranch } from 'react-icons/bi';
 import SearchBox from "@/components/SearchBox";
 import PrConversations from "@/components/PrConversations";
+import PrComments from './PrReviewComments';
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
 import {motion} from "framer-motion";
 import LoaderComponent from "@/components/Loader";
-
+import ReactMarkdown from 'react-markdown';
 
 
 
@@ -25,6 +25,7 @@ interface PR {
     type: string;
     title: string;
     url: string;
+    state:string;
     prDetails: {
         prNumber: number;
         prTitle: string;
@@ -36,21 +37,25 @@ interface PR {
         commits: Commit[];
         numFilesChanged:number;
     }
+    reviewComments: Conversation[];
 }
 
 interface Conversation {
     url: string;
     html_url: string;
     issue_url: string;
+    state:string;
     id: number;
     node_id: string;
     user: {
         login: string;
+        html_url: string;
         id: number;
         node_id: string;
         avatar_url: string;
     };
     created_at: string;
+    submitted_at:string;
     updated_at: string;
     author_association: string;
     body: string;
@@ -160,7 +165,12 @@ function getLabelColor(label : string){
     }
 }
 
-const PrPage: React.FC = () => {
+interface PrPageProps {
+    Type: string; 
+    number:string;
+  }
+
+const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
     const [data, setData] = useState<PR | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const bg = useColorModeValue('#f6f6f7', '#171923');
@@ -172,15 +182,17 @@ const PrPage: React.FC = () => {
     }, [bg]);
 
 
-    const path = usePathname();
-    const brokenpath = path ? path.split('/') : '';
-    const prNumber = brokenpath[2];
+    // const path = usePathname();
+    // const brokenpath = path ? path.split('/') : '';
+    const prNumber = number;
+    console.log(Type);
+    console.log(prNumber);
 
     useEffect(() => {
         if (prNumber) {
             const fetchData = async () => {
                 try {
-                    const response = await fetch(`/api/get-pr-or-issue-details/${prNumber}`);
+                    const response = await fetch(`/api/get-pr-details/${Type}/${prNumber}`);
                     const jsonData = await response.json();
 
                     if (jsonData && typeof jsonData === 'object') {
@@ -259,13 +271,23 @@ const PrPage: React.FC = () => {
                                             </NextLink>
                                             <Text className={'text-3xl'}>{data?.title}</Text>
                                             <Box paddingTop={3}>
-                                                <Wrap>
-                                                    <WrapItem>
+                                            <Wrap>
+                                                <WrapItem>
+                                                    {data?.state === 'merged' ? (
                                                         <Badge variant={'solid'} colorScheme={'purple'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
-                                                            <BiGitMerge />  Merged
+                                                            <BiGitMerge /> Merged
                                                         </Badge>
-                                                    </WrapItem>
-                                                </Wrap>
+                                                    ) : data?.state === 'closed' ? (
+                                                        <Badge variant={'solid'} colorScheme={'red'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
+                                                            <BiLockAlt /> Closed
+                                                        </Badge>
+                                                    ) : data?.state === 'open' ? (
+                                                        <Badge variant={'solid'} colorScheme={'green'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
+                                                            <BiGitBranch /> Open
+                                                        </Badge>
+                                                    ) : null}
+                                                </WrapItem>
+                                            </Wrap>
                                             </Box>
                                         </Box>
 
@@ -328,7 +350,7 @@ const PrPage: React.FC = () => {
                                                                             <Wrap>
                                                                                 <WrapItem>
                                                                                     <Badge  colorScheme={getLabelColor(item)} paddingX={4} paddingY={2} className={'rounded-full'}>
-                                                                                        item
+                                                                                        {item}
                                                                                     </Badge>
                                                                                 </WrapItem>
                                                                             </Wrap>
@@ -439,11 +461,34 @@ const PrPage: React.FC = () => {
                                         </Box>
 
                                         <Box>
+                                            <Text className="text-3xl font-bold" paddingY={8}>
+                                                Description
+                                            </Text>
+
+                                            <Box className="border border-blue-400 p-4 rounded-lg">
+                                                <Text className="text-xl">
+                                                    <ReactMarkdown>
+                                                        {data?.prDetails?.prDescription || ''}
+                                                    </ReactMarkdown>
+                                                </Text>
+                                            </Box>
+                                        </Box>
+
+
+                                        <Box>
                                             <Text className={'text-3xl font-bold'} paddingY={8}>
                                                 All Conversations
                                             </Text>
 
-                                            <PrConversations prNumber={prNumber}/>
+                                            <PrConversations dataset={data}/>
+                                        </Box>
+
+                                        <Box>
+                                            <Text className={'text-3xl font-bold'} paddingY={8}>
+                                                Review Comments
+                                            </Text>
+
+                                            <PrComments dataset={data}/>
                                         </Box>
 
                                     </Box>
