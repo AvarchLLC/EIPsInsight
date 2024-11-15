@@ -23,7 +23,7 @@ import {
   import axios from "axios";
   import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
   import { DownloadIcon } from "@chakra-ui/icons";
-import Comments from "@/components/comments";
+  import Comments from "@/components/comments";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {
@@ -424,7 +424,7 @@ import Comments from "@/components/comments";
         <hr></hr>
         <br/>
         <Text fontSize="3xl" fontWeight="bold">Comments</Text>
-          <Comments/>
+          <Comments page={"boards"}/>
         </Box>
       </Box>
               </AllLayout>

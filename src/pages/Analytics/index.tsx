@@ -31,6 +31,7 @@ import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
 import {ChevronUpIcon } from "@chakra-ui/icons";
 import axios from "axios";
+import Comments from "@/components/comments";
 
 
 // Dynamic import for Ant Design's Column chart
@@ -489,7 +490,9 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${(item as PR).repo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    href={type === 'PRs' 
+                      ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
+                      : `https://github.com/ethereum/${(item as Issue).repo}/issues/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -519,7 +522,9 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    href={type === 'PRs' 
+                      ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
+                      : `https://github.com/ethereum/${(item as Issue).repo}/issues/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -549,7 +554,7 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${(item as PR).repo}/pull/${item.prNumber}`} 
+                    href={`/PR/${(item as PR).repo}/pull/${item.prNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -579,7 +584,9 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${(item as PR).repo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    href={type === 'PRs' 
+                      ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
+                      : `https://github.com/ethereum/${(item as Issue).repo}/issues/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -1372,6 +1379,14 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
                   )}
                 </>
                 )}
+
+<Box>
+          <br/>
+        <hr></hr>
+        <br/>
+        <Text fontSize="3xl" fontWeight="bold">Comments</Text>
+          <Comments page={"Analytics"}/>
+        </Box>
         </Box>
       </AllLayout>
     )

@@ -1,18 +1,24 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const uri = process.env.MONGODB_URI as string; // Add your MongoDB connection string in environment variables.
+const uri = process.env.MONGODB_URI as string; // Ensure this is set in your environment variables
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const client = new MongoClient(uri);
+  const { page } = req.query; // Extract the page parameter from the URL
+
+  if (!page || typeof page !== 'string') {
+    res.status(400).json({ message: 'page is required' });
+    return;
+  }
 
   if (req.method === 'GET') {
-    // Fetch comments
+    // Fetch comments for the specified page
     try {
       await client.connect();
       const database = client.db('test');
       const comments = database.collection('comments');
-      const allComments = await comments.find({}).toArray();
+      const allComments = await comments.find({ page }).toArray();
       res.status(200).json(allComments);
     } catch (err) {
       res.status(500).json({ message: 'Error fetching comments' });
@@ -20,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       await client.close();
     }
   } else if (req.method === 'POST' && !req.query.commentId) {
-    // Add new comment
+    // Add a new comment to the specified page
     const { content } = req.body;
     try {
       await client.connect();
@@ -29,6 +35,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const newComment = {
         content,
+        page, // Add the page to the new comment
         createdAt: new Date(),
         subComments: [],
       };
@@ -37,6 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(201).json({
         _id: result.insertedId,
         content,
+        page,
         createdAt: new Date(),
         subComments: [],
       });
@@ -46,7 +54,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       await client.close();
     }
   } else if (req.method === 'POST' && req.query.commentId) {
-    // Add a reply to a specific comment
+    // Add a reply to a specific comment in the specified page
     const { commentId } = req.query;
     const { content } = req.body;
 
@@ -56,14 +64,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const comments = database.collection('comments');
 
       const result = await comments.updateOne(
-        { _id: new ObjectId(commentId as string) },
+        { _id: new ObjectId(commentId as string), page },
         { $push: { subComments: { content, createdAt: new Date() } } }
       );
 
       if (result.modifiedCount > 0) {
         res.status(200).json({ message: 'Reply added successfully' });
       } else {
-        res.status(404).json({ message: 'Comment not found' });
+        res.status(404).json({ message: 'Comment not found or page mismatch' });
       }
     } catch (err) {
       res.status(500).json({ message: 'Error posting reply' });
