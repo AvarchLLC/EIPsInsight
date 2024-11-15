@@ -8,6 +8,7 @@ import { CSVLink } from "react-csv";
 import {ChevronUpIcon } from "@chakra-ui/icons";
 import DateTime from "@/components/DateTime";
 import { motion } from "framer-motion";
+import Comments from "@/components/comments";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -772,7 +773,7 @@ const renderChart = () => {
                                 <Td textAlign="center" verticalAlign="middle">
                                     <Button
                                         as="a"
-                                        href={`https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`}
+                                        href={`/PR/${pr.repo}/${pr.prNumber}`}
                                         target="_blank"
                                         colorScheme="blue"
                                         variant="solid"
@@ -1183,6 +1184,13 @@ const renderChart = () => {
             )}
     </>
     )}
+    <Box>
+          <br/>
+        <hr></hr>
+        <br/>
+        <Text fontSize="3xl" fontWeight="bold">Comments</Text>
+          <Comments page={"Reviewers"}/>
+        </Box>
     </Box>
     {/* </motion.div> */}
   </AllLayout>

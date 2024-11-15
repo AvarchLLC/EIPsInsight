@@ -8,8 +8,12 @@ interface Comment {
   content: string;
   subComments?: Comment[]; // Ensure this matches your DB structure
 }
+interface CommentsProps {
+  page: string;
+}
 
-const Comments: React.FC = () => {
+
+const Comments: React.FC<CommentsProps> =({page}) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [replyCommentId, setReplyCommentId] = useState<string | null>(null);
@@ -18,7 +22,7 @@ const Comments: React.FC = () => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await axios.get('/api/comments');
+        const response = await axios.get(`/api/comments/${page}`);
         console.log('Fetched comments:', response.data);
         setComments(response.data);
       } catch (error) {
@@ -32,7 +36,7 @@ const Comments: React.FC = () => {
   const handleAddComment = async () => {
     if (newComment.trim() === '') return;
     try {
-      const response = await axios.post('/api/comments', { content: newComment });
+      const response = await axios.post(`/api/comments/${page}`, { content: newComment });
       console.log('Added comment:', response.data);
       setComments([...comments, response.data]);
       setNewComment('');
@@ -45,7 +49,7 @@ const Comments: React.FC = () => {
     if (replyText.trim() === '') return;
 
     try {
-      const response = await axios.post(`/api/comments/${commentId}/reply`, { content: replyText });
+      const response = await axios.post(`/api/comments/${page}/${commentId}/reply`, { content: replyText });
       console.log('Reply response:', response.data); // Log the response
 
       const newReply: Comment = {
