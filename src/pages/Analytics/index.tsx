@@ -38,13 +38,7 @@ import Comments from "@/components/comments";
 // const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualAxes), { ssr: false });
 
-const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails','/api/ripsprdetails'];
-const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails', '/api/ripsissuedetails'];
-const API_ENDPOINTS = {
-  eips: '/api/editorsprseips',
-  ercs: '/api/editorsprsercs',
-  rips: '/api/editorsprsrips'
-}
+
 
 type PR = {
   repo:string;
@@ -492,7 +486,7 @@ useEffect(() => {
                   <a 
                     href={type === 'PRs' 
                       ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
-                      : `https://github.com/ethereum/${(item as Issue).repo}/issues/${(item as Issue).IssueNumber}`} 
+                      : `/issue/${(item as Issue).repo}/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -524,7 +518,7 @@ useEffect(() => {
                   <a 
                     href={type === 'PRs' 
                       ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
-                      : `https://github.com/ethereum/${(item as Issue).repo}/issues/${(item as Issue).IssueNumber}`} 
+                      : `/issue/${(item as Issue).repo}/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -586,7 +580,7 @@ useEffect(() => {
                   <a 
                     href={type === 'PRs' 
                       ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
-                      : `https://github.com/ethereum/${(item as Issue).repo}/issues/${(item as Issue).IssueNumber}`} 
+                      : `/issue/${(item as Issue).repo}/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >

@@ -4,31 +4,31 @@ import NextLink from "next/link";
 import React from "react";
 import ReactMarkdown from 'react-markdown';
 
-interface PrConversationsProps {
-    dataset: PR|null;
+interface IssueConversationsProps {
+    dataset: issue|null;
 }
 
-interface PR {
+interface issue {
     type: string;
     title: string;
     url: string;
     state:string;
-    prDetails: {
-        prNumber: number;
-        prTitle: string;
-        prDescription: string;
+    issueDetails: {
+        issueNumber: number;
+        issueTitle: string;
+        issueDescription: string;
         labels: string[];
         conversations: Conversation[];
         numConversations: number;
         participants: string[];
-        commits: Commit[];
-    };
+    }
 }
 
 interface Conversation {
     url: string;
     html_url: string;
     issue_url: string;
+    state:string;
     id: number;
     node_id: string;
     user: {
@@ -50,66 +50,14 @@ interface Conversation {
     performed_via_github_app: null | any;
 }
 
-interface Commit {
-    sha: string;
-    node_id: string;
-    commit: {
-        author: {
-            name: string;
-            email: string;
-            date: string;
-        };
-        committer: {
-            name: string;
-            email: string;
-            date: string;
-        };
-        message: string;
-        tree: {
-            sha: string;
-            url: string;
-        };
-        url: string;
-        comment_count: number;
-        verification: {
-            verified: boolean;
-            reason: string;
-            signature: string;
-            payload: string;
-        };
-    };
-    url: string;
-    html_url: string;
-    comments_url: string;
-    author: {
-        login: string;
-        id: number;
-        node_id: string;
-        avatar_url: string;
-    };
-    committer: {
-        login: string;
-        id: number;
-        node_id: string;
-        avatar_url: string;
-    };
-    parents: Parent[];
-}
 
-interface Parent {
-    sha: string;
-    url: string;
-    html_url: string;
-}
-
-
-const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
-    const [data, setData] = useState<PR | null>(null);
+const IssueConversations: React.FC<IssueConversationsProps> = ({dataset}) => {
+    const [data, setData] = useState<issue | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const bg = useColorModeValue('#f6f6f7', '#1F2937');
     const bg2 = useColorModeValue('#E5E7EB', '#374151');
     const codeBg = useColorModeValue('#f5f5f5', '#2d3748'); // Light and dark mode background for code blocks
-    const preCodeBg = useColorModeValue('#f5f5f5', '#2d3748');
+    const preCodeBg = useColorModeValue('#f5f5f5', '#2d3748'); // Light and dark mode background for block code
     useEffect(() => {
         setData(dataset);
         setIsLoading(false);
@@ -130,7 +78,7 @@ const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
                     ):(
                         <>
                             {
-                                data?.prDetails?.conversations.map(comment => (
+                                data?.issueDetails?.conversations.map(comment => (
                                     <Box
                                         className={'mx-8 mb-8 rounded-lg'}
                                         paddingY={4}
@@ -204,6 +152,8 @@ const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
                                             {comment.body.split('\r\n\r\n')[0] || ''}
                                             </ReactMarkdown>
 
+ 
+ {/* {comment.body.split('\r\n\r\n')[0]} */}
                                         </Box>
                                         <Box
                                         className={'mx-8'}
@@ -233,4 +183,4 @@ const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
     )
 }
 
-export default PrConversations;
+export default IssueConversations;

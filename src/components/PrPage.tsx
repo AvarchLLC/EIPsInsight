@@ -17,8 +17,7 @@ import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
 import {motion} from "framer-motion";
 import LoaderComponent from "@/components/Loader";
-import ReactMarkdown from 'react-markdown';
-
+import MarkdownBox from './PrOrIssueDescription';
 
 
 interface PR {
@@ -465,13 +464,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
                                                 Description
                                             </Text>
 
-                                            <Box className="border border-blue-400 p-4 rounded-lg">
-                                                <Text className="text-xl">
-                                                    <ReactMarkdown>
-                                                        {data?.prDetails?.prDescription || ''}
-                                                    </ReactMarkdown>
-                                                </Text>
-                                            </Box>
+                                            <MarkdownBox text={data?.prDetails?.prDescription}/>
                                         </Box>
 
 
