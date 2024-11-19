@@ -1,6 +1,7 @@
 import {
   Box,
   Text,
+  Input,
   useColorModeValue,
   Wrap,
   WrapItem,
@@ -128,6 +129,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
   });
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedAuthor, setSelectedAuthor] = useState("");
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
@@ -249,11 +251,19 @@ const Table: React.FC<TableProps> = ({ type }) => {
 
     const isCategoryMatch =
       !selectedCategory || item.category === selectedCategory;
-    return isYearInRange && isMonthInRange && isStatusMatch && isCategoryMatch;
+
+    const isAuthorMatch = !selectedAuthor || 
+      item.author.toLowerCase().includes(selectedAuthor.toLowerCase());
+  
+    return isYearInRange && isMonthInRange && isStatusMatch && isCategoryMatch && isAuthorMatch;
   });
+
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
+    console.log(DataForFilter);
+    
     if (DataForFilter && DataForFilter.length > 0) {
       // Create CSV headers
       const headers =
@@ -287,7 +297,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
         selectedYearRange.start === "" &&
         selectedYearRange.end === "" &&
         selectedMonthRange.start === "" &&
-        selectedMonthRange.end === ""
+        selectedMonthRange.end === "" &&
+        selectedAuthor === ""
       ) {
         a.download = `All_${type.toUpperCase()}s.csv`;
       } else {
@@ -310,6 +321,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
   for (let year = startYear; year <= currentYear; year++) {
     yearsArr.push(year);
   }
+
+  // useEffect(()=>{
+  //   console.log(selectedAuthor);
+  // },[selectedAuthor]);
 
   return (
     <>
@@ -366,6 +381,15 @@ const Table: React.FC<TableProps> = ({ type }) => {
 
                 <PopoverContent className={"px-4"}>
                   <div className={"space-y-10 py-4"}>
+                  <Box>
+                    <Text>Enter Author Name:</Text>
+                    <Input
+                      value={selectedAuthor}
+                      onChange={(e) => setSelectedAuthor(e.target.value)}
+                      placeholder="Type author name"
+                    />
+                    {/* <Text mt={4}>Selected Author: {selectedAuthor || "None"}</Text> */}
+                  </Box>
                     <Select
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value)}
