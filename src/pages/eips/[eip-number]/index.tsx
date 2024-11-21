@@ -34,6 +34,7 @@ interface EipMetadataJson {
   description: string;
   author: string[];
   "discussions-to": string;
+  "last-call-deadline":string;
   status: string;
   type: string;
   category: string;
@@ -278,6 +279,12 @@ const TestComponent = () => {
                       <Tr>
                         <Th>Status</Th>
                         <Td>{metadataJson?.status}</Td>
+                      </Tr>
+                    )}
+                    {metadataJson?.status && (
+                      <Tr>
+                        <Th>Last Call Deadline</Th>
+                        <Td>{metadataJson["last-call-deadline"]}</Td>
                       </Tr>
                     )}
                     {metadataJson?.type && (

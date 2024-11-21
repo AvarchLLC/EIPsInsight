@@ -1,53 +1,55 @@
-const express = require("express");
-const app = express();
-const axios = require('axios');
-const cheerio = require('cheerio');
-const { Octokit } = require('@octokit/rest');
-const mongoose = require('mongoose');
-const accessToken = process.env.ACCESS_TOKEN;
 import { Request, Response } from 'express';
+import mongoose, { Schema } from 'mongoose';
 
-let page = 1;
-let allOpenIssues: number[] = []; // Explicitly declare the type as an array of numbers
-
-
-const perPage = 100; // Number of items per page
-
-async function fetchIssues() {
-    try {
-        let hasNextPage = true;
-
-        while (hasNextPage) {
-            const response = await axios.get(`https://api.github.com/repos/ethereum/EIPs/issues?state=open&page=${page}&per_page=${perPage}`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-
-            const linkHeader = response.headers.link;
-            hasNextPage = linkHeader && linkHeader.includes('rel="next"');
-            const issueNumbers = response.data.map((issue:any) => issue.number);
-            allOpenIssues = allOpenIssues.concat(issueNumbers);
-
-            if (hasNextPage) {
-                page++;
-            }
-        }
-
-        return allOpenIssues;
-    } catch (error) {
-        throw error; // Propagate the error
-    }
+if (mongoose.connection.readyState === 0) {
+    if (typeof process.env.MONGODB_URI === 'string') {
+        mongoose.connect(process.env.MONGODB_URI);
+      } else {
+        // Handle the case where the environment variable is not defined
+        console.error('MONGODB_URI environment variable is not defined');
+      }
 }
+
+const IssueDetailsSchema = new Schema({
+    issueNumber: { type: Number },
+    IssueTitle: { type: String },
+    IssueDescription: { type: String },
+    labels: { type: [String] },
+    conversations: { type: [Object] },
+    numConversations: { type: Number },
+    participants: { type: [String] },
+    numParticipants: { type: Number },
+    commits: { type: [Object] },
+    numCommits: { type: Number },
+    filesChanged: { type: [String] },
+    numFilesChanged: { type: Number },
+    mergeDate: { type: Date },
+});
+
+// Define separate models for each collection
+const EipIssueDetails = mongoose.models.alleipsissuedetails || mongoose.model('alleipsissuedetails', IssueDetailsSchema);
+const ErcIssueDetails = mongoose.models.allercsissuedetails || mongoose.model('allercsissuedetails', IssueDetailsSchema);
+const RipIssueDetails = mongoose.models.allripsissuedetails || mongoose.model('allripsissuedetails', IssueDetailsSchema);
 
 
 export default async (req: Request, res: Response) => {
     try {
-        const result = await fetchIssues();
-        console.log(result.length);
-        res.json(result);
+        // Retrieve unique Issue numbers from each collection with repository information
+        const eipIssueNumbers = await EipIssueDetails.find({}, { issueNumber: 1, _id: 0 }).lean();
+        const ercIssueNumbers = await ErcIssueDetails.find({}, { issueNumber: 1, _id: 0 }).lean();
+        const ripIssueNumbers = await RipIssueDetails.find({}, { issueNumber: 1, _id: 0 }).lean();
+
+        // Add repository information to each Issue number
+        const formattedIssueNumbers = [
+            ...eipIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, repo: 'EIPs' })),
+            ...ercIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, repo: 'ERCs' })),
+            ...ripIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, repo: 'RIPs' })),
+        ];
+
+        // Send the consolidated list as a JSON response
+        res.json(formattedIssueNumbers);
     } catch (error) {
-        console.error('Error fetching data:', error);
-        res.status(500).json({ error: 'An error occurred while fetching data' });
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Something went wrong' });
     }
 };

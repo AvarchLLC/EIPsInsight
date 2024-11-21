@@ -7,6 +7,11 @@ interface PRItem {
   repo:string;
 }
 
+interface IssueItem {
+  issueNumber: number;
+  repo:string;
+}
+
 interface EIP {
   _id: string;
   eip: string;
@@ -33,12 +38,17 @@ const SearchBox: React.FC = () => {
   const [pr, setPR] = useState<PRProps>({
     type: "Pull Request",
   }); 
+  const [issue, setIssue] = useState<PRProps>({
+    type: "Issue",
+    });
+  const [IssueData, setIssueData]=useState<IssueItem[]>([]);
   const [eipData, setEipData] = useState<EIP[]>([]);
   const [query, setQuery] = useState("");
   const router = usePathname();
   const splitPath = router?.split("/") || [];
   const type = splitPath[1] || "eip";
   const [filteredResults, setFilteredResults] = useState<PRItem[]>([]);
+  const [filteredIssueResults, setFilteredIssueResults] = useState<IssueItem[]>([]);
   const [filteredEIPResults, setFilteredEIPResults] = useState<EIP[]>([]);
 
   // const data = [];
@@ -61,6 +71,22 @@ const SearchBox: React.FC = () => {
   
       fetchData();
   }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const response = await fetch(`/api/allissues`);
+            console.log(response);
+            const jsonData = await response.json();
+            setIssueData(jsonData);
+            console.log('IssueData:', jsonData);
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    fetchData();
+}, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,6 +103,9 @@ const SearchBox: React.FC = () => {
 
   useEffect(() => {
     const queryStr = query.trim();
+
+
+    console.log(queryStr);
 
     if (queryStr) {
       // Deduplicate using a Set to track unique (prNumber, repo) combinations
@@ -110,6 +139,38 @@ const SearchBox: React.FC = () => {
           return bLength - aLength; // Sort by the length of the prNumber in descending order
         }),
       ];
+
+      const seenIssues = new Set<string>();
+
+      // Filter PR results based on exact match first
+      const exactIssueMatches = IssueData.filter((item) => {
+        const key = `${item.issueNumber}-${item.repo}`;
+        if (seenIssues.has(key)) return false; // Skip if already seen
+        seenIssues.add(key); // Mark as seen
+        return item.issueNumber.toString() === queryStr;
+      });
+
+      // Filter PR results for partial matches (those that start with the query)
+      const partialIssueMatches = IssueData
+        .filter((item) => item.issueNumber.toString().startsWith(queryStr))
+        .filter((item) => item.issueNumber.toString() !== queryStr) // Exclude exact matches
+        .filter((item) => {
+          const key = `${item.issueNumber}-${item.repo}`;
+          if (seenIssues.has(key)) return false; // Skip if already seen
+          seenIssues.add(key); // Mark as seen
+          return true;
+        });
+
+      // Combine exact matches and partial matches, sorting by length
+      const newFilteredIssueResults = [
+        ...exactIssueMatches,
+        ...partialIssueMatches.sort((a, b) => {
+          const aLength = a.issueNumber.toString().length;
+          const bLength = b.issueNumber.toString().length;
+          return bLength - aLength; // Sort by the length of the prNumber in descending order
+        }),
+      ];
+      console.log(newFilteredIssueResults);
 
       // Deduplicate for EIP data
       const seenEIPs = new Set<string>();
@@ -146,10 +207,12 @@ const SearchBox: React.FC = () => {
       // Update the state with the filtered and sorted results
       setFilteredResults(newFilteredResults);
       setFilteredEIPResults(newFilteredEIPResults);
+      setFilteredIssueResults(newFilteredIssueResults);
     } else {
       // If query is empty, clear the results
       setFilteredResults([]);
       setFilteredEIPResults([]);
+      setFilteredIssueResults([]);
     }
   }, [query]);
 
@@ -158,6 +221,14 @@ const SearchBox: React.FC = () => {
   const handleSearchResultClick = async (selectedNumber: number,repo:string) => {
     try {
           window.location.href = `/PR/${repo}/${selectedNumber}`;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleSearchIssueResultClick = async (selectedNumber: number,repo:string) => {
+    try {
+          window.location.href = `/issue/${repo}/${selectedNumber}`;
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -186,7 +257,7 @@ const SearchBox: React.FC = () => {
   <div>
     <input
       type="text"
-      placeholder="Search EIP/ERC/RIP/PR"
+      placeholder="Search EIP/ERC/RIP/PR/ISSUE"
       value={query}
       onChange={(e) => setQuery(e.target.value)}
       className="border p-2 rounded w-full text-center focus:border-blue-100"
@@ -194,8 +265,8 @@ const SearchBox: React.FC = () => {
 
     <div className={"grid grid-cols-1"}>
       <div>
-        {query && filteredResults.length === 0 && filteredEIPResults.length === 0 ? (
-          <p className="mt-2 text-red-500 text-center font-bold">Invalid EIP/ERC/RIP/PR number</p>
+        {query && filteredResults.length === 0 && filteredEIPResults.length === 0 && filteredIssueResults.length===0 ? (
+          <p className="mt-2 text-red-500 text-center font-bold">Invalid EIP/ERC/RIP/PR/Issue number</p>
         ) : (
           query && (
             <select
@@ -210,6 +281,16 @@ const SearchBox: React.FC = () => {
                   className="py-2"
                 >
                   {result.repo} PR: {result.prNumber}
+                </option>
+              ))}
+              {filteredIssueResults.map(result => (
+                <option
+                  key={result.issueNumber}
+                  value={result.issueNumber}
+                  onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
+                  className="py-2"
+                >
+                  {result.repo} ISSUE: {result.issueNumber}
                 </option>
               ))}
               {filteredEIPResults.map(result => (
