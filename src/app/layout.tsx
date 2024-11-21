@@ -10,6 +10,7 @@ import { Suspense } from 'react';
 const mont = Inter({ subsets: ['latin'] })
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
+import Head from 'next/head';
 
 export default function RootLayout({
   children,
@@ -47,6 +48,20 @@ export default function RootLayout({
       >
        <ColorModeScript initialColorMode='dark' />
       <Providers>
+      <Head>
+                {/* Google Analytics */}
+                <script async src="https://www.googletagmanager.com/gtag/js?id=G-N59QCDB9WN"></script>
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+                      gtag('config', 'G-N59QCDB9WN');
+                    `,
+                  }}
+                />
+              </Head>
           <Navbar/>
 
           {children}

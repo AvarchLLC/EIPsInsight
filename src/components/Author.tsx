@@ -1,260 +1,213 @@
-import React, {useEffect, useState} from 'react';
-import {Box, useColorModeValue, Text} from "@chakra-ui/react";
-import {borderColor} from "@mui/system";
-import NextLink from "next/link";
-import {motion} from "framer-motion";
-import LoaderComponent from "@/components/Loader";
-
-// interface Author{
-//     login: string;
-//     id: number;
-//     node_id: string;
-//     avatar_url: string;
-//     gravatar_id: string;
-//     url: string;
-//     html_url: string;
-//     followers_url: string;
-//     following_url: string;
-//     gists_url: string;
-//     starred_url: string;
-//     subscriptions_url: string;
-//     organizations_url: string;
-//     repos_url: string;
-//     events_url: string;
-//     received_events_url: string;
-//     type: string;
-//     site_admin:boolean;
-//     contributions: number;
-// }
+import React, { useEffect, useState } from 'react';
+import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex } from "@chakra-ui/react";
+import { saveAs } from 'file-saver';
+import AllLayout from './Layout';
+import NextLink from 'next/link';
 
 interface EIP {
-    _id: string;
-    eip: string;
-    title: string;
-    author: string;
-    status: string;
-    type: string;
-    category: string;
-    created: string;
-    discussion: string;
-    deadline: string;
-    requires: string;
-    unique_ID: number;
-    __v: number;
+  _id: string;
+  eip: string;
+  type: string;
+  title:string;
+  category: string;
+  author: string;
+  repo: string;
 }
 
 const Author: React.FC = () => {
+  const [data, setData] = useState<EIP[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedAuthor, setSelectedAuthor] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 25;
 
-    // const [data, setData] = React.useState<Author[]>([]);
-    const [data, setData] = React.useState<EIP[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/graphsv3`);
+        const jsonData = await response.json();
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(`/api/allcontributors`);
-    //             const jsonData = await response.json();
-    //             console.log(jsonData);
-    //             setData(jsonData);
-    //             setIsLoading(false);
-    //         } catch (error) {
-    //             console.error("Error fetching data:", error);
-    //             setIsLoading(false);
-    //         }
-    //     };
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`/api/alleips`);
-                const jsonData = await response.json();
-                console.log(jsonData);
-                setData(jsonData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                setIsLoading(false);
+        const getEarliestEntries = (data: any[], key: string) => {
+          const uniqueEntries: Record<string, any> = {};
+          data.forEach(entry => {
+            const entryKey = entry[key];
+            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) < new Date(uniqueEntries[entryKey].changeDate)) {
+              uniqueEntries[entryKey] = entry;
             }
+          });
+          return Object.values(uniqueEntries);
         };
 
-        fetchData();
-    }, []);
+        let filteredData = [
+          ...getEarliestEntries(jsonData.eip, 'eip'),
+          ...getEarliestEntries(jsonData.erc, 'eip'),
+          ...getEarliestEntries(jsonData.rip, 'eip'),
+        ];
+        filteredData = filteredData.filter(
+          (entry: EIP, index: number, self: EIP[]) =>
+            entry.eip !== '1' || index === self.findIndex((e: EIP) => e.eip === '1')
+        );
 
+        setData(filteredData);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
 
+    fetchData();
+  }, []);
 
-    const uniqueAuthorNames = new Set<string>();
+  // Filter and paginate data
+  const filteredData = data.filter(item =>
+    !selectedAuthor || item.author.toLowerCase().includes(selectedAuthor.toLowerCase())
+  );
+  const totalPages = Math.ceil(filteredData.length / cardsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * cardsPerPage,
+    currentPage * cardsPerPage
+  );
 
-    const formattedAuthors : any[] = [];
-
-    data.forEach((item) => {
-        const authors = item.author.split(','); // Split authors by comma
-
-        authors.forEach((author) => {
-            const trimmedAuthor = author.trim();
-            if (trimmedAuthor) {
-                if (trimmedAuthor.includes('@') && trimmedAuthor.includes('(') && trimmedAuthor.includes(')')) {
-                    // It matches type 2 pattern
-                    const type2Match = trimmedAuthor.match(/^(.*?)\s?\((@.*?)\)$/);
-                    if (type2Match) {
-                        const name = type2Match[1].trim();
-                        const username = type2Match[2].replace(/[@()]/g, ''); // Remove "@" and brackets
-                        // Add the name to the set and to the result if it's unique
-                        if (!uniqueAuthorNames.has(name)) {
-                            uniqueAuthorNames.add(name);
-                            formattedAuthors.push({ name, username });
-                        }
-                    }
-                } else {
-
-                    const type1Match = trimmedAuthor.match(/^(.*?)\s?<.*?@.*?>$/);
-                    if (type1Match) {
-                        const name = type1Match[1].trim();
-                        // Add the name to the set and to the result if it's unique
-                        if (!uniqueAuthorNames.has(name)) {
-                            uniqueAuthorNames.add(name);
-                            formattedAuthors.push({ name });
-                        }
-                    }
-                }
-            }
-        });
+  const jsonToCsv = (data: EIP[]): string => { 
+    const csvRows: string[] = [];
+    const headers = ['EIP', 'Title', 'Author', 'Type', 'Category', 'Repo'];
+    
+    // Add headers to the CSV
+    csvRows.push(headers.join(','));
+  
+    // Add data rows
+    data.forEach((item: EIP) => {
+      const row = [
+        `EIP-${item.eip}`, // EIP ID
+        `"${item.title}"`, // Title (quoted to handle commas)
+        `"${item.author}"`, // Author(s) (quoted to handle commas)
+        item.type, // Type
+        item.category, // Category
+        item.repo.toUpperCase() // Repo in uppercase
+      ];
+      csvRows.push(row.join(','));
     });
+  
+    return csvRows.join('\n');
+  };
+  
+  const handleDownload = () => {
+    if (!filteredData.length) {
+      alert('No data to download.');
+      return;
+    }
+  
+    const csvData = jsonToCsv(filteredData);
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'Author_data.csv');
+  };
 
-    // console.log(formattedAuthors);
+  const bg = useColorModeValue('#f7fafc', '#171923');
+  const cardBg = useColorModeValue('white', 'gray.700');
+  const border = useColorModeValue('gray.300', 'gray.600');
 
+  return (
+    <>
+      <Box p={5} maxW="1200px" mx="auto">
+        {/* Search Bar & Download Button */}
+        <Flex justifyContent="center" mb={8} alignItems="center" gap={4}>
+          <Input
+            placeholder="Search Author"
+            value={selectedAuthor}
+            onChange={(e) => setSelectedAuthor(e.target.value)}
+            size="lg"
+            width="50%"
+            borderRadius="full"
+            boxShadow="md"
+            bg={useColorModeValue('white', 'gray.800')}
+            borderColor={useColorModeValue('gray.300', 'gray.600')}
+            _focus={{
+              borderColor: useColorModeValue('blue.400', 'blue.600'),
+              boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
+            }}
+          />
+          <Button colorScheme="blue" size="lg" borderRadius="full" onClick={handleDownload}>
+            Download Data
+          </Button>
+        </Flex>
+        </Box>
+        <Box p={4}>
 
-    // const [githubData, setGithubData] = useState<any[]>([]);
-    //
-    // // Function to fetch GitHub profile data
-    // const fetchGitHubProfile = async (username: string) => {
-    //     try {
-    //         const response = await fetch(`https://api.github.com/users/${username}`);
-    //         if (response.ok) {
-    //             const userData = await response.json();
-    //             return userData;
-    //         } else {
-    //             throw new Error('GitHub API response not okay');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching GitHub profile:', error);
-    //         return null;
-    //     }
-    // };
+        {isLoading ? (
+          <Text textAlign="center">Loading...</Text>
+        ) : (
+          <>
+            {/* Display Cards */}
+            <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={6}>
+              {paginatedData.map((item) => (
+                <NextLink
+                  key={item._id}
+                  href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}
+                  target="_blank"
+                  passHref
+                >
+                  {/* <a target="_blank" rel="noopener noreferrer">  */}
+                  <Box
+                    as="a"
+                    borderWidth="1px"
+                    borderRadius="lg"
+                    bg={cardBg}
+                    borderColor="blue.100"
+                    p={6}
+                    shadow="lg"
+                    transition="transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out"
+                    _hover={{ transform: 'scale(1.05)', shadow: 'xl' }}
+                    display="flex"
+                    flexDirection="column"
+                  >
+                    {/* EIP Heading */}
+                    <Text fontSize="2xl" fontWeight="extrabold" color="blue.600" mb={4}>
+                    {item.repo.toUpperCase()}-{item.eip}
+                    </Text>
+                    {/* Type */}
+                    <Text fontSize="md"  color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+                      <b>Type:</b>{item.type}
+                    </Text>
+                    {/* <Text fontSize="md" color={useColorModeValue('gray.600', 'gray.400')} mb={3}>
+                      {item.type}
+                    </Text> */}
+                    {/* Category */}
+                    <Text fontSize="md" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+                      <b>Category:</b>{item.category}
+                    </Text>
+                    {/* <Text fontSize="md" color={useColorModeValue('gray.600', 'gray.400')}>
+                      {item.category}
+                    </Text> */}
+                  </Box>
+                   {/* </a> */}
+                </NextLink>
+              ))}
+            </SimpleGrid>
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         const githubProfiles = await Promise.all(
-    //             formattedAuthors.map((author) => {
-    //                 if (author.username) {
-    //                     return fetchGitHubProfile(author.username);
-    //                 } else {
-    //                     return Promise.resolve(null);
-    //                 }
-    //             })
-    //         );
-    //
-    //         setGithubData(githubProfiles);
-    //     };
-    //
-    //     fetchData();
-    // }, [formattedAuthors]);
-
-
-
-
-
-
-
-        const bg = useColorModeValue('#f7fafc', '#171923');
-    const border = useColorModeValue('#000000', '#ffffff')
-
-    return(
-        <>
-            {/*<Box*/}
-            {/*    paddingBottom={{lg:'10', sm: '10',base: '10'}}*/}
-            {/*    marginX={{lg:"40",md:'2', sm: '2', base: '2'}}*/}
-            {/*    paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}*/}
-            {/*    marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}*/}
-            {/*>*/}
-            {/*    {*/}
-            {/*        isLoading ? (*/}
-            {/*            <>*/}
-            {/*                <Box*/}
-            {/*                    display="flex"*/}
-            {/*                    justifyContent="center"*/}
-            {/*                    alignItems="center"*/}
-            {/*                    height="100vh"*/}
-            {/*                >*/}
-            {/*                    <motion.div*/}
-            {/*                        initial={{ opacity: 0, y: -20 }}*/}
-            {/*                        animate={{ opacity: 1, y: 0 }}*/}
-            {/*                        transition={{ duration: 0.5 }}*/}
-            {/*                    >*/}
-            {/*                        <LoaderComponent />*/}
-            {/*                    </motion.div>*/}
-            {/*                </Box>*/}
-            {/*            </>*/}
-            {/*        ):(*/}
-            {/*            <Box*/}
-            {/*                className={'grid grid-cols-3 gap-8'}*/}
-            {/*            >*/}
-
-            {/*                    {*/}
-            {/*                        formattedAuthors.map((author,index) => (*/}
-            {/*                            <>*/}
-            {/*                            <Box*/}
-            {/*                                bgColor={bg}*/}
-            {/*                                border={2}*/}
-            {/*                                borderColor={border}*/}
-            {/*                                borderRadius={'0.55rem'}*/}
-            {/*                                padding={4}*/}
-            {/*                            >*/}
-            {/*                                <div className={'space-y-8'} key={index}>*/}
-            {/*                                    /!*<div className={'flex justify-center w-full'}>*!/*/}
-            {/*                                    /!*    <NextLink href={authors.html_url} target={'_blank'}>*!/*/}
-            {/*                                    /!*        <img*!/*/}
-            {/*                                    /!*            src={authors.avatar_url}*!/*/}
-            {/*                                    /!*            alt={authors.login}*!/*/}
-            {/*                                    /!*            className={'w-20 h-20 rounded-full hover:scale-110 duration-200 ml-5 mt-3'}*!/*/}
-            {/*                                    /!*        />*!/*/}
-            {/*                                    /!*    </NextLink>*!/*/}
-            {/*                                    /!*</div>*!/*/}
-
-            {/*                                    /!*<div>*!/*/}
-            {/*                                    /!*    <Text className={'text-2xl font-bold text-center'}>{authors.login}</Text>*!/*/}
-            {/*                                    /!*</div>*!/*/}
-
-            {/*                                    /!*<div>*!/*/}
-            {/*                                    /!*    <Text className={'text-xl text-center'}>Contributions - {authors.contributions}</Text>*!/*/}
-            {/*                                    /!*</div>*!/*/}
-            {/*                                    <div className={'flex justify-center w-full'}>*/}
-            {/*                                        {*/}
-            {/*                                            author.username ? (*/}
-            {/*                                                <img*/}
-            {/*                                                    src={githubData[index]?.avatar_url}*/}
-            {/*                                                    alt={`${author.username}'s GitHub Avatar`}*/}
-            {/*                                                    className={'w-20 h-20 rounded-full hover:scale-110 duration-200 ml-5 mt-3'}*/}
-            {/*                                                />*/}
-            {/*                                            ): null*/}
-            {/*                                        }*/}
-            {/*                                    </div>*/}
-            {/*                                    <Text className={'text-2xl font-bold text-center'}>{author.name}</Text>*/}
-            {/*                                </div>*/}
-            {/*                            </Box>*/}
-            {/*                            </>*/}
-            {/*                        ))*/}
-            {/*                    }*/}
-
-            {/*            </Box>*/}
-            {/*        )*/}
-            {/*    }*/}
-            {/*</Box>*/}
-
-
-            {/*<Box>*/}
-
-            {/*</Box>*/}
-        </>
-    );
+            {/* Pagination */}
+            <Box mt={8} display="flex" justifyContent="center" alignItems="center" gap={4}>
+              <Button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <Text>
+                Page {currentPage} of {totalPages}
+              </Text>
+              <Button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </Box>
+          </>
+        )}
+      </Box>
+    </>
+  );
 };
-//
+
 export default Author;

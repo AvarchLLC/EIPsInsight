@@ -9,6 +9,8 @@ import {ChevronUpIcon } from "@chakra-ui/icons";
 import DateTime from "@/components/DateTime";
 import { motion } from "framer-motion";
 import Comments from "@/components/comments";
+import { FiFilter } from 'react-icons/fi';
+import { AiOutlineClose } from 'react-icons/ai';
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -37,11 +39,48 @@ const ReviewTracker = () => {
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [selectedStartYear, setSelectedStartYear] = useState<string | null>(null);
+  const [selectedStartMonth, setSelectedStartMonth] = useState<string | null>(null);
+  const [selectedEndYear, setSelectedEndYear] = useState<string | null>(null);
+  const [selectedEndMonth, setSelectedEndMonth] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'eips' | 'ercs' | 'rips' |'all'>('all');
   const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [sliderValue, setSliderValue] = useState<number>(0);
+
+  const years = Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString());
+  const months = [
+    { name: 'Jan', value: '01' },
+    { name: 'Feb', value: '02' },
+    { name: 'Mar', value: '03' },
+    { name: 'Apr', value: '04' },
+    { name: 'May', value: '05' },
+    { name: 'Jun', value: '06' },
+    { name: 'Jul', value: '07' },
+    { name: 'Aug', value: '08' },
+    { name: 'Sep', value: '09' },
+    { name: 'Oct', value: '10' },
+    { name: 'Nov', value: '11' },
+    { name: 'Dec', value: '12' },
+  ];
+
+  const handleFilterData = () => {
+    if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
+      const startDate = `${selectedStartYear}-${selectedStartMonth}`;
+      const endDate = `${selectedEndYear}-${selectedEndMonth}`;
+
+      const filteredData = chart1data.filter((item) => {
+        const itemDate = item.monthYear; // Assuming monthYear is in "YYYY-MM" format
+        return itemDate >= startDate && itemDate <= endDate;
+      });
+
+      console.log('Filtered Data:', filteredData);
+      return filteredData;
+    }
+    return chart1data; // Return all data if no filters are applied
+  };
 
   const toggleCollapse = () => setShow(!show);
 
@@ -145,7 +184,49 @@ const ReviewTracker = () => {
   };
 
   const generateCSVData2 = () => {
+    console.log("downloadable data:", downloaddata);
+    setLoading3(true);
+
+    console.log(selectedStartMonth);
+    console.log(selectedEndMonth);
+    console.log(selectedEndYear);
+    console.log(selectedStartYear);
   
+    if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
+      // Construct start and end dates in ISO format
+      const startDate = new Date(`${selectedStartYear}-${selectedStartMonth}-01T00:00:00Z`);
+      const endDate = new Date(
+        `${selectedEndYear}-${selectedEndMonth}-01T00:00:00Z`
+      );
+  
+      // Adjust end date to include the entire month
+      endDate.setMonth(endDate.getMonth() + 1);
+      endDate.setDate(0); // Last day of the month
+  
+      const filteredData = downloaddata.filter((pr) => {
+        const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
+        return reviewDate && reviewDate >= startDate && reviewDate <= endDate;
+      });
+  
+      console.log("Filtered Data (Review Date):", filteredData);
+  
+      const csv = filteredData.map((pr: PR) => ({
+        PR_Number: pr.prNumber,
+        Title: pr.prTitle,
+        Reviewer: pr.reviewer,
+        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+      }))
+    ;
+  
+      setCsvData(csv);
+    setLoading3(false);
+  }
+  else{
     const filteredData =downloaddata
   
     const csv = filteredData.map((pr: PR) => ({
@@ -162,7 +243,9 @@ const ReviewTracker = () => {
   ;
 
     setCsvData(csv); 
-  };
+  }
+  
+};
 
   useEffect(() => {
     fetchData();
@@ -440,7 +523,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
           {/* Assuming a download option exists for the yearly data as well */}
           <CSVLink 
             data={csvData.length ? csvData : []} 
-            filename={`reviews_data_since_2015.csv`} 
+            filename={`reviews_data.csv`} 
             onClick={(e:any) => {
               generateCSVData2();
               if (csvData.length === 0) {
@@ -538,7 +621,7 @@ type ReviewDatum = {
 };
 
 const renderChart = () => {
-  const dataToUse = chart1data; // Assuming 'data' is accessible in the scope
+  const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
   console.log("data to use:",dataToUse)
   const filteredData = dataToUse.filter(item =>
     Object.keys(showReviewer) // Get the list of reviewers from showReviewer
@@ -979,38 +1062,163 @@ const renderChart = () => {
         </Box>
  
 
+        <Box
+  bgColor={bg}
+  padding="2rem"
+  borderRadius="0.55rem"
+  _hover={{
+    border: "1px",
+    borderColor: "#30A0E0",
+  }}
+>
+  <Box className={"w-full"}>
+    <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+      <Heading size="md" color="black">
+        {`PRs Reviewed (Monthly, since 2015)`}
+      </Heading>
+      <Flex alignItems="center">
+        <CSVLink
+          data={csvData.length ? csvData : []}
+          filename={`reviews_data_since_2015.csv`}
+          onClick={(e: any) => {
+            generateCSVData2();
+            if (csvData.length === 0) {
+              e.preventDefault();
+              console.error("CSV data is empty or not generated correctly.");
+            }
+          }}
+        >
+          <Button colorScheme="blue" mr="1rem">
+            {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+          </Button>
+        </CSVLink>
+        <Button
+          colorScheme="blue"
+          onClick={() => setShowFilters(!showFilters)}
+          leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
+        >
+          {showFilters ? "Hide Filters" : "Show Filters"}
+        </Button>
+      </Flex>
+    </Flex>
+
+    {/* Filters Section */}
+    {showFilters && (
       <Box
-            bgColor={bg}
-            padding="2rem"
-            borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
-          >
-          <Box className={"w-full"}>
-          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color="black">
-            {`PRs Reviewed (Monthly, since 2015)`}
-          </Heading>
-          {/* Assuming a download option exists for the yearly data as well */}
-          <CSVLink 
-            data={csvData.length ? csvData : []} 
-            filename={`reviews_data_since_2015.csv`} 
-            onClick={(e:any) => {
-              generateCSVData2();
-              if (csvData.length === 0) {
-                e.preventDefault(); 
-                console.error("CSV data is empty or not generated correctly.");
-              }
-            }}
-          >
-            <Button colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
-          </CSVLink>
+        bg="blue.50"
+        borderRadius="md"
+        p={4}
+        mt="1rem"
+      >
+        <Flex justifyContent="flex-start" gap="2rem" mb="1rem">
+          {/* Start Date Filters */}
+          <Box>
+            <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
+            <Flex>
+              <Select
+                placeholder="Year"
+                value={selectedStartYear || ''}
+                onChange={(e) => setSelectedStartYear(e.target.value)}
+                mr="1rem"
+                bg="white"
+                color="black"
+              >
+                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+              <Select
+                placeholder="Month"
+                value={selectedStartMonth || ''}
+                onChange={(e) => setSelectedStartMonth(e.target.value)}
+                bg="white"
+                color="black"
+              >
+                {[
+                  { name: 'Jan', value: '01' },
+                  { name: 'Feb', value: '02' },
+                  { name: 'Mar', value: '03' },
+                  { name: 'Apr', value: '04' },
+                  { name: 'May', value: '05' },
+                  { name: 'Jun', value: '06' },
+                  { name: 'Jul', value: '07' },
+                  { name: 'Aug', value: '08' },
+                  { name: 'Sep', value: '09' },
+                  { name: 'Oct', value: '10' },
+                  { name: 'Nov', value: '11' },
+                  { name: 'Dec', value: '12' },
+                ].map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.name}
+                  </option>
+                ))}
+              </Select>
+            </Flex>
+          </Box>
+
+          {/* End Date Filters */}
+          <Box>
+            <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
+            <Flex>
+              <Select
+                placeholder="Year"
+                value={selectedEndYear || ''}
+                onChange={(e) => setSelectedEndYear(e.target.value)}
+                mr="1rem"
+                bg="white"
+                color="black"
+              >
+                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+              <Select
+                placeholder="Month"
+                value={selectedEndMonth || ''}
+                onChange={(e) => setSelectedEndMonth(e.target.value)}
+                bg="white"
+                color="black"
+              >
+                {[
+                  { name: 'Jan', value: '01' },
+                  { name: 'Feb', value: '02' },
+                  { name: 'Mar', value: '03' },
+                  { name: 'Apr', value: '04' },
+                  { name: 'May', value: '05' },
+                  { name: 'Jun', value: '06' },
+                  { name: 'Jul', value: '07' },
+                  { name: 'Aug', value: '08' },
+                  { name: 'Sep', value: '09' },
+                  { name: 'Oct', value: '10' },
+                  { name: 'Nov', value: '11' },
+                  { name: 'Dec', value: '12' },
+                ].map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.name}
+                  </option>
+                ))}
+              </Select>
+            </Flex>
+          </Box>
         </Flex>
-            {renderChart()}
-            <DateTime />
-          </Box></Box>
+        {/* <Button colorScheme="blue" onClick={renderChart}>
+          Apply Filters
+        </Button> */}
+      </Box>
+    )}
+
+    {/* Chart Rendering */}
+    {renderChart()}
+    <DateTime />
+  </Box>
+</Box>
+
+
+
           
       <Box>
       <Text color="gray.500" fontStyle="italic" textAlign="center">
