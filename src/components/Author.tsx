@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex } from "@chakra-ui/react";
+import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex,IconButton, Tooltip } from "@chakra-ui/react";
 import { saveAs } from 'file-saver';
 import AllLayout from './Layout';
 import NextLink from 'next/link';
+// import AuthorEIPCounter from './AuthorBoard';
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 
 interface EIP {
   _id: string;
@@ -14,12 +16,20 @@ interface EIP {
   repo: string;
 }
 
+interface AuthorCount {
+  name: string;
+  count: number;
+}
+
 const Author: React.FC = () => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAuthor, setSelectedAuthor] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 25;
+
+  const [authorCounts, setAuthorCounts] = useState<AuthorCount[]>([]);
+  const [visibleCount, setVisibleCount] = useState(20);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +41,7 @@ const Author: React.FC = () => {
           const uniqueEntries: Record<string, any> = {};
           data.forEach(entry => {
             const entryKey = entry[key];
-            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) < new Date(uniqueEntries[entryKey].changeDate)) {
+            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
               uniqueEntries[entryKey] = entry;
             }
           });
@@ -58,6 +68,33 @@ const Author: React.FC = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const authorMap: Record<string, number> = {};
+
+    data.forEach((eip) => {
+      const authors = eip.author.split(",").map((author) => author.trim());
+      authors.forEach((author) => {
+        if (author) {
+          authorMap[author] = (authorMap[author] || 0) + 1;
+        }
+      });
+    });
+
+    const authorArray = Object.entries(authorMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    setAuthorCounts(authorArray);
+  }, [data]);
+
+  const handleExpand = () => {
+    setVisibleCount((prev) => Math.min(prev + 20, authorCounts.length));
+  };
+
+  const handleCollapse = () => {
+    setVisibleCount(20);
+  };
 
   // Filter and paginate data
   const filteredData = data.filter(item =>
@@ -111,7 +148,7 @@ const Author: React.FC = () => {
     <>
       <Box p={5} maxW="1200px" mx="auto">
         {/* Search Bar & Download Button */}
-        <Flex justifyContent="center" mb={8} alignItems="center" gap={4}>
+        <Flex justifyContent="center" mt={3} alignItems="center" gap={4}>
           <Input
             placeholder="Search Author"
             value={selectedAuthor}
@@ -134,10 +171,91 @@ const Author: React.FC = () => {
         </Box>
         <Box p={4}>
 
+          {/* <AuthorEIPCounter eips={data}/> */}
+
         {isLoading ? (
           <Text textAlign="center">Loading...</Text>
         ) : (
           <>
+          <Flex
+      wrap="wrap"
+    //   direction="column"
+      alignItems="center"
+      justifyContent="center"
+      p={4}
+      mb={2}
+      borderRadius="lg"
+      overflowX="auto"
+    >
+      {authorCounts.slice(0, visibleCount).map((author) => (
+  <Box
+    key={author.name}
+    bg={selectedAuthor === author.name ? "blue.600" : "blue.500"}
+    color="white"
+    px={3}
+    py={1}
+    borderRadius="full"
+    m={2} // Increased margin to create more spacing
+    border="1px solid"
+    borderColor="blue.500"
+    whiteSpace="nowrap"
+    transform={
+      selectedAuthor === author.name ? "scale(1.1)" : "scale(1.0)"
+    }
+    transition="all 0.2s ease"
+    _hover={{
+      bg: "blue.400",
+      transform: "scale(1.05)",
+      cursor: "pointer",
+    }}
+    onClick={() => setSelectedAuthor(author.name)}
+  >
+    <Text fontSize="sm" fontWeight="bold">
+      {author.name} ({author.count})
+    </Text>
+  </Box>
+))}
+
+
+      {visibleCount < authorCounts.length && (
+        <Tooltip label="Expand" fontSize="md">
+          <IconButton
+          icon={<ChevronDownIcon fontWeight="bold" />}
+          aria-label="View More"
+          onClick={handleExpand}
+          variant="ghost"
+          bg="blue.500"
+          color="white"
+          ml={2}
+          fontSize="xl"
+          borderRadius="full" // Corrected the property for rounded circle
+          w="40px" // Added fixed width
+          h="40px" // Added fixed height
+          _hover={{ bg: "blue.400", transform: "scale(1.1)" }} // Adjusted hover behavior
+        />
+
+        </Tooltip>
+      )}
+
+      {visibleCount > 20 && (
+        <Tooltip label="Collapse" fontSize="md">
+          <IconButton
+            icon={<ChevronUpIcon fontWeight="bold" />}
+            aria-label="View More"
+          onClick={handleCollapse}
+          variant="ghost"
+          bg="blue.500"
+          color="white"
+          ml={2}
+          fontSize="xl"
+          borderRadius="full" // Corrected the property for rounded circle
+          w="40px" // Added fixed width
+          h="40px" // Added fixed height
+          _hover={{ bg: "blue.400", transform: "scale(1.1)" }} // Adjusted hover behavior
+        />
+        </Tooltip>
+      )}
+    </Flex>
             {/* Display Cards */}
             <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={6}>
               {paginatedData.map((item) => (
@@ -162,7 +280,7 @@ const Author: React.FC = () => {
                     flexDirection="column"
                   >
                     {/* EIP Heading */}
-                    <Text fontSize="2xl" fontWeight="extrabold" color="blue.600" mb={4}>
+                    <Text fontSize="2xl" fontWeight="extrabold" color={useColorModeValue('blue.500', 'blue.300')} mb={4}>
                     {item.repo.toUpperCase()}-{item.eip}
                     </Text>
                     {/* Type */}

@@ -72,6 +72,10 @@ const Navbar: React.FC = () => {
               label: "Boards",
               href: `/boards`,
         },
+        {
+          label: "Search by author",
+          href: `/authors`,
+        },
       ],
     },    
     {

@@ -272,7 +272,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
                 flexDirection="column"
               >
                 {type === 'Total'
-    ? `Total Ethereum Proposals - [${data.length}]`
+    ? `All EIPs [${data.length}]`
     : `${type} - [${data.length}]`}
               </Text>
             </NextLink>
