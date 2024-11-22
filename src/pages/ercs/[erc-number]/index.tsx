@@ -240,7 +240,7 @@ const TestComponent = () => {
                         <Td>{metadataJson?.status}</Td>
                       </Tr>
                     )}
-                    {metadataJson?.status && (
+                    {metadataJson?.["last-call-deadline"] && (
                       <Tr>
                         <Th>Last Call Deadline</Th>
                         <Td>{metadataJson["last-call-deadline"]}</Td>

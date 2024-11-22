@@ -185,7 +185,7 @@ const Dashboard = () => {
         base: "xl",
       }}
     >
-      Ethereum <br /> Improvement <br /> Proposal <br /> Insights
+      Ethereum <br /> Improvement <br /> Proposal <br /> Insight
     </Text>
                       </Box>
                       <br/>
@@ -248,7 +248,7 @@ const Dashboard = () => {
                                 color: useColorModeValue("white", "#F5F5F5"),
                               }}
                             >
-                              {monthName} {year} Insights
+                              {monthName} {year} Insight
                             </Button>
                           </NextLink>
                         </Box>
@@ -279,7 +279,7 @@ const Dashboard = () => {
                     bgGradient={useColorModeValue(bgGradientLight, bgGradientDark)} 
                     bgClip="text" 
                   >
-                    Ethereum <br /> Improvement <br /> Proposal <br /> Insights
+                    Ethereum <br /> Improvement <br /> Proposals <br /> Insight
                   </Text>
                   <Stack direction={"row"} spacing={"6"} paddingTop={"20"} justifyContent={"center"}>
                     <Box>
@@ -337,7 +337,7 @@ const Dashboard = () => {
                             color: useColorModeValue("white", "#F5F5F5"),
                           }}
                         >
-                          {monthName} {year} Insights
+                          {monthName} {year} Insight
                         </Button>
                       </NextLink>
                     </Box>
@@ -346,17 +346,6 @@ const Dashboard = () => {
                   <AllChart type="Total"  dataset={data}/>
                 </div>
               </Box>
-
-              {/* <div className="py-8"> */}
-                {/* <Box
-                  className={
-                    "w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
-                  }
-                  bgColor={bg}
-                > */}
-                 <ToolsSection/>
-                {/* </Box> */}
-              {/* </div> */}
 
               <div className="py-8">
                 <Box
@@ -369,41 +358,38 @@ const Dashboard = () => {
                 </Box>
               </div>
 
-              {/* <Box className={"lg:grid grid-cols-2 hidden pb-20"}>
-                <div className={"pl-8"}>
-                  <BoyGirl />
-                </div>
+              {/* <div className="py-8"> */}
+                {/* <Box
+                  className={
+                    "w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
+                  }
+                  bgColor={bg}
+                > */}
+                 <ToolsSection/>
+                {/* </Box> */}
+              {/* </div> */}
 
-                <div className={" flex justify-center items-center"}>
-                  <div className={"pt-24 space-y-6"}>
-                    <h1 className={"text-5xl font-bold"}>
-                      What is <span className="text-blue-400">an EIP</span>?
+
+              <Box
+                  className="grid grid-cols-1 lg:grid-cols-2 pb-10 gap-8 lg:gap-8"
+                  bg="rgba(0, 0, 0, 0.5)"
+                  borderRadius="md" // Rounded corners
+                  padding={5}
+                  boxShadow="md"
+                  marginTop={10}
+                >
+                  {/* Centered Heading */}
+                  <div className="col-span-full text-center">
+                    <h1 className="text-5xl font-bold">
+                      <span className="text-gray-200">What is</span>{" "}
+                      <span className="text-blue-400">EIPsInsight</span>
+                      <span className="text-gray-200">?</span>
                     </h1>
-                    <p className={"text-3xl max-w-xl"}>
-                      EIP is a design document providing information to the
-                      Ethereum community or describing a new feature or
-                      improvement for the{" "}
-                      <span className="text-blue-400">Ethereum blockchain</span>
-                      .
-                    </p>
-                    <NextLink href={"/resources"}>
-                      <span className="text-blue-400 text-xl flex space-x-5">
-                        Learn More{" "}
-                        <BsArrowUpRight className={"pt-2"} size={25} />
-                      </span>
-                    </NextLink>
+                    {/* <hr className="mt-4 border-gray-500" />  */}
                   </div>
-                </div>
-              </Box> */}
 
-                <Box className="grid grid-cols-1 lg:grid-cols-2 pb-20 gap-8 lg:gap-16"
-                bg="rgba(0, 0, 0, 0.5)"
-                borderRadius="md" // Rounded corners
-                padding={9} 
-                boxShadow="md" 
-                marginTop={4}>
                   {/* Left Side - YouTube Video */}
-                  <div className="flex justify-center lg:justify-center items-center">
+                  <div className="flex justify-center items-center">
                     <iframe
                       width="560"
                       height="315"
@@ -418,21 +404,35 @@ const Dashboard = () => {
                   {/* Right Side - EIPInsight Info */}
                   <div className="flex justify-center items-center">
                     <div className="text-center max-w-xl space-y-6">
-                    <h1 className="text-5xl font-bold">
-                    <span className="text-gray-200">What is</span> <span className="text-blue-400">EIPInsight</span><span className="text-gray-200">?</span>
-                    </h1>
-                    <p className="text-xl text-justify text-gray-200"> {/* Change to smoke white */}
-                      EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposal (EIP), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period. Data provided is used for tracking the progress and workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
+                    <p className="text-xl text-justify text-gray-200">
+                      EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposal (
+                      <NextLink href="/eip">
+                        <span className="text-blue-400">EIP</span>
+                      </NextLink>), 
+                      Ethereum Request for Comments (
+                      <NextLink href="/erc">
+                        <span className="text-blue-400">ERCs</span>
+                      </NextLink>), 
+                      and Rollup Improvement Proposals (
+                      <NextLink href="/rip">
+                        <span className="text-blue-400">RIPs</span>
+                      </NextLink>), 
+                      over a specified period. Data provided is used for tracking the progress and workload distribution among 
+                      <NextLink href="/eips/eip-1">
+                        <span className="text-blue-400"> EIP Editors</span>
+                      </NextLink>, ensuring transparency and efficiency in the proposal review process.
                     </p>
-                    <NextLink href="/resources">
-                      <span className="text-blue-400 text-xl flex items-center space-x-2">
-                        Learn More <BsArrowUpRight className="pt-1" size={25} />
-                      </span>
-                    </NextLink>
 
+
+                      <NextLink href="/resources">
+                        <span className="text-blue-400 text-xl flex items-center space-x-2">
+                          Learn More <BsArrowUpRight className="pt-1" size={25} />
+                        </span>
+                      </NextLink>
                     </div>
                   </div>
                 </Box>
+
                 <br/>
                 </motion.div>
                 <br/>
