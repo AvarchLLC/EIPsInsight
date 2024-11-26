@@ -29,12 +29,23 @@ interface EIP {
   __v: number;
 }
 
+interface EIP2 {
+  _id: string;
+  eip: string;
+  type: string;
+  title:string;
+  category: string;
+  author: string;
+  repo: string;
+}
+
 interface PRProps {
   type: string;
 }
 
 const SearchBox: React.FC = () => {
   const [data, setData] = useState<PRItem[]>([]);
+  const [authordata, setauthorData] = useState<EIP2[]>([]);
   const [pr, setPR] = useState<PRProps>({
     type: "Pull Request",
   }); 
@@ -51,11 +62,53 @@ const SearchBox: React.FC = () => {
   const [filteredIssueResults, setFilteredIssueResults] = useState<IssueItem[]>([]);
   const [filteredEIPResults, setFilteredEIPResults] = useState<EIP[]>([]);
 
-  // const data = [];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/graphsv3`);
+        const jsonData = await response.json();
 
-  // for (let i = 1; i <= 8000; i++) {
-  //   data.push({ prOrIssueNumber: i });
-  // }
+        const getEarliestEntries = (data: any[], key: string) => {
+          const uniqueEntries: Record<string, any> = {};
+          data.forEach(entry => {
+            const entryKey = entry[key];
+            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
+              uniqueEntries[entryKey] = entry;
+            }
+          });
+          return Object.values(uniqueEntries);
+        };
+
+        let filteredData = [
+          ...getEarliestEntries(jsonData.eip, 'eip'),
+          ...getEarliestEntries(jsonData.erc, 'eip'),
+          ...getEarliestEntries(jsonData.rip, 'eip'),
+        ];
+        filteredData = filteredData.filter(
+          (entry: EIP, index: number, self: EIP2[]) =>
+            entry.eip !== '1' || index === self.findIndex((e: EIP2) => e.eip === '1')
+        );
+
+        setauthorData(filteredData);
+        console.log("author data: ", filteredData);
+        // setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredAuthorData = query
+  ? authordata.filter(item =>
+      item.author.toLowerCase().includes(query.toLowerCase())
+    )
+  : [];
+
+
+  console.log("filtered author data:", filteredAuthorData)
 
   useEffect(() => {
       const fetchData = async () => {
@@ -257,57 +310,74 @@ const SearchBox: React.FC = () => {
   <div>
     <input
       type="text"
-      placeholder="Search EIP/ERC/RIP/PR/ISSUE"
+      placeholder="Search EIP/ERC/RIP/PR/ISSUE/Author"
       value={query}
       onChange={(e) => setQuery(e.target.value)}
       className="border p-2 rounded w-full text-center focus:border-blue-100"
     />
 
-    <div className={"grid grid-cols-1"}>
-      <div>
-        {query && filteredResults.length === 0 && filteredEIPResults.length === 0 && filteredIssueResults.length===0 ? (
-          <p className="mt-2 text-red-500 text-center font-bold">Invalid EIP/ERC/RIP/PR/Issue number</p>
-        ) : (
-          query && (
-            <select
-              className="mt-2 border p-2 rounded w-full text-center space-y-5"
-              size={10}
+<div className={"grid grid-cols-1"}>
+  <div>
+    {query && 
+    filteredResults.length === 0 && 
+    filteredEIPResults.length === 0 && 
+    filteredIssueResults.length === 0 && 
+    filteredAuthorData.length === 0 ? (
+      <p className="mt-2 text-red-500 text-center font-bold">
+        Invalid EIP/ERC/RIP/PR/Issue/Author
+      </p>
+    ) : (
+      query && (
+        <select
+          className="mt-2 border p-2 rounded w-full text-center space-y-5"
+          size={10}
+        >
+          {filteredResults.map(result => (
+            <option
+              key={result.prNumber}
+              value={result.prNumber}
+              onClick={() => handleSearchResultClick(result.prNumber, result.repo)}
+              className="py-2"
             >
-              {filteredResults.map(result => (
-                <option
-                  key={result.prNumber}
-                  value={result.prNumber}
-                  onClick={() => handleSearchResultClick(result.prNumber, result.repo)}
-                  className="py-2"
-                >
-                  {result.repo} PR: {result.prNumber}
-                </option>
-              ))}
-              {filteredIssueResults.map(result => (
-                <option
-                  key={result.issueNumber}
-                  value={result.issueNumber}
-                  onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
-                  className="py-2"
-                >
-                  {result.repo} ISSUE: {result.issueNumber}
-                </option>
-              ))}
-              {filteredEIPResults.map(result => (
-                <option
-                  key={result.eip}
-                  value={result.eip}
-                  onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
-                  className="py-2"
-                >
-                  {result.repo.toUpperCase()} Number: {result.eip}
-                </option>
-              ))}
-            </select>
-          )
-        )}
-      </div>
-    </div>
+              {result.repo} PR: {result.prNumber}
+            </option>
+          ))}
+          {filteredIssueResults.map(result => (
+            <option
+              key={result.issueNumber}
+              value={result.issueNumber}
+              onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
+              className="py-2"
+            >
+              {result.repo} ISSUE: {result.issueNumber}
+            </option>
+          ))}
+          {filteredEIPResults.map(result => (
+            <option
+              key={result.eip}
+              value={result.eip}
+              onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
+              className="py-2"
+            >
+              {result.repo.toUpperCase()} Number: {result.eip}
+            </option>
+          ))}
+          {filteredAuthorData.map(result => (
+            <option
+            key={result.eip}
+            value={result.eip}
+              onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
+              className="py-2"
+            >
+              {result.repo.toUpperCase()} Number: {result.eip}
+            </option>
+          ))}
+        </select>
+      )
+    )}
+  </div>
+</div>
+
   </div>
 </>
 

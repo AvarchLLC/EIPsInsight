@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Box, Flex, Heading, useColorModeValue, Spinner, Link  } from "@chakra-ui/react";
+import { Box, Flex, Heading, useColorModeValue, Spinner, Link, Button, Text  } from "@chakra-ui/react";
+import { CSVLink } from "react-csv";
 import LoaderComponent from "@/components/Loader";
 import DateTime from "@/components/DateTime";
 import { usePathname } from "next/navigation";
@@ -22,32 +23,26 @@ const InsightsLeaderboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
   const [chart1data, setchart1Data] = useState<any[]>([]);
+  const [downloaddata, setdownloadData] = useState<any[]>([]);
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
+  const [reviewers, setReviewers] = useState<string[]>([]);
+  const [reviewerData, setReviewerData] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [selectedStartYear, setSelectedStartYear] = useState<string | null>(null);
+  const [selectedStartMonth, setSelectedStartMonth] = useState<string | null>(null);
+  const [selectedEndYear, setSelectedEndYear] = useState<string | null>(null);
+  const [selectedEndMonth, setSelectedEndMonth] = useState<string | null>(null);
+  const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
+  const [show, setShow] = useState(false);
+  const bg = useColorModeValue("#f6f6f7", "#171923");
+  const [sliderValue, setSliderValue] = useState<number>(0);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all'>('all');
-  const bg = useColorModeValue("#f6f6f7", "#171923");
   const path = usePathname();
-  let year = "";
-  let month = "";
+  const [loading3,setLoading3]=useState<boolean>(false);
 
-//   if (path) {
-//     const pathParts = path.split("/");
-//     year = pathParts[2];
-//     month = pathParts[3];
-//     setSelectedYear(year);
-//     setSelectedMonth(month);
-//   }
-
-  // Function to generate CSV data
-  type PR = {
-    prNumber: number;
-    prTitle: string;
-    reviewDate?: string;
-    created_at?: string;
-    closed_at?: string;
-    merged_at?: string;
-  };
   
   useEffect(() => {
     if (path) {
@@ -224,6 +219,82 @@ const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => 
     reviewer: string;
     count: number; // Change this based on your actual data structure
 }
+type PR = {
+  repo:string;
+  prNumber: number;
+  reviewer:string;
+  prTitle: string;
+  reviewDate?: string;
+  created_at?: string;
+  closed_at?: string;
+  merged_at?: string;
+};
+
+
+const generateCSVData2 = () => {
+  console.log("downloadable data:", downloaddata);
+  setLoading3(true);
+
+  console.log(selectedStartMonth);
+  console.log(selectedEndMonth);
+  console.log(selectedEndYear);
+  console.log(selectedStartYear);
+
+  if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
+    // Construct start and end dates in ISO format
+    const startDate = new Date(`${selectedStartYear}-${selectedStartMonth}-01T00:00:00Z`);
+    const endDate = new Date(
+      `${selectedEndYear}-${selectedEndMonth}-01T00:00:00Z`
+    );
+
+    // Adjust end date to include the entire month
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0); // Last day of the month
+
+    const filteredData = downloaddata.filter((pr) => {
+      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
+      return reviewDate && reviewDate >= startDate && reviewDate <= endDate;
+    });
+
+    console.log("Filtered Data (Review Date):", filteredData);
+
+    const csv = filteredData.map((pr: PR) => ({
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }))
+  ;
+
+    setCsvData(csv);
+  setLoading3(false);
+}
+else{
+  const filteredData =downloaddata
+
+  const csv = filteredData.map((pr: PR) => ({
+    PR_Number: pr.prNumber,
+    Title: pr.prTitle,
+    Reviewer: pr.reviewer,
+    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+    Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+    Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+  }))
+;
+
+  setCsvData(csv); 
+}
+
+};
+
 
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
     let monthlyChartData: MonthlyChartData[] | undefined;
@@ -260,6 +331,41 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
                 <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
                     {/* Monthly Leaderboard Chart */}
                     <Box width={{ base: "100%", md: "100%" }} minHeight="250px" paddingTop={10}>
+                    <Flex 
+  justifyContent="center" // Center items horizontally
+  alignItems="center" // Align items vertically
+  marginBottom="0.5rem" 
+  gap={4} // Add some space between the items
+>
+  <Text
+    color="#30A0E0"
+    fontSize="2xl"
+    fontWeight="bold"
+    textAlign="center"
+    marginBottom="0.5rem"
+  >
+    {`Open PRs and Issues (${selectedYear})`}
+  </Text>
+
+  {/* Download button next to the text */}
+  <CSVLink 
+    data={csvData.length ? csvData : []} 
+    filename={`reviews_data.csv`} 
+    onClick={(e: any) => {
+      generateCSVData2();
+      if (csvData.length === 0) {
+        e.preventDefault(); 
+        console.error("CSV data is empty or not generated correctly.");
+      }
+    }}
+  >
+    <Button colorScheme="blue">
+      {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+    </Button>
+  </CSVLink>
+</Flex>
+
+        <br/>
                         <Bar {...getBarChartConfig(monthlyChartData)} />
                     </Box>
                 </Flex>

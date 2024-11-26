@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Spinner, Text } from "@chakra-ui/react";
+import { Box, useColorModeValue, Spinner, Text, Select, Flex } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
 import Dashboard from "./Dashboard";
 import NextLink from "next/link";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -34,30 +35,33 @@ const getCat = (cat: string) => {
   }
 };
 
-interface AreaProps {
-  data: MappedDataItem[];
-  xField: string;
-  yField: string;
-  color: string[];
-  seriesField: string;
-  xAxis: {
-    range: number[];
-    tickCount: number;
-  };
-  areaStyle: {
-    fillOpacity: number;
-  };
-  legend: {
-    position: string;
-  };
-  smooth: boolean;
-}
+const getStatus = (status: string) => {
+  switch (status) {
+    case "Draft":
+      return "Draft";
+    case "Final":
+    case "Accepted":
+    case "Superseded":
+      return "Final";
+    case "Last Call":
+      return "Last Call";
+    case "Withdrawn":
+    case "Abandoned":
+    case "Rejected":
+      return "Withdrawn";
+    case "Review":
+      return "Review";
+    case "Living":
+    case "Active":
+      return "Living";
+    case "Stagnant":
+      return "Stagnant";
+    default:
+      return "Final";
+  }
+};
 
-interface MappedDataItem {
-  category: string;
-  date: string;
-  value: number;
-}
+
 
 interface EIP {
   _id: string;
@@ -76,11 +80,6 @@ interface EIP {
   __v: number;
 }
 
-interface FormattedEIP {
-  category: string;
-  date: string;
-  value: number;
-}
 
 const categoryColors: string[] = [
   "rgb(255, 99, 132)",
@@ -94,18 +93,7 @@ const categoryColors: string[] = [
   "rgb(255, 0, 0)",
   "rgb(0, 128, 0)",
 ];
-const categoryBorder: string[] = [
-  "rgba(255, 99, 132, 0.2)",
-  "rgba(255, 159, 64, 0.2)",
-  "rgba(255, 205, 86, 0.2)",
-  "rgba(75, 192, 192, 0.2)",
-  "rgba(54, 162, 235, 0.2)",
-  "rgba(153, 102, 255, 0.2)",
-  "rgba(255, 99, 255, 0.2)",
-  "rgba(50, 205, 50, 0.2)",
-  "rgba(255, 0, 0, 0.2)",
-  "rgba(0, 128, 0, 0.2)",
-];
+
 
 interface APIResponse {
   eip: EIP[];
@@ -122,13 +110,11 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
   const [data, setData] = useState<EIP[]>([]);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [isLoading, setIsLoading] = useState(true);
+  const [chart,setchart]=useState("category");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const response = await fetch(`/api/new/all`);
-        // const dataset = await response.json();
-        // const dataset=dataset;
         if (type === "EIP") {
           setData(dataset.eip);
         } else if (type === "ERC") {
@@ -154,6 +140,12 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     year: number;
     value: number;
   }
+
+  interface TransformedData2 {
+    status: string;
+    year: number;
+    value: number;
+  }
   
   const transformedData = data.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
@@ -176,6 +168,28 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
   
     return acc;
   }, []);
+
+  const transformedData2 = data.reduce<TransformedData[]>((acc, item) => {
+    const year = new Date(item.created).getFullYear();
+    const status = getStatus(item.status);
+  
+    // Check if a record for the same category and year already exists
+    const existingEntry = acc.find((entry) => entry.year === year && entry.category === status);
+  
+    if (existingEntry) {
+      // If it exists, increment the value
+      existingEntry.value += 1;
+    } else {
+      // Otherwise, create a new entry
+      acc.push({
+        category: status,
+        year: year,
+        value: 1,
+      });
+    }
+  
+    return acc;
+  }, []);
   
   
   
@@ -188,10 +202,12 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     }
   );
 
-  console.log(transformedData);
+  const transformedData3 = chart === "status" ? transformedData2 : transformedData;
+
+  console.log(transformedData3);
 
   const config = {
-    data: transformedData,
+    data: transformedData3,
     xField: "year",
     yField: "value",
     interactions: [{ type: "element-selected" }, { type: "element-active" }],
@@ -250,32 +266,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
               borderColor: "#30A0E0",
             }}
           >
-            <NextLink
-              href={
-                type === "ERC"
-                  ? "/erctable"
-                  : type === "EIP"
-                  ? "/eiptable"
-                  : type === "RIP"
-                  ? "/riptable"
-                  : "/alltable"
-              }
-            >
-              <Text
-                fontSize="2xl"
-                fontWeight="bold"
-                color="#30A0E0"
-                className="text-left"
-                paddingY={4}
-                paddingLeft={4}
-                display="flex"
-                flexDirection="column"
-              >
-                {type === 'Total'
-    ? `All EIPs [${data.length}]`
-    : `${type} - [${data.length}]`}
-              </Text>
-            </NextLink>
+            
             <Box
             width={"100%"}       // Make the container full width
             minWidth={"100px"}  // Set a minimum width
@@ -288,6 +279,52 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
             animate={{ opacity: 1, y: 0 }}
             // transition={{ duration: 0.5 }}
           >
+             <Flex justify="space-between" align="center">
+      {/* Label and Dropdown in the same row */}
+      <Box>
+        <Text fontSize="2xl" fontWeight="bold" color="#30A0E0">
+          {type === 'Total' ? `All EIPs [${data.length}]` : `${type} - [${data.length}]`}
+        </Text>
+      </Box>
+
+      {/* Dropdown aligned to the right */}
+      <Box>
+      {/* <Select
+  value={chart}
+  onChange={(e) => setchart(e.target.value)}
+  mt={1}
+  mb={4}
+  width="auto"
+  backgroundColor="#30A0E0"
+  color="black"
+  _focus={{
+    borderColor: "#30A0E0",
+    outline: "none",
+  }}
+  border="1px solid #30A0E0"
+  icon={<ChevronDownIcon />}  // Explicitly using a Chevron icon for better visibility
+  // _icon={{
+  //   color: "white",  // Make sure the arrow color matches the theme
+  // }}
+> */}
+
+<Select
+              variant="outline"
+              // placeholder="Select Year"
+              value={chart}
+              mt={1}
+              // mb={2}
+              backgroundColor="#30A0E0"
+              color="black"
+              onChange={(e) => setchart(e.target.value)}
+              className="border border-gray-300 rounded px-7 py-2 focus:outline-none focus:border-blue-500"
+              size="md"
+            >
+  <option value="category">Category</option>
+  <option value="status">Status</option>
+</Select>
+      </Box>
+    </Flex>
             <Area {...config} />
             <Box className={"w-full"}>
               <DateTime />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex,IconButton, Tooltip } from "@chakra-ui/react";
+import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex,IconButton, Tooltip, Spinner,} from "@chakra-ui/react";
 import { saveAs } from 'file-saver';
 import AllLayout from './Layout';
 import NextLink from 'next/link';
@@ -71,22 +71,27 @@ const Author: React.FC = () => {
 
   useEffect(() => {
     const authorMap: Record<string, number> = {};
-
+  
     data.forEach((eip) => {
       const authors = eip.author.split(",").map((author) => author.trim());
       authors.forEach((author) => {
         if (author) {
-          authorMap[author] = (authorMap[author] || 0) + 1;
+          // Extract GitHub handle from the author's name if available
+          const handleMatch = author.match(/\(@([a-zA-Z0-9-_]+)\)$/);
+          const authorName = handleMatch ? handleMatch[1] : author; // Use the handle if matched, else fallback to name
+  
+          authorMap[authorName] = (authorMap[authorName] || 0) + 1;
         }
       });
     });
-
+  
     const authorArray = Object.entries(authorMap)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
-
+  
     setAuthorCounts(authorArray);
   }, [data]);
+  
 
   const handleExpand = () => {
     setVisibleCount((prev) => Math.min(prev + 20, authorCounts.length));
@@ -105,6 +110,7 @@ const Author: React.FC = () => {
     (currentPage - 1) * cardsPerPage,
     currentPage * cardsPerPage
   );
+  console.log("paginated data:", paginatedData);
 
   const jsonToCsv = (data: EIP[]): string => { 
     const csvRows: string[] = [];
@@ -128,6 +134,11 @@ const Author: React.FC = () => {
   
     return csvRows.join('\n');
   };
+
+  const filteredAuthors = authorCounts.filter((author) =>
+    author.name.toLowerCase().includes(selectedAuthor.toLowerCase())
+  );
+  
   
   const handleDownload = () => {
     if (!filteredData.length) {
@@ -164,12 +175,14 @@ const Author: React.FC = () => {
               boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
             }}
           />
-          <Button colorScheme="blue" size="lg" borderRadius="full" onClick={handleDownload}>
+          {/* <Button colorScheme="blue" size="lg" borderRadius="full" onClick={handleDownload}>
             Download Data
-          </Button>
+          </Button> */}
         </Flex>
         </Box>
         <Box p={4}>
+
+        
 
           {/* <AuthorEIPCounter eips={data}/> */}
 
@@ -187,7 +200,7 @@ const Author: React.FC = () => {
       borderRadius="lg"
       overflowX="auto"
     >
-      {authorCounts.slice(0, visibleCount).map((author) => (
+      {filteredAuthors.slice(0, visibleCount).map((author) => (
   <Box
     key={author.name}
     bg={selectedAuthor === author.name ? "blue.600" : "blue.500"}
@@ -215,6 +228,8 @@ const Author: React.FC = () => {
     </Text>
   </Box>
 ))}
+
+
 
 
       {visibleCount < authorCounts.length && (
@@ -256,6 +271,22 @@ const Author: React.FC = () => {
         </Tooltip>
       )}
     </Flex>
+
+    <Box mt={8}>
+                    {/* Download CSV section */}
+                    <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
+                    <Text fontSize="lg"
+                    marginBottom={2}
+                    color={useColorModeValue("gray.800", "gray.200")}>
+                        You can download the data here:
+                      </Text>
+                      <Button colorScheme="blue" onClick={handleDownload} disabled={isLoading}>
+                        {isLoading ? <Spinner size="sm" /> : "Download CSV"}
+                      </Button>
+                    </Box>
+                  </Box>
+
+                  
             {/* Display Cards */}
             <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={6}>
               {paginatedData.map((item) => (
@@ -267,38 +298,154 @@ const Author: React.FC = () => {
                 >
                   {/* <a target="_blank" rel="noopener noreferrer">  */}
                   <Box
-                    as="a"
-                    borderWidth="1px"
-                    borderRadius="lg"
-                    bg={cardBg}
-                    borderColor="blue.100"
-                    p={6}
-                    shadow="lg"
-                    transition="transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out"
-                    _hover={{ transform: 'scale(1.05)', shadow: 'xl' }}
-                    display="flex"
-                    flexDirection="column"
-                  >
-                    {/* EIP Heading */}
-                    <Text fontSize="2xl" fontWeight="extrabold" color={useColorModeValue('blue.500', 'blue.300')} mb={4}>
-                    {item.repo.toUpperCase()}-{item.eip}
-                    </Text>
-                    {/* Type */}
-                    <Text fontSize="md"  color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
-                      <b>Type:</b>{item.type}
-                    </Text>
-                    {/* <Text fontSize="md" color={useColorModeValue('gray.600', 'gray.400')} mb={3}>
-                      {item.type}
-                    </Text> */}
-                    {/* Category */}
-                    <Text fontSize="md" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
-                      <b>Category:</b>{item.category}
-                    </Text>
-                    {/* <Text fontSize="md" color={useColorModeValue('gray.600', 'gray.400')}>
-                      {item.category}
-                    </Text> */}
-                  </Box>
-                   {/* </a> */}
+  bg={bg}
+  paddingX="0.5rem"
+  borderRadius="0.55rem"
+  _hover={{
+    border: "1px",
+    borderColor: "#30A0E0",
+  }}
+  width="100%" // Adjust width based on container size
+  padding="1rem"
+  display="flex"
+  flexDirection="column"
+>
+  {/* Repo-EIP Title Section */}
+  <Text
+    fontSize="2xl"
+    fontWeight="extrabold"
+    color={useColorModeValue('blue.500', 'blue.300')}
+    mb={4}
+  >
+    {item.repo.toUpperCase()}-{item.eip}
+  </Text>
+
+  <Text
+    fontSize="lg"
+    fontWeight="bold"
+    color={useColorModeValue('gray.700', 'gray.300')}
+    isTruncated
+    maxWidth="100%" // Ensure title is truncated if too long
+    marginBottom="0.5rem"
+  >
+    {item.title} {/* Display title */}
+  </Text>
+
+  {/* Type Section */}
+  <Text fontSize="md" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+    <b>Type:</b> {item.type}
+  </Text>
+
+  {/* Category Section */}
+  <Text fontSize="md" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+    <b>Category:</b> {item.category}
+  </Text>
+
+  {/* Title Section */}
+
+  {/* Authors Section */}
+  <Text fontSize="sm" fontWeight="bold" color={useColorModeValue('gray.700', 'gray.300')} marginBottom="0.5rem">
+  Authors:
+</Text>
+<Box
+  display="flex"
+  flexWrap="wrap"
+  gap="0.5rem"
+  marginBottom="1rem"
+  maxWidth="100%"
+>
+  {(() => {
+    // Split the authors string, clean up names, and trim each name
+    const authors = item.author.split(",").map((author) =>
+      author.replace(/<.*?>/g, "").trim() // Remove the <...> part
+    );
+
+    // Sort authors so selected ones appear first
+    const sortedAuthors = authors.sort((a, b) => {
+      const aIsSelected = !!(
+        selectedAuthor &&
+        a.toLowerCase().includes(selectedAuthor.toLowerCase())
+      ); // Convert to boolean
+      const bIsSelected = !!(
+        selectedAuthor &&
+        b.toLowerCase().includes(selectedAuthor.toLowerCase())
+      ); // Convert to boolean
+      return Number(bIsSelected) - Number(aIsSelected); // Perform arithmetic safely
+    });
+
+    // Render the first 4 authors
+    return sortedAuthors.slice(0, 1).map((author, index) => {
+      const authorName = author; // Use GitHub handle if available, else use author name
+      const isSelected =
+        selectedAuthor && authorName.toLowerCase().includes(selectedAuthor.toLowerCase());
+    
+      return (
+        <Box
+          key={`author-${index}`} // Use index as fallback for key
+          bg={isSelected ? "blue.600" : "blue.500"}
+          color="white"
+          px={3}
+          py={1}
+          borderRadius="full"
+          m={2} // Margin for spacing
+          border="1px solid"
+          borderColor="blue.500"
+          whiteSpace="nowrap"
+          transform={isSelected ? "scale(1.1)" : "scale(1.0)"}
+          transition="all 0.2s ease"
+          _hover={{
+            bg: "blue.400",
+            transform: "scale(1.05)",
+            cursor: "pointer",
+          }}
+          onClick={() => setSelectedAuthor(authorName)} // Set selected author
+        >
+          <Text fontSize="sm" fontWeight="bold">
+            {authorName} {/* Display author name */}
+          </Text>
+        </Box>
+      );
+    }).concat(
+      sortedAuthors.length > 1 ? (
+        <Box
+          key="more-authors"
+          // bg="blue.500"
+          color={useColorModeValue('gray.700', 'gray.300')}
+          // px={3}
+          py={1}
+          borderRadius="full"
+          m={2} // Margin for spacing
+          // border="1px solid"
+          // borderColor="blue.500"
+          whiteSpace="nowrap"
+          transform="scale(1.0)"
+          transition="all 0.2s ease"
+          _hover={{
+            bg: "blue.400",
+            transform: "scale(1.05)",
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            // Handle the click for the "more" action, like showing all authors
+          }}
+        >
+          <Text fontSize="sm" fontWeight="bold">
+            ...more {/* Display 'more' */}
+          </Text>
+        </Box>
+      ) : []
+    );
+    
+    
+  })()}
+  
+</Box>
+
+
+
+</Box>
+
+                 
                 </NextLink>
               ))}
             </SimpleGrid>

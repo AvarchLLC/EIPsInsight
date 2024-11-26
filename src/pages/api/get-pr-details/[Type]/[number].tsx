@@ -41,8 +41,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
         // const number = req.params.number; // Get the PR or Issue number from the URL parameter
-        console.log("number:",number);
-        console.log("Type:", Type);
+        // console.log("number:",number);
+        // console.log("Type:", Type);
 
         // Check if a PR with the given number exists
         let prDetails = null;
@@ -53,7 +53,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-            console.log(prResponse);
+            // console.log(prResponse);
 
 
             if (prResponse.status === 200) {
@@ -61,8 +61,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 const issueDetails = await processPRDetails(prResponse.data,typeString);
 
                 var state = prResponse.data.state;
-                console.log(prResponse.data.merged);
-                console.log(prResponse.data.state);
+                // console.log(prResponse.data.merged);
+                // console.log(prResponse.data.state);
 
                 if (state === "closed" && prResponse.data.merged === true) {
                     state = 'merged';
@@ -73,6 +73,27 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
+                
+                let allConversations2 = commentsResponse.data;
+                console.log(commentsResponse.data);
+
+                allConversations2 = allConversations2.concat(commentsResponse);
+
+                const participants2 = getParticipants2(allConversations2);
+
+                const commitAuthor = issueDetails?.commits[0]?.author?.login;
+
+                // Merge participants, including the commit author if available
+                const mergedParticipants = new Set([
+                    ...issueDetails.participants,
+                    ...participants2,
+                    ...(commitAuthor ? [commitAuthor] : [])  // Add commit author if it exists
+                ]);
+
+                const uniqueParticipantsArray = Array.from(mergedParticipants);
+
+                issueDetails.participants=uniqueParticipantsArray;
+                issueDetails.numParticipants=uniqueParticipantsArray.length;
 
                 prDetails = {
                     type: 'Pull Request',
@@ -213,6 +234,20 @@ const getParticipants = (conversations: any[], commits: any[]) => {
     // Convert the Set back to an array
     return Array.from(uniqueParticipants);
 };
+
+const getParticipants2 = (conversations: any[]) => {
+    if (conversations.length === 0) return [];
+
+    const commentParticipants = conversations
+        .filter((conversation) => conversation.user && conversation.user.login && conversation.user.login !== 'github-actions[bot]')
+        .map((conversation) => conversation.user.login);
+
+    // Use a Set to ensure uniqueness and convert it back to an array
+    const uniqueParticipants = new Set(commentParticipants);
+    
+    return Array.from(uniqueParticipants);
+};
+
 
 
 
