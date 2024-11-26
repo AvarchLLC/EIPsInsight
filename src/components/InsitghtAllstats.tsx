@@ -19,6 +19,8 @@ const MyComponent = () => {
   }
 
   return (
+    <>
+    
     <Box
   padding="2rem"
   bgColor={bg}
@@ -53,21 +55,12 @@ const MyComponent = () => {
       {/* First Chart Box with fixed height and heading */}
       <Box
         bgColor={bg}
-        padding="1rem"
+        // padding="1rem"
         borderRadius="0.55rem"
         minHeight="470px" // Set minimum height
         // marginBottom="1rem"
       >
-        <Text
-          color={"#30A0E0"}
-          fontSize="3xl"
-          fontWeight="bold"
-          textAlign="center"
-          // marginBottom="0.5rem"
-          paddingTop={5}
-        >
-          Editors Leaderboard
-        </Text>
+        
         <InsightsLeaderboard /> {/* First chart */}
         
       </Box>
@@ -79,11 +72,27 @@ const MyComponent = () => {
   <br/>
   {/* Second Row: Open PRs and Issues */}
   
-    <InsightsOpenPrsIssues/> {/* Second chart */}
+   
     
 </Box>
-
+<br/>
+  
+      {/* Third Box: Open PRs and Issues */}
+      <Box
+        padding="1rem"
+        bgColor={bg}
+        borderRadius="0.55rem"
+        _hover={{
+          border: "1px",
+          borderColor: "#30A0E0",
+        }}
+      >
+        <InsightsOpenPrsIssues />
+      </Box>
+    {/* </Box> */}
+    </>
   );
+  
 };
 
 export default MyComponent;

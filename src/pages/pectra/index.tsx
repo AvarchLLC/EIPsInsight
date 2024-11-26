@@ -285,7 +285,7 @@ const All = () => {
            fontWeight="bold"
            color="#30A0E0"
           >
-            Pectra Upgrade
+            Eth upgrades
           </Text>
           <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
   Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 

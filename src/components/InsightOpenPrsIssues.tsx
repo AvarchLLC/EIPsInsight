@@ -12,8 +12,6 @@ import DateTime from "@/components/DateTime";
 import LoaderComponent from "@/components/Loader";
 import { usePathname } from "next/navigation";
 
-// Dynamic import for Ant Design's Column chart
-// const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualAxes), { ssr: false });
 const Line = dynamic(() => import("@ant-design/plots").then(mod => mod.Line), { ssr: false });
 
