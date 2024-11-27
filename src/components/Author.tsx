@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex,IconButton, Tooltip, Spinner,} from "@chakra-ui/react";
+import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex,IconButton, Tooltip, Spinner, Avatar} from "@chakra-ui/react";
 import { saveAs } from 'file-saver';
 import AllLayout from './Layout';
 import NextLink from 'next/link';
 // import AuthorEIPCounter from './AuthorBoard';
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
 
 interface EIP {
   _id: string;
@@ -26,7 +27,15 @@ const Author: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAuthor, setSelectedAuthor] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [filterVisible, setFilterVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const cardsPerPage = 25;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedAuthor]);
 
   const [authorCounts, setAuthorCounts] = useState<AuthorCount[]>([]);
   const [visibleCount, setVisibleCount] = useState(20);
@@ -76,12 +85,30 @@ const Author: React.FC = () => {
       const authors = eip.author.split(",").map((author) => author.trim());
       authors.forEach((author) => {
         if (author) {
-          // Extract GitHub handle from the author's name if available
-          const handleMatch = author.match(/\(@([a-zA-Z0-9-_]+)\)$/);
-          const authorName = handleMatch ? handleMatch[1] : author; // Use the handle if matched, else fallback to name
-  
-          authorMap[authorName] = (authorMap[authorName] || 0) + 1;
+          // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
+          const handleMatch = author.match(/(.+?)\s\(@([a-zA-Z0-9-_]+)\)$/);
+          
+          if (handleMatch) {
+            // Add counts for the full name and the GitHub handle
+            const fullName = handleMatch[1].trim(); // Extract full name
+            const handle = handleMatch[2].trim();  // Extract handle
+        
+            authorMap[fullName] = (authorMap[fullName] || 0) + 1;
+            authorMap[`@${handle}`] = (authorMap[`@${handle}`] || 0) + 1;
+          } else {
+            // Match email address in the format: Vitalik Buterin <vitalik.buterin@ethereum.org>
+            const emailMatch = author.match(/(.+?)\s<.+?>$/);
+        
+            if (emailMatch) {
+              const fullName = emailMatch[1].trim(); // Ignore email part, extract only the name
+              authorMap[fullName] = (authorMap[fullName] || 0) + 1;
+            } else {
+              // If no special format is found, count the entire string as the author's name
+              authorMap[author] = (authorMap[author] || 0) + 1;
+            }
+          }
         }
+        
       });
     });
   
@@ -106,7 +133,12 @@ const Author: React.FC = () => {
     !selectedAuthor || item.author.toLowerCase().includes(selectedAuthor.toLowerCase())
   );
   const totalPages = Math.ceil(filteredData.length / cardsPerPage);
-  const paginatedData = filteredData.slice(
+  const filteredData2 = searchTerm
+    ? filteredData.filter((item) =>
+        item.eip.toString().includes(searchTerm.trim())
+      )
+    : filteredData;
+  const paginatedData = filteredData2.slice(
     (currentPage - 1) * cardsPerPage,
     currentPage * cardsPerPage
   );
@@ -155,6 +187,9 @@ const Author: React.FC = () => {
   const cardBg = useColorModeValue('white', 'gray.700');
   const border = useColorModeValue('gray.300', 'gray.600');
 
+
+
+
   return (
     <>
       <Box p={5} maxW="1200px" mx="auto">
@@ -202,31 +237,37 @@ const Author: React.FC = () => {
     >
       {filteredAuthors.slice(0, visibleCount).map((author) => (
   <Box
-    key={author.name}
-    bg={selectedAuthor === author.name ? "blue.600" : "blue.500"}
-    color="white"
-    px={3}
-    py={1}
-    borderRadius="full"
-    m={2} // Increased margin to create more spacing
-    border="1px solid"
-    borderColor="blue.500"
-    whiteSpace="nowrap"
-    transform={
-      selectedAuthor === author.name ? "scale(1.1)" : "scale(1.0)"
-    }
-    transition="all 0.2s ease"
-    _hover={{
-      bg: "blue.400",
-      transform: "scale(1.05)",
-      cursor: "pointer",
-    }}
-    onClick={() => setSelectedAuthor(author.name)}
-  >
-    <Text fontSize="sm" fontWeight="bold">
-      {author.name} ({author.count})
-    </Text>
-  </Box>
+  key={author.name}
+  bg={selectedAuthor === author.name ? "blue.600" : "blue.500"}
+  color="white"
+  px={2} // Reduced padding
+  py={1} // Reduced padding
+  borderRadius="full"
+  m={1} // Reduced margin
+  border="1px solid"
+  borderColor="blue.500"
+  whiteSpace="nowrap"
+  transform={selectedAuthor === author.name ? "scale(1.1)" : "scale(1.0)"}
+  transition="all 0.2s ease"
+  _hover={{
+    bg: "blue.400",
+    transform: "scale(1.05)",
+    cursor: "pointer",
+  }}
+  onClick={() => setSelectedAuthor(author.name)}
+  display="flex"
+  alignItems="center"
+>
+  <Avatar
+    size="sm"
+    src={author.name.startsWith('@') ? `https://github.com/${author.name.slice(1)}.png` : ''}
+    bg={author.name.startsWith('@') ? undefined : 'black'}
+  />
+  <Text fontSize="xs" fontWeight="bold" ml={1} mr={1}>
+    {author.name} ({author.count})
+  </Text>
+</Box>
+
 ))}
 
 
@@ -272,12 +313,12 @@ const Author: React.FC = () => {
       )}
     </Flex>
 
-    <Box mt={8}>
+                  <Box mt={8}>
                     {/* Download CSV section */}
                     <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
                     <Text fontSize="lg"
                     marginBottom={2}
-                    color={useColorModeValue("gray.800", "gray.200")}>
+                    color="black">
                         You can download the data here:
                       </Text>
                       <Button colorScheme="blue" onClick={handleDownload} disabled={isLoading}>
@@ -285,6 +326,42 @@ const Author: React.FC = () => {
                       </Button>
                     </Box>
                   </Box>
+            
+                  <Box
+  display="flex"
+  justifyContent="flex-start" // Align items to the start (left)
+  alignItems="center"
+  mb={4}
+  ml={2}
+  gap={4}
+>
+  {/* Filter Button on the left */}
+  <Button
+    onClick={() => setFilterVisible((prev) => !prev)}
+    bg="blue.500"
+    color="white"
+    _hover={{ bg: "blue.600" }}
+  >
+    Filter EIP
+  </Button>
+
+  {/* Search Bar to the right of the filter button */}
+  {filterVisible && (
+    <Input
+      placeholder="Search EIP"
+      boxShadow="md"
+      bg={useColorModeValue('white', 'gray.800')}
+      borderColor={useColorModeValue('gray.300', 'gray.600')}
+      _focus={{
+        borderColor: useColorModeValue('blue.400', 'blue.600'),
+        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
+      }}
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      width="200px"
+    />
+  )}
+</Box>
 
                   
             {/* Display Cards */}
@@ -381,29 +458,40 @@ const Author: React.FC = () => {
     
       return (
         <Box
-          key={`author-${index}`} // Use index as fallback for key
-          bg={isSelected ? "blue.600" : "blue.500"}
-          color="white"
-          px={3}
-          py={1}
-          borderRadius="full"
-          m={2} // Margin for spacing
-          border="1px solid"
-          borderColor="blue.500"
-          whiteSpace="nowrap"
-          transform={isSelected ? "scale(1.1)" : "scale(1.0)"}
-          transition="all 0.2s ease"
-          _hover={{
-            bg: "blue.400",
-            transform: "scale(1.05)",
-            cursor: "pointer",
-          }}
-          onClick={() => setSelectedAuthor(authorName)} // Set selected author
-        >
-          <Text fontSize="sm" fontWeight="bold">
-            {authorName} {/* Display author name */}
-          </Text>
-        </Box>
+  key={`author-${index}`} // Use index as fallback for key
+  bg={isSelected ? "blue.600" : "blue.500"}
+  color="white"
+  px={3}
+  py={1}
+  borderRadius="full"
+  m={2} // Margin for spacing
+  border="1px solid"
+  borderColor="blue.500"
+  whiteSpace="nowrap"
+  transform={isSelected ? "scale(1.1)" : "scale(1.0)"}
+  transition="all 0.2s ease"
+  _hover={{
+    bg: "blue.400",
+    transform: "scale(1.05)",
+    cursor: "pointer",
+  }}
+  onClick={() => setSelectedAuthor(authorName)} // Set selected author
+  display="flex"
+  alignItems="center" // Align items horizontally
+>
+  <Avatar
+    size="sm"
+    src={authorName.includes('@') && authorName.includes(')') 
+      ? `https://github.com/${authorName.slice(authorName.indexOf('@') + 1, authorName.indexOf(')'))}.png`
+      : ''} // Extract GitHub handle between @ and )
+    bg={authorName.includes('@') && authorName.includes(')') ? undefined : 'black'}
+    mr={2} // Adjust spacing between avatar and text
+  />
+  <Text fontSize="sm" fontWeight="bold" mr={1}>
+    {authorName} {/* Display author name */}
+  </Text>
+</Box>
+
       );
     }).concat(
       sortedAuthors.length > 1 ? (

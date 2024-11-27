@@ -6,11 +6,13 @@ import {
   Flex,
   Text,
   Spinner,
-  Link as LI
+  Link as LI,
+  Button
 } from "@chakra-ui/react";
 import DateTime from "@/components/DateTime";
 import LoaderComponent from "@/components/Loader";
 import { usePathname } from "next/navigation";
+import { CSVLink } from "react-csv";
 
 const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualAxes), { ssr: false });
 const Line = dynamic(() => import("@ant-design/plots").then(mod => mod.Line), { ssr: false });
@@ -58,7 +60,7 @@ const InsightsOpenPrsIssues: React.FC = () => {
 
   const toggleCollapse = () => setShow(!show);
   const [selectedYear, setSelectedYear] = useState<string>('');
-  // const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [data, setData] = useState<{
     PRs: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[], review:PR[] } };
     Issues: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } };
@@ -73,6 +75,11 @@ const InsightsOpenPrsIssues: React.FC = () => {
     PRs: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[], review:PR[] } };
     Issues: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } };
   }>({ PRs: {}, Issues: {} });
+
+  const [csvData, setCsvData] = useState<any[]>([]);
+
+  const [loading2,setLoading2]=useState<boolean>(false);
+
 
 
   const [showCategory, setShowCategory] = useState<{ [key: string]: boolean }>({
@@ -89,15 +96,20 @@ const InsightsOpenPrsIssues: React.FC = () => {
   useEffect(() => {
     if (path) {
       const pathParts = path.split("/");
-      const year = pathParts[2]; // Extract year from the path
+      const year = pathParts[2];
+      const month = pathParts[3];
   
       // Only fetch data if the year has changed
       if (year !== selectedYear) {
         setSelectedYear(year); 
         fetchData(year)// Update the selected year
       }
+
+      if(month!=selectedMonth){
+        setSelectedMonth(month);
+      }
     }
-  }, [path, selectedYear]);
+  }, [path, selectedYear, selectedMonth]);
   
 
 // const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails', '/api/ripsprdetails'];
@@ -535,6 +547,7 @@ const fetchPRData3 = async (year: string) => {
     const dataToUse4=  data2.Issues;
     const dataToUse5 = data3.PRs;
     const dataToUse6=  data3.Issues;
+    console.log("data to use in charts:", dataToUse);
 
     // Transform data for chart rendering
     const transformedData = Object.keys(dataToUse).flatMap(monthYear => {
@@ -834,6 +847,65 @@ return <Line {...config} />;
 
   }  
 
+  const generateCSVData = () => {
+    if (!selectedYear || !selectedMonth) {
+      console.error('Year and month must be selected to generate CSV');
+      return;
+    }
+  
+    const key = `${selectedYear}-${selectedMonth}`; // Format key as "YYYY-MM"
+  
+    // Extract data for the specified year and month
+    const combinedPRs = [
+      ...(data.PRs[key]?.open || []),
+      ...(data2.PRs[key]?.open || []),
+      ...(data3.PRs[key]?.open || []),
+    ];
+  
+    const combinedIssues = [
+      ...(data.Issues[key]?.open || []),
+      ...(data2.Issues[key]?.open || []),
+      ...(data3.Issues[key]?.open || []),
+    ];
+  
+    // Combine PR and Issue data
+    const allData = [...combinedPRs, ...combinedIssues];
+  
+    // Format data into CSV-friendly structure
+    const csv = allData.map((item) => {
+      // Check if item is a PR
+      if ('prNumber' in item) {
+        return {
+          Number: item.prNumber,
+          Title: item.prTitle,
+          State: item.merged_at ? 'Merged' : item.closed_at ? 'Closed' : 'Open',
+          Created_Date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
+          Closed_Date: item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+          Merged_Date: item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-',
+          // Review_Date: item.reviewDate ? new Date(item.reviewDate).toLocaleDateString() : '-',
+          Link: `https://github.com/ethereum/${item.repo}/pull/${item.prNumber}`,
+        };
+      } else {
+        return {
+          Number: item.IssueNumber,
+          Title: item.IssueTitle,
+          State: item.state,
+          Created_Date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
+          Closed_Date: item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+          Merged_Date: '-',
+          // Review_Date: '-',
+          Link: `https://github.com/ethereum/${item.repo}/issues/${item.IssueNumber}`,
+        };
+      }
+    });
+  
+    console.log("csv data:", csv);
+  
+    setCsvData(csv);
+  };
+  
+  
+
 
 
   return (
@@ -849,7 +921,41 @@ return <Line {...config} />;
         minHeight="400px" // Set minimum height
         marginTop={{ base: "1rem", md: "1rem" }} // Margin for separation
       >
-        <Text
+
+<Flex 
+  justifyContent="center" // Center items horizontally
+  alignItems="center" // Align items vertically
+  marginBottom="0.5rem" 
+  gap={4} // Add some space between the items
+>
+  <Text
+    color="#30A0E0"
+    fontSize="2xl"
+    fontWeight="bold"
+    textAlign="center"
+    marginBottom="0.5rem"
+  >
+    {`Open PRs and Issues (${selectedYear})`}
+  </Text>
+
+  {/* Download button next to the text */}
+  <CSVLink 
+    data={csvData.length ? csvData : []} 
+    filename={`OpenPRSAndIssues-${selectedYear}-${selectedMonth}.csv`} 
+    onClick={(e: any) => {
+      generateCSVData();
+      if (csvData.length === 0) {
+        e.preventDefault(); 
+        console.error("CSV data is empty or not generated correctly.");
+      }
+    }}
+  >
+    <Button colorScheme="blue">
+      {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+    </Button>
+  </CSVLink>
+</Flex>
+        {/* <Text
           color="#30A0E0"
           fontSize="2xl"
           fontWeight="bold"
@@ -857,17 +963,9 @@ return <Line {...config} />;
           marginBottom="0.5rem"
         >
           {`Open PRs and Issues (${selectedYear})`}
-        </Text>
+        </Text> */}
         <LI href="/Analytics">
           <Box padding="1rem" borderRadius="0.55rem">
-            <Flex
-              justifyContent="center"
-              alignItems="center"
-              height="100%"
-              // marginTop="10rem"
-            >
-          {/* Centered Spinner */}
-            </Flex>
             {renderChart()}
           </Box>
         </LI>

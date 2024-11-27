@@ -27,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === 'POST' && !req.query.commentId) {
     // Add a new comment to the specified page
-    const { content } = req.body;
+    const { content, author, profileLink, profileImage} = req.body;
     try {
       await client.connect();
       const database = client.db('test');
@@ -35,6 +35,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const newComment = {
         content,
+        author,
+        profileLink,
+        profileImage,
         page, // Add the page to the new comment
         createdAt: new Date(),
         subComments: [],
