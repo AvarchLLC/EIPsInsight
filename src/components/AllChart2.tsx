@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Spinner, Text, Select, Flex } from "@chakra-ui/react";
+import { Box, useColorModeValue, Spinner, Text, Select, Flex, Link } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
@@ -282,10 +282,18 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
              <Flex justify="space-between" align="center">
       {/* Label and Dropdown in the same row */}
       <Box>
-        <Text fontSize="2xl" fontWeight="bold" color="#30A0E0">
+      <Link href="/alltable">
+        <Text 
+          fontSize="2xl" 
+          fontWeight="bold" 
+          color="#30A0E0" 
+          cursor="pointer" // Optional: To indicate it's clickable
+          _hover={{ textDecoration: 'underline' }} // Optional: Adds hover effect
+        >
           {type === 'Total' ? `All EIPs [${data.length}]` : `${type} - [${data.length}]`}
         </Text>
-      </Box>
+      </Link>
+    </Box>
 
       {/* Dropdown aligned to the right */}
       <Box>

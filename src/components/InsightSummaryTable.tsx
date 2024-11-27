@@ -10,9 +10,13 @@ import {
   TableContainer,
   useColorModeValue,
   Text,
+  Spinner,
+  Button,
+  Flex,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { CSVLink } from "react-csv";
 
 interface StatusChange {
   _id: string;
@@ -74,6 +78,8 @@ export default function InsightSummary() {
   const [data, setData] = useState<StatusChange[]>([]);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const path = usePathname();
+  const [csvData, setCsvData] = useState<any[]>([]);
+  const [loading2,setLoading2]=useState<boolean>(false);
 
   let year = "";
   let month = "";
@@ -340,35 +346,7 @@ export default function InsightSummary() {
           monthYearData[closedKey].closed.push(issue);
       }
   
-      // Set openDate to the creation date and endDate to the 1st of the closed month or current month
-      // let openDate = new Date(createdDate);
-      // let createdConstant = new Date(createdDate); // Store the creation date separately
-      // let endDate = issue.closed_at 
-      //     ? new Date(new Date(issue.closed_at).getUTCFullYear(), new Date(issue.closed_at).getUTCMonth(), 1) 
-      //     : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Include the current month
-      
-      // // Loop through each month the issue was open
-      // while (openDate <= endDate) { // Open until the start of the closed month or current month
-      //     const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-      
-      //     if (!monthYearData[openKey]) {
-      //         monthYearData[openKey] = { created: [], closed: [], open: [] };
-      //     }
-      
-      //     // Check if the issue was still open on the 1st of the month
-      //     const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
-          
-      //     // Skip if the openDate corresponds to the created month
-      //     if (!(openDate.getUTCFullYear() === createdConstant.getUTCFullYear() && openDate.getUTCMonth() === createdConstant.getUTCMonth())) {
-      //         if (firstOfMonth <= openDate && (!issue.closed_at || firstOfMonth < new Date(issue.closed_at))) {
-      //             // Add to open only if it's still open on the first of that month
-      //             addIfNotExists(monthYearData[openKey].open, issue);
-      //         }
-      //     }
-      
-      //     // Move to the next month
-      //     openDate = incrementMonth(openDate);
-      // }
+
 
       if (createdDate) {
         let createdDateObj = new Date(createdDate);
@@ -447,38 +425,7 @@ export default function InsightSummary() {
     fetchData();
   }, [year, month]);
 
-  //   const eipData = data?.map((item) => {
-  //     const { count, _id, repo } = item;
-  //     if (repo === "eip") {
-  //       return {
-  //         count,
-  //         _id,
-  //         repo: "EIP",
-  //       };
-  //     }
-  //   });
 
-  //   const ercData = data?.map((item) => {
-  //     const { count, _id, repo } = item;
-  //     if (repo === "erc") {
-  //       return {
-  //         count,
-  //         _id,
-  //         repo: "ERC",
-  //       };
-  //     }
-  //   });
-  //   const ripData = data?.map((item) => {
-  //     const { count, _id, repo } = item;
-
-  //     if (repo === "rip") {
-  //       return {
-  //         count,
-  //         _id,
-  //         repo: "RIP",
-  //       };
-  //     }
-  //   });
 
   const statuses = [
     "Draft",
@@ -490,6 +437,7 @@ export default function InsightSummary() {
     "Withdrawn",
   ];
   const tableData = statuses.map((status) => {
+    console.log("table data:", data);
     const statusData = data.filter((item) => item._id === status);
     return {
       _id: status,
@@ -499,11 +447,65 @@ export default function InsightSummary() {
     };
   });
 
+  const generateCSVData = () => {
+    console.log("input data", data)
+    const csvData = data.flatMap((item) =>
+      item.statusChanges.map((statusChange) => ({
+        _id: item._id,
+        repo: item.repo,
+        eip: statusChange.eip,
+        title: statusChange.title,
+        fromStatus: statusChange.fromStatus,
+        toStatus: statusChange.toStatus,
+        link: `https://eipsinsight.com/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${statusChange.eip}`,
+      }))
+    );
+    console.log("Oputput data:", csvData)
+    setCsvData(csvData)
+  
+    return csvData;
+  };
+
   return (
     <>
-      <Text fontSize="3xl" fontWeight="bold" color="blue.400" textAlign="center" paddingTop={8} paddingLeft={8}>
+      <Flex 
+  justifyContent="center" // Center items horizontally
+  alignItems="center" // Align items vertically
+  // marginBottom="0.5rem" 
+  gap={4} // Add some space between the items
+  paddingTop={8}
+>
+{/* <Text fontSize="3xl" fontWeight="bold" color="blue.400" textAlign="center" paddingTop={8} paddingLeft={8}>
         Summary
-      </Text>
+      </Text> */}
+  <Text
+    color="#30A0E0"
+    fontSize="2xl"
+    fontWeight="bold"
+    textAlign="center"
+    // marginBottom="0.5rem"
+     paddingLeft={8}
+  >
+    {`Summary`}
+  </Text>
+
+  {/* Download button next to the text */}
+  <CSVLink 
+    data={csvData.length ? csvData : []} 
+    filename={`OpenPRSAndIssues-${year}-${month}.csv`} 
+    onClick={(e: any) => {
+      generateCSVData();
+      if (csvData.length === 0) {
+        e.preventDefault(); 
+        console.error("CSV data is empty or not generated correctly.");
+      }
+    }}
+  >
+    <Button colorScheme="blue">
+      {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+    </Button>
+  </CSVLink>
+</Flex>
       <TableContainer bg={bg} padding={4} rounded={"xl"} marginTop={8}>
         <Table variant="simple" size="md" bg={bg} padding={8}>
           <TableCaption>eipsinsight.com</TableCaption>
@@ -549,62 +551,12 @@ export default function InsightSummary() {
                         {item.ripCount}
                       </a>
                     </Td>
-                    {/* <Td isNumeric>
-                      {item.eipCount + item.ercCount + item.ripCount}
-                    </Td> */}
+                   
                   </Tr>
                 </>
               );
             })}
-            {/* <Tr>
-              <Td>Open PRs</Td>
-              <Td>{prData.EIPs.open}</Td>
-              <Td>{prData.ERCs.open}</Td>
-              <Td>{prData.RIPs.open}</Td> */}
-              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Created PRs</Td>
-              <Td>{prData.EIPs.created}</Td>
-              <Td>{prData.ERCs.created}</Td>
-              <Td>{prData.RIPs.created}</Td> */}
-              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Closed PRs</Td>
-              <Td>{prData.EIPs.closed}</Td>
-              <Td>{prData.ERCs.closed}</Td>
-              <Td>{prData.RIPs.closed}</Td> */}
-              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Merged PRs</Td>
-              <Td>{prData.EIPs.merged}</Td>
-              <Td>{prData.ERCs.merged}</Td>
-              <Td>{prData.RIPs.merged}</Td> */}
-              {/* <Td isNumeric>{prData.EIPs.merged+prData.ERCs.merged+prData.RIPs.merged}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Created Issues</Td>
-              <Td>{issueData.EIPs.created}</Td>
-              <Td>{issueData.ERCs.created}</Td>
-              <Td>{issueData.RIPs.created}</Td> */}
-              {/* <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Open Issues</Td>
-              <Td>{issueData.EIPs.open}</Td>
-              <Td>{issueData.ERCs.open}</Td>
-              <Td>{issueData.RIPs.open}</Td> */}
-              {/* <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Closed Issues</Td>
-              <Td>{issueData.EIPs.closed}</Td>
-              <Td>{issueData.ERCs.closed}</Td>
-              <Td>{issueData.RIPs.closed}</Td> */}
-              {/* <Td isNumeric>{issueData.EIPs.closed+issueData.ERCs.closed+issueData.RIPs.closed}</Td> */}
-            {/* </Tr> */}
+           
             
           </Tbody>
         </Table>

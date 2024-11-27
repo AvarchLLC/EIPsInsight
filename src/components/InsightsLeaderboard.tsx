@@ -22,6 +22,7 @@ type ShowReviewerType = { [key: string]: boolean };
 const InsightsLeaderboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
+  const [data2, setData2] = useState<any[]>([]);
   const [chart1data, setchart1Data] = useState<any[]>([]);
   const [downloaddata, setdownloadData] = useState<any[]>([]);
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
@@ -42,6 +43,43 @@ const InsightsLeaderboard = () => {
   const [activeTab, setActiveTab] = useState<'all'>('all');
   const path = usePathname();
   const [loading3,setLoading3]=useState<boolean>(false);
+  const [loading2,setLoading2]=useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!selectedYear || !selectedMonth) return; // Ensure year and month are selected
+
+      setLoading2(true);
+
+      // Format the key to 'yyyy-mm' format
+      const key = `${selectedYear}-${selectedMonth}`;
+
+      // Define the API endpoint based on activeTab ('PRs' or 'Issues')
+      const endpoint =`/api/ReviewersCharts/data/${activeTab.toLowerCase()}/${key}`
+        
+
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const result = await response.json();
+        // console.log(result)
+
+        console.log("result:",result[0].PRs);
+
+        setData2(result[0].PRs)
+        // console.log(formattedData); 
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading2(false); // Reset loading state after fetching
+      }
+    };
+
+    fetchData(); // Invoke the fetch function
+
+  }, [selectedYear, selectedMonth]);
 
   
   useEffect(() => {
@@ -231,34 +269,17 @@ type PR = {
 };
 
 
-const generateCSVData2 = () => {
-  console.log("downloadable data:", downloaddata);
-  setLoading3(true);
+const generateCSVData = () => {
+  if (!selectedYear || !selectedMonth) {
+    console.error('Year and Month must be selected to generate CSV');
+    return;
+  }
 
-  console.log(selectedStartMonth);
-  console.log(selectedEndMonth);
-  console.log(selectedEndYear);
-  console.log(selectedStartYear);
+  console.log(data2)
 
-  if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
-    // Construct start and end dates in ISO format
-    const startDate = new Date(`${selectedStartYear}-${selectedStartMonth}-01T00:00:00Z`);
-    const endDate = new Date(
-      `${selectedEndYear}-${selectedEndMonth}-01T00:00:00Z`
-    );
+  const filteredData = data2
 
-    // Adjust end date to include the entire month
-    endDate.setMonth(endDate.getMonth() + 1);
-    endDate.setDate(0); // Last day of the month
-
-    const filteredData = downloaddata.filter((pr) => {
-      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
-      return reviewDate && reviewDate >= startDate && reviewDate <= endDate;
-    });
-
-    console.log("Filtered Data (Review Date):", filteredData);
-
-    const csv = filteredData.map((pr: PR) => ({
+  const csv = data2.map((pr: PR) => ({
       PR_Number: pr.prNumber,
       Title: pr.prTitle,
       Reviewer: pr.reviewer,
@@ -270,31 +291,10 @@ const generateCSVData2 = () => {
       Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
     }))
   ;
-
-    setCsvData(csv);
-  setLoading3(false);
-}
-else{
-  const filteredData =downloaddata
-
-  const csv = filteredData.map((pr: PR) => ({
-    PR_Number: pr.prNumber,
-    Title: pr.prTitle,
-    Reviewer: pr.reviewer,
-    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-    Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-    Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-  }))
-;
+  console.log("csv data:",csv);
 
   setCsvData(csv); 
-}
-
 };
-
 
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
     let monthlyChartData: MonthlyChartData[] | undefined;
@@ -344,7 +344,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
     textAlign="center"
     marginBottom="0.5rem"
   >
-    {`Open PRs and Issues (${selectedYear})`}
+    {`Editors Leaderboard`}
   </Text>
 
   {/* Download button next to the text */}
@@ -352,7 +352,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
     data={csvData.length ? csvData : []} 
     filename={`reviews_data.csv`} 
     onClick={(e: any) => {
-      generateCSVData2();
+      generateCSVData();
       if (csvData.length === 0) {
         e.preventDefault(); 
         console.error("CSV data is empty or not generated correctly.");
@@ -360,7 +360,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
     }}
   >
     <Button colorScheme="blue">
-      {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+      {loading2 ? <Spinner size="sm" /> : "Download CSV"}
     </Button>
   </CSVLink>
 </Flex>

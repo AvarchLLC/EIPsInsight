@@ -548,7 +548,7 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`/PR/${(item as PR).repo}/pull/${item.prNumber}`} 
+                    href={`/PR/${(item as PR).repo}/${item.prNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >

@@ -63,42 +63,6 @@ export default function LargeWithAppLinksAndSocial() {
   const year = new Date().getFullYear();
 
   return (
-    // <Box
-    //   bg={useColorModeValue("gray.50", "gray.900")}
-    //   color={useColorModeValue("gray.700", "gray.200")}
-    // >
-    //   <Box
-    //     borderTopWidth={1}
-    //     borderStyle={"solid"}
-    //     borderColor={useColorModeValue("gray.200", "gray.700")}
-    //   >
-    //     <Container
-    //       as={Stack}
-    //       maxW={"6xl"}
-    //       py={4}
-    //       direction={'row'}
-    //       spacing={4}
-    //       justify={{ base: "space-between" }}
-    //       align={{ md: "center" }}
-    //     >
-    //       <Text paddingTop={{base:"1",md:"0"}}>
-    //         Build With <span> 💙 </span> by&nbsp; <NextLink href={'https://avarch.org/index.html#0'} target={'_blank'}>Avarch</NextLink>
-    //       </Text>
-    //       <Stack direction={"row"} spacing={6}>
-    //         <SocialButton label={"Twitter"} href={"https://twitter.com/ether_world"} >
-    //           <FaTwitter />
-    //         </SocialButton>
-    //         <SocialButton label={"YouTube"} href={"https://www.youtube.com/channel/UCnceAY-vAQsO8TgGAj5SGFA"}>
-    //           <FaYoutube />
-    //         </SocialButton>
-    //         <SocialButton label={"Instagram"} href={"https://www.instagram.com/etherworld.co/?hl=en"}>
-    //           <FaInstagram />
-    //         </SocialButton>
-    //       </Stack>
-    //     </Container>
-    //   </Box>
-    // </Box>
-
 
 
       <>
@@ -130,7 +94,7 @@ export default function LargeWithAppLinksAndSocial() {
               <NextLink href={`/insight/${year}/${getMonth(monthName)}`}>{monthName} {year} Insights</NextLink>
               <NextLink href={'/resources'}>Resources</NextLink>
               <NextLink href={'https://github.com/AvarchLLC/EIPsInsight/issues'}>Found a bug? Report here!</NextLink>
-              <NextLink href={'https://forms.gle/agMKc6orypdxC4Yn6'} target="_blank">Feedback Form</NextLink>
+              <NextLink href={'/Feedback'} target="_blank">Feedback Form</NextLink>
             </Stack>
 
             <Stack
