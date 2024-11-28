@@ -14,6 +14,7 @@ import {
 import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
+import DashboardDonut2 from "@/components/DashboardDonut2";
 import DashboardDonut from "@/components/DashboardDonut";
 import {
   Anchor,
@@ -477,7 +478,7 @@ const Dashboard = () => {
                 <div className="col-span-2">
                   <StatBox
                     title="Meta EIPs"
-                    value={new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size}
+                    value={(new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size)+1}
                     description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
                     icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
                     url="meta"
@@ -552,6 +553,43 @@ const Dashboard = () => {
                 }}
                 className="hover: cursor-pointer ease-in duration-200"
               >
+                <NextLink href="/all">
+                  <Text
+                    fontSize="2xl"
+                    fontWeight="bold"
+                    color="#30A0E0"
+                    marginRight="6"
+                    paddingBottom={6}
+                  >
+                  {`Category - [${allData.length}]`}
+                  </Text>
+                </NextLink>
+                <DashboardDonut2 dataset={data} />
+              </Box>
+            </Box>
+
+            <Box
+              display="grid"
+              gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
+              gap={"6"}
+              marginTop={"20px"}
+            >
+
+             <Box
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 } as any}
+                bgColor={bg}
+                paddingY={{ lg: "2rem", sm: "2rem" }}
+                paddingX={{ lg: "2rem", sm: "0.5rem" }}
+                borderRadius="0.55rem"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#30A0E0",
+                }}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
                 <NextLink href="/status">
                   <Text
                     fontSize="2xl"
@@ -565,6 +603,68 @@ const Dashboard = () => {
                 </NextLink>
                 <DashboardDonut dataset={data} />
               </Box>
+              
+              <div className="grid grid-cols-2 gap-6">
+                <div className="col-span-2">
+                <StatBox
+                  title="Draft"
+                  value={allData.filter((item) => item.status === "Draft").length}
+                  description="Draft EIPs are proposals still under initial consideration and open for feedback."
+                  icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+                  url="alltable"
+                />
+                </div>
+
+                <StatBox
+                  title="Review"
+                  value={allData.filter((item) => item.status === "Review").length}
+                  description="EIPs in the Review stage are being actively discussed and evaluated by the community."
+                  icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Last Call"
+                  value={allData.filter((item) => item.status === "Last Call").length}
+                  description="Last Call EIPs are nearing finalization, with a short period for final community comments."
+                  icon={<Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Final"
+                  value={allData.filter((item) => item.status === "Final").length}
+                  description="Final EIPs have been formally accepted and implemented as part of the Ethereum protocol."
+                  icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Withdrawn"
+                  value={allData.filter((item) => item.status === "Withdrawn").length}
+                  description="Withdrawn EIPs have been removed from consideration by the author or due to lack of support."
+                  icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Stagnant"
+                  value={allData.filter((item) => item.status === "Stagnant").length}
+                  description="Stagnant EIPs are inactive and have not progressed for a prolonged period."
+                  icon={<Icon as={Clipboard} fontSize={{ base: "10", lg: "15" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Living"
+                  value={allData.filter((item) => item.status === "Living").length}
+                  description="Living EIPs are continuously updated and reflect evolving standards or documentation."
+                  icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+                  url="alltable"
+                />
+              </div>
+
+              
             </Box>
             </Box>
           

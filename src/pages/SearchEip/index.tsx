@@ -1,12 +1,13 @@
 import React from 'react';
 import AllLayout from "@/components/Layout";
-import Author from "@/components/Author";
+import SearchByEip from '@/components/SearchByEIP';
 
 const Authors: React.FC = () => {
     return (
         <>
             <AllLayout>
-                <Author defaultQuery=''/>
+              
+                <SearchByEip defaultQuery=''/>
             </AllLayout>
         </>
     );

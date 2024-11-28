@@ -43,15 +43,16 @@ interface PRProps {
   type: string;
 }
 
+interface AuthorCount {
+  name: string;
+  count: number;
+}
+
 const SearchBox: React.FC = () => {
   const [data, setData] = useState<PRItem[]>([]);
   const [authordata, setauthorData] = useState<EIP2[]>([]);
-  const [pr, setPR] = useState<PRProps>({
-    type: "Pull Request",
-  }); 
-  const [issue, setIssue] = useState<PRProps>({
-    type: "Issue",
-    });
+  const [authorCounts, setAuthorCounts] = useState<AuthorCount[]>([]);
+ 
   const [IssueData, setIssueData]=useState<IssueItem[]>([]);
   const [eipData, setEipData] = useState<EIP[]>([]);
   const [query, setQuery] = useState("");
@@ -90,7 +91,7 @@ const SearchBox: React.FC = () => {
         );
 
         setauthorData(filteredData);
-        console.log("author data: ", filteredData);
+        // console.log("author data: ", filteredData);
         // setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -101,20 +102,65 @@ const SearchBox: React.FC = () => {
     fetchData();
   }, []);
 
-  const filteredAuthorData = query
-  ? authordata.filter(item =>
-      item.author.toLowerCase().includes(query.toLowerCase())
-    )
-  : [];
+  useEffect(() => {
+    const authorMap: Record<string, number> = {};
+  
+    authordata.forEach((eip) => {
+      const authors = eip.author.split(",").map((author) => author.trim());
+      authors.forEach((author) => {
+        if (author) {
+          // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
+          const handleMatch = author.match(/(.+?)\s\(@([a-zA-Z0-9-_]+)\)$/);
+          
+          if (handleMatch) {
+            // Add counts for the full name and the GitHub handle
+            const fullName = handleMatch[1].trim(); // Extract full name
+            const handle = handleMatch[2].trim();  // Extract handle
+        
+            authorMap[fullName] = (authorMap[fullName] || 0) + 1;
+            authorMap[`@${handle}`] = (authorMap[`@${handle}`] || 0) + 1;
+          } else {
+            // Match email address in the format: Vitalik Buterin <vitalik.buterin@ethereum.org>
+            const emailMatch = author.match(/(.+?)\s<.+?>$/);
+        
+            if (emailMatch) {
+              const fullName = emailMatch[1].trim(); // Ignore email part, extract only the name
+              authorMap[fullName] = (authorMap[fullName] || 0) + 1;
+            } else {
+              // If no special format is found, count the entire string as the author's name
+              authorMap[author] = (authorMap[author] || 0) + 1;
+            }
+          }
+        }
+        
+      });
+    });
+  
+    const authorArray = Object.entries(authorMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  
+    setAuthorCounts(authorArray);
+  }, [authordata]);
+
+  // const filteredAuthorData = query
+  // ? authordata.filter(item =>
+  //     item.author.toLowerCase().includes(query.toLowerCase())
+  //   )
+  // : [];
+
+  const filteredAuthors = authorCounts.filter((author) =>
+    author.name.toLowerCase().includes(query.toLowerCase())
+  );
 
 
-  console.log("filtered author data:", filteredAuthorData)
+  // console.log("filtered author data:", filteredAuthors)
 
   useEffect(() => {
       const fetchData = async () => {
           try {
               const response = await fetch(`/api/allprs`);
-              console.log(response);
+              // console.log(response);
               const jsonData = await response.json();
               setData(jsonData);
           } catch (error) {
@@ -128,10 +174,10 @@ const SearchBox: React.FC = () => {
     const fetchData = async () => {
         try {
             const response = await fetch(`/api/allissues`);
-            console.log(response);
+            // console.log(response);
             const jsonData = await response.json();
             setIssueData(jsonData);
-            console.log('IssueData:', jsonData);
+            // console.log('IssueData:', jsonData);
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -192,6 +238,7 @@ const SearchBox: React.FC = () => {
           return bLength - aLength; // Sort by the length of the prNumber in descending order
         }),
       ];
+      console.log(newFilteredResults);
 
       const seenIssues = new Set<string>();
 
@@ -223,7 +270,7 @@ const SearchBox: React.FC = () => {
           return bLength - aLength; // Sort by the length of the prNumber in descending order
         }),
       ];
-      console.log(newFilteredIssueResults);
+      // console.log(newFilteredIssueResults);
 
       // Deduplicate for EIP data
       const seenEIPs = new Set<string>();
@@ -287,9 +334,17 @@ const SearchBox: React.FC = () => {
     }
   };
 
+  const handleAuthorSearchResultClick = async (author:string) => {
+    try {
+          window.location.href = `/authors/${author}`;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   const EIPhandleSearchResultClick = (selectedEIPNumber: string, type: string) => {
-    console.log(selectedEIPNumber);
-    console.log(type);
+    // console.log(selectedEIPNumber);
+    // console.log(type);
   
     if (type === "erc") {
       window.location.href = `/ercs/erc-${selectedEIPNumber}`;
@@ -303,6 +358,24 @@ const SearchBox: React.FC = () => {
   
     return selectedEIPNumber;
   };
+
+  const queryStr = query.trim(); // Remove spaces from the query string
+
+const uniqueResults = filteredResults.filter((result, index, self) => {
+  // Remove spaces from the PR number for comparison
+  const prNumberStr = result.prNumber.toString().trim();
+
+  // Ensure the PR number length is greater than or equal to the query string length
+  const isLengthValid = prNumberStr.length >= queryStr.length;
+
+  // Ensure the PR is unique based on both repo and PR number
+  const isUnique = index === self.findIndex((r) => 
+    r.prNumber === result.prNumber && r.repo === result.repo
+  );
+
+  return isLengthValid && isUnique;
+});
+
   
 
   return (
@@ -322,7 +395,7 @@ const SearchBox: React.FC = () => {
     filteredResults.length === 0 && 
     filteredEIPResults.length === 0 && 
     filteredIssueResults.length === 0 && 
-    filteredAuthorData.length === 0 ? (
+    filteredAuthors.length === 0 ? (
       <p className="mt-2 text-red-500 text-center font-bold">
         Invalid EIP/ERC/RIP/PR/Issue/Author
       </p>
@@ -332,7 +405,7 @@ const SearchBox: React.FC = () => {
           className="mt-2 border p-2 rounded w-full text-center space-y-5"
           size={10}
         >
-          {filteredResults.map(result => (
+          {uniqueResults.map(result => (
             <option
               key={result.prNumber}
               value={result.prNumber}
@@ -362,14 +435,14 @@ const SearchBox: React.FC = () => {
               {result.repo.toUpperCase()} Number: {result.eip}
             </option>
           ))}
-          {filteredAuthorData.map(result => (
+          {filteredAuthors.map(result => (
             <option
-            key={result.eip}
-            value={result.eip}
-              onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
+            key={result.name}
+            value={result.name}
+              onClick={() => handleAuthorSearchResultClick(result.name)}
               className="py-2"
             >
-              {result.repo.toUpperCase()} Number: {result.eip}
+              {result.name} ({result.count})
             </option>
           ))}
         </select>
