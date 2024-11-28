@@ -72,9 +72,26 @@ const Navbar: React.FC = () => {
               label: "Boards",
               href: `/boards`,
         },
+        // {
+        //   label: "Search by author",
+        //   href: `/authors`,
+        // },
         {
-          label: "Search by author",
-          href: `/authors`,
+          label: "Search By",
+          children:[
+            {
+              label: "Author",
+              href: `/authors`,
+            },
+            {
+              label: "EIP",
+              href: `/SearchEip`,
+            },
+            {
+              label: "EIP Title",
+              href: `/SearchEipTitle`,
+            },
+          ],
         },
       ],
     },    
@@ -288,6 +305,7 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
+
                     {navItem.children && navItem.label === "More" && (
                       <PopoverContent
                         border={0}
@@ -360,7 +378,8 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
-                   {navItem.children && navItem.label === "Tools" && (
+
+                    {navItem.children && navItem.label === "Tools" && (
                       <PopoverContent
                         border={0}
                         boxShadow={"xl"}
@@ -372,29 +391,33 @@ const Navbar: React.FC = () => {
                         maxH={"900px"}
                       >
                         <Stack direction={"column"} spacing={2}>
-                          {navItem.children.map((child) => (
-                            <Box
-                              _hover={{
-                                bg: useColorModeValue("pink.50", "gray.900"),
-                              }}
-                              p={2}
-                              rounded={"md"}
-                              role={"group"}
-                            >
-                              <Text
-                                transition={"all .3s ease"}
-                                _groupHover={{ color: "pink.400" }}
-                                fontWeight={500}
+                          {navItem.children.map((child) =>
+                            child.label === "Search By" ? (
+                              <DesktopSubNav key={child.label} {...child} />
+                            ) : (
+                              <Box
+                                key={child.label} // Unique key for React rendering
+                                _hover={{
+                                  bg: useColorModeValue("pink.50", "gray.900"),
+                                }}
+                                p={2}
+                                rounded={"md"}
+                                role={"group"}
                               >
-                                <NextLink href={`${child.href}`}>
-                                  {child.label}
-                                </NextLink>
-                              </Text>
-                            </Box>
-                          ))}
+                                <Text
+                                  transition={"all .3s ease"}
+                                  _groupHover={{ color: "pink.400" }}
+                                  fontWeight={500}
+                                >
+                                  <NextLink href={`${child.href}`}>{child.label}</NextLink>
+                                </Text>
+                              </Box>
+                            )
+                          )}
                         </Stack>
                       </PopoverContent>
                     )}
+
 
                     {navItem.children &&
                       navItem.label !== "Insight" &&
@@ -567,7 +590,26 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                        {navItem.children && (navItem.label === "More" || navItem.label === "Tools") && (
+                       {navItem.children && navItem.label === "Search By" && (
+                          <PopoverContent
+                            border={0}
+                            boxShadow={"xl"}
+                            bg={popoverContentBgColor}
+                            p={4}
+                            rounded={"xl"}
+                            minW={"xs"}
+                            className={"overflow-y-auto"}
+                            maxH={"600px"}
+                          >
+                            <Stack direction={"column"} spacing={2}>
+                              {navItem.children.map((child) => (
+                                <DesktopSubNav key={child.label} {...child} />
+                              ))}
+                            </Stack>
+                          </PopoverContent>
+                        )}
+
+                        {navItem.children && (navItem.label === "More") && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -602,6 +644,45 @@ const Navbar: React.FC = () => {
                                   </Text>
                                 </Box>
                               ))}
+                            </Stack>
+                          </PopoverContent>
+                        )}
+
+                       {navItem.children && (navItem.label === "Tools") && (
+                          <PopoverContent
+                            border={0}
+                            boxShadow={"xl"}
+                            bg={popoverContentBgColor}
+                            p={4}
+                            rounded={"xl"}
+                            minW={"sm"}
+                            className={"overflow-y-auto"}
+                            maxH={"900px"}
+                          >
+                            <Stack direction={"column"} spacing={2}>
+                            {navItem.children.map((child) =>
+                            child.label === "Search By" ? (
+                              <DesktopSubNav key={child.label} {...child} />
+                            ) : (
+                              <Box
+                                key={child.label} // Unique key for React rendering
+                                _hover={{
+                                  bg: useColorModeValue("pink.50", "gray.900"),
+                                }}
+                                p={2}
+                                rounded={"md"}
+                                role={"group"}
+                              >
+                                <Text
+                                  transition={"all .3s ease"}
+                                  _groupHover={{ color: "pink.400" }}
+                                  fontWeight={500}
+                                >
+                                  <NextLink href={`${child.href}`}>{child.label}</NextLink>
+                                </Text>
+                              </Box>
+                            )
+                          )}
                             </Stack>
                           </PopoverContent>
                         )}

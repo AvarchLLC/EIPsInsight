@@ -1,12 +1,12 @@
 import React from 'react';
 import AllLayout from "@/components/Layout";
-import Author from "@/components/Author";
+import SearchByTitle from '@/components/SearchByTitle';
 
 const Authors: React.FC = () => {
     return (
         <>
             <AllLayout>
-                <Author defaultQuery=''/>
+              <SearchByTitle defaultQuery=''/>
             </AllLayout>
         </>
     );

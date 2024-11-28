@@ -26,7 +26,7 @@ interface AuthorProps {
   defaultQuery: string;
 }
 
-const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
+const SearchByTitle: React.FC<AuthorProps> = ({ defaultQuery }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAuthor, setSelectedAuthor] = useState("");
@@ -138,14 +138,18 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   const filteredData = data.filter(item =>
     !selectedAuthor || item.author.toLowerCase().includes(selectedAuthor.toLowerCase())
   );
-  // const totalPages = Math.ceil(filteredData.length / cardsPerPage);
+  
   const filteredData2 = searchTerm
     ? filteredData.filter((item) =>
-        item.eip.toString().includes(searchTerm.trim())
+        item.title.toLowerCase().trim().includes(searchTerm.toLowerCase().trim())
       )
     : filteredData;
     const totalPages = Math.ceil(filteredData2.length / cardsPerPage);
-  
+  const paginatedData = filteredData2.slice(
+    (currentPage - 1) * cardsPerPage,
+    currentPage * cardsPerPage
+  );
+  console.log("paginated data:", paginatedData);
 
   const jsonToCsv = (data: EIP[]): string => { 
     const csvRows: string[] = [];
@@ -174,11 +178,12 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
     author.name.toLowerCase().includes(selectedAuthor.toLowerCase())
   );
   
-  const paginatedData = filteredData2.slice(
-    (currentPage - 1) * cardsPerPage,
-    currentPage * cardsPerPage
-  );
-  console.log("paginated data:", paginatedData);
+  
+  // const paginatedData = filteredData2.slice(
+  //   (currentPage - 1) * cardsPerPage,
+  //   currentPage * cardsPerPage
+  // );
+  // console.log("paginated data:", paginatedData);
   
   const handleDownload = () => {
     if (!paginatedData.length) {
@@ -204,9 +209,9 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
         {/* Search Bar & Download Button */}
         <Flex justifyContent="center" mt={3} alignItems="center" gap={4}>
           <Input
-            placeholder="Search Author"
-            value={selectedAuthor}
-            onChange={(e) => setSelectedAuthor(e.target.value)}
+            placeholder="Search EIP Title"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             size="lg"
             width="50%"
             borderRadius="full"
@@ -233,17 +238,16 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
           <Text textAlign="center">Loading...</Text>
         ) : (
           <>
-          <Flex
+          {/* <Flex
       wrap="wrap"
-    //   direction="column"
       alignItems="center"
       justifyContent="center"
       p={4}
       mb={2}
       borderRadius="lg"
       overflowX="auto"
-    >
-      {filteredAuthors.slice(0, visibleCount).map((author) => (
+    > */}
+      {/* {filteredAuthors.slice(0, visibleCount).map((author) => (
   <Box
   key={author.name}
   bg={selectedAuthor === author.name ? "blue.600" : "blue.500"}
@@ -276,12 +280,12 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   </Text>
 </Box>
 
-))}
+))} */}
 
 
 
 
-      {visibleCount < authorCounts.length && (
+      {/* {visibleCount < authorCounts.length && (
         <Tooltip label="Expand" fontSize="md">
           <IconButton
           icon={<ChevronDownIcon fontWeight="bold" />}
@@ -319,7 +323,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
         />
         </Tooltip>
       )}
-    </Flex>
+    </Flex> */}
 
                   <Box mt={8}>
                     {/* Download CSV section */}
@@ -335,15 +339,15 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
                     </Box>
                   </Box>
             
-                  <Box
+                  {/* <Box
   display="flex"
-  justifyContent="flex-start" // Align items to the start (left)
+  justifyContent="flex-start" 
   alignItems="center"
   mb={4}
   ml={2}
   gap={4}
 >
-  {/* Filter Button on the left */}
+ 
   <Button
     onClick={() => setFilterVisible((prev) => !prev)}
     bg="blue.500"
@@ -353,7 +357,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
     Filter EIP
   </Button>
 
-  {/* Search Bar to the right of the filter button */}
+  
   {filterVisible && (
     <Input
       placeholder="Search EIP"
@@ -369,7 +373,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
       width="200px"
     />
   )}
-</Box>
+</Box> */}
 
                   
             {/* Display Cards */}
@@ -571,4 +575,4 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   );
 };
 
-export default Author;
+export default SearchByTitle;
