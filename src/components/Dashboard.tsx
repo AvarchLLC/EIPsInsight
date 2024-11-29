@@ -43,6 +43,7 @@ import BoyGirl3 from "@/components/BoyGirl3";
 import AllChart from "./AllChart2";
 import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 import ToolsSection from "./AvailableTools";
+import TypeGraphs from "@/components/TypeGraphs2";
 
 interface EIP {
   _id: string;
@@ -437,6 +438,9 @@ const Dashboard = () => {
                 <br/>
                 </motion.div>
                 <br/>
+                <Box paddingTop={8} paddingBottom={8}>
+              <TypeGraphs />
+            </Box>
 
                 <Box
                       bg="rgba(0, 0, 0, 0.5)"

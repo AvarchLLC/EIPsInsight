@@ -96,7 +96,7 @@ const Core = () => {
               />
             </FlexBetween>
             <TableStatus cat="Core" />
-            <AreaStatus type={"EIPs"} />
+            {/* <AreaStatus type={"EIPs"} /> */}
           </Box>
         </motion.div>
       )}

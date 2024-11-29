@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Spinner } from "@chakra-ui/react";
+import { Box, useColorModeValue, Spinner, Flex, Heading, Button } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
@@ -55,6 +55,23 @@ interface MappedDataItem {
   value: number;
 }
 
+interface EIP2 {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+  repo: string;
+}
+
 interface EIP {
   status: string;
   eips: {
@@ -64,7 +81,7 @@ interface EIP {
     date: string;
     count: number;
     category: string;
-    eips:any[];
+    eips: EIP2[];
   }[];
 }
 
@@ -206,6 +223,44 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     } as any,
   };
 
+  const headingColor = useColorModeValue('black', 'white');
+
+  const downloadData = () => {
+    // Transform the `typeData` to extract the required details
+    const transformedData = filteredData.flatMap((item) => {
+        return item.eips.flatMap((eip) => {
+            return eip.eips.map(({ eip: eipNumber, title, status }) => ({
+                month: eip.month,
+                year: eip.year,
+                category: eip.category,
+                eip: eipNumber,
+                title,
+                status,
+            }));
+        });
+    });
+
+    // Define the CSV header
+    const header = "Month,Year,Category,EIP,Title,Status\n";
+
+    // Prepare the CSV content
+    const csvContent = "data:text/csv;charset=utf-8,"
+        + header
+        + transformedData.map(({ month, year, category, eip, title, status }) => {
+            return `${month},${year},${category},${eip},${title},${status}`;
+        }).join("\n");
+
+    // Encode the CSV content for downloading
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "eip_data.csv");
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+};
+
+
   return (
     <>
       {isLoading ? ( // Show loader while data is loading
@@ -218,24 +273,14 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
           <Spinner />
         </Box>
       ) : (
-        <Box
-          bgColor={bg}
-          marginTop={"2rem"}
-          p="0.5rem"
-          borderRadius="0.35rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={400}
-          overflowX="auto"
-          overflowY="hidden"
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200 h-max"
-        >
+        <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color={headingColor}>
+            {`${status}`}
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <Button colorScheme="blue" onClick={downloadData}>Download CSV</Button>
+        </Flex>
           <Area {...config} />
           <Box className={"w-full"}>
             <DateTime />

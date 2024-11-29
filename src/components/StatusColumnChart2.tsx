@@ -4,26 +4,26 @@ import { Box, useColorModeValue, Button, Flex, Heading } from "@chakra-ui/react"
 import dynamic from "next/dynamic";
 
 interface StatusChart {
-  statusChanges: [
-    {
+    statusChanges: {
       eip: string;
       lastStatus: string;
       eipTitle: string;
       eipCategory: string;
-    }
-  ];
-  year: number;
-}
-
-interface APIResponse {
-  eip: StatusChart[];
-  erc: StatusChart[];
-}
-
-interface AreaCProps {
-  category: string;
-  type: string;
-}
+    }[];
+    year: number;
+  }
+  
+  interface APIResponse {
+    eip: StatusChart[];
+    erc: StatusChart[];
+    rip: StatusChart[];
+  }
+  
+  interface AreaCProps {
+    category: string;
+    type: string;
+  }
+  
 
 const getStatus = (status: string) => {
   switch (status) {
@@ -101,7 +101,7 @@ const getCat = (cat: string) => {
   }
 };
 
-const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
+const StatusChart2: React.FC<AreaCProps> = ({ category, type }) => {
   const [data, setData] = useState<APIResponse>();
   const [typeData, setTypeData] = useState<StatusChart[]>([]);
 
@@ -111,8 +111,28 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
         const response = await fetch(`/api/new/final-status-by-year`);
         const jsonData = await response.json();
         setData(jsonData);
-        console.log("chart data", jsonData);
-        setTypeData(jsonData.eip);
+
+        const combinedData = [...jsonData.eip, ...jsonData.erc, ...jsonData.rip].reduce(
+            (acc: StatusChart[], curr: StatusChart) => {
+              const existingYear = acc.find((item) => item.year === curr.year);
+              if (existingYear) {
+                // Merge status changes if year already exists
+                existingYear.statusChanges.push(...curr.statusChanges);
+              } else {
+                // Add a new entry for the year
+                acc.push({ year: curr.year, statusChanges: [...curr.statusChanges] });
+              }
+              return acc;
+            },
+            [] as StatusChart[]
+          );
+        
+        if(category==="ERC"){
+          console.log("chart data", jsonData.erc);
+          console.log("Combined Chart Data", combinedData);
+        }
+        
+        setTypeData(combinedData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -146,6 +166,11 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
       value: 1,
     }))
   );
+
+  if(category==="Meta"){
+    console.log("filteredData", filteredData);
+    console.log("transformed data:",transformedData);
+  }
 
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Column),
@@ -237,4 +262,4 @@ return (
 
 };
 
-export default StatusChart;
+export default StatusChart2;

@@ -4,6 +4,9 @@ import {
   useColorModeValue,
   Select,
   Spinner,
+  Button,
+  Flex,
+  Heading
 } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
@@ -66,6 +69,12 @@ interface MappedDataItem {
   value: number;
 }
 
+interface GrpahsProps {
+  eip: EIP[];
+  erc: EIP[];
+  rip: EIP[];
+}
+
 interface EIP {
   status: string;
   eips: {
@@ -74,13 +83,8 @@ interface EIP {
     year: number;
     date: string;
     count: number;
+    eips: EIP2[];
   }[];
-}
-
-interface GrpahsProps {
-  eip: EIP[];
-  erc: EIP[];
-  rip: EIP[];
 }
 
 interface EIP2 {
@@ -303,7 +307,62 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     },
   };
 
+  const removeDuplicatesFromEips = (eips: EIP2[]) => {
+    const seen = new Set();
+    
+    return eips.filter((eip) => {
+      if (!seen.has(eip.eip)) {
+        seen.add(eip.eip); // Track seen eip numbers
+        return true;
+      }
+      return false; // Filter out duplicates
+    });
+  };
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
+
+  const downloadData = () => {
+    // Filter data based on the selected status
+    const filteredData = typeData.filter((item) => item.status === selectedStatus);
+
+    // Transform the filtered data to get the necessary details
+    const transformedData = filteredData.flatMap((item) => {
+        return item.eips.flatMap((eip) => {
+            const category = getCat(eip.category); // Assuming this function returns a string
+            const year = eip.year.toString(); // Convert year to string
+            const uniqueEips = removeDuplicatesFromEips(eip.eips); // Assuming this returns an array of EIPs
+            return uniqueEips.map(({ eip }) => ({
+                category,
+                year,
+                eip, // Individual EIP
+            }));
+        });
+    });
+
+    // Define the CSV header
+    const header = "Category,Year,EIPs\n";
+
+    // Prepare the CSV content
+    const csvContent = "data:text/csv;charset=utf-8,"
+        + header
+        + transformedData.map(({ category, year, eip }) => {
+            return `${category},${year},${eip}`; // Each EIP on a separate line
+        }).join("\n");
+
+    // Check the generated CSV content before download
+    console.log("CSV Content:", csvContent);
+
+    // Encode the CSV content for downloading
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${selectedStatus}.csv`); // Name your CSV file here
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+};
+
+const headingColor = useColorModeValue('black', 'white');
 
   return (
     <Box
@@ -359,6 +418,14 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
         ) : (
           // Show chart when it's ready
           <>
+          <br/>
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color={headingColor}>
+            {`${selectedStatus}`}
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <Button colorScheme="blue" onClick={downloadData}>Download CSV</Button>
+        </Flex>
             <Area {...config} />
           </>
         )}

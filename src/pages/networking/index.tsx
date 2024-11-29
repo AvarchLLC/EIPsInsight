@@ -94,7 +94,7 @@ const Networking = () => {
               />
             </FlexBetween>
             <TableStatus cat="Networking" />
-            <AreaStatus type={"EIPs"} />
+            {/* <AreaStatus type={"EIPs"} /> */}
           </Box>
         </motion.div>
       )}

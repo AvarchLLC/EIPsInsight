@@ -32,48 +32,6 @@ const getCat = (cat: string) => {
   }
 };
 
-function getMonthName(month: number): string {
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  return months[month - 1];
-}
-
-interface AreaProps {
-  data: MappedDataItem[];
-  xField: string;
-  yField: string;
-  color: string[];
-  seriesField: string;
-  xAxis: {
-    range: number[];
-    tickCount: number;
-  };
-  areaStyle: {
-    fillOpacity: number;
-  };
-  legend: {
-    position: string;
-  };
-  smooth: boolean;
-}
-
-interface MappedDataItem {
-  category: string;
-  date: string;
-  value: number;
-}
 
 interface EIP2 {
   _id: string;
@@ -105,11 +63,7 @@ interface EIP {
   }[];
 }
 
-interface FormattedEIP {
-  category: string;
-  date: string;
-  value: number;
-}
+
 
 const categoryColors: string[] = [
   "rgb(255, 99, 132)",
@@ -140,11 +94,6 @@ const categoryBorder: string[] = [
 interface AreaCProps {
   dataset: EIP[];
   status:string;
-}
-interface APIResponse {
-  eip: EIP[];
-  erc: EIP[];
-  rip: EIP[];
 }
 
 const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {

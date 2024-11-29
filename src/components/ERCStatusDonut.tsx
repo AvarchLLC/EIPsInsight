@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Icon, useColorModeValue, Text } from "@chakra-ui/react";
+import { Box, Icon, useColorModeValue, Text, Spinner, Button, Flex, Heading } from "@chakra-ui/react";
 import DateTime from "@/components/DateTime";
 import {
   Chart as ChartJS,
@@ -144,26 +144,78 @@ const ERCStatusDonut = () => {
     },
   };
 
+  const downloadData = () => {
+    // Convert the data to CSV format
+    const csvContent = [
+      // CSV headers
+      ["_id", "eip", "title", "author", "status", "type", "category", "created", "discussion", "deadline", "requires", "unique_ID", "__v"],
+      // Data rows
+      ...data.map(item => [
+        // item._id,
+        item.eip,
+        item.title,
+        item.author,
+        item.status,
+        item.type,
+        item.category,
+        item.created,
+        item.discussion,
+        item.deadline,
+        item.requires,
+        // item.unique_ID,
+        // item.__v,
+      ])
+    ]
+    .map(row => row.join(","))  // Join each row with commas
+    .join("\n");  // Join rows with newlines
+  
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    
+    // Create a URL for the Blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create an anchor tag to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.csv";  // File name
+    a.click();
+    
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
+  
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const headingColor = useColorModeValue('black', 'white');
+
   return (
     <>
-      <Box bg={bg} borderRadius="0.55rem">
-        <a href="/erctable">
-          <Text
-            fontSize="2xl"
-            fontWeight="bold"
-            color="#30A0E0"
-            marginX="6"
-            paddingY={4}
-          >
-            {` Status - [${data.length}]`}
-          </Text>
-        </a>
+      <Box
+        bg={bg}
+        borderRadius="0.55rem"
+        _hover={{
+          border: "1px",
+          borderColor: "#30A0E0",
+        }}
+      >
+        <br/>
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" paddingX="1rem">
+          <Heading size="md" color={headingColor}>
+            <a href="/erctable">
+              {`Status - [${data.length}]`}
+            </a>
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <Button colorScheme="blue" onClick={downloadData}>
+            Download CSV
+          </Button>
+        </Flex>
         <Area {...config} />
         <Box className={"w-full"}>
           <DateTime />
         </Box>
       </Box>
+
     </>
   );
 };
