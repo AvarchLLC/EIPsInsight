@@ -16,15 +16,26 @@ interface EIP {
   deadline: string;
   requires: string;
   unique_ID: number;
+  repo:string;
   __v: number;
 }
 
+interface APIResponse {
+    eip: EIP[];
+    erc: EIP[];
+    rip: EIP[];
+  }
+
 const EIPCatBoxGrid = () => {
-  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
+  const [data, setData] = useState<APIResponse>({
+    eip: [],
+    erc: [],
+    rip: [],
+  });
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
+        const response = await fetch(`/api/new/all`);
         console.log(response);
         const jsonData = await response.json();
         setData(jsonData);
@@ -36,19 +47,33 @@ const EIPCatBoxGrid = () => {
     fetchData();
   }, []);
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
 
-  const MetaCount = data.filter((item) => item.type === "Meta").length;
-  const InformationalCount: any = data.filter(
-    (item) => item.type === "Informational"
-  ).length;
-  const CoreCount = data.filter((item) => item.category === "Core").length;
-  const NetworkingCount = data.filter(
-    (item) => item.category === "Networking"
-  ).length;
-  const InterfaceCount = data.filter(
-    (item) => item.category === "Interface"
-  ).length;
-  const totalCount = data.filter((item) => item.category !== "ERC").length;
+  const MetaCount = new Set(
+    allData.filter((item) => item.type === "Meta").map((item) => item.eip)
+  ).size;
+
+  const InformationalCount = new Set(
+    allData.filter((item) => item.type === "Informational").map((item) => item.eip)
+  ).size;
+
+  const CoreCount =
+    allData.filter(
+      (item) =>
+        item.type === "Standards Track" && item.category === "Core"
+    ).length || 0;
+
+  const NetworkingCount = new Set(
+    allData.filter((item) => item.category === "Networking").map((item) => item.eip)
+  ).size;
+
+  const InterfaceCount = new Set(
+    allData.filter((item) => item.category === "Interface").map((item) => item.eip)
+  ).size;
+
+  const totalCount =
+    MetaCount + InformationalCount + CoreCount + NetworkingCount + InterfaceCount;
+
 
   return (
     <>
@@ -79,7 +104,7 @@ const EIPCatBoxGrid = () => {
       <Text fontSize="3xl" fontWeight="bold" color="#30A0E0" paddingY={8}>
         Standards Track -{" "}
         {
-          data.filter(
+          allData.filter(
             (item) => item.type === "Standards Track" && item.category !== "ERC"
           ).length
         }

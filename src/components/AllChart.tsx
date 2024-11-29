@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Spinner, Text } from "@chakra-ui/react";
+import { Box, useColorModeValue, Spinner, Text,Button, Flex, Heading } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
@@ -223,7 +223,46 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     
   };
   
+  const downloadData = () => {
+    // Convert the data to CSV format
+    const csvContent = [
+      // CSV headers
+      [ "eip", "title", "author", "status", "type", "category", "created", "discussion", "deadline", "requires", ],
+      // Data rows
+      ...data.map(item => [
+        // item._id,
+        item.eip,
+        item.title,
+        item.author,
+        item.status,
+        item.type,
+        item.category,
+        item.created,
+        item.discussion,
+        item.deadline,
+        item.requires,
+        // item.unique_ID,
+        // item.__v,
+      ])
+    ]
+    .map(row => row.join(","))  // Join each row with commas
+    .join("\n");  // Join rows with newlines
   
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    
+    // Create a URL for the Blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create an anchor tag to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.csv";  // File name
+    a.click();
+    
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
   
 
   return (
@@ -239,61 +278,69 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         </Box>
       ) : (
         <>
-          <Box
-            bgColor={bg}
-            paddingX="0.5rem"
-            borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
-          >
-            <NextLink
-              href={
-                type === "ERC"
-                  ? "/erctable"
-                  : type === "EIP"
-                  ? "/eiptable"
-                  : type === "RIP"
-                  ? "/riptable"
-                  : "/alltable"
-              }
-            >
-              <Text
-                fontSize="2xl"
-                fontWeight="bold"
-                color="#30A0E0"
-                className="text-left"
-                paddingY={4}
-                paddingLeft={4}
-                display="flex"
-                flexDirection="column"
-              >
-                {type === 'Total'
-    ? `Total Ethereum Proposals - [${data.length}]`
-    : `${type} - [${data.length}]`}
-              </Text>
-            </NextLink>
-            <Box
-            width={"100%"}       // Make the container full width
-            minWidth={"100px"}  // Set a minimum width
-            height={400}
-            overflowX="auto"     // Enable horizontal scrolling if necessary
-            overflowY="hidden"
-            as={motion.div}
-            padding={"2 rem"}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            // transition={{ duration: 0.5 }}
-          >
-            <Area {...config} />
-            <Box className={"w-full"}>
-              <DateTime />
-            </Box>
-          </Box>
+  <Box
+    bgColor={bg}
+    paddingX="0.5rem"
+    borderRadius="0.55rem"
+    _hover={{
+      border: "1px",
+      borderColor: "#30A0E0",
+    }}
+  >
+    
 
-          </Box>
-        </>
+    {/* Flex container to place the Text and Button on opposite ends */}
+    <Flex justifyContent="space-between" alignItems="center" paddingX="1rem" marginBottom="1rem">
+    <NextLink
+      href={
+        type === "ERC"
+          ? "/erctable"
+          : type === "EIP"
+          ? "/eiptable"
+          : type === "RIP"
+          ? "/riptable"
+          : "/alltable"
+      }
+    >
+      <Text
+        fontSize="2xl"
+        fontWeight="bold"
+        color="#30A0E0"
+        className="text-left"
+        paddingY={4}
+        paddingLeft={4}
+        display="flex"
+        flexDirection="column"
+      >
+        {type === 'Total'
+          ? `Total Ethereum Proposals - [${data.length}]`
+          : `${type} - [${data.length}]`}
+      </Text>
+    </NextLink>
+      <Button colorScheme="blue" onClick={downloadData}>
+        Download CSV
+      </Button>
+    </Flex>
+
+    <Box
+      width={"100%"}       // Make the container full width
+      minWidth={"100px"}  // Set a minimum width
+      height={400}
+      overflowX="auto"     // Enable horizontal scrolling if necessary
+      overflowY="hidden"
+      as={motion.div}
+      padding={"2 rem"}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <Area {...config} />
+      <Box className={"w-full"}>
+        <DateTime />
+      </Box>
+    </Box>
+  </Box>
+</>
+
       )}
     </>
   );
