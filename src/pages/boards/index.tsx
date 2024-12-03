@@ -149,18 +149,19 @@ import {
     return (
       <AllLayout>
         {/* Tab selection for EIPs and ERCs */}
-        <Box  padding={8} mt={8} ml={8} mr={8} mb={1}>
+        <Box  padding={4} mt={8} ml={8} mr={8} mb={1}>
         <Box
-      padding={4}
+      pl={4}
       bg={useColorModeValue("blue.50", "gray.700")}
       borderRadius="md"
-      marginBottom={8}
+      pr="8px"
+      marginBottom={2}
     >
       <Flex justify="space-between" align="center">
         <Heading
           as="h3"
           size="lg"
-          marginBottom={4}
+          marginBottom={2}
           color={useColorModeValue("#3182CE", "blue.300")}
         >
         EIP Board FAQ
@@ -170,14 +171,17 @@ import {
   borderRadius="md" // Rounded corners
   padding={2} // Padding inside the box
 >
-  <IconButton
+<IconButton
     onClick={toggleCollapse}
     icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
     variant="ghost"
+     h="24px" // Smaller height
+     w="20px"
     aria-label="Toggle Instructions"
     _hover={{ bg: 'blue' }} // Maintain background color on hover
     _active={{ bg: 'blue' }} // Maintain background color when active
     _focus={{ boxShadow: 'none' }} // Remove focus outline
+    
   />
 </Box>
       </Flex>
@@ -265,7 +269,7 @@ import {
       )} */}
     </Box>
         
-        <Flex justify="center" mb={8}>
+        <Flex justify="center" mt={1}>
           <Button
             colorScheme="blue"
             onClick={() => setActiveTab('EIPs')}
@@ -312,87 +316,90 @@ import {
   
           {/* Scrollable Table */}
           <TableContainer
-          minHeight="500px"
-          overflowY="auto"
-          overflowX="auto"
-          borderWidth="1px"
-          borderRadius="md"
-          p={4}
-          boxShadow="md"
-          maxHeight="900px"
-        >
-          <Table variant="striped" colorScheme="gray" size="lg" mt={4} borderRadius="md" boxShadow="md" width="100%">
-            <Thead bg="#171923">
-              <Tr>
-                <Th textAlign="center" borderTopLeftRadius="10px" minWidth="6rem" color="white">
-                  Serial Number
-                </Th>
-                <Th textAlign="center" minWidth="10rem" color="white">
-                  PR Number
-                </Th>
-                <Th textAlign="center" borderTopRightRadius="10px" minWidth="10rem" color="white">
-                  PR Link
-                </Th>
-              </Tr>
-            </Thead>
-            
-            <Tbody>
-          {displayedData.length === 0 ? (
-            <Tr>
-              <Td colSpan={3} textAlign="center" color="white">
-                No Data Available
-              </Td>
-            </Tr>
-          ) : (
-            displayedData.map((item: any, index: number) => (
-              <Tr key={item._id}>
-                <Td textAlign="center">
-                  <Box
-                    bg="gray.600" // Box background color
-                    color="white" // Text color
-                    borderRadius="md" // Rounded corners
-                    paddingX={2} // Horizontal padding
-                    paddingY={1} // Vertical padding
-                    display="inline-block" // Ensures the box wraps tightly around the content
-                  >
-                    {index + 1}
-                  </Box>
-                </Td>
-                <Td textAlign="center">
-                  <Box
-                    bg="gray.600" // Box background color
-                    color="white" // Text color
-                    borderRadius="md" // Rounded corners
-                    paddingX={2} // Horizontal padding
-                    paddingY={1} // Vertical padding
-                    display="inline-block" // Ensures the box wraps tightly around the content
-                  >
-                    {extractPrNumber(item.url)}
-                  </Box>
-                </Td>
-                <Td textAlign="center">
-                  <button
-                    style={{
-                      backgroundColor: '#428bca',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                    }}
-                  >
-                    <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ color: '#ffffff', textDecoration: 'none' }}>
-                      View PR
-                    </a>
-                  </button>
-                </Td>
-              </Tr>
-            ))
-          )}
-        </Tbody>
+  minHeight="500px"
+  overflowY="auto"
+  overflowX="auto"
+  borderWidth="1px"
+  borderRadius="md"
+  p={4}
+  boxShadow="md"
+  maxHeight="900px"
+>
+  <Table variant="striped" colorScheme="gray" size="md" borderRadius="md" boxShadow="md" width="100%">
+    <Thead bg="#171923">
+      <Tr>
+        <Th textAlign="center" borderTopLeftRadius="10px" minWidth="6rem" color="white">
+          Serial Number
+        </Th>
+        <Th textAlign="center" minWidth="10rem" color="white">
+          PR Number
+        </Th>
+        <Th textAlign="center" borderTopRightRadius="10px" minWidth="10rem" color="white">
+          PR Link
+        </Th>
+      </Tr>
+    </Thead>
 
-          </Table>
-        </TableContainer>
+    <Tbody>
+      {displayedData.length === 0 ? (
+        <Tr>
+          <Td colSpan={3} textAlign="center" color="white">
+            No Data Available
+          </Td>
+        </Tr>
+      ) : (
+        displayedData.map((item: any, index: number) => (
+          <Tr key={item._id} height="40px"> {/* Adjust row height */}
+            <Td textAlign="center">
+              <Box
+                bg="gray.600"
+                color="white"
+                borderRadius="md"
+                paddingX="8px" // Smaller horizontal padding
+                paddingY="4px" // Smaller vertical padding
+                fontSize="md" // Adjust text size
+                display="inline-block"
+              >
+                {index + 1}
+              </Box>
+            </Td>
+            <Td textAlign="center">
+              <Box
+                bg="gray.600"
+                color="white"
+                borderRadius="md"
+                paddingX="8px"
+                paddingY="4px"
+                fontSize="md"
+                display="inline-block"
+              >
+                {extractPrNumber(item.url)}
+              </Box>
+            </Td>
+            <Td textAlign="center">
+              <button
+                style={{
+                  backgroundColor: '#428bca',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '4px 8px', // Smaller padding
+                  fontSize: '0.85rem', // Smaller font size
+                  cursor: 'pointer',
+                  borderRadius: '5px',
+                }}
+              >
+                <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ color: '#ffffff', textDecoration: 'none' }}>
+                  View PR
+                </a>
+              </button>
+            </Td>
+          </Tr>
+        ))
+      )}
+    </Tbody>
+  </Table>
+</TableContainer>
+
 
 
 

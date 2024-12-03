@@ -20,7 +20,7 @@ import SearchBox from "@/components/SearchBox";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import { motion } from "framer-motion";
 import PectraTable from "@/components/PectraTable";
-import { Table, Thead, Tbody, Tr, Th, Td, Link } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, Link,TableContainer } from "@chakra-ui/react";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import Image from "next/image";
@@ -285,8 +285,20 @@ const All = () => {
            fontWeight="bold"
            color="#30A0E0"
           >
-            Eth upgrades
+            Ethereum Network Upgrades
           </Text>
+          <Text
+   as={motion.div}
+   initial={{ opacity: 0, y: -20 }}
+   animate={{ opacity: 1, y: 0 }}
+   transition={{ duration: 0.5 } as any}
+   fontSize={{base: "2xl",md:"2xl", lg: "2xl"}}
+   fontWeight="bold"
+   color="#30A0E0"
+   mt={2}
+>
+  PECTRA
+</Text>
           <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
   Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
   collectively known as{" "}
@@ -350,68 +362,78 @@ const All = () => {
       Devnets & Testnets
     </Text>
 
-    <Table
-  variant="striped"
-  colorScheme="gray"
-  size="lg"
-  mt={4}
-  style={{ border: "1px solid black", borderRadius: "md", boxShadow: "md", width: "100%" }}
->
-  <Thead>
-    <Tr style={{ border: "1px solid black" }}>
-      <Th style={{ border: "1px solid black" }}>Date</Th>
-      <Th style={{ border: "1px solid black" }}>Devnet Spec</Th>
-    </Tr>
-  </Thead>
-  <Tbody>
-    {[
-      {
-        date: "October 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-4",
-        specText: "Pectra Devnet 4 (Specs)",
-      },
-      {
-        date: "August 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
-        specText: "Pectra Devnet 3 (Specs)",
-        additionalLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
-        additionalText: "Tests Specs",
-      },
-      {
-        date: "July 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-2",
-        specText: "Pectra Devnet 2 (Specs)",
-      },
-      {
-        date: "June 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-1",
-        specText: "Pectra Devnet 1 (Specs)",
-      },
-      {
-        date: "May 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
-        specText: "Pectra Devnet 0 (Specs)",
-      },
-    ].map((item, index) => (
-      <Tr style={{ border: "1px solid black" }} key={index}>
-        <Td style={{ border: "1px solid black" }}>{item.date}</Td>
-        <Td style={{ border: "1px solid black" }}>
-          <Link href={item.specLink} color="blue.500" textDecor="underline" isExternal>
-            {item.specText}
-          </Link>
-          {item.additionalLink && (
-            <>
-              ,{" "}
-              <Link href={item.additionalLink} color="blue.500" textDecor="underline" isExternal>
-                {item.additionalText}
-              </Link>
-            </>
-          )}
-        </Td>
+    <TableContainer style={{ maxHeight: "300px", overflowY: "auto" }}>
+  <Table
+    variant="striped"
+    colorScheme="gray"
+    size="lg"
+    mt={4}
+    style={{
+      border: "1px solid black",
+      borderRadius: "md",
+      boxShadow: "md",
+      width: "100%",
+      tableLayout: "fixed", // Ensures consistent column width
+    }}
+  >
+    <Thead>
+      <Tr style={{ border: "1px solid black" }}>
+        <Th style={{ border: "1px solid black" }}>Date</Th>
+        <Th style={{ border: "1px solid black" }}>Devnet Spec</Th>
       </Tr>
-    ))}
-  </Tbody>
-</Table>
+    </Thead>
+    <Tbody>
+      {[
+        {
+          date: "November 2024",
+          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-5",
+          specText: "Pectra Devnet 5 (Specs)",
+        },
+        {
+          date: "October 2024",
+          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-4",
+          specText: "Pectra Devnet 4 (Specs)",
+        },
+        {
+          date: "August 2024",
+          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
+          specText: "Pectra Devnet 3 (Specs)",
+        },
+        {
+          date: "August 2024",
+          specLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
+          specText: "Tests Specs",
+        },
+        {
+          date: "July 2024",
+          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-2",
+          specText: "Pectra Devnet 2 (Specs)",
+        },
+        {
+          date: "June 2024",
+          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-1",
+          specText: "Pectra Devnet 1 (Specs)",
+        },
+        {
+          date: "May 2024",
+          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
+          specText: "Pectra Devnet 0 (Specs)",
+        },
+      ].map((item, index) => (
+        <Tr style={{ border: "1px solid black" }} key={index}>
+          <Td style={{ border: "1px solid black" }}>{item.date}</Td>
+          <Td style={{ border: "1px solid black" }}>
+            <Link href={item.specLink} color="blue.500" textDecor="underline" isExternal>
+              {item.specText}
+            </Link>
+           
+          </Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+</TableContainer>
+
 
   </Box>
 
@@ -551,7 +573,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%', height: '300px', border: 'none' }}
+        style={{ width: '500px', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/YuEA-jE2Z8c"
         title="Blog 1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -567,7 +589,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%', height: '300px', border: 'none' }}
+        style={{ width: '500px', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/pyfKM_hOKaM"
         title="Blog 2"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -583,7 +605,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%', height: '300px', border: 'none' }}
+        style={{ width: '500px', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpnKFDl1KzGOKqwux5JaLlv"
         title="Playlist 1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -599,7 +621,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%',  height: '300px', border: 'none' }}
+        style={{ width: '500px',  height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpok0smGmq-dFGVHQzW84a2"
         title="Playlist 2"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -615,7 +637,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%', height: '300px', border: 'none' }}
+        style={{ width: '500px', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/nJ57mkttCH0"
         title="Video 1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -631,7 +653,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%',  height: '300px', border: 'none' }}
+        style={{ width: '500px',  height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/0tEcFa9J5TM"
         title="Video 2"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -647,7 +669,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%',  height: '300px', border: 'none' }}
+        style={{ width: '500px',  height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/sIr6XX8yR8o"
         title="Video 3"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -663,7 +685,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%',  height: '300px', border: 'none' }}
+        style={{ width: '500px',  height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/B69btfxKVks"
         title="Video 4"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

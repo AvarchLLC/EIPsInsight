@@ -181,11 +181,13 @@ const Month = () => {
               </NextLink>
               <br/>
               <Box
-    padding={4}
-    bg={useColorModeValue("blue.50", "gray.700")}
-    borderRadius="md"
-    marginBottom={8}
-  >
+      pl={4}
+      bg={useColorModeValue("blue.50", "gray.700")}
+      borderRadius="md"
+      pr="8px"
+      pt="3px"
+      marginBottom={5}
+    >
 
     <Flex justify="space-between" align="center">
         <Heading
@@ -205,6 +207,8 @@ const Month = () => {
     onClick={toggleCollapse}
     icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
     variant="ghost"
+    h="24px" // Smaller height
+     w="20px"
     aria-label="Toggle Instructions"
     _hover={{ bg: 'blue' }} // Maintain background color on hover
     _active={{ bg: 'blue' }} // Maintain background color when active

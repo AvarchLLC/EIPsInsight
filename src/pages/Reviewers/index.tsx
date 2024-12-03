@@ -786,33 +786,33 @@ const renderChart = () => {
     return (
         <Box mt={8} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
             <Table >
-                <Thead bg="black">
+                <Thead p="8px" bg="black">
                     <Tr>
-                        <Th color="white" textAlign="center" verticalAlign="middle"  borderTopLeftRadius="10px">
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle"  borderTopLeftRadius="10px">
                             PR Number
                         </Th>
-                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
                             Title
                         </Th>
-                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
                             Reviewed By
                         </Th>
-                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
                             Review Date
                         </Th>
-                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
                             Created Date
                         </Th>
-                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
                             Closed Date
                         </Th>
-                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
                             Merged Date
                         </Th>
-                        <Th color="white" textAlign="center" verticalAlign="middle" >
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
                             Status
                         </Th>
-                        <Th color="white" textAlign="center" verticalAlign="middle"  borderTopRightRadius="10px">
+                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle"  borderTopRightRadius="10px">
                             Link
                         </Th>
                     </Tr>
@@ -828,32 +828,32 @@ const renderChart = () => {
                                 : 'Open';
 
                         return (
-                            <Tr key={pr.prNumber}> {/* Set border for rows */}
-                                <Td textAlign="center" verticalAlign="middle"  width="100px">
+                            <Tr p="8px" key={pr.prNumber}> {/* Set border for rows */}
+                                <Td p="8px" textAlign="center" verticalAlign="middle"  width="100px">
                                     {pr.prNumber}
                                 </Td>
-                                <Td textAlign="center" verticalAlign="middle"  style={{ wordWrap: 'break-word', maxWidth: '200px' }}>
+                                <Td p="8px" textAlign="center" verticalAlign="middle"  style={{ wordWrap: 'break-word', maxWidth: '200px' }}>
                                     {pr.prTitle}
                                 </Td>
-                                <Td textAlign="center" verticalAlign="middle" >
+                                <Td p="8px" textAlign="center" verticalAlign="middle" >
                                     {pr.reviewer}
                                 </Td>
-                                <Td textAlign="center" verticalAlign="middle" >
+                                <Td p="8px" textAlign="center" verticalAlign="middle" >
                                     {pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-'}
                                 </Td>
-                                <Td textAlign="center" verticalAlign="middle" >
+                                <Td p="8px" textAlign="center" verticalAlign="middle" >
                                     {pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-'}
                                 </Td>
-                                <Td textAlign="center" verticalAlign="middle" >
+                                <Td p="8px" textAlign="center" verticalAlign="middle" >
                                     {pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-'}
                                 </Td>
-                                <Td textAlign="center" verticalAlign="middle" >
+                                <Td p="8px" textAlign="center" verticalAlign="middle" >
                                     {pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-'}
                                 </Td>
-                                <Td textAlign="center" verticalAlign="middle" >
+                                <Td p="8px" textAlign="center" verticalAlign="middle" >
                                     {status}
                                 </Td>
-                                <Td textAlign="center" verticalAlign="middle">
+                                <Td p="8px" textAlign="center" verticalAlign="middle">
                                     <Button
                                         as="a"
                                         href={`/PR/${pr.repo}/${pr.prNumber}`}
@@ -892,10 +892,11 @@ const renderChart = () => {
 
 
 <Box
-      padding={4}
+      pl={4}
       bg={useColorModeValue("blue.50", "gray.700")}
       borderRadius="md"
-      marginBottom={8}
+      pr="8px"
+      marginBottom={2}
     >
       <Flex justify="space-between" align="center">
         <Heading
@@ -914,6 +915,8 @@ const renderChart = () => {
     onClick={toggleCollapse}
     icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
     variant="ghost"
+    h="24px" // Smaller height
+     w="20px"
     aria-label="Toggle Instructions"
     _hover={{ bg: 'blue' }} // Maintain background color on hover
     _active={{ bg: 'blue' }} // Maintain background color when active
@@ -1002,7 +1005,7 @@ const renderChart = () => {
           RIPs
         </Button>
       </Flex> */}
-      <Flex justify="center" mb={8}>
+      <Flex justify="center" >
   <Menu>
     <MenuButton
       as={Button}
