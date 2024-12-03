@@ -402,6 +402,7 @@ useEffect(() => {
           textAlign="center" 
           borderTopLeftRadius="10px" 
           minWidth="6rem"
+          p="8px"
         >
           Number
         </Th>
@@ -412,6 +413,7 @@ useEffect(() => {
           whiteSpace="normal" // Allow wrapping
           overflow="hidden"   // Prevent overflow
           textOverflow="ellipsis" // Add ellipsis for overflowed text
+          p="8px"
         >
           Title
         </Th>
@@ -419,6 +421,7 @@ useEffect(() => {
           color="white" 
           textAlign="center" 
           minWidth="6rem" 
+          p="8px"
         >
           State
         </Th>
@@ -426,6 +429,7 @@ useEffect(() => {
           color="white" 
           textAlign="center" 
           minWidth="6rem" 
+          p="8px"
         >
           Created At
         </Th>
@@ -433,6 +437,7 @@ useEffect(() => {
           color="white" 
           textAlign="center" 
           minWidth="6rem" 
+          p="8px"
           
         >
           Closed At
@@ -442,6 +447,7 @@ useEffect(() => {
             color="white" 
             textAlign="center" 
             minWidth="6rem" 
+            p="8px"
           >
             Merged At
           </Th>
@@ -450,6 +456,7 @@ useEffect(() => {
           color="white" 
           textAlign="center" 
           minWidth="10rem"
+          p="8px"
         >
           Link
         </Th>
@@ -461,20 +468,20 @@ useEffect(() => {
     <Tbody>
       {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
         <Tr>
-          <Td colSpan={type === 'PRs' ? 6 : 5} textAlign="center">No Data Available</Td>
+          <Td colSpan={type === 'PRs' ? 8 : 6} textAlign="center">No Data Available</Td>
         </Tr>
       ) : (
         <>
           {/* Render Created Items */}
           {showCategory.created && items.created.map((item: PR | Issue) => (
             <Tr key={`created-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
-              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-              <Td style={{ wordWrap: 'break-word', maxWidth: '200px' }}>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-              <Td textAlign="center" verticalAlign="middle">Created</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td p="8px"style={{ wordWrap: 'break-word', maxWidth: '200px' }}>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td p="8px"textAlign="center" verticalAlign="middle">Created</Td>
+              <Td p="8px"textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px"textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
               {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-              <Td>
+              <Td p="8px">
                 <button style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
@@ -500,13 +507,13 @@ useEffect(() => {
           {/* Render Closed Items */}
           {showCategory.closed && items.closed.map((item: PR | Issue) => (
             <Tr key={`closed-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
-              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-              <Td textAlign="center" verticalAlign="middle">Closed</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-              {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-              <Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">Closed</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              {type === 'PRs' && <Td p="8px" textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+              <Td p="8px">
                 <button style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
@@ -532,13 +539,13 @@ useEffect(() => {
           {/* Render Merged Items (only for PRs) */}
           {showCategory.merged && type === 'PRs' && (items as { merged: PR[] }).merged.map((item: PR) => (
             <Tr key={`merged-${item.prNumber}`} borderWidth="1px" borderColor="gray.200">
-              <Td textAlign="center" verticalAlign="middle">{item.prNumber}</Td>
-              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{item.prTitle}</Td>
-              <Td textAlign="center" verticalAlign="middle">Merged</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
-              <Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.prNumber}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{item.prTitle}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">Merged</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
+              <Td p="8px">
                 <button style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
@@ -562,13 +569,13 @@ useEffect(() => {
           {/* Render Open Items */}
           {showCategory.open && items.open.map((item: PR | Issue) => (
             <Tr key={`open-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
-              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-              <Td textAlign="center" verticalAlign="middle">Open</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-              {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-              <Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">Open</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              {type === 'PRs' && <Td p="8px" textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+              <Td p="8px">
                 <button style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
@@ -1049,10 +1056,11 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
           </Heading>
 
           <Box
-      padding={4}
+      pl={4}
       bg={useColorModeValue("blue.50", "gray.700")}
       borderRadius="md"
-      marginBottom={8}
+      pr="8px"
+      marginBottom={2}
     >
       <Flex justify="space-between" align="center">
         <Heading
@@ -1072,10 +1080,13 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     onClick={toggleCollapse}
     icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
     variant="ghost"
+     h="24px" // Smaller height
+     w="20px"
     aria-label="Toggle Instructions"
     _hover={{ bg: 'blue' }} // Maintain background color on hover
     _active={{ bg: 'blue' }} // Maintain background color when active
     _focus={{ boxShadow: 'none' }} // Remove focus outline
+    
   />
 </Box>
 
@@ -1166,7 +1177,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       )} */}
     </Box>
   
-          <Flex justify="center" mb={8}>
+          <Flex justify="center" mb={4}>
             <Button
               colorScheme="blue"
               onClick={() => setActiveTab('PRs')}
@@ -1187,14 +1198,14 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
          
           <Box
             bgColor={bg}
-            padding="2rem"
+            padding="1rem"
             borderRadius="0.55rem"
             _hover={{
               border: "1px",
               borderColor: "#30A0E0",
             }}
           >
-          <Box padding={"2rem"} borderRadius={"0.55rem"}>
+          <Box  borderRadius={"0.55rem"}>
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
             {`Github PR Analytics (Monthly, since 2015)`}

@@ -11,7 +11,7 @@ interface ToolCardProps {
 
 const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link, size, layout }) => {
   const bg = useColorModeValue("#F5F5F5", "#171923");
-  const cardHeight = size === "large" ? { base: "350px", md: "525px" } : { base: "200px", md: "250px" };
+  const cardHeight = size === "large" ? { base: "250px", md: "425px" } : { base: "200px", md: "200px" };
 
   const flexDirection: { base: 'column' | 'column-reverse'; md: 'row' | 'row-reverse' | 'column' | 'column-reverse' } = {
     base: "column-reverse",
@@ -81,10 +81,10 @@ const ToolsSection: FC = () => {
   const headingBgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)";
 
   return (
-    <Box py={10} textAlign="center" bg="rgba(0, 0, 0, 0.5)" borderRadius="md" padding={10} boxShadow="md">
+    <Box  textAlign="center" bg="rgba(0, 0, 0, 0.5)" borderRadius="md" padding={5} boxShadow="md">
       <Flex
         direction={{ base: "column", lg: "row" }}
-        mb={10}
+        mb={1}
         mx="auto" // Centers the Flex container
         maxW="1200px" // Ensures the Flex container doesn't exceed the width of the grid
         w="100%" // Ensures it takes the full width up to the maxW
