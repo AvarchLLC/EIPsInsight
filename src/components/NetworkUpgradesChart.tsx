@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Box, useColorModeValue, Flex, Heading, Button, Spinner } from "@chakra-ui/react";
 
@@ -123,40 +123,40 @@ const colorMap = uniqueUpgrades.reduce((map, upgrade, index) => {
   return map;
 }, {} as Record<string, string>);
 
-const NetworkUpgradesChart = () => {
+const NetworkUpgradesChart = React.memo(() => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [isLoading, setIsLoading] = useState(false);
 
-  const downloadData = async () => {
+  const downloadData = useCallback(async () => {
     setIsLoading(true); // Activate loader
     const header = "Date,Network Upgrade,EIP Link,Requires\n";
-  
+    
     try {
       const csvContent = "data:text/csv;charset=utf-8," + header
         + await Promise.all(rawData.map(async ({ date, upgrade, eip }) => {
           const eipNo = eip.replace('EIP-', '');
           const url = `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${eipNo}.md`;
-  
+
           try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Failed to fetch EIP-${eipNo}`);
-  
+
             const eipData = await response.text();
             const requiresMatch = eipData.match(/requires:\s*(.+)/);
             let requires = requiresMatch ? requiresMatch[1].trim() : 'None';
-  
+
             // Escape requires field if it contains commas
             if (requires.includes(",")) {
               requires = `"${requires}"`;
             }
-  
+
             return `${date},${upgrade},https://eipsinsight.com/eips/eip-${eipNo},${requires}`;
           } catch (error) {
             console.error(`Error fetching data for EIP-${eipNo}:`, error);
             return `${date},${upgrade},https://eipsinsight.com/eips/eip-${eipNo},"Error fetching requires"`;
           }
         })).then(rows => rows.join("\n"));
-  
+
       // Trigger download
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
@@ -164,14 +164,12 @@ const NetworkUpgradesChart = () => {
       link.setAttribute("download", "network_upgrades.csv");
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-  
     } catch (error) {
-      console.error("Error generating CSV:", error);
+      console.error("Error downloading data:", error);
     } finally {
       setIsLoading(false); // Deactivate loader
     }
-  };
+  }, []);
   // Chart configuration
   const config = {
     data: transformedData,
@@ -217,6 +215,6 @@ const NetworkUpgradesChart = () => {
       <Column {...config} />
     </Box>
   );
-};
+});
 
 export default NetworkUpgradesChart;

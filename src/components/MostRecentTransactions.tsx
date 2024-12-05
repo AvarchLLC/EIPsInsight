@@ -11,11 +11,11 @@ const RecentTransactions: React.FC = () => {
   const tableSize = useBreakpointValue({ base: 'sm', md: 'md' });
 
   useEffect(() => {
-    // Fetch most recent transactions from the API
+    // Fetch the most recent transactions from the API
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/blockchain/recent/Transactions');
-        setTransactions(response.data.data);
+        const response = await axios.get('/api/blockchain/recent/transactions');
+        setTransactions(response.data.data.reverse()); // Reverse to show newest first
       } catch (err) {
         setError('Failed to fetch transactions');
       } finally {
@@ -24,16 +24,63 @@ const RecentTransactions: React.FC = () => {
     };
 
     fetchTransactions();
+
+    // Setup SSE connection to listen for live transactions
+    const eventSource = new EventSource('/api/blockchain/live/transactions');
+
+    eventSource.onmessage = (event) => {
+      const newTransaction = JSON.parse(event.data);
+
+      setTransactions((prevTransactions) => {
+        if (prevTransactions.some(tx => tx.hash === newTransaction.hash)) {
+          return prevTransactions; // Avoid duplicates
+        }
+
+        const updatedTransactions = [newTransaction, ...prevTransactions];
+        if (updatedTransactions.length > 10) {
+          updatedTransactions.pop(); // Maintain limit of 10 transactions
+        }
+        return updatedTransactions;
+      });
+    };
+
+    eventSource.onerror = () => {
+      setError('Error receiving live updates');
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close(); // Clean up the SSE connection when the component unmounts
+    };
   }, []);
 
   if (loading) {
-    return <Spinner size="xl" />;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" mt={8} mb={8}>
+        <Spinner size="xl" />
+      </Box>
+    );
   }
 
   if (error) {
-    return <Text color="red.500">{error}</Text>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" mt={8} mb={8}>
+        <Text color="red.500">{error}</Text>
+      </Box>
+    );
+    
   }
 
+  const formatHash = (hash: string | undefined) => {
+    if (!hash) return 'N/A';
+    return `${hash.slice(0, 8)}...`;
+  };
+  
+  const formatAddress = (address: string | undefined) => {
+    if (!address) return 'N/A';
+    return `${address.slice(0, 8)}...${address.slice(-8)}`;
+  };
+  
   return (
     <Box
       borderWidth="1px"
@@ -51,18 +98,24 @@ const RecentTransactions: React.FC = () => {
         <Thead>
           <Tr>
             <Th>Transaction Hash</Th>
+            <Th>From</Th>
+            <Th>To</Th>
+            <Th>Amount (ETH)</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {transactions.map((txHash, index) => (
-            <Tr key={index}>
-              <Td isTruncated maxWidth="300px">
-                <NextLink href={`/explorer/Transaction/${txHash}`} passHref>
+          {transactions.filter((tx) => tx.hash).map((tx, index) => (
+            <Tr key={tx.hash || index}>
+              <Td>
+                <NextLink href={`/explorer/Transaction/${tx.hash}`} passHref>
                   <Text as="a" color="blue.500" fontWeight="bold">
-                    {txHash.length > 50 ? `${txHash.slice(0, 50)}...` : txHash}
+                    {formatHash(tx.hash)}
                   </Text>
                 </NextLink>
               </Td>
+              <Td>{formatAddress(tx.from)}</Td>
+              <Td>{formatAddress(tx.to)}</Td>
+              <Td>{tx.value}</Td>
             </Tr>
           ))}
         </Tbody>

@@ -17,7 +17,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    const recentTransactions = latestBlock.transactions.slice(-10); // Last 10 transactions
+    // Fetch the full transaction details for each transaction in the block
+    const transactionsInfo = await Promise.all(
+      latestBlock.transactions.slice(0, 10).map(async (txHash) => {
+        // Fetch the full transaction data using the tx hash
+        const tx = await provider.getTransaction(txHash);
+
+        if (!tx) {
+          throw new Error(`Transaction ${txHash} not found`);
+        }
+
+        // Convert transaction value to Ether
+        const valueInEth = tx.value ? ethers.formatEther(tx.value) : '0 ETH';
+
+        return {
+          hash: tx.hash,
+          from: tx.from,
+          to: tx.to,
+          value: valueInEth,
+        };
+      })
+    );
+
+    // Return the last 10 transactions
+    const recentTransactions = transactionsInfo.slice(-10);
 
     res.status(200).json({
       success: true,
