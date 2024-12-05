@@ -26,6 +26,10 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import Image from "next/image";
 import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
+import { FaSyncAlt } from "react-icons/fa";
+
+const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
+
 
 const All = () => {
   const [selected, setSelected] = useState("Meta");
@@ -61,16 +65,16 @@ const All = () => {
   };
 
   const pectraData = [
-    {
+  //   {
       
-      eip: "7600",
-      title: "Hardfork Meta - Pectra",
-      author: "Tim Beiko (@timbeiko)",
-      link: "https://eipsinsight.com/eips/eip-7600",
-      type: "Meta",
-      category: "Meta",
-      discussion: "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205",
-  },
+  //     eip: "7600",
+  //     title: "Hardfork Meta - Pectra",
+  //     author: "Tim Beiko (@timbeiko)",
+  //     link: "https://eipsinsight.com/eips/eip-7600",
+  //     type: "Meta",
+  //     category: "Meta",
+  //     discussion: "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205",
+  // },
     {
         eip: "2537",
         title: "Precompile for BLS12-381 curve operations",
@@ -125,15 +129,15 @@ const All = () => {
         category:"Core",
         discussion:"https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
       },
-      {
-        eip: "7594",
-        title: "PeerDAS - Peer Data Availability Sampling",
-        author: "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
-        link: "https://eipsinsight.com/eips/eip-7594",
-        type:"Standards Track",
-        category:"Networking",
-        discussion:"https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
-      },
+      // {
+      //   eip: "7594",
+      //   title: "PeerDAS - Peer Data Availability Sampling",
+      //   author: "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
+      //   link: "https://eipsinsight.com/eips/eip-7594",
+      //   type:"Standards Track",
+      //   category:"Networking",
+      //   discussion:"https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
+      // },
       {
         eip: "7685",
         title: "General purpose execution layer requests",
@@ -153,32 +157,32 @@ const All = () => {
         discussion:"https://ethereum-magicians.org/t/eip-set-eoa-account-code-for-one-transaction/19923"
       },
       {
-        eip: "7692",
-        title: "EVM Object Format (EOFv1) Meta",
-        author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz), Danno Ferrin (@shemnon)",
-        link: "https://eipsinsight.com/eips/eip-7692",
-        type:"Meta",
-        category:"Meta",
-        discussion:"https://ethereum-magicians.org/t/eip-7692-evm-object-format-eof-meta/19686"
+        eip: "7742",
+        title: "Uncouple blob count between CL and EL",
+        author: "Alex Stokes (@ralexstokes)",
+        link: "https://eipsinsight.com/eips/eip-7742",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7742-uncouple-blob-count-between-cl-and-el/20550"
       },
-      // {
-      //   eip: "663",
-      //   title: "SWAPN, DUPN and EXCHANGE instructions",
-      //   author: "Alex Beregszaszi (@axic), Charles Cooper (@charles-cooper), Danno Ferrin (@shemnon)",
-      //   link: "https://eipsinsight.com/eips/eip-2537",
-      //   type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-663-unlimited-swap-and-dup-instructions/3346"
-      // },
-      // {
-      //     eip: "3540",
-      //     title: "EOF - EVM Object Format v1",
-      //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Matt Garnett (@lightclient)",
-      //     link: "https://eipsinsight.com/eips/eip-3540",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/evm-object-format-eof/5727"
-      // },
+      {
+        eip: "7623",
+        title: "Increase calldata cost",
+        author: "Toni Wahrstätter (@nerolation), Vitalik Buterin (@vbuterin)",
+        link: "https://eipsinsight.com/eips/eip-7623",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7623-increase-calldata-cost/18647"
+      },
+      {
+          eip: "7762",
+          title: "Increase MIN_BASE_FEE_PER_BLOB_GAS",
+          author: "Max Resnick (@MaxResnick)",
+          link: "https://eipsinsight.com/eips/eip-7762",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7762-increase-min-base-fee-per-blob-gas/20949"
+      },
       //   {
       //     eip: "3670",
       //     title: "EOF - Code Validation",
@@ -261,6 +265,82 @@ const All = () => {
       //   discussion:"https://ethereum-magicians.org/t/eip-7698-eof-creation-transaction/19784"
       // },
   ];
+
+  console.log("sepolia key:",sepolia_key);
+  const calculateTargetBlock = (currentBlock: number) => {
+    const targetDate = new Date("2025-02-15T00:00:00Z");
+    const currentDate = new Date();
+    
+    // Calculate the time difference in seconds
+    const secondsDifference = (targetDate.getTime() - currentDate.getTime()) / 1000;
+    
+    // Average block time in seconds (12 seconds per block)
+    const averageBlockTime = 12;
+    
+    // Calculate the target block number
+    const targetBlock = currentBlock + Math.floor(secondsDifference / averageBlockTime);
+    
+    return targetBlock;
+  };
+
+  const [targetBlock, setTargetBlock] = useState(0);
+  const [currentBlock, setCurrentBlock] = useState(0);
+  const [timer, setTimer] = useState(20); // 10-second timer
+  
+
+  // Fetch the current block number from Sepolia every 10 seconds
+  useEffect(() => {
+    const fetchBlockNumber = async () => {
+      try {
+        const response = await fetch(
+          sepolia_key,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              method: "eth_blockNumber",
+              params: [],
+              id: 1,
+              jsonrpc: "2.0",
+            }),
+          }
+        );
+        const data = await response.json();
+        const blockNumber = parseInt(data.result, 16);
+        setCurrentBlock(blockNumber);
+
+        // Calculate the target block based on current block number
+        const calculatedTargetBlock = calculateTargetBlock(blockNumber);
+        setTargetBlock(calculatedTargetBlock);
+      } catch (error) {
+        console.error("Error fetching block number:", error);
+      }
+    };
+
+    const interval = setInterval(() => {
+      fetchBlockNumber();
+      setTimer(20); // Reset the timer to 10 seconds after each fetch
+    }, 20000); // Fetch every 10 seconds
+
+    // Countdown timer that resets every 10 seconds
+    const countdownInterval = setInterval(() => {
+      setTimer((prev) => (prev === 0 ? 20 : prev - 1)); // Countdown logic
+    }, 1000);
+
+    // Initial fetch
+    fetchBlockNumber(); // Fetch on initial load
+    // Cleanup intervals on component unmount
+    return () => {
+      clearInterval(interval);
+      clearInterval(countdownInterval);
+    };
+  }, []);
+
+
+
+
   return (
     <>
       <AllLayout>
@@ -299,6 +379,75 @@ const All = () => {
 >
   PECTRA
 </Text>
+
+<Box
+  textAlign="center"
+  p={6}
+  maxWidth="700px"
+  mx="auto"
+  mt={1}
+  borderRadius="lg"
+  boxShadow="xl"
+  bg="blue.500"
+  color="white"
+>
+  <Text
+    as={motion.div}
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    fontSize={{ base: "2xl", md: "2xl", lg: "2xl" }}
+    fontWeight="bold"
+    color="white"
+    mb={4}
+  >
+    PECTRA Upgrade (Sepolia)
+  </Text>
+
+  
+    <Box
+    as={motion.div}
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    bg="blue.600"
+    color="white"
+    borderRadius="md"
+    p={2}
+    mb={4}
+    fontSize="xs"
+    fontWeight="normal"
+  >
+    <Text
+    fontSize="4xl"
+    fontWeight="bold"
+    color="white"
+    mb={4}
+    as={motion.div}
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    // transition={{ duration: 1 }}
+  >
+    {targetBlock - currentBlock} blocks away
+    </Text>
+    </Box>
+  
+  
+  <Text
+    fontSize="sm"
+    color="white"
+    mb={4}
+    as={motion.div}
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+  >
+    Refreshes in {timer} seconds
+    </Text>
+
+  <Text fontSize="sm" color="gray.300">
+    * The scheduled block number is not announced yet, and this is an approximation.
+  </Text>
+</Box>
+<br/>
+
           <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
   Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
   collectively known as{" "}

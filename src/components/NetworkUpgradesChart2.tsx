@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Box, useColorModeValue, Flex, Heading, Button } from "@chakra-ui/react";
 
@@ -121,7 +121,7 @@ const colorMap = transformedData.reduce((map, author, index) => {
   return map;
 }, {} as Record<string, string>);
 
-const AuthorContributionsChart = () => {
+const AuthorContributionsChart = React.memo(() => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   // Chart configuration
@@ -169,6 +169,6 @@ const AuthorContributionsChart = () => {
       <Column {...config} />
     </Box>
   );
-};
+});
 
 export default AuthorContributionsChart;

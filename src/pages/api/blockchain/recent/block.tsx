@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const blockPromises = [];
 
     // Fetch the last 10 blocks with transactions
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 1; i++) {
       blockPromises.push(provider.getBlock(latestBlockNumber - i, true)); // 'true' fetches transactions
     }
 
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Create an array to hold the block info (block number, miner, and reward)
     const blockDetails = validBlocks.map((block: any) => {
-      const blockReward = ethers.formatEther('2'); // Default block reward (adjust based on your network rules)
+      const blockReward = ethers.formatEther('2'); 
 
       return {
         blockNumber: block.number,
