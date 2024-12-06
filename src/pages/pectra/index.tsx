@@ -266,7 +266,7 @@ const All = () => {
       // },
   ];
 
-  console.log("sepolia key:",sepolia_key);
+  // console.log("sepolia key:",sepolia_key);
   const calculateTargetBlock = (currentBlock: number) => {
     const targetDate = new Date("2025-02-15T00:00:00Z");
     const currentDate = new Date();
@@ -380,7 +380,7 @@ const All = () => {
   PECTRA
 </Text>
 
-<Box
+{/* <Box
   textAlign="center"
   p={6}
   maxWidth="700px"
@@ -445,7 +445,7 @@ const All = () => {
   <Text fontSize="sm" color="gray.300">
     * The scheduled block number is not announced yet, and this is an approximation.
   </Text>
-</Box>
+</Box> */}
 <br/>
 
           <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
@@ -462,7 +462,7 @@ const All = () => {
       </Text>
   </NLink>{" "}
   on the mainnet. Given the complexities 
-  of testing and the scope of changes, including over 20{" "}
+  of testing and the scope of changes, including over 11{" "}
   <NLink href={`https://www.youtube.com/watch?v=AyidVR6X6J8`}>
       <Text as={"span"} color="blue.500" textDecor={"underline"}>
         Ethereum Improvement Proposals (EIPs)
@@ -475,7 +475,7 @@ const All = () => {
         Fusaka
       </Text>
   </NLink>(a combination of Fulu and Osaka) upgrade. 
-  Currently, the testing team is working on Pectra Devnet 3 and has finalized the specifications for Devnet 4. Specs 
+  Currently, the testing team is working on Pectra Devnet 5 and has finalized the specifications for Devnet 4. Specs 
   and other details can be followed below.{" "}
   <NLink href={`#carousel-section`}>
       <Text as={"span"} color="blue.500" textDecor={"underline"}>

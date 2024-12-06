@@ -51,16 +51,13 @@ export default function RootLayout({
       <Head>
                 {/* Google Analytics */}
                 <script async src="https://www.googletagmanager.com/gtag/js?id=G-N59QCDB9WN"></script>
-                <script
-                  dangerouslySetInnerHTML={{
-                    __html: `
-                      window.dataLayer = window.dataLayer || [];
-                      function gtag(){dataLayer.push(arguments);}
-                      gtag('js', new Date());
-                      gtag('config', 'G-N59QCDB9WN');
-                    `,
-                  }}
-                />
+                <script>
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments)}
+                  gtag('js', new Date());
+
+                  gtag('config', 'G-N59QCDB9WN');
+                </script>
               </Head>
           <Navbar/>
 
