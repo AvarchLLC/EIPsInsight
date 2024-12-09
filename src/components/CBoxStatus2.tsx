@@ -17,6 +17,7 @@ import {
 import { useWindowSize } from "react-use";
 import DateTime from "@/components/DateTime";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -239,7 +240,17 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
           fontSize={"14px"}
           fontWeight={"bold"}
           padding={"8px 20px"}
-          onClick={downloadCSV} // Updated here
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadCSV;
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
         >
           Download Reports
         </Button>

@@ -6,6 +6,7 @@ import NextLink from 'next/link';
 // import AuthorEIPCounter from './AuthorBoard';
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { SearchIcon } from "@chakra-ui/icons";
+import axios from 'axios';
 
 interface EIP {
   _id: string;
@@ -329,7 +330,17 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
                     color="black">
                         You can download the data here:
                       </Text>
-                      <Button colorScheme="blue" onClick={handleDownload} disabled={isLoading}>
+                      <Button colorScheme="blue" onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      handleDownload
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }} disabled={isLoading}>
                         {isLoading ? <Spinner size="sm" /> : "Download CSV"}
                       </Button>
                     </Box>

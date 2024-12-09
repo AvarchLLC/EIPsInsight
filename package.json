@@ -61,6 +61,7 @@
     "react-awesome-slider": "^4.1.0",
     "react-awesome-slider-fc": "^1.0.0",
     "react-chartjs-2": "^5.2.0",
+    "react-cookie-consent": "^9.0.0",
     "react-copy-to-clipboard": "^5.1.0",
     "react-csv": "^2.2.2",
     "react-date-range": "^2.0.1",

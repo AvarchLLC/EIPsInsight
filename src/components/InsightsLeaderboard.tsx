@@ -5,6 +5,7 @@ import { CSVLink } from "react-csv";
 import LoaderComponent from "@/components/Loader";
 import DateTime from "@/components/DateTime";
 import { usePathname } from "next/navigation";
+import axios from "axios";
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -44,6 +45,8 @@ const InsightsLeaderboard = () => {
   const path = usePathname();
   const [loading3,setLoading3]=useState<boolean>(false);
   const [loading2,setLoading2]=useState<boolean>(false);
+
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,6 +108,7 @@ const InsightsLeaderboard = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
+      console.log("reviewers from github:", reviewers);
   
       return reviewers;
     } catch (error) {
@@ -134,9 +138,11 @@ const InsightsLeaderboard = () => {
         (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
         {}
       );
-      console.log(initialShowReviewer)
+      console.log("show reviewers data:",initialShowReviewer)
   
       setShowReviewer(initialShowReviewer);
+
+      
      
       setchart1Data(formattedData);
     } catch (error) {
@@ -145,6 +151,35 @@ const InsightsLeaderboard = () => {
       setLoading(false); // Ensure loading state is set to false in all cases
     }
   };
+
+  useEffect(() => {
+    fetchReviewers().then((uniqueReviewers) => {
+      setReviewers(uniqueReviewers);
+      console.log("unique reviewers:", uniqueReviewers);
+  
+      // Initially, set all reviewers to true
+      const initialShowReviewer = uniqueReviewers.reduce(
+        (acc, reviewer) => ({
+          ...acc,
+          [reviewer]: true, // Set all fetched reviewers to true initially
+        }),
+        {} as ShowReviewerType
+      );
+  
+      // Set reviewers that aren't in the unique list to false
+      const finalShowReviewer = Object.keys(initialShowReviewer).reduce(
+        (acc, reviewer) => ({
+          ...acc,
+          [reviewer]: uniqueReviewers.includes(reviewer) ? true : false, // Set false for others
+        }),
+        {} as ShowReviewerType
+      );
+  
+      setShowReviewer(finalShowReviewer);
+      console.log(finalShowReviewer);
+    });
+  }, []);
+  
 
   useEffect(() => {
     fetchData();
@@ -351,11 +386,22 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   <CSVLink 
     data={csvData.length ? csvData : []} 
     filename={`reviews_data.csv`} 
-    onClick={(e: any) => {
-      generateCSVData();
-      if (csvData.length === 0) {
-        e.preventDefault(); 
-        console.error("CSV data is empty or not generated correctly.");
+    onClick={async (e: any) => {
+      try {
+        // Generate the CSV data
+        generateCSVData();
+  
+        // Check if CSV data is empty and prevent default behavior
+        if (csvData.length === 0) {
+          e.preventDefault();
+          console.error("CSV data is empty or not generated correctly.");
+          return;
+        }
+  
+        // Trigger the API call to update the download counter
+        await axios.post("/api/DownloadCounter");
+      } catch (error) {
+        console.error("Error triggering download counter:", error);
       }
     }}
   >

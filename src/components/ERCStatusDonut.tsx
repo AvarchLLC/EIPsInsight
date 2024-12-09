@@ -19,6 +19,7 @@ ChartJS.register(
   Legend
 );
 import dynamic from "next/dynamic";
+import axios from "axios";
 
 interface EIP {
   _id: string;
@@ -206,7 +207,17 @@ const ERCStatusDonut = () => {
             </a>
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={downloadData}>
+          <Button colorScheme="blue" onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData;
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>
             Download CSV
           </Button>
         </Flex>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
 import Dashboard from "./Dashboard";
 import NextLink from "next/link";
+import axios from "axios";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -317,7 +318,17 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
           : `${type} - [${data.length}]`}
       </Text>
     </NextLink>
-      <Button colorScheme="blue" onClick={downloadData}>
+      <Button colorScheme="blue" onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData;
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>
         Download CSV
       </Button>
     </Flex>

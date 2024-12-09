@@ -4,7 +4,7 @@ import { Flex, Heading, Button,Box, useColorModeValue, Spinner } from "@chakra-u
 import { useWindowSize } from "react-use";
 import DateTime from "@/components/DateTime";
 import { motion } from "framer-motion";
-
+import axios from "axios";
 const getCat = (cat: string) => {
   switch (cat) {
     case "Standards Track":
@@ -218,7 +218,17 @@ const StackedColumnChart: React.FC = () => {
             {`Draft vs Final`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={downloadData}>Download CSV</Button>
+          <Button colorScheme="blue" onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData;
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>Download CSV</Button>
         </Flex>
           <Area {...config} />
           <Box className={"w-full"}>

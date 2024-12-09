@@ -13,8 +13,12 @@ import CatTable from "@/components/CatTable";
 import RipCatTable from "@/components/RipCatTable";
 import SearchBox from "@/components/SearchBox";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import Link from "next/link";
+
+import { motion } from "framer-motion";
+
+const MotionBox = motion(Box);
 
 interface EIP {
   _id: string;
@@ -34,7 +38,7 @@ interface EIP {
 }
 
 const All = () => {
-  const [selected, setSelected] = useState("Meta");
+  const [selected, setSelected] = useState("All");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [data, setData] = useState<EIP[]>([]);
   const [data2, setData2] = useState<EIP[]>([]);
@@ -43,6 +47,7 @@ const All = () => {
   
   
   const optionArr = [
+    "All",
     "Meta",
     "Informational",
     "Core",
@@ -70,6 +75,9 @@ const All = () => {
         const alldata=jsonData.eip.concat(jsonData.erc).concat(jsonData.rip);
         let filteredData = alldata
         .filter((item:any) => item.category === selected);
+        if(selected==="All"){
+          filteredData=alldata;
+        }
 
         setData2(filteredData);
 
@@ -91,6 +99,10 @@ const All = () => {
   useEffect(()=>{
         let filteredData = data
         .filter((item:any) => item.category === selected);
+        if(selected==="All"){
+          filteredData=data;
+        }
+        console.log("main data:", filteredData);
 
         setData2(filteredData);
   },[selected]);
@@ -100,7 +112,7 @@ const All = () => {
     let filteredData;
     if(selected!=='RIP'){
     filteredData = data
-        .filter((item) => item.category === selected)
+        .filter((item) => (selected==="All"||item.category === selected))
         .map((item) => {
             const { eip, title, author, repo } = item;
             return { eip, title, author, repo };
@@ -185,27 +197,53 @@ const All = () => {
             </div>
           </Box>
 
-          {!loading && (
-                <Box mt={8}>
-                    {/* Download CSV section */}
-                    <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-                        <Text fontSize="lg"
-                            marginBottom={2}
-                            color={useColorModeValue("gray.800", "gray.200")}>
-                            You can download the data here:
-                        </Text>
-                        <Button 
-                            colorScheme="blue" 
-                            onClick={handleDownload} 
-                            isLoading={loading} // Show loading spinner on button
-                            loadingText="Downloading" // Optional loading text
-                            isDisabled={loading} // Disable button when loading
-                        >
-                            Download CSV
-                        </Button>
-                    </Box>
-                </Box>
-            )}
+          <>
+      {loading ? (
+        <MotionBox
+          mt={8}
+          textAlign="center"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{
+            duration: 0.5,
+            repeat: Infinity,
+            repeatType: "reverse", // Pulsating effect
+          }}
+        >
+          <Spinner size="xl" color="blue.500" />
+          <Text
+            mt={4}
+            fontSize="lg"
+            color={useColorModeValue("gray.700", "gray.300")}
+          >
+            Fetching data...
+          </Text>
+        </MotionBox>
+      ) : (
+        <Box mt={8}>
+          {/* Download CSV section */}
+          <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
+            <Text
+              fontSize="lg"
+              marginBottom={2}
+              color={useColorModeValue("gray.800", "gray.200")}
+            >
+              You can download the data here:
+            </Text>
+            <Button
+              colorScheme="blue"
+              onClick={handleDownload}
+              isLoading={loading} // Show loading spinner on button
+              loadingText="Downloading" // Optional loading text
+              isDisabled={loading} // Disable button when loading
+            >
+              Download CSV
+            </Button>
+          </Box>
+        </Box>
+      )}
+    </>
 
           {selected === "RIP" ? (
             <Box>
@@ -219,6 +257,11 @@ const All = () => {
           </Box>
           ) : (
             <Box>
+              {!loading && (selected === "Meta" || selected === "All") && (
+                <Box mt={2} color="gray.500" fontStyle="italic">
+                  * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can vary by 1.
+                </Box>
+              )}
               <CatTable dataset={data2} cat={selected} status={"Living"} />
               <CatTable dataset={data2} cat={selected} status={"Final"} />
               <CatTable dataset={data2} cat={selected} status={"Last Call"} />

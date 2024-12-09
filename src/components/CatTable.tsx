@@ -115,7 +115,7 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
   });
 
   const filteredData = dataset
-    .filter((item) =>item.category === cat && item.status === status)
+    .filter((item) => (cat === "All" || item.category === cat) && item.status === status)
     .map((item) => {
       const { eip, title, author, repo } = item;
       return {
@@ -126,7 +126,7 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
       };
     });
 
-    console.log(filteredData);
+    console.log("filtered data:",filteredData);
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 

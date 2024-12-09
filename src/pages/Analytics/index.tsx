@@ -466,7 +466,7 @@ useEffect(() => {
 
   
     <Tbody>
-      {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
+      {items.created.length === 0 && items.closed.length === 0 && items.open.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
         <Tr>
           <Td colSpan={type === 'PRs' ? 8 : 6} textAlign="center">No Data Available</Td>
         </Tr>

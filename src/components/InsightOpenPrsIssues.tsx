@@ -7,12 +7,13 @@ import {
   Text,
   Spinner,
   Link as LI,
-  Button
+  Button, 
 } from "@chakra-ui/react";
 import DateTime from "@/components/DateTime";
 import LoaderComponent from "@/components/Loader";
 import { usePathname } from "next/navigation";
 import { CSVLink } from "react-csv";
+import axios from "axios";
 
 const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualAxes), { ssr: false });
 const Line = dynamic(() => import("@ant-design/plots").then(mod => mod.Line), { ssr: false });
@@ -79,6 +80,7 @@ const InsightsOpenPrsIssues: React.FC = () => {
   const [csvData, setCsvData] = useState<any[]>([]);
 
   const [loading2,setLoading2]=useState<boolean>(false);
+
 
 
 
@@ -912,7 +914,15 @@ return <Line {...config} />;
        
     <>
     {loading ? (
-      <></> // Return empty fragment when loading
+      <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Spinner size="lg" /> {/* Use a larger size */}
+    </div> // Return empty fragment when loading
     ) : (
       <Box
         bgColor={bg}
@@ -942,11 +952,22 @@ return <Line {...config} />;
   <CSVLink 
     data={csvData.length ? csvData : []} 
     filename={`OpenPRSAndIssues-${selectedYear}-${selectedMonth}.csv`} 
-    onClick={(e: any) => {
-      generateCSVData();
-      if (csvData.length === 0) {
-        e.preventDefault(); 
-        console.error("CSV data is empty or not generated correctly.");
+    onClick={async (e: any) => {
+      try {
+        // Generate the CSV data
+        generateCSVData();
+  
+        // Check if CSV data is empty and prevent default behavior
+        if (csvData.length === 0) {
+          e.preventDefault();
+          console.error("CSV data is empty or not generated correctly.");
+          return;
+        }
+  
+        // Trigger the API call to update the download counter
+        await axios.post("/api/DownloadCounter");
+      } catch (error) {
+        console.error("Error triggering download counter:", error);
       }
     }}
   >

@@ -1,5 +1,5 @@
 import React from 'react';
-import TransactionSearch from '@/components/SearchTransaction';
+import TransactionSearch from '@/components/BlockChainSearch';
 import AllLayout from '@/components/Layout';
 import RecentBlocks from '@/components/MostRecentBlocks';
 import RecentTransactions from '@/components/MostRecentTransactions';
