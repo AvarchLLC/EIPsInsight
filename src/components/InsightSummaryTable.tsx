@@ -17,6 +17,7 @@ import {
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { CSVLink } from "react-csv";
+import axios from "axios";
 
 interface StatusChange {
   _id: string;
@@ -493,11 +494,22 @@ export default function InsightSummary() {
   <CSVLink 
     data={csvData.length ? csvData : []} 
     filename={`OpenPRSAndIssues-${year}-${month}.csv`} 
-    onClick={(e: any) => {
-      generateCSVData();
-      if (csvData.length === 0) {
-        e.preventDefault(); 
-        console.error("CSV data is empty or not generated correctly.");
+    onClick={async (e: any) => {
+      try {
+        // Generate the CSV data
+        generateCSVData();
+  
+        // Check if CSV data is empty and prevent default behavior
+        if (csvData.length === 0) {
+          e.preventDefault();
+          console.error("CSV data is empty or not generated correctly.");
+          return;
+        }
+  
+        // Trigger the API call to update the download counter
+        await axios.post("/api/DownloadCounter");
+      } catch (error) {
+        console.error("Error triggering download counter:", error);
       }
     }}
   >

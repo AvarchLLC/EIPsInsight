@@ -84,7 +84,7 @@ const ToolsSection: FC = () => {
         <ToolCard imageSrc="/DashboardCard5.png" label="All EIPs" link="/all" />
         <ToolCard imageSrc="/DashBoardCard4.png" label="Did you Know" link="/trivia" />
         <ToolCard imageSrc="/DashboardCard6.png" label="Feedback Form" link="/Feedback" />
-        <ToolCard imageSrc="/DashboardCard8.png" label="More Resources" link="/resources" />
+        <ToolCard imageSrc="/dashBoardCard8.png" label="More Resources" link="/resources" />
       </Grid>
     </Box>
   );

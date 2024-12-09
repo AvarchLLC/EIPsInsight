@@ -13,6 +13,7 @@ import React, { useEffect, useState } from "react";
 import LoaderComponent from "./Loader";
 import DateTime from "@/components/DateTime";
 import NextLink from "next/link";
+import axios from "axios";
 
 interface AreaProps {
   data: MappedDataItem[];
@@ -424,7 +425,17 @@ const headingColor = useColorModeValue('black', 'white');
             {`${selectedStatus}`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={downloadData}>Download CSV</Button>
+          <Button colorScheme="blue" onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData;
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>Download CSV</Button>
         </Flex>
             <Area {...config} />
           </>

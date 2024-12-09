@@ -1,72 +1,84 @@
-// app/providers.tsx
-'use client'
-import './globals.css'
-import { Montserrat, DM_Sans, Inter } from 'next/font/google'
-import { Providers } from './providers'
+'use client';
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { Providers } from './providers';
 import { ColorModeScript } from '@chakra-ui/react';
-import Navbar from "@/components/Navbar";
-import LargeWithAppLinksAndSocial from '@/components/Footer';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-const mont = Inter({ subsets: ['latin'] })
-import { motion, AnimatePresence } from "framer-motion";
-import { usePathname, useRouter } from "next/navigation";
-import Head from 'next/head';
+import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import Script from 'next/script';
+import ConsentBanner from '@/components/ConsenstBanner';
 
-export default function RootLayout({
+const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });
+const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
+
+const mont = Inter({ subsets: ['latin'] });
+
+export default function AllLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const router = usePathname();
+  const pathname = usePathname();
+
   return (
     <html lang="en">
-      <AnimatePresence>
-        
-      <body  className={`${mont.className}`}>
-        <motion.div
-        key={router}
-        initial="initialState"
-        animate="animateState"
-        exit="exitState"
-        transition={{
-          duration: 0.75,
-        }}
-        variants={{
-          initialState: {
-            opacity: 0,
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)",
-          },
-          animateState: {
-            opacity: 1,
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)",
-          },
-          exitState: {
-            clipPath: "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)",
-          },
-        }}
-        className="base-page-size"
-      >
-       <ColorModeScript initialColorMode='dark' />
-      <Providers>
-      <Head>
-                {/* Google Analytics */}
-                <script async src="https://www.googletagmanager.com/gtag/js?id=G-N59QCDB9WN"></script>
-                <script>
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments)}
-                  gtag('js', new Date());
-
-                  gtag('config', 'G-N59QCDB9WN');
-                </script>
-              </Head>
-          <Navbar/>
-
-          {children}
-        <LargeWithAppLinksAndSocial/>
-        </Providers>
-        </motion.div>
+      <head>
+        {/* Google Analytics Script */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-N59QCDB9WN"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+        >
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-N59QCDB9WN', { anonymize_ip: true });
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              analytics_storage: 'denied',
+            });
+          `}
+        </Script>
+      </head>
+      <body className={`${mont.className}`}>
+        <ColorModeScript initialColorMode="dark" />
+        <AnimatePresence>
+          <motion.div
+            key={pathname}
+            initial="initialState"
+            animate="animateState"
+            exit="exitState"
+            transition={{ duration: 0.75 }}
+            variants={{
+              initialState: {
+                opacity: 0,
+                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
+              },
+              animateState: {
+                opacity: 1,
+                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
+              },
+              exitState: {
+                clipPath: 'polygon(50% 0, 50% 0, 50% 100%, 50% 100%)',
+              },
+            }}
+            className="base-page-size"
+          >
+            <Providers>
+              <Navbar />
+              <Suspense>{children}</Suspense>
+              <ConsentBanner />
+              <Footer />
+            </Providers>
+          </motion.div>
+        </AnimatePresence>
       </body>
-      </AnimatePresence>
     </html>
-  )
+  );
 }

@@ -2,7 +2,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ethers } from 'ethers';
 
-const provider = new ethers.JsonRpcProvider('http://127.0.0.1:8545'); // Geth RPC URL
+const provider = new ethers.JsonRpcProvider(`https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query; // 'id' will be the transaction hash

@@ -190,12 +190,19 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
     })
     .filter((item: any) => item.category === cat);
 
-  const filteredDataWithMergedYearsAndMonths = filteredData.map(
-    (item, index) => ({
-      "#": (index + 1).toString(), // Add the sr number
-      ...item,
-    })
-  );
+    const filteredDataWithMergedYearsAndMonths = filteredData
+  .sort((a, b) => {
+    const eipA = parseInt(a.eip, 10); // Convert 'eip' field to a number
+    const eipB = parseInt(b.eip, 10);
+    return eipA - eipB; // Sort numerically based on the 'eip' field
+  })
+  .map((item, index) => ({
+    "#": (index + 1).toString(), // Add the sr number after sorting
+    ...item,
+  }));
+
+  
+  console.log("filtered data:", filteredDataWithMergedYearsAndMonths);
 
   const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
     const isYearInRange =
@@ -420,7 +427,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
               
               <CSmartTable
                 items={filteredDataWithMergedYearsAndMonths.sort(
-                  (a, b) => parseInt(a["#"]) - parseInt(b["#"])
+                  (a, b) => parseInt(a["eip"]) - parseInt(b["eip"])
                 )}
                 activePage={1}
                 clickableRows

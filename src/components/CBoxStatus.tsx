@@ -21,6 +21,7 @@ import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
 import { DownloadIcon } from "@chakra-ui/icons";
 import { Spinner } from "@chakra-ui/react";
+import axios from "axios";
 
 interface EIP {
   _id: string;
@@ -405,7 +406,17 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
                 fontSize={"14px"}
                 fontWeight={"bold"}
                 padding={"8px 20px"}
-                onClick={convertAndDownloadCSV}
+                onClick={async () => {
+                  try {
+                    // Trigger the CSV conversion and download
+                    convertAndDownloadCSV();
+              
+                    // Trigger the API call
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
               >
                 <DownloadIcon marginEnd={"1.5"} />
                 Download Reports

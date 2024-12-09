@@ -106,10 +106,23 @@ interface TableProps {
   type: string;
 }
 
+interface EIPEntry {
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  repo: string;
+  statusChanges: string;
+}
+
+
 
 const Table: React.FC<TableProps> = ({ type }) => {
-  const [data, setData] = useState<EIP[]>([]);
+  // const [data, setData] = useState<EIP[]>([]);
   const [data2, setData2] = useState<EIPData[]>([]);
+  const [data3, setData3] = useState<EIPEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   // const [mergedData, setMergedData] = useState<
@@ -145,17 +158,17 @@ const Table: React.FC<TableProps> = ({ type }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
-        if (type === "EIP") {
-          setData(jsonData.eip);
-        } else if (type === "ERC") {
-          setData(jsonData.erc);
-        } else if (type === "Total") {
-          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
-        } else if (type === "RIP") {
-          setData(jsonData.rip);
-        }
+        // const response = await fetch(`/api/new/all`);
+        // const jsonData = await response.json();
+        // if (type === "EIP") {
+        //   setData(jsonData.eip);
+        // } else if (type === "ERC") {
+        //   setData(jsonData.erc);
+        // } else if (type === "Total") {
+        //   setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        // } else if (type === "RIP") {
+        //   setData(jsonData.rip);
+        // }
 
         const response2 = await fetch(`/api/new/graphsv3`);
         const jsonData5 = await response2.json();
@@ -176,14 +189,61 @@ const Table: React.FC<TableProps> = ({ type }) => {
           return Object.values(uniqueEntries);
         }
 
+        function getallEntries(data: any, key: any) {
+          const allEntries: EIPEntry[] = [];
+        
+          // Create a map to store status changes for each eip
+          const eipStatusChangesMap: { [eip: string]: string[] } = {};
+        
+          data.forEach((entry: any) => {
+            const { eip, fromStatus, toStatus, changedDay, changedMonth, changedYear } = entry;
+        
+            // Generate the status change string in the required format
+            const statusChangeString = `${fromStatus} -> ${toStatus}, ${changedDay}-${changedMonth}-${changedYear}`;
+        
+            // If we already have status changes for this eip, add the new change
+            if (eipStatusChangesMap[eip]) {
+              eipStatusChangesMap[eip].push(statusChangeString);
+            } else {
+              // Otherwise, start a new list for this eip
+              eipStatusChangesMap[eip] = [statusChangeString];
+            }
+          });
+        
+          // Now, build the final entries with status changes concatenated into one string for each EIP
+          data.forEach((entry: any) => {
+            const { eip, title, author, status, type, category, repo } = entry;
+            
+            // Join the status changes into a single string
+            const statusChanges = eipStatusChangesMap[eip]?.join(', ') || '';
+        
+            allEntries.push({
+              eip,
+              title,
+              author,
+              status,
+              type,
+              category,
+              repo,
+              statusChanges
+            });
+          });
+        
+          return allEntries;
+        }
+
         let filteredData:any;
+        let filteredData2:any;
 
         if (type === "EIP") {
           filteredData = getEarliestEntries(jsonData5.eip, 'eip');
+          // filteredData2 = getallEntries(jsonData5.eip, 'eip');
         } else if (type === "ERC") {
           filteredData = getEarliestEntries(jsonData5.erc, 'eip');
+          // filteredData2 = getallEntries(jsonData5.erc, 'eip');
         } else if (type === "RIP") {
           filteredData = getEarliestEntries(jsonData5.rip, 'eip');
+          // filteredData2 = getallEntries(jsonData5.rip, 'eip');
         } else if (type === "Total") {
           // Concatenate filtered data for all types
           filteredData = [
@@ -191,14 +251,59 @@ const Table: React.FC<TableProps> = ({ type }) => {
             ...getEarliestEntries(jsonData5.erc, 'eip'),
             ...getEarliestEntries(jsonData5.rip, 'eip'),
           ];
+          // filteredData2 = [
+          //   ...getallEntries(jsonData5.eip, 'eip'),
+          //   ...getallEntries(jsonData5.erc, 'eip'),
+          //   ...getallEntries(jsonData5.rip, 'eip'),
+          // ];
+          
           filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
             entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
-          );          
+          ); 
+          // filteredData2 = filteredData2.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
+          //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
+          // );          
         }
         console.log(filteredData);
 
         setData2(filteredData);
+        // setData3(filteredData2);
         setIsLoading(false);
+
+        if (type === "EIP") {
+          // filteredData = getEarliestEntries(jsonData5.eip, 'eip');
+          filteredData2 = getallEntries(jsonData5.eip, 'eip');
+        } else if (type === "ERC") {
+          // filteredData = getEarliestEntries(jsonData5.erc, 'eip');
+          filteredData2 = getallEntries(jsonData5.erc, 'eip');
+        } else if (type === "RIP") {
+          // filteredData = getEarliestEntries(jsonData5.rip, 'eip');
+          filteredData2 = getallEntries(jsonData5.rip, 'eip');
+        } else if (type === "Total") {
+          // Concatenate filtered data for all types
+          // filteredData = [
+          //   ...getEarliestEntries(jsonData5.eip, 'eip'),
+          //   ...getEarliestEntries(jsonData5.erc, 'eip'),
+          //   ...getEarliestEntries(jsonData5.rip, 'eip'),
+          // ];
+          filteredData2 = [
+            ...getallEntries(jsonData5.eip, 'eip'),
+            ...getallEntries(jsonData5.erc, 'eip'),
+            ...getallEntries(jsonData5.rip, 'eip'),
+          ];
+          
+          filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
+            entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
+          ); 
+          // filteredData2 = filteredData2.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
+          //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
+          // );          
+        }
+        console.log(filteredData);
+
+        // setData2(filteredData);
+        setData3(filteredData2);
+        // setIsLoading(false);
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -266,11 +371,19 @@ const Table: React.FC<TableProps> = ({ type }) => {
     
     if (DataForFilter && DataForFilter.length > 0) {
       // Create CSV headers
-      const headers =
-        Object.keys(filteredDataWithMergedYearsAndMonths[0]).join(",") + "\n";
-
+      const mergedData = DataForFilter.map((item) => {
+        const matchingEntry = data3.find((entry) => entry.eip === item.eip);
+        return {
+          ...item,
+          statusChanges: matchingEntry ? matchingEntry.statusChanges : '', // Default to empty string if no match
+        };
+      });
+  
+      // Create CSV headers
+      const headers = Object.keys(mergedData[0]).join(",") + "\n";
+  
       // Convert data to CSV rows
-      const csvRows = DataForFilter.map((item) => {
+      const csvRows = mergedData.map((item) => {
         const values = Object.values(item).map((value) => {
           // Ensure values with commas are enclosed in double quotes
           if (typeof value === "string" && value.includes(",")) {
@@ -278,19 +391,20 @@ const Table: React.FC<TableProps> = ({ type }) => {
           }
           return value;
         });
-
+  
         return values.join(",");
       });
-
+  
       // Combine headers and rows
       const csvContent = headers + csvRows.join("\n");
-
+  
       // Trigger CSV download
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.style.display = "none";
       a.href = url;
+      
       if (
         selectedCategory === "" &&
         selectedStatus === "" &&
@@ -351,13 +465,24 @@ const Table: React.FC<TableProps> = ({ type }) => {
         >
           {isLoading ? ( // Show loader while data is loading
             <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              height="200px"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="column" // Stack spinner and text vertically
+            height="200px"
+          >
+            <Spinner size="xl" /> {/* Larger spinner */}
+            <Text 
+              mt={4}               // Add margin-top for spacing
+              fontSize="lg"        // Make the text larger
+              fontWeight="bold"    // Make the text bold
+              color="gray.600"     // Set a nice gray color
+              textAlign="center"   // Center the text
             >
-              <Spinner />
-            </Box>
+              Fetching data...
+            </Text>
+          </Box>
+          
           ) : (
             <>
               <Popover trigger={"hover"} placement={"bottom-start"}>

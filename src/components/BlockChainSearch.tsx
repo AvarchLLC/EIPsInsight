@@ -16,7 +16,7 @@ const TransactionSearch = () => {
   return (
     <Flex justifyContent="center" mt={3} alignItems="center" gap={4}>
       <Input
-        placeholder="Search Transaction by Hash"
+        placeholder="Search Transaction/Block"
         value={selectedTransaction}
         onChange={(e) => setSelectedTransaction(e.target.value)}
         size="lg"

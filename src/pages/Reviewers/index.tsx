@@ -67,20 +67,28 @@ const ReviewTracker = () => {
   ];
 
   const handleFilterData = () => {
-    if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
-      const startDate = `${selectedStartYear}-${selectedStartMonth}`;
-      const endDate = `${selectedEndYear}-${selectedEndMonth}`;
+    const currentYear = new Date().getFullYear();
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, "0");
 
-      const filteredData = chart1data.filter((item) => {
-        const itemDate = item.monthYear; // Assuming monthYear is in "YYYY-MM" format
-        return itemDate >= startDate && itemDate <= endDate;
-      });
+    // Set default values for start and end dates
+    const startDate = `${selectedStartYear || "2015"}-${selectedStartMonth || "01"}`;
+    const endDate = `${selectedEndYear || currentYear}-${selectedEndMonth || currentMonth}`;
 
-      console.log('Filtered Data:', filteredData);
-      return filteredData;
+    // Filter only if start or end date is provided
+    if (startDate && endDate) {
+        const filteredData = chart1data.filter((item) => {
+            const itemDate = item.monthYear; // Assuming monthYear is in "YYYY-MM" format
+            return itemDate >= startDate && itemDate <= endDate;
+        });
+
+        console.log("Filtered Data:", filteredData);
+        return filteredData;
     }
-    return chart1data; // Return all data if no filters are applied
-  };
+
+    // Return all data if no filters are applied
+    return chart1data;
+};
+
 
   const toggleCollapse = () => setShow(!show);
 
@@ -1207,6 +1215,60 @@ const renderChart = () => {
               </Select>
             </Flex>
           </Box>
+          <Box>
+          <Heading size="sm" mb="0.5rem" color="black">Select Reviewer</Heading>
+          <Menu closeOnSelect={false}>
+            <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon />}
+              colorScheme="blue"
+              size="md"
+              width="150px"
+            >
+              Reviewers
+            </MenuButton>
+
+            <MenuList maxHeight="200px" overflowY="auto">
+              {/* Deselect all reviewers */}
+              <MenuItem onClick={deselectAllReviewers}>
+                <Text as="span" fontWeight="bold" textDecoration="underline">
+                  Remove All
+                </Text>
+              </MenuItem>
+
+              {/* Select all reviewers */}
+              <MenuItem onClick={selectAllReviewers}>
+                <Text as="span" fontWeight="bold" textDecoration="underline">
+                Emeritus Editors
+                </Text>
+              </MenuItem>
+
+              {/* Select only active reviewers */}
+              <MenuItem onClick={selectActiveReviewers}>
+                <Text as="span" fontWeight="bold" textDecoration="underline">
+                  Active Editors
+                </Text>
+              </MenuItem>
+
+              {/* Render each reviewer with a checkbox */}
+              {Object.keys(showReviewer).map((reviewer) => (
+                <MenuItem key={reviewer}>
+                  <Checkbox
+                    isChecked={showReviewer[reviewer]}
+                    onChange={(e) =>
+                      setShowReviewer({
+                        ...showReviewer,
+                        [reviewer]: e.target.checked,
+                      })
+                    }
+                  >
+                    {reviewer}
+                  </Checkbox>
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+        </Box>
         </Flex>
         {/* <Button colorScheme="blue" onClick={renderChart}>
           Apply Filters
