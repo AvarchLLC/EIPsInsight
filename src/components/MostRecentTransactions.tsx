@@ -14,7 +14,7 @@ const RecentTransactions: React.FC = () => {
     // Fetch the most recent transactions from the API
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get('/api/blockchain/recent/transactions');
+        const response = await axios.get('/api/blockchain/recent/Transactions');
         setTransactions(response.data.data.reverse()); // Reverse to show newest first
       } catch (err) {
         setError('Failed to fetch transactions');

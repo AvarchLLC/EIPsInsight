@@ -21,7 +21,7 @@ const RecentBlocks: React.FC = () => {
   useEffect(() => {
     const fetchBlocks = async () => {
       try {
-        const response = await axios.get('/api/blockchain/recent/blocks');
+        const response = await axios.get('/api/blockchain/recent/Blocks');
         setBlocks(response.data.data.reverse());
       } catch (err) {
         setError('Failed to fetch recent blocks');
