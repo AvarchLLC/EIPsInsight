@@ -11,12 +11,15 @@ import { motion } from "framer-motion";
 import Comments from "@/components/comments";
 import { FiFilter } from 'react-icons/fi';
 import { AiOutlineClose } from 'react-icons/ai';
+import { LineConfig } from '@ant-design/plots';
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 const Bar = dynamic(() => import("@ant-design/plots").then(mod => mod.Bar), { ssr: false });
+const Line = dynamic(() => import("@ant-design/plots").then(mod => mod.Line), { ssr: false });
+
 
 
 const API_ENDPOINTS = {
@@ -35,6 +38,7 @@ const ReviewTracker = () => {
   // const [showReviewer, setShowReviewer] = useState<{ [key: string]: boolean }>({});
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
   const [reviewers, setReviewers] = useState<string[]>([]);
+  const [editors, seteditors] = useState<string[]>([]);
   const [reviewerData, setReviewerData] = useState<any[]>([]);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
@@ -81,7 +85,7 @@ const ReviewTracker = () => {
             return itemDate >= startDate && itemDate <= endDate;
         });
 
-        console.log("Filtered Data:", filteredData);
+        // console.log("Filtered Data:", filteredData);
         return filteredData;
     }
 
@@ -165,13 +169,203 @@ const ReviewTracker = () => {
     merged_at?: string;
   };
 
+  interface ColorsMap {
+    [key: string]: string;
+  }
+
+
+  
+
+
+
+
+  useEffect(() => {
+    const fetchAndSetReviewers = async () => {
+      const reviewersList = await fetchReviewers();
+      seteditors(reviewersList); // Set the fetched reviewers list
+      setLoading(false); // Set loading to false once data is fetched
+    };
+
+    fetchAndSetReviewers();
+  }, []);
+  
+  const reviewerstimeline = () => {
+    const editorList = editors;
+    const filteredData = downloaddata.filter((pr) => editorList.includes(pr.reviewer));
+  
+    // Create a map to store active time ranges for each reviewer
+    const reviewerTimeRanges: { [reviewer: string]: { startTime: number; endTime: number }[] } = {};
+  
+    filteredData.forEach((pr) => {
+      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
+      if (reviewDate) {
+        const reviewer = pr.reviewer;
+        const reviewHour = reviewDate.getHours();
+        const reviewMinute = reviewDate.getMinutes();
+        const reviewTime = reviewHour * 60 + reviewMinute; // Convert time to minutes in a 24-hour format
+  
+        if (!reviewerTimeRanges[reviewer]) {
+          reviewerTimeRanges[reviewer] = [];
+        }
+  
+        // If it's the first review for this reviewer, add a new time range
+        let lastRange = reviewerTimeRanges[reviewer][reviewerTimeRanges[reviewer].length - 1];
+        
+        if (!lastRange) {
+          reviewerTimeRanges[reviewer].push({ startTime: reviewTime, endTime: reviewTime });
+        } else {
+          // If there's a gap of more than 1 hour, start a new range
+          if (reviewTime >lastRange.endTime ) {
+            // Record a new range
+            reviewerTimeRanges[reviewer][0].endTime= reviewTime;
+          } else if(reviewTime <lastRange.startTime) {
+            // Extend the current range to include this review time
+            reviewerTimeRanges[reviewer][0].startTime= reviewTime;
+          }
+        }
+      }
+    });
+  
+    // Merge overlapping or consecutive time ranges
+    Object.keys(reviewerTimeRanges).forEach((reviewer) => {
+      const ranges = reviewerTimeRanges[reviewer];
+      ranges.sort((a, b) => a.startTime - b.startTime); // Sort ranges by start time
+  
+      let mergedRanges: { startTime: number; endTime: number }[] = [];
+  
+      ranges.forEach((range) => {
+        if (mergedRanges.length === 0) {
+          mergedRanges.push(range);
+        } else {
+          const lastRange = mergedRanges[mergedRanges.length - 1];
+          if (range.startTime <= lastRange.endTime + 60) {
+            // If ranges are adjacent or overlapping, merge them
+            lastRange.endTime = Math.max(lastRange.endTime, range.endTime);
+          } else {
+            // Otherwise, start a new range
+            mergedRanges.push(range);
+          }
+        }
+      });
+  
+      // Update the reviewer time ranges with merged ranges
+      reviewerTimeRanges[reviewer] = mergedRanges;
+    });
+  
+    // Flatten the time ranges into a single array with formatted start and end times
+    // const timeline = Object.keys(reviewerTimeRanges).flatMap((reviewer) =>
+    //   reviewerTimeRanges[reviewer].map((range) => ({
+    //     reviewer,
+    //     start: formatTime(range.startTime),
+    //     end: formatTime(range.endTime),
+    //   }))
+    // );
+  
+    // Helper function to format time in 'HH:mm AM/PM'
+    const formatTime = (timeInMinutes: number) => {
+      const hours = Math.floor(timeInMinutes / 60);
+      const minutes = timeInMinutes % 60;
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const formattedHour = hours % 12 || 12; // Convert 24-hour format to 12-hour format
+      const formattedMinute = minutes < 10 ? `0${minutes}` : minutes;
+      return `${formattedHour}:${formattedMinute} ${period}`;
+    };
+
+    console.log(reviewerTimeRanges)
+  
+    // // Flatten the time ranges into a single array with formatted times
+    const timeline = Object.keys(reviewerTimeRanges).flatMap((reviewer) =>
+      reviewerTimeRanges[reviewer].map((range) => ({
+        reviewer,
+        start: formatTime(range.startTime),
+        end: formatTime(range.endTime),
+      }))
+    );
+  
+    console.log(timeline); // This will log the formatted timeline
+  
+    const reviewerColorsMap: ColorsMap = {
+      MicahZoltu: "hsl(315, 85%, 50%)",
+      Pandapip1: "hsl(270, 85%, 50%)",
+      SamWilsn: "hsl(90, 85%, 50%)",
+      axic: "hsl(0, 85%, 50%)",
+      g11tech: "hsl(180, 85%, 50%)",
+      gcolvin: "hsl(225, 85%, 50%)",
+      lightclient: "hsl(45, 85%, 50%)",
+      xinbenlv: "hsl(135, 85%, 50%)",
+    };
+  
+    const config: LineConfig = {
+      data: timeline,
+      xField: "start",
+      yField: "reviewer",
+      seriesField: "reviewer",
+      color: (datum: any, defaultColor?: string) => {
+        const reviewer = datum.reviewer as string;
+        return reviewerColorsMap[reviewer] || defaultColor || "gray";
+      },
+      label: {
+        formatter: (datum: any) => `${datum.start}`, // Displaying the formatted time
+      },
+      xAxis: {
+        min: 0,
+        max: 1440, // 24 hours in minutes
+        tickCount: 24,
+      },
+      yAxis: {
+        title: { text: "Reviewers" },
+      },
+      lineStyle: {
+        lineWidth: 4,
+      },
+      tooltip: {
+        customContent: (title: string, data: any[]) => {
+          const content = data
+            .map((item) => {
+              const { reviewer, start, end } = item.data || {};
+              return `
+                <div>
+                  <strong>${item.name}</strong>: ${item.value}<br />
+                  <strong>Start:</strong> ${start || "N/A"}<br />
+                  <strong>End:</strong> ${end || "N/A"}
+                </div>
+              `;
+            })
+            .join("");
+          return `
+            <div style="padding: 10px; border: 1px solid #ccc; background: white;">
+              <strong>${title}</strong><br />
+              ${content}
+            </div>
+          `;
+        },
+      },
+    };
+  
+    return (
+      <Box>
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color="black">
+            Reviewers Timeline
+          </Heading>
+          <Button colorScheme="blue">Download CSV</Button>
+        </Flex>
+  
+        <Box bgColor="white" padding="2rem" borderRadius="0.55rem" margin="10px">
+          <Line {...config} />
+        </Box>
+      </Box>
+    );
+  };
+  
+
   const generateCSVData = () => {
     if (!selectedYear || !selectedMonth) {
       console.error('Year and Month must be selected to generate CSV');
       return;
     }
 
-    console.log(data)
+    // console.log(data)
   
     const filteredData = data
   
@@ -192,13 +386,13 @@ const ReviewTracker = () => {
   };
 
   const generateCSVData2 = () => {
-    console.log("downloadable data:", downloaddata);
+    // console.log("downloadable data:", downloaddata);
     setLoading3(true);
 
-    console.log(selectedStartMonth);
-    console.log(selectedEndMonth);
-    console.log(selectedEndYear);
-    console.log(selectedStartYear);
+    // console.log(selectedStartMonth);
+    // console.log(selectedEndMonth);
+    // console.log(selectedEndYear);
+    // console.log(selectedStartYear);
   
     if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
       // Construct start and end dates in ISO format
@@ -216,7 +410,7 @@ const ReviewTracker = () => {
         return reviewDate && reviewDate >= startDate && reviewDate <= endDate;
       });
   
-      console.log("Filtered Data (Review Date):", filteredData);
+      // console.log("Filtered Data (Review Date):", filteredData);
   
       const csv = filteredData.map((pr: PR) => ({
         PR_Number: pr.prNumber,
@@ -247,13 +441,74 @@ const ReviewTracker = () => {
       Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
       Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
       Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-    }))
-  ;
+    }));
 
     setCsvData(csv); 
   }
   
 };
+
+const generateCSVData3 = (reviewer: string) => {
+  setLoading3(true);
+
+  // Construct the start and end dates if the year and month are selected
+  if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
+    const startDate = new Date(`${selectedStartYear}-${selectedStartMonth}-01T00:00:00Z`);
+    const endDate = new Date(`${selectedEndYear}-${selectedEndMonth}-01T00:00:00Z`);
+
+    // Adjust end date to include the entire month
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0); // Last day of the month
+
+    // Filter the data based on review date and reviewer
+    const filteredData = downloaddata.filter((pr) => {
+      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
+      return (
+        reviewDate &&
+        reviewDate >= startDate &&
+        reviewDate <= endDate &&
+        (reviewer ? pr.reviewer === reviewer : true) // Filter by reviewer if provided
+      );
+    });
+
+    // Map the filtered data to CSV format
+    const csv = filteredData.map((pr: PR) => ({
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }));
+
+    setCsvData(csv);
+  } else {
+    // If no date range is selected, use all data and filter by reviewer if provided
+    const filteredData = downloaddata.filter((pr) => 
+      reviewer ? pr.reviewer === reviewer : true // Filter by reviewer if provided
+    );
+
+    const csv = filteredData.map((pr: PR) => ({
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }));
+
+    setCsvData(csv);
+  }
+
+  setLoading3(false);
+};
+
 
   useEffect(() => {
     fetchData();
@@ -297,7 +552,7 @@ const ReviewTracker = () => {
         (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
         {}
       );
-      console.log(initialShowReviewer)
+      // console.log(initialShowReviewer)
   
       setShowReviewer(initialShowReviewer);
      
@@ -311,81 +566,7 @@ const ReviewTracker = () => {
   
   
 
-  const transformData = (
-    data: any[], 
-    rev: { [key: string]: boolean },
-    formattedData:any[]
-  ): any[] => {
-    const monthYearData: {
-      [key: string]: { 
-        [reviewer: string]: { 
-          monthYear: string, 
-          reviewer: string, 
-          count: number, 
-          prs: any[] 
-        } 
-      } 
-    } = {};
   
-    data.forEach(review => {
-      const reviewDate = new Date(review.reviewDate || review.created_at || review.closed_at || review.merged_at);
-      
-      if (isNaN(reviewDate.getTime())) {
-        console.error("Invalid date format for review:", review);
-        return;
-      }
-    
-      const key = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, '0')}`;
-      const reviewer = review.reviewer;
-    
-      if (!monthYearData[key]) {
-        monthYearData[key] = {};
-      }
-    
-      // Check if the reviewer is present in reviewerData
-      const reviewerInfo = formattedData.find(r => r.reviewer === reviewer);
-      
-      if (reviewerInfo) {
-        // Check if reviewDate is within the timeline for the reviewer
-        const startDate = new Date(reviewerInfo.startDate);
-        const endDate = reviewerInfo.endDate ? new Date(reviewerInfo.endDate) : new Date(); // Consider current date if endDate is null
-    
-        if (reviewDate >= startDate && reviewDate <= endDate) {
-          // Proceed to add the review to monthYearData
-          if (!monthYearData[key][reviewer]) {
-            monthYearData[key][reviewer] = { monthYear: key, reviewer, count: 0, prs: [] };
-          }
-    
-          // Avoid counting duplicate records
-          const isDuplicate = monthYearData[key][reviewer].prs.some(pr => pr.prNumber === review.prNumber);
-          if (!isDuplicate) {
-            monthYearData[key][reviewer].count += 1;
-            monthYearData[key][reviewer].prs.push(review);
-          }
-        }
-      } else {
-        // If the reviewer is not in reviewerData, continue the process below
-        // (You can handle the logic for reviewers not found in reviewerData if needed)
-        if (!monthYearData[key][reviewer]) {
-          monthYearData[key][reviewer] = { monthYear: key, reviewer, count: 0, prs: [] };
-        }
-    
-        // Avoid counting duplicate records
-        const isDuplicate = monthYearData[key][reviewer].prs.some(pr => pr.prNumber === review.prNumber);
-        if (!isDuplicate) {
-          monthYearData[key][reviewer].count += 1;
-          monthYearData[key][reviewer].prs.push(review);
-        }
-      }
-    });
-    
-  
-    const result = Object.entries(monthYearData).flatMap(([monthYear, reviewers]) => 
-      Object.values(reviewers).filter((item: { reviewer: string }) => rev[item.reviewer])
-    );
-  
-    return result;
-  };
   
 
 // Define types for clarity
@@ -408,12 +589,7 @@ interface PRData {
   count: number ;
 }
 
-// interface LeaderboardChartsProps {
-//   data: PRData[];
-//   selectedYear: string;
-//   selectedMonth: string;
-//   renderTable: (year: string, month: string) => JSX.Element;
-// }
+
 
 const getYearlyData = (data: PRData[]) => {
   // Initialize an accumulator to hold yearly data
@@ -439,7 +615,7 @@ const getYearlyData = (data: PRData[]) => {
       return acc;
     }, {} as Record<string, number>);
 
-  console.log("Combined data from 2015 to 2024:", sortedYearlyData);
+  // console.log("Combined data from 2015 to 2024:", sortedYearlyData);
   return sortedYearlyData;
 };
 
@@ -464,7 +640,7 @@ const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
       return acc;
     }, {} as Record<string, number>);
 
-  console.log("Year:", year, "Month:", month, "Sorted Data:", sortedMonthlyData);
+  // console.log("Year:", year, "Month:", month, "Sorted Data:", sortedMonthlyData);
   return sortedMonthlyData;
 };
 
@@ -654,7 +830,7 @@ const renderChart = () => {
   console.log("filtered data:", filteredData);
   // Transform and group the filtered data based on your business logic
   const transformedData = transformAndGroupData(filteredData);
-  console.log(transformedData);
+  // console.log(transformedData);
 
   // Sort the transformed data by monthYear
   const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
@@ -684,7 +860,7 @@ const renderChart = () => {
       // Optionally handle when sliding stops
       onAfterChange: (value:any) => {
         // Perform any additional actions after the slider is changed
-        console.log('Slider moved to:', value);
+        // console.log('Slider moved to:', value);
       },
     },
     legend: { position: "top-right" as const }, // Legend position
@@ -696,6 +872,119 @@ const renderChart = () => {
 };
 
 
+const renderCharts3 = () => {
+  const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
+  const filteredData = dataToUse.filter(item =>
+    Object.keys(showReviewer)
+      .filter(reviewer => showReviewer[reviewer])
+      .includes(item.reviewer)
+  );
+
+  // Assign colors to reviewers
+  const reviewers = Array.from(new Set(filteredData.map(item => item.reviewer)));
+  const totalReviewers = reviewers.length;
+  filteredData.forEach((item, index) => {
+    if (!reviewerColorsMap[item.reviewer]) {
+      reviewerColorsMap[item.reviewer] = `hsl(${(index * (360 / totalReviewers)) % 360}, 85%, 50%)`;
+    }
+  });
+  console.log(reviewerColorsMap)
+
+  // Generate chart configurations for each reviewer
+  const reviewerCharts = reviewers.map(reviewer => {
+    const reviewerData = filteredData
+      .filter(item => item.reviewer === reviewer)
+      .sort((a, b) => a.monthYear.localeCompare(b.monthYear)); // Sort data by monthYear
+
+    const config = {
+      data: reviewerData,
+      xField: "monthYear",
+      yField: "count",
+      seriesField: "reviewer",
+      geometryOptions: [
+        {
+          geometry: "line",
+          smooth: true,
+          lineStyle: {
+            stroke: reviewerColorsMap[reviewer],
+            lineWidth: 4,
+          },
+        },
+      ],
+      xAxis: { label: { rotate: -45 } }, // Rotate X-axis labels for better readability
+      yAxis: {
+        label: {
+          formatter: (text: string) => {
+            const value = parseFloat(text);
+            return !isNaN(value) ? value.toFixed(0) : text;
+          },
+        },
+      },
+      legend: { position: 'top-right' as const },
+    };
+
+    return (
+      <Box
+  key={reviewer}
+  bgColor={bg}
+  padding="2rem"
+  borderRadius="0.55rem"
+  _hover={{
+    border: "1px",
+    borderColor: "#30A0E0",
+  }}
+  style={{ flex: "1 0 45%", minWidth: "300px", margin: "10px" }}
+>
+  {/* Reviewer Name and CSV Download Button */}
+  <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+    <Heading size="md" color="black">
+      <strong>{reviewer}</strong>
+    </Heading>
+    {/* CSV Download Button */}
+    <CSVLink
+      data={csvData.length ? csvData : []}
+      filename={`${reviewer}_reviews_data.csv`}
+      onClick={(e: any) => {
+        generateCSVData3(reviewer); // Pass the reviewer name to generateCSVData3
+        if (csvData.length === 0) {
+          e.preventDefault();
+          console.error("CSV data is empty or not generated correctly.");
+        }
+      }}
+    >
+      <Button colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
+    </CSVLink>
+  </Flex>
+
+  {/* Chart Component */}
+  {/* <Box className="w-full" style={{ textAlign: "center" }}>
+    <h3>{reviewer}</h3>
+  </Box> */}
+  <Line {...config} />
+
+  {/* DateTime Component */}
+  <Box className="w-full" style={{ marginTop: "20px" }}>
+    <DateTime />
+  </Box>
+</Box>
+
+    );
+  });
+
+  // Render charts in a responsive grid layout
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "space-around",
+        gap: "20px",
+      }}
+    >
+      {reviewerCharts}
+    </div>
+  );
+};
 
 
   const toggleDropdown = () => setShowDropdown(prev => !prev);
@@ -733,7 +1022,7 @@ const renderChart = () => {
         const result = await response.json();
         // console.log(result)
 
-        console.log("result:",result[0].PRs);
+        // console.log("result:",result[0].PRs);
 
         setData(result[0].PRs)
         // console.log(formattedData); 
@@ -768,7 +1057,7 @@ const renderChart = () => {
 
         const combinedPRs = (result as ReviewData[]).flatMap((item) => item.PRs || []);
 
-      console.log("Combined PRs:", combinedPRs);
+      // console.log("Combined PRs:", combinedPRs);
 
       // Set the combined PRs as download data
       
@@ -786,10 +1075,10 @@ const renderChart = () => {
   }, [activeTab]);
 
   const renderTable = (year: string, month: string, reviewerFilter: any) => {
-    console.log(data);
+    // console.log(data);
     const filteredData = data;
 
-        console.log("filtered data:",filteredData);
+        // console.log("filtered data:",filteredData);
 
     return (
         <Box mt={8} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
@@ -1455,8 +1744,17 @@ const renderChart = () => {
                 {renderTable(selectedYear, selectedMonth, showReviewer)}
               </Box>
             )}
+
     </>
     )}
+            <br/>
+            <Box className="w-full">
+              {renderCharts3()} 
+            </Box>
+            {/* <Box className="w-full">
+            <Text fontSize="3xl" fontWeight="bold">Editors Timeline</Text>
+              {reviewerstimeline()}
+            </Box> */}
     <Box>
           <br/>
         <hr></hr>
