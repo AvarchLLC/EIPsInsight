@@ -19,6 +19,7 @@ import { LineConfig } from '@ant-design/plots';
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 const Bar = dynamic(() => import("@ant-design/plots").then(mod => mod.Bar), { ssr: false });
 const Line = dynamic(() => import("@ant-design/plots").then(mod => mod.Line), { ssr: false });
+const Scatter = dynamic(() => import("@ant-design/plots").then(mod => mod.Scatter), { ssr: false });
 
 
 
@@ -28,12 +29,22 @@ const API_ENDPOINTS = {
   rips: '/api/editorsprsrips'
 };
 
+const active_endpoints={
+  eips: '/api/activeeditorsprseips',
+  ercs: '/api/activeeditorsprsercs',
+  rips: '/api/activeeditorsprsrips',
+  all: '/api/activeeditorsprsall'
+}
+
 type ShowReviewerType = { [key: string]: boolean }; 
 
 const ReviewTracker = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
   const [chart1data, setchart1Data] = useState<any[]>([]);
+  const [eipdata, seteipData] = useState<any[]>([]);
+  const [ercdata, setercData] = useState<any[]>([]);
+  const [ripdata, setripData] = useState<any[]>([]);
   const [downloaddata, setdownloadData] = useState<any[]>([]);
   // const [showReviewer, setShowReviewer] = useState<{ [key: string]: boolean }>({});
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
@@ -44,15 +55,25 @@ const ReviewTracker = () => {
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [showFilters2, setShowFilters2] = useState<boolean>(false);
   const [selectedStartYear, setSelectedStartYear] = useState<string | null>(null);
   const [selectedStartMonth, setSelectedStartMonth] = useState<string | null>(null);
   const [selectedEndYear, setSelectedEndYear] = useState<string | null>(null);
   const [selectedEndMonth, setSelectedEndMonth] = useState<string | null>(null);
+  const [selectedStartYear2, setSelectedStartYear2] = useState<string>("2015");
+  const [selectedStartMonth2, setSelectedStartMonth2] = useState<string>("01");
+  const [selectedEndYear2, setSelectedEndYear2] = useState<string>(new Date().getFullYear().toString());
+  const [selectedEndMonth2, setSelectedEndMonth2] = useState<string>(
+    String(new Date().getMonth() + 1).padStart(2, "0")
+  );
   const [activeTab, setActiveTab] = useState<'eips' | 'ercs' | 'rips' |'all'>('all');
   const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [sliderValue, setSliderValue] = useState<number>(0);
+  const [sliderValue2, setSliderValue2] = useState([0, 1]);
+  const [Linechart, setLinechart] = useState<boolean>(false);
+  const [loading4, setLoading4] = useState<boolean>(false);
 
   const years = Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString());
   const months = [
@@ -189,174 +210,7 @@ const ReviewTracker = () => {
     fetchAndSetReviewers();
   }, []);
   
-  const reviewerstimeline = () => {
-    const editorList = editors;
-    const filteredData = downloaddata.filter((pr) => editorList.includes(pr.reviewer));
   
-    // Create a map to store active time ranges for each reviewer
-    const reviewerTimeRanges: { [reviewer: string]: { startTime: number; endTime: number }[] } = {};
-  
-    filteredData.forEach((pr) => {
-      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
-      if (reviewDate) {
-        const reviewer = pr.reviewer;
-        const reviewHour = reviewDate.getHours();
-        const reviewMinute = reviewDate.getMinutes();
-        const reviewTime = reviewHour * 60 + reviewMinute; // Convert time to minutes in a 24-hour format
-  
-        if (!reviewerTimeRanges[reviewer]) {
-          reviewerTimeRanges[reviewer] = [];
-        }
-  
-        // If it's the first review for this reviewer, add a new time range
-        let lastRange = reviewerTimeRanges[reviewer][reviewerTimeRanges[reviewer].length - 1];
-        
-        if (!lastRange) {
-          reviewerTimeRanges[reviewer].push({ startTime: reviewTime, endTime: reviewTime });
-        } else {
-          // If there's a gap of more than 1 hour, start a new range
-          if (reviewTime >lastRange.endTime ) {
-            // Record a new range
-            reviewerTimeRanges[reviewer][0].endTime= reviewTime;
-          } else if(reviewTime <lastRange.startTime) {
-            // Extend the current range to include this review time
-            reviewerTimeRanges[reviewer][0].startTime= reviewTime;
-          }
-        }
-      }
-    });
-  
-    // Merge overlapping or consecutive time ranges
-    Object.keys(reviewerTimeRanges).forEach((reviewer) => {
-      const ranges = reviewerTimeRanges[reviewer];
-      ranges.sort((a, b) => a.startTime - b.startTime); // Sort ranges by start time
-  
-      let mergedRanges: { startTime: number; endTime: number }[] = [];
-  
-      ranges.forEach((range) => {
-        if (mergedRanges.length === 0) {
-          mergedRanges.push(range);
-        } else {
-          const lastRange = mergedRanges[mergedRanges.length - 1];
-          if (range.startTime <= lastRange.endTime + 60) {
-            // If ranges are adjacent or overlapping, merge them
-            lastRange.endTime = Math.max(lastRange.endTime, range.endTime);
-          } else {
-            // Otherwise, start a new range
-            mergedRanges.push(range);
-          }
-        }
-      });
-  
-      // Update the reviewer time ranges with merged ranges
-      reviewerTimeRanges[reviewer] = mergedRanges;
-    });
-  
-    // Flatten the time ranges into a single array with formatted start and end times
-    // const timeline = Object.keys(reviewerTimeRanges).flatMap((reviewer) =>
-    //   reviewerTimeRanges[reviewer].map((range) => ({
-    //     reviewer,
-    //     start: formatTime(range.startTime),
-    //     end: formatTime(range.endTime),
-    //   }))
-    // );
-  
-    // Helper function to format time in 'HH:mm AM/PM'
-    const formatTime = (timeInMinutes: number) => {
-      const hours = Math.floor(timeInMinutes / 60);
-      const minutes = timeInMinutes % 60;
-      const period = hours >= 12 ? 'PM' : 'AM';
-      const formattedHour = hours % 12 || 12; // Convert 24-hour format to 12-hour format
-      const formattedMinute = minutes < 10 ? `0${minutes}` : minutes;
-      return `${formattedHour}:${formattedMinute} ${period}`;
-    };
-
-    console.log(reviewerTimeRanges)
-  
-    // // Flatten the time ranges into a single array with formatted times
-    const timeline = Object.keys(reviewerTimeRanges).flatMap((reviewer) =>
-      reviewerTimeRanges[reviewer].map((range) => ({
-        reviewer,
-        start: formatTime(range.startTime),
-        end: formatTime(range.endTime),
-      }))
-    );
-  
-    console.log(timeline); // This will log the formatted timeline
-  
-    const reviewerColorsMap: ColorsMap = {
-      MicahZoltu: "hsl(315, 85%, 50%)",
-      Pandapip1: "hsl(270, 85%, 50%)",
-      SamWilsn: "hsl(90, 85%, 50%)",
-      axic: "hsl(0, 85%, 50%)",
-      g11tech: "hsl(180, 85%, 50%)",
-      gcolvin: "hsl(225, 85%, 50%)",
-      lightclient: "hsl(45, 85%, 50%)",
-      xinbenlv: "hsl(135, 85%, 50%)",
-    };
-  
-    const config: LineConfig = {
-      data: timeline,
-      xField: "start",
-      yField: "reviewer",
-      seriesField: "reviewer",
-      color: (datum: any, defaultColor?: string) => {
-        const reviewer = datum.reviewer as string;
-        return reviewerColorsMap[reviewer] || defaultColor || "gray";
-      },
-      label: {
-        formatter: (datum: any) => `${datum.start}`, // Displaying the formatted time
-      },
-      xAxis: {
-        min: 0,
-        max: 1440, // 24 hours in minutes
-        tickCount: 24,
-      },
-      yAxis: {
-        title: { text: "Reviewers" },
-      },
-      lineStyle: {
-        lineWidth: 4,
-      },
-      tooltip: {
-        customContent: (title: string, data: any[]) => {
-          const content = data
-            .map((item) => {
-              const { reviewer, start, end } = item.data || {};
-              return `
-                <div>
-                  <strong>${item.name}</strong>: ${item.value}<br />
-                  <strong>Start:</strong> ${start || "N/A"}<br />
-                  <strong>End:</strong> ${end || "N/A"}
-                </div>
-              `;
-            })
-            .join("");
-          return `
-            <div style="padding: 10px; border: 1px solid #ccc; background: white;">
-              <strong>${title}</strong><br />
-              ${content}
-            </div>
-          `;
-        },
-      },
-    };
-  
-    return (
-      <Box>
-        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color="black">
-            Reviewers Timeline
-          </Heading>
-          <Button colorScheme="blue">Download CSV</Button>
-        </Flex>
-  
-        <Box bgColor="white" padding="2rem" borderRadius="0.55rem" margin="10px">
-          <Line {...config} />
-        </Box>
-      </Box>
-    );
-  };
   
 
   const generateCSVData = () => {
@@ -386,50 +240,8 @@ const ReviewTracker = () => {
   };
 
   const generateCSVData2 = () => {
-    // console.log("downloadable data:", downloaddata);
-    setLoading3(true);
-
-    // console.log(selectedStartMonth);
-    // console.log(selectedEndMonth);
-    // console.log(selectedEndYear);
-    // console.log(selectedStartYear);
-  
-    if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
-      // Construct start and end dates in ISO format
-      const startDate = new Date(`${selectedStartYear}-${selectedStartMonth}-01T00:00:00Z`);
-      const endDate = new Date(
-        `${selectedEndYear}-${selectedEndMonth}-01T00:00:00Z`
-      );
-  
-      // Adjust end date to include the entire month
-      endDate.setMonth(endDate.getMonth() + 1);
-      endDate.setDate(0); // Last day of the month
-  
-      const filteredData = downloaddata.filter((pr) => {
-        const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
-        return reviewDate && reviewDate >= startDate && reviewDate <= endDate;
-      });
-  
-      // console.log("Filtered Data (Review Date):", filteredData);
-  
-      const csv = filteredData.map((pr: PR) => ({
-        PR_Number: pr.prNumber,
-        Title: pr.prTitle,
-        Reviewer: pr.reviewer,
-        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-      }))
-    ;
-  
-      setCsvData(csv);
-    setLoading3(false);
-  }
-  else{
-    const filteredData =downloaddata
+    
+    const filteredData =downloaddata;
   
     const csv = filteredData.map((pr: PR) => ({
       PR_Number: pr.prNumber,
@@ -444,12 +256,86 @@ const ReviewTracker = () => {
     }));
 
     setCsvData(csv); 
-  }
-  
+ 
+};
+
+const generateCSVData5 = () => {
+
+  console.log("selected start:",selectedStartYear);
+  console.log("selected start month:",selectedStartMonth);
+  const currentYear = new Date().getFullYear();
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, "0");
+  const startYear = selectedStartYear || "2015";
+  const startMonth=selectedStartMonth || "01";
+  const endYear = selectedEndYear || currentYear;
+  const endMonth =selectedEndMonth || currentMonth;
+
+  if (startYear && startMonth && endYear && endMonth) {
+    // Construct start and end dates in ISO format
+    const startDate = new Date(`${startYear}-${startMonth}-01T00:00:00Z`);
+    const endDate = new Date(
+      `${endYear}-${endMonth}-01T00:00:00Z`
+    );
+
+    console.log("start date:", startDate);
+    console.log("end date:",endDate);
+
+    // Adjust end date to include the entire month
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0); // Last day of the month
+
+    console.log("download data 5:", downloaddata)
+
+    const filteredData = downloaddata.filter((pr) => {
+      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
+      const shouldIncludeReviewer = pr.reviewer && showReviewer[pr.reviewer];
+      return (
+        shouldIncludeReviewer &&
+        reviewDate &&
+        reviewDate >= startDate &&
+        reviewDate <= endDate
+      );
+    });
+    console.log("Filtered Data 5:", filteredData);
+
+    const csv = filteredData.map((pr: PR) => ({
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }))
+  ;
+
+    setCsvData(csv);
+  // setLoading3(false);
+}
+else{
+  const filteredData =downloaddata
+
+  const csv = filteredData.map((pr: PR) => ({
+    PR_Number: pr.prNumber,
+    Title: pr.prTitle,
+    Reviewer: pr.reviewer,
+    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+    Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+    Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+  }));
+
+  setCsvData(csv); 
+}
+
 };
 
 const generateCSVData3 = (reviewer: string) => {
-  setLoading3(true);
+  // setLoading3(true);
 
   // Construct the start and end dates if the year and month are selected
   if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
@@ -506,7 +392,7 @@ const generateCSVData3 = (reviewer: string) => {
     setCsvData(csv);
   }
 
-  setLoading3(false);
+  // setLoading3(false);
 };
 
 
@@ -806,7 +692,7 @@ type ReviewDatum = {
 
 const renderChart = () => {
   const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
-  console.log("data to use:",dataToUse)
+  // console.log("data to use:",dataToUse)
   const filteredData = dataToUse.filter(item =>
     Object.keys(showReviewer) // Get the list of reviewers from showReviewer
       .filter(reviewer => showReviewer[reviewer]) // Only include checked reviewers
@@ -827,7 +713,7 @@ const renderChart = () => {
       reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
     }
   });
-  console.log("filtered data:", filteredData);
+  // console.log("filtered data:", filteredData);
   // Transform and group the filtered data based on your business logic
   const transformedData = transformAndGroupData(filteredData);
   // console.log(transformedData);
@@ -835,7 +721,7 @@ const renderChart = () => {
   // Sort the transformed data by monthYear
   const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
 
-  console.log("sorted data:", sortedData);
+  // console.log("sorted data:", sortedData);
 
   // Chart configuration
   const config = {
@@ -872,6 +758,73 @@ const renderChart = () => {
 };
 
 
+const renderChart4 = () => {
+  const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
+  // console.log("data to use:", dataToUse);
+
+  const filteredData = dataToUse.filter(item =>
+    Object.keys(showReviewer) // Get the list of reviewers from showReviewer
+      .filter(reviewer => showReviewer[reviewer]) // Only include checked reviewers
+      .includes(item.reviewer) // Check if the item reviewer is in the list of checked reviewers
+  );
+
+  const generateDistinctColor = (index: number, total: number) => {
+    const hue = (index * (360 / total)) % 360;  // Golden angle for better color distribution
+    return `hsl(${hue}, 85%, 50%)`; // High saturation and medium brightness for vibrancy
+  };
+
+  // Assign colors if not already assigned
+  const reviewers = Array.from(new Set(filteredData.map(item => item.reviewer)));
+  const totalReviewers = reviewers.length;
+  filteredData.forEach((item, index) => {
+    if (!reviewerColorsMap[item.reviewer]) {
+      // Assign a new color only if the reviewer doesn't already have one
+      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
+    }
+  });
+
+  // console.log("filtered data:", filteredData);
+
+  // Transform and group the filtered data based on your business logic
+  const transformedData = transformAndGroupData(filteredData);
+
+  // Sort the transformed data by monthYear
+  const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
+
+  // console.log("sorted data:", sortedData);
+
+  // Chart configuration for Line Chart
+  const config = {
+    data: sortedData as ReviewDatum[], // Ensure sortedData matches the expected type
+    xField: "monthYear", // X-axis field
+    yField: "count", // Y-axis field
+    seriesField: "reviewer", // Field for series grouping
+    color: (datum: any) => reviewerColorsMap[(datum as ReviewDatum).reviewer], // Typecast datum to ReviewDatum
+    lineStyle: {
+      lineWidth: 2, // Line width
+    },
+    slider: {
+      start: sliderValue, // Set the start value from the state
+      end: 1, // End of the slider
+      step: 0.01, // Define the step value for the slider
+      min: 0, // Minimum value for the slider
+      max: 1, // Maximum value for the slider
+      onChange: (value: any) => {
+        setSliderValue(value); // Update state when slider value changes
+      },
+      // Optionally handle when sliding stops
+      onAfterChange: (value: any) => {
+        // console.log("Slider moved to:", value);
+      },
+    },
+    legend: { position: "top-right" as const }, // Legend position
+  };
+
+  // Render the Line chart with the provided config
+  return <Line {...config} />;
+};
+
+
 const renderCharts3 = () => {
   const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
   const filteredData = dataToUse.filter(item =>
@@ -888,7 +841,7 @@ const renderCharts3 = () => {
       reviewerColorsMap[item.reviewer] = `hsl(${(index * (360 / totalReviewers)) % 360}, 85%, 50%)`;
     }
   });
-  console.log(reviewerColorsMap)
+  // console.log(reviewerColorsMap)
 
   // Generate chart configurations for each reviewer
   const reviewerCharts = reviewers.map(reviewer => {
@@ -920,6 +873,19 @@ const renderCharts3 = () => {
           },
         },
       },
+      slider: {
+        start: sliderValue2[0], // Start value for the slider
+        end: sliderValue2[1], // End value for the slider
+        step: 0.01, // Define the step value for the slider
+        min: 0, // Minimum value for the slider
+        max: 1, // Maximum value for the slider
+        onChange: (value: [number, number]) => {
+          setSliderValue2(value); // Update state when slider value changes
+        },
+        onAfterChange: (value: [number, number]) => {
+          // console.log("Slider moved to:", value);
+        },
+      },
       legend: { position: 'top-right' as const },
     };
 
@@ -937,24 +903,51 @@ const renderCharts3 = () => {
 >
   {/* Reviewer Name and CSV Download Button */}
   <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-    <Heading size="md" color="black">
-      <strong>{reviewer}</strong>
-    </Heading>
-    {/* CSV Download Button */}
-    <CSVLink
-      data={csvData.length ? csvData : []}
-      filename={`${reviewer}_reviews_data.csv`}
-      onClick={(e: any) => {
-        generateCSVData3(reviewer); // Pass the reviewer name to generateCSVData3
-        if (csvData.length === 0) {
-          e.preventDefault();
-          console.error("CSV data is empty or not generated correctly.");
-        }
+  {/* Reviewer Info (Image and GitHub Handle Link) */}
+  <Flex alignItems="center">
+    <img
+      src={`https://github.com/${reviewer}.png?size=24`}
+      alt={`${reviewer}'s avatar`}
+      style={{
+        marginRight: "8px",
+        width: "48px",
+        height: "48px",
+        borderRadius: "50%",
+      }}
+    />
+    <a
+      href={`https://github.com/${reviewer}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        fontWeight: "bold",
+        fontSize: "1rem",
+        textDecoration: "none",
+        color: "black",
       }}
     >
-      <Button colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
-    </CSVLink>
+      {reviewer}
+    </a>
   </Flex>
+
+  {/* CSV Download Button */}
+  <CSVLink
+    data={csvData.length ? csvData : []}
+    filename={`${reviewer}_reviews_data.csv`}
+    onClick={(e: any) => {
+      generateCSVData3(reviewer); // Pass the reviewer name to generateCSVData3
+      if (csvData.length === 0) {
+        e.preventDefault();
+        console.error("CSV data is empty or not generated correctly.");
+      }
+    }}
+  >
+    <Button colorScheme="blue">
+      {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+    </Button>
+  </CSVLink>
+</Flex>
+
 
   {/* Chart Component */}
   {/* <Box className="w-full" style={{ textAlign: "center" }}>
@@ -1170,6 +1163,316 @@ const renderCharts3 = () => {
     );
 };
 
+interface PRInfo {
+  prNumber: number;
+  prTitle: string;
+  created_at?: string;
+  closed_at?: string;
+  merged_at?: string;
+  reviewDate: string;
+  reviewComment?: string;
+  repo: string;
+}
+
+interface ReviewerData {
+  [reviewerName: string]: PRInfo[];
+}
+
+const [activeData, setActiveData] = useState<ReviewerData>({});
+
+const fetchData4 = async () => {
+  setLoading4(true);
+  try {
+    // Step 1: Fetch active tab data
+    const response = await fetch(active_endpoints[activeTab]);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+
+    // Step 2: Fetch reviewer timelines
+    const timelineResponse = await fetch('/api/editorsActivity');
+    if (!timelineResponse.ok) {
+      throw new Error('Failed to fetch timelines!');
+    }
+    const timelines = await timelineResponse.json();
+
+    // Format the timeline data for easy access
+    const timelineMap = timelines.reduce((map: any, reviewer: any) => {
+      map[reviewer.reviewer] = {
+        startDate: new Date(reviewer.startDate),
+        endDate: reviewer.endDate ? new Date(reviewer.endDate) : null, // null means no end date
+      };
+      return map;
+    }, {});
+
+    // Step 3: Filter reviews based on timeline
+    const filteredData = Object.keys(data).reduce((filtered: ReviewerData, reviewerName: string) => {
+      if (!timelineMap[reviewerName]) return filtered; // Skip if no timeline info available
+
+      const { startDate, endDate } = timelineMap[reviewerName];
+      const reviews = data[reviewerName].filter((review: PRInfo) => {
+        const reviewDate = new Date(review.reviewDate);
+        return reviewDate >= startDate && (!endDate || reviewDate <= endDate); // Check if within timeline
+      });
+
+      if (reviews.length > 0) {
+        filtered[reviewerName] = reviews; // Include only reviewers with valid reviews
+      }
+      return filtered;
+    }, {});
+
+    console.log('Filtered scatterplot data:', filteredData);
+    setActiveData(filteredData); // Update state with filtered data
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading4(false);
+  }
+};
+
+
+
+// Fetch data whenever activeTab changes
+useEffect(() => {
+  fetchData4();
+}, [activeTab]);
+
+const [loading5,setLoading5]=useState<boolean>(false);
+
+const fetchDataspeciality = async () => {
+  setLoading5(true);
+  try {
+
+    const endpoint1 =`/api/ReviewersCharts/chart/eips`
+    const endpoint2 =`/api/ReviewersCharts/chart/ercs`
+    const endpoint3 =`/api/ReviewersCharts/chart/rips`
+
+    const response1 = await fetch(endpoint1); // Replace with your API endpoint
+    const response2 = await fetch(endpoint2); 
+    const response3 = await fetch(endpoint3); 
+    if (!response1.ok) {
+      throw new Error('Network response was not ok');
+    }
+    if (!response2.ok) {
+      throw new Error('Network response was not ok');
+    }
+    if (!response3.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const formattedData1: { monthYear: string; reviewer: string; count: number }[] = await response1.json();
+    const formattedData2: { monthYear: string; reviewer: string; count: number }[] = await response2.json();
+    const formattedData3: { monthYear: string; reviewer: string; count: number }[] = await response3.json();
+    console.log("eip data:",formattedData1)
+
+    seteipData(formattedData1);
+    setercData(formattedData2);
+    setripData(formattedData3);
+  } catch (error) {
+    console.error("Error during data fetch:", error);
+  } finally {
+    setLoading5(false); // Ensure loading state is set to false in all cases
+  }
+};
+
+useEffect(()=>{
+  fetchDataspeciality();
+},[]);
+
+const handleFilterData2 = () => {
+  const startDate = `${selectedStartYear2}-${selectedStartMonth2}`;
+  const endDate = `${selectedEndYear2}-${selectedEndMonth2}`;
+  console.log("active data:",activeData);
+  console.log("start:",startDate);
+  console.log("end:",endDate)
+
+  const filteredData:any = [];
+  for (const reviewerName in activeData) {
+    const reviews = activeData[reviewerName];
+    reviews.forEach((pr: PRInfo) => {
+      const reviewDate = new Date(pr.reviewDate);
+      const reviewMonthYear = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, "0")}`;
+
+      if (reviewMonthYear >= startDate && reviewMonthYear <= endDate) {
+        filteredData.push({
+          reviewer: reviewerName,
+          reviewDate: pr.reviewDate,
+          formattedTime: reviewDate.toLocaleString("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          }),
+        });
+      }
+    });
+  }
+  return filteredData;
+};
+
+const editorsActivity = () => {
+  const activityData: any = handleFilterData2();
+
+  const convertTo24Hour = (time: string): string => {
+    const [hours, minutes, period] = time.match(/(\d+):(\d+)\s?(AM|PM)/i)!.slice(1);
+    let hh = parseInt(hours, 10);
+    if (period.toUpperCase() === "PM" && hh !== 12) hh += 12;
+    if (period.toUpperCase() === "AM" && hh === 12) hh = 0;
+    return `${hh.toString().padStart(2, "0")}:${minutes}`;
+  };
+
+  const processedData = activityData.map((item: any) => ({
+    ...item,
+    timeIn24Hour: convertTo24Hour(item.formattedTime),
+  }));
+
+  processedData.sort((a: any, b: any) =>
+    a.timeIn24Hour.localeCompare(b.timeIn24Hour)
+  );
+
+  const reviewers = [...new Set(processedData.map((item: any) => item.reviewer))];
+  const reviewerColors: { [key: string]: string } = {};
+  reviewers.forEach((reviewer, index) => {
+    reviewerColors[reviewer as string] = generateDistinctColor(index, reviewers.length);
+  });
+
+  const scatterConfig = {
+    data: processedData,
+    xField: "timeIn24Hour",
+    yField: "reviewer",
+    colorField: "reviewer",
+    size: 5,
+    pointStyle: ({ reviewer }: any) => ({
+      fill: reviewerColors[reviewer] || "#000",
+      fillOpacity: 0.7,
+      stroke: "#fff",
+      lineWidth: 1,
+    }),
+    xAxis: {
+      title: {
+        text: "Time (24-hour format)",
+      },
+      tickCount: 9,
+    },
+    yAxis: {
+      title: {
+        text: "Reviewer",
+      },
+    },
+    tooltip: {
+      formatter: (datum: any) => ({
+        name: "Reviewer",
+        value: `${datum.reviewer} at ${datum.timeIn24Hour}`,
+      }),
+    },
+  };
+
+  return (
+    <Box padding="1rem" overflowX="auto">
+      {loading4 ? (
+        <Flex justify="center" align="center" height="100vh">
+        <Spinner size="xl" />
+      </Flex>
+    ) : (
+      <div>
+        <Scatter {...scatterConfig} />
+      </div>
+      )}
+    </Box>
+  );
+};
+
+
+const editorsSpecialityChart = () => {
+
+  const processData1 = getYearlyData(eipdata);
+  const yearlyChartData1 = formatChartData(processData1);
+  const processData2 = getYearlyData(ercdata);
+  const yearlyChartData2 = formatChartData(processData2);
+  const processData3 = getYearlyData(ripdata);
+  const yearlyChartData3 = formatChartData(processData3);
+  console.log("new chart data:",yearlyChartData1)
+
+  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech"];
+
+  // Step 1: Filter the data to include only target reviewers
+  const filteredEIPData = yearlyChartData1.filter((item) =>
+    targetReviewers.includes(item.reviewer)
+  );
+  const filteredERCData = yearlyChartData2.filter((item) =>
+    targetReviewers.includes(item.reviewer)
+  );
+  const filteredRIPData = yearlyChartData3.filter((item) =>
+    targetReviewers.includes(item.reviewer)
+  );
+  console.log("filtered data spec:", filteredEIPData)
+  console.log("eip data spec:", eipdata);
+
+  // Step 2: Combine and format the data for the chart
+  const chartData = [
+    ...filteredEIPData.map((item) => ({
+      reviewer: item.reviewer,
+      repo: "EIPs",
+      value: item.count,
+    })),
+    ...filteredERCData.map((item) => ({
+      reviewer: item.reviewer,
+      repo: "ERCs",
+      value: item.count,
+    })),
+    ...filteredRIPData.map((item) => ({
+      reviewer: item.reviewer,
+      repo: "RIPs",
+      value: item.count,
+    })),
+  ];
+
+  console.log("chart data spec:", chartData)
+
+  // Step 3: Define the Column chart configuration
+  const columnConfig = {
+    data: chartData,
+    xField: 'reviewer',  // Reviewer names will be on the x-axis
+    yField: 'value',     // The count of PRs for each repo category
+    isGroup: true,       // Group the bars based on the repo categories
+    seriesField: 'repo', // Use the repo field to differentiate between EIPs, ERCs, RIPs
+    color: ['#1890FF', '#52C41A', '#FF4D4F'], // Colors for EIPs, ERCs, and RIPs
+    yAxis: {
+      title: {
+        text: 'Number of PRs reviewed',
+      },
+    },
+    tooltip: {
+      formatter: (datum: any) => ({
+        name: datum.reviewer,
+        value: `${datum.repo}: ${datum.value} PRs`,
+      }),
+    },
+    legend: { position: "top-right" as const },
+  };
+
+  return (
+    <Box padding="1rem">
+      {loading5 ? (
+        <Flex justify="center" align="center" height="100vh">
+          <Spinner size="xl" />
+        </Flex>
+      ) : (
+        <Box height="400px">
+          <Column {...columnConfig} />
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+
+
+// Generate distinct colors for editors
+const generateDistinctColor = (index: number, total: number) => {
+  const hue = (index * (360 / total)) % 360; // Golden angle for better color distribution
+  return `hsl(${hue}, 85%, 50%)`; // High saturation and medium brightness for vibrancy
+};
+
 
   return (
     loading ? (
@@ -1316,22 +1619,30 @@ const renderCharts3 = () => {
 
     <MenuList maxHeight="200px" overflowY="auto">
       {/* Option for all */}
-      <MenuItem onClick={() => setActiveTab('all')}>
+      <MenuItem onClick={() => {
+        setActiveTab('all');
+      }}>
         ALL
       </MenuItem>
 
       {/* Option for EIPs */}
-      <MenuItem onClick={() => setActiveTab('eips')}>
+      <MenuItem onClick={() => {
+        setActiveTab('eips');
+      }}>
         EIPs
       </MenuItem>
 
       {/* Option for ERCs */}
-      <MenuItem onClick={() => setActiveTab('ercs')}>
+      <MenuItem onClick={() => {
+        setActiveTab('ercs');
+      }}>
         ERCs
       </MenuItem>
 
       {/* Option for RIPs */}
-      <MenuItem onClick={() => setActiveTab('rips')}>
+      <MenuItem onClick={() => {
+        setActiveTab('rips');
+      }}>
         RIPs
       </MenuItem>
     </MenuList>
@@ -1381,7 +1692,7 @@ const renderCharts3 = () => {
           data={csvData.length ? csvData : []}
           filename={`reviews_data_since_2015.csv`}
           onClick={(e: any) => {
-            generateCSVData2();
+            generateCSVData5();
             if (csvData.length === 0) {
               e.preventDefault();
               console.error("CSV data is empty or not generated correctly.");
@@ -1392,6 +1703,13 @@ const renderCharts3 = () => {
             {loading3 ? <Spinner size="sm" /> : "Download CSV"}
           </Button>
         </CSVLink>
+        <Button
+          colorScheme="blue"
+          onClick={() => setLinechart(!Linechart)}
+          mr="1rem"
+        >
+          {Linechart ? "Column Chart" : "Line Chart"}
+        </Button>
         <Button
           colorScheme="blue"
           onClick={() => setShowFilters(!showFilters)}
@@ -1566,7 +1884,7 @@ const renderCharts3 = () => {
     )}
 
     {/* Chart Rendering */}
-    {renderChart()}
+    {Linechart ? renderChart4() : renderChart()}
     <DateTime />
   </Box>
 </Box>
@@ -1751,11 +2069,176 @@ const renderCharts3 = () => {
             <Box className="w-full">
               {renderCharts3()} 
             </Box>
-            {/* <Box className="w-full">
-            <Text fontSize="3xl" fontWeight="bold">Editors Timeline</Text>
-              {reviewerstimeline()}
-            </Box> */}
+            <br/>
+
+            <Box
+              bgColor={bg}
+              padding="2rem"
+              borderRadius="0.55rem"
+              _hover={{
+                border: "1px",
+                borderColor: "#30A0E0",
+              }}
+            >
+            <Box className="w-full">
+
+            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+            <Heading
+              as="h3"
+              size="lg"
+              marginBottom={2}
+              marginTop={2}
+              fontWeight="bold"
+              color={useColorModeValue("#3182CE", "blue.300")}
+            > Active Editors Timeline Scatterplot
+            </Heading>
+              <Flex alignItems="center">
+                <Button
+                  colorScheme="blue"
+                  onClick={() => setShowFilters2(!showFilters2)}
+                  leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
+                  mr="1rem"
+                >
+                  {showFilters2 ? "Hide Filters" : "Show Filters"}
+                </Button>
+              </Flex>
+            </Flex>
+
+            {showFilters2 && (
+      <Box
+        bg="blue.50"
+        borderRadius="md"
+        p={4}
+        mt="1rem"
+      >
+        <Flex justifyContent="flex-start" gap="2rem" mb="1rem">
+          {/* Start Date Filters */}
+          <Box>
+            <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
+            <Flex>
+              <Select
+                placeholder="Year"
+                value={selectedStartYear2 || ''}
+                onChange={(e) => setSelectedStartYear2(e.target.value)}
+                mr="1rem"
+                bg="white"
+                color="black"
+              >
+                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+              <Select
+                placeholder="Month"
+                value={selectedStartMonth2 || ''}
+                onChange={(e) => setSelectedStartMonth2(e.target.value)}
+                bg="white"
+                color="black"
+              >
+                {[
+                  { name: 'Jan', value: '01' },
+                  { name: 'Feb', value: '02' },
+                  { name: 'Mar', value: '03' },
+                  { name: 'Apr', value: '04' },
+                  { name: 'May', value: '05' },
+                  { name: 'Jun', value: '06' },
+                  { name: 'Jul', value: '07' },
+                  { name: 'Aug', value: '08' },
+                  { name: 'Sep', value: '09' },
+                  { name: 'Oct', value: '10' },
+                  { name: 'Nov', value: '11' },
+                  { name: 'Dec', value: '12' },
+                ].map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.name}
+                  </option>
+                ))}
+              </Select>
+            </Flex>
+          </Box>
+
+          {/* End Date Filters */}
+          <Box>
+            <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
+            <Flex>
+              <Select
+                placeholder="Year"
+                value={selectedEndYear2 || ''}
+                onChange={(e) => setSelectedEndYear2(e.target.value)}
+                mr="1rem"
+                bg="white"
+                color="black"
+              >
+                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+              <Select
+                placeholder="Month"
+                value={selectedEndMonth2 || ''}
+                onChange={(e) => setSelectedEndMonth2(e.target.value)}
+                bg="white"
+                color="black"
+              >
+                {[
+                  { name: 'Jan', value: '01' },
+                  { name: 'Feb', value: '02' },
+                  { name: 'Mar', value: '03' },
+                  { name: 'Apr', value: '04' },
+                  { name: 'May', value: '05' },
+                  { name: 'Jun', value: '06' },
+                  { name: 'Jul', value: '07' },
+                  { name: 'Aug', value: '08' },
+                  { name: 'Sep', value: '09' },
+                  { name: 'Oct', value: '10' },
+                  { name: 'Nov', value: '11' },
+                  { name: 'Dec', value: '12' },
+                ].map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.name}
+                  </option>
+                ))}
+              </Select>
+            </Flex>
+          </Box>
+          <Box>
+        </Box>
+        </Flex>
+      </Box>
+    )}
+
+               {editorsActivity()}
+            </Box>
+            </Box>
     <Box>
+
+      <br/>
+      <Box
+              bgColor={bg}
+              padding="2rem"
+              borderRadius="0.55rem"
+              _hover={{
+                border: "1px",
+                borderColor: "#30A0E0",
+              }}
+            >
+            <Box className="w-full">
+            <Heading
+              as="h3"
+              size="lg"
+              marginBottom={2}
+              marginTop={2}
+              fontWeight="bold"
+              color={useColorModeValue("#3182CE", "blue.300")}
+            > Active Editors vs Repo Contributions
+            </Heading>
+              {editorsSpecialityChart()}
+            </Box>
+          </Box>
           <br/>
         <hr></hr>
         <br/>
