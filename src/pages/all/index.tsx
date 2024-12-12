@@ -176,7 +176,7 @@ const All = () => {
         >
           <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold py-8">
             <div className="flex justify-between w-full">
-              <div className="space-x-12">
+              <div className="space-x-6">
                 {optionArr.map((item, key) => (
                   <button
                     onClick={() => {
