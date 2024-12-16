@@ -17,7 +17,7 @@
  
  #[derive(Debug)]
  enum Error {
-     Octocrab(octocrab::Error),
+     Octocrab(Box<octocrab::Error>),
      Other(String),
  }
  
@@ -34,8 +34,15 @@
  
  impl From<octocrab::Error> for Error {
      fn from(value: octocrab::Error) -> Self {
-         Self::Octocrab(value)
+         Self::Octocrab(Box::new(value))
      }
+ }
+ 
+ fn pr_identifier(pr: &PullRequest) -> String {
+     pr.html_url
+         .as_ref()
+         .map(ToString::to_string)
+         .unwrap_or_else(|| pr.url.clone())
  }
  
  #[derive(Template)]
@@ -81,16 +88,14 @@
      let mut last_error = Ok(());
  
      for pr in opr {
-         let pr_identifier = pr
-             .html_url
-             .as_ref()
-             .map(ToString::to_string)
-             .unwrap_or_else(|| pr.url.clone());
- 
          if let Some(labels) = &pr.labels {
              let has_a_review = labels.iter().any(|label| label.name == "a-review");
-             if has_a_review {
-                 println!("Skipping PR due to 'a-review' label: {:?}", pr.html_url);
+             let has_e_review = labels.iter().any(|label| label.name == "e-review");
+             if has_a_review && !has_e_review {
+                 println!(
+                     "Skipping PR due to 'a-review' label: {}",
+                     pr_identifier(&pr)
+                 );
                  continue;
              }
          }
@@ -98,7 +103,7 @@
          let created = match pr.created_at {
              Some(created) => created,
              None => {
-                 let msg = format!("No created date: {}", pr_identifier);
+                 let msg = format!("No created date: {}", pr_identifier(&pr));
                  eprintln!("{}", msg);
                  last_error = Err(Error::Other(msg));
                  continue;
@@ -115,7 +120,10 @@
                  events.push(review_event);
              }
              Err(e) => {
-                 let msg = format!("Unable to get reviews by editor: {}\n{e:#?}", pr_identifier);
+                 let msg = format!(
+                     "Unable to get reviews by editor: {}\n{e:#?}",
+                     pr_identifier(&pr)
+                 );
                  eprintln!("{}", msg);
                  last_error = Err(e.into());
                  continue;
@@ -125,7 +133,7 @@
          let pr_authors = match authors(&octocrab, &pr, owner, repo).await {
              Ok(authors) => authors,
              Err(e) => {
-                 let msg = format!("Unable to get authors: {}\n{e:#?}", pr_identifier);
+                 let msg = format!("Unable to get authors: {}\n{e:#?}", pr_identifier(&pr));
                  eprintln!("{}", msg);
                  last_error = Err(e.into());
                  continue;
@@ -134,7 +142,10 @@
          let comments = match comments(&octocrab, &pr, owner, repo, &editors, &pr_authors).await {
              Ok(comments) => comments,
              Err(e) => {
-                 let msg = format!("Unable to get issue comments: {}\n{e:#?}", pr_identifier);
+                 let msg = format!(
+                     "Unable to get issue comments: {}\n{e:#?}",
+                     pr_identifier(&pr)
+                 );
                  eprintln!("{}", msg);
                  last_error = Err(e.into());
                  continue;
@@ -145,7 +156,7 @@
              match pr_comments(&octocrab, &pr, owner, repo, &editors, &pr_authors).await {
                  Ok(comments) => comments,
                  Err(e) => {
-                     let msg = format!("Unable to get PR comments: {}\n{e:#?}", pr_identifier);
+                     let msg = format!("Unable to get PR comments: {}\n{e:#?}", pr_identifier(&pr));
                      eprintln!("{}", msg);
                      last_error = Err(e.into());
                      continue;
@@ -155,7 +166,7 @@
          let pr_commits = match commits(&octocrab, &pr, owner, repo).await {
              Ok(commits) => commits,
              Err(e) => {
-                 let msg = format!("Unable to get PR commits: {}\n{e:#?}", pr_identifier);
+                 let msg = format!("Unable to get PR commits: {}\n{e:#?}", pr_identifier(&pr));
                  eprintln!("{}", msg);
                  last_error = Err(e.into());
                  continue;
@@ -362,14 +373,14 @@
  
          let (preamble, _) = match Preamble::split(&decoded_content) {
              Err(e) => {
-                 eprintln!("{:?}: {e}", pr.html_url);
+                 eprintln!("{e}: {}", pr_identifier(pr));
                  continue;
              }
              Ok(o) => o,
          };
          let preamble = match Preamble::parse(Some(&file), preamble) {
              Err(e) => {
-                 eprintln!("{:?}: {e}", pr.html_url);
+                 eprintln!("{e}: {}", pr_identifier(pr));
                  continue;
              }
              Ok(o) => o,
