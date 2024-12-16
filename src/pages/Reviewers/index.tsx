@@ -866,6 +866,8 @@ const renderCharts3 = () => {
       ],
       xAxis: { label: { rotate: -45 } }, // Rotate X-axis labels for better readability
       yAxis: {
+        max: 110, // Set a fixed maximum value for the Y-axis
+        min: 0, // Ensure the Y-axis always starts at 0
         label: {
           formatter: (text: string) => {
             const value = parseFloat(text);
@@ -1340,12 +1342,12 @@ const editorsActivity = () => {
     xField: "timeIn24Hour",
     yField: "reviewer",
     colorField: "reviewer",
-    size: 5,
+    size: 7,
     pointStyle: ({ reviewer }: any) => ({
       fill: reviewerColors[reviewer] || "#000",
       fillOpacity: 0.7,
-      stroke: "#fff",
-      lineWidth: 1,
+      stroke: reviewerColors[reviewer] || "#000", // Match stroke to fill color
+      lineWidth: 0.5, // Thinner border for better readability
     }),
     xAxis: {
       title: {
@@ -1365,6 +1367,7 @@ const editorsActivity = () => {
       }),
     },
   };
+  
 
   return (
     <Box padding="1rem" overflowX="auto">

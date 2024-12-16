@@ -1045,7 +1045,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       <LoaderComponent />
     ) : (
       <AllLayout>
-        <Box padding={8} margin={8}>
+        <Box padding={2} margin={2}>
           <Heading
             size="xl"
             marginBottom={10}
@@ -1211,9 +1211,15 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
             {`Github PR Analytics (Monthly, since 2015)`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={handleDownload2} disabled={loading3}>
+          <Button
+            colorScheme="blue"
+            onClick={handleDownload2}
+            disabled={loading3}
+            fontSize={{ base: "xs", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
+          >
             {loading3 ? <Spinner size="sm" /> : "Download CSV"}
           </Button>
+
         </Flex>
         <Flex justify="center" mb={8}>
   <Menu>
