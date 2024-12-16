@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useWindowSize } from "react-use";
 import { Box, useColorModeValue, Button, Flex, Heading } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
+import axios from "axios";
 
 interface StatusChart {
     statusChanges: {
@@ -249,7 +250,19 @@ return (
           <Heading size="md" color={headingColor}>
               {category}
           </Heading>
-          <Button colorScheme="blue" onClick={downloadData}>
+          <Button colorScheme="blue" 
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadData();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
+          >
               Download CSV
           </Button>
       </Flex>

@@ -243,7 +243,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
           onClick={async () => {
             try {
               // Trigger the CSV conversion and download
-              downloadCSV;
+              downloadCSV();
         
               // Trigger the API call
               await axios.post("/api/DownloadCounter");

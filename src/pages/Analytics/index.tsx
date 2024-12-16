@@ -1213,7 +1213,17 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
           {/* Assuming a download option exists for the yearly data as well */}
           <Button
             colorScheme="blue"
-            onClick={handleDownload2}
+            onClick={async () => {
+              try {
+                // Trigger the CSV conversion and download
+                handleDownload2();
+          
+                // Trigger the API call
+                await axios.post("/api/DownloadCounter");
+              } catch (error) {
+                console.error("Error triggering download counter:", error);
+              }
+            }}
             disabled={loading3}
             fontSize={{ base: "xs", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
           >
@@ -1374,7 +1384,19 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
                     color={useColorModeValue("gray.800", "gray.200")}>
                         You can download the data here:
                       </Text>
-                      <Button colorScheme="blue" onClick={handleDownload} disabled={loading2}>
+                      <Button colorScheme="blue" 
+                      onClick={async () => {
+                        try {
+                          // Trigger the CSV conversion and download
+                          handleDownload();
+                    
+                          // Trigger the API call
+                          await axios.post("/api/DownloadCounter");
+                        } catch (error) {
+                          console.error("Error triggering download counter:", error);
+                        }
+                      }} 
+                      disabled={loading2}>
                         {loading2 ? <Spinner size="sm" /> : "Download CSV"}
                       </Button>
                     </Box>

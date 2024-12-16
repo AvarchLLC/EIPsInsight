@@ -12,6 +12,7 @@ import Comments from "@/components/comments";
 import { FiFilter } from 'react-icons/fi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { LineConfig } from '@ant-design/plots';
+import axios from "axios";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -594,11 +595,22 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
           <CSVLink 
             data={csvData.length ? csvData : []} 
             filename={`reviews_data.csv`} 
-            onClick={(e:any) => {
-              generateCSVData2();
-              if (csvData.length === 0) {
-                e.preventDefault(); 
-                console.error("CSV data is empty or not generated correctly.");
+            // onClick={(e:any) => {
+            //   generateCSVData2();
+            //   if (csvData.length === 0) {
+            //     e.preventDefault(); 
+            //     console.error("CSV data is empty or not generated correctly.");
+            //   }
+            // }}
+            onClick={async () => {
+              try {
+                // Trigger the CSV conversion and download
+                generateCSVData2();
+          
+                // Trigger the API call
+                await axios.post("/api/DownloadCounter");
+              } catch (error) {
+                console.error("Error triggering download counter:", error);
               }
             }}
           >
@@ -639,11 +651,22 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
           <CSVLink 
             data={csvData.length ? csvData : []} 
             filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
-            onClick={(e:any) => {
-              generateCSVData();
-              if (csvData.length === 0) {
-                e.preventDefault(); 
-                console.error("CSV data is empty or not generated correctly.");
+            // onClick={(e:any) => {
+            //   generateCSVData();
+            //   if (csvData.length === 0) {
+            //     e.preventDefault(); 
+            //     console.error("CSV data is empty or not generated correctly.");
+            //   }
+            // }}
+            onClick={async () => {
+              try {
+                // Trigger the CSV conversion and download
+                generateCSVData();
+          
+                // Trigger the API call
+                await axios.post("/api/DownloadCounter");
+              } catch (error) {
+                console.error("Error triggering download counter:", error);
               }
             }}
           >
@@ -936,11 +959,22 @@ const renderCharts3 = () => {
   <CSVLink
     data={csvData.length ? csvData : []}
     filename={`${reviewer}_reviews_data.csv`}
-    onClick={(e: any) => {
-      generateCSVData3(reviewer); // Pass the reviewer name to generateCSVData3
-      if (csvData.length === 0) {
-        e.preventDefault();
-        console.error("CSV data is empty or not generated correctly.");
+    // onClick={(e: any) => {
+    //   generateCSVData3(reviewer); // Pass the reviewer name to generateCSVData3
+    //   if (csvData.length === 0) {
+    //     e.preventDefault();
+    //     console.error("CSV data is empty or not generated correctly.");
+    //   }
+    // }}
+    onClick={async () => {
+      try {
+        // Trigger the CSV conversion and download
+        generateCSVData3(reviewer);
+  
+        // Trigger the API call
+        await axios.post("/api/DownloadCounter");
+      } catch (error) {
+        console.error("Error triggering download counter:", error);
       }
     }}
   >
@@ -1694,11 +1728,22 @@ const generateDistinctColor = (index: number, total: number) => {
         <CSVLink
           data={csvData.length ? csvData : []}
           filename={`reviews_data_since_2015.csv`}
-          onClick={(e: any) => {
-            generateCSVData5();
-            if (csvData.length === 0) {
-              e.preventDefault();
-              console.error("CSV data is empty or not generated correctly.");
+          // onClick={(e: any) => {
+          //   generateCSVData5();
+          //   if (csvData.length === 0) {
+          //     e.preventDefault();
+          //     console.error("CSV data is empty or not generated correctly.");
+          //   }
+          // }}
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              generateCSVData5();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
             }
           }}
         >
@@ -2046,11 +2091,22 @@ const generateDistinctColor = (index: number, total: number) => {
                     <CSVLink 
                       data={csvData.length ? csvData : []} 
                       filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
-                      onClick={(e:any) => {
-                        generateCSVData();
-                        if (csvData.length === 0) {
-                          e.preventDefault(); 
-                          console.error("CSV data is empty or not generated correctly.");
+                      // onClick={(e:any) => {
+                      //   generateCSVData();
+                      //   if (csvData.length === 0) {
+                      //     e.preventDefault(); 
+                      //     console.error("CSV data is empty or not generated correctly.");
+                      //   }
+                      // }}
+                      onClick={async () => {
+                        try {
+                          // Trigger the CSV conversion and download
+                          generateCSVData();
+                    
+                          // Trigger the API call
+                          await axios.post("/api/DownloadCounter");
+                        } catch (error) {
+                          console.error("Error triggering download counter:", error);
                         }
                       }}
                     >
@@ -2237,7 +2293,7 @@ const generateDistinctColor = (index: number, total: number) => {
               marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors vs Repo Contributions
+            > Active Editors PR reviews in each Repository 
             </Heading>
               {editorsSpecialityChart()}
             </Box>

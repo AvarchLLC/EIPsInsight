@@ -333,7 +333,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
                       <Button colorScheme="blue" onClick={async () => {
     try {
       // Trigger the CSV conversion and download
-      handleDownload
+      handleDownload()
 
       // Trigger the API call
       await axios.post("/api/DownloadCounter");

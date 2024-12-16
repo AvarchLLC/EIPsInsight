@@ -306,7 +306,17 @@ import {
           fontSize={"14px"}
           fontWeight={"bold"}
           padding={"8px 20px"}
-          onClick={handleDownload}
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              handleDownload();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
         >
           <DownloadIcon marginEnd={"1.5"} />
           Download Reports
