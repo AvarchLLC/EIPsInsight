@@ -68,7 +68,7 @@ export default function AllLayout({
                 clipPath: 'polygon(50% 0, 50% 0, 50% 100%, 50% 100%)',
               },
             }}
-            className={mont.className}
+            className="base-page-size"
           >
             <Providers>
               <Navbar />
