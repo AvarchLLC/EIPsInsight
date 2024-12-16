@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Box, useColorModeValue, Flex, Heading, Button, Spinner } from "@chakra-ui/react";
+import axios from "axios";
 
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 
@@ -208,7 +209,20 @@ const NetworkUpgradesChart = React.memo(() => {
             {`Network Upgrades`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={downloadData} isDisabled={isLoading}>
+          <Button colorScheme="blue" 
+          // onClick={downloadData} 
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadData();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
+          isDisabled={isLoading}>
             {isLoading ? <Spinner size="sm" /> : "Download CSV"}
           </Button>
         </Flex>

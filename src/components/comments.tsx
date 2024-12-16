@@ -131,7 +131,7 @@ const Comments: React.FC<CommentsProps> =({page}) => {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Write a comment..."
             />
-            <Button onClick={handleAddComment} colorScheme="blue">
+            <Button onClick={handleAddComment} colorScheme="blue" fontSize={{ base: "xs", md: "md" }}>
               Add Comment
             </Button>
           </HStack>

@@ -8,6 +8,7 @@ import "../app/globals.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
+import Script from 'next/script';
 
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
@@ -35,37 +36,42 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         },
       }}
       className={`${mont.className} base-page-size`}
-      
+      style={{ width: "100%", margin: "0", padding: "0" }}
     >
       <Head>
         <title>EIPs Insights</title>
         <link rel="icon" href="/eipFavicon.png" />
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-N59QCDB9WN"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+        >
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-N59QCDB9WN', { anonymize_ip: true });
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              analytics_storage: 'denied',
+            });
+          `}
+        </Script>
       </Head>
       <ColorModeScript initialColorMode="dark" />
       <Providers>
         <Navbar />
-
-        {/* New Section with Highlighted Background and Emojis */}
-        {/* <Box 
-          bg="skyblue" 
-          color="white" 
-          py={4} 
-          textAlign="center"
-          fontWeight="bold"
-          fontSize="xl"
-        >
-          🚀 We have participated in the Gitcoin Octant Community Round 1! ❤️ Please support us here:{" "} 👉 
-          <Link 
-            href="https://explorer.gitcoin.co/#/round/10/66/40" 
-            isExternal 
-            textDecoration="underline"
-            color="white"
-          >
-           Link
-          </Link>
-        </Box> */}
-
+        <Box
+  width="100%"
+  px={{ base: "0", md: "4", lg: "8" }} // Responsive padding
+  py={{ base: "0", md: "6" }}
+  overflowX="hidden"
+>
         {children}
+        </Box>
         <LargeWithAppLinksAndSocial />
       </Providers>
     </motion.div>

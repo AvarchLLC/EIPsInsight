@@ -15,6 +15,7 @@ import SearchBox from "@/components/SearchBox";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 // import { motion } from "framer-motion";
 import Link from "next/link";
+import axios from "axios";
 
 import { motion } from "framer-motion";
 
@@ -233,7 +234,17 @@ const All = () => {
             </Text>
             <Button
               colorScheme="blue"
-              onClick={handleDownload}
+              onClick={async () => {
+                try {
+                  // Trigger the CSV conversion and download
+                  handleDownload();
+            
+                  // Trigger the API call
+                  await axios.post("/api/DownloadCounter");
+                } catch (error) {
+                  console.error("Error triggering download counter:", error);
+                }
+              }}
               isLoading={loading} // Show loading spinner on button
               loadingText="Downloading" // Optional loading text
               isDisabled={loading} // Disable button when loading

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Icon, useColorModeValue, Text, Spinner, Button, Flex, Heading } from "@chakra-ui/react";
 import DateTime from "@/components/DateTime";
+import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -206,7 +207,19 @@ const RIPStatusDonut = () => {
             </a>
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={downloadData}>
+          <Button colorScheme="blue" 
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadData();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
+          >
             Download CSV
           </Button>
         </Flex>

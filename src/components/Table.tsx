@@ -15,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Spinner } from "@chakra-ui/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/react";
+import axios from "axios";
 
 const statusArr = [
   "Final",
@@ -494,7 +495,17 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       fontSize={"14px"}
                       fontWeight={"bold"}
                       padding={"10px 20px"}
-                      onClick={convertAndDownloadCSV}
+                      onClick={async () => {
+                        try {
+                          // Trigger the CSV conversion and download
+                          convertAndDownloadCSV();
+                    
+                          // Trigger the API call
+                          await axios.post("/api/DownloadCounter");
+                        } catch (error) {
+                          console.error("Error triggering download counter:", error);
+                        }
+                      }}
                     >
                       <DownloadIcon marginEnd={"1.5"} />
                       Download Reports

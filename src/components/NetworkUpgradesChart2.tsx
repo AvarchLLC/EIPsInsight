@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Box, useColorModeValue, Flex, Heading, Button } from "@chakra-ui/react";
+import axios from "axios";
 
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 
@@ -162,7 +163,19 @@ const AuthorContributionsChart = React.memo(() => {
     <Box bg={bg} p={5} borderRadius="lg">
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
         <Heading size="md">Author Contributions</Heading>
-        <Button onClick={downloadData} colorScheme="blue">
+        <Button 
+        onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadData();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }} 
+          colorScheme="blue">
           Download CSV
         </Button>
       </Flex>

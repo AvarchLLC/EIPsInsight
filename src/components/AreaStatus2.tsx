@@ -221,7 +221,7 @@ const StackedColumnChart: React.FC = () => {
           <Button colorScheme="blue" onClick={async () => {
     try {
       // Trigger the CSV conversion and download
-      downloadData;
+      downloadData();
 
       // Trigger the API call
       await axios.post("/api/DownloadCounter");

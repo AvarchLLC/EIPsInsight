@@ -4,8 +4,16 @@
 
 .chakra-ui-dark body {
     background: linear-gradient(135deg, #1a202c, #2d3748) !important;
-  }
+}
   
-  .chakra-ui-light body {
+.chakra-ui-light body {
     background: linear-gradient(135deg, #f7fafc, #e2e8f0) !important;
-  }
+}
+
+html, body {
+  margin: 0; 
+  padding: 0;
+  width: 100%;
+ 
+}
+
