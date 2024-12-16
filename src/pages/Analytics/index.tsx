@@ -1287,6 +1287,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
     color="black"
     mr={4}
+    fontSize={{ base: 'xs', md: 'sm' }}
   >
     {activeTab === 'PRs' ? 'Created PRs' : 'Created Issues'}
   </Checkbox>
@@ -1296,6 +1297,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       onChange={() => setShowCategory(prev => ({ ...prev, open: !prev.open }))}
       color="black"
       mr={4}
+      fontSize={{ base: 'xs', md: 'sm' }}
     >
       Open PRs
     </Checkbox>
@@ -1305,6 +1307,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
     color="black"
     mr={4}
+    fontSize={{ base: 'xs', md: 'sm' }}
   >
     {activeTab === 'PRs' ? 'Closed PRs' : 'Closed Issues'}
   </Checkbox>
@@ -1314,6 +1317,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
       color="black"
       mr={4}
+      fontSize={{ base: 'xs', md: 'sm' }}
     >
       Merged PRs
     </Checkbox>

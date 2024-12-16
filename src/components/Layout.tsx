@@ -63,15 +63,8 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
       </Head>
       <ColorModeScript initialColorMode="dark" />
       <Providers>
-        <Navbar />
-        <Box
-  width="100%"
-  px={{ base: "0", md: "4", lg: "8" }} // Responsive padding
-  py={{ base: "0", md: "6" }}
-  overflowX="hidden"
->
+        <Navbar />  
         {children}
-        </Box>
         <LargeWithAppLinksAndSocial />
       </Providers>
     </motion.div>
