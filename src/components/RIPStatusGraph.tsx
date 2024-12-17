@@ -9,10 +9,27 @@ import DateTime from "./DateTime";
 import dynamic from "next/dynamic";
 const getStatus = (status: string) => {
   switch (status) {
+    case "Draft":
+      return "Draft";
+    case "Final":
+    case "Accepted":
+    case "Superseded":
+      return "Final";
     case "Last Call":
-      return "LastCall";
+      return "Last Call";
+    case "Withdrawn":
+    case "Abandoned":
+    case "Rejected":
+      return "Withdrawn";
+    case "Review":
+      return "Review";
+    case "Living":
+    case "Active":
+      return "Living";
+    case "Stagnant":
+      return "Stagnant";
     default:
-      return status;
+      return "Final";
   }
 };
 

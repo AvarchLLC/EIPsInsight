@@ -149,7 +149,8 @@ import {
     return (
       <AllLayout>
         {/* Tab selection for EIPs and ERCs */}
-        <Box  padding={4} mt={8} ml={8} mr={8} mb={1}>
+        <Box  padding={{ base: 1, md: 4 }}
+        margin={{ base: 2, md: 4 }}>
         <Box
       pl={4}
       bg={useColorModeValue("blue.50", "gray.700")}
@@ -157,7 +158,7 @@ import {
       pr="8px"
       marginBottom={2}
     >
-      <Flex justify="space-between" align="center">
+      <Flex justify="space-between" align="center"padding={1}>
         <Heading
           as="h3"
           size="lg"
@@ -303,7 +304,7 @@ import {
         <Button
           colorScheme="blue"
           variant="outline"
-          fontSize={"14px"}
+          fontSize={{ base: "0.6rem", md: "md" }} 
           fontWeight={"bold"}
           padding={"8px 20px"}
           onClick={async () => {

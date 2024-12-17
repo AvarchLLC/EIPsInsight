@@ -82,7 +82,7 @@ const RIPStatusDonut = () => {
       status: "Withdrawn",
       value: data.filter((item) => item.status === "Withdrawn").length,
     },
-  ];
+  ].filter((item) => item.value > 0);
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Pie),
     {

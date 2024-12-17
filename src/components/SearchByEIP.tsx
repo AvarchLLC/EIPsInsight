@@ -43,7 +43,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
   }, [selectedAuthor]);
 
   const [authorCounts, setAuthorCounts] = useState<AuthorCount[]>([]);
-  const [visibleCount, setVisibleCount] = useState(20);
+  const [visibleCount, setVisibleCount] = useState(5);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -128,11 +128,11 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
   
 
   const handleExpand = () => {
-    setVisibleCount((prev) => Math.min(prev + 20, authorCounts.length));
+    setVisibleCount((prev) => Math.min(prev + 5, authorCounts.length));
   };
 
   const handleCollapse = () => {
-    setVisibleCount(20);
+    setVisibleCount(5);
   };
 
   // Filter and paginate data
@@ -214,7 +214,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             size="lg"
-            width="50%"
+            width={{ base: '80%', md: '50%' }}
             borderRadius="full"
             boxShadow="md"
             bg={useColorModeValue('white', 'gray.800')}
