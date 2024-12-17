@@ -8,7 +8,7 @@ import "../app/globals.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
-import Script from 'next/script';
+import Script from "next/script";
 
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
@@ -36,7 +36,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         },
       }}
       className={`${mont.className} base-page-size`}
-      style={{ width: "100%", margin: "0", padding: "0" }}
+      
     >
       <Head>
         <title>EIPs Insights</title>
@@ -63,7 +63,28 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
       </Head>
       <ColorModeScript initialColorMode="dark" />
       <Providers>
-        <Navbar />  
+        <Navbar />
+
+        {/* New Section with Highlighted Background and Emojis */}
+        {/* <Box 
+          bg="skyblue" 
+          color="white" 
+          py={4} 
+          textAlign="center"
+          fontWeight="bold"
+          fontSize="xl"
+        >
+          🚀 We have participated in the Gitcoin Octant Community Round 1! ❤️ Please support us here:{" "} 👉 
+          <Link 
+            href="https://explorer.gitcoin.co/#/round/10/66/40" 
+            isExternal 
+            textDecoration="underline"
+            color="white"
+          >
+           Link
+          </Link>
+        </Box> */}
+
         {children}
         <LargeWithAppLinksAndSocial />
       </Providers>

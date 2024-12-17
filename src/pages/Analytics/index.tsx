@@ -1045,7 +1045,10 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       <LoaderComponent />
     ) : (
       <AllLayout>
-        <Box padding={2} margin={2}>
+        <Box 
+        padding={{ base: 1, md: 4 }}
+        margin={{ base: 2, md: 4 }}
+        >
           <Heading
             size="xl"
             marginBottom={10}
@@ -1165,6 +1168,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
           After selecting your preferred data using the View More option, you can download reports based on the filtered data for further analysis or record-keeping. 
           Simply click the download button to export the data in your chosen format.
         </Text>
+        <br/>
       </Collapse>
 
       {/* {!show && (
@@ -1225,7 +1229,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
               }
             }}
             disabled={loading3}
-            fontSize={{ base: "xs", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
+            fontSize={{ base: "0.6rem", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
           >
             {loading3 ? <Spinner size="sm" /> : "Download CSV"}
           </Button>
@@ -1281,12 +1285,13 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       </Box>
       <br/>
          
-          <Flex justify="center" mb={8}>
+          <Flex justify="center" ml={3} mb={8}>
   <Checkbox
     isChecked={showCategory.created}
     onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
     color="black"
-    mr={4}
+    borderColor="black"
+    mr={3}
     fontSize={{ base: 'xs', md: 'sm' }}
   >
     {activeTab === 'PRs' ? 'Created PRs' : 'Created Issues'}
@@ -1296,7 +1301,8 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       isChecked={showCategory.open}
       onChange={() => setShowCategory(prev => ({ ...prev, open: !prev.open }))}
       color="black"
-      mr={4}
+      borderColor="black"
+      mr={3}
       fontSize={{ base: 'xs', md: 'sm' }}
     >
       Open PRs
@@ -1306,7 +1312,8 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     isChecked={showCategory.closed}
     onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
     color="black"
-    mr={4}
+    borderColor="black"
+    mr={3}
     fontSize={{ base: 'xs', md: 'sm' }}
   >
     {activeTab === 'PRs' ? 'Closed PRs' : 'Closed Issues'}
@@ -1316,7 +1323,8 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       isChecked={showCategory.merged}
       onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
       color="black"
-      mr={4}
+      borderColor="black"
+      mr={3}
       fontSize={{ base: 'xs', md: 'sm' }}
     >
       Merged PRs

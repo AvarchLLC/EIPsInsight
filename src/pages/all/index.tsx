@@ -192,7 +192,7 @@ const All = () => {
                   </button>
                 ))}
               </div>
-              <div>
+              <div className="w-full max-w-md">
                 <SearchBox />
               </div>
             </div>

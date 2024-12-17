@@ -43,7 +43,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   }, [selectedAuthor]);
 
   const [authorCounts, setAuthorCounts] = useState<AuthorCount[]>([]);
-  const [visibleCount, setVisibleCount] = useState(20);
+  const [visibleCount, setVisibleCount] = useState(5);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -128,11 +128,11 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   
 
   const handleExpand = () => {
-    setVisibleCount((prev) => Math.min(prev + 20, authorCounts.length));
+    setVisibleCount((prev) => Math.min(prev + 5, authorCounts.length));
   };
 
   const handleCollapse = () => {
-    setVisibleCount(20);
+    setVisibleCount(5);
   };
 
   // Filter and paginate data
@@ -209,7 +209,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
             value={selectedAuthor}
             onChange={(e) => setSelectedAuthor(e.target.value)}
             size="lg"
-            width="50%"
+            width={{ base: '80%', md: '50%' }}
             borderRadius="full"
             boxShadow="md"
             bg={useColorModeValue('white', 'gray.800')}
@@ -219,9 +219,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
               boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
             }}
           />
-          {/* <Button colorScheme="blue" size="lg" borderRadius="full" onClick={handleDownload}>
-            Download Data
-          </Button> */}
+          
         </Flex>
         </Box>
         <Box p={4}>

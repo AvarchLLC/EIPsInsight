@@ -13,6 +13,7 @@ import { FiFilter } from 'react-icons/fi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { LineConfig } from '@ant-design/plots';
 import axios from "axios";
+import dayjs from "dayjs";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -73,6 +74,8 @@ const ReviewTracker = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [sliderValue2, setSliderValue2] = useState([0, 1]);
+  const [sliderValue3, setSliderValue3] = useState<number>(0);
+  const [sliderValue4, setSliderValue4] = useState<number>(0);
   const [Linechart, setLinechart] = useState<boolean>(false);
   const [loading4, setLoading4] = useState<boolean>(false);
 
@@ -614,7 +617,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
               }
             }}
           >
-            <Button colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
+            <Button fontSize={{ base: "0.6rem", md: "md" }}  colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
           </CSVLink>
         </Flex>
         <br/>
@@ -670,7 +673,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
               }
             }}
           >
-            <Button colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
+            <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }} >{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
           </CSVLink>
         </Flex>
         <br/>
@@ -856,6 +859,21 @@ const renderCharts3 = () => {
       .includes(item.reviewer)
   );
 
+  const generateMonthYearRange = (start: string, end: string) => {
+    const range = [];
+    let current = dayjs(start);
+    const endDate = dayjs(end);
+  
+    while (current.isBefore(endDate) || current.isSame(endDate)) {
+      range.push(current.format("YYYY-MM"));
+      current = current.add(1, "month");
+    }
+  
+    return range;
+  };
+  
+  const completeXAxisRange = generateMonthYearRange("2019-05", dayjs().format("YYYY-MM"));
+
   // Assign colors to reviewers
   const reviewers = Array.from(new Set(filteredData.map(item => item.reviewer)));
   const totalReviewers = reviewers.length;
@@ -865,12 +883,20 @@ const renderCharts3 = () => {
     }
   });
   // console.log(reviewerColorsMap)
+const filledData = reviewers.flatMap((reviewer) => {
+  const reviewerData = filteredData.filter((item) => item.reviewer === reviewer);
+  const dataMap = new Map(reviewerData.map((item) => [item.monthYear, item]));
 
-  // Generate chart configurations for each reviewer
-  const reviewerCharts = reviewers.map(reviewer => {
-    const reviewerData = filteredData
-      .filter(item => item.reviewer === reviewer)
-      .sort((a, b) => a.monthYear.localeCompare(b.monthYear)); // Sort data by monthYear
+  return completeXAxisRange.map((monthYear) => ({
+    monthYear,
+    reviewer,
+    count: dataMap.get(monthYear)?.count || 0, // Default to 0 if missing
+  }));
+});
+
+// Generate chart configurations for each reviewer
+const reviewerCharts = reviewers.map((reviewer) => {
+  const reviewerData = filledData.filter((item) => item.reviewer === reviewer);
 
     const config = {
       data: reviewerData,
@@ -978,7 +1004,7 @@ const renderCharts3 = () => {
       }
     }}
   >
-    <Button colorScheme="blue">
+    <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }} >
       {loading3 ? <Spinner size="sm" /> : "Download CSV"}
     </Button>
   </CSVLink>
@@ -1113,35 +1139,90 @@ const renderCharts3 = () => {
         <Box mt={8} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
             <Table >
                 <Thead p="8px" bg="black">
+                    
                     <Tr>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle"  borderTopLeftRadius="10px">
-                            PR Number
-                        </Th>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
-                            Title
-                        </Th>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
-                            Reviewed By
-                        </Th>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
-                            Review Date
-                        </Th>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
-                            Created Date
-                        </Th>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
-                            Closed Date
-                        </Th>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
-                            Merged Date
-                        </Th>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle" >
-                            Status
-                        </Th>
-                        <Th p="8px" color="white" textAlign="center" verticalAlign="middle"  borderTopRightRadius="10px">
-                            Link
-                        </Th>
-                    </Tr>
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              borderTopLeftRadius="10px" 
+                              minWidth="6rem"
+                              p="8px"
+                            >
+                              PR Number
+                            </Th>
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              minWidth="11rem"
+                              whiteSpace="normal" // Allow wrapping
+                              overflow="hidden"   // Prevent overflow
+                              textOverflow="ellipsis" // Add ellipsis for overflowed text
+                              p="8px"
+                            >
+                              Title
+                            </Th>
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              minWidth="6rem" 
+                              p="8px"
+                              
+                            >
+                              Reviewed by
+                            </Th>
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              minWidth="6rem" 
+                              p="8px"
+                              
+                            >
+                              Review Date
+                            </Th>
+                            
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              minWidth="6rem" 
+                              p="8px"
+                            >
+                              Created Date
+                            </Th>
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              minWidth="6rem" 
+                              p="8px"
+                              
+                            >
+                              Closed Date
+                            </Th>
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              minWidth="6rem" 
+                              p="8px"
+                              
+                            >
+                              Merged Date
+                            </Th>
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              minWidth="6rem" 
+                              p="8px"
+                            >
+                              Status
+                            </Th>
+                            <Th 
+                              color="white" 
+                              textAlign="center" 
+                              minWidth="10rem"
+                              p="8px"
+                            >
+                              Link
+                            </Th>
+                          </Tr>
                 </Thead>
                 </Table>
                 <Table variant="striped" colorScheme="gray" >
@@ -1400,6 +1481,21 @@ const editorsActivity = () => {
         value: `${datum.reviewer} at ${datum.timeIn24Hour}`,
       }),
     },
+    slider: {
+      start: sliderValue3, // Set the start value from the state
+      end: 1, // End of the slider
+      step: 0.01, // Define the step value for the slider
+      min: 0, // Minimum value for the slider
+      max: 1, // Maximum value for the slider
+      onChange: (value:any) => {
+        setSliderValue3(value); // Update state when slider value changes
+      },
+      // Optionally handle when sliding stops
+      onAfterChange: (value:any) => {
+        // Perform any additional actions after the slider is changed
+        // console.log('Slider moved to:', value);
+      },
+    },
   };
   
 
@@ -1516,12 +1612,11 @@ const generateDistinctColor = (index: number, total: number) => {
       <LoaderComponent />
     ) : (
       <AllLayout>
-        {/* <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-            > */}
-        <Box padding={8} margin={8}>
+        
+        <Box 
+        padding={{ base: 1, md: 4 }}
+        margin={{ base: 2, md: 4 }}
+        >
           <Heading
             size="xl"
             marginBottom={10}
@@ -1615,6 +1710,15 @@ const generateDistinctColor = (index: number, total: number) => {
           You can refine the data by selecting or deselecting specific editors from the checkbox list. 
           This will filter the chart and table to show data only for the selected editors, enabling you to focus on individual contributions.
         </Text>
+        <br/>
+        <Text
+          fontSize="md"
+          color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
+        >
+          Note: The reviews made by the editor during their active time as an editor are considered for plotting the charts 
+        </Text>
+        <br/>
       </Collapse>
 
       {/* {!show && (
@@ -1628,20 +1732,7 @@ const generateDistinctColor = (index: number, total: number) => {
     </Box>
 
 
-      {/* <Flex justify="center" mb={8}>
-      <Button colorScheme="blue" onClick={() => setActiveTab('all')} isActive={activeTab === 'all'}>
-          ALL
-        </Button>
-        <Button colorScheme="blue" onClick={() => setActiveTab('eips')} isActive={activeTab === 'eips'} ml={4}>
-          EIPs
-        </Button>
-        <Button colorScheme="blue" onClick={() => setActiveTab('ercs')} isActive={activeTab === 'ercs'} ml={4}>
-          ERCs
-        </Button>
-        <Button colorScheme="blue" onClick={() => setActiveTab('rips')} isActive={activeTab === 'rips'} ml={4}>
-          RIPs
-        </Button>
-      </Flex> */}
+     
       <Flex justify="center" >
   <Menu>
     <MenuButton
@@ -1655,28 +1746,28 @@ const generateDistinctColor = (index: number, total: number) => {
     </MenuButton>
 
     <MenuList maxHeight="200px" overflowY="auto">
-      {/* Option for all */}
+     
       <MenuItem onClick={() => {
         setActiveTab('all');
       }}>
         ALL
       </MenuItem>
 
-      {/* Option for EIPs */}
+     
       <MenuItem onClick={() => {
         setActiveTab('eips');
       }}>
         EIPs
       </MenuItem>
 
-      {/* Option for ERCs */}
+      
       <MenuItem onClick={() => {
         setActiveTab('ercs');
       }}>
         ERCs
       </MenuItem>
 
-      {/* Option for RIPs */}
+     
       <MenuItem onClick={() => {
         setActiveTab('rips');
       }}>
@@ -1687,10 +1778,10 @@ const generateDistinctColor = (index: number, total: number) => {
 </Flex>
 
      
-        <Box padding="2rem" borderRadius="0.55rem">
+        <Box padding="0.5rem" borderRadius="0.55rem">
           <Box
             bgColor={bg}
-            padding="2rem"
+            // padding="2rem"
             borderRadius="0.55rem"
             _hover={{
               border: "1px",
@@ -1719,6 +1810,7 @@ const generateDistinctColor = (index: number, total: number) => {
     borderColor: "#30A0E0",
   }}
 >
+  {/* The part that is breaking start */}
   <Box className={"w-full"}>
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
       <Heading size="md" color="black">
@@ -1728,26 +1820,20 @@ const generateDistinctColor = (index: number, total: number) => {
         <CSVLink
           data={csvData.length ? csvData : []}
           filename={`reviews_data_since_2015.csv`}
-          // onClick={(e: any) => {
-          //   generateCSVData5();
-          //   if (csvData.length === 0) {
-          //     e.preventDefault();
-          //     console.error("CSV data is empty or not generated correctly.");
-          //   }
-          // }}
+          
           onClick={async () => {
             try {
-              // Trigger the CSV conversion and download
+             
               generateCSVData5();
         
-              // Trigger the API call
+             
               await axios.post("/api/DownloadCounter");
             } catch (error) {
               console.error("Error triggering download counter:", error);
             }
           }}
         >
-          <Button colorScheme="blue" mr="1rem">
+          <Button colorScheme="blue" mr="1rem" fontSize={{ base: "0.6rem", md: "md" }} display={{ base: "none", md: "flex" }}>
             {loading3 ? <Spinner size="sm" /> : "Download CSV"}
           </Button>
         </CSVLink>
@@ -1755,6 +1841,7 @@ const generateDistinctColor = (index: number, total: number) => {
           colorScheme="blue"
           onClick={() => setLinechart(!Linechart)}
           mr="1rem"
+          display={{ base: "none", md: "flex" }}
         >
           {Linechart ? "Column Chart" : "Line Chart"}
         </Button>
@@ -1762,13 +1849,55 @@ const generateDistinctColor = (index: number, total: number) => {
           colorScheme="blue"
           onClick={() => setShowFilters(!showFilters)}
           leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
+          fontSize={{ base: "0.6rem", md: "md" }} 
+          display={{ base: "none", md: "flex" }}
         >
           {showFilters ? "Hide Filters" : "Show Filters"}
         </Button>
       </Flex>
     </Flex>
+    
+    <Flex alignItems="center">
 
-    {/* Filters Section */}
+      <CSVLink
+          data={csvData.length ? csvData : []}
+          filename={`reviews_data_since_2015.csv`}
+          
+          onClick={async () => {
+            try {
+             
+              generateCSVData5();
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
+        >
+          <Button colorScheme="blue" mr="1rem" fontSize={{ base: "0.6rem", md: "md" }} display={{ base: "flex", md: "none" }}>
+            {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+          </Button>
+        </CSVLink>
+        
+        <Button
+          colorScheme="blue"
+          onClick={() => setLinechart(!Linechart)}
+          mr="1rem"
+          display={{ base: "flex", md: "none" }}
+          fontSize={{ base: "0.6rem", md: "md" }}
+        >
+          {Linechart ? "Column Chart" : "Line Chart"}
+        </Button>
+        <Button
+          colorScheme="blue"
+          onClick={() => setShowFilters(!showFilters)}
+          leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
+          fontSize={{ base: "0.6rem", md: "md" }} 
+          display={{ base: "flex", md: "none" }}
+        >
+          {showFilters ? "Hide Filters" : "Show Filters"}
+        </Button>
+      </Flex>
+    
     {showFilters && (
       <Box
         bg="blue.50"
@@ -1776,79 +1905,37 @@ const generateDistinctColor = (index: number, total: number) => {
         p={4}
         mt="1rem"
       >
-        <Flex justifyContent="flex-start" gap="2rem" mb="1rem">
-          {/* Start Date Filters */}
-          <Box>
-            <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
-            <Flex>
-              <Select
-                placeholder="Year"
-                value={selectedStartYear || ''}
-                onChange={(e) => setSelectedStartYear(e.target.value)}
-                mr="1rem"
-                bg="white"
-                color="black"
-              >
+        <Flex flexDirection={{ base: "column", md: "row" }} justifyContent="flex-start" gap="2rem" mb="1rem">
+          
+        <Box>
+          <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
+          <Flex>
+          <HStack spacing={4}>
+            {/* Year Dropdown for Start Date */}
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedStartYear ? `${selectedStartYear}` : 'Year'}
+              </MenuButton>
+              <MenuList bg="white" color="black" borderColor="blue.500">
                 {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
-                  <option key={year} value={year}>
+                  <MenuItem
+                    key={year}
+                    onClick={() => setSelectedStartYear(year)}
+                    bg="white"
+                    color="black"
+                  >
                     {year}
-                  </option>
+                  </MenuItem>
                 ))}
-              </Select>
-              <Select
-                placeholder="Month"
-                value={selectedStartMonth || ''}
-                onChange={(e) => setSelectedStartMonth(e.target.value)}
-                bg="white"
-                color="black"
-              >
-                {[
-                  { name: 'Jan', value: '01' },
-                  { name: 'Feb', value: '02' },
-                  { name: 'Mar', value: '03' },
-                  { name: 'Apr', value: '04' },
-                  { name: 'May', value: '05' },
-                  { name: 'Jun', value: '06' },
-                  { name: 'Jul', value: '07' },
-                  { name: 'Aug', value: '08' },
-                  { name: 'Sep', value: '09' },
-                  { name: 'Oct', value: '10' },
-                  { name: 'Nov', value: '11' },
-                  { name: 'Dec', value: '12' },
-                ].map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.name}
-                  </option>
-                ))}
-              </Select>
-            </Flex>
-          </Box>
+              </MenuList>
+            </Menu>
 
-          {/* End Date Filters */}
-          <Box>
-            <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
-            <Flex>
-              <Select
-                placeholder="Year"
-                value={selectedEndYear || ''}
-                onChange={(e) => setSelectedEndYear(e.target.value)}
-                mr="1rem"
-                bg="white"
-                color="black"
-              >
-                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </Select>
-              <Select
-                placeholder="Month"
-                value={selectedEndMonth || ''}
-                onChange={(e) => setSelectedEndMonth(e.target.value)}
-                bg="white"
-                color="black"
-              >
+            {/* Month Dropdown for Start Date */}
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedStartMonth ? `${selectedStartMonth}` : 'Month'}
+              </MenuButton>
+              <MenuList bg="white" color="black" borderColor="blue.500">
                 {[
                   { name: 'Jan', value: '01' },
                   { name: 'Feb', value: '02' },
@@ -1863,14 +1950,80 @@ const generateDistinctColor = (index: number, total: number) => {
                   { name: 'Nov', value: '11' },
                   { name: 'Dec', value: '12' },
                 ].map((month) => (
-                  <option key={month.value} value={month.value}>
+                  <MenuItem
+                    key={month.value}
+                    onClick={() => setSelectedStartMonth(month.value)}
+                    bg="white"
+                    color="black"
+                  >
                     {month.name}
-                  </option>
+                  </MenuItem>
                 ))}
-              </Select>
-            </Flex>
-          </Box>
-          <Box>
+              </MenuList>
+            </Menu>
+            </HStack>
+          </Flex>
+        </Box>
+
+        <Box>
+          <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
+          <Flex>
+          <HStack spacing={4}>
+            {/* Year Dropdown for End Date */}
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedEndYear ? `${selectedEndYear}` : 'Year'}
+              </MenuButton>
+              <MenuList bg="white" color="black" borderColor="blue.500">
+                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                  <MenuItem
+                    key={year}
+                    onClick={() => setSelectedEndYear(year)}
+                    bg="white"
+                    color="black"
+                  >
+                    {year}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            {/* Month Dropdown for End Date */}
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedEndMonth ? `${selectedEndMonth}` : 'Month'}
+              </MenuButton>
+              <MenuList bg="white" color="black" borderColor="blue.500">
+                {[
+                  { name: 'Jan', value: '01' },
+                  { name: 'Feb', value: '02' },
+                  { name: 'Mar', value: '03' },
+                  { name: 'Apr', value: '04' },
+                  { name: 'May', value: '05' },
+                  { name: 'Jun', value: '06' },
+                  { name: 'Jul', value: '07' },
+                  { name: 'Aug', value: '08' },
+                  { name: 'Sep', value: '09' },
+                  { name: 'Oct', value: '10' },
+                  { name: 'Nov', value: '11' },
+                  { name: 'Dec', value: '12' },
+                ].map((month) => (
+                  <MenuItem
+                    key={month.value}
+                    onClick={() => setSelectedEndMonth(month.value)}
+                    bg="white"
+                    color="black"
+                  >
+                    {month.name}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+            </HStack>
+          </Flex>
+        </Box>
+
+                  <Box>
           <Heading size="sm" mb="0.5rem" color="black">Select Reviewer</Heading>
           <Menu closeOnSelect={false}>
             <MenuButton
@@ -1884,28 +2037,28 @@ const generateDistinctColor = (index: number, total: number) => {
             </MenuButton>
 
             <MenuList maxHeight="200px" overflowY="auto">
-              {/* Deselect all reviewers */}
+             
               <MenuItem onClick={deselectAllReviewers}>
                 <Text as="span" fontWeight="bold" textDecoration="underline">
                   Remove All
                 </Text>
               </MenuItem>
 
-              {/* Select all reviewers */}
+              
               <MenuItem onClick={selectAllReviewers}>
                 <Text as="span" fontWeight="bold" textDecoration="underline">
                 Emeritus Editors
                 </Text>
               </MenuItem>
 
-              {/* Select only active reviewers */}
+              
               <MenuItem onClick={selectActiveReviewers}>
                 <Text as="span" fontWeight="bold" textDecoration="underline">
                   Active Editors
                 </Text>
               </MenuItem>
 
-              {/* Render each reviewer with a checkbox */}
+              
               {Object.keys(showReviewer).map((reviewer) => (
                 <MenuItem key={reviewer}>
                   <Checkbox
@@ -1925,16 +2078,17 @@ const generateDistinctColor = (index: number, total: number) => {
           </Menu>
         </Box>
         </Flex>
-        {/* <Button colorScheme="blue" onClick={renderChart}>
-          Apply Filters
-        </Button> */}
+       
       </Box>
     )}
 
-    {/* Chart Rendering */}
+   
     {Linechart ? renderChart4() : renderChart()}
     <DateTime />
   </Box>
+
+
+  {/* the part that is breaking the plot */}
 </Box>
 
 
@@ -1950,7 +2104,7 @@ const generateDistinctColor = (index: number, total: number) => {
      
       <Flex justify="center">
       <HStack spacing={4}>
-         {/* Reviewer Selection */}
+         
          <Menu closeOnSelect={false}>
       <MenuButton
         as={Button}
@@ -1963,28 +2117,28 @@ const generateDistinctColor = (index: number, total: number) => {
       </MenuButton>
 
       <MenuList maxHeight="200px" overflowY="auto">
-        {/* Deselect all reviewers */}
+        
         <MenuItem onClick={deselectAllReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
             Remove All
           </Text>
         </MenuItem>
 
-        {/* Select all reviewers */}
+        
         <MenuItem onClick={selectAllReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
           Emeritus Editors
           </Text>
         </MenuItem>
 
-        {/* Select only active reviewers */}
+        
         <MenuItem onClick={selectActiveReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
             Active Editors
           </Text>
         </MenuItem>
 
-        {/* Render each reviewer with a checkbox */}
+        
         {Object.keys(showReviewer).map((reviewer) => (
           <MenuItem key={reviewer}>
             <Checkbox
@@ -2010,10 +2164,10 @@ const generateDistinctColor = (index: number, total: number) => {
         <br/>
 
       {showDropdown && (
-        <HStack spacing={4}>
-        <Box display="flex" justifyContent="center" gap="1rem">
+        // <HStack spacing={4}>
+        <Box display={{ base: "none", md: "flex" }} justifyContent="center" gap="1rem">
           
-            {/* Year Selection */}
+            
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
                 {selectedYear ? `Year: ${selectedYear}` : 'Select Year'}
@@ -2033,7 +2187,62 @@ const generateDistinctColor = (index: number, total: number) => {
               </MenuList>
             </Menu>
 
-            {/* Month Selection */}
+            
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                colorScheme="blue"
+                isDisabled={!selectedYear} 
+              >
+                {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
+              </MenuButton>
+              <MenuList>
+                {selectedYear && getMonths().map((month, index) => (
+                  <MenuItem key={index} onClick={() => setSelectedMonth(month)}>
+                    {month}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+        </Box>
+        // </HStack>
+      )}
+       </HStack>
+      </Flex>
+
+      <Flex justify="center" mt={4}>
+        
+      <HStack spacing={4}>
+         
+       
+        
+
+      {showDropdown && (
+        <HStack spacing={4}>
+        <Box display={{ base: "flex", md: "none" }} justifyContent="center" gap="1rem">
+          
+            
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedYear ? `Year: ${selectedYear}` : 'Select Year'}
+              </MenuButton>
+              <MenuList>
+                {getYears().map((year) => (
+                  <MenuItem
+                    key={year}
+                    onClick={() => {
+                      setSelectedYear(year.toString());
+                      setSelectedMonth(null); 
+                    }}
+                  >
+                    {year}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            
             <Menu>
               <MenuButton
                 as={Button}
@@ -2056,12 +2265,13 @@ const generateDistinctColor = (index: number, total: number) => {
       )}
        </HStack>
       </Flex>
+      <br/>
 
       {selectedMonth && (
-        <Box padding="2rem" borderRadius="0.55rem">
+        <Box padding="0.5rem" borderRadius="0.55rem">
           <Box
             bgColor={bg}
-            padding="2rem"
+            // padding="2rem"
             borderRadius="0.55rem"
             _hover={{
               border: "1px",
@@ -2081,7 +2291,7 @@ const generateDistinctColor = (index: number, total: number) => {
       
             {selectedYear && selectedMonth && (
                 <Box mt={8}>
-                  {/* Download CSV section */}
+                 
                   <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
                     <Text fontSize="lg"
                       marginBottom={2}
@@ -2091,26 +2301,20 @@ const generateDistinctColor = (index: number, total: number) => {
                     <CSVLink 
                       data={csvData.length ? csvData : []} 
                       filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
-                      // onClick={(e:any) => {
-                      //   generateCSVData();
-                      //   if (csvData.length === 0) {
-                      //     e.preventDefault(); 
-                      //     console.error("CSV data is empty or not generated correctly.");
-                      //   }
-                      // }}
+                      
                       onClick={async () => {
                         try {
-                          // Trigger the CSV conversion and download
+                         
                           generateCSVData();
                     
-                          // Trigger the API call
+                         
                           await axios.post("/api/DownloadCounter");
                         } catch (error) {
                           console.error("Error triggering download counter:", error);
                         }
                       }}
                     >
-                       <Button colorScheme="blue">{loading2 ? <Spinner size="sm" /> : "Download CSV"}</Button>
+                       <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }} >{loading2 ? <Spinner size="sm" /> : "Download CSV"}</Button>
                     </CSVLink>
                   </Box>
                 </Box>
@@ -2156,6 +2360,7 @@ const generateDistinctColor = (index: number, total: number) => {
                   colorScheme="blue"
                   onClick={() => setShowFilters2(!showFilters2)}
                   leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
+                  fontSize={{ base: "0.6rem", md: "md" }} 
                   mr="1rem"
                 >
                   {showFilters2 ? "Hide Filters" : "Show Filters"}
@@ -2170,98 +2375,116 @@ const generateDistinctColor = (index: number, total: number) => {
         p={4}
         mt="1rem"
       >
-        <Flex justifyContent="flex-start" gap="2rem" mb="1rem">
-          {/* Start Date Filters */}
+        <Flex justifyContent="flex-start" flexDirection={{ base: "column", md: "row" }} gap="2rem" mb="1rem">
+          
           <Box>
             <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
             <Flex>
-              <Select
-                placeholder="Year"
-                value={selectedStartYear2 || ''}
-                onChange={(e) => setSelectedStartYear2(e.target.value)}
-                mr="1rem"
-                bg="white"
-                color="black"
-              >
+            <HStack spacing={4}>
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedStartYear2 ? `${selectedStartYear2}` : 'Select Year'}
+              </MenuButton>
+              <MenuList bg="white" color="black" borderColor="blue.500">
                 {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
-                  <option key={year} value={year}>
+                  <MenuItem key={year} onClick={() => setSelectedStartYear2(year)} bg="white" color="black">
                     {year}
-                  </option>
+                  </MenuItem>
                 ))}
-              </Select>
-              <Select
-                placeholder="Month"
-                value={selectedStartMonth2 || ''}
-                onChange={(e) => setSelectedStartMonth2(e.target.value)}
-                bg="white"
-                color="black"
-              >
-                {[
-                  { name: 'Jan', value: '01' },
-                  { name: 'Feb', value: '02' },
-                  { name: 'Mar', value: '03' },
-                  { name: 'Apr', value: '04' },
-                  { name: 'May', value: '05' },
-                  { name: 'Jun', value: '06' },
-                  { name: 'Jul', value: '07' },
-                  { name: 'Aug', value: '08' },
-                  { name: 'Sep', value: '09' },
-                  { name: 'Oct', value: '10' },
-                  { name: 'Nov', value: '11' },
-                  { name: 'Dec', value: '12' },
-                ].map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.name}
-                  </option>
-                ))}
-              </Select>
+              </MenuList>
+            </Menu>
+
+            <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+              {selectedStartMonth2 ? `${selectedStartMonth2}` : 'Select Month'}
+            </MenuButton>
+            <MenuList bg="white" color="black" borderColor="blue.500">
+              {[
+                { name: 'Jan', value: '01' },
+                { name: 'Feb', value: '02' },
+                { name: 'Mar', value: '03' },
+                { name: 'Apr', value: '04' },
+                { name: 'May', value: '05' },
+                { name: 'Jun', value: '06' },
+                { name: 'Jul', value: '07' },
+                { name: 'Aug', value: '08' },
+                { name: 'Sep', value: '09' },
+                { name: 'Oct', value: '10' },
+                { name: 'Nov', value: '11' },
+                { name: 'Dec', value: '12' },
+              ].map((month) => (
+                <MenuItem
+                  key={month.value}
+                  onClick={() => setSelectedStartMonth2(month.value)}
+                  bg="white"
+                  color="black"
+                >
+                  {month.name}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+            </HStack>
             </Flex>
           </Box>
 
-          {/* End Date Filters */}
+          
           <Box>
             <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
             <Flex>
-              <Select
-                placeholder="Year"
-                value={selectedEndYear2 || ''}
-                onChange={(e) => setSelectedEndYear2(e.target.value)}
-                mr="1rem"
-                bg="white"
-                color="black"
-              >
-                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </Select>
-              <Select
-                placeholder="Month"
-                value={selectedEndMonth2 || ''}
-                onChange={(e) => setSelectedEndMonth2(e.target.value)}
-                bg="white"
-                color="black"
-              >
-                {[
-                  { name: 'Jan', value: '01' },
-                  { name: 'Feb', value: '02' },
-                  { name: 'Mar', value: '03' },
-                  { name: 'Apr', value: '04' },
-                  { name: 'May', value: '05' },
-                  { name: 'Jun', value: '06' },
-                  { name: 'Jul', value: '07' },
-                  { name: 'Aug', value: '08' },
-                  { name: 'Sep', value: '09' },
-                  { name: 'Oct', value: '10' },
-                  { name: 'Nov', value: '11' },
-                  { name: 'Dec', value: '12' },
-                ].map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.name}
-                  </option>
-                ))}
-              </Select>
+            <HStack spacing={4}>
+              {/* Year Dropdown */}
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                  {selectedEndYear2 ? `${selectedEndYear2}` : 'Select Year'}
+                </MenuButton>
+                <MenuList bg="white" color="black" borderColor="blue.500">
+                  {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                    <MenuItem
+                      key={year}
+                      onClick={() => setSelectedEndYear2(year)}
+                      bg="white"
+                      color="black"
+                    >
+                      {year}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+
+              {/* Month Dropdown */}
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                  {selectedEndMonth2 ? `${selectedEndMonth2}` : 'Select Month'}
+                </MenuButton>
+                <MenuList bg="white" color="black" borderColor="blue.500">
+                  {[
+                    { name: 'Jan', value: '01' },
+                    { name: 'Feb', value: '02' },
+                    { name: 'Mar', value: '03' },
+                    { name: 'Apr', value: '04' },
+                    { name: 'May', value: '05' },
+                    { name: 'Jun', value: '06' },
+                    { name: 'Jul', value: '07' },
+                    { name: 'Aug', value: '08' },
+                    { name: 'Sep', value: '09' },
+                    { name: 'Oct', value: '10' },
+                    { name: 'Nov', value: '11' },
+                    { name: 'Dec', value: '12' },
+                  ].map((month) => (
+                    <MenuItem
+                      key={month.value}
+                      onClick={() => setSelectedEndMonth2(month.value)}
+                      bg="white"
+                      color="black"
+                    >
+                      {month.name}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+            </HStack>
+
             </Flex>
           </Box>
           <Box>
@@ -2304,6 +2527,9 @@ const generateDistinctColor = (index: number, total: number) => {
         <Text fontSize="3xl" fontWeight="bold">Comments</Text>
           <Comments page={"Reviewers"}/>
         </Box>
+
+
+        
     </Box>
     {/* </motion.div> */}
   </AllLayout>
