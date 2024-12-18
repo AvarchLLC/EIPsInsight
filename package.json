@@ -40,6 +40,7 @@
     "clsx": "^2.0.0",
     "cors": "^2.8.5",
     "d3-interpolate": "^3.0.1",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.3.1",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.6",

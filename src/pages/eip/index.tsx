@@ -201,243 +201,79 @@ const Type = () => {
           transition={{ duration: 0.5 }}
         >
           <Box
-            hideBelow={"lg"}
-            paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-            marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-            paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-            marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
-          >
-            <FlexBetween>
-              <Header
-                title={`Ethereum Improvement Proposal - [${data.length}]`}
-                subtitle="Meta, Informational, Standard Track - Core, Interface, Networking."
-              />
-            </FlexBetween>
-            <Box className={"w-full pt-10"}>
-              <SearchBox />
-            </Box>
+  paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}
+  marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
+  paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+  marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+>
+  <FlexBetween>
+    <Header
+      title={`Ethereum Improvement Proposal - [${data.length}]`}
+      subtitle="Meta, Informational, Standard Track - Core, Interface, Networking."
+    />
+  </FlexBetween>
 
-            {/* <Box paddingTop={"8"}>
-              <EIPCatBoxGrid />
-            </Box> */}
-            <Box className="grid grid-cols-3 pt-8 gap-x-5">
-              <Box>
-                <EIPStatusDonut />
-              </Box>
-              <Box>
-                <AllChart type="EIP" />
-              </Box>
-              <Box className="h-fit">
-                <OtherBox type="EIPs" />
-              </Box>
-              {/* <Box>
-                <ERCGraph />
-              </Box> */}
-            </Box>
-            {/* <Box paddingTop={8}>
-              <StatusBox />
-            </Box> */}
+  <Box className={"w-full pt-10"}>
+    <SearchBox />
+  </Box>
 
-            <Box paddingTop={8}>
-              <TypeGraphs />
-            </Box>
+  <Box className="grid grid-cols-1 lg:grid-cols-3 pt-8 gap-5">
+  <Box>
+    <EIPStatusDonut />
+  </Box>
+  <Box>
+    <AllChart type="EIP" />
+  </Box>
+  <Box className="h-fit">
+    <OtherBox type="EIPs" />
+  </Box>
+</Box>
 
-            <Box
-              hideBelow={"lg"}
-              paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-            >
-              {/* <Box>
-                <Table />
-              </Box> */}
-              <AreaC type={"EIPs"} />
-              <Box paddingY={"8"}>
-                <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
-                  Draft vs Final
-                </Text>
-                <AreaStatus type={"EIPs"} />
-              </Box>
-              <Box className={"group relative flex gap-3"}>
-                <Box className={"flex"}>
-                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                    Draft -{" "}
-                    <NextLink href={`/tableStatus/eip/Draft`}>
-                      {" "}
-                      [ {
-                        data.filter((item) => item.status === "Draft").length
-                      }{" "}
-                      ]
-                    </NextLink>
-                  </Text>
-                  <p className={"text-red-700"}>*</p>
-                </Box>
-                <p className={"hidden group-hover:block text-lg"}>
-                  Count as on date
-                </p>
-              </Box>
-              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Draft"} dataset={data2}/>
 
-                <CBoxStatus status={"Draft"} type={"EIPs"} dataset={data3}/>
-              </Grid>
+  <Box paddingTop={8}>
+    <TypeGraphs />
+  </Box>
 
-              <Box className={"group relative flex gap-3"}>
-                <Box className={"flex"}>
-                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                    Review -{" "}
-                    <NextLink href={`/tableStatus/eip/Review`}>
-                      {" "}
-                      [ {
-                        data.filter((item) => item.status === "Review").length
-                      }{" "}
-                      ]
-                    </NextLink>
-                  </Text>
-                  <p className={"text-red-700"}>*</p>
-                </Box>
-                <p className={"hidden group-hover:block text-lg"}>
-                  Count as on date
-                </p>
-              </Box>
+  <Box paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}>
+    <AreaC type={"EIPs"} />
 
-              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Review"} dataset={data2}/>
+    <Box paddingY={"8"}>
+      <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
+        Draft vs Final
+      </Text>
+      <AreaStatus type={"EIPs"} />
+    </Box>
 
-                <CBoxStatus status={"Review"} type={"EIPs"} dataset={data3}/>
-              </Grid>
+    {["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"].map((status) => (
+  <Box key={status} className={"group relative flex flex-col gap-3"} paddingBottom={8}>
+    {/* Label Section aligned to the left */}
+    <Box className={"flex gap-3"}>
+      <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+        {status} -{" "}
+        <NextLink href={`/tableStatus/eip/${status}`}>
+          [{data.filter((item) => item.status === status).length}]
+        </NextLink>
+      </Text>
+      <p className={"text-red-700"}>*</p>
+      <p className={"hidden group-hover:block text-lg"}>Count as on date</p>
+    </Box>
+    
+    {/* Scrollable Charts Grid */}
+    <Box overflowX="auto">
+      <Grid templateColumns={{ base: "1fr", sm: "1fr", lg: "repeat(2, 1fr)" }} gap={6}>
+        <StackedColumnChart type={"EIPs"} status={status} dataset={data2} />
+        <CBoxStatus status={status} type={"EIPs"} dataset={data3} />
+      </Grid>
+    </Box>
+  </Box>
+))}
 
-              <Box className={"group relative flex gap-3"}>
-                <Box className={"flex"}>
-                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                    Last Call -
-                    <NextLink href={`/tableStatus/eip/LastCall`}>
-                      {" "}
-                      [{" "}
-                      {
-                        data.filter((item) => item.status === "Last Call")
-                          .length
-                      }{" "}
-                      ]{" "}
-                    </NextLink>
-                  </Text>
-                  <p className={"text-red-700"}>*</p>
-                </Box>
-                <p className={"hidden group-hover:block text-lg"}>
-                  Count as on date
-                </p>
-              </Box>
 
-              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Last Call"} dataset={data2}/>
+  </Box>
+</Box>
 
-                <CBoxStatus status={"Last Call"} type={"EIPs"} dataset={data3}/>
-              </Grid>
 
-              <Box className={"group relative flex gap-3"}>
-                <Box className={"flex"}>
-                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                    Living -
-                    <NextLink href={`/tableStatus/eip/Living`}>
-                      {" "}
-                      [ {
-                        data.filter((item) => item.status === "Living").length
-                      }{" "}
-                      ]
-                    </NextLink>
-                  </Text>
-                  <p className={"text-red-700"}>*</p>
-                </Box>
-                <p className={"hidden group-hover:block text-lg"}>
-                  Count as on date
-                </p>
-              </Box>
-
-              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Living"} dataset={data2}/>
-
-                <CBoxStatus status={"Living"} type={"EIPs"} dataset={data3}/>
-              </Grid>
-
-              <Box className={"group relative flex gap-3"}>
-                <Box className={"flex"}>
-                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                    Final -
-                    <NextLink href={`/tableStatus/eip/Final`}>
-                      {" "}
-                      [ {
-                        data.filter((item) => item.status === "Final").length
-                      }{" "}
-                      ]{" "}
-                    </NextLink>
-                  </Text>
-                  <p className={"text-red-700"}>*</p>
-                </Box>
-                <p className={"hidden group-hover:block text-lg"}>
-                  Count as on date
-                </p>
-              </Box>
-
-              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Final"} dataset={data2}/>
-
-                <CBoxStatus status={"Final"} type={"EIPs"} dataset={data3}/>
-              </Grid>
-
-              <Box className={"group relative flex gap-3"}>
-                <Box className={"flex"}>
-                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                    Stagnant -
-                    <NextLink href={`/tableStatus/eip/Stagnant`}>
-                      {" "}
-                      [{" "}
-                      {
-                        data.filter((item) => item.status === "Stagnant").length
-                      }{" "}
-                      ]{" "}
-                    </NextLink>
-                  </Text>
-                  <p className={"text-red-700"}>*</p>
-                </Box>
-                <p className={"hidden group-hover:block text-lg"}>
-                  Count as on date
-                </p>
-              </Box>
-
-              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Stagnant"} dataset={data2}/>
-
-                <CBoxStatus status={"Stagnant"} type={"EIPs"} dataset={data3}/>
-              </Grid>
-
-              <Box className={"group relative flex gap-3"}>
-                <Box className={"flex"}>
-                  <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                    Withdrawn -
-                    <NextLink href={`/tableStatus/eip/Withdrawn`}>
-                      {" "}
-                      [{" "}
-                      {
-                        data.filter((item) => item.status === "Withdrawn")
-                          .length
-                      }{" "}
-                      ]{" "}
-                    </NextLink>
-                  </Text>
-                  <p className={"text-red-700"}>*</p>
-                </Box>
-                <p className={"hidden group-hover:block text-lg"}>
-                  Count as on date
-                </p>
-              </Box>
-
-              <Grid templateColumns="repeat(2, 1fr)" gap={6} paddingBottom={8}>
-                <StackedColumnChart type={"EIPs"} status={"Withdrawn"} dataset={data2}/>
-
-                <CBoxStatus status={"Withdrawn"} type={"EIPs"} dataset={data3}/>
-              </Grid>
-            </Box>
-          </Box>
-
-          <Box
+          {/* <Box
             display={{ lg: "none", sm: "block" }}
             paddingBottom={{ lg: "10", sm: "10", base: "10" }}
             marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
@@ -473,7 +309,7 @@ const Type = () => {
                 <AreaC type={"EIPs"} />
               </Box>
             </Box>
-          </Box>
+          </Box> */}
         </motion.div>
       )}
     </AllLayout>

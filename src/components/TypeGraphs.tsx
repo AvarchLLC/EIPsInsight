@@ -265,7 +265,7 @@ const TypeGraphs = () => {
       </Box>
 
       <Box display={{ lg: "none", sm: "block" }}>
-        <Text fontSize="xl" fontWeight="bold" color="#4267B2">
+        {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2">
           Draft
         </Text>
 
@@ -294,8 +294,8 @@ const TypeGraphs = () => {
           <StackedColumnChart status="Draft" />
           <Box className={"w-full"}>
             <DateTime />
-          </Box>
-        </Box>
+          </Box> */}
+        {/* </Box> */}
 
         {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
           Draft vs Final
@@ -401,7 +401,7 @@ const TypeGraphs = () => {
           </Box>
         </Box>
 
-        <NextLink href={"/erc"}>
+        {/* <NextLink href={"/erc"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
             ERC - [{data.filter((item) => item.category === "ERC").length}]
           </Text>
@@ -431,7 +431,7 @@ const TypeGraphs = () => {
           <Box className={"w-full"}>
             <DateTime />
           </Box>
-        </Box>
+        </Box> */}
 
         <NextLink href={"/meta"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">

@@ -946,10 +946,10 @@ const reviewerCharts = reviewers.map((reviewer) => {
   bgColor={bg}
   padding="2rem"
   borderRadius="0.55rem"
-  _hover={{
-    border: "1px",
-    borderColor: "#30A0E0",
-  }}
+  // _hover={{
+  //   border: "1px",
+  //   borderColor: "#30A0E0",
+  // }}
   style={{ flex: "1 0 45%", minWidth: "300px", margin: "10px" }}
 >
   {/* Reviewer Name and CSV Download Button */}
@@ -1783,10 +1783,10 @@ const generateDistinctColor = (index: number, total: number) => {
             bgColor={bg}
             // padding="2rem"
             borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
           >
 
         
@@ -1805,10 +1805,10 @@ const generateDistinctColor = (index: number, total: number) => {
   bgColor={bg}
   padding="2rem"
   borderRadius="0.55rem"
-  _hover={{
-    border: "1px",
-    borderColor: "#30A0E0",
-  }}
+  // _hover={{
+  //   border: "1px",
+  //   borderColor: "#30A0E0",
+  // }}
 >
   {/* The part that is breaking start */}
   <Box className={"w-full"}>
@@ -2273,10 +2273,10 @@ const generateDistinctColor = (index: number, total: number) => {
             bgColor={bg}
             // padding="2rem"
             borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
           >
             <Box className="w-full">
               {renderCharts2(chart1data, selectedYear, selectedMonth)}
@@ -2338,10 +2338,10 @@ const generateDistinctColor = (index: number, total: number) => {
               bgColor={bg}
               padding="2rem"
               borderRadius="0.55rem"
-              _hover={{
-                border: "1px",
-                borderColor: "#30A0E0",
-              }}
+              // _hover={{
+              //   border: "1px",
+              //   borderColor: "#30A0E0",
+              // }}
             >
             <Box className="w-full">
 
@@ -2503,10 +2503,10 @@ const generateDistinctColor = (index: number, total: number) => {
               bgColor={bg}
               padding="2rem"
               borderRadius="0.55rem"
-              _hover={{
-                border: "1px",
-                borderColor: "#30A0E0",
-              }}
+              // _hover={{
+              //   border: "1px",
+              //   borderColor: "#30A0E0",
+              // }}
             >
             <Box className="w-full">
             <Heading

@@ -405,7 +405,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
       }
     }}
   >
-    <Button colorScheme="blue">
+    <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue">
       {loading2 ? <Spinner size="sm" /> : "Download CSV"}
     </Button>
   </CSVLink>

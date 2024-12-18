@@ -396,9 +396,12 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   paddingX="0.5rem"
   borderRadius="0.55rem"
   _hover={{
-    border: "1px",
-    borderColor: "#30A0E0",
+    transform: "scale(1.05)", // Slight scale increase for smooth transformation
+    outline: "2px solid #30A0E0", // Outline instead of border
+    outlineOffset: "-2px", // Pull outline inside for better visual alignment
+    transition: "transform 0.2s ease, outline 0.2s ease", // Smooth hover effect
   }}
+  transition="transform 0.2s ease, outline 0.2s ease"
   width="100%" // Adjust width based on container size
   padding="1rem"
   display="flex"
@@ -505,42 +508,12 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
     mr={2} // Adjust spacing between avatar and text
   />
   <Text fontSize="sm" fontWeight="bold" mr={1}>
-    {authorName} {/* Display author name */}
+    {authorName} {sortedAuthors.length > 1 && " …more"} {/* Display author name */}
   </Text>
 </Box>
 
       );
-    }).concat(
-      sortedAuthors.length > 1 ? (
-        <Box
-          key="more-authors"
-          // bg="blue.500"
-          color={useColorModeValue('gray.700', 'gray.300')}
-          // px={3}
-          py={1}
-          borderRadius="full"
-          m={2} // Margin for spacing
-          // border="1px solid"
-          // borderColor="blue.500"
-          whiteSpace="nowrap"
-          transform="scale(1.0)"
-          transition="all 0.2s ease"
-          _hover={{
-            bg: "blue.400",
-            transform: "scale(1.05)",
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            // Handle the click for the "more" action, like showing all authors
-          }}
-        >
-          <Text fontSize="sm" fontWeight="bold">
-            ...more {/* Display 'more' */}
-          </Text>
-        </Box>
-      ) : []
-    );
-    
+    })
     
   })()}
   

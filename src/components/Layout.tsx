@@ -8,7 +8,7 @@ import "../app/globals.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
-import Script from "next/script";
+// import Script from "next/script";
 
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
@@ -41,25 +41,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
       <Head>
         <title>EIPs Insights</title>
         <link rel="icon" href="/eipFavicon.png" />
-        <Script
-          strategy="afterInteractive"
-          src="https://www.googletagmanager.com/gtag/js?id=G-N59QCDB9WN"
-        />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-        >
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-N59QCDB9WN', { anonymize_ip: true });
-            gtag('consent', 'default', {
-              ad_storage: 'denied',
-              analytics_storage: 'denied',
-            });
-          `}
-        </Script>
+        
       </Head>
       <ColorModeScript initialColorMode="dark" />
       <Providers>

@@ -1015,7 +1015,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
             
           },
           {
-              min:  yAxisMin, // Start from 0 for the trend line
+              min:  -30, // Start from 0 for the trend line
               max: yAxisMax, // Set max for trend line y-axis
               label: {
                 formatter: () => '', // Completely hide labels
@@ -1204,10 +1204,10 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
             bgColor={bg}
             padding="1rem"
             borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
           >
           <Box  borderRadius={"0.55rem"}>
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">

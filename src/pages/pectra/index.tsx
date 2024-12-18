@@ -361,8 +361,8 @@ const All = () => {
            initial={{ opacity: 0, y: -20 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.5 } as any}
-           fontSize={{base: "4xl",md:"4xl", lg: "6xl"}}
-           fontWeight="bold"
+           fontSize={{base: "2xl",md:"4xl", lg: "6xl"}}
+           fontWeight={{ base: "extrabold", md: "bold", lg: "bold" }}
            color="#30A0E0"
           >
             Ethereum Network Upgrades
@@ -448,7 +448,7 @@ const All = () => {
 </Box> */}
 <br/>
 
-          <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
+          <Text mb={4} fontSize={{base: "md",md:"2xl", lg: "2xl"}} textAlign="justify">  {/* Justify text alignment */}
   Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
   collectively known as{" "}
   <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
@@ -628,7 +628,7 @@ const All = () => {
 
 
           {
-            <Box>
+            <Box display={{ base: "none", md: "block" }}>
               <PectraTable PectraData={pectraData}/>
               <br/>
               <Text
@@ -646,7 +646,7 @@ const All = () => {
           }
         </Box>
        
-        <Box className="w-3/4 mx-auto" id="carousel-section"> {/* Width set to 50% of the screen */}
+        <Box display={{ base: "none", md: "block" }} className="w-3/4 mx-auto" id="carousel-section"> {/* Width set to 50% of the screen */}
         
         <Carousel 
   showThumbs={false} 
@@ -660,6 +660,7 @@ const All = () => {
     hasPrev && (
       <button
         type="button"
+        
         onClick={onClickHandler}
         title={label}
         style={{

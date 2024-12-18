@@ -275,30 +275,40 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
         </Box>
       ) : (
         <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
-          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color={headingColor}>
-            {`${status}`}
-          </Heading>
-          {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" 
-          onClick={async () => {
-            try {
-              // Trigger the CSV conversion and download
-              downloadData();
-        
-              // Trigger the API call
-              await axios.post("/api/DownloadCounter");
-            } catch (error) {
-              console.error("Error triggering download counter:", error);
-            }
-          }}
-          >Download CSV</Button>
-        </Flex>
-          <Area {...config} />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box>
+  <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+    <Heading size="md" color={headingColor}>
+      {`${status}`}
+    </Heading>
+    {/* Assuming a download option exists for the yearly data as well */}
+    <Button 
+      colorScheme="blue" 
+      onClick={async () => {
+        try {
+          // Trigger the CSV conversion and download
+          downloadData();
+
+          // Trigger the API call
+          await axios.post("/api/DownloadCounter");
+        } catch (error) {
+          console.error("Error triggering download counter:", error);
+        }
+      }}
+    >
+      Download CSV
+    </Button>
+  </Flex>
+
+  {/* Make the area chart scrollable on smaller screens */}
+  <Box overflowX="auto">
+    <Area {...config} />
+  </Box>
+
+  {/* Make the DateTime section scrollable in x-direction if necessary */}
+  <Box className={"w-full"} overflowX="auto">
+    <DateTime />
+  </Box>
+</Box>
+
       )}
     </>
   );
