@@ -210,6 +210,7 @@ const NetworkUpgradesChart = React.memo(() => {
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <Button colorScheme="blue" 
+          fontSize={{ base: "0.6rem", md: "md" }}
           // onClick={downloadData} 
           onClick={async () => {
             try {

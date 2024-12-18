@@ -164,6 +164,7 @@ const AuthorContributionsChart = React.memo(() => {
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
         <Heading size="md">Author Contributions</Heading>
         <Button 
+        fontSize={{ base: "0.6rem", md: "md" }}
         onClick={async () => {
             try {
               // Trigger the CSV conversion and download

@@ -301,16 +301,11 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
               </WrapItem>
             </Wrap>
           </Td>
-          <Td>
-            {/*<Link*/}
-            {/*    href={`/table/${getCat(key)}/${status}`}*/}
-            {/*    className="text-blue-400 hover:cursor-pointer font-semibold"*/}
-            {/*>*/}
-            {/*    {result[key]}*/}
-            {/*</Link>*/}
+          <Td className={"ml-20 text-blue-400"} >
+           
             {result[key]}
           </Td>
-          <Td className={"ml-10 text-blue-400"}>{percentage}%</Td>
+          <Td display={{ base: "none", sm: "table-cell" }} className={"ml-10 text-blue-400"}>{percentage}%</Td>
         </Tr>
       );
     }
@@ -329,16 +324,11 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
             </WrapItem>
           </Wrap>
         </Td>
-        <Td>
-          {/*<Link*/}
-          {/*    href={`/table/${getCat(key)}/${status}`}*/}
-          {/*    className="text-blue-400 hover:cursor-pointer font-semibold"*/}
-          {/*>*/}
-          {/*    {result[key]}*/}
-          {/*</Link>*/}
+        <Td className={"ml-20 text-blue-400"} >
+          
           {result[key]}
         </Td>
-        <Td className={"ml-10 text-blue-400"}>{percentage}%</Td>
+        <Td display={{ base: "none", sm: "table-cell" }} className={"ml-10 text-blue-400"}>{percentage}%</Td>
       </Tr>
     );
   }
@@ -430,7 +420,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
                 <Tr>
                   <Th minW="50px">Type - Category</Th>
                   <Th minW="200px">Numbers</Th>
-                  <Th minW="200px">Percentage</Th>
+                  <Th display={{ base: "none", sm: "table-cell" }} minW="200px">Percentage</Th>
                 </Tr>
               </Thead>
               <Tbody>{rows}</Tbody>

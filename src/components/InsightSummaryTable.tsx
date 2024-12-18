@@ -513,7 +513,7 @@ export default function InsightSummary() {
       }
     }}
   >
-    <Button colorScheme="blue">
+    <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue">
       {loading2 ? <Spinner size="sm" /> : "Download CSV"}
     </Button>
   </CSVLink>

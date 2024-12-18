@@ -92,51 +92,59 @@ const ERC = () => {
         </Box>
       ) : (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
-            <FlexBetween>
-              <Header
-                title={`Ethereum Request for Comment - [ ${data.length} ]`}
-                subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
-              />
-            </FlexBetween>
-            {/* <Text className="text-red-400">
-              The data before Oct 25 2023 is missing due to EIP ERC split. It
-              will be here soon!
-            </Text> */}
-            <Box className={"w-full pt-4"}>
-              <SearchBox />
-            </Box>
-            <Box className="grid grid-cols-3 pt-8 gap-x-5">
-              <Box>
-                <ERCStatusDonut />
-              </Box>
-              <Box>
-                <AllChart type="ERC" />
-              </Box>
-              <Box className="h-fit">
-                <OtherBox type="ERCs" />
-              </Box>
-            </Box>
-            {/* <TableStatus cat="ERC" /> */}
-            <Box>
-              <AreaC type={"ERCs"} />
-            </Box>
-            <Box className={"pt-8"}>
-              <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                Draft vs Final
-              </Text>
-              <AreaStatus type={"ERCs"} />
-            </Box>
-            <Box paddingY={8}>
-              <ERCStatusGraph />
-            </Box>
-          </Box>
-        </motion.div>
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  exit={{ opacity: 0 }}
+  transition={{ duration: 0.5 }}
+>
+  <Box className="mx-4 sm:mx-10 md:mx-20 mt-10 mb-20">
+    <FlexBetween>
+      <Header
+        title={`Ethereum Request for Comment - [ ${data.length} ]`}
+        subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
+      />
+    </FlexBetween>
+
+    {/* <Text className="text-red-400">
+      The data before Oct 25 2023 is missing due to EIP ERC split. It
+      will be here soon!
+    </Text> */}
+
+    <Box className="w-full pt-4">
+      <SearchBox />
+    </Box>
+
+    <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-8 gap-5">
+      <Box>
+        <ERCStatusDonut />
+      </Box>
+      <Box>
+        <AllChart type="ERC" />
+      </Box>
+      <Box className="h-fit">
+        <OtherBox type="ERCs" />
+      </Box>
+    </Box>
+
+    {/* <TableStatus cat="ERC" /> */}
+
+    <Box>
+      <AreaC type="ERCs" />
+    </Box>
+
+    <Box className="pt-8">
+      <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+        Draft vs Final
+      </Text>
+      <AreaStatus type="ERCs" />
+    </Box>
+
+    <Box paddingY={8}>
+      <ERCStatusGraph />
+    </Box>
+  </Box>
+</motion.div>
+
       )}
     </AllLayout>
   );

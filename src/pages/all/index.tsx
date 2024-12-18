@@ -177,7 +177,9 @@ const All = () => {
         >
           <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold py-8">
             <div className="flex justify-between w-full">
-              <div className="space-x-6">
+            <Box>
+              {/* For larger screens, render buttons */}
+              <Box display={{ base: "none", md: "flex" }} className="space-x-6">
                 {optionArr.map((item, key) => (
                   <button
                     onClick={() => {
@@ -191,12 +193,37 @@ const All = () => {
                     {item}
                   </button>
                 ))}
-              </div>
-              <div className="w-full max-w-md">
+              </Box>
+
+              {/* For smaller screens, render a dropdown */}
+              <Box display={{ base: "block", md: "none" }}>
+                <select
+                  value={selected}
+                  onChange={(e) => setSelected(e.target.value)}
+                  style={{
+                    padding: "8px",
+                    borderRadius: "4px",
+                    borderColor: "gray",
+                    fontSize: "16px",
+                  }}
+                >
+                  {optionArr.map((item, key) => (
+                    <option value={item} key={key}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </Box>
+            </Box>
+
+              <Box display={{ base: "none", md: "block" }} className="w-full max-w-md">
                 <SearchBox />
-              </div>
+              </Box>
             </div>
           </Box>
+          <Box display={{ base: "block", md: "none" }} className="w-full max-w-md">
+                <SearchBox />
+            </Box>
 
           <>
       {loading ? (

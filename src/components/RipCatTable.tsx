@@ -161,6 +161,16 @@ import {
                 columnSorter
                 itemsPerPage={5}
                 pagination
+                paginationProps={{
+                  pages: Math.ceil(filteredData.length / 5), // Calculate the number of pages based on the items and items per page
+                  style: {
+                    display: 'flex',
+                    flexWrap: 'wrap', // Allow pagination to wrap in smaller screens
+                    justifyContent: 'center',
+                    gap: '8px', // Space between pagination items
+                    padding: '10px',
+                  },
+                }}
                 tableProps={{
                   hover: true,
                   responsive: true,
