@@ -85,8 +85,25 @@ interface EIP {
     date: string;
     count: number;
     category: string;
-    eips:any[];
+    eips:EIP2[];
   }[];
+}
+
+interface EIP2 {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+  repo: string;
 }
 
 interface FormattedEIP {
@@ -259,34 +276,70 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
 
   const downloadData = () => {
     // Filter data based on the selected status
-    let filteredData = dataset;
+    let filteredData = dataset.slice(1).concat(dataset[0]);
+
+    console.log("new filtered data:",filteredData)
+
     
     // Transform the filtered data to get the necessary details
     const transformedData = filteredData.flatMap((item) => {
-        return item.eips.flatMap((eip) => {
-            const category = getCat(eip.category); // Assuming this function returns a string
-            const year = eip.year.toString(); // Convert year to string
-            const uniqueEips = removeDuplicatesFromEips(eip.eips); // Assuming this returns an array of EIPs
-            return uniqueEips.map(({ eip }) => ({
-                category,
-                year,
-                eip, // Individual EIP
-            }));
-        });
+      return item.eips.flatMap((eipGroup) => {
+        const category = getCat(eipGroup.category); // Assuming this function returns a string
+        const year = eipGroup.date.split("-")[0]; // Extract year from date
+        const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Deduplicate EIPs if needed
+    
+        return uniqueEips.map((uniqueEip) => ({
+          category,
+          year,
+          eip: uniqueEip.eip, // EIP number
+          author: uniqueEip.author, // Author of the EIP
+          repo: uniqueEip.repo, // Repo type (e.g., "eip", "erc", "rip")
+          discussion: uniqueEip.discussion, // Discussion link
+          status: uniqueEip.status, // Status of the EIP
+          created: uniqueEip.created, // Creation date
+          deadline: uniqueEip.deadline || "", // Deadline if exists, else empty
+          type: uniqueEip.type, // Type of the EIP
+          title: uniqueEip.title, // Title of the EIP
+        }));
+      });
     });
+    
 
-    // Define the CSV header
-    const header = "Category,Year,EIPs\n";
-  
-    // Prepare the CSV content
-    const csvContent = "data:text/csv;charset=utf-8,"
-        + header
-        + transformedData.map(({ category, year, eip }) => {
-            return `${category},${year},${eip}`; // Each EIP on a separate line
-        }).join("\n");
+
+  if (!transformedData.length) {
+      console.error("Transformed data is empty.");
+      alert("No transformed data available for download.");
+      return;
+  }
+
+  // Define the CSV header
+  const header = " EIP, Title, Author, Status, Type, Category, Created at, Link\n";
+
+  // Prepare the CSV content
+  const csvContent =
+      "data:text/csv;charset=utf-8," + 
+      header +
+      transformedData
+          .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+              // Generate the correct URL based on the repo type
+              const url = category === "ERCs"
+              ? `https://eipsinsight.com/ercs/erc-${eip}`
+              : category === "RIPs"
+              ? `https://eipsinsight.com/rips/rip-${eip}`
+              : `https://eipsinsight.com/eips/eip-${eip}`;
+            
+                      
+
+              // Handle the 'deadline' field, use empty string if not available
+              const deadlineValue = deadline || "";
+
+              // Wrap fields in double quotes to handle commas
+              return `"${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${created.replace(/"/g, '""')}",,"${url}"`;
+          })
+          .join("\n");
   
     // Check the generated CSV content before download
-    console.log("CSV Content:", csvContent);
+    // console.log("CSV Content:", csvContent);
   
     // Encode the CSV content for downloading
     const encodedUri = encodeURI(csvContent);

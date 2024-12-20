@@ -81,7 +81,7 @@ const Resource = () => {
   <Text className="text-4xl text-blue-400 font-semibold text-left mb-4">
     Featured Blogs
   </Text>
-  <Box className="w-3/4 mx-auto"> {/* Width set to 75% of the screen */}
+  <Box display={{ base: 'node', md: 'block' }}  className="w-3/4 mx-auto"> {/* Width set to 75% of the screen */}
   <Carousel 
   showThumbs={false} 
   autoPlay 
@@ -339,30 +339,31 @@ const Resource = () => {
 
 
       <Box className="flex w-full justify-center items-center">
-        <Box className="flex flex-col">
-          <Text className="text-4xl py-6 text-blue-400 font-bold">
-            Featured Videos
-          </Text>
-          <Box
-            ref={containerRef}
-            className="flex overflow-x-auto py-4 px-6 h-[20rem]"
-            onWheel={handleScroll}
-            style={{ scrollBehavior: "smooth", overflow: "hidden" }}
-            bg={bg}
-            borderRadius={"0.55rem"}
-          >
-            {cards.map((item, index) => (
-              <a
-                href={item.href}
-                target="_blank"
-                key={index}
-                className="flex-shrink-0 mr-4"
-              >
-                <Image src={item.image} height={500} width={500} alt="Blah" />
-              </a>
-            ))}
-          </Box>
-        </Box>
+      <Box display={{ base: 'none', md: 'block' }} className="flex flex-col">
+  <Text className="text-4xl py-6 text-blue-400 font-bold">
+    Featured Videos
+  </Text>
+  <Box
+    ref={containerRef}
+    className="flex overflow-x-auto py-4 px-6 h-[20rem] lg:border-r lg:border-blue-400"
+    onWheel={handleScroll}
+    style={{ scrollBehavior: "smooth", overflow: "hidden" }}
+    bg={bg}
+    borderRadius={"0.55rem"}
+  >
+    {cards.map((item, index) => (
+      <a
+        href={item.href}
+        target="_blank"
+        key={index}
+        className="flex-shrink-0 mr-4"
+      >
+        <Image src={item.image} height={500} width={500} alt="Blah" />
+      </a>
+    ))}
+  </Box>
+</Box>
+
       </Box>
     </Box>
   );

@@ -226,28 +226,24 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
   
   const downloadData = () => {
     // Convert the data to CSV format
-    const csvContent = [
-      // CSV headers
-      [ "eip", "title", "author", "status", "type", "category", "created", "discussion", "deadline", "requires", ],
-      // Data rows
-      ...data.map(item => [
-        // item._id,
-        item.eip,
-        item.title,
-        item.author,
-        item.status,
-        item.type,
-        item.category,
-        item.created,
-        item.discussion,
-        item.deadline,
-        item.requires,
-        // item.unique_ID,
-        // item.__v,
-      ])
-    ]
-    .map(row => row.join(","))  // Join each row with commas
-    .join("\n");  // Join rows with newlines
+    const header = "Repo, EIP, Title, Author, Status, Type, Category, Discussion, Created at, Deadline, Link\n";
+
+// Prepare the CSV content
+const csvContent = header
+    + data.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+        // Generate the correct URL based on the repo type
+        const url = repo === "eip"
+            ? `https://eipsinsight.com/eips/eip-${eip}`
+            : repo === "erc"
+            ? `https://eipsinsight.com/ercs/erc-${eip}`
+            : `https://eipsinsight.com/rips/rip-${eip}`;
+
+        // Handle the 'deadline' field, use empty string if not available
+        const deadlineValue = deadline || "";
+
+        // Wrap title, author, discussion, and status in double quotes to handle commas
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
+    }).join("\n");
   
     // Create a Blob with the CSV content
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });

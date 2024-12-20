@@ -218,9 +218,9 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
         "_id",
         "fromStatus",
         "toStatus",
-        "changeDate",
-        "type",
-        "discussion",
+        // "changeDate",
+        // "type",
+        // "discussion",
         "requires",
         "changedDay",
         "changedMonth",
@@ -278,60 +278,108 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
   };
 
   const numRows = typeData.length + 4;
-  const rowHeight = 40; // Assuming each row has a height of 40px
-  const maxHeight = `${numRows * rowHeight}px`;
-  const rows = [];
-  const standardTrackKeys = [];
+const rowHeight = 40; // Assuming each row has a height of 40px
+const maxHeight = `${numRows * rowHeight}px`;
+const rows = [];
+const standardTrackKeys = [];
 
-  var total = 0;
-  for (const key in result) {
-    total = total + result[key];
-  }
-  for (const key in result) {
-    let percentage = ((result[key] * 100) / total).toFixed(2);
-    if (key.startsWith("Standard")) {
-      standardTrackKeys.push(key);
-    } else {
-      rows.push(
-        <Tr key={key}>
-          <Td minW="100px">
-            <Wrap>
-              <WrapItem>
-                <Badge colorScheme="pink">{key}</Badge>
-              </WrapItem>
-            </Wrap>
-          </Td>
-          <Td className={"ml-20 text-blue-400"} >
-           
-            {result[key]}
-          </Td>
-          <Td display={{ base: "none", sm: "table-cell" }} className={"ml-10 text-blue-400"}>{percentage}%</Td>
-        </Tr>
-      );
-    }
-  }
-
-  standardTrackKeys.sort();
-
-  for (const key of standardTrackKeys) {
-    let percentage = ((result[key] * 100) / total).toFixed(2);
-    rows.unshift(
+var total = 0;
+for (const key in result) {
+  total = total + result[key];
+}
+for (const key in result) {
+  let percentage = ((result[key] * 100) / total).toFixed(2);
+  if (key.startsWith("Standard")) {
+    standardTrackKeys.push(key);
+  } else {
+    rows.push(
       <Tr key={key}>
-        <Td minW="100px">
+        <Td
+          style={{
+            wordWrap: 'break-word',  // Allow word wrapping
+            overflowWrap: 'break-word', // For better wrapping behavior across browsers
+            whiteSpace: 'normal', // Enable text wrapping
+            minWidth: '120px', // Ensures it wraps correctly
+          }}
+          className="break-all"  // Force word break for long strings
+        >
           <Wrap>
             <WrapItem>
-              <Badge colorScheme="blue">{key}</Badge>
+              <Badge colorScheme="pink">{key}</Badge>
             </WrapItem>
           </Wrap>
         </Td>
-        <Td className={"ml-20 text-blue-400"} >
-          
+        <Td
+          style={{
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            minWidth: '100px',
+          }}
+          className={"ml-20 text-blue-400"}
+        >
           {result[key]}
         </Td>
-        <Td display={{ base: "none", sm: "table-cell" }} className={"ml-10 text-blue-400"}>{percentage}%</Td>
+        <Td
+          style={{
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            minWidth: '150px',
+          }}
+          className={"ml-10 text-blue-400"}
+        >
+          {percentage}%
+        </Td>
       </Tr>
     );
   }
+}
+
+standardTrackKeys.sort();
+
+for (const key of standardTrackKeys) {
+  let percentage = ((result[key] * 100) / total).toFixed(2);
+  rows.unshift(
+    <Tr key={key}>
+      <Td
+        style={{
+          wordWrap: 'break-word',  // Allow word wrapping
+          overflowWrap: 'break-word', // For better wrapping behavior across browsers
+          whiteSpace: 'normal', // Enable text wrapping
+          minWidth: '120px', // Ensures it wraps correctly
+        }}
+        className="break-all"
+      >
+        <Wrap>
+          <WrapItem>
+            <Badge colorScheme="blue">{key}</Badge>
+          </WrapItem>
+        </Wrap>
+      </Td>
+      <Td
+        style={{
+          wordWrap: 'break-word',
+          overflowWrap: 'break-word',
+          minWidth: '100px',
+        }}
+        className={"ml-20 text-blue-400"}
+      >
+        {result[key]}
+      </Td>
+      <Td
+        style={{
+          wordWrap: 'break-word',
+          overflowWrap: 'break-word',
+          minWidth: '150px',
+        }}
+        className={"ml-10 text-blue-400"}
+      >
+        {percentage}%
+      </Td>
+    </Tr>
+  );
+}
+  
+  
 
   const currentYear = new Date().getFullYear();
   const years = Array.from(
@@ -388,7 +436,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
                 </option>
               ))}
             </Select>
-
+  
             <Box>
               <Button
                 colorScheme="blue"
@@ -400,7 +448,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
                   try {
                     // Trigger the CSV conversion and download
                     convertAndDownloadCSV();
-              
+  
                     // Trigger the API call
                     await axios.post("/api/DownloadCounter");
                   } catch (error) {
@@ -413,29 +461,62 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
               </Button>
             </Box>
           </Box>
-
+  
           <TableContainer>
-            <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
-              <Thead>
-                <Tr>
-                  <Th minW="50px">Type - Category</Th>
-                  <Th minW="200px">Numbers</Th>
-                  <Th display={{ base: "none", sm: "table-cell" }} minW="200px">Percentage</Th>
-                </Tr>
-              </Thead>
-              <Tbody>{rows}</Tbody>
-            </Table>
-          </TableContainer>
-          <Box className={"flex justify-center w-full text-center"}>
+  <Table variant="simple" minW="50%" maxW="100%" layout="auto">
+    <Thead>
+      <Tr>
+        <Th
+          style={{
+            wordWrap: 'break-word',
+            minWidth: '120px',
+            paddingLeft: '10px', // Adding padding for spacing
+            paddingRight: '10px', // Adding padding for spacing
+          }}
+        >
+          Type - Category
+        </Th>
+        <Th
+          style={{
+            wordWrap: 'break-word',
+            minWidth: '100px',
+            paddingLeft: '10px', // Padding to ensure separation
+            paddingRight: '10px', // Padding to ensure separation
+          }}
+        >
+          Numbers
+        </Th>
+        <Th
+          style={{
+            wordWrap: 'break-word',
+            minWidth: '150px',
+            paddingLeft: '10px', // Padding to ensure separation
+            paddingRight: '10px', // Padding to ensure separation
+          }}
+        >
+          Percentage
+        </Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {rows}
+    </Tbody>
+  </Table>
+</TableContainer>
+
+  
+          <Box className="flex justify-center w-full text-center">
             <Text
               fontSize="xl"
               fontWeight="bold"
               color="#30A0E0"
               marginRight="6"
+              style={{ wordWrap: 'break-word' }}
             >
               Total: {total}
             </Text>
           </Box>
+  
           <Box className={"w-full"}>
             <DateTime />
           </Box>

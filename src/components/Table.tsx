@@ -116,6 +116,8 @@ interface EIPEntry {
   category: string;
   repo: string;
   statusChanges: string;
+  TypeChanges:string;
+  CategoryChanges:string;
 }
 
 
@@ -195,12 +197,22 @@ const Table: React.FC<TableProps> = ({ type }) => {
         
           // Create a map to store status changes for each eip
           const eipStatusChangesMap: { [eip: string]: string[] } = {};
+          const eipTypeChangesMap: { [eip: string]: string[] } = {};
+          const eipCategoryChangesMap: { [eip: string]: string[] } = {};
         
           data.forEach((entry: any) => {
-            const { eip, fromStatus, toStatus, changedDay, changedMonth, changedYear } = entry;
+            const { eip, type,category,fromStatus, toStatus, changedDay, changedMonth, changedYear } = entry;
+
+            if(eip=='5069'){
+              console.log('entry:', entry);
+            }
         
             // Generate the status change string in the required format
-            const statusChangeString = `${fromStatus} -> ${toStatus}, ${changedDay}-${changedMonth}-${changedYear}`;
+            
+            const statusChangeString = `${fromStatus === "unknown" ? "" : fromStatus + " -> "}${toStatus}, ${changedDay}-${changedMonth}-${changedYear}`;
+
+            const eipType=`${type}`
+            const eipCategory=`${category}`
         
             // If we already have status changes for this eip, add the new change
             if (eipStatusChangesMap[eip]) {
@@ -209,6 +221,28 @@ const Table: React.FC<TableProps> = ({ type }) => {
               // Otherwise, start a new list for this eip
               eipStatusChangesMap[eip] = [statusChangeString];
             }
+
+            if (eipTypeChangesMap[eip]) {
+              const previousType = eipTypeChangesMap[eip][eipTypeChangesMap[eip].length - 1];
+              if(eip=='5069'){
+                console.log("prev:",previousType);
+                console.log("curr:",eipType)
+              }
+              if (previousType !== eipType) {
+                eipTypeChangesMap[eip].push(`->${eipType}`);
+              }
+            } else {
+              eipTypeChangesMap[eip] = [eipType];
+            }
+            
+
+            if(eipCategoryChangesMap[eip]){
+              eipCategoryChangesMap[eip].push(`->${eipCategory}`)
+            }
+            else{
+              eipCategoryChangesMap[eip]= [eipCategory]
+            }
+
           });
         
           // Now, build the final entries with status changes concatenated into one string for each EIP
@@ -217,6 +251,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
             
             // Join the status changes into a single string
             const statusChanges = eipStatusChangesMap[eip]?.join(', ') || '';
+            const TypeChanges = eipTypeChangesMap[eip]?.join(', ') || '';
+            const CategoryChanges = eipCategoryChangesMap[eip]?.join(', ') || '';
         
             allEntries.push({
               eip,
@@ -226,7 +262,9 @@ const Table: React.FC<TableProps> = ({ type }) => {
               type,
               category,
               repo,
-              statusChanges
+              statusChanges,
+              TypeChanges,
+              CategoryChanges
             });
           });
         
@@ -265,7 +303,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
           //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
           // );          
         }
-        console.log(filteredData);
+        // console.log(filteredData);
 
         setData2(filteredData);
         // setData3(filteredData2);
@@ -300,7 +338,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
           //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
           // );          
         }
-        console.log(filteredData);
+        // console.log(filteredData);
 
         // setData2(filteredData);
         setData3(filteredData2);
@@ -368,7 +406,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
-    console.log(DataForFilter);
+    // console.log(DataForFilter);
     
     if (DataForFilter && DataForFilter.length > 0) {
       // Create CSV headers
@@ -376,7 +414,9 @@ const Table: React.FC<TableProps> = ({ type }) => {
         const matchingEntry = data3.find((entry) => entry.eip === item.eip);
         return {
           ...item,
-          statusChanges: matchingEntry ? matchingEntry.statusChanges : '', // Default to empty string if no match
+          statusChanges: matchingEntry ? matchingEntry.statusChanges : '',
+          TypeChanges: matchingEntry ? matchingEntry.TypeChanges : '',
+          CategoryChanges: matchingEntry ? matchingEntry.CategoryChanges : '', 
         };
       });
   

@@ -173,7 +173,7 @@ const TypeGraphs = () => {
           {/*</NextLink>*/}
           <NextLink href={"/meta"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Meta - [{(new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size)+1}]
+              Meta - [{(new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size)}]
             </Text>
           </NextLink>
           <NextLink href={"/informational"}>

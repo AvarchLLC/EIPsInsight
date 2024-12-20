@@ -482,7 +482,7 @@ const Dashboard = () => {
                 <div className="col-span-2">
                   <StatBox
                     title="Meta EIPs"
-                    value={(new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size)+1}
+                    value={(new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size)}
                     description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
                     icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
                     url="meta"

@@ -9,6 +9,7 @@ import {
   Tbody,
   Th,
   Tr,
+  Td,
   Thead,
   TableContainer,
   Text,
@@ -237,7 +238,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
             <Button
           colorScheme="blue"
           variant="outline"
-          fontSize={"14px"}
+          fontSize={{ base: "0.6rem", md: "md" }}
           fontWeight={"bold"}
           padding={"8px 20px"}
           onClick={async () => {
@@ -259,25 +260,26 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
           <br/>
 
           <TableContainer>
-            <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
-              <Thead>
-                <Tr>
-                  <Th minW="50px">Category</Th>
-                  <Th minW="200px">Numbers</Th>
-                  <Th minW="200px">Percentage</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {rows.map((row) => (
-                  <Tr key={`${row.category}-${row.year}`}>
-                    <Th>{`${row.category}`}</Th>
-                    <Th>{row.value}</Th>
-                    <Th>{((row.value / total) * 100).toFixed(2)}%</Th>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+  <Table variant="simple" minW="50%" maxW="100%" layout="fixed">
+    <Thead>
+      <Tr>
+        <Th minW="50px" style={{ wordWrap: 'break-word' }}>Category</Th>
+        <Th minW="200px" style={{ wordWrap: 'break-word' }}>Numbers</Th>
+        <Th minW="200px" style={{ wordWrap: 'break-word' }}>Percentage</Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {rows.map((row) => (
+        <Tr key={`${row.category}-${row.year}`}>
+          <Td style={{ wordWrap: 'break-word' }}>{`${row.category}`}</Td>
+          <Td style={{ wordWrap: 'break-word' }}>{row.value}</Td>
+          <Td style={{ wordWrap: 'break-word' }}>{((row.value / total) * 100).toFixed(2)}%</Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+</TableContainer>
+
           <Box className={"flex justify-center w-full text-center"}>
             <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
               Total: {total}
