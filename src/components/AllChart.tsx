@@ -242,7 +242,7 @@ const csvContent = header
         const deadlineValue = deadline || "";
 
         // Wrap title, author, discussion, and status in double quotes to handle commas
-        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
     }).join("\n");
   
     // Create a Blob with the CSV content
