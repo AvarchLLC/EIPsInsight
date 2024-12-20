@@ -920,21 +920,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     })
   : [];
 
-  //   const trendData = showCategory.open
-  // ? chartdata?.map(item => {
-  //     // Ensure the item is defined and contains the necessary properties
-  //     const monthYear = item.monthYear;
-  //     const openCount = item.type === 'Open' ? item.count : 0; // Assuming 'Open' type for open PRs
-
-  //     // Ensure openCount is calculated correctly
-  //     const adjustedOpenCount = openCount + (activeTab === 'PRs' ? Math.abs(getmin) : Math.abs(closedMax));
-
-  //     return {
-  //       monthYear,
-  //       Open: adjustedOpenCount,
-  //     };
-  //   }) || [] // If chartdata is undefined, return an empty array
-  // : [];
+ 
   
 
 
@@ -1008,14 +994,12 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     },
       ],
       yAxis: [
+        {
+          min: -300, // Set the minimum value for the bar chart y-axis
+          max: 600,  // Set the maximum value for the bar chart y-axis
+      },
           {
-              min: yAxisMin, // Set min for bar chart y-axis
-              max: 0, // Set max based on negative values
-              
-            
-          },
-          {
-              min:  -30, // Start from 0 for the trend line
+              min:  0, 
               max: yAxisMax, // Set max for trend line y-axis
               label: {
                 formatter: () => '', // Completely hide labels

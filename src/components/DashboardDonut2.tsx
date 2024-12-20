@@ -104,7 +104,7 @@ const DashboardDonut2: React.FC<AreaCProps> =({dataset}) => {
       },
       {
         status: "Meta",
-        value: allData.filter((item) => getCat(item.category) === "Meta").length,
+        value: allData.filter((item) => getCat(item.category) === "Meta").length-1,
       },
     
   ];

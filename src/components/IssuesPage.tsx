@@ -197,174 +197,168 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
                             ):(
                                 <>
                                     <Box>
-                                        <FlexBetween>
-                                            <Header title={"Issue"} subtitle={`#${data?.issueDetails?.issueNumber}`}/>
-                                            <SearchBox />
-                                        </FlexBetween>
+                                    <FlexBetween flexDirection={{ base: 'column', md: 'row' }} alignItems="center">
+    <Header title={"Issue"} subtitle={`#${data?.issueDetails?.issueNumber}`} />
+    <Box display={{ base: 'none', md: 'block' }} width="100%" maxWidth="400px">
+        <SearchBox />
+    </Box>
+</FlexBetween>
 
-                                        <Box className={'flex space-x-10 items-center'} paddingTop={8}>
-                                            {/* <NextLink href={`https://github.com/${data?.issueDetails?.commits[0]?.author?.login}`} target={'_blank'}>
-                                                <img
-                                                    src={data?.issueDetails?.commits[0]?.author?.avatar_url}
-                                                    alt={data?.issueDetails?.commits[0]?.author?.login}
-                                                    width={80}
-                                                    height={80}
-                                                    className={'rounded-full hover:scale-110 duration-200'}
-                                                />
-                                            </NextLink> */}
-                                            <Text className={'text-3xl'}>{data?.title}</Text>
-                                            <Box paddingTop={3}>
-                                            <Wrap>
-                                                <WrapItem>
-                                                    {data?.state === 'merged' ? (
-                                                        <Badge variant={'solid'} colorScheme={'purple'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
-                                                            <BiGitMerge /> Merged
-                                                        </Badge>
-                                                    ) : data?.state === 'closed' ? (
-                                                        <Badge variant={'solid'} colorScheme={'red'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
-                                                            <BiLockAlt /> Closed
-                                                        </Badge>
-                                                    ) : data?.state === 'open' ? (
-                                                        <Badge variant={'solid'} colorScheme={'green'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
-                                                            <BiGitBranch /> Open
-                                                        </Badge>
-                                                    ) : null}
-                                                </WrapItem>
-                                            </Wrap>
-                                            </Box>
-                                        </Box>
+<Box display={{ base: 'block', md: 'none' }} width="100%" paddingTop={4}>
+    <SearchBox />
+</Box>
 
-                                        <Box paddingTop={8}>
-                                            <Box
-                                                className={'border border-blue-400 rounded-[0.55rem]'}
-                                                display={'grid'}
-                                                gridTemplateColumns={'1fr 1fr'}
-                                                paddingY={4}
-                                                paddingX={8}
-                                            >
-                                                <Box
-                                                    className={'border-r border-blue-400'}
-                                                >
+<Box
+    className={'flex items-center'}
+    paddingTop={8}
+    flexDirection={{ base: 'column', lg: 'row' }}
+    justifyContent={{ base: 'center', lg: 'flex-start' }}
+    textAlign={{ base: 'center', lg: 'left' }}
+    gap={{ base: 4, lg: 10 }}
+>
+    {/* Title */}
+    <Text className={'text-3xl'}>{data?.title}</Text>
 
-                                                    {
-                                                        data?.issueDetails?.labels.length !== 0 ? (
-                                                            <Box className={'pb-10'}>
-                                                                <Text className={'text-2xl font-bold pb-5'}>Labels: </Text>
-                                                                <div className="flex space-x-3">
-                                                                    {
-                                                                        data?.issueDetails?.labels.map(item => (
-                                                                            <Wrap>
-                                                                                <WrapItem>
-                                                                                    <Badge  colorScheme={getLabelColor(item)} paddingX={4} paddingY={2} className={'rounded-full'}>
-                                                                                        {item}
-                                                                                    </Badge>
-                                                                                </WrapItem>
-                                                                            </Wrap>
-                                                                        ))
-                                                                    }
-                                                                </div>
-                                                            </Box>
-                                                        ):(
-                                                            <>
-                                                            </>
-                                                        )
-                                                    }
+    {/* Tag */}
+    <Box paddingTop={{ base: 4, lg: 0 }}>
+        <Wrap justify={{ base: 'center', lg: 'flex-start' }}>
+            <WrapItem>
+                {data?.state === 'merged' ? (
+                    <Badge variant={'solid'} colorScheme={'purple'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
+                        <BiGitMerge /> Merged
+                    </Badge>
+                ) : data?.state === 'closed' ? (
+                    <Badge variant={'solid'} colorScheme={'red'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
+                        <BiLockAlt /> Closed
+                    </Badge>
+                ) : data?.state === 'open' ? (
+                    <Badge variant={'solid'} colorScheme={'green'} display={'flex'} className={'text-3xl px-4 py-2 rounded-xl space-x-2'}>
+                        <BiGitBranch /> Open
+                    </Badge>
+                ) : null}
+            </WrapItem>
+        </Wrap>
+    </Box>
+</Box>
 
-                                                    <Box>
-                                                        <Text className={'text-2xl font-bold pb-5'}>Participants: </Text>
-                                                        <div className={'flex flex-wrap'}>
-                                                            {
-                                                                data?.issueDetails?.participants.map(participant => {
-                                                                    const matchingConversation = data?.issueDetails?.conversations.find(conversation => conversation.user.login === participant);
+<Box paddingTop={8}>
+    <Box
+        className={'border border-blue-400 rounded-[0.55rem]'}
+        display={'grid'}
+        gridTemplateColumns={{ base: '1fr', md: '1fr 1fr' }}
+        paddingY={4}
+        paddingX={8}
+    >
+        {/* Labels and Participants */}
+        <Box className="border-0 lg:border-r lg:border-blue-400" paddingRight={4}>
+            {data?.issueDetails?.labels.length !== 0 && (
+                <Box className={'pb-10'}>
+                    <Text className={'text-2xl font-bold pb-5'}>Labels: </Text>
+                    <div className="flex flex-wrap gap-2">
+                        {data?.issueDetails?.labels.map(item => (
+                            <Wrap>
+                                <WrapItem>
+                                    <Badge colorScheme={getLabelColor(item)} paddingX={4} paddingY={2} className={'rounded-full'}>
+                                        {item}
+                                    </Badge>
+                                </WrapItem>
+                            </Wrap>
+                        ))}
+                    </div>
+                </Box>
+            )}
 
-                                                                    if (matchingConversation) {
-                                                                        return (
-                                                                            <NextLink key={participant} href={`https://github.com/${matchingConversation.user.login}`} target={'_blank'}>
-                                                                                <img
-                                                                                    src={`${matchingConversation.user.avatar_url}`}
-                                                                                    alt=""
-                                                                                    width={50}
-                                                                                    height={50}
-                                                                                    className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
-                                                                                />
-                                                                            </NextLink>
-                                                                        );
-                                                                    }
+            <Box>
+                <Text className={'text-2xl font-bold pb-5'}>Participants: </Text>
+                <div className={'flex flex-wrap gap-3'}>
+                    {data?.issueDetails?.participants.map(participant => {
+                        const matchingConversation = data?.issueDetails?.conversations.find(conversation => conversation.user.login === participant);
 
-                                                                    return null;
-                                                                })
-                                                            }
-                                                        </div>
-                                                    </Box>
-                                                </Box>
+                        if (matchingConversation) {
+                            return (
+                                <NextLink key={participant} href={`https://github.com/${matchingConversation.user.login}`} target={'_blank'}>
+                                    <img
+                                        src={`${matchingConversation.user.avatar_url}`}
+                                        alt=""
+                                        width={50}
+                                        height={50}
+                                        className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
+                                    />
+                                </NextLink>
+                            );
+                        }
 
-                                                <Box
-                                                    className={'pl-10'}
-                                                >
-                                                    <div className={'flex items-center space-x-10 pb-10'}>
-                                                        <Text className={'text-2xl font-bold'}>Link:</Text>
-                                                        <NextLink href={`${data?.url}`} target={'_blank'}>
-                                                            <Wrap>
-                                                                <Button variant={'outline'} colorScheme={'purple'}>
-                                                                    <Text className={'text-sm'}>Go to Github Issue</Text>
-                                                                </Button>
-                                                            </Wrap>
-                                                        </NextLink>
-                                                    </div>
+                        return null;
+                    })}
+                </div>
+            </Box>
+        </Box>
 
-                                                    <table>
-                                                        <tbody>
-                                                        <tr>
-                                                            <td className={'text-2xl pb-10  pr-16 flex'}>
-                                                                <NextLink href={'https://github.com/eth-bot'} target={'_blank'}>
-                                                                    <img
-                                                                        src={`https://avatars.githubusercontent.com/u/85952233?v=4`}
-                                                                        alt=""
-                                                                        width={50}
-                                                                        height={50}
-                                                                        className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
-                                                                    />
-                                                                </NextLink>
-                                                                <span className="pt-5">ETH-Bot Comments:</span>
-                                                            </td>
-                                                            <td className={'text-xl pb-10 rounded'}>
-                                                                <Wrap>
-                                                                    <WrapItem>
-                                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
-                                                                            {ethBotCount}
-                                                                        </Badge>
-                                                                    </WrapItem>
-                                                                </Wrap>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td className={'text-2xl pr-16 flex'}>
-                                                                <NextLink href={'https://github.com/features/actions'} target={'_blank'}>
-                                                                    <img
-                                                                        src={`https://avatars.githubusercontent.com/in/15368?s=80&v=4`}
-                                                                        alt=""
-                                                                        width={50}
-                                                                        height={50}
-                                                                        className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
-                                                                    />
-                                                                </NextLink>
-                                                                <span className='pt-4'>Github-Actions Bot:</span>
-                                                            </td>
-                                                            <td className={'text-xl'}>
-                                                                <Wrap>
-                                                                    <WrapItem>
-                                                                        <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
-                                                                            {gitActionsBotCount}
-                                                                        </Badge>
-                                                                    </WrapItem>
-                                                                </Wrap>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </Box>
-                                            </Box>
-                                        </Box>
+        {/* Link and Bot Information */}
+        <Box pl={{ base: 0, md: 4 }}>
+        <div className="flex items-center space-x-4 pb-6">
+            <Text className="text-lg md:text-2xl font-bold">Link:</Text>
+             <NextLink href={`${data?.url}`} target="_blank">
+            <Button variant="outline" colorScheme="purple">
+                <Text className="text-sm">Go to Github PR Page</Text>
+            </Button>
+            </NextLink>
+        </div>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td className="text-lg md:text-2xl pb-6 pr-8 flex items-center">
+                            <NextLink href={'https://github.com/eth-bot'} target={'_blank'}>
+                                <img
+                                    src={`https://avatars.githubusercontent.com/u/85952233?v=4`}
+                                    alt=""
+                                    width={50}
+                                    height={50}
+                                    className="rounded-full hover:scale-110 duration-200"
+                                />
+                            </NextLink>
+                            <span className="pt-5">ETH-Bot Comments:</span>
+                        </td>
+                        <td className={'text-xl pb-10 rounded'}>
+                            <Wrap>
+                                <WrapItem>
+                                    <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
+                                        {ethBotCount}
+                                    </Badge>
+                                </WrapItem>
+                            </Wrap>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className={'text-2xl pr-16 flex'}>
+                            <NextLink href={'https://github.com/features/actions'} target={'_blank'}>
+                                <img
+                                    src={`https://avatars.githubusercontent.com/in/15368?s=80&v=4`}
+                                    alt=""
+                                    width={50}
+                                    height={50}
+                                    className={'rounded-full hover:scale-110 duration-200 flex mr-5 my-3'}
+                                />
+                            </NextLink>
+                            <span className="pt-4">Github-Actions Bot:</span>
+                        </td>
+                        <td className={'text-xl'}>
+                            <Wrap>
+                                <WrapItem>
+                                    <Badge colorScheme={'gray'} className={'rounded-full'} fontSize={'2xl'} paddingX={4} paddingY={2}>
+                                        {gitActionsBotCount}
+                                    </Badge>
+                                </WrapItem>
+                            </Wrap>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </Box>
+    </Box>
+</Box>
+
 
                                         <Box>
                                             <Text className="text-3xl font-bold" paddingY={8}>

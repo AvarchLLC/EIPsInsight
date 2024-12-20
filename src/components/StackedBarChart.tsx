@@ -229,27 +229,79 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
   const downloadData = () => {
     // Transform the `typeData` to extract the required details
     const transformedData = filteredData.flatMap((item) => {
-        return item.eips.flatMap((eip) => {
-            return eip.eips.map(({ eip: eipNumber, title, status }) => ({
-                month: eip.month,
-                year: eip.year,
-                category: eip.category,
-                eip: eipNumber,
-                title,
-                status,
+        return item.eips.flatMap((eipGroup) => {
+            return eipGroup.eips.map((eip) => ({
+                month: eipGroup.month, // Assuming eipGroup includes 'month'
+                year: eipGroup.year,  // Assuming eipGroup includes 'year'
+                category: eipGroup.category, // Category from the group
+                eip: eip.eip, // EIP number
+                title: eip.title, // Title of the EIP
+                status: eip.status, // Status of the EIP
+                type: eip.type, // Type of the EIP
+                discussion: eip.discussion, // Discussion link
+                repo: eip.repo, // Repo type (e.g., "eip", "erc", "rip")
+                author: eip.author, // Author of the EIP
+                created: eip.created, // Creation date
+                deadline: eip.deadline || "", // Deadline if exists, else empty
             }));
         });
     });
 
+    if (!transformedData.length) {
+        console.error("No data to transform.");
+        alert("No data available for download.");
+        return;
+    }
+
     // Define the CSV header
-    const header = "Month,Year,Category,EIP,Title,Status\n";
+    const header =
+        "Month,Year,Category,EIP,Title,Author,Status,Type,Created at,Link\n";
 
     // Prepare the CSV content
-    const csvContent = "data:text/csv;charset=utf-8,"
-        + header
-        + transformedData.map(({ month, year, category, eip, title, status }) => {
-            return `${month},${year},${category},${eip},${title},${status}`;
-        }).join("\n");
+    const csvContent =
+        "data:text/csv;charset=utf-8," +
+        header +
+        transformedData
+            .map(
+                ({
+                    month,
+                    year,
+                    category,
+                    repo,
+                    eip,
+                    title,
+                    author,
+                    status,
+                    type,
+                    discussion,
+                    created,
+                    deadline,
+                }) => {
+                    // Generate the correct URL based on the repo type
+                    const url =
+                        repo === "eip"
+                            ? `https://eipsinsight.com/eips/eip-${eip}`
+                            : repo === "erc"
+                            ? `https://eipsinsight.com/ercs/erc-${eip}`
+                            : `https://eipsinsight.com/rips/rip-${eip}`;
+
+                    // Return the CSV line with all fields
+                    return `${month},${year},"${category.replace(
+                        /"/g,
+                        '""'
+                    )}","${eip}","${title.replace(/"/g, '""')}","${author.replace(
+                        /"/g,
+                        '""'
+                    )}","${status.replace(/"/g, '""')}","${type.replace(
+                        /"/g,
+                        '""'
+                    )}","${created.replace(
+                        /"/g,
+                        '""'
+                    )}","${url}"`;
+                }
+            )
+            .join("\n");
 
     // Encode the CSV content for downloading
     const encodedUri = encodeURI(csvContent);
@@ -260,6 +312,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     link.click();
     document.body.removeChild(link);
 };
+
 
 
   return (

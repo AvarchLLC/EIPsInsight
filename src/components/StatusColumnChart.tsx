@@ -192,17 +192,22 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     });
 
     // Define the CSV header
-    const header = "EIP,Last Status,EIP Title,EIP Category,Year\n";
+    const header = "EIP,Last Status,EIP Title,EIP Category,Year,Link\n";
 
     // Prepare the CSV content
     const csvContent =
         "data:text/csv;charset=utf-8," +
         header +
         transformedData
-            .map(({ eip, lastStatus, eipTitle, eipCategory, year }) => {
-                return `${eip},${lastStatus},${eipTitle},${eipCategory},${year}`;
-            })
-            .join("\n");
+        .map(({ eip, lastStatus, eipTitle, eipCategory, year }) => {
+            return `${eip},${lastStatus},${eipTitle},${eipCategory},${year},${
+              eipCategory === "ERC"
+                    ? `https://eipsinsight.com/ercs/erc-${eip}`
+                    : type === "EIPs"
+                    ? `https://eipsinsight.com/eips/eip-${eip}`
+                    : `https://eipsinsight.com/rips/rip-${eip}`
+            }`;
+        }).join("\n");
 
     // Check the generated CSV content before download
     console.log("CSV Content:", csvContent);

@@ -326,32 +326,67 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     // Filter data based on the selected status
     const filteredData = typeData.filter((item) => item.status === selectedStatus);
 
+    if (!filteredData.length) {
+        console.error("No data available for the selected status.");
+        alert("No data available for download.");
+        return;
+    }
+
     // Transform the filtered data to get the necessary details
     const transformedData = filteredData.flatMap((item) => {
-        return item.eips.flatMap((eip) => {
-            const category = getCat(eip.category); // Assuming this function returns a string
-            const year = eip.year.toString(); // Convert year to string
-            const uniqueEips = removeDuplicatesFromEips(eip.eips); // Assuming this returns an array of EIPs
-            return uniqueEips.map(({ eip }) => ({
+        return item.eips.flatMap((eipGroup) => {
+            const category = getCat(eipGroup.category); // Assuming this function returns a string
+            const year = eipGroup.year.toString(); // Convert year to string
+            const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Assuming this returns an array of EIPs
+
+            return uniqueEips.map((eip) => ({
                 category,
                 year,
-                eip, // Individual EIP
+                eip: eip.eip, // EIP number
+                author: eip.author, // Author of the EIP
+                repo: eip.repo, // Repo type (e.g., "eip", "erc", "rip")
+                discussion: eip.discussion, // Discussion link
+                status: eip.status, // Status of the EIP
+                created: eip.created, // Creation date
+                deadline: eip.deadline || "", // Deadline if exists, else empty
+                type: eip.type, // Type of the EIP
+                title: eip.title, // Title of the EIP
             }));
         });
     });
 
+    if (!transformedData.length) {
+        console.error("Transformed data is empty.");
+        alert("No transformed data available for download.");
+        return;
+    }
+
     // Define the CSV header
-    const header = "Category,Year,EIPs\n";
+    const header = "Repo, EIP, Title, Author, Status, Type, Category, Discussion, Created at, Deadline, Link\n";
 
     // Prepare the CSV content
-    const csvContent = "data:text/csv;charset=utf-8,"
-        + header
-        + transformedData.map(({ category, year, eip }) => {
-            return `${category},${year},${eip}`; // Each EIP on a separate line
-        }).join("\n");
+    const csvContent =
+        "data:text/csv;charset=utf-8," + 
+        header +
+        transformedData
+            .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+                // Generate the correct URL based on the repo type
+                const url =
+                    category === "ERC"
+                        ? `https://eipsinsight.com/ercs/erc-${eip}`
+                        : `https://eipsinsight.com/eips/eip-${eip}`;
+                        
+
+                // Handle the 'deadline' field, use empty string if not available
+                const deadlineValue = deadline || "";
+
+                // Wrap fields in double quotes to handle commas
+                return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
+            })
+            .join("\n");
 
     // Check the generated CSV content before download
-    console.log("CSV Content:", csvContent);
+    console.log("CSV Content Preview:", csvContent);
 
     // Encode the CSV content for downloading
     const encodedUri = encodeURI(csvContent);
@@ -362,6 +397,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     link.click();
     document.body.removeChild(link);
 };
+
 
 const headingColor = useColorModeValue('black', 'white');
 

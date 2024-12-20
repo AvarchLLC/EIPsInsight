@@ -83,10 +83,10 @@ const MyComponent = () => {
         padding="1rem"
         bgColor={bg}
         borderRadius="0.55rem"
-        _hover={{
-          border: "1px",
-          borderColor: "#30A0E0",
-        }}
+        // _hover={{
+        //   border: "1px",
+        //   borderColor: "#30A0E0",
+        // }}
         overflowX="auto" // Enable horizontal scrolling if content overflows
       >
         <InsightsOpenPrsIssues />

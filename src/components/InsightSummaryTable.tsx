@@ -493,7 +493,7 @@ export default function InsightSummary() {
   {/* Download button next to the text */}
   <CSVLink 
     data={csvData.length ? csvData : []} 
-    filename={`OpenPRSAndIssues-${year}-${month}.csv`} 
+    filename={`StatusChanges-${year}-${month}.csv`} 
     onClick={async (e: any) => {
       try {
         // Generate the CSV data

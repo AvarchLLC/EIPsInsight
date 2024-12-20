@@ -115,16 +115,16 @@ const All = () => {
     filteredData = data
         .filter((item) => (selected==="All"||item.category === selected))
         .map((item) => {
-            const { eip, title, author, repo } = item;
-            return { eip, title, author, repo };
+            const { repo, eip, title, author, discussion, status, type, category,created } = item;
+            return { repo, eip, title, author, discussion, status, type, category,created };
         });
       }
     else{
     filteredData=data
     .filter((item) => item.repo === 'rip')
         .map((item) => {
-            const { eip, title, author, repo } = item;
-            return { eip, title, author, repo };
+            const { repo, eip, title, author, discussion, status, type, category,created } = item;
+            return { repo, eip, title, author, discussion, status, type, category,created };
         });
     }
 
@@ -135,15 +135,23 @@ const All = () => {
     }
 
     // Define the CSV header
-    const header = "EIP,Title,Author,Repo\n";
+    const header = "Repo, EIP, Title, Author,Status, Type, Category, Discussion, Created at, Link\n";
 
     // Prepare the CSV content
     const csvContent = "data:text/csv;charset=utf-8,"
-        + header
-        + filteredData.map(({ eip, title, author, repo }) => {
-            // Wrap title and author in double quotes to handle commas
-            return `${eip},"${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${repo}"`;
-        }).join("\n");
+    + header
+    + filteredData.map(({ repo, eip, title, author, discussion, status, type, category, created }) => {
+        // Generate the correct URL based on the repo type
+        const url = repo === "eip"
+            ? `https://eipsinsight.com/eips/eip-${eip}`
+            : repo === "erc"
+            ? `https://eipsinsight.com/ercs/erc-${eip}`
+            : `https://eipsinsight.com/rips/rip-${eip}`;
+
+        // Wrap title and author in double quotes to handle commas
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${url}"`;
+    }).join("\n");
+
   
     // Check the generated CSV content before download
     console.log("CSV Content:", csvContent);
@@ -196,7 +204,11 @@ const All = () => {
               </Box>
 
               {/* For smaller screens, render a dropdown */}
-              <Box display={{ base: "block", md: "none" }}>
+              <Box display={{ base: "block", md: "none" }}
+              className="w-full max-w-md" 
+              mx="auto" // Horizontal centering
+              textAlign="center" 
+              >
                 <select
                   value={selected}
                   onChange={(e) => setSelected(e.target.value)}
@@ -216,14 +228,19 @@ const All = () => {
               </Box>
             </Box>
 
-              <Box display={{ base: "none", md: "block" }} className="w-full max-w-md">
+              <Box display={{ base: "none", lg: "block" }} className="w-full max-w-md">
                 <SearchBox />
               </Box>
             </div>
           </Box>
-          <Box display={{ base: "block", md: "none" }} className="w-full max-w-md">
-                <SearchBox />
-            </Box>
+          <Box 
+          display={{ base: "block", md: "block", lg: "none" }} 
+          className="w-full max-w-md" 
+          mx="auto" // Horizontal centering
+          textAlign="center" // Ensures content inside the box is centered
+        >
+          <SearchBox />
+        </Box>
 
           <>
       {loading ? (
