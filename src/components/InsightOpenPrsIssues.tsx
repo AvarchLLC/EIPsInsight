@@ -855,51 +855,79 @@ return <Line {...config} />;
       return;
     }
   
-    const key = `${selectedYear}-${selectedMonth}`; // Format key as "YYYY-MM"
-  
-    // Extract data for the specified year and month
-    const combinedPRs = [
-      ...(data.PRs[key]?.open || []),
-      ...(data2.PRs[key]?.open || []),
-      ...(data3.PRs[key]?.open || []),
-    ];
-  
-    const combinedIssues = [
-      ...(data.Issues[key]?.open || []),
-      ...(data2.Issues[key]?.open || []),
-      ...(data3.Issues[key]?.open || []),
-    ];
-  
-    // Combine PR and Issue data
-    const allData = [...combinedPRs, ...combinedIssues];
-  
-    // Format data into CSV-friendly structure
-    const csv = allData.map((item) => {
-      // Check if item is a PR
-      if ('prNumber' in item) {
-        return {
-          Number: item.prNumber,
-          Title: item.prTitle,
-          State: item.merged_at ? 'Merged' : item.closed_at ? 'Closed' : 'Open',
-          Created_Date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
-          Closed_Date: item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
-          Merged_Date: item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-',
-          // Review_Date: item.reviewDate ? new Date(item.reviewDate).toLocaleDateString() : '-',
-          Link: `https://github.com/ethereum/${item.repo}/pull/${item.prNumber}`,
-        };
-      } else {
-        return {
-          Number: item.IssueNumber,
-          Title: item.IssueTitle,
-          State: item.state,
-          Created_Date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
-          Closed_Date: item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
-          Merged_Date: '-',
-          // Review_Date: '-',
-          Link: `https://github.com/ethereum/${item.repo}/issues/${item.IssueNumber}`,
-        };
-      }
-    });
+   // Convert selectedMonth to a number for comparison
+const selectedMonthNumber = parseInt(selectedMonth, 10);
+
+// Generate keys for all months from 01 to selectedMonth
+const keys = Array.from({ length: selectedMonthNumber }, (_, i) =>
+  `${selectedYear}-${String(i + 1).padStart(2, '0')}` // Format as "YYYY-MM"
+);
+
+// Initialize arrays to accumulate combined data
+const combinedPRs: any[] = [];
+const combinedIssues: any[] = [];
+
+// Iterate through the generated month keys and accumulate data
+keys.forEach((key) => {
+  // Add the key as a field for each PR and Issue
+  const prData = [
+    ...(data.PRs[key]?.open || []),
+    ...(data2.PRs[key]?.open || []),
+    ...(data3.PRs[key]?.open || [])
+  ].map((item) => ({ ...item, key }));
+
+  const issueData = [
+    ...(data.Issues[key]?.open || []),
+    ...(data2.Issues[key]?.open || []),
+    ...(data3.Issues[key]?.open || [])
+  ].map((item) => ({ ...item, key }));
+
+  combinedPRs.push(...prData);
+  combinedIssues.push(...issueData);
+});
+
+// Combine PR and Issue data
+const allData = [...combinedPRs, ...combinedIssues];
+
+// Format data into CSV-friendly structure
+const csv = allData.map((item) => {
+  if ('prNumber' in item) {
+    const createdDate = item.created_at ? new Date(item.created_at) : null;
+    const createdMonth = createdDate ? createdDate.toLocaleString('default', { month: 'long' }) : '-';
+    const createdYear = createdDate ? createdDate.getFullYear() : '-';
+
+    return {
+      Key: item.key, // Add the month-year key
+      Number: item.prNumber,
+      Title: item.prTitle,
+      State: item.merged_at ? 'Merged' : item.closed_at ? 'Closed' : 'Open',
+      Created_Date: createdDate ? createdDate.toLocaleDateString() : '-',
+      // Created_Month: createdMonth,
+      // Created_Year: createdYear,
+      Closed_Date: item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+      Merged_Date: item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-',
+      Link: `https://github.com/ethereum/${item.repo}/pull/${item.prNumber}`,
+    };
+  } else {
+    const createdDate = item.created_at ? new Date(item.created_at) : null;
+    const createdMonth = createdDate ? createdDate.toLocaleString('default', { month: 'long' }) : '-';
+    const createdYear = createdDate ? createdDate.getFullYear() : '-';
+
+    return {
+      Key: item.key, // Add the month-year key
+      Number: item.IssueNumber,
+      Title: item.IssueTitle,
+      State: item.state,
+      Created_Date: createdDate ? createdDate.toLocaleDateString() : '-',
+      // Created_Month: createdMonth,
+      // Created_Year: createdYear,
+      Closed_Date: item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+      Merged_Date: '-',
+      Link: `https://github.com/ethereum/${item.repo}/issues/${item.IssueNumber}`,
+    };
+  }
+});
+
   
     console.log("csv data:", csv);
   

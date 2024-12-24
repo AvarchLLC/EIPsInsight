@@ -46,7 +46,19 @@ const All = () => {
   const [data3, setData3] = useState<EIP[]>([]);
   const [loading, setLoading] = useState(false); 
   
-  
+  useEffect(() => {
+    // Check if a hash exists in the URL
+    const hash = window.location.hash.slice(1); // Remove the '#' character
+    if (hash && optionArr.includes(hash)) {
+      setSelected(hash);
+    }
+  }, []); // Empty dependency array to run only on component mount
+
+  const handleSelection = (item:any) => {
+    setSelected(item);
+    window.location.hash = item; // Update the hash in the URL
+  };
+
   const optionArr = [
     "All",
     "Meta",
@@ -190,9 +202,7 @@ const All = () => {
               <Box display={{ base: "none", md: "flex" }} className="space-x-6">
                 {optionArr.map((item, key) => (
                   <button
-                    onClick={() => {
-                      setSelected(item);
-                    }}
+                     onClick={() => handleSelection(item)}
                     className={
                       selected === item ? "underline underline-offset-4" : ""
                     }
