@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
-import { 
-  Box, 
-  Grid, 
-  useColorModeValue, 
-  Text, 
-  Heading, 
+import {
+  Box,
+  Grid,
+  useColorModeValue,
+  Text,
+  Heading,
   useDisclosure,
   IconButton,
   Flex,
@@ -20,15 +20,17 @@ import LoaderComponent from "@/components/Loader";
 import StackedColumnChart from "@/components/DraftBarChart";
 import NextLink from "next/link";
 
-import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 
 import InsightsAllStats from "@/components/InsitghtAllstats";
+
+import { useRouter } from "next/router";
 
 interface StatusChange {
   _id: string;
   count: number;
   statusChanges: {
-    [key: string]: any; // Add index signature here
+    [key: string]: any;
     _id: string;
     eip: string;
     fromStatus: string;
@@ -60,12 +62,6 @@ interface APIData {
   rip: StatusChange[];
 }
 
-interface MappedDataItem {
-  category: string;
-  date: string;
-  value: number;
-}
-
 interface EIP {
   status: string;
   eips: {
@@ -75,15 +71,14 @@ interface EIP {
     date: string;
     count: number;
     category: string;
-    eips:any[];
+    eips: any[];
   }[];
 }
 
 function getMonthName(monthNumber: number): string {
   const date = new Date();
-  date.setMonth(monthNumber - 1); // Subtract 1 since months are zero-mdd in JavaScript
-  const monthName = date.toLocaleString("default", { month: "long" });
-  return monthName;
+  date.setMonth(monthNumber - 1);
+  return date.toLocaleString("default", { month: "long" });
 }
 
 const Month = () => {
@@ -107,11 +102,9 @@ const Month = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulating a loading delay
     const timeout = setTimeout(() => {
       setIsLoading(false);
     }, 2000);
-    // Cleanup function
     return () => clearTimeout(timeout);
   }, []);
 
@@ -120,7 +113,6 @@ const Month = () => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        console.log("rip data:",jsonData.rip);
         setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         setIsLoading(false);
       } catch (error) {
@@ -144,6 +136,30 @@ const Month = () => {
   const prevMonth = Number(month) - 1;
   const prevMonthName = getMonthName(prevMonth);
 
+  const router = useRouter();
+
+  const scrollToHash = () => {
+    const hash = window.location.hash;
+    if (hash) {
+      const element = document.getElementById(hash.slice(1));
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      scrollToHash();
+    }
+  }, [isLoading]);
+
+  useLayoutEffect(() => {
+    router.events.on("routeChangeComplete", scrollToHash);
+    return () => {
+      router.events.off("routeChangeComplete", scrollToHash);
+    };
+  }, [router]);
   return (
     <AllLayout>
       {isLoading ? ( // Check if the data is still loading
@@ -244,89 +260,54 @@ const Month = () => {
               {/* Defining the stats table here */}
               {/* <InsightStats/> */}
 
-              <Text
-                fontSize="3xl"
-                fontWeight="bold"
-                color="blue.400"
-                paddingTop={8}
-              >
-                Draft
-              </Text>
+              <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
+        Draft
+      </Text>
+      <Box paddingTop={"8"} id="Draft">
+        <StackedColumnChart dataset={filteredData1} status="Draft" />
+      </Box>
 
-              <Box paddingTop={"8"}>
-                <StackedColumnChart dataset={filteredData1} status="Draft" />
-              </Box>
-              <Text
-                fontSize="3xl"
-                fontWeight="bold"
-                color="blue.400"
-                paddingTop={8}
-              >
-                Review
-              </Text>
-              <Box paddingY={"8"}>
-                <StackedColumnChart dataset={filteredData2} status="Review"/>
-              </Box>
+      <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
+        Review
+      </Text>
+      <Box paddingY={"8"} id="Review">
+        <StackedColumnChart dataset={filteredData2} status="Review" />
+      </Box>
 
-              <Text
-                fontSize="3xl"
-                fontWeight="bold"
-                color="blue.400"
-                paddingTop={8}
-              >
-                Last Call
-              </Text>
-              <Box paddingY={"8"}>
-                <StackedColumnChart dataset={filteredData3} status="Last Call"/>
-              </Box>
+      <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
+        Last Call
+      </Text>
+      <Box paddingY={"8"} id="LastCall">
+        <StackedColumnChart dataset={filteredData3} status="Last Call" />
+      </Box>
 
-              <Text
-                fontSize="3xl"
-                fontWeight="bold"
-                color="blue.400"
-                paddingTop={8}
-              >
-                Living
-              </Text>
-              <Box paddingY={"8"}>
-                <StackedColumnChart dataset={filteredData4} status="Living"/>
-              </Box>
+      <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
+        Living
+      </Text>
+      <Box paddingY={"8"} id="Living">
+        <StackedColumnChart dataset={filteredData4} status="Living" />
+      </Box>
 
-              <Text
-                fontSize="3xl"
-                fontWeight="bold"
-                color="blue.400"
-                paddingTop={8}
-              >
-                Final
-              </Text>
-              <Box paddingY={"8"}>
-                <StackedColumnChart dataset={filteredData5} status="Final"/>
-              </Box>
+      <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
+        Final
+      </Text>
+      <Box paddingY={"8"} id="Final">
+        <StackedColumnChart dataset={filteredData5} status="Final" />
+      </Box>
 
-              <Text
-                fontSize="3xl"
-                fontWeight="bold"
-                color="blue.400"
-                paddingTop={8}
-              >
-                Stagnant
-              </Text>
-              <Box paddingY={"8"}>
-                <StackedColumnChart dataset={filteredData6} status="Stagnant"/>
-              </Box>
+      <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
+        Stagnant
+      </Text>
+      <Box paddingY={"8"} id="Stagnant">
+        <StackedColumnChart dataset={filteredData6} status="Stagnant" />
+      </Box>
 
-              <Text
-                fontSize="3xl"
-                fontWeight="bold"
-                color="blue.400"
-                paddingTop={8}
-              >
-                Withdrawn
-              </Text>
-              <Box paddingY={"8"}>
-                <StackedColumnChart dataset={filteredData7} status="Withdrawn"/>
-              </Box>
+      <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
+        Withdrawn
+      </Text>
+      <Box paddingY={"8"} id="Withdrawn">
+        <StackedColumnChart dataset={filteredData7} status="Withdrawn" />
+      </Box>
             </Box>
            
           </motion.div>

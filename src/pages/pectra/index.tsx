@@ -462,7 +462,7 @@ const All = () => {
       </Text>
   </NLink>{" "}
   on the mainnet. Given the complexities 
-  of testing and the scope of changes, including over 11{" "}
+  of testing and the scope of changes, including 11{" "}
   <NLink href={`https://www.youtube.com/watch?v=AyidVR6X6J8`}>
       <Text as={"span"} color="blue.500" textDecor={"underline"}>
         Ethereum Improvement Proposals (EIPs)
@@ -475,7 +475,13 @@ const All = () => {
         Fusaka
       </Text>
   </NLink>(a combination of Fulu and Osaka) upgrade. 
-  Currently, the testing team is working on Pectra Devnet 5 and has finalized the specifications for Devnet 4. Specs 
+  Currently, the testing team is working on Pectra {" "}
+  <NLink href={`https://notes.ethereum.org/@ethpandaops/pectra-devnet-5`}>
+      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+  Devnet 5
+      </Text>
+  </NLink>
+   {" "}and has finalized the specifications for Devnet 4. Specs 
   and other details can be followed below.{" "}
   <NLink href={`#carousel-section`}>
       <Text as={"span"} color="blue.500" textDecor={"underline"}>
@@ -511,7 +517,7 @@ const All = () => {
       Devnets & Testnets
     </Text>
 
-    <TableContainer style={{ maxHeight: "300px", overflowY: "auto" }}>
+    <TableContainer style={{ maxHeight: "400px", overflowY: "auto" }}>
   <Table
     variant="striped"
     colorScheme="gray"

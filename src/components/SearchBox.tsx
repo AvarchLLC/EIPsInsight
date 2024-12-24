@@ -201,12 +201,22 @@ const SearchBox: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const queryStr = query.trim();
+    var queryStr = query.trim();
+    let queryStr2 = ''; // To store the non-numeric part at the beginning
+
+    // Regular expression to split the query into numeric and non-numeric parts
+    const match = queryStr.match(/^(\D+)?(\d+)?/);
+
+    if (match) {
+      queryStr2 = match[1]?.trim() || ''; // Non-numeric prefix
+      queryStr = match[2]?.trim() || '';  // Numeric part
+    }
+
+    console.log('Query Numeric Part:', queryStr);
+    console.log('Query Non-Numeric Part:', queryStr2);
 
 
-    console.log(queryStr);
-
-    if (queryStr) {
+    if (queryStr ||queryStr2) {
       // Deduplicate using a Set to track unique (prNumber, repo) combinations
       const seenPRs = new Set<string>();
 
@@ -284,15 +294,20 @@ const SearchBox: React.FC = () => {
       });
 
       // Filter EIP results for partial matches (those that start with the query)
-      const partialEIPMatches = eipData
-        .filter((item) => item.eip.startsWith(queryStr))
-        .filter((item) => item.eip !== queryStr) // Exclude exact matches
-        .filter((item) => {
-          const key = `${item.eip}-${item.repo}`;
-          if (seenEIPs.has(key)) return false; // Skip if already seen
-          seenEIPs.add(key); // Mark as seen
-          return true;
-        });
+      const partialEIPMatches = queryStr 
+  ? eipData
+      .filter((item) => item.eip.startsWith(queryStr)) // Match the partial query
+      .filter((item) => item.eip !== queryStr) // Exclude exact matches
+      .filter((item) => {
+        const key = `${item.eip}-${item.repo}`;
+        if (seenEIPs.has(key)) return false; // Skip if already seen
+        seenEIPs.add(key); // Mark as seen
+        return true;
+      })
+  : eipData; // If queryStr is empty, return the full data
+
+// Continue with the rest of your logic as before
+
 
       // Combine exact EIP matches and partial matches, sorting by length
       const newFilteredEIPResults = [
@@ -305,9 +320,30 @@ const SearchBox: React.FC = () => {
       ];
 
       // Update the state with the filtered and sorted results
-      setFilteredResults(newFilteredResults);
-      setFilteredEIPResults(newFilteredEIPResults);
-      setFilteredIssueResults(newFilteredIssueResults);
+      // Update the state with the filtered and sorted results
+// if (["p", "pr", ""].includes(queryStr2.toLowerCase())) {
+  setFilteredResults(newFilteredResults);
+// }
+
+// if (["i", "is", "iss", "issu", "issue", ""].includes(queryStr2.toLowerCase())) {
+  setFilteredIssueResults(newFilteredIssueResults);
+// }
+console.log("final data:",newFilteredEIPResults)
+
+if (queryStr2.toLowerCase() === "e") {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => ["eip", "erc"].includes(item.repo)));
+} else if (["r", "ri", "rip", "rip n", "rip nu", "rip num", "rip numb", "rip number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "rip"));
+} else if (["e", "ei", "eip", "eip n", "eip nu", "eip num", "eip numb", "eip number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "eip"));
+} else if (["er", "erc", "erc n", "erc nu", "erc num", "erc numb", "erc number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "erc"));
+} else {
+  setFilteredEIPResults(newFilteredEIPResults);
+}
+
+      
+      
     } else {
       // If query is empty, clear the results
       setFilteredResults([]);
