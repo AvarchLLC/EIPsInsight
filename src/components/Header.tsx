@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
         </Text>
         {title === "DASHBOARD" && (
           <CopyLink
-            link="http://localhost:3000/home#Dashboard"
+            link="https://eipsinsight.com//home#Dashboard"
             style={{ marginLeft: "10px", marginBottom: "3px" }} // Add margin for better spacing
           />
         )}

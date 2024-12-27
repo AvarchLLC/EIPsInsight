@@ -265,49 +265,49 @@ const Month = () => {
               {/* <InsightStats/> */}
 
               <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Draft <CopyLink link={`http://localhost:3000/insight/${year}/${month}#Draft`} />
+        Draft <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Draft`} />
       </Text>
       <Box paddingTop={"8"} id="Draft">
         <StackedColumnChart dataset={filteredData1} status="Draft" />
       </Box>
 
       <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Review <CopyLink link={`http://localhost:3000/insight/${year}/${month}#Review`} />
+        Review <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Review`} />
       </Text>
       <Box paddingY={"8"} id="Review">
         <StackedColumnChart dataset={filteredData2} status="Review" />
       </Box>
 
       <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Last Call <CopyLink link={`http://localhost:3000/insight/${year}/${month}#LastCall`} />
+        Last Call <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#LastCall`} />
       </Text>
       <Box paddingY={"8"} id="LastCall">
         <StackedColumnChart dataset={filteredData3} status="Last Call" />
       </Box>
 
       <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Living <CopyLink link={`http://localhost:3000/insight/${year}/${month}#Living`} />
+        Living <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Living`} />
       </Text>
       <Box paddingY={"8"} id="Living">
         <StackedColumnChart dataset={filteredData4} status="Living" />
       </Box>
 
       <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Final <CopyLink link={`http://localhost:3000/insight/${year}/${month}#Final`} />
+        Final <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Final`} />
       </Text>
       <Box paddingY={"8"} id="Final">
         <StackedColumnChart dataset={filteredData5} status="Final" />
       </Box>
 
       <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Stagnant <CopyLink link={`http://localhost:3000/insight/${year}/${month}#Stagnant`} />
+        Stagnant <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Stagnant`} />
       </Text>
       <Box paddingY={"8"} id="Stagnant">
         <StackedColumnChart dataset={filteredData6} status="Stagnant" />
       </Box>
 
       <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Withdrawn <CopyLink link={`http://localhost:3000/insight/${year}/${month}#Withdrawn`} />
+        Withdrawn <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Withdrawn`} />
       </Text>
       <Box paddingY={"8"} id="Withdrawn">
         <StackedColumnChart dataset={filteredData7} status="Withdrawn" />

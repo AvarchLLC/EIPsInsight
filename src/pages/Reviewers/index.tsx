@@ -600,7 +600,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
       <Box width={{ base: "100%", md: "45%" }} padding="1rem">
         <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
-            {`Editors Leaderboard`}<CopyLink link={`http://localhost:3000/Reviewers#Leaderboard`} />
+            {`Editors Leaderboard`}<CopyLink link={`https://eipsinsight.com//Reviewers#Leaderboard`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <CSVLink 
@@ -988,7 +988,7 @@ const reviewerCharts = reviewers.map((reviewer) => {
     >
       {reviewer}
     </a>
-    {/* <CopyLink link={`http://localhost:3000/Reviewers#${reviewer}`}/> */}
+    {/* <CopyLink link={`https://eipsinsight.com//Reviewers#${reviewer}`}/> */}
   </Flex>
 
   {/* CSV Download Button */}
@@ -1849,7 +1849,7 @@ const router = useRouter();
   <Box id="Monthly" className={"w-full"}>
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
       <Heading size="md" color="black">
-        {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`http://localhost:3000/Reviewers#Monthly`} />
+        {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com//Reviewers#Monthly`} />
       </Heading>
       <Flex alignItems="center">
         <CSVLink
@@ -2383,7 +2383,7 @@ const router = useRouter();
               marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors Timeline Scatterplot <CopyLink link={`http://localhost:3000/Reviewers#ActivityTimeline`} />
+            > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com//Reviewers#ActivityTimeline`} />
             </Heading> 
               <Flex alignItems="center">
                 <Button
@@ -2546,7 +2546,7 @@ const router = useRouter();
               marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors PR reviews in each Repository <CopyLink link={`http://localhost:3000/Reviewers#Speciality`} />
+            > Active Editors PR reviews in each Repository <CopyLink link={`https://eipsinsight.com//Reviewers#Speciality`} />
             </Heading>
               {editorsSpecialityChart()}
             </Box>

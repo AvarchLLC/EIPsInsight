@@ -207,7 +207,7 @@ const NetworkUpgradesChart = React.memo(() => {
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
          <Heading size="md" color={headingColor}>
-            {`Network Upgrades`} <CopyLink link={`http://localhost:3000/pectra#NetworkUpgrades`} />
+            {`Network Upgrades`} <CopyLink link={`https://eipsinsight.com//pectra#NetworkUpgrades`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <Button colorScheme="blue" 

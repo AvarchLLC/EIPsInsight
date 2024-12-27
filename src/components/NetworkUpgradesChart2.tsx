@@ -162,7 +162,7 @@ const AuthorContributionsChart = React.memo(() => {
   return (
     <Box bg={bg} p={5} borderRadius="lg">
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
-        <Heading size="md">Author Contributions  <CopyLink link={`http://localhost:3000/pectra#AuthorContributions`} /></Heading>
+        <Heading size="md">Author Contributions  <CopyLink link={`https://eipsinsight.com//pectra#AuthorContributions`} /></Heading>
         <Button 
         fontSize={{ base: "0.6rem", md: "md" }}
         onClick={async () => {
