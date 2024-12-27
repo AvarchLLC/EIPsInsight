@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import dynamic from "next/dynamic";
 import { Box, Flex, Spinner, Select,Heading, IconButton, Collapse, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
@@ -14,6 +14,9 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { LineConfig } from '@ant-design/plots';
 import axios from "axios";
 import dayjs from "dayjs";
+import CopyLink from "@/components/CopyLink";
+import { useRouter } from "next/router";
+import { DownloadIcon } from "@chakra-ui/icons";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -265,8 +268,8 @@ const ReviewTracker = () => {
 
 const generateCSVData5 = () => {
 
-  console.log("selected start:",selectedStartYear);
-  console.log("selected start month:",selectedStartMonth);
+  // console.log("selected start:",selectedStartYear);
+  // console.log("selected start month:",selectedStartMonth);
   const currentYear = new Date().getFullYear();
     const currentMonth = String(new Date().getMonth() + 1).padStart(2, "0");
   const startYear = selectedStartYear || "2015";
@@ -281,14 +284,14 @@ const generateCSVData5 = () => {
       `${endYear}-${endMonth}-01T00:00:00Z`
     );
 
-    console.log("start date:", startDate);
-    console.log("end date:",endDate);
+    // console.log("start date:", startDate);
+    // console.log("end date:",endDate);
 
     // Adjust end date to include the entire month
     endDate.setMonth(endDate.getMonth() + 1);
     endDate.setDate(0); // Last day of the month
 
-    console.log("download data 5:", downloaddata)
+    // console.log("download data 5:", downloaddata)
 
     const filteredData = downloaddata.filter((pr) => {
       const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
@@ -300,7 +303,7 @@ const generateCSVData5 = () => {
         reviewDate <= endDate
       );
     });
-    console.log("Filtered Data 5:", filteredData);
+    // console.log("Filtered Data 5:", filteredData);
 
     const csv = filteredData.map((pr: PR) => ({
       PR_Number: pr.prNumber,
@@ -417,6 +420,7 @@ const generateCSVData3 = (reviewer: string) => {
   
   
   
+  
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -434,17 +438,21 @@ const generateCSVData3 = (reviewer: string) => {
       // const reviewers = Array.from(new Set(formattedData.map(review => review.reviewer)));
 
       // console.log("reviewers:",reviewers);
-      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu",];
-
+      const githubHandles = await fetchReviewers();
+      // console.log("active:",activereviewers);
       
       // // Create the initial state for showing reviewers (set all to true by default)
       const initialShowReviewer = githubHandles.reduce(
         (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
         {}
       );
-      // console.log(initialShowReviewer)
+      console.log("initial reviewers:",initialShowReviewer)
   
       setShowReviewer(initialShowReviewer);
+      
+      // const activereviewers = await fetchReviewers();
+      // console.log("active:",activereviewers);
+
      
       setchart1Data(formattedData);
     } catch (error) {
@@ -592,7 +600,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
       <Box width={{ base: "100%", md: "45%" }} padding="1rem">
         <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
-            {`Editors Leaderboard`}
+            {`Editors Leaderboard`}<CopyLink link={`http://localhost:3000/Reviewers#Leaderboard`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <CSVLink 
@@ -942,6 +950,7 @@ const reviewerCharts = reviewers.map((reviewer) => {
 
     return (
       <Box
+      id={reviewer}
   key={reviewer}
   bgColor={bg}
   padding="2rem"
@@ -979,6 +988,7 @@ const reviewerCharts = reviewers.map((reviewer) => {
     >
       {reviewer}
     </a>
+    {/* <CopyLink link={`http://localhost:3000/Reviewers#${reviewer}`}/> */}
   </Flex>
 
   {/* CSV Download Button */}
@@ -1136,7 +1146,7 @@ const reviewerCharts = reviewers.map((reviewer) => {
         // console.log("filtered data:",filteredData);
 
     return (
-        <Box mt={8} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
+        <Box mt={2} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
             <Table >
                 <Thead p="8px" bg="black">
                     
@@ -1339,7 +1349,7 @@ const fetchData4 = async () => {
       return filtered;
     }, {});
 
-    console.log('Filtered scatterplot data:', filteredData);
+    // console.log('Filtered scatterplot data:', filteredData);
     setActiveData(filteredData); // Update state with filtered data
   } catch (err) {
     console.error(err);
@@ -1380,7 +1390,7 @@ const fetchDataspeciality = async () => {
     const formattedData1: { monthYear: string; reviewer: string; count: number }[] = await response1.json();
     const formattedData2: { monthYear: string; reviewer: string; count: number }[] = await response2.json();
     const formattedData3: { monthYear: string; reviewer: string; count: number }[] = await response3.json();
-    console.log("eip data:",formattedData1)
+    // console.log("eip data:",formattedData1)
 
     seteipData(formattedData1);
     setercData(formattedData2);
@@ -1399,9 +1409,9 @@ useEffect(()=>{
 const handleFilterData2 = () => {
   const startDate = `${selectedStartYear2}-${selectedStartMonth2}`;
   const endDate = `${selectedEndYear2}-${selectedEndMonth2}`;
-  console.log("active data:",activeData);
-  console.log("start:",startDate);
-  console.log("end:",endDate)
+  // console.log("active data:",activeData);
+  // console.log("start:",startDate);
+  // console.log("end:",endDate)
 
   const filteredData:any = [];
   for (const reviewerName in activeData) {
@@ -1523,7 +1533,7 @@ const editorsSpecialityChart = () => {
   const yearlyChartData2 = formatChartData(processData2);
   const processData3 = getYearlyData(ripdata);
   const yearlyChartData3 = formatChartData(processData3);
-  console.log("new chart data:",yearlyChartData1)
+  // console.log("new chart data:",yearlyChartData1)
 
   const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech"];
 
@@ -1537,8 +1547,8 @@ const editorsSpecialityChart = () => {
   const filteredRIPData = yearlyChartData3.filter((item) =>
     targetReviewers.includes(item.reviewer)
   );
-  console.log("filtered data spec:", filteredEIPData)
-  console.log("eip data spec:", eipdata);
+  // console.log("filtered data spec:", filteredEIPData)
+  // console.log("eip data spec:", eipdata);
 
   // Step 2: Combine and format the data for the chart
   const chartData = [
@@ -1559,7 +1569,7 @@ const editorsSpecialityChart = () => {
     })),
   ];
 
-  console.log("chart data spec:", chartData)
+  // console.log("chart data spec:", chartData)
 
   // Step 3: Define the Column chart configuration
   const columnConfig = {
@@ -1605,6 +1615,31 @@ const generateDistinctColor = (index: number, total: number) => {
   const hue = (index * (360 / total)) % 360; // Golden angle for better color distribution
   return `hsl(${hue}, 85%, 50%)`; // High saturation and medium brightness for vibrancy
 };
+
+const router = useRouter();
+
+  const scrollToHash = () => {
+    const hash = window.location.hash;
+    if (hash) {
+      const element = document.getElementById(hash.slice(1));
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      scrollToHash();
+    }
+  }, [loading]);
+
+  useLayoutEffect(() => {
+    router.events.on("routeChangeComplete", scrollToHash);
+    return () => {
+      router.events.off("routeChangeComplete", scrollToHash);
+    };
+  }, [router]);
 
 
   return (
@@ -1791,7 +1826,7 @@ const generateDistinctColor = (index: number, total: number) => {
 
         
             
-            <Box className="w-full">
+            <Box id="Leaderboard" className="w-full">
               {renderCharts(chart1data, selectedYear, selectedMonth)}
               <DateTime />
             </Box>
@@ -1811,10 +1846,10 @@ const generateDistinctColor = (index: number, total: number) => {
   // }}
 >
   {/* The part that is breaking start */}
-  <Box className={"w-full"}>
+  <Box id="Monthly" className={"w-full"}>
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
       <Heading size="md" color="black">
-        {`PRs Reviewed (Monthly, since 2015)`}
+        {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`http://localhost:3000/Reviewers#Monthly`} />
       </Heading>
       <Flex alignItems="center">
         <CSVLink
@@ -2045,16 +2080,16 @@ const generateDistinctColor = (index: number, total: number) => {
               </MenuItem>
 
               
-              <MenuItem onClick={selectAllReviewers}>
+              {/* <MenuItem onClick={selectAllReviewers}>
                 <Text as="span" fontWeight="bold" textDecoration="underline">
                 Emeritus Editors
                 </Text>
-              </MenuItem>
+              </MenuItem> */}
 
               
               <MenuItem onClick={selectActiveReviewers}>
                 <Text as="span" fontWeight="bold" textDecoration="underline">
-                  Active Editors
+                  Select All
                 </Text>
               </MenuItem>
 
@@ -2125,16 +2160,16 @@ const generateDistinctColor = (index: number, total: number) => {
         </MenuItem>
 
         
-        <MenuItem onClick={selectAllReviewers}>
+        {/* <MenuItem onClick={selectAllReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
           Emeritus Editors
           </Text>
-        </MenuItem>
+        </MenuItem> */}
 
         
         <MenuItem onClick={selectActiveReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
-            Active Editors
+            Select All
           </Text>
         </MenuItem>
 
@@ -2290,38 +2325,33 @@ const generateDistinctColor = (index: number, total: number) => {
         <>
       
             {selectedYear && selectedMonth && (
-                <Box mt={8}>
-                 
-                  <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-                    <Text fontSize="lg"
-                      marginBottom={2}
-                      color={useColorModeValue("gray.800", "gray.200")}>
-                      You can download the data here:
-                    </Text>
-                    <CSVLink 
-                      data={csvData.length ? csvData : []} 
-                      filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
-                      
-                      onClick={async () => {
-                        try {
-                         
-                          generateCSVData();
-                    
-                         
-                          await axios.post("/api/DownloadCounter");
-                        } catch (error) {
-                          console.error("Error triggering download counter:", error);
-                        }
-                      }}
-                    >
-                       <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }} >{loading2 ? <Spinner size="sm" /> : "Download CSV"}</Button>
-                    </CSVLink>
-                  </Box>
-                </Box>
+                <Box mt={8} display="flex" justifyContent="flex-end">
+                <CSVLink
+                  data={csvData.length ? csvData : []}
+                  filename={`reviews_${selectedYear}_${selectedMonth}.csv`}
+                  onClick={async () => {
+                    try {
+                      generateCSVData();
+                      await axios.post("/api/DownloadCounter");
+                    } catch (error) {
+                      console.error("Error triggering download counter:", error);
+                    }
+                  }}
+                >
+                  <Button
+                    colorScheme="blue"
+                    fontSize={{ base: "0.6rem", md: "md" }}
+                   
+                  >  <DownloadIcon marginEnd={"1.5"} />
+                    {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+                  </Button>
+                </CSVLink>
+              </Box>
+              
             )}
 
             {selectedYear && selectedMonth && (
-              <Box mt={8}>
+              <Box>
                 {renderTable(selectedYear, selectedMonth, showReviewer)}
               </Box>
             )}
@@ -2343,7 +2373,7 @@ const generateDistinctColor = (index: number, total: number) => {
               //   borderColor: "#30A0E0",
               // }}
             >
-            <Box className="w-full">
+            <Box id="ActivityTimeline" className="w-full">
 
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
             <Heading
@@ -2353,8 +2383,8 @@ const generateDistinctColor = (index: number, total: number) => {
               marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors Timeline Scatterplot
-            </Heading>
+            > Active Editors Timeline Scatterplot <CopyLink link={`http://localhost:3000/Reviewers#ActivityTimeline`} />
+            </Heading> 
               <Flex alignItems="center">
                 <Button
                   colorScheme="blue"
@@ -2508,7 +2538,7 @@ const generateDistinctColor = (index: number, total: number) => {
               //   borderColor: "#30A0E0",
               // }}
             >
-            <Box className="w-full">
+            <Box id="Speciality" className="w-full">
             <Heading
               as="h3"
               size="lg"
@@ -2516,7 +2546,7 @@ const generateDistinctColor = (index: number, total: number) => {
               marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors PR reviews in each Repository 
+            > Active Editors PR reviews in each Repository <CopyLink link={`http://localhost:3000/Reviewers#Speciality`} />
             </Heading>
               {editorsSpecialityChart()}
             </Box>

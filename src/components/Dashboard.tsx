@@ -11,11 +11,13 @@ import {
   Link as LI,
   Stack,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
 import DashboardDonut2 from "@/components/DashboardDonut2";
 import DashboardDonut from "@/components/DashboardDonut";
+// import { useRouter } from "next/router";
 import {
   Anchor,
   BookOpen,
@@ -28,7 +30,8 @@ import { BsArrowUpRight, BsGraphUp } from "react-icons/bs";
 import StackedColumnChart from "@/components/StackedBarChart";
 import AreaC from "@/components/AreaC";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { mockEIP } from "@/data/eipdata";
 import { usePathname } from "next/navigation";
 import FlexBetween from "./FlexBetween";
@@ -44,6 +47,7 @@ import AllChart from "./AllChart2";
 import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 import ToolsSection from "./AvailableTools";
 import TypeGraphs from "@/components/TypeGraphs2";
+import CopyLink from "./CopyLink";
 
 interface EIP {
   _id: string;
@@ -118,6 +122,31 @@ const Dashboard = () => {
     month: "long",
   });
   const year = new Date().getFullYear();
+
+  // const router = useRouter();
+  
+    const scrollToHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.getElementById(hash.slice(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    };
+  
+    useEffect(() => {
+      if (!isLoading) {
+        scrollToHash();
+      }
+    }, [isLoading]);
+  
+    useLayoutEffect(() => {
+      router.events.on("routeChangeComplete", scrollToHash);
+      return () => {
+        router.events.off("routeChangeComplete", scrollToHash);
+      };
+    }, [router]);
 
   return (
     <>
@@ -450,11 +479,11 @@ const Dashboard = () => {
                       >
               <FlexBetween>
           
-              <Box id={"1"} color={"rgba(255, 255, 255, 0.7)"} >
+              <Box id={"Dashboard"} color={"rgba(255, 255, 255, 0.7)"} >
   <Header
     title="DASHBOARD"
     subtitle="Welcome to the dashboard"
-  />
+  /> 
 </Box>
 
                 <Box>

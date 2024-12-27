@@ -76,7 +76,7 @@ export default function LargeWithAppLinksAndSocial() {
             <Stack
                 direction={"column"}
             >
-              <h1 className={'font-bold text-2xl'}>EIPs Insights</h1>
+              <h1 className={'font-bold text-2xl'}>EIPs Insight</h1>
               <h2 className={'text-xl'}>Build With <span> 💙 </span> by&nbsp; <NextLink href={'https://avarch.org'} target={'_blank'}>Avarch</NextLink></h2>
               <div className={'flex space-x-5'}>
                 <Text className={'text-lg font-bold'}>Join us: </Text>

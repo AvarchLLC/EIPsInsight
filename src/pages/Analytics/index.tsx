@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import dynamic from "next/dynamic";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
@@ -26,12 +26,16 @@ import {
   Collapse,
   useColorModeValue
 } from "@chakra-ui/react";
+import { DownloadIcon } from "@chakra-ui/icons";
 import DateTime from "@/components/DateTime";
 import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
 import {ChevronUpIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import Comments from "@/components/comments";
+import { useRouter } from "next/router";
+
+import CopyLink from "@/components/CopyLink";
 
 
 // Dynamic import for Ant Design's Column chart
@@ -311,7 +315,7 @@ useEffect(() => {
 
 
     return (
-      <Box mt={8} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
+      <Box mt={2} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
       <Flex
       wrap="wrap"
       justify="space-around"
@@ -1021,6 +1025,31 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     return <DualAxes {...config} />;
 };
 
+const router = useRouter();
+
+  const scrollToHash = () => {
+    const hash = window.location.hash;
+    if (hash) {
+      const element = document.getElementById(hash.slice(1));
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      scrollToHash();
+    }
+  }, [loading]);
+
+  useLayoutEffect(() => {
+    router.events.on("routeChangeComplete", scrollToHash);
+    return () => {
+      router.events.off("routeChangeComplete", scrollToHash);
+    };
+  }, [router]);
+
 
 
 
@@ -1193,10 +1222,10 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
             //   borderColor: "#30A0E0",
             // }}
           >
-          <Box  borderRadius={"0.55rem"}>
+          <Box id="GithubAnalytics" borderRadius={"0.55rem"}>
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
-            {`Github PR Analytics (Monthly, since 2015)`}
+            {`Github PR Analytics (Monthly, since 2015)`}<CopyLink link={`http://localhost:3000/Analytics#GithubAnalytics`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <Button
@@ -1372,14 +1401,14 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
           )}
   
           {selectedYear && selectedMonth && (
-                  <Box mt={8}>
+                  <Box mt={8} display="flex" justifyContent="flex-end">
                     {/* Download CSV section */}
-                    <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-                    <Text fontSize="lg"
+                    {/* <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}> */}
+                    {/* <Text fontSize="lg"
                     marginBottom={2}
                     color={useColorModeValue("gray.800", "gray.200")}>
                         You can download the data here:
-                      </Text>
+                      </Text> */}
                       <Button colorScheme="blue" 
                       onClick={async () => {
                         try {
@@ -1393,16 +1422,16 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
                         }
                       }} 
                       disabled={loading2}>
-                        {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+                       <DownloadIcon marginEnd={"1.5"} /> {loading2 ? <Spinner size="sm" /> : "Download CSV"}
                       </Button>
-                    </Box>
+                    {/* </Box> */}
                   </Box>
               )}
                {showDropdown && ( 
                 <>
           
                   {selectedYear && selectedMonth && (
-                    <Box mt={8}>
+                    <Box mt={2}>
                      {renderTable(selectedYear, selectedMonth, activeTab)}
                     </Box>
                   )}

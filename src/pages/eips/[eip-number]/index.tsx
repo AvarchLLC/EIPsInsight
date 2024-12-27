@@ -27,7 +27,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { Markdown } from "@/components/MarkdownEIP";
-import Header from "@/components/Header";
+import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
 
 interface EipMetadataJson {
@@ -320,113 +320,113 @@ const TestComponent = () => {
               <Box>
       {/* Collapse Button */}
        <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="1">
-      <Flex justify="space-between" align="center">
-        {/* Heading on the Left */}
-        <Heading size="md" color={"#30A0E0"}>
-          Status Timeline
-        </Heading>
+            <Flex justify="space-between" align="center">
+              {/* Heading on the Left */}
+              <Heading size="md" color={"#30A0E0"}>
+                Status Timeline
+              </Heading>
 
-        {/* Dropdown Button on the Right */}
-         <Box
-          bg="blue" // Gray background
-          borderRadius="md" // Rounded corners
-          padding={2} // Padding inside the box
-        >
-        <IconButton
-          onClick={toggleCollapse}
-          icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
-          variant="ghost"
-          h="24px" // Smaller height
-          w="20px"
-          aria-label="Toggle Status Timeline"
-          _hover={{ bg: 'blue' }} // Background color on hover
-          _active={{ bg: 'blue' }} // Background color when active
-          _focus={{ boxShadow: 'none' }} // Remove focus outline
-        />
-        </Box>
-      </Flex>
+              {/* Dropdown Button on the Right */}
+              <Box
+                bg="blue" // Gray background
+                borderRadius="md" // Rounded corners
+                padding={2} // Padding inside the box
+              >
+              <IconButton
+                onClick={toggleCollapse}
+                icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+                variant="ghost"
+                h="24px" // Smaller height
+                w="20px"
+                aria-label="Toggle Status Timeline"
+                _hover={{ bg: 'blue' }} // Background color on hover
+                _active={{ bg: 'blue' }} // Background color when active
+                _focus={{ boxShadow: 'none' }} // Remove focus outline
+              />
+              </Box>
+            </Flex>
 
-      {/* Status Timeline - This is shown only when `show` is true */}
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
-            {data
-              .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
-              .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
-              .map((item, index, sortedData) => {
-                const currentDate = new Date(item.date);
-                const nextItem = sortedData[index + 1];
-                const nextDate = nextItem ? new Date(nextItem.date) : null;
+            {/* Status Timeline - This is shown only when `show` is true */}
+            {show && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
+                  {data
+                    .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
+                    .map((item, index, sortedData) => {
+                      const currentDate = new Date(item.date);
+                      const nextItem = sortedData[index + 1];
+                      const nextDate = nextItem ? new Date(nextItem.date) : null;
 
-                // Calculate the day difference between current and next item
-                const dayDifference = nextDate
-                  ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
-                  : null;
+                      // Calculate the day difference between current and next item
+                      const dayDifference = nextDate
+                        ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
+                        : null;
 
-                return (
-                  <React.Fragment key={index}>
-                    {/* Status and Date */}
-                    <VStack align="center" spacing={3} minW="120px" maxW="120px" mb={4}>
-                      <Box
-                        p="5"
-                        bg={useColorModeValue("white", "gray.800")}
-                        borderRadius="md"
-                        boxShadow={useColorModeValue("md", "dark-lg")}
-                        textAlign="center"
-                        minH="80px"
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <Text fontWeight="bold" color={statusColor}>
-                          {item.status}
-                        </Text>
-                        <Text color={dateColor}>
-                          {currentDate.toLocaleDateString("en-US", {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })}
-                        </Text>
-                      </Box>
-                    </VStack>
+                      return (
+                        <React.Fragment key={index}>
+                          {/* Status and Date */}
+                          <VStack align="center" spacing={3} minW="120px" maxW="120px" mb={4}>
+                            <Box
+                              p="5"
+                              bg={useColorModeValue("white", "gray.800")}
+                              borderRadius="md"
+                              boxShadow={useColorModeValue("md", "dark-lg")}
+                              textAlign="center"
+                              minH="80px"
+                              display="flex"
+                              flexDirection="column"
+                              justifyContent="center"
+                            >
+                              <Text fontWeight="bold" color={statusColor}>
+                                {item.status}
+                              </Text>
+                              <Text color={dateColor}>
+                                {currentDate.toLocaleDateString("en-US", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}
+                              </Text>
+                            </Box>
+                          </VStack>
 
-                    {/* Arrow design and days difference */}
-                    {nextItem && (
-                      <VStack align="center" spacing={1}>
-                        <Box
-                          h="1px"
-                          w="80px"
-                          borderBottom="1px solid"
-                          borderColor="gray.400"
-                          position="relative"
-                        >
-                          {/* Arrow pointing forward */}
-                          <Box
-                            position="absolute"
-                            right="-10px"
-                            top="-4px"
-                            borderTop="5px solid transparent"
-                            borderBottom="5px solid transparent"
-                            borderLeft="10px solid gray"
-                          />
-                        </Box>
-                        <Text color="gray.500" fontSize="sm">
-                          {dayDifference} days
-                        </Text>
-                      </VStack>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-          </Flex>
+                          {/* Arrow design and days difference */}
+                          {nextItem && (
+                            <VStack align="center" spacing={1}>
+                              <Box
+                                h="1px"
+                                w="80px"
+                                borderBottom="1px solid"
+                                borderColor="gray.400"
+                                position="relative"
+                              >
+                                {/* Arrow pointing forward */}
+                                <Box
+                                  position="absolute"
+                                  right="-10px"
+                                  top="-4px"
+                                  borderTop="5px solid transparent"
+                                  borderBottom="5px solid transparent"
+                                  borderLeft="10px solid gray"
+                                />
+                              </Box>
+                              <Text color="gray.500" fontSize="sm">
+                                {dayDifference} days
+                              </Text>
+                            </VStack>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                </Flex>
         </motion.div>
       )}
-    </Box>
+      </Box>
     </Box>
     
               {data2.length > 1 && (

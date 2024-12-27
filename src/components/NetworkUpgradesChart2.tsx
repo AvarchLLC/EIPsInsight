@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Box, useColorModeValue, Flex, Heading, Button } from "@chakra-ui/react";
 import axios from "axios";
-
+import CopyLink from "./CopyLink";
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 
 // Define the data structure for each entry
@@ -162,7 +162,7 @@ const AuthorContributionsChart = React.memo(() => {
   return (
     <Box bg={bg} p={5} borderRadius="lg">
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
-        <Heading size="md">Author Contributions</Heading>
+        <Heading size="md">Author Contributions  <CopyLink link={`http://localhost:3000/pectra#AuthorContributions`} /></Heading>
         <Button 
         fontSize={{ base: "0.6rem", md: "md" }}
         onClick={async () => {

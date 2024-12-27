@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Box, useColorModeValue, Flex, Heading, Button, Spinner } from "@chakra-ui/react";
 import axios from "axios";
+import CopyLink from "./CopyLink";
 
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 
@@ -206,7 +207,7 @@ const NetworkUpgradesChart = React.memo(() => {
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
          <Heading size="md" color={headingColor}>
-            {`Network Upgrades`}
+            {`Network Upgrades`} <CopyLink link={`http://localhost:3000/pectra#NetworkUpgrades`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <Button colorScheme="blue" 

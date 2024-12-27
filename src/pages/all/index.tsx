@@ -16,7 +16,7 @@ import { CCardBody, CSmartTable } from "@coreui/react-pro";
 // import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
-
+import { DownloadIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
@@ -238,9 +238,14 @@ const All = () => {
               </Box>
             </Box>
 
-              <Box display={{ base: "none", lg: "block" }} className="w-full max-w-md">
-                <SearchBox />
-              </Box>
+            <Box 
+              display={{ base: "none", lg: "block" }} 
+              className="w-full max-w-md" 
+              ml={4} // Adjust the value as needed
+            >
+              <SearchBox />
+            </Box>
+
             </div>
           </Box>
           <Box 
@@ -276,42 +281,37 @@ const All = () => {
           </Text>
         </MotionBox>
       ) : (
-        <Box mt={8}>
-          {/* Download CSV section */}
-          <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-            <Text
-              fontSize="lg"
-              marginBottom={2}
-              color={useColorModeValue("gray.800", "gray.200")}
-            >
-              You can download the data here:
-            </Text>
-            <Button
-              colorScheme="blue"
-              onClick={async () => {
-                try {
-                  // Trigger the CSV conversion and download
-                  handleDownload();
-            
-                  // Trigger the API call
-                  await axios.post("/api/DownloadCounter");
-                } catch (error) {
-                  console.error("Error triggering download counter:", error);
-                }
-              }}
-              isLoading={loading} // Show loading spinner on button
-              loadingText="Downloading" // Optional loading text
-              isDisabled={loading} // Disable button when loading
-            >
-              Download CSV
-            </Button>
-          </Box>
-        </Box>
+        <></>
       )}
     </>
 
           {selected === "RIP" ? (
             <Box>
+              
+    <Box mt={2} display="flex" justifyContent="flex-end" alignItems="center">
+      <Button
+        colorScheme="blue"
+        onClick={async () => {
+          try {
+            // Trigger the CSV conversion and download
+            handleDownload();
+
+            // Trigger the API call
+            await axios.post("/api/DownloadCounter");
+          } catch (error) {
+            console.error("Error triggering download counter:", error);
+          }
+        }}
+        isLoading={loading} // Show loading spinner on button
+        loadingText="Downloading" // Optional loading text
+        isDisabled={loading} // Disable button when loading
+      >
+       <DownloadIcon marginEnd={"1.5"} /> Download CSV
+      </Button>
+    
+</Box>
+
+
             <RipCatTable dataset={data3} cat={selected} status={"Living"} />
             <RipCatTable dataset={data3} cat={selected} status={"Final"} />
             <RipCatTable dataset={data3} cat={selected} status={"Last Call"} />
@@ -322,11 +322,58 @@ const All = () => {
           </Box>
           ) : (
             <Box>
-              {!loading && (selected === "Meta" || selected === "All") && (
-                <Box mt={2} color="gray.500" fontStyle="italic">
-                  * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can vary by 1.
-                </Box>
-              )}
+              <Box>
+  {selected === "Meta" || selected === "All" ? (
+    <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+      <Box color="gray.500" fontStyle="italic">
+        * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can vary by 1.
+      </Box>
+      <Button
+        colorScheme="blue"
+        onClick={async () => {
+          try {
+            // Trigger the CSV conversion and download
+            handleDownload();
+
+            // Trigger the API call
+            await axios.post("/api/DownloadCounter");
+          } catch (error) {
+            console.error("Error triggering download counter:", error);
+          }
+        }}
+        isLoading={loading} // Show loading spinner on button
+        loadingText="Downloading" // Optional loading text
+        isDisabled={loading} // Disable button when loading
+      >
+       <DownloadIcon marginEnd={"1.5"} /> Download CSV
+      </Button>
+    </Box>
+  ) : (
+    <Box mt={2} display="flex" justifyContent="flex-end" alignItems="center">
+      <Button
+        colorScheme="blue"
+        onClick={async () => {
+          try {
+            // Trigger the CSV conversion and download
+            handleDownload();
+
+            // Trigger the API call
+            await axios.post("/api/DownloadCounter");
+          } catch (error) {
+            console.error("Error triggering download counter:", error);
+          }
+        }}
+        isLoading={loading} // Show loading spinner on button
+        loadingText="Downloading" // Optional loading text
+        isDisabled={loading} // Disable button when loading
+      >
+        Download CSV
+      </Button>
+    </Box>
+  )}
+</Box>
+
+
               <CatTable dataset={data2} cat={selected} status={"Living"} />
               <CatTable dataset={data2} cat={selected} status={"Final"} />
               <CatTable dataset={data2} cat={selected} status={"Last Call"} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -27,6 +27,8 @@ import Image from "next/image";
 import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 import { FaSyncAlt } from "react-icons/fa";
+import { useRouter } from "next/router";
+
 
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
@@ -338,6 +340,30 @@ const All = () => {
     };
   }, []);
 
+  const router = useRouter();
+  
+    const scrollToHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.getElementById(hash.slice(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    };
+  
+    useEffect(() => {
+      if (!isLoading) {
+        scrollToHash();
+      }
+    }, [isLoading]);
+  
+    useLayoutEffect(() => {
+      router.events.on("routeChangeComplete", scrollToHash);
+      return () => {
+        router.events.off("routeChangeComplete", scrollToHash);
+      };
+    }, [router]);
 
 
 
@@ -490,11 +516,11 @@ const All = () => {
   </NLink>.
 </Text>
 
-<Box>
+<Box id="NetworkUpgrades">
   <NetworkUpgradesChart/>
 </Box>
 <br/>
-<Box>
+<Box id="AuthorContributions">
   <NetworkUpgradesChart2/>
 </Box>
 

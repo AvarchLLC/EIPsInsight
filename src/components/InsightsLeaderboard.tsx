@@ -140,7 +140,7 @@ const InsightsLeaderboard = () => {
       );
       console.log("show reviewers data:",initialShowReviewer)
   
-      setShowReviewer(initialShowReviewer);
+      // setShowReviewer(initialShowReviewer);
 
       
      

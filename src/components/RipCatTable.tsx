@@ -132,7 +132,7 @@ import {
         {filteredData.length > 0 ? (
           <Box
             bgColor={bg}
-            marginTop={"12"}
+            marginTop={"2"}
             p="1rem 1rem"
             borderRadius="0.55rem"
             _hover={{
