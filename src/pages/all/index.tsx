@@ -238,13 +238,13 @@ const All = () => {
               </Box>
             </Box>
 
-            <Box 
+            {/* <Box 
               display={{ base: "none", lg: "block" }} 
               className="w-full max-w-md" 
               ml={4} // Adjust the value as needed
             >
               <SearchBox />
-            </Box>
+            </Box> */}
 
             </div>
           </Box>
@@ -287,7 +287,7 @@ const All = () => {
 
           {selected === "RIP" ? (
             <Box>
-              
+              {!loading && (
     <Box mt={2} display="flex" justifyContent="flex-end" alignItems="center">
       <Button
         colorScheme="blue"
@@ -309,7 +309,7 @@ const All = () => {
        <DownloadIcon marginEnd={"1.5"} /> Download CSV
       </Button>
     
-</Box>
+</Box>)}
 
 
             <RipCatTable dataset={data3} cat={selected} status={"Living"} />
@@ -324,7 +324,9 @@ const All = () => {
             <Box>
               <Box>
   {selected === "Meta" || selected === "All" ? (
-    <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+    <Box>
+     {!loading && (
+      <Box  mt={2} display="flex" justifyContent="space-between" alignItems="center">
       <Box color="gray.500" fontStyle="italic">
         * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can vary by 1.
       </Box>
@@ -347,8 +349,10 @@ const All = () => {
       >
        <DownloadIcon marginEnd={"1.5"} /> Download CSV
       </Button>
+    </Box> )}
     </Box>
   ) : (
+    
     <Box mt={2} display="flex" justifyContent="flex-end" alignItems="center">
       <Button
         colorScheme="blue"

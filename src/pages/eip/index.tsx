@@ -213,7 +213,7 @@ const Type = () => {
     />
   </FlexBetween>
 
-  <Box className={"w-full pt-10"}>
+  <Box display={{ base: "block", md: "block", lg:"none" }} className={"w-full pt-10"}>
     <SearchBox />
   </Box>
 

@@ -22,6 +22,7 @@ import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import { GitHub } from "react-feather";
 import Logo from "@/components/Logo";
+import SearchBox from "./SearchBox";
 
 interface NavItem {
   label: string;
@@ -142,16 +143,13 @@ const Navbar: React.FC = () => {
     },
     {
       label: "More",
-      children: [
-        // {
-        //     label: "Authors",
-        //     href: `/authors`
-        // },
-        {
-          label: "Resources",
-          href: `/resources`,
-        },
-      ],
+      // children: [
+      //   {
+      //     label: "Resources",
+      //     href: `/resources`,
+      //   },
+      // ],
+      href: `/resources`,
     },
   ];
 
@@ -255,7 +253,7 @@ const Navbar: React.FC = () => {
                   textAlign={useBreakpointValue({ base: "center", md: "left" })}
                   color={useColorModeValue("gray.800", "white")}
                   ml={4}
-                  mt={5}
+                  mt={1}
                   className="font-bold hover:opacity-25 cursor-pointer ease-in duration-150"
                 >
                   EIPs Insight
@@ -445,6 +443,9 @@ const Navbar: React.FC = () => {
                 </Box>
               ))}
             </div>
+            <Box ml={5} display={{ base: "none", md: "block" }}  minWidth="302px">
+            <SearchBox/>
+            </Box>
 
             <Flex ml={10}>
               <Stack
@@ -455,6 +456,7 @@ const Navbar: React.FC = () => {
                 mr={6}
                 pr={4}
               >
+                {/* <SearchBox/> */}
                 <NextLink href="https://github.com/Avarch-org/EIPUI" passHref>
                   <IconButton
                     aria-label="github"

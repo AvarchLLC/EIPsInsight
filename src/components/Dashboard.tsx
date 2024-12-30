@@ -378,16 +378,18 @@ const Dashboard = () => {
                 </div>
               </Box>
 
-              <div className="py-8">
+              <Box
+                className="py-8"
+                display={{ base: "block", md: "block", lg:"none" }}
+              >
                 <Box
-                  className={
-                    "w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
-                  }
+                  className="w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
                   bgColor={bg}
                 >
                   <SearchBox />
                 </Box>
-              </div>
+              </Box>
+
 
               {/* <div className="py-8"> */}
                 {/* <Box

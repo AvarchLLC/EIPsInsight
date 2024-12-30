@@ -105,7 +105,7 @@ const RIP = () => {
       />
     </FlexBetween>
 
-    <Box className="w-full pt-4">
+    <Box display={{ base: "block", md: "block", lg:"none" }} className="w-full pt-4">
       <SearchBox />
     </Box>
 

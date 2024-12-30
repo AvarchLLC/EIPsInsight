@@ -199,9 +199,7 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
                                     <Box>
                                     <FlexBetween flexDirection={{ base: 'column', md: 'row' }} alignItems="center">
     <Header title={"Issue"} subtitle={`#${data?.issueDetails?.issueNumber}`} />
-    <Box display={{ base: 'none', md: 'block' }} width="100%" maxWidth="400px">
-        <SearchBox />
-    </Box>
+    
 </FlexBetween>
 
 <Box display={{ base: 'block', md: 'none' }} width="100%" paddingTop={4}>
@@ -300,7 +298,7 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
             <Text className="text-lg md:text-2xl font-bold">Link:</Text>
              <NextLink href={`${data?.url}`} target="_blank">
             <Button variant="outline" colorScheme="purple">
-                <Text className="text-sm">Go to Github PR Page</Text>
+                <Text className="text-sm">Go to Github Issue Page</Text>
             </Button>
             </NextLink>
         </div>

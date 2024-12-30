@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -412,56 +412,79 @@ const uniqueResults = filteredResults.filter((result, index, self) => {
   return isLengthValid && isUnique;
 });
 
+const [showDropdown, setShowDropdown] = useState(false);
+const dropdownRef = useRef<HTMLDivElement | null>(null); // Type the ref
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !(dropdownRef.current as HTMLDivElement).contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   
 
-  return (
-    <>
-  <div>
+return (
+  <div className="relative w-full">
     <input
       type="text"
       placeholder="Search EIP/ERC/RIP/PR/ISSUE/Author"
       value={query}
-      onChange={(e) => setQuery(e.target.value)}
+      onChange={(e) => {
+        setQuery(e.target.value);
+        setShowDropdown(true); // Show dropdown when typing
+      }}
       className="border p-2 rounded w-full text-center focus:border-blue-100"
     />
 
-<div className={"grid grid-cols-1"}>
-  <div>
-    {query && 
-    filteredResults.length === 0 && 
-    filteredEIPResults.length === 0 && 
-    filteredIssueResults.length === 0 && 
-    filteredAuthors.length === 0 ? (
-      <p className="mt-2 text-red-500 text-center font-bold">
-        Invalid EIP/ERC/RIP/PR/Issue/Author
-      </p>
-    ) : (
-      query && (
-        <select
-          className="mt-2 border p-2 rounded w-full text-center space-y-5"
-          size={10}
-        >
-          {uniqueResults.map(result => (
-            <option
-              key={result.prNumber}
-              value={result.prNumber}
-              onClick={() => handleSearchResultClick(result.prNumber, result.repo)}
-              className="py-2"
-            >
-              {result.repo} PR: {result.prNumber}
-            </option>
-          ))}
-          {filteredIssueResults.map(result => (
-            <option
-              key={result.issueNumber}
-              value={result.issueNumber}
-              onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
-              className="py-2"
-            >
-              {result.repo} ISSUE: {result.issueNumber}
-            </option>
-          ))}
-          {filteredEIPResults.map(result => (
+    {showDropdown && query && (
+      <div
+        ref={dropdownRef}
+        className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto"
+      >
+        {filteredResults.length === 0 &&
+        filteredEIPResults.length === 0 &&
+        filteredIssueResults.length === 0 &&
+        filteredAuthors.length === 0 ? (
+          <p className="p-2 text-red-500 text-center font-bold">
+            Invalid EIP/ERC/RIP/PR/Issue/Author
+          </p>
+        ) : (
+          <select
+            className="w-full p-2 rounded text-center"
+            size={10}
+            onChange={(e) => console.log(e.target.value)}
+          >
+            {uniqueResults.map((result) => (
+              <option
+                key={result.prNumber}
+                value={result.prNumber}
+                onClick={() =>
+                  handleSearchResultClick(result.prNumber, result.repo)
+                }
+              >
+                {result.repo} PR: {result.prNumber}
+              </option>
+            ))}
+            {filteredIssueResults.map((result) => (
+              <option
+                key={result.issueNumber}
+                value={result.issueNumber}
+                onClick={() =>
+                  handleSearchResultClick(result.issueNumber, result.repo)
+                }
+              >
+                {result.repo} ISSUE: {result.issueNumber}
+              </option>
+            ))}
+             {filteredEIPResults.map(result => (
             <option
               key={result.eip}
               value={result.eip}
@@ -471,7 +494,7 @@ const uniqueResults = filteredResults.filter((result, index, self) => {
               {result.repo.toUpperCase()} Number: {result.eip}
             </option>
           ))}
-          {filteredAuthors.map(result => (
+            {filteredAuthors.map(result => (
             <option
             key={result.name}
             value={result.name}
@@ -481,16 +504,12 @@ const uniqueResults = filteredResults.filter((result, index, self) => {
               {result.name} ({result.count})
             </option>
           ))}
-        </select>
-      )
+          </select>
+        )}
+      </div>
     )}
   </div>
-</div>
-
-  </div>
-</>
-
-  );
+);
 };
 
 export default SearchBox;
