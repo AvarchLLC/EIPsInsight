@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex,IconButton, Tooltip, Spinner, Avatar} from "@chakra-ui/react";
+import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex,IconButton, Tooltip, Spinner, Avatar, Menu, MenuItem, MenuButton, MenuList} from "@chakra-ui/react";
 import { saveAs } from 'file-saver';
 import AllLayout from './Layout';
 import NextLink from 'next/link';
@@ -14,6 +14,7 @@ interface EIP {
   type: string;
   title:string;
   category: string;
+  status:string;
   author: string;
   repo: string;
 }
@@ -224,9 +225,25 @@ const SearchByTitle: React.FC<AuthorProps> = ({ defaultQuery }) => {
               boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
             }}
           />
-          {/* <Button colorScheme="blue" size="lg" borderRadius="full" onClick={handleDownload}>
-            Download Data
-          </Button> */}
+           <Menu>
+                <MenuButton
+                  as={Button}
+                  rightIcon={<ChevronDownIcon />}
+                  colorScheme="blue"
+                  size="md"
+                  width="200px" // Fixed width
+                >
+                  Title
+                </MenuButton>
+                <MenuList>
+                  <MenuItem onClick={() => window.location.href = '/SearchEip'}>
+                  Authors
+                  </MenuItem>
+                  <MenuItem onClick={() => window.location.href = '/SearchEipTitle'}>
+                    EIP
+                  </MenuItem>
+                </MenuList>
+              </Menu>
         </Flex>
         </Box>
         <Box p={4}>
@@ -326,8 +343,8 @@ const SearchByTitle: React.FC<AuthorProps> = ({ defaultQuery }) => {
       )}
     </Flex> */}
 
-                  <Box mt={8}>
-                    {/* Download CSV section */}
+                  {/* <Box mt={8}>
+                   
                     <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
                     <Text fontSize="lg"
                     marginBottom={2}
@@ -337,10 +354,10 @@ const SearchByTitle: React.FC<AuthorProps> = ({ defaultQuery }) => {
                       <Button colorScheme="blue" 
                       onClick={async () => {
                         try {
-                          // Trigger the CSV conversion and download
+                          
                           handleDownload();
                     
-                          // Trigger the API call
+                        
                           await axios.post("/api/DownloadCounter");
                         } catch (error) {
                           console.error("Error triggering download counter:", error);
@@ -350,43 +367,32 @@ const SearchByTitle: React.FC<AuthorProps> = ({ defaultQuery }) => {
                         {isLoading ? <Spinner size="sm" /> : "Download CSV"}
                       </Button>
                     </Box>
-                  </Box>
+                  </Box> */}
             
-                  {/* <Box
+            <Box
   display="flex"
-  justifyContent="flex-start" 
+  justifyContent="flex-end" // Align items to the start (left)
   alignItems="center"
   mb={4}
   ml={2}
   gap={4}
 >
- 
-  <Button
-    onClick={() => setFilterVisible((prev) => !prev)}
-    bg="blue.500"
-    color="white"
-    _hover={{ bg: "blue.600" }}
-  >
-    Filter EIP
-  </Button>
+<Button colorScheme="blue" onClick={async () => {
+                      try {
+                        // Trigger the CSV conversion and download
+                        handleDownload()
 
+                        // Trigger the API call
+                        await axios.post("/api/DownloadCounter");
+                      } catch (error) {
+                        console.error("Error triggering download counter:", error);
+                      }
+                    }} disabled={isLoading}>
+                        {isLoading ? <Spinner size="sm" /> : "Download CSV"}
+                      </Button>
+ 
   
-  {filterVisible && (
-    <Input
-      placeholder="Search EIP"
-      boxShadow="md"
-      bg={useColorModeValue('white', 'gray.800')}
-      borderColor={useColorModeValue('gray.300', 'gray.600')}
-      _focus={{
-        borderColor: useColorModeValue('blue.400', 'blue.600'),
-        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
-      }}
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      width="200px"
-    />
-  )}
-</Box> */}
+</Box>
 
                   
             {/* Display Cards */}
@@ -404,133 +410,155 @@ const SearchByTitle: React.FC<AuthorProps> = ({ defaultQuery }) => {
   paddingX="0.5rem"
   borderRadius="0.55rem"
   _hover={{
-    transform: "scale(1.05)", // Slight scale increase for smooth transformation
-    outline: "2px solid #30A0E0", // Outline instead of border
-    outlineOffset: "-2px", // Pull outline inside for better visual alignment
-    transition: "transform 0.2s ease, outline 0.2s ease", // Smooth hover effect
+    transform: "scale(1.05)",
+    outline: "2px solid #30A0E0",
+    outlineOffset: "-2px",
+    transition: "transform 0.2s ease, outline 0.2s ease",
   }}
   transition="transform 0.2s ease, outline 0.2s ease"
-  width="100%" // Adjust width based on container size
+  width="100%"
   padding="1rem"
   display="flex"
   flexDirection="column"
+  minHeight="300px" // Fixed height for uniformity
+  justifyContent="space-between" // Align items evenly
 >
   {/* Repo-EIP Title Section */}
   <Text
-    fontSize="2xl"
+    fontSize="xl"
     fontWeight="extrabold"
     color={useColorModeValue('blue.500', 'blue.300')}
-    mb={4}
+    mb={3}
+    wordBreak="break-word"
   >
     {item.repo.toUpperCase()}-{item.eip}
   </Text>
 
+  {/* Title Section */}
   <Text
-    fontSize="lg"
+    fontSize="sm"
     fontWeight="bold"
     color={useColorModeValue('gray.700', 'gray.300')}
     isTruncated
-    maxWidth="100%" // Ensure title is truncated if too long
+    maxWidth="100%"
     marginBottom="0.5rem"
   >
-    {item.title} {/* Display title */}
+    {item.title}
   </Text>
 
   {/* Type Section */}
-  <Text fontSize="md" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+  <Text fontSize="sm" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
     <b>Type:</b> {item.type}
   </Text>
 
   {/* Category Section */}
-  <Text fontSize="md" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+  <Text fontSize="sm" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
     <b>Category:</b> {item.category}
   </Text>
-
-  {/* Title Section */}
+  <Text fontSize="sm" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+    <b>Status:</b> {item.status}
+  </Text>
 
   {/* Authors Section */}
-  <Text fontSize="sm" fontWeight="bold" color={useColorModeValue('gray.700', 'gray.300')} marginBottom="0.5rem">
-  Authors:
-</Text>
-<Box
+  <Text
+    fontSize="xs"
+    fontWeight="bold"
+    color={useColorModeValue('gray.700', 'gray.300')}
+    marginBottom="0.5rem"
+  >
+    Authors:
+  </Text>
+  <Box
   display="flex"
-  flexWrap="wrap"
+  alignItems="center"
   gap="0.5rem"
   marginBottom="1rem"
   maxWidth="100%"
 >
   {(() => {
-    // Split the authors string, clean up names, and trim each name
     const authors = item.author.split(",").map((author) =>
-      author.replace(/<.*?>/g, "").trim() // Remove the <...> part
+      author.replace(/<.*?>/g, "").trim()
     );
 
-    // Sort authors so selected ones appear first
     const sortedAuthors = authors.sort((a, b) => {
       const aIsSelected = !!(
         selectedAuthor &&
         a.toLowerCase().includes(selectedAuthor.toLowerCase())
-      ); // Convert to boolean
+      );
       const bIsSelected = !!(
         selectedAuthor &&
         b.toLowerCase().includes(selectedAuthor.toLowerCase())
-      ); // Convert to boolean
-      return Number(bIsSelected) - Number(aIsSelected); // Perform arithmetic safely
+      );
+      return Number(bIsSelected) - Number(aIsSelected);
     });
 
-    // Render the first 4 authors
-    return sortedAuthors.slice(0, 1).map((author, index) => {
-      const authorName = author; // Use GitHub handle if available, else use author name
-      const isSelected =
-        selectedAuthor && authorName.toLowerCase().includes(selectedAuthor.toLowerCase());
-    
-      return (
+    // Show only the first author with ...more if applicable
+    const firstAuthor = sortedAuthors[0];
+    const hasMoreAuthors = sortedAuthors.length > 1;
+
+    return (
+      <Box
+        display="flex"
+        alignItems="center"
+        gap="0.5rem"
+        maxWidth="100%"
+        bg="blue.500"
+        color="white"
+        px={2}
+        py={1}
+        borderRadius="full"
+        border="1px solid"
+        borderColor="blue.500"
+        wordBreak="break-word" // Allow wrapping
+        whiteSpace="normal"    // Ensure text can wrap
+        overflow="hidden"      // Prevent overflow
+        flexWrap="nowrap"      // Prevent splitting of content
+        transition="all 0.2s ease"
+        _hover={{
+          bg: "blue.400",
+          transform: "scale(1.05)",
+          cursor: "pointer",
+        }}
+        onClick={() => setSelectedAuthor(firstAuthor)} // Set selected author
+      >
+        <Avatar
+          size="xs"
+          src={
+            firstAuthor.includes("@") && firstAuthor.includes(")")
+              ? `https://github.com/${firstAuthor.slice(
+                  firstAuthor.indexOf("@") + 1,
+                  firstAuthor.indexOf(")")
+                )}.png`
+              : ""
+          }
+          bg={
+            firstAuthor.includes("@") && firstAuthor.includes(")")
+              ? undefined
+              : "black"
+          }
+        />
         <Box
-  key={`author-${index}`} // Use index as fallback for key
-  bg={isSelected ? "blue.600" : "blue.500"}
-  color="white"
-  px={3}
-  py={1}
-  borderRadius="full"
-  m={2} // Margin for spacing
-  border="1px solid"
-  borderColor="blue.500"
-  whiteSpace="nowrap"
-  transform={isSelected ? "scale(1.1)" : "scale(1.0)"}
-  transition="all 0.2s ease"
-  _hover={{
-    bg: "blue.400",
-    transform: "scale(1.05)",
-    cursor: "pointer",
-  }}
-  onClick={() => setSelectedAuthor(authorName)} // Set selected author
-  display="flex"
-  alignItems="center" // Align items horizontally
->
-  <Avatar
-    size="sm"
-    src={authorName.includes('@') && authorName.includes(')') 
-      ? `https://github.com/${authorName.slice(authorName.indexOf('@') + 1, authorName.indexOf(')'))}.png`
-      : ''} // Extract GitHub handle between @ and )
-    bg={authorName.includes('@') && authorName.includes(')') ? undefined : 'black'}
-    mr={2} // Adjust spacing between avatar and text
-  />
-  <Text fontSize="sm" fontWeight="bold" mr={1}>
-      {authorName} {sortedAuthors.length > 1 && " …more"} {/* Display author name */}
-  </Text>
-</Box>
-
-      );
-    })
-    
-    
+          display="flex"
+          alignItems="center"
+          gap="0.25rem"
+          flexWrap="wrap"  // Allow wrapping of the text
+        >
+          <Text fontSize="xs" fontWeight="bold" isTruncated>
+            {firstAuthor}
+          </Text>
+          {hasMoreAuthors && (
+            <Text fontSize="xs" fontWeight="bold" ml={1} whiteSpace="nowrap">
+              ...more
+            </Text>
+          )}
+        </Box>
+      </Box>
+    );
   })()}
-  
 </Box>
 
-
-
 </Box>
+
 
                  
                 </NextLink>

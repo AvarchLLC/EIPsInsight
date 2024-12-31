@@ -444,70 +444,73 @@ return (
       className="border p-2 rounded w-full text-center focus:border-blue-100"
     />
 
-    {showDropdown && query && (
-      <div
-        ref={dropdownRef}
-        className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto"
+{showDropdown && query && (
+  <div
+    ref={dropdownRef}
+    className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto"
+  >
+    {filteredResults.length === 0 &&
+    filteredEIPResults.length === 0 &&
+    filteredIssueResults.length === 0 &&
+    filteredAuthors.length === 0 ? (
+      <p className="p-2 text-red-500 text-center font-bold">
+        Invalid EIP/ERC/RIP/PR/Issue/Author
+      </p>
+    ) : (
+      <select
+        className="w-full p-2 rounded text-center"
+        size={10}
+        onChange={(e) => console.log(e.target.value)}
       >
-        {filteredResults.length === 0 &&
-        filteredEIPResults.length === 0 &&
-        filteredIssueResults.length === 0 &&
-        filteredAuthors.length === 0 ? (
-          <p className="p-2 text-red-500 text-center font-bold">
-            Invalid EIP/ERC/RIP/PR/Issue/Author
-          </p>
-        ) : (
-          <select
-            className="w-full p-2 rounded text-center"
-            size={10}
-            onChange={(e) => console.log(e.target.value)}
+        {uniqueResults.map((result) => (
+          <option
+            key={result.prNumber}
+            value={result.prNumber}
+            onClick={() =>
+              handleSearchResultClick(result.prNumber, result.repo)
+            }
+            className="text-lg py-3" // Increase font size and vertical padding
           >
-            {uniqueResults.map((result) => (
-              <option
-                key={result.prNumber}
-                value={result.prNumber}
-                onClick={() =>
-                  handleSearchResultClick(result.prNumber, result.repo)
-                }
-              >
-                {result.repo} PR: {result.prNumber}
-              </option>
-            ))}
-            {filteredIssueResults.map((result) => (
-              <option
-                key={result.issueNumber}
-                value={result.issueNumber}
-                onClick={() =>
-                  handleSearchResultClick(result.issueNumber, result.repo)
-                }
-              >
-                {result.repo} ISSUE: {result.issueNumber}
-              </option>
-            ))}
-             {filteredEIPResults.map(result => (
-            <option
-              key={result.eip}
-              value={result.eip}
-              onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
-              className="py-2"
-            >
-              {result.repo.toUpperCase()} Number: {result.eip}
-            </option>
-          ))}
-            {filteredAuthors.map(result => (
-            <option
+            {result.repo} PR: {result.prNumber}
+          </option>
+        ))}
+        {filteredIssueResults.map((result) => (
+          <option
+            key={result.issueNumber}
+            value={result.issueNumber}
+            onClick={() =>
+              handleSearchIssueResultClick(result.issueNumber, result.repo)
+            }
+            className="text-lg py-3" // Increase font size and vertical padding
+          >
+            {result.repo} ISSUE: {result.issueNumber}
+          </option>
+        ))}
+        {filteredEIPResults.map((result) => (
+          <option
+            key={result.eip}
+            value={result.eip}
+            onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
+            className="text-lg py-3" // Increase font size and vertical padding
+          >
+            {result.repo.toUpperCase()} Number: {result.eip}
+          </option>
+        ))}
+        {filteredAuthors.map((result) => (
+          <option
             key={result.name}
             value={result.name}
-              onClick={() => handleAuthorSearchResultClick(result.name)}
-              className="py-2"
-            >
-              {result.name} ({result.count})
-            </option>
-          ))}
-          </select>
-        )}
-      </div>
+            onClick={() => handleAuthorSearchResultClick(result.name)}
+            className="text-lg py-3" // Increase font size and vertical padding
+          >
+            {result.name} ({result.count})
+          </option>
+        ))}
+      </select>
     )}
+  </div>
+)}
+
   </div>
 );
 };

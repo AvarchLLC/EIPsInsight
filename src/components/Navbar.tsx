@@ -79,20 +79,21 @@ const Navbar: React.FC = () => {
         // },
         {
           label: "Search By",
-          children:[
-            {
-              label: "Author",
-              href: `/authors`,
-            },
-            {
-              label: "EIP",
-              href: `/SearchEip`,
-            },
-            {
-              label: "EIP Title",
-              href: `/SearchEipTitle`,
-            },
-          ],
+          href:`/authors`,
+          // children:[
+          //   {
+          //     label: "Author",
+          //     href: `/authors`,
+          //   },
+          //   {
+          //     label: "EIP",
+          //     href: `/SearchEip`,
+          //   },
+          //   {
+          //     label: "EIP Title",
+          //     href: `/SearchEipTitle`,
+          //   },
+          // ],
         },
       ],
     },    
@@ -253,7 +254,7 @@ const Navbar: React.FC = () => {
                   textAlign={useBreakpointValue({ base: "center", md: "left" })}
                   color={useColorModeValue("gray.800", "white")}
                   ml={4}
-                  mt={1}
+                  mt={3}
                   className="font-bold hover:opacity-25 cursor-pointer ease-in duration-150"
                 >
                   EIPs Insight
@@ -390,9 +391,9 @@ const Navbar: React.FC = () => {
                       >
                         <Stack direction={"column"} spacing={2}>
                           {navItem.children.map((child) =>
-                            child.label === "Search By" ? (
-                              <DesktopSubNav key={child.label} {...child} />
-                            ) : (
+                            // child.label === "Search By" ? (
+                            //   <DesktopSubNav key={child.label} {...child} />
+                            // ) : (
                               <Box
                                 key={child.label} // Unique key for React rendering
                                 _hover={{
@@ -410,7 +411,7 @@ const Navbar: React.FC = () => {
                                   <NextLink href={`${child.href}`}>{child.label}</NextLink>
                                 </Text>
                               </Box>
-                            )
+                            // )
                           )}
                         </Stack>
                       </PopoverContent>
@@ -512,7 +513,7 @@ const Navbar: React.FC = () => {
                   textAlign={useBreakpointValue({ base: "center", md: "left" })}
                   color={useColorModeValue("gray.800", "white")}
                   ml={4}
-                  mt={3.5}
+                  mt={6}
                   className="font-bold hover:opacity-25 cursor-pointer ease-in duration-150 pt-1"
                 >
                   EIPs <br /> Insights

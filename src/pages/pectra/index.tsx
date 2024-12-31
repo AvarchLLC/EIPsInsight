@@ -11,6 +11,9 @@ import {
   UnorderedList,
   ListItem,
   Heading,
+  Flex,
+  Image,
+  SimpleGrid,
   Grid
 } from "@chakra-ui/react";
 import NLink from "next/link";
@@ -23,7 +26,7 @@ import PectraTable from "@/components/PectraTable";
 import { Table, Thead, Tbody, Tr, Th, Td, Link,TableContainer } from "@chakra-ui/react";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import Image from "next/image";
+// import Image from "next/image";
 import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 import { FaSyncAlt } from "react-icons/fa";
@@ -65,6 +68,69 @@ const All = () => {
     }
     return list;
   };
+
+  const Card = ({ image, title, content, link }: { image: string; title: string; content: string; link: string }) => (
+    <Flex
+      direction="row"
+      bg={bg}
+      p={3}
+      borderRadius="md"
+      boxShadow="md"
+      width="100%" // Full width for list-style layout
+      maxWidth="400px" // Optional: limit card width for better readability
+      height="120px" // Fixed height for uniformity
+      align="center"
+      justify="flex-start"
+      mb={4} // Space between list items
+    >
+      <Image
+        src={image}
+        alt={title}
+        boxSize="80px" // Fixed size for the image
+        objectFit="cover"
+        borderRadius="md"
+        mr={4} // Space between image and text
+      />
+      <Box>
+        <Text
+          fontSize="sm"
+          fontWeight="bold"
+          noOfLines={1} // Limit title to 1 line
+          mb={1}
+        >
+          {title}
+        </Text>
+        <Link href={link} color="blue.400" fontSize="xs" isExternal>
+          Read More
+        </Link>
+      </Box>
+    </Flex>
+  );
+  
+  
+  
+  
+
+  const PectraPosts= [
+    {
+        image: "pectra1.jpg",
+        title: "Ethereum Developers Push Proposal to increase Gossip Limit",
+        content: "Gossip Limit in Blockchain Networks, Current Setup, Reasons for 10 MiB Limit, Challenges, Proposal Objectives, Implementation & Alternatives.",
+        link: "https://etherworld.co/2024/12/15/ethereum-developers-push-proposal-to-increase-gossip-limit/"
+    },
+    {
+        image: "pectra2.jpg",
+        title: "Ethereum Launches Mekong Testnet: A Guide",
+        content: "Ethereum’s Mekong testnet offers developers and stakers a sandbox to explore the Pectra upgrade’s UX and staking changes, shaping the upcoming mainnet deployment.",
+        link: "https://etherworld.co/2024/11/08/mekong-testnet/"
+    },
+    {
+        image: "pectra3.jpg",
+        title: "Consensus-layer Call 144: EIPs, Pectra, and Blob Scaling",
+        content: "Ethereum developers discussed key updates on Pectra, EIPs 7742 and 7782, and strategies for scaling blobs, focusing on network performance, PeerDAS, and upcoming changes for the Pectra hard fork.",
+        link: "https://etherworld.co/2024/10/17/consensus-layer-call-144/"
+    }
+]
 
   const pectraData = [
   //   {
@@ -131,15 +197,7 @@ const All = () => {
         category:"Core",
         discussion:"https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
       },
-      // {
-      //   eip: "7594",
-      //   title: "PeerDAS - Peer Data Availability Sampling",
-      //   author: "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
-      //   link: "https://eipsinsight.com/eips/eip-7594",
-      //   type:"Standards Track",
-      //   category:"Networking",
-      //   discussion:"https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
-      // },
+      
       {
         eip: "7685",
         title: "General purpose execution layer requests",
@@ -406,117 +464,89 @@ const All = () => {
   PECTRA
 </Text>
 
-{/* <Box
-  textAlign="center"
-  p={6}
-  maxWidth="700px"
-  mx="auto"
-  mt={1}
-  borderRadius="lg"
-  boxShadow="xl"
-  bg="blue.500"
-  color="white"
->
-  <Text
-    as={motion.div}
-    initial={{ opacity: 0, y: -20 }}
-    animate={{ opacity: 1, y: 0 }}
-    fontSize={{ base: "2xl", md: "2xl", lg: "2xl" }}
-    fontWeight="bold"
-    color="white"
-    mb={4}
-  >
-    PECTRA Upgrade (Sepolia)
-  </Text>
-
-  
-    <Box
-    as={motion.div}
-    initial={{ opacity: 0, y: -20 }}
-    animate={{ opacity: 1, y: 0 }}
-    bg="blue.600"
-    color="white"
-    borderRadius="md"
-    p={2}
-    mb={4}
-    fontSize="xs"
-    fontWeight="normal"
-  >
-    <Text
-    fontSize="4xl"
-    fontWeight="bold"
-    color="white"
-    mb={4}
-    as={motion.div}
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    // transition={{ duration: 1 }}
-  >
-    {targetBlock - currentBlock} blocks away
-    </Text>
-    </Box>
-  
-  
-  <Text
-    fontSize="sm"
-    color="white"
-    mb={4}
-    as={motion.div}
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-  >
-    Refreshes in {timer} seconds
-    </Text>
-
-  <Text fontSize="sm" color="gray.300">
-    * The scheduled block number is not announced yet, and this is an approximation.
-  </Text>
-</Box> */}
 <br/>
 
-          <Text mb={4} fontSize={{base: "md",md:"2xl", lg: "2xl"}} textAlign="justify">  {/* Justify text alignment */}
-  Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
-  collectively known as{" "}
-  <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+<Flex
+  direction={{ base: "column", md: "row" }} // Stack vertically on small screens, horizontally on larger ones
+  align="flex-start" // Align content to the top
+  gap={6} // Add spacing between text and cards
+  width="100%" // Ensure the Flex container occupies full width
+  justify="space-between" // Distribute space evenly between text and cards
+>
+  {/* Text Section */}
+  <Text
+    flex={{ base: "1 1 auto", md: "3" }} // Text takes 3/5 width on larger screens
+    fontSize={{ base: "md", md: "lg", lg: "2xl" }}
+    textAlign="justify"
+    lineHeight="1.6"
+    maxWidth="1200px" // Limit text width for better readability
+  >
+    Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
+    collectively known as{" "}
+    <NLink href="https://eipsinsight.com/eips/eip-7600">
+      <Text as="span" color="blue.500" textDecor="underline">
         Pectra
       </Text>
-  </NLink>. This upgrade will involve significant changes to both the{" "}
-  <NLink href={`https://www.youtube.com/watch?v=nJ57mkttCH0`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+    </NLink>. This upgrade will involve significant changes to both the{" "}
+    <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+      <Text as="span" color="blue.500" textDecor="underline">
         Execution and Consensus layers
       </Text>
-  </NLink>{" "}
-  on the mainnet. Given the complexities 
-  of testing and the scope of changes, including 11{" "}
-  <NLink href={`https://www.youtube.com/watch?v=AyidVR6X6J8`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+    </NLink>{" "} 
+    on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
+    <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
+      <Text as="span" color="blue.500" textDecor="underline">
         Ethereum Improvement Proposals (EIPs)
       </Text>
-  </NLink>, 
-  the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
-  now been shifted to the upcoming{" "}
-  <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+    </NLink>, 
+    the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
+    now been shifted to the upcoming{" "}
+    <NLink href="https://eipsinsight.com/eips/eip-7600">
+      <Text as="span" color="blue.500" textDecor="underline">
         Fusaka
       </Text>
-  </NLink>(a combination of Fulu and Osaka) upgrade. 
-  Currently, the testing team is working on Pectra {" "}
-  <NLink href={`https://notes.ethereum.org/@ethpandaops/pectra-devnet-5`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
-  Devnet 5
+    </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
+    <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-5">
+      <Text as="span" color="blue.500" textDecor="underline">
+        Devnet 5
       </Text>
-  </NLink>
-   {" "}and has finalized the specifications for Devnet 4. Specs 
-  and other details can be followed below.{" "}
-  <NLink href={`#carousel-section`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
+    </NLink>{" "} 
+    and has finalized the specifications for Devnet 4. Specs and other details can be followed below.{" "}
+    <NLink href="#carousel-section">
+      <Text as="span" color="blue.500" textDecor="underline">
         View more
       </Text>
-  </NLink>.
-</Text>
+    </NLink>.
+  </Text>
 
-<Box id="NetworkUpgrades">
+  {/* Cards Section */}
+  <Flex
+    flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
+    wrap="wrap" // Ensure cards can wrap onto new rows if needed
+    justify="flex-start" // Align cards to the left
+    gap={4} // Add spacing between cards
+    width="100%" // Ensure cards section takes up full width
+  >
+    {PectraPosts.map((pectra, index) => (
+      <Card
+        key={index}
+        image={pectra.image}
+        title={pectra.title}
+        content={pectra.content}
+        link={pectra.link}
+      />
+    ))}
+  </Flex>
+</Flex>
+
+
+
+
+
+
+
+
+<Box id="NetworkUpgrades" mt={2}>
   <NetworkUpgradesChart/>
 </Box>
 <br/>

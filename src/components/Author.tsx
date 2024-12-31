@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, useColorModeValue, Text, Input, SimpleGrid, Button, Flex,IconButton, Tooltip, Spinner, Avatar} from "@chakra-ui/react";
+import { Box, useColorModeValue, Text, Select,Input, SimpleGrid, Button, Flex,IconButton, Tooltip, Spinner, Avatar,Menu, MenuButton, MenuList,MenuItem} from "@chakra-ui/react";
 import { saveAs } from 'file-saver';
 import AllLayout from './Layout';
 import NextLink from 'next/link';
@@ -203,26 +203,49 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   return (
     <>
       <Box p={5} maxW="1200px" mx="auto">
-        {/* Search Bar & Download Button */}
-        <Flex justifyContent="center" mt={3} alignItems="center" gap={4}>
-          <Input
-            placeholder="Search Author"
-            value={selectedAuthor}
-            onChange={(e) => setSelectedAuthor(e.target.value)}
-            size="lg"
-            width={{ base: '80%', md: '50%' }}
-            borderRadius="full"
-            boxShadow="md"
-            bg={useColorModeValue('white', 'gray.800')}
-            borderColor={useColorModeValue('gray.300', 'gray.600')}
-            _focus={{
-              borderColor: useColorModeValue('blue.400', 'blue.600'),
-              boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
-            }}
-          />
-          
-        </Flex>
-        </Box>
+  {/* Search Bar & Dropdown */}
+  <Flex justifyContent="center" mt={3} alignItems="center" gap={4}>
+    {/* Search Input */}
+    <Input
+      placeholder="Search Author"
+      value={selectedAuthor}
+      onChange={(e) => setSelectedAuthor(e.target.value)}
+      size="lg"
+      width={{ base: '80%', md: '50%' }}
+      borderRadius="full"
+      boxShadow="md"
+      bg={useColorModeValue('white', 'gray.800')}
+      borderColor={useColorModeValue('gray.300', 'gray.600')}
+      _focus={{
+        borderColor: useColorModeValue('blue.400', 'blue.600'),
+        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
+      }}
+    />
+
+    {/* Dropdown Menu */}
+    <Menu>
+      <MenuButton
+        as={Button}
+        rightIcon={<ChevronDownIcon />}
+        colorScheme="blue"
+        size="md"
+        width="200px" // Fixed width
+      >
+        Authors
+      </MenuButton>
+      <MenuList>
+        <MenuItem onClick={() => window.location.href = '/SearchEip'}>
+          EIP
+        </MenuItem>
+        <MenuItem onClick={() => window.location.href = '/SearchEipTitle'}>
+          Title
+        </MenuItem>
+      </MenuList>
+    </Menu>
+  </Flex>
+</Box>
+
+
         <Box p={4}>
 
         
@@ -321,29 +344,25 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
       )}
     </Flex>
 
-                  <Box mt={8}>
-                    {/* Download CSV section */}
-                    <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-                    <Text fontSize="lg"
-                    marginBottom={2}
-                    color="black">
-                        You can download the data here:
-                      </Text>
+                  {/* <Box mt={8}>
+                   
+                    <Box padding={1} marginBottom={1}>
+                    
                       <Button colorScheme="blue" onClick={async () => {
-    try {
-      // Trigger the CSV conversion and download
-      handleDownload()
+                      try {
+                       
+                        handleDownload()
 
-      // Trigger the API call
-      await axios.post("/api/DownloadCounter");
-    } catch (error) {
-      console.error("Error triggering download counter:", error);
-    }
-  }} disabled={isLoading}>
+                       
+                        await axios.post("/api/DownloadCounter");
+                      } catch (error) {
+                        console.error("Error triggering download counter:", error);
+                      }
+                    }} disabled={isLoading}>
                         {isLoading ? <Spinner size="sm" /> : "Download CSV"}
                       </Button>
                     </Box>
-                  </Box>
+                  </Box> */}
             
                   <Box
   display="flex"
@@ -353,6 +372,19 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   ml={2}
   gap={4}
 >
+<Button colorScheme="blue" onClick={async () => {
+                      try {
+                        // Trigger the CSV conversion and download
+                        handleDownload()
+
+                        // Trigger the API call
+                        await axios.post("/api/DownloadCounter");
+                      } catch (error) {
+                        console.error("Error triggering download counter:", error);
+                      }
+                    }} disabled={isLoading}>
+                        {isLoading ? <Spinner size="sm" /> : "Download CSV"}
+                      </Button>
   {/* Filter Button on the left */}
   <Button
     onClick={() => setFilterVisible((prev) => !prev)}

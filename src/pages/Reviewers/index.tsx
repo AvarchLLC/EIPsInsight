@@ -438,7 +438,9 @@ const generateCSVData3 = (reviewer: string) => {
       // const reviewers = Array.from(new Set(formattedData.map(review => review.reviewer)));
 
       // console.log("reviewers:",reviewers);
-      const githubHandles = await fetchReviewers();
+      // const githubHandles = await fetchReviewers();
+      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu",];
+      const githubHandles2 = await fetchReviewers();
       // console.log("active:",activereviewers);
       
       // // Create the initial state for showing reviewers (set all to true by default)
@@ -446,9 +448,21 @@ const generateCSVData3 = (reviewer: string) => {
         (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
         {}
       );
+      const updatedReviewers = Object.keys(initialShowReviewer).reduce((acc, reviewer) => {
+        acc[reviewer] = githubHandles2.includes(reviewer);
+        return acc;
+      }, {} as ShowReviewerType);
+    
+      setShowReviewer(updatedReviewers);
       console.log("initial reviewers:",initialShowReviewer)
   
-      setShowReviewer(initialShowReviewer);
+      // setShowReviewer(initialShowReviewer);
+
+      
+
+      // selectActiveReviewers();
+
+      
       
       // const activereviewers = await fetchReviewers();
       // console.log("active:",activereviewers);
@@ -2160,14 +2174,14 @@ const router = useRouter();
         </MenuItem>
 
         
-        {/* <MenuItem onClick={selectAllReviewers}>
+        <MenuItem onClick={selectActiveReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
-          Emeritus Editors
+          Active Editors
           </Text>
-        </MenuItem> */}
+        </MenuItem>
 
         
-        <MenuItem onClick={selectActiveReviewers}>
+        <MenuItem onClick={selectAllReviewers}>
           <Text as="span" fontWeight="bold" textDecoration="underline">
             Select All
           </Text>

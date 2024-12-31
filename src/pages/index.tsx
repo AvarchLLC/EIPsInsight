@@ -6,7 +6,7 @@ import Head from "next/head"
 import ViewsShare from "@/components/ViewsNShare";
 
 
-const Dasboard = () => {
+const Home = () => {
  
   useEffect(() => {
     // Send a POST request to increment the counter when the page loads
@@ -32,4 +32,4 @@ const Dasboard = () => {
   );
 };
 
-export default Dasboard;
+export default Home;

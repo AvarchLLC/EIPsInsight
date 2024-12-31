@@ -191,7 +191,7 @@ const PECTRA= [
                 and optimize the management of proposals.
               </Text>
               <Link
-                href="https://etherworld.co/2024/12/30/eips-insight-recap-2024-milestones/"
+                href="/milestones"
                 color="blue.400"
                 isExternal
               >
