@@ -5,6 +5,7 @@ import {
   Wrap,
   WrapItem,
   Badge,
+  Flex,
   Link,
   Button,
 } from "@chakra-ui/react";
@@ -350,6 +351,7 @@ const InsightTable: React.FC<TabProps> = ({
         ) : (
           <>
             <Box>
+              <Flex justifyContent="flex-end">
               <Button
                 colorScheme="blue"
                 variant="outline"
@@ -371,6 +373,7 @@ const InsightTable: React.FC<TabProps> = ({
                 <DownloadIcon marginEnd={"1.5"} />
                 Download Reports
               </Button>
+              </Flex>
             </Box>
             <CSmartTable
               items={filteredData.sort((a, b) => a.sr - b.sr)}

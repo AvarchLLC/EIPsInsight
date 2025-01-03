@@ -7,6 +7,7 @@ import {
   WrapItem,
   Badge,
   Link,
+  Flex,
   Button,
   Select,
 } from "@chakra-ui/react";
@@ -184,7 +185,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
             const entryKey = entry[key];
             
             // If this is the first time we see this `key` or if the current entry's date is earlier, store it
-            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) < new Date(uniqueEntries[entryKey].changeDate)) {
+            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
               uniqueEntries[entryKey] = entry;
             }
           });
@@ -199,19 +200,25 @@ const Table: React.FC<TableProps> = ({ type }) => {
           const eipStatusChangesMap: { [eip: string]: string[] } = {};
           const eipTypeChangesMap: { [eip: string]: string[] } = {};
           const eipCategoryChangesMap: { [eip: string]: string[] } = {};
+          const standardTrackTypes = [
+            "Standards Track",
+            "Standard Track",
+            "Standards Track (Core, Networking, Interface, ERC)",
+            "Standard"
+          ];
         
           data.forEach((entry: any) => {
             const { eip, type,category,fromStatus, toStatus, changedDay, changedMonth, changedYear } = entry;
 
-            if(eip=='5069'){
+            if(eip=='615'){
               console.log('entry:', entry);
             }
         
             // Generate the status change string in the required format
             
-            const statusChangeString = `${fromStatus === "unknown" ? "" : fromStatus + " -> "}${toStatus}, ${changedDay}-${changedMonth}-${changedYear}`;
+            const statusChangeString = `${fromStatus === "unknown" ? "" : fromStatus + " -> "}${toStatus}(${changedDay}-${changedMonth}-${changedYear})`;
 
-            const eipType=`${type}`
+            let eipType=`${type}`
             const eipCategory=`${category}`
         
             // If we already have status changes for this eip, add the new change
@@ -223,15 +230,25 @@ const Table: React.FC<TableProps> = ({ type }) => {
             }
 
             if (eipTypeChangesMap[eip]) {
-              const previousType = eipTypeChangesMap[eip][eipTypeChangesMap[eip].length - 1];
-              if(eip=='5069'){
-                console.log("prev:",previousType);
-                console.log("curr:",eipType)
+              let previousType = eipTypeChangesMap[eip][eipTypeChangesMap[eip].length - 1];
+              
+              if(standardTrackTypes.includes(eipType)){
+                eipType="Standards Track"
               }
-              if (previousType !== eipType) {
+              if(previousType===`->${eipType}`){
+                previousType=eipType
+              }
+              if ((previousType !== eipType)&& ("->"+previousType !== eipType)) {
                 eipTypeChangesMap[eip].push(`->${eipType}`);
+                if(eip=='615'){
+                  console.log(`${previousType}->${eipType}`);
+                }
+            
               }
             } else {
+              if(standardTrackTypes.includes(eipType)){
+                eipType="Standards Track"
+              }
               eipTypeChangesMap[eip] = [eipType];
             }
             
@@ -251,8 +268,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
             
             // Join the status changes into a single string
             const statusChanges = eipStatusChangesMap[eip]?.join(', ') || '';
-            const TypeChanges = eipTypeChangesMap[eip]?.join(', ') || '';
-            const CategoryChanges = eipCategoryChangesMap[eip]?.join(', ') || '';
+            const TypeChanges = eipTypeChangesMap[eip]?.join(' ') || '';
+            const CategoryChanges = eipCategoryChangesMap[eip]?.join(' ') || '';
         
             allEntries.push({
               eip,
@@ -378,7 +395,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
   });
   const filteredDataWithMergedYearsAndMonths = filteredData;
 
-  // console.log("filtered data:", filteredDataWithMergedYearsAndMonths)
+  console.log("filtered data:", filteredDataWithMergedYearsAndMonths)
 
   const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
     const isYearInRange =
@@ -416,7 +433,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
           ...item,
           statusChanges: matchingEntry ? matchingEntry.statusChanges : '',
           TypeChanges: matchingEntry ? matchingEntry.TypeChanges : '',
-          CategoryChanges: matchingEntry ? matchingEntry.CategoryChanges : '', 
+          // CategoryChanges: matchingEntry ? matchingEntry.CategoryChanges : '', 
         };
       });
   
@@ -526,9 +543,11 @@ const Table: React.FC<TableProps> = ({ type }) => {
           
           ) : (
             <>
+            <Flex justifyContent="flex-end">
               <Popover trigger={"hover"} placement={"bottom-start"}>
                 <PopoverTrigger>
                   <Box>
+                  
                     <Button
                       colorScheme="blue"
                       variant="outline"
@@ -550,6 +569,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       <DownloadIcon marginEnd={"1.5"} />
                       Download Reports
                     </Button>
+                    {/* </Flex> */}
                   </Box>
                  
                 </PopoverTrigger>
@@ -660,6 +680,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   </div>
                 </PopoverContent>
               </Popover>
+              </Flex>
 
               <CSmartTable
                 items={filteredDataWithMergedYearsAndMonths}
@@ -737,7 +758,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${type === "ERC" ? "ercs/erc" : type === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -750,7 +771,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${type === "ERC" ? "ercs/erc" : type === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>

@@ -239,7 +239,7 @@ const Type = () => {
 
     <Box paddingY={"8"}>
       <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
-        Draft vs Final
+        Draft vs Final (Over the Years)
       </Text>
       <AreaStatus type={"EIPs"} />
     </Box>

@@ -279,6 +279,7 @@ const csvContent = header
     bgColor={bg}
     paddingX="0.5rem"
     borderRadius="0.55rem"
+    minHeight="540px"
     _hover={{
       border: "1px",
       borderColor: "#30A0E0",
@@ -314,7 +315,7 @@ const csvContent = header
           : `${type} - [${data.length}]`}
       </Text>
     </NextLink>
-      <Button colorScheme="blue" onClick={async () => {
+      <Button colorScheme="blue"  fontSize={{ base: "0.6rem", md: "md" }} onClick={async () => {
     try {
       // Trigger the CSV conversion and download
       downloadData();
@@ -332,18 +333,18 @@ const csvContent = header
     <Box
       width={"100%"}       // Make the container full width
       minWidth={"100px"}  // Set a minimum width
-      height={400}
+      // height={400}
       overflowX="auto"     // Enable horizontal scrolling if necessary
       overflowY="hidden"
       as={motion.div}
-      padding={"2 rem"}
+      // padding={"2 rem"}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
     >
       <Area {...config} />
-      <Box className={"w-full"}>
-        <DateTime />
-      </Box>
+     <Box className={"w-full"}>
+          <DateTime />
+        </Box>
     </Box>
   </Box>
 </>

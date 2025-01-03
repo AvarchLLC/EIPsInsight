@@ -20,6 +20,7 @@ ChartJS.register(
 );
 import dynamic from "next/dynamic";
 import axios from "axios";
+import NextLink from "next/link";
 
 interface EIP {
   _id: string;
@@ -191,6 +192,7 @@ const csvContent = header
       <Box
         bg={bg}
         borderRadius="0.55rem"
+         minHeight="540px"
         _hover={{
           border: "1px",
           borderColor: "#30A0E0",
@@ -199,12 +201,27 @@ const csvContent = header
         <br/>
         <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" paddingX="1rem">
           <Heading size="md" color={headingColor}>
-            <a href="/erctable">
-              {`Status - [${data.length}]`}
-            </a>
+          <NextLink
+      href={
+         "/erctable"
+      }
+    >
+      <Text
+        fontSize="2xl"
+        fontWeight="bold"
+        color="#30A0E0"
+        className="text-left"
+        // paddingY={4}
+        paddingLeft={4}
+        display="flex"
+        flexDirection="column"
+      >
+        {`Present status - [${data.length}]`}
+      </Text>
+    </NextLink>
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={async () => {
+          <Button colorScheme="blue"  fontSize={{ base: "0.6rem", md: "md" }} onClick={async () => {
     try {
       // Trigger the CSV conversion and download
       downloadData();

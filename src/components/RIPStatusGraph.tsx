@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Grid, Text, useColorModeValue, Button, Flex} from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import StatusColumnChart from "@/components/StatusColumnChart";
 import AreaC from "@/components/AreaStatus";
@@ -84,12 +84,41 @@ const RIPStatusGraph = () => {
     fetchData();
   }, []);
 
+  const handleDownloadCSV = (data: StatusChartData[]) => {
+    // Convert data to CSV
+    const csvContent = [
+      ["Year", "EIP", "Last Status", "EIP Title", "EIP Category", "Link"], // Headers
+      ...data.flatMap((item) =>
+        item.statusChanges.map((statusChange) => [
+          item.year,
+          statusChange.eip,
+          statusChange.lastStatus,
+          statusChange.eipTitle,
+          statusChange.eipCategory,
+          `https://eipsinsight.com/rips/rip-${statusChange.eip}`,
+        ])
+      ),
+    ].map((row) => row.join(","))
+      .join("\n");
+  
+    // Create a Blob and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "status_chart_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/final-status-by-year`);
         const jsonData = await response.json();
         setData(jsonData);
+        console.log(jsonData.rip)
         setGraphData(jsonData.rip);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -150,20 +179,26 @@ const RIPStatusGraph = () => {
 
   return (
     <>
-      <Box
-        className="h-full"
-        bg={bg}
-        paddingY={4}
-        paddingX={6}
-        borderRadius={"0.55rem"}
-      >
+       <Box className="h-full" bg={bg} paddingY={4} paddingX={6} borderRadius={"0.55rem"}>
+      <Flex justifyContent="space-between" alignItems="center" marginBottom="1rem">
         <NextLink href={"/riptable"}>
           <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-            RIP - [{data.length}]
+            RIP (Progress Over the Years) - [{data.length}]
           </Text>
         </NextLink>
-        <Area {...config} />
-      </Box>
+        <Button
+          colorScheme="blue"
+          fontSize={{ base: "0.6rem", md: "md" }}
+          onClick={() => handleDownloadCSV(graphData)}
+        >
+          Download CSV
+        </Button>
+      </Flex>
+      <Area {...config} />
+      <Box className={"w-full"}>
+          <DateTime />
+        </Box>
+    </Box>
     </>
   );
 };

@@ -23,6 +23,8 @@ import RIPStatusGraph from "@/components/RIPStatusGraph";
 import OtherBox from "@/components/OtherStats";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {ChevronUpIcon } from "@chakra-ui/icons";
+import RipCatTable from "@/components/RipCatTable";
+
 interface EIP {
   _id: string;
   eip: string;
@@ -35,6 +37,7 @@ interface EIP {
   discussion: string;
   deadline: string;
   requires: string;
+  repo:string;
   unique_ID: number;
   __v: number;
 }
@@ -47,6 +50,7 @@ interface APIResponse {
 const RIP = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
+  const [data3, setData3] = useState<EIP[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -54,6 +58,12 @@ const RIP = () => {
         console.log(response);
         const jsonData = await response.json();
         setData(jsonData.rip);
+        const alldata=jsonData.eip.concat(jsonData.erc).concat(jsonData.rip);
+        let filteredData2 = alldata
+        .filter((item:any) => item.repo === 'rip');
+        
+        setData3(filteredData2);
+        console.log("filtered data:",filteredData2)
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -109,7 +119,7 @@ const RIP = () => {
     <FlexBetween>
       <Header
         title={`Rolling Improvement Proposal - [ ${data.length} ]`}
-        subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
+        subtitle="RIPs describe changes to the RIP process, or other non-optional changes."
       />
     </FlexBetween>
     <Box
@@ -235,7 +245,19 @@ const RIP = () => {
     <Box paddingY={8}>
       <RIPStatusGraph />
     </Box>
+
+    {/* <Box paddingY={8}>
+    <RipCatTable dataset={data3} cat={"RIP"} status={"Living"} />
+            <RipCatTable dataset={data3} cat={"RIP"} status={"Final"} />
+            <RipCatTable dataset={data3} cat={"RIP"} status={"Last Call"} />
+            <RipCatTable dataset={data3} cat={"RIP"} status={"Review"} />
+            <RipCatTable dataset={data3} cat={"RIP"} status={"Draft"} />
+            <RipCatTable dataset={data3} cat={"RIP"} status={"Withdrawn"} />
+            <RipCatTable dataset={data3} cat={"RIP"} status={"Stagnant"} />
+    </Box> */}
+    
   </Box>
+  
 </motion.div>
 
       )}

@@ -134,7 +134,7 @@ const ERC = () => {
 
     <Box className="pt-8">
       <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-        Draft vs Final
+        Draft vs Final (Over the Years)
       </Text>
       <AreaStatus type="ERCs" />
     </Box>

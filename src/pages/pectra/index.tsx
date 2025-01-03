@@ -72,30 +72,31 @@ const All = () => {
   const Card = ({ image, title, content, link }: { image: string; title: string; content: string; link: string }) => (
     <Flex
       direction="row"
-      bg={bg}
+      bg="gray.50"
       p={3}
       borderRadius="md"
       boxShadow="md"
-      width="100%" // Full width for list-style layout
-      maxWidth="400px" // Optional: limit card width for better readability
-      height="120px" // Fixed height for uniformity
+      width="100%"
+      minWidth="280px" // Prevent cards from shrinking too much
+      maxWidth="400px" // Limit card width
+      height="auto" // Allow flexible height for content
       align="center"
       justify="flex-start"
-      mb={4} // Space between list items
+      mb={4}
     >
       <Image
         src={image}
         alt={title}
-        boxSize="80px" // Fixed size for the image
+        boxSize="80px"
         objectFit="cover"
         borderRadius="md"
-        mr={4} // Space between image and text
+        mr={4}
       />
       <Box>
         <Text
           fontSize="sm"
           fontWeight="bold"
-          noOfLines={1} // Limit title to 1 line
+          noOfLines={1}
           mb={1}
         >
           {title}
@@ -106,6 +107,7 @@ const All = () => {
       </Box>
     </Flex>
   );
+  
   
   
   
@@ -452,198 +454,199 @@ const All = () => {
             Ethereum Network Upgrades
           </Text>
           <Text
-   as={motion.div}
-   initial={{ opacity: 0, y: -20 }}
-   animate={{ opacity: 1, y: 0 }}
-   transition={{ duration: 0.5 } as any}
-   fontSize={{base: "2xl",md:"2xl", lg: "2xl"}}
-   fontWeight="bold"
-   color="#30A0E0"
-   mt={2}
->
-  PECTRA
-</Text>
+          as={motion.div}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 } as any}
+          fontSize={{base: "2xl",md:"2xl", lg: "2xl"}}
+          fontWeight="bold"
+          color="#30A0E0"
+          mt={2}
+        >
+          PECTRA
+        </Text>
 
-<br/>
+        <br/>
 
-<Flex
-  direction={{ base: "column", md: "row" }} // Stack vertically on small screens, horizontally on larger ones
-  align="flex-start" // Align content to the top
-  gap={6} // Add spacing between text and cards
-  width="100%" // Ensure the Flex container occupies full width
-  justify="space-between" // Distribute space evenly between text and cards
->
-  {/* Text Section */}
-  <Text
-    flex={{ base: "1 1 auto", md: "3" }} // Text takes 3/5 width on larger screens
-    fontSize={{ base: "md", md: "lg", lg: "2xl" }}
-    textAlign="justify"
-    lineHeight="1.6"
-    maxWidth="1200px" // Limit text width for better readability
-  >
-    Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
-    collectively known as{" "}
-    <NLink href="https://eipsinsight.com/eips/eip-7600">
-      <Text as="span" color="blue.500" textDecor="underline">
-        Pectra
-      </Text>
-    </NLink>. This upgrade will involve significant changes to both the{" "}
-    <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
-      <Text as="span" color="blue.500" textDecor="underline">
-        Execution and Consensus layers
-      </Text>
-    </NLink>{" "} 
-    on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
-    <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
-      <Text as="span" color="blue.500" textDecor="underline">
-        Ethereum Improvement Proposals (EIPs)
-      </Text>
-    </NLink>, 
-    the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
-    now been shifted to the upcoming{" "}
-    <NLink href="https://eipsinsight.com/eips/eip-7600">
-      <Text as="span" color="blue.500" textDecor="underline">
-        Fusaka
-      </Text>
-    </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
-    <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-5">
-      <Text as="span" color="blue.500" textDecor="underline">
-        Devnet 5
-      </Text>
-    </NLink>{" "} 
-    and has finalized the specifications for Devnet 4. Specs and other details can be followed below.{" "}
-    <NLink href="#carousel-section">
-      <Text as="span" color="blue.500" textDecor="underline">
-        View more
-      </Text>
-    </NLink>.
-  </Text>
+        <Flex
+           direction={{ base: "column", md: "row" }}
+           align="flex-start"
+           gap={{ base: 4, md: 6 }}
+           width="100%"
+           justify="space-between"
+           wrap="wrap" 
+        >
+          {/* Text Section */}
+          <Text
+            flex={{ base: "1 1 auto", md: "3" }} // Text takes 3/5 width on larger screens
+            fontSize={{ base: "md", md: "lg", lg: "2xl" }}
+            textAlign="justify"
+            lineHeight="1.6"
+            maxWidth="1200px" // Limit text width for better readability
+          >
+            Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
+            collectively known as{" "}
+            <NLink href="https://eipsinsight.com/eips/eip-7600">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Pectra
+              </Text>
+            </NLink>. This upgrade will involve significant changes to both the{" "}
+            <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Execution and Consensus layers
+              </Text>
+            </NLink>{" "} 
+            on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
+            <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Ethereum Improvement Proposals (EIPs)
+              </Text>
+            </NLink>, 
+            the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
+            now been shifted to the upcoming{" "}
+            <NLink href="https://eipsinsight.com/eips/eip-7600">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Fusaka
+              </Text>
+            </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
+            <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-5">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Devnet 5
+              </Text>
+            </NLink>{" "} 
+            and has finalized the specifications for Devnet 4. Specs and other details can be followed below.{" "}
+            <NLink href="#carousel-section">
+              <Text as="span" color="blue.500" textDecor="underline">
+                View more
+              </Text>
+            </NLink>.
+          </Text>
 
-  {/* Cards Section */}
-  <Flex
-    flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
-    wrap="wrap" // Ensure cards can wrap onto new rows if needed
-    justify="flex-start" // Align cards to the left
-    gap={4} // Add spacing between cards
-    width="100%" // Ensure cards section takes up full width
-  >
-    {PectraPosts.map((pectra, index) => (
-      <Card
-        key={index}
-        image={pectra.image}
-        title={pectra.title}
-        content={pectra.content}
-        link={pectra.link}
-      />
-    ))}
-  </Flex>
-</Flex>
-
-
-
+          {/* Cards Section */}
+          <Flex
+            flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
+            wrap="wrap" // Ensure cards can wrap onto new rows if needed
+            justify="flex-start" // Align cards to the left
+            gap={4} // Add spacing between cards
+            width="100%" // Ensure cards section takes up full width
+          >
+            {PectraPosts.map((pectra, index) => (
+              <Card
+                key={index}
+                image={pectra.image}
+                title={pectra.title}
+                content={pectra.content}
+                link={pectra.link}
+              />
+            ))}
+          </Flex>
+        </Flex>
 
 
 
 
 
-<Box id="NetworkUpgrades" mt={2}>
-  <NetworkUpgradesChart/>
-</Box>
-<br/>
-<Box id="AuthorContributions">
-  <NetworkUpgradesChart2/>
-</Box>
+
+
+
+        <Box id="NetworkUpgrades" mt={2}>
+          <NetworkUpgradesChart/>
+        </Box>
+        <br/>
+        <Box id="AuthorContributions">
+          <NetworkUpgradesChart2/>
+        </Box>
 
 
       <Grid
-  templateColumns={{ base: "1fr", md: "1fr 1fr" }} // Stack vertically on small screens
-  gap={6}
-  p={6}
->
-  {/* Left Side - Motion Text and Table */}
-  <Box>
-    <Text
-      as={motion.div}
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      fontSize={{ base: "xl", md: "2xl", lg: "4xl" }}
-      fontWeight="bold"
-      color="#30A0E0"
+      templateColumns={{ base: "1fr", md: "1fr 1fr" }} // Stack vertically on small screens
+      gap={6}
+      p={6}
     >
-      Devnets & Testnets
-    </Text>
+      {/* Left Side - Motion Text and Table */}
+      <Box>
+        <Text
+          as={motion.div}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          fontSize={{ base: "xl", md: "2xl", lg: "4xl" }}
+          fontWeight="bold"
+          color="#30A0E0"
+        >
+          Devnets & Testnets
+        </Text>
 
-    <TableContainer style={{ maxHeight: "400px", overflowY: "auto" }}>
-  <Table
-    variant="striped"
-    colorScheme="gray"
-    size="lg"
-    mt={4}
-    style={{
-      border: "1px solid black",
-      borderRadius: "md",
-      boxShadow: "md",
-      width: "100%",
-      tableLayout: "fixed", // Ensures consistent column width
-    }}
-  >
-    <Thead>
-      <Tr style={{ border: "1px solid black" }}>
-        <Th style={{ border: "1px solid black" }}>Date</Th>
-        <Th style={{ border: "1px solid black" }}>Devnet Spec</Th>
-      </Tr>
-    </Thead>
-    <Tbody>
-      {[
-        {
-          date: "November 2024",
-          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-5",
-          specText: "Pectra Devnet 5 (Specs)",
-        },
-        {
-          date: "October 2024",
-          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-4",
-          specText: "Pectra Devnet 4 (Specs)",
-        },
-        {
-          date: "August 2024",
-          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
-          specText: "Pectra Devnet 3 (Specs)",
-        },
-        {
-          date: "August 2024",
-          specLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
-          specText: "Tests Specs",
-        },
-        {
-          date: "July 2024",
-          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-2",
-          specText: "Pectra Devnet 2 (Specs)",
-        },
-        {
-          date: "June 2024",
-          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-1",
-          specText: "Pectra Devnet 1 (Specs)",
-        },
-        {
-          date: "May 2024",
-          specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
-          specText: "Pectra Devnet 0 (Specs)",
-        },
-      ].map((item, index) => (
-        <Tr style={{ border: "1px solid black" }} key={index}>
-          <Td style={{ border: "1px solid black" }}>{item.date}</Td>
-          <Td style={{ border: "1px solid black" }}>
-            <Link href={item.specLink} color="blue.500" textDecor="underline" isExternal>
-              {item.specText}
-            </Link>
-           
-          </Td>
-        </Tr>
-      ))}
-    </Tbody>
-  </Table>
-</TableContainer>
+        <TableContainer style={{ maxHeight: "400px", overflowY: "auto" }}>
+      <Table
+        variant="striped"
+        colorScheme="gray"
+        size="lg"
+        mt={4}
+        style={{
+          border: "1px solid black",
+          borderRadius: "md",
+          boxShadow: "md",
+          width: "100%",
+          tableLayout: "fixed", // Ensures consistent column width
+        }}
+      >
+        <Thead>
+          <Tr style={{ border: "1px solid black" }}>
+            <Th style={{ border: "1px solid black" }}>Date</Th>
+            <Th style={{ border: "1px solid black" }}>Devnet Spec</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {[
+            {
+              date: "November 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-5",
+              specText: "Pectra Devnet 5 (Specs)",
+            },
+            {
+              date: "October 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-4",
+              specText: "Pectra Devnet 4 (Specs)",
+            },
+            {
+              date: "August 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
+              specText: "Pectra Devnet 3 (Specs)",
+            },
+            {
+              date: "August 2024",
+              specLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
+              specText: "Tests Specs",
+            },
+            {
+              date: "July 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-2",
+              specText: "Pectra Devnet 2 (Specs)",
+            },
+            {
+              date: "June 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-1",
+              specText: "Pectra Devnet 1 (Specs)",
+            },
+            {
+              date: "May 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
+              specText: "Pectra Devnet 0 (Specs)",
+            },
+          ].map((item, index) => (
+            <Tr style={{ border: "1px solid black" }} key={index}>
+              <Td style={{ border: "1px solid black" }}>{item.date}</Td>
+              <Td style={{ border: "1px solid black" }}>
+                <Link href={item.specLink} color="blue.500" textDecor="underline" isExternal>
+                  {item.specText}
+                </Link>
+              
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </TableContainer>
 
 
   </Box>

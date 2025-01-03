@@ -101,8 +101,12 @@ const Navbar: React.FC = () => {
       label: "Insight",
       children: [
         {
-          label: "2024",
+          label: "2025",
           children: getMonthsTillCurrentYear(),
+        },
+        {
+          label: "2024",
+          children: getMonthsTillYear(2024),
         },
         {
           label: "2023",
@@ -244,10 +248,11 @@ const Navbar: React.FC = () => {
             borderStyle={"solid"}
             borderColor={useColorModeValue("gray.200", "gray.900")}
             align={"center"}
+            // wrap={"wrap"}
             justifyContent={"space-between"} // Add this line
             className="lg:mx-40 md:mx-20 sm:mx-10 mx-10"
           >
-            <Box className={"flex"}>
+            <Box className={"flex"} flexShrink={0}>
               <Logo />
               <NextLink href={`/home`} passHref>
                 <Text
@@ -264,7 +269,7 @@ const Navbar: React.FC = () => {
 
             <Spacer />
 
-            <div className={"flex space-x-8 font-bold"}>
+            <div className={"flex space-x-2 font-bold"} >
               {NAV_ITEMS.map((navItem) => (
                 <Box key={navItem.label}>
                   <Popover trigger={"hover"} placement={"bottom-start"}>
@@ -756,9 +761,14 @@ const Navbar: React.FC = () => {
                               </Stack>
                             </PopoverContent>
                           )}
+                          
                       </Popover>
                     </Box>
                   ))}
+                  <Box m={4}>
+                  <SearchBox/>
+                  </Box>
+                  
                 </div>
               </>
             ) : (

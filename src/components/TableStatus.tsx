@@ -7,6 +7,7 @@ import {
   Badge,
   Link,
   Button,
+  Flex,
   Select,
 } from "@chakra-ui/react";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
@@ -311,9 +312,11 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
             </Box>
           ) : (
             <>
+            <Flex justifyContent="flex-end">
               <Popover trigger={"hover"} placement={"bottom-start"}>
                 <PopoverTrigger>
                   <Box>
+                    {/* <Flex justifyContent="flex-end"> */}
                     <Button
                     
                       colorScheme="blue"
@@ -336,6 +339,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       <DownloadIcon marginEnd={"1.5"} />
                       Download Reports
                     </Button>
+                    {/* </Flex> */}
                   </Box>
                 </PopoverTrigger>
                 <br/>
@@ -435,6 +439,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                   </div>
                 </PopoverContent>
               </Popover>
+              </Flex>
               
               <CSmartTable
                 items={filteredDataWithMergedYearsAndMonths.sort(

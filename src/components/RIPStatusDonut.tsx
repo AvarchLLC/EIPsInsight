@@ -20,6 +20,7 @@ ChartJS.register(
   Legend
 );
 import dynamic from "next/dynamic";
+import NextLink from "next/link";
 
 interface EIP {
   _id: string;
@@ -195,16 +196,37 @@ const csvContent = header
           border: "1px",
           borderColor: "#30A0E0",
         }}
+        minHeight="540px"
       >
         <br/>
         <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" paddingX="1rem">
           <Heading size="md" color={headingColor}>
-            <a href="/riptable">
+          <NextLink
+      href={
+         "/riptable"
+      }
+    >
+      <Text
+        fontSize="2xl"
+        fontWeight="bold"
+        color="#30A0E0"
+        className="text-left"
+        // paddingY={4}
+        paddingLeft={4}
+        display="flex"
+        flexDirection="column"
+      >
+        {`Present status - [${data.length}]`}
+      </Text>
+    </NextLink>
+            
+            {/* <a href="/riptable">
               {`Status - [${data.length}]`}
-            </a>
+            </a> */}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <Button colorScheme="blue" 
+           fontSize={{ base: "0.6rem", md: "md" }}
           onClick={async () => {
             try {
               // Trigger the CSV conversion and download
@@ -221,7 +243,7 @@ const csvContent = header
           </Button>
         </Flex>
         <Area {...config} />
-        <Box className={"w-full"}>
+       <Box className={"w-full"}>
           <DateTime />
         </Box>
       </Box>
