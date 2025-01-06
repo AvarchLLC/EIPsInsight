@@ -37,7 +37,34 @@ interface EIP {
   repo:string;
   unique_ID: number;
   __v: number;
-} 
+}
+
+const getCat = (cat: string) => {
+    switch (cat) {
+      case "Standards Track" ||
+        "Standard Track" ||
+        "Standards Track (Core, Networking, Interface, ERC)" ||
+        "Standard" ||
+        "Process" ||
+        "Core" ||
+        "core":
+        return "Core";
+      case "ERC":
+        return "ERCs";
+      case "RIP":
+        return "RIPs";
+      case "Networking":
+        return "Networking";
+      case "Interface":
+        return "Interface";
+      case "Meta":
+        return "Meta";
+      case "Informational":
+        return "Informational";
+      default:
+        return "Core";
+    }
+  };
 
 const EIPStatusDonut = () => {
   const [data, setData] = useState<EIP[]>([]);
@@ -47,7 +74,7 @@ const EIPStatusDonut = () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData.rip);
+        setData(jsonData.erc);
         setIsReady(true);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -86,7 +113,21 @@ const EIPStatusDonut = () => {
       status: "Withdrawn",
       value: data.filter((item) => item.status === "Withdrawn").length,
     },
-  ].filter((item) => item.value > 0);
+  ];
+
+  const dat2 = [
+   
+      {
+        status: "Meta",
+        value: data.filter((item) => getCat(item.category) === "Meta").length,
+      },
+      {
+        status: "ERC",
+        value: data.filter((item) => getCat(item.category) === "ERCs").length,
+      },
+    
+  ];
+
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Pie),
     {
@@ -121,7 +162,7 @@ const EIPStatusDonut = () => {
 
   const config = {
     appendPadding: 10,
-    data: dat,
+    data: dat2,
     angleField: "value",
     colorField: "status",
     radius: 1,
@@ -201,11 +242,11 @@ const csvContent = header
         }}
       >
         <br/>
-        <Flex justifyContent="space-between" alignItems="center" paddingX="1rem">
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" paddingX="1rem">
           <Heading size="md" color={headingColor}>
           <NextLink
       href={
-         "/riptable"
+         "/erctable"
       }
     >
       <Text
@@ -217,7 +258,7 @@ const csvContent = header
         display="flex"
         flexDirection="column"
       >
-        {`RIP - [${data.length}]`}
+        {`ERC - [${data.length}]`}
       </Text>
     </NextLink>
           </Heading>

@@ -5,12 +5,12 @@ import dynamic from "next/dynamic";
 import axios from "axios";
 
 interface StatusChart {
-  statusChanges: [
+  categoryChanges: [
     {
       eip: string;
-      lastStatus: string;
+      lastCategory: string;
       eipTitle: string;
-      eipCategory: string;
+      eipStatus: string;
     }
   ];
   year: number;
@@ -64,18 +64,6 @@ const categoryColors: string[] = [
   "rgb(255, 0, 0)",
   "rgb(0, 128, 0)",
 ];
-const categoryBorder: string[] = [
-  "rgba(255, 99, 132, 0.2)",
-  "rgba(255, 159, 64, 0.2)",
-  "rgba(255, 205, 86, 0.2)",
-  "rgba(75, 192, 192, 0.2)",
-  "rgba(54, 162, 235, 0.2)",
-  "rgba(153, 102, 255, 0.2)",
-  "rgba(255, 99, 255, 0.2)",
-  "rgba(50, 205, 50, 0.2)",
-  "rgba(255, 0, 0, 0.2)",
-  "rgba(0, 128, 0, 0.2)",
-];
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -109,7 +97,7 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/final-status-by-year`);
+        const response = await fetch(`/api/new/final-category-by-year`);
         const jsonData = await response.json();
         setData(jsonData);
         console.log("chart data", jsonData);
@@ -129,14 +117,14 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
 
   const filteredData = typeData.map((item) => ({
     year: item.year,
-    statusChanges: item.statusChanges.filter(
-      (x) => getCat(x.eipCategory) === category
+    categoryChanges: item.categoryChanges.filter(
+      (x) => getStatus(x.eipStatus) === category
     ),
   }));
 
   const transformedData = filteredData.flatMap((item) =>
-    item.statusChanges.map((change) => ({
-      status: getStatus(change.lastStatus),
+    item.categoryChanges.map((change) => ({
+      category: getCat(change.lastCategory),
       year: item.year,
       value: 1,
     }))
@@ -169,18 +157,18 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
   };
 
   const downloadData = () => {
-    // Define the eipCategory you want to filter by
+    // Define the eipStatus you want to filter by
     const targetCategory = category; // Replace with the desired category value
 
     // Transform the typeData to get the necessary details
-    const transformedData = typeData.flatMap(({ statusChanges, year }) => {
-        return statusChanges
-            .filter(({ eipCategory }) => eipCategory === targetCategory) // Filter by eipCategory
-            .map(({ eip, lastStatus, eipTitle, eipCategory }) => ({
+    const transformedData = typeData.flatMap(({ categoryChanges, year }) => {
+        return categoryChanges
+            .filter(({ eipStatus }) => eipStatus === targetCategory) // Filter by eipStatus
+            .map(({ eip, lastCategory, eipTitle, eipStatus }) => ({
                 eip,
-                lastStatus,
+                lastCategory,
                 eipTitle,
-                eipCategory,
+                eipStatus,
                 year: year.toString(), // Convert year to string
             }));
     });
@@ -193,9 +181,9 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
         "data:text/csv;charset=utf-8," +
         header +
         transformedData
-        .map(({ eip, lastStatus, eipTitle, eipCategory, year }) => {
-            return `${eip},${lastStatus},${eipTitle},${eipCategory},${year},${
-              eipCategory === "ERC"
+        .map(({ eip, lastCategory, eipTitle, eipStatus, year }) => {
+            return `${eip},${lastCategory},${eipTitle},${eipStatus},${year},${
+              eipStatus === "ERC"
                     ? `https://eipsinsight.com/ercs/erc-${eip}`
                     : type === "EIPs"
                     ? `https://eipsinsight.com/eips/eip-${eip}`

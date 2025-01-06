@@ -126,7 +126,7 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
       };
     });
 
-    console.log("filtered data:",filteredData);
+    console.log(" test filtered data:",filteredData);
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 

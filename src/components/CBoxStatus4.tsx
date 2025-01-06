@@ -111,6 +111,8 @@ const getCat = (cat: string) => {
       return "Core";
     case "ERC":
       return "ERCs";
+    case "RIP":
+      return "RIPs";
     case "Networking":
       return "Networking";
     case "Interface":
@@ -144,6 +146,11 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
           );
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
+          console.log(" test erc data:", jsonData.erc)
+        }
+        else if(type === "RIPs" && jsonData.rip){
+            setTypeData(jsonData.rip);
+            console.log(" test erc data:", jsonData.rip)
         }
         setIsLoading(false);
       } catch (error) {
@@ -159,7 +166,12 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
       setTypeData(data?.eip || []);
     } else if (type === "ERCs") {
       setTypeData(data?.erc || []);
+      console.log(" test erc data2:", data?.erc)
     }
+    else if(type === "RIPs") {
+        setTypeData(data?.rip || []);
+        console.log(" test rip data2:", data?.rip)
+      }
   });
 
   const statusData = typeData.filter(
@@ -171,9 +183,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
 
   const result: { [key: string]: number } = {};
 
-  yearData
-    .filter((item) => item.category !== "ERC")
-    .forEach((item) => {
+  yearData.forEach((item) => {
       item.eips.forEach((item) => {
         if (
           (item.type === "Standards Track" ||
@@ -188,9 +198,9 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
           if (item.category === "Core") {
             result["Standard - Core"] = (result["Standard - Core"] || 0) + 1;
           }
-          //  else if (item.category === "ERC") {
-          //   result["Standard - ERC"] = (result["Standard - ERC"] || 0) + 1;
-          // }
+           else if (item.category === "ERC") {
+            result["Standard - ERC"] = (result["Standard - ERC"] || 0) + 1;
+          }
           else if (item.category === "Networking") {
             result["Standard - Networking"] =
               (result["Standard - Networking"] || 0) + 1;
@@ -383,8 +393,8 @@ for (const key of standardTrackKeys) {
 
   const currentYear = new Date().getFullYear();
   const years = Array.from(
-    new Array(currentYear - 2014),
-    (val, index) => index + 2015
+    new Array(currentYear - 2022),
+    (val, index) => index + 2023
   ).reverse();
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedYear(parseInt(event.target.value));
@@ -406,7 +416,7 @@ for (const key of standardTrackKeys) {
       ) : (
         <Box
           bgColor={bg}
-          // marginTop={"2rem"}
+        //   marginTop={"2rem"}
           p="1rem 1rem"
           borderRadius="0.55rem"
           overflowX="auto"

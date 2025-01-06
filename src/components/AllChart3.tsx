@@ -6,34 +6,6 @@ import DateTime from "@/components/DateTime";
 import NextLink from "next/link";
 import axios from "axios";
 
-const getCat = (cat: string) => {
-  switch (cat) {
-    case "Standards Track" ||
-      "Standard Track" ||
-      "Standards Track (Core, Networking, Interface, ERC)" ||
-      "Standard" ||
-      "Process" ||
-      "Core" ||
-      "core":
-      return "Core";
-    case "ERC":
-      return "ERCs";
-    case "RIP":
-      return "RIPs";
-    case "Networking":
-      return "Networking";
-    case "Interface":
-      return "Interface";
-    case "Meta":
-      return "Meta";
-    case "Informational":
-      return "Informational";
-    default:
-      return "Core";
-  }
-};
-
-
 interface EIP {
   _id: string;
   eip: string;
@@ -65,9 +37,10 @@ const categoryColors: string[] = [
   "rgb(0, 128, 0)",
 ];
 
+
 interface ChartProps {
   type: string;
-}
+} 
 
 const AllChart: React.FC<ChartProps> = ({ type }) => {
   const [data, setData] = useState<EIP[]>([]);
@@ -100,17 +73,17 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
   }, []);
 
   interface TransformedData {
-    category: string;
+    status: string;
     year: number;
     value: number;
   }
   
   const transformedData = data.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
-    const category = getCat(item.category);
+    const status = item.status;
   
     // Check if a record for the same category and year already exists
-    const existingEntry = acc.find((entry) => entry.year === year && entry.category === category);
+    const existingEntry = acc.find((entry) => entry.year === year && entry.status === status);
   
     if (existingEntry) {
       // If it exists, increment the value
@@ -118,7 +91,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     } else {
       // Otherwise, create a new entry
       acc.push({
-        category: category,
+        status: status,
         year: year,
         value: 1,
       });
@@ -160,7 +133,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
       end: 1,
   },
     color: categoryColors,
-    seriesField: "category",
+    seriesField: "status",
     isStack: true,
     areaStyle: { fillOpacity: 0.6 },
     legend: { position: "top-right" as const },
@@ -261,10 +234,7 @@ const csvContent = header
     </NextLink>
       <Button colorScheme="blue"  fontSize={{ base: "0.6rem", md: "md" }} onClick={async () => {
     try {
-      // Trigger the CSV conversion and download
       downloadData();
-
-      // Trigger the API call
       await axios.post("/api/DownloadCounter");
     } catch (error) {
       console.error("Error triggering download counter:", error);
@@ -277,11 +247,9 @@ const csvContent = header
     <Box
       width={"100%"}       // Make the container full width
       minWidth={"100px"}  // Set a minimum width
-      // height={400}
       overflowX="auto"     // Enable horizontal scrolling if necessary
       overflowY="hidden"
       as={motion.div}
-      // padding={"2 rem"}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
     >

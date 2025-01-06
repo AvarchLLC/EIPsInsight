@@ -202,22 +202,21 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
       ) : (
         <Box
         bgColor={bg}
-        // marginTop={"0.7rem"}
-        p="1.5rem" // Uniform padding or use px/rem as needed
-        pt="1.5rem"
-        pb="1.5rem"
-        borderRadius="0.55rem"
-        overflowX="auto"
-        _hover={{
-          border: "1px",
-          borderColor: "#30A0E0",
-        }}
-        maxH={maxHeight}
-        as={motion.div}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 } as any}
-        className="ease-in duration-200"
+                 // marginTop={"2rem"}
+                 p="1rem 1rem"
+                 borderRadius="0.55rem"
+                 overflowX="auto"
+                 _hover={{
+                   border: "1px",
+                   borderColor: "#30A0E0",
+                 }}
+                 maxH={maxHeight}
+                 as={motion.div}
+                 minHeight="600px"
+                 initial={{ opacity: 0, y: -20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 0.5 } as any}
+                 className="ease-in duration-200"
         >
           <Box className={"flex w-full gap-10"}>
             <Select

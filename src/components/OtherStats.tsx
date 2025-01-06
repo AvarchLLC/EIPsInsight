@@ -30,7 +30,7 @@ interface EIP {
 
 interface Props {
   type: string;
-}
+} 
 
 const OtherBox: React.FC<Props> = ({ type }) => {
   const [EIPdata, setEIPData] = useState<EIP>({
@@ -100,7 +100,7 @@ const OtherBox: React.FC<Props> = ({ type }) => {
     <Box
       bgColor={bg}
       p="1rem"
-      minHeight="540px"
+      minHeight="605px"
       borderRadius="0.55rem"
       _hover={{
         border: "1px",

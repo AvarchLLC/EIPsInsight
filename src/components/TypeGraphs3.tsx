@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Grid, Text, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import StatusColumnChart from "@/components/StatusColumnChart";
+import StatusColumnChart from "@/components/StatusCategoryChart";
 import NextLink from "next/link";
 import DateTime from "./DateTime";
 
@@ -50,19 +50,19 @@ const TypeGraphs = () => {
         <Grid templateColumns="1fr 1fr 1fr" gap={8}>
           <NextLink href={"/core"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Core - [{data.filter((item) => item.category === "Core").length}]
+              Draft - [{data.filter((item) => item.status === "Draft").length}]
             </Text>
           </NextLink>
           <NextLink href={"/networking"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Networking - [
-              {data.filter((item) => item.category === "Networking").length}]
+              Review - [
+              {data.filter((item) => item.status === "Review").length}]
             </Text>
           </NextLink>
           <NextLink href={"/interface"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Interface - [
-              {data.filter((item) => item.category === "Interface").length}]
+              Last Call - [
+              {data.filter((item) => item.status === "Last Call").length}]
             </Text>
           </NextLink>
         </Grid>
@@ -87,7 +87,7 @@ const TypeGraphs = () => {
             transition={{ duration: 0.5 } as any}
             className="hover: cursor-pointer ease-in duration-200"
           >
-            <StatusColumnChart category={"Core"} type={"EIPs"} />
+            <StatusColumnChart category={"Draft"} type={"EIPs"} />
             <Box className={"w-full"}>
               <DateTime />
             </Box>
@@ -112,7 +112,7 @@ const TypeGraphs = () => {
             transition={{ duration: 0.5 } as any}
             className="hover: cursor-pointer ease-in duration-200"
           >
-            <StatusColumnChart category={"Networking"} type={"EIPs"} />
+            <StatusColumnChart category={"Review"} type={"EIPs"} />
             <Box className={"w-full"}>
               <DateTime />
             </Box>
@@ -137,7 +137,7 @@ const TypeGraphs = () => {
             transition={{ duration: 0.5 } as any}
             className="hover: cursor-pointer ease-in duration-200"
           >
-            <StatusColumnChart category={"Interface"} type={"EIPs"} />
+            <StatusColumnChart category={"LastCall"} type={"EIPs"} />
             <Box className={"w-full"}>
               <DateTime />
             </Box>
@@ -151,42 +151,24 @@ const TypeGraphs = () => {
           {/*</NextLink>*/}
           <NextLink href={"/meta"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Meta - [{data.filter((item) => item.type === "Meta").length}]
+              Final - [{data.filter((item) => item.status === "Final").length}]
             </Text>
           </NextLink>
           <NextLink href={"/informational"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Informational - [
-              {data.filter((item) => item.type === "Informational").length}]
+              Withdrawn - [
+              {data.filter((item) => item.status === "Withdrawn").length}]
+            </Text>
+          </NextLink>
+          <NextLink href={"/informational"}>
+            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+              Stagnant - [
+              {data.filter((item) => item.status === "Withdrawn").length}]
             </Text>
           </NextLink>
         </Grid>
         <Grid templateColumns="1fr 1fr 1fr" gap={8}>
-          {/*<Box*/}
-          {/*    marginTop={"2rem"}*/}
-          {/*    bg={bg}*/}
-          {/*    p="0.5rem"*/}
-          {/*    borderRadius="0.55rem"*/}
-          {/*    display="flex"*/}
-          {/*    flexDirection="column"*/}
-          {/*    justifyContent="center"*/}
-          {/*    alignItems="center"*/}
-          {/*    height={400}*/}
-          {/*    _hover={{*/}
-          {/*        border: "1px",*/}
-          {/*        borderColor: "#30A0E0",*/}
-          {/*    }}*/}
-          {/*    as={motion.div}*/}
-          {/*    initial={{ opacity: 0, y: -20 }}*/}
-          {/*    animate={{ opacity: 1, y: 0 }}*/}
-          {/*    transition={{ duration: 0.5 } as any}*/}
-          {/*    className="hover: cursor-pointer ease-in duration-200"*/}
-          {/*>*/}
-          {/*    <StatusColumnChart category={'ERCs'} />*/}
-          {/*    <Box className={'w-full'}>*/}
-          {/*        <DateTime />*/}
-          {/*    </Box>*/}
-          {/*</Box>*/}
+          
 
           <Box
             marginTop={"2rem"}
@@ -208,7 +190,7 @@ const TypeGraphs = () => {
             transition={{ duration: 0.5 } as any}
             className="hover: cursor-pointer ease-in duration-200"
           >
-            <StatusColumnChart category={"Meta"} type={"EIPs"} />
+            <StatusColumnChart category={"Final"} type={"EIPs"} />
             <Box className={"w-full"}>
               <DateTime />
             </Box>
@@ -234,7 +216,33 @@ const TypeGraphs = () => {
             transition={{ duration: 0.5 } as any}
             className="hover: cursor-pointer ease-in duration-200"
           >
-            <StatusColumnChart category={"Informational"} type={"EIPs"} />
+            <StatusColumnChart category={"Withdrawn"} type={"EIPs"} />
+            <Box className={"w-full"}>
+              <DateTime />
+            </Box>
+          </Box>
+
+          <Box
+            marginTop={"2rem"}
+            bg={bg}
+            p="0.5rem"
+            borderRadius="0.55rem"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            height={400}
+            _hover={{
+              border: "1px",
+              borderColor: "#30A0E0",
+            }}
+            as={motion.div}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 } as any}
+            className="hover: cursor-pointer ease-in duration-200"
+          >
+            <StatusColumnChart category={"Stagnant"} type={"EIPs"} />
             <Box className={"w-full"}>
               <DateTime />
             </Box>

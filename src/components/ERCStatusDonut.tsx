@@ -32,21 +32,23 @@ interface EIP {
   category: string;
   created: string;
   discussion: string;
-  repo:string;
   deadline: string;
   requires: string;
+  repo:string;
   unique_ID: number;
   __v: number;
-}
+} 
 
-const ERCStatusDonut = () => {
+const EIPStatusDonut = () => {
   const [data, setData] = useState<EIP[]>([]);
+  const [isReady, setIsReady] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
         setData(jsonData.erc);
+        setIsReady(true);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -167,6 +169,7 @@ const csvContent = header
         // Wrap title, author, discussion, and status in double quotes to handle commas
         return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
     }).join("\n");
+
   
     // Create a Blob with the CSV content
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -186,20 +189,19 @@ const csvContent = header
   
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const headingColor = useColorModeValue('black', 'white');
-
   return (
     <>
       <Box
         bg={bg}
         borderRadius="0.55rem"
-         minHeight="540px"
+        minHeight="605px"
         _hover={{
           border: "1px",
           borderColor: "#30A0E0",
         }}
       >
         <br/>
-        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" paddingX="1rem">
+        <Flex justifyContent="space-between" alignItems="center" paddingX="1rem">
           <Heading size="md" color={headingColor}>
           <NextLink
       href={
@@ -207,16 +209,15 @@ const csvContent = header
       }
     >
       <Text
-        fontSize="2xl"
+        fontSize="xl"
         fontWeight="bold"
         color="#30A0E0"
         className="text-left"
-        // paddingY={4}
         paddingLeft={4}
         display="flex"
         flexDirection="column"
       >
-        {`Present status - [${data.length}]`}
+        {`ERC - [${data.length}]`}
       </Text>
     </NextLink>
           </Heading>
@@ -245,4 +246,4 @@ const csvContent = header
   );
 };
 
-export default ERCStatusDonut;
+export default EIPStatusDonut;

@@ -61,11 +61,7 @@ const All = () => {
 
   const optionArr = [
     "All",
-    "Meta",
-    "Informational",
-    "Core",
-    "Networking",
-    "Interface",
+    "EIP",
     "ERC",
     "RIP",
   ];
@@ -200,17 +196,32 @@ const All = () => {
             <Box>
               {/* For larger screens, render buttons */}
               <Box display={{ base: "none", md: "flex" }} className="space-x-6">
-                {optionArr.map((item, key) => (
-                  <button
-                     onClick={() => handleSelection(item)}
-                    className={
-                      selected === item ? "underline underline-offset-4" : ""
-                    }
+              {optionArr.map((item, key) => {
+                if (item === "All") {
+                  return (
+                    <button
+                      key={key}
+                      className="underline underline-offset-4"
+                    >
+                      {item}
+                    </button>
+                  );
+                }
+
+                const link = `/${item.toLowerCase()}`;
+
+                return (
+                  <a
+                    href={link}
                     key={key}
+                    className="mr-4"
                   >
-                    {item}
-                  </button>
-                ))}
+                    <button>
+                      {item}
+                    </button>
+                  </a>
+                );
+              })}
               </Box>
 
               {/* For smaller screens, render a dropdown */}

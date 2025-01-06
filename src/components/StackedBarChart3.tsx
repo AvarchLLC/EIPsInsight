@@ -152,6 +152,10 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
         }
+        else if(type === "RIPs" && jsonData.rip){
+            setTypeData(jsonData.rip);
+            console.log(" test erc data:", jsonData.rip)
+        }
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -166,7 +170,11 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
       setTypeData(data?.eip || []);
     } else if (type === "ERCs") {
       setTypeData(data?.erc || []);
-    }
+      console.log(" test erc data3:", data?.erc)
+    } else if(type === "RIPs") {
+        setTypeData(data?.rip || []);
+        console.log(" test rip data2:", data?.rip)
+      }
   });
 
   const [isChartReady, setIsChartReady] = useState(false);
@@ -188,7 +196,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
         value: eip.count,
       }))
     )
-    .filter((item) => item.category !== "ERCs");
+    // .filter((item) => item.category !== "ERCs");
     console.log(transformedData);
   
   const Area = dynamic(
@@ -332,31 +340,13 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     <Heading size="md" color={headingColor}>
       {`${status}`}
     </Heading>
-    {/* Assuming a download option exists for the yearly data as well */}
-    {/* <Button 
-      colorScheme="blue" 
-      onClick={async () => {
-        try {
-          // Trigger the CSV conversion and download
-          downloadData();
-
-          // Trigger the API call
-          await axios.post("/api/DownloadCounter");
-        } catch (error) {
-          console.error("Error triggering download counter:", error);
-        }
-      }}
-    >
-      Download CSV
-    </Button> */}
+   
   </Flex>
 
-  {/* Make the area chart scrollable on smaller screens */}
   <Box overflowX="auto">
     <Area {...config} />
   </Box>
 
-  {/* Make the DateTime section scrollable in x-direction if necessary */}
   <Box className={"w-full"} overflowX="auto">
     <DateTime />
   </Box>

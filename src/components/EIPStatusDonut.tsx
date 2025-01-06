@@ -37,7 +37,7 @@ interface EIP {
   repo:string;
   unique_ID: number;
   __v: number;
-}
+} 
 
 const EIPStatusDonut = () => {
   const [data, setData] = useState<EIP[]>([]);
@@ -194,14 +194,14 @@ const csvContent = header
       <Box
         bg={bg}
         borderRadius="0.55rem"
-        minHeight="540px"
+        minHeight="605px"
         _hover={{
           border: "1px",
           borderColor: "#30A0E0",
         }}
       >
         <br/>
-        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" paddingX="1rem">
+        <Flex justifyContent="space-between" alignItems="center" paddingX="1rem">
           <Heading size="md" color={headingColor}>
           <NextLink
       href={
@@ -213,12 +213,11 @@ const csvContent = header
         fontWeight="bold"
         color="#30A0E0"
         className="text-left"
-        // paddingY={4}
         paddingLeft={4}
         display="flex"
         flexDirection="column"
       >
-        {`Present status - [${data.length}]`}
+        {`EIP - [${data.length}]`}
       </Text>
     </NextLink>
           </Heading>

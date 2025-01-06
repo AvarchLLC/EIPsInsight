@@ -40,48 +40,54 @@ const ResourcesPage: React.FC = () => {
 
   
 
-  const Card = ({ image, title, content, link }: { image: string; title: string; content: string; link: string }) => (
-    <Flex
-      direction={{ base: "column", md: "row" }}
-      bg={bg}
-      p={5}
-      borderRadius="lg"
-      boxShadow="lg"
-      mb={5}
-      height={{ base: "300px", sm: "350px", md: "200px" }}
-    align="flex-start" // Aligns content to the top
-    
-    >
-      <Image
-        src={image}
-        alt={title}
-        boxSize={{ base: "100%", md: "150px" }}
-        objectFit="cover"
+  const Card = ({ image, title, content, link }: { image: string; title: string; content: string; link: string }) => {
+    return (
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        bg="gray.100" // Replace `bg` with a default color if undefined
+        p={5}
         borderRadius="lg"
-        mr={{ md: 5 }}
-      />
-      <Box>
-      <Text
-        fontSize={{ base: "sm", md: "lg", lg: "xl" }} // Adjust font size for title
-        fontWeight="bold" textAlign="justify"
+        boxShadow="lg"
+        mb={5}
+        height={{ base: "300px", sm: "350px", md: "200px" }}
+        align="center"
       >
-          {title}
-        </Text>
-        <Text
-        mt={2}
-        fontSize={{ base: "sm", sm: "xs", md: "md" }} // Adjust font size for content
-        display={{ base: "none", md: "none",lg:"block" }} // Hide content on sm screens
-        // noOfLines={3}
-        textAlign="justify"
-      >
-          {content}
-        </Text>
-        <Link href={link} color="blue.400" isExternal>
-          Read More
-        </Link>
-      </Box>
-    </Flex>
-  );
+        <Image
+          src={image}
+          alt={title}
+          boxSize={{ base: "150px", md: "150px" }}
+          objectFit="cover"
+          borderRadius="lg"
+          mr={{ md: 5 }}
+        />
+        <Box flex="1" overflow="hidden">
+          <Text
+            fontSize={{ base: "sm", md: "lg", lg: "xl" }}
+            fontWeight="bold"
+            noOfLines={1}
+            mb={1}
+          >
+            {title}
+          </Text>
+          <Text
+            mt={2}
+            fontSize={{ base: "sm", md: "md", lg: "lg" }}
+            noOfLines={3} // Limit to 3 lines on all screen sizes
+            textAlign="justify"
+            overflow="hidden" // Ensures text doesn't overflow
+          >
+            {content}
+          </Text>
+          <Link href={link} color="blue.400" isExternal>
+            Read More
+          </Link>
+        </Box>
+      </Flex>
+    );
+  };
+  
+  // export default Card;
+  
   
 
  const EIPS= [
@@ -156,153 +162,43 @@ const PECTRA= [
         link: "https://etherworld.co/2024/10/17/consensus-layer-call-144/"
     }
 ]
+const INSIGHT= [
+  {
+      image: "EipsInsightRecap.jpg",
+      title: "Eipsinsight milestones 2024",
+      content: "Gossip Limit in Blockchain Networks, Current Setup, Reasons for 10 MiB Limit, Challenges, Proposal Objectives, Implementation & Alternatives.",
+      link: "/milestones2024"
+  },
+  {
+      image: "Blockchain_Future.png",
+      title: "What is EIPsInsight?",
+      content: "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs),  Ethereum Request for Comments (ERCs), Rollup Improvement Proposals (RIPs) over a specified period.",
+      link: "/About"
+  },
+ 
+]
 
   const tabContent = [
     {
       label: "EIPsInsight",
       content: (
-        <Box>
-          {/* Cards */}
-          <Flex
-            direction={{ base: "column", md: "row" }}
-            bg={bg}
-            p={5}
-            borderRadius="lg"
-            boxShadow="lg"
-            mb={5}
-          >
-            <Image
-              src="EipsInsightRecap.jpg"
-              alt="EipsInsight"
-              boxSize={{ base: "100%", md: "150px" }}
-              objectFit="cover"
-              borderRadius="lg"
-              mr={{ md: 5 }}
-            />
-            <Box>
-              <Text fontSize="2xl" fontWeight="bold" textAlign="justify">
-                Eipsinsight milestones 2024
-              </Text>
-              <Text mt={2} fontSize={{ base: "sm", sm: "xs", md: "md" }} textAlign="justify">
-                As the Ethereum Improvement Proposals (EIPs) play an important role in shaping Ethereum's future, tools
-                like EIPs Insight offer valuable analytics and tracking solutions to enhance transparency and
-                efficiency. This review highlights the pivotal role played by the Analytics Scheduler, Reviewers
-                Tracker, EIP Board, and other utilities, which together streamline workflows, promote accountability,
-                and optimize the management of proposals.
-              </Text>
-              <Link
-                href="/milestones"
-                color="blue.400"
-                isExternal
-              >
-                Read More
-              </Link>
-            </Box>
-          </Flex>
-
-          {/* Below Content */}
-          <Box bg={bg} p={5} borderRadius="lg" boxShadow="lg">
-  <Text 
-    fontSize={{ base: "sm", sm: "xs", md: "xl" }} 
-    fontWeight="semibold" 
-    color="blue.400" 
-    textAlign="justify"
-  >
-    What is EIPsInsight?
-  </Text>
-
-  <Text 
-    fontSize={{ base: "sm", sm: "xs", md: "xl" }} 
-    mt={4} 
-    textAlign="justify"
-  >
-    EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of{" "}
-    <Link href="https://github.com/ethereum/EIPs" color="blue.400" isExternal className="underline">
-      Ethereum Improvement Proposals (EIPs)
-    </Link>,{" "}
-    <Link href="https://github.com/ethereum/ERCs" color="blue.400" isExternal className="underline">
-      Ethereum Request for Comments (ERCs)
-    </Link>, and{" "}
-    <Link href="https://github.com/ethereum/RIPs" color="blue.400" isExternal className="underline">
-      Rollup Improvement Proposals (RIPs)
-    </Link>{" "}
-    over a specified period. Data provided is used for tracking the progress and workload distribution among
-    EIP Editors, ensuring transparency and efficiency in the proposal review process.
-  </Text>
-
-  <Text 
-    fontSize={{ base: "sm", sm: "xs", md: "xl" }} 
-    mt={4} 
-    textAlign="justify"
-  >
-    EIPsInsight is a tooling platform dedicated to providing in-depth analysis, up-to-date information, and
-    comprehensive insights on Ethereum Standards. Our mission is to empower editors, developers, stakeholders,
-    and the broader Ethereum community with the knowledge and tools necessary to understand and engage with
-    the ongoing evolution of the Ethereum Standards.
-  </Text>
-
-  <Text 
-    fontSize={{ base: "sm", sm: "xs", md: "xl" }} 
-    fontWeight="semibold" 
-    color="blue.400" 
-    textAlign="justify" 
-    mt={10}
-  >
-    Key Features:
-  </Text>
-
-  <ul className="list-disc list-inside space-y-2 text-left text-justify">
-    <li>
-      <strong>Monthly Insight:</strong> Follow the status change of proposals under different types and
-      categories with beautiful charts and tables providing details.
-    </li>
-    <li>
-      <strong>Toolings:</strong> Make use of different toolings such as "Editor Review Tracker" and "Issues
-      and PRs Trackers" which will provide the proposals added, reviewed and moved to various statuses by EIP
-      Editors. These will be helpful for tracking the progress and workload distribution among EIP Editors,
-      ensuring transparency and efficiency in the proposal review process.
-    </li>
-    <li>
-      <strong>Detailed EIP Database:</strong> Explore our extensive database of EIPs, complete with detailed
-      descriptions, statuses, and relevant discussions. Whether you're looking for historical proposals or the
-      latest advancements, our database is your go-to resource.
-    </li>
-    <li>
-      <strong>Expert Analysis:</strong> Gain access to expert commentary and analysis on significant EIPs,
-      their potential impacts, and the broader implications for the Ethereum ecosystem. Our team of
-      experienced analysts and contributors ensure you have the most accurate and relevant insights.
-    </li>
-    <li>
-      <strong>Community Engagement:</strong> Join the conversation with our vibrant community of Ethereum
-      enthusiasts, developers, and stakeholders. Participate in forums, provide feedback on proposals, and
-      stay connected with the latest developments in the Ethereum space.
-    </li>
-    <li>
-      <strong>Educational Resources:</strong> New to EIPs? Our educational resources are designed to help you
-      understand the proposal process, the technical details, and the importance of various EIPs. From
-      beginners to seasoned developers, there's something for everyone.
-    </li>
-    <li>
-      <strong>Regular Updates:</strong> Stay informed with our regular updates and newsletters. Get the latest
-      news, changes, and discussions surrounding EIPs delivered straight to your inbox.
-    </li>
-  </ul>
-
-  <Text 
-    fontSize={{ base: "sm", sm: "xs", md: "xl" }} 
-    mt={6} 
-    textAlign="justify"
-  >
-    At EIPsInsight, we believe in the power of open-source collaboration and the continuous improvement of the
-    Ethereum network.{" "}
-    <Link href="https://x.com/TeamAvarch" color="blue.400" isExternal className="underline">
-      Join us
-    </Link>{" "}
-    in exploring the future of Ethereum, one proposal at a time.
-  </Text>
-</Box>
-
-        </Box>
+        <>
+            <SimpleGrid 
+                columns={{ base: 1, md: 2 }}  // 1 column on small screens, 2 columns on medium and larger screens
+                spacing={4}  // Adjust the space between cards
+            >
+                {INSIGHT.map((eip, index) => (
+                <div key={index}>
+                    {Card({ 
+                    image: eip.image, 
+                    title: eip.title, 
+                    content: eip.content, 
+                    link: eip.link 
+                    })}
+                </div>
+                ))}
+            </SimpleGrid>
+          </>
       ),
     },
     {
@@ -533,43 +429,50 @@ const PECTRA= [
         if (key === 2) handleSelection("PECTRA");
         if (key === 3) handleSelection("RIPs");
       }}>
-      <Box mt={2}  borderRadius="10px 10px 0 0" >
-        <Flex
-          justify="space-between" // Distribute the space between tabs
-          bg="gray.700" // Darker background for dark mode
-          p={1}
-          mb={1}
+     <Box mt={2} borderRadius="10px 10px 0 0">
+  <Flex
+    justify="space-between"
+    bg="gray.700"
+    p={1}
+    mb={1}
+    borderRadius="md"
+  >
+    <TabList
+      mb={1}
+      display="flex"
+      flexWrap="wrap" // Enable wrapping for tabs
+      width="100%"
+      gap={2} // Add spacing between tabs
+    >
+      {tabContent.map((tab, index) => (
+        <Tab
+          key={index}
+          _selected={{
+            bg: "gray.800",
+            color: "white",
+            borderColor: "lightblue",
+            paddingY: 2,
+          }}
+          _hover={{
+            bg: "gray.600",
+          }}
+          p={2}
+          flex={{ base: "1 1 calc(50% - 1rem)", md: "1 1 calc(25% - 1rem)" }} // Responsive flex basis
+          textAlign="center"
           borderRadius="md"
-        //   boxShadow="md"
+          boxShadow="sm"
+          cursor="pointer"
+          color="white"
+          whiteSpace="normal" // Allow text wrapping
+          wordBreak="break-word" // Handle long words
         >
-          <TabList mb={1} display="flex" width="100%">
-            {tabContent.map((tab, index) => (
-              <Tab
-                key={index}
-                _selected={{
-                  bg: "gray.800", // Darker background for selected tab
-                  color: "white", // Text color for selected tab
-                  borderColor: "lightblue", // Highlight border color for selected tab
-                  paddingY: 2, // Reduce the top and bottom padding
-                }}
-                _hover={{
-                  bg: "gray.600", // Hover effect for tabs
-                }}
-                p={2}
-                flex="1 1 150px" // Allow tabs to grow and take up available space
-                textAlign="center"
-                m={2}
-                borderRadius="md"
-                boxShadow="sm"
-                cursor="pointer"
-                color="white" // Always white text
-              >
-                {tab.label}
-              </Tab>
-            ))}
-          </TabList>
-        </Flex>
-      </Box>
+          {tab.label}
+        </Tab>
+      ))}
+    </TabList>
+  </Flex>
+</Box>
+
 
       <TabPanels>
         {tabContent.map((tab, index) => (

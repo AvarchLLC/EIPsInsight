@@ -37,7 +37,34 @@ interface EIP {
   repo:string;
   unique_ID: number;
   __v: number;
-} 
+}
+
+const getCat = (cat: string) => {
+    switch (cat) {
+      case "Standards Track" ||
+        "Standard Track" ||
+        "Standards Track (Core, Networking, Interface, ERC)" ||
+        "Standard" ||
+        "Process" ||
+        "Core" ||
+        "core":
+        return "Core";
+      case "ERC":
+        return "ERCs";
+      case "RIP":
+        return "RIPs";
+      case "Networking":
+        return "Networking";
+      case "Interface":
+        return "Interface";
+      case "Meta":
+        return "Meta";
+      case "Informational":
+        return "Informational";
+      default:
+        return "Core";
+    }
+  };
 
 const EIPStatusDonut = () => {
   const [data, setData] = useState<EIP[]>([]);
@@ -48,6 +75,8 @@ const EIPStatusDonut = () => {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
         setData(jsonData.rip);
+        console.log(jsonData);
+        console.log("rip data:",jsonData.rip);
         setIsReady(true);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -57,36 +86,36 @@ const EIPStatusDonut = () => {
     fetchData();
   }, []);
 
-  const dat = [
+  const dat2 = [
     {
-      status: "Final",
-      value: data.filter((item) => item.status === "Final").length,
+      status: "Core",
+      value: data.filter((item) => item.type === "Standards Track" && item.category === "Core" && item.repo==="rip").length,
     },
-    {
-      status: "Draft",
-      value: data.filter((item) => item.status === "Draft").length,
-    },
-    {
-      status: "Review",
-      value: data.filter((item) => item.status === "Review").length,
-    },
-    {
-      status: "Last Call",
-      value: data.filter((item) => item.status === "Last Call").length,
-    },
-    {
-      status: "Living",
-      value: data.filter((item) => item.status === "Living").length,
-    },
-    {
-      status: "Stagnant",
-      value: data.filter((item) => item.status === "Stagnant").length,
-    },
-    {
-      status: "Withdrawn",
-      value: data.filter((item) => item.status === "Withdrawn").length,
-    },
+      {
+        status: "Networking",
+        value: data.filter((item) => getCat(item.category) === "Networking").length,
+      },
+      {
+        status: "Interface",
+        value: data.filter((item) => getCat(item.category) === "Interface").length,
+      },
+      {
+        status: "Informational",
+        value: data.filter((item) => getCat(item.category) === "Informational").length,
+      },
+      {
+        status: "Meta",
+        value: data.filter((item) => getCat(item.category) === "Meta").length,
+      },
+      {
+        status: "RIP",
+        value: data.filter((item) => getCat(item.category) === "RIPs").length,
+      },
+    
   ].filter((item) => item.value > 0);
+  
+  
+
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Pie),
     {
@@ -118,10 +147,11 @@ const EIPStatusDonut = () => {
     "rgba(255, 0, 0, 0.2)",
     "rgba(0, 128, 0, 0.2)",
   ];
+  console.log(data);
 
   const config = {
     appendPadding: 10,
-    data: dat,
+    data: dat2,
     angleField: "value",
     colorField: "status",
     radius: 1,
@@ -201,7 +231,7 @@ const csvContent = header
         }}
       >
         <br/>
-        <Flex justifyContent="space-between" alignItems="center" paddingX="1rem">
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" paddingX="1rem">
           <Heading size="md" color={headingColor}>
           <NextLink
       href={
@@ -209,7 +239,7 @@ const csvContent = header
       }
     >
       <Text
-        fontSize="xl"
+        fontSize="2xl"
         fontWeight="bold"
         color="#30A0E0"
         className="text-left"
