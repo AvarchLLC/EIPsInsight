@@ -89,13 +89,16 @@ import {
     const filteredData = dataset
       .filter((item) => (cat === "All" || item.category === cat) && item.category === status)
       .map((item) => {
-        const { eip, title, author, repo } = item;
-        return {
-          eip,
-          title,
-          author,
-          repo,
-        };
+        const { eip, title, author, repo, type, category, status } = item;
+      return {
+        eip,
+        title,
+        author,
+        repo,
+        type,
+        category,
+        status,
+      };
       });
   
       console.log(" test filtered data:",filteredData);
@@ -177,6 +180,33 @@ import {
                     {
                       key: 'author',
                       label: 'Author',
+                      _style: {
+                        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                        color: isDarkMode ? 'white' : 'black',
+                        fontWeight: 'bold',
+                      }
+                    },
+                    {
+                      key: 'type',
+                      label: 'Type',
+                      _style: {
+                        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                        color: isDarkMode ? 'white' : 'black',
+                        fontWeight: 'bold',
+                      }
+                    },
+                    {
+                      key: 'category',
+                      label: 'category',
+                      _style: {
+                        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                        color: isDarkMode ? 'white' : 'black',
+                        fontWeight: 'bold',
+                      }
+                    },
+                    {
+                      key: 'status',
+                      label: 'status',
                       _style: {
                         backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
                         color: isDarkMode ? 'white' : 'black',

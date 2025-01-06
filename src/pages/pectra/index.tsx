@@ -69,44 +69,63 @@ const All = () => {
     return list;
   };
 
-  const Card = ({ image, title, content, link }: { image: string; title: string; content: string; link: string }) => (
-    <Flex
-      direction="row"
-      bg="gray.50"
-      p={3}
-      borderRadius="md"
-      boxShadow="md"
-      width="100%"
-      minWidth="280px" // Prevent cards from shrinking too much
-      maxWidth="400px" // Limit card width
-      height="auto" // Allow flexible height for content
-      align="center"
-      justify="flex-start"
-      mb={4}
-    >
-      <Image
-        src={image}
-        alt={title}
-        boxSize="80px"
-        objectFit="cover"
+  // import { Flex, Image, Box, Text, Link, useColorModeValue } from "@chakra-ui/react";
+
+  const Card = ({
+    image,
+    title,
+    content,
+    link,
+  }: {
+    image: string;
+    title: string;
+    content: string;
+    link: string;
+  }) => {
+    const bg = useColorModeValue("gray.50", "gray.700"); // Light mode: gray.50, Dark mode: gray.700
+    const textColor = useColorModeValue("black", "white"); // Light mode: black, Dark mode: white
+  
+    return (
+      <Flex
+        direction="row"
+        bg={bg}
+        p={3}
         borderRadius="md"
-        mr={4}
-      />
-      <Box>
-        <Text
-          fontSize="sm"
-          fontWeight="bold"
-          noOfLines={1}
-          mb={1}
-        >
-          {title}
-        </Text>
-        <Link href={link} color="blue.400" fontSize="xs" isExternal>
-          Read More
-        </Link>
-      </Box>
-    </Flex>
-  );
+        boxShadow="md"
+        width="100%"
+        minWidth="280px" // Prevent cards from shrinking too much
+        maxWidth="400px" // Limit card width
+        height="auto" // Allow flexible height for content
+        align="center"
+        justify="flex-start"
+        mb={4}
+      >
+        <Image
+          src={image}
+          alt={title}
+          boxSize="80px"
+          objectFit="cover"
+          borderRadius="md"
+          mr={4}
+        />
+        <Box>
+          <Text
+            fontSize="sm"
+            fontWeight="bold"
+            noOfLines={1}
+            mb={1}
+            color={textColor} // Dynamically set text color
+          >
+            {title}
+          </Text>
+          <Link href={link} color="blue.400" fontSize="xs" isExternal>
+            Read More
+          </Link>
+        </Box>
+      </Flex>
+    );
+  };
+  
   
   
   
@@ -135,16 +154,7 @@ const All = () => {
 ]
 
   const pectraData = [
-  //   {
-      
-  //     eip: "7600",
-  //     title: "Hardfork Meta - Pectra",
-  //     author: "Tim Beiko (@timbeiko)",
-  //     link: "https://eipsinsight.com/eips/eip-7600",
-  //     type: "Meta",
-  //     category: "Meta",
-  //     discussion: "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205",
-  // },
+
     {
         eip: "2537",
         title: "Precompile for BLS12-381 curve operations",
@@ -524,22 +534,42 @@ const All = () => {
 
           {/* Cards Section */}
           <Flex
-            flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
-            wrap="wrap" // Ensure cards can wrap onto new rows if needed
-            justify="flex-start" // Align cards to the left
-            gap={4} // Add spacing between cards
-            width="100%" // Ensure cards section takes up full width
-          >
-            {PectraPosts.map((pectra, index) => (
-              <Card
-                key={index}
-                image={pectra.image}
-                title={pectra.title}
-                content={pectra.content}
-                link={pectra.link}
-              />
-            ))}
-          </Flex>
+  flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
+  wrap="wrap" // Ensure cards can wrap onto new rows if needed
+  justify="flex-start" // Align cards to the left
+  gap={4} // Add spacing between cards
+  width="100%" // Ensure cards section takes up full width
+  maxHeight="300px" // Limit the height of the container
+  overflowY="auto" // Make the container vertically scrollable
+  overflowX="hidden" // Prevent horizontal scrolling
+  p={4} // Add padding for better spacing inside the scroll area
+  sx={{
+    "&::-webkit-scrollbar": {
+      width: "8px", // Width of the scrollbar
+    },
+    "&::-webkit-scrollbar-thumb": {
+      background: "#3182ce", // Color of the scrollbar thumb
+      borderRadius: "4px", // Rounded edges for the thumb
+    },
+    "&::-webkit-scrollbar-thumb:hover": {
+      background: "#2b6cb0", // Darker color on hover
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "#edf2f7", // Light background for the track
+    },
+  }}
+>
+  {PectraPosts.map((pectra, index) => (
+    <Card
+      key={index}
+      image={pectra.image}
+      title={pectra.title}
+      content={pectra.content}
+      link={pectra.link}
+    />
+  ))}
+</Flex>
+
         </Flex>
 
 

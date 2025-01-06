@@ -6,31 +6,11 @@ import {
   WrapItem,
   Badge,
   Link,
-  Button,
-  Select,
+
 } from "@chakra-ui/react";
 import React, { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Spinner } from "@chakra-ui/react";
-import {
-  Column,
-  PaginationState,
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  ColumnDef,
-  OnChangeFn,
-  flexRender,
-} from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 
 interface EIP {
@@ -76,6 +56,7 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
       setIsLoading(false);
     }, 2000);
   });
+  
   console.log(dataset);
   console.log(status);
   console.log(cat);
@@ -97,6 +78,7 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
         // const response = await fetch(`/api/new/all`);
         // const jsonData = await response.json();
         setData(dataset);
+        console.log("dataset:",dataset)
         setIsLoading(false); // Set isLoading to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -117,12 +99,15 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
   const filteredData = dataset
     .filter((item) => (cat === "All" || item.category === cat) && item.status === status)
     .map((item) => {
-      const { eip, title, author, repo } = item;
+      const { eip, title, author, repo, type, category, status } = item;
       return {
         eip,
         title,
         author,
         repo,
+        type,
+        category,
+        status,
       };
     });
 
@@ -205,6 +190,33 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
                   {
                     key: 'author',
                     label: 'Author',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'type',
+                    label: 'Type',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'category',
+                    label: 'category',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'status',
+                    label: 'status',
                     _style: {
                       backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
                       color: isDarkMode ? 'white' : 'black',

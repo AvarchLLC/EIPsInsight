@@ -76,7 +76,7 @@ const All = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
+      try { 
         setLoading(true);
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
@@ -302,6 +302,7 @@ const All = () => {
     <Box mt={2} display="flex" justifyContent="flex-end" alignItems="center">
       <Button
         colorScheme="blue"
+        fontSize={{ base: "0.6rem", md: "md" }}
         onClick={async () => {
           try {
             // Trigger the CSV conversion and download

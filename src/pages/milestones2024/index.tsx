@@ -131,7 +131,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone2.jpg" alt="Image 2" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -155,7 +155,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone3.png" alt="Image 3" borderRadius="md"
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -176,7 +176,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone4.jpg" alt="Image 4" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -198,7 +198,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone5.png" alt="Image 5" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -234,7 +234,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone6.png" alt="Image 6" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -262,7 +262,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone7.png" alt="Image 7" borderRadius="md"
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -283,7 +283,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone8.png" alt="Image 8" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "950px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -311,7 +311,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone9.png" alt="Image 9" borderRadius="md"
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "950px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -364,7 +364,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone10.png" alt="Image 10" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "950px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -420,7 +420,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone11.png" alt="Image 11" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -451,7 +451,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone12.png" alt="Image 12" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -472,7 +472,7 @@ const EIPsInsightRecap = () => {
         </Text>
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone13.png" alt="Image 13" borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain"
@@ -496,7 +496,7 @@ const EIPsInsightRecap = () => {
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone14.png" alt="Pectra Overview" 
         borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain" 
@@ -511,7 +511,7 @@ const EIPsInsightRecap = () => {
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone15.png" alt="Pectra Specifications" 
         borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain" 
@@ -536,7 +536,7 @@ const EIPsInsightRecap = () => {
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone16.png" alt="Upgrade Chart" 
         borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain" 
@@ -557,7 +557,7 @@ const EIPsInsightRecap = () => {
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone17.png" alt="Author Insights"
         borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain" 
@@ -583,7 +583,7 @@ const EIPsInsightRecap = () => {
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone18.png" alt="EIP Statistics" 
         borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain" 
@@ -602,7 +602,7 @@ const EIPsInsightRecap = () => {
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone19.png" alt="ERC Statistics"
         borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain" 
@@ -617,7 +617,7 @@ const EIPsInsightRecap = () => {
         <Box display="flex" justifyContent="center" width="100%">
         <Image src="milestone20.png" alt="RIP Dashboard" 
         borderRadius="md" 
-        width={{ base: "250px", md: "450px", lg: "650px" }} // Use width instead of boxSize for rectangular shape
+        width={{ base: "250px", md: "450px", lg: "850px" }} // Use width instead of boxSize for rectangular shape
         height="auto" // Maintain aspect ratio
         border="2px solid blue" 
         objectFit="contain" 

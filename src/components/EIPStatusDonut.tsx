@@ -209,7 +209,7 @@ const csvContent = header
       }
     >
       <Text
-        fontSize="2xl"
+        fontSize="xl"
         fontWeight="bold"
         color="#30A0E0"
         className="text-left"

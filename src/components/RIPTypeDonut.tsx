@@ -108,7 +108,7 @@ const EIPStatusDonut = () => {
         value: data.filter((item) => getCat(item.category) === "Meta").length,
       },
       {
-        status: "RIP",
+        status: "RIPs",
         value: data.filter((item) => getCat(item.category) === "RIPs").length,
       },
     
