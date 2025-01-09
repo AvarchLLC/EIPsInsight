@@ -7,6 +7,8 @@ import { SimpleGrid } from "@chakra-ui/react";
 const ResourcesPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const bg2 = useColorModeValue("gray.50", "gray.700"); // Light mode: gray.50, Dark mode: gray.700
+  const textColor2 = useColorModeValue("black", "white"); // Light mode: black, Dark mode: white
 
   const handleSelection = (hash:any) => {
     if (hash === "EIPsInsight") {
@@ -28,11 +30,11 @@ const ResourcesPage: React.FC = () => {
     // Match the hash to the corresponding tab index
     if (hash === "EIPsInsight") {
       setTabIndex(0);
-    } else if (hash === "EIPs") {
+    } else if (hash.toUpperCase() === "EIPs") {
       setTabIndex(1);
-    } else if (hash === "PECTRA") {
+    } else if (hash.toUpperCase() === "PECTRA") {
       setTabIndex(2);
-    } else if (hash === "RIPs") {
+    } else if (hash.toUpperCase() === "RIPs") {
       setTabIndex(3);
     }
   }, []);
@@ -44,7 +46,7 @@ const ResourcesPage: React.FC = () => {
     return (
       <Flex
         direction={{ base: "column", md: "row" }}
-        bg="gray.100" // Replace `bg` with a default color if undefined
+        bg={bg2}
         p={5}
         borderRadius="lg"
         boxShadow="lg"
@@ -64,6 +66,7 @@ const ResourcesPage: React.FC = () => {
           <Text
             fontSize={{ base: "sm", md: "lg", lg: "xl" }}
             fontWeight="bold"
+            color={textColor2}
             noOfLines={1}
             mb={1}
           >
@@ -74,6 +77,7 @@ const ResourcesPage: React.FC = () => {
             fontSize={{ base: "sm", md: "md", lg: "lg" }}
             noOfLines={3} // Limit to 3 lines on all screen sizes
             textAlign="justify"
+            color={textColor2}
             overflow="hidden" // Ensures text doesn't overflow
           >
             {content}
@@ -143,6 +147,12 @@ const ResourcesPage: React.FC = () => {
 
 
 const PECTRA= [
+    {
+        image: "pectra4.png",
+        title: "EtherWorld Weekly — Edition 301",
+        content: "EtherWorld Weekly Edition 301 kicks off the new year with Ethereum’s top 2024 updates, Vitalik’s insights, and upcoming blockchain events. Dive into client releases, governance standards, and the future of AI x crypto!",
+        link: "https://etherworld.co/2025/01/05/etherworld-weekly-edition-301/"
+    },
     {
         image: "pectra1.jpg",
         title: "Ethereum Developers Push Proposal to increase Gossip Limit",
@@ -258,7 +268,11 @@ const INSIGHT= [
     A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem. RIPs act as specifications to improve rollups, enhance interoperability, and standardize development processes.
   </Text>
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    All RIPs are optional. RIPs are and will always remain optional standards for Rollups and participants in the larger EVM ecosystem.
+    <Link  href="https://ethereum-magicians.org/t/about-the-rips-category/19805"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>All RIPs are optional</Link>. RIPs are and will always remain optional standards for Rollups and participants in the larger EVM ecosystem.
   </Text>
   
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
@@ -268,13 +282,13 @@ const INSIGHT= [
     RIPs help coordinate technical improvements for rollups in a transparent, collaborative way. They:
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Propose new features and optimizations.</li>
-    <li>Collect community feedback on rollup-related issues.</li>
-    <li>Serve as a historical record of design decisions.</li>
+    <li>Propose <b>new features</b> and optimizations.</li>
+    <li>Collect <b>community feedback</b> on rollup-related issues.</li>
+    <li>Serve as a <b>historical record</b> of design decisions.</li>
     <li>Help rollups track progress, especially for multi-client implementations.</li>
   </ul>
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    By adopting RIPs, rollups can align on standards and ensure better interoperability across Layer 2 solutions. The goal of the RIP project is to standardize and provide high-quality documentation for Rollups in the Ethereum ecosystem.
+    By adopting RIPs, rollups can align on standards and ensure better <b>interoperability</b> across Layer 2 solutions. The goal of the RIP project is to standardize and provide high-quality documentation for Rollups in the Ethereum ecosystem.
   </Text>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10">
@@ -284,12 +298,12 @@ const INSIGHT= [
     <strong>Standards Track RIPs</strong> - Changes that impact most or all rollup implementations, including:
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Core: Changes to network rules, block validity, EVM opcodes, cryptographic updates.</li>
-    <li>RRC (Rollup Request for Comments): Application-level standards like token or wallet formats.</li>
-    <li>Other: Improvements relevant to core developer discussions.</li>
+    <li><b>Core</b>: Changes to network rules, block validity, EVM opcodes, cryptographic updates.</li>
+    <li><b>RRC (Rollup Request for Comments)</b>: Application-level standards like token or wallet formats.</li>
+    <li><b>Other</b>: Improvements relevant to core developer discussions.</li>
   </ul>
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    <strong>Meta RIPs</strong> - Proposals related to rollup processes, governance, or the RIP process itself. These are not technical but focus on procedures, tools, or guidelines.
+    <strong>Meta RIPs</strong> - Proposals related to rollup processes, governance, or the RIP process itself. These are not technical but focus on <b>procedures, tools, or guidelines</b>.
   </Text>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
@@ -299,16 +313,20 @@ const INSIGHT= [
     The RIP process follows these steps:
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Idea Stage: Share your proposal idea for initial feedback (e.g., Ethereum Magicians forum).</li>
-    <li>Draft: Submit a formal RIP using the template provided.</li>
-    <li>Review: Invite community discussion and peer review.</li>
-    <li>Final: Once accepted, the RIP becomes the standard and is ready for implementation.</li>
-    <li>Stagnant: RIPs inactive for 6+ months may be labeled as stagnant.</li>
-    <li>Withdrawn: Proposals that authors decide to discontinue.</li>
-    <li>Living: RIPs continually updated without reaching a final state.</li>
+    <li><b>Idea Stage</b>: Share your proposal idea for initial feedback (e.g., Ethereum Magicians forum).</li>
+    <li><b>Draft</b>: Submit a formal RIP using the template provided.</li>
+    <li><b>Review</b>: Invite community discussion and peer review.</li>
+    <li><b>Final</b>: Once accepted, the RIP becomes the standard and is ready for implementation.</li>
+    <li><b>Stagnant</b>: RIPs inactive for 6+ months may be labeled as stagnant.</li>
+    <li><b>Withdrawn</b>: Proposals that authors decide to discontinue.</li>
+    <li><b>Living</b>: RIPs continually updated without reaching a final state.</li>
   </ul>
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    Tip: For Core RIPs, presenting your proposal during Rollcall meetings is the best way to gather technical feedback and consensus from rollup core teams.
+    <b>Tip</b>: For Core RIPs, presenting your proposal during  <Link  href="https://github.com/ethereum/pm/issues"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>Rollcall meetings</Link> is the best way to gather technical feedback and consensus from rollup core teams.
   </Text>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
@@ -318,7 +336,11 @@ const INSIGHT= [
     Anyone! Whether you're a developer, researcher, or rollup enthusiast, you can submit an RIP. Before drafting:
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Discuss your idea on the Ethereum Magicians Forum.</li>
+    <li>Discuss your idea on the <Link  href="https://ethereum-magicians.org/"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>Ethereum Magicians Forum</Link>.</li>
     <li>Collaborate with rollup teams early to build consensus.</li>
   </ul>
 
@@ -329,11 +351,11 @@ const INSIGHT= [
     A strong RIP includes:
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Clear Specification: Detailed syntax and semantics of the proposed change.</li>
-    <li>Motivation: Why the change is necessary.</li>
-    <li>Rationale: Design decisions and alternatives considered.</li>
-    <li>Security Considerations: Risks, mitigations, and guidance.</li>
-    <li>Backwards Compatibility: Notes on how the proposal impacts existing implementations.</li>
+    <li><b>Clear Specification</b>: Detailed syntax and semantics of the proposed change.</li>
+    <li><b>Motivation</b>: Why the change is necessary.</li>
+    <li><b>Rationale</b>: Design decisions and alternatives considered.</li>
+    <li><b>Security Considerations</b>: Risks, mitigations, and guidance.</li>
+    <li><b>Backwards Compatibility</b>: Notes on how the proposal impacts existing implementations.</li>
   </ul>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
@@ -343,16 +365,20 @@ const INSIGHT= [
     RIPs must follow a specific template and structure in Markdown format. Each RIP includes:
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Preamble: Metadata such as RIP number, title, author(s), and status.</li>
-    <li>Abstract: A brief technical summary.</li>
-    <li>Specification: A detailed technical description of the proposal.</li>
-    <li>Rationale: Explanation of design choices.</li>
-    <li>Security Considerations: Assessment of potential risks.</li>
-    <li>Test Cases (if applicable): Mandatory for consensus changes.</li>
-    <li>Reference Implementation (optional): Code to aid understanding.</li>
+    <li><b>Preamble</b>: Metadata such as RIP number, title, author(s), and status.</li>
+    <li><b>Abstract</b>: A brief technical summary.</li>
+    <li><b>Specification</b>: A detailed technical description of the proposal.</li>
+    <li><b>Rationale</b>: Explanation of design choices.</li>
+    <li><b>Security Considerations</b>: Assessment of potential risks.</li>
+    <li><b>Test Cases (if applicable)</b>: Mandatory for consensus changes.</li>
+    <li><b>Reference Implementation (optional)</b>: Code to aid understanding.</li>
   </ul>
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    Refer to the RIP Template for guidelines.
+    Refer to the <Link  href="https://github.com/ethereum/RIPs/blob/master/rip-template.md"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>RIP Template</Link> for guidelines.
   </Text>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
@@ -362,45 +388,79 @@ const INSIGHT= [
     RIP Editors ensure proposals are well-formatted and ready for review. They do not decide the merits of a proposal. Current RIP editors include:
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Ansgar Dietrichs</li>
-    <li>Carl Beekhuizen</li>
-    <li>Yoav Weiss</li>
-    <li>Nicolas Consigny</li>
+    <li><b>Ansgar Dietrichs</b></li>
+    <li><b>Carl Beekhuizen</b></li>
+    <li><b>Yoav Weiss</b></li>
+    <li><b>Nicolas Consigny</b></li>
   </ul>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
     Where Can I Track RIPs and Rollup Progress?
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>GitHub Repository: RIP Repository</li>
-    <li>Discussions: Ethereum Magicians Forum</li>
-    <li>Rollup Status: L2BEAT</li>
-    <li>Comparison of Rollups: rollup.codes</li>
+    <li><b>GitHub Repository</b>: <Link  href="https://github.com/ethereum/RIPs"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>RIP Repository</Link></li>
+    <li><b>Discussions</b>: 
+    <Link  href="https://ethereum-magicians.org/"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>
+      Ethereum Magicians Forum</Link></li>
+    <li><b>Rollup Status</b>: <Link  href="https://l2beat.com/scaling/summary"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>
+      L2BEAT</Link></li>
+    <li><b>Comparison of Rollups</b>: <Link  href="https://www.rollup.codes/"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>
+      rollup.codes</Link></li>
   </ul>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
     What Happens After a RIP is Final?
   </Text>
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    Once an RIP is accepted and implemented by at least one rollup on their mainnet, it becomes a Final RIP. Care is taken to resolve any conflicts before deployment to avoid competing standards.
+    Once an RIP is accepted and implemented by at least one rollup on their mainnet, it becomes a <b>Final RIP</b>. Care is taken to resolve any conflicts before deployment to avoid competing standards.
   </Text>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
     How Do I Stay Involved?
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Contribute: Submit your RIP or provide feedback on existing proposals.</li>
-    <li>Discuss: Join community discussions on forums and GitHub.</li>
-    <li>Engage: Present your RIP at Rollcall meetings to build consensus.</li>
+    <li><b>Contribute</b>: Submit your RIP or provide feedback on existing proposals.</li>
+    <li><b>Discuss</b>: Join community discussions on forums and GitHub.</li>
+    <li><b>Engage</b>: Present your RIP at Rollcall meetings to build consensus.</li>
   </ul>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10"textAlign="justify">
     Where Can I Find More Information?
   </Text>
   <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>RIP Template: Link to Template</li>
-    <li>RIP Discussions: Ethereum Magicians Forum</li>
-    <li>Rollup Specifications: rollup.codes</li>
+    <li><b>RIP Template</b>: <Link  href="https://github.com/ethereum/RIPs/blob/master/rip-template.md"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>Link to Template</Link></li>
+    <li><b>RIP Discussions</b>: <Link  href="https://ethereum-magicians.org/"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>
+      Ethereum Magicians Forum</Link></li>
+    <li><b>Rollup Specifications</b>: <Link  href="https://www.rollup.codes/"
+    isExternal
+    color="blue.500"
+    textDecoration="underline"
+    _hover={{  color: "blue.700" }}>
+      rollup.codes</Link></li>
   </ul>
 
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={6} textAlign="justify">

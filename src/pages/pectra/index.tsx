@@ -134,6 +134,12 @@ const All = () => {
 
   const PectraPosts= [
     {
+      image: "pectra4.png",
+      title: "EtherWorld Weekly — Edition 301",
+      content: "EtherWorld Weekly Edition 301 kicks off the new year with Ethereum’s top 2024 updates, Vitalik’s insights, and upcoming blockchain events. Dive into client releases, governance standards, and the future of AI x crypto!",
+      link: "https://etherworld.co/2025/01/05/etherworld-weekly-edition-301/"
+  },
+    {
         image: "pectra1.jpg",
         title: "Ethereum Developers Push Proposal to increase Gossip Limit",
         content: "Gossip Limit in Blockchain Networks, Current Setup, Reasons for 10 MiB Limit, Challenges, Proposal Objectives, Implementation & Alternatives.",
