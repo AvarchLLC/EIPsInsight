@@ -80,6 +80,7 @@ interface EIP {
   status: string;
   eips: {
     status: string;
+    repo:string;
     month: number;
     year: number;
     date: string;
@@ -287,13 +288,14 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
         const category = getCat(eipGroup.category); // Assuming this function returns a string
         const year = eipGroup.date.split("-")[0]; // Extract year from date
         const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Deduplicate EIPs if needed
+        const repo =  eipGroup.repo;
     
         return uniqueEips.map((uniqueEip) => ({
           category,
           year,
           eip: uniqueEip.eip, // EIP number
           author: uniqueEip.author, // Author of the EIP
-          repo: uniqueEip.repo, // Repo type (e.g., "eip", "erc", "rip")
+          repo,
           discussion: uniqueEip.discussion, // Discussion link
           status: uniqueEip.status, // Status of the EIP
           created: uniqueEip.created, // Creation date
@@ -313,7 +315,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   }
 
   // Define the CSV header
-  const header = " EIP, Title, Author, Status, Type, Category, Created at, Link\n";
+  const header = " Repo, EIP, Title, Author, Status, Type, Category, Created at, Link\n";
 
   // Prepare the CSV content
   const csvContent =
@@ -322,9 +324,9 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
       transformedData
           .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
               // Generate the correct URL based on the repo type
-              const url = category === "ERCs"
+              const url = repo === "erc"
               ? `https://eipsinsight.com/ercs/erc-${eip}`
-              : category === "RIPs"
+              : repo === "rip"
               ? `https://eipsinsight.com/rips/rip-${eip}`
               : `https://eipsinsight.com/eips/eip-${eip}`;
             
@@ -334,7 +336,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
               const deadlineValue = deadline || "";
 
               // Wrap fields in double quotes to handle commas
-              return `"${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${created.replace(/"/g, '""')}",,"${url}"`;
+              return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${created.replace(/"/g, '""')}",,"${url}"`;
           })
           .join("\n");
   

@@ -134,7 +134,8 @@ const Month = () => {
   let filteredData5 = data.filter((item) => item.status === "Final");
   let filteredData6 = data.filter((item) => item.status === "Stagnant");
   let filteredData7 = data.filter((item) => item.status === "Withdrawn");
-
+  
+  console.log("meta data:",filteredData4)
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const prevMonth = Number(month) - 1;

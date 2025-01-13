@@ -242,7 +242,7 @@ export default async (req: Request, res: Response) => {
         $group: {
           _id: {
             status: "$status",
-            category: "RIP",
+            category: "$category",
             changedYear: { $year: "$changeDate" },
             changedMonth: { $month: "$changeDate" },
           },
@@ -255,7 +255,7 @@ export default async (req: Request, res: Response) => {
           _id: "$_id.status",
           eips: {
             $push: {
-              category: "RIP",
+              category: "$_id.category",
               changedYear: "$_id.changedYear",
               changedMonth: "$_id.changedMonth",
               count: "$count",
@@ -276,9 +276,9 @@ export default async (req: Request, res: Response) => {
         status: group._id,
         eips: group.eips
           .reduce((acc, eipGroup) => {
-            const { changedYear, changedMonth, count, eips } = eipGroup;
+            const { category,changedYear, changedMonth, count, eips } = eipGroup;
             acc.push({
-              category: "RIP",
+              category,
               month: changedMonth,
               year: changedYear,
               date: `${changedYear}-${changedMonth}`,

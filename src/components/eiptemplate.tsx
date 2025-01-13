@@ -70,6 +70,7 @@ const initialSteps: Step[] = [
   { label: "Discussions To", key: "discussionsTo", type: "input" },
   { label: "Status", key: "status", type: "select", options: ["Draft"] },
   { label: "Type", key: "type", type: "select", options: ["Standards Track", "Meta", "Informational"] },
+  { label: "Category", key: "category", type: "select", options: ["Core", "Networking", "Interface", "ERC"] },
   { label: "Created", key: "created", type: "input" },
   { label: "Requires", key: "requires", type: "input" },
   { label: "Abstract", key: "abstract", type: "textarea" },
@@ -95,16 +96,7 @@ const EipTemplateEditor = () => {
 
   const handleInputChange = (key: TemplateDataKeys, value: string) => {
     setTemplateData((prev) => ({ ...prev, [key]: value }));
-
-    if (key === "type" && value === "Standards Track") {
-      setSteps((prevSteps) => [
-        ...prevSteps.slice(0, 6),
-        { label: "Category", key: "category", type: "select", options: ["Core", "Networking", "Interface", "ERC"] },
-        ...prevSteps.slice(6),
-      ]);
-    } else if (key === "type" && value !== "Standards Track") {
-      setSteps((prevSteps) => prevSteps.filter((step) => step.key !== "category"));
-    }
+    setSteps((prevSteps) => prevSteps);
   };
 
   const handleMarkdownInsert = (key: TemplateDataKeys, syntax: string) => {
@@ -244,12 +236,13 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 
     const handleDownload = async () => {
       // const [isLoading, setIsLoading] = useState(false);
+      // to check: created description other fields
+      // done: author dicussions title eip category type status 
     
       const requiredHeaders: TemplateDataKeys[] = [
         "title",
         "description",
         "author",
-        "discussionsTo",
         "status",
         "type",
         "created",
@@ -260,6 +253,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       const errorMessages: string[] = [];
     
       setIsLoading(true); // Show spinner
+
     
       // Check if any required header is missing
       requiredHeaders.forEach((header) => {
@@ -279,9 +273,19 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       if (templateData.discussionsTo && !discussionsRegex.test(templateData.discussionsTo)) {
         errorMessages.push("The discussions-to field should contain a valid link to ethereum-magicians.org.");
       }
+
+      const createdRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (templateData.created && !createdRegex.test(templateData.created)) {
+        errorMessages.push("The created field should be in the format yyyy-mm-dd.");
+      }
     
       // Requires field validation
       if (templateData.requires) {
+        const isValidFormat = /^[\d\s,]*$/.test(templateData.requires);
+
+      if (!isValidFormat) {
+        errorMessages.push("The 'requires' field should only contain numbers, commas, and spaces.");
+      } else {
         const requiresNumbers = templateData.requires
           .split(",")
           .map((num) => num.trim())
@@ -312,6 +316,56 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
           }
         }
       }
+    }
+
+    const requiredFieldsToCheck: (keyof TemplateData)[] = [
+      "abstract",
+      "motivation",
+      "specification",
+      "rationale",
+      "backwardsCompatibility",
+      "referenceImplementation",
+      "securityConsiderations",
+    ];
+    
+    for (const field of requiredFieldsToCheck) {
+      const fieldValue = templateData[field];
+  
+      // Check if the field contains references like [EIP-1000](./eip-1000.md)
+      const regex = /\[EIP-(\d+)\]\(.*?eip-(\d+)\.md\)/g;
+      let match;
+  
+      // Loop through all matches in the field
+      while ((match = regex.exec(fieldValue)) !== null) {
+        const num = match[1]; // Extract the number (e.g., 1000)
+  
+        // Check if the reference is valid
+        const links = [
+          `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${num}.md`,
+          `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${num}.md`,
+          `https://raw.githubusercontent.com/ethereum/ERCs/master/EIPS/erc-${num}.md`,
+        ];
+  
+        let isValid = false;
+        for (const link of links) {
+          try {
+            const response = await fetch(link);
+            if (response.ok) {
+              isValid = true;
+              break;
+            }
+          } catch {
+            // Ignore fetch errors
+          }
+        }
+  
+        // If the reference is invalid, push an error message
+        if (!isValid) {
+          errorMessages.push(`Invalid reference in ${field}: EIP-${num}`);
+        }
+      }
+    }
+
     
       // Check for unrecognized headers (like category)
       if (templateData.type === "Standards Track" && !templateData.category) {
@@ -340,8 +394,45 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     
       // Proceed with template generation if no errors
       const template = `---
-    // Template content as in your original code
-    ---`;
+eip: <TBD>
+title: ${templateData.title}
+description: ${templateData.description}
+author: ${templateData.author}
+discussions-to: ${templateData.discussionsTo}
+status: ${templateData.status}
+type: ${templateData.type}
+${templateData.type === "Standards Track" && templateData.category ? `category: ${templateData.category}` : ""}
+created: ${templateData.created}
+${templateData.requires ? `requires: ${templateData.requires}` : ""}
+---
+  
+## Abstract
+${templateData.abstract}
+  
+## Motivation
+${templateData.motivation}
+  
+## Specification
+${templateData.specification}
+  
+## Rationale
+${templateData.rationale}
+  
+## Backwards Compatibility
+${templateData.backwardsCompatibility}
+  
+## Test Cases
+${templateData.testCases}
+  
+## Reference Implementation
+${templateData.referenceImplementation}
+  
+## Security Considerations
+${templateData.securityConsiderations}
+  
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
+`;
     
       const cleanedTemplate = template.replace(/---\n([\s\S]*?)\n---/, (match, content) => {
         const cleanedContent = content
@@ -515,167 +606,212 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
                   borderWidth="2px"
                 />
               )}
-              {step.type === "textarea" && (
+              {step.type === "textarea"&& (
                 <Box>
-                  <HStack spacing={2} mb={2} wrap="wrap">
-  <Wrap spacing={2}>
-    {/* Bold */}
-    <WrapItem>
-      <IconButton
-        icon={<FaBold />}
-        aria-label="Bold"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "**bold** ")}
-      />
-    </WrapItem>
+                  {step.label !== "Description" && (
+                    <HStack spacing={2} mb={2} wrap="wrap">
+                    <Wrap spacing={2}>
+                      {/* Bold */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaBold />}
+                          aria-label="Bold"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "**bold** ")}
+                        />
+                      </WrapItem>
 
-    {/* Italic */}
-    <WrapItem>
-      <IconButton
-        icon={<FaItalic />}
-        aria-label="Italic"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "*italic* ")}
-      />
-    </WrapItem>
+                      {/* Italic */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaItalic />}
+                          aria-label="Italic"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "*italic* ")}
+                        />
+                      </WrapItem>
 
-    {/* H1 */}
-    <WrapItem>
-      <IconButton
-        icon={<FaHeading />}
-        aria-label="H1"
-        size="sm"
-        fontSize="lg"
-        onClick={() => handleMarkdownInsert(step.key, "# Heading 1\n")}
-      />
-    </WrapItem>
+                      {/* H1 */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaHeading />}
+                          aria-label="H1"
+                          size="sm"
+                          fontSize="lg"
+                          onClick={() => handleMarkdownInsert(step.key, "# Heading 1\n")}
+                        />
+                      </WrapItem>
 
-    {/* H2 */}
-    <WrapItem>
-      <IconButton
-        icon={<FaHeading />}
-        aria-label="H2"
-        size="sm"
-        fontSize="md"
-        onClick={() => handleMarkdownInsert(step.key, "## Heading 2\n")}
-      />
-    </WrapItem>
+                      {/* H2 */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaHeading />}
+                          aria-label="H2"
+                          size="sm"
+                          fontSize="md"
+                          onClick={() => handleMarkdownInsert(step.key, "## Heading 2\n")}
+                        />
+                      </WrapItem>
 
-    {/* H3 */}
-    <WrapItem>
-      <IconButton
-        icon={<FaHeading />}
-        aria-label="H3"
-        size="sm"
-        fontSize="sm"
-        onClick={() => handleMarkdownInsert(step.key, "### Heading 3\n")}
-      />
-    </WrapItem>
+                      {/* H3 */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaHeading />}
+                          aria-label="H3"
+                          size="sm"
+                          fontSize="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "### Heading 3\n")}
+                        />
+                      </WrapItem>
 
-    {/* Code */}
-    <WrapItem>
-      <IconButton
-        icon={<FaCode />}
-        aria-label="Code"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "`code` ")}
-      />
-    </WrapItem>
+                      {/* Code */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaCode />}
+                          aria-label="Code"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "`code` ")}
+                        />
+                      </WrapItem>
 
-    {/* Quote */}
-    <WrapItem>
-      <IconButton
-        icon={<FaQuoteLeft />}
-        aria-label="Quote"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "> quote\n")}
-      />
-    </WrapItem>
+                      {/* Quote */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaQuoteLeft />}
+                          aria-label="Quote"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "> quote\n")}
+                        />
+                      </WrapItem>
 
-    {/* Generic List */}
-    <WrapItem>
-      <IconButton
-        icon={<FaListUl />}
-        aria-label="Generic List"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "- item\n")}
-      />
-    </WrapItem>
+                      {/* Generic List */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaListUl />}
+                          aria-label="Generic List"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "- \n")}
+                        />
+                      </WrapItem>
 
-    {/* Numbered List */}
-    <WrapItem>
-      <IconButton
-        icon={<FaListOl />}
-        aria-label="Numbered List"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "1. item\n")}
-      />
-    </WrapItem>
+                      {/* Numbered List */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaListOl />}
+                          aria-label="Numbered List"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "1. \n")}
+                        />
+                      </WrapItem>
 
-    {/* Checklist */}
-    <WrapItem>
-      <IconButton
-        icon={<FaCheckSquare />}
-        aria-label="Checklist"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "- [ ] item\n")}
-      />
-    </WrapItem>
+                      {/* Checklist */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaCheckSquare />}
+                          aria-label="Checklist"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "- [ ] item\n")}
+                        />
+                      </WrapItem>
 
-    {/* Create Link */}
-    <WrapItem>
-      <IconButton
-        icon={<FaLink />}
-        aria-label="Create Link"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "[link](url) ")}
-      />
-    </WrapItem>
+                      {/* Create Link */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaLink />}
+                          aria-label="Create Link"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "[link](url) ")}
+                        />
+                      </WrapItem>
 
-    {/* Insert Table */}
-    <WrapItem>
-      <IconButton
-        icon={<FaTable />}
-        aria-label="Insert Table"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "| Header | Header |\n|-------|-------|\n| Cell  | Cell  |\n")}
-      />
-    </WrapItem>
+                      {/* Insert Table */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaTable />}
+                          aria-label="Insert Table"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "| Header | Header |\n|-------|-------|\n| Cell  | Cell  |\n")}
+                        />
+                      </WrapItem>
 
-    {/* Horizontal Line */}
-    <WrapItem>
-      <IconButton
-        icon={<FaMinus />}
-        aria-label="Horizontal Line"
-        size="sm"
-        onClick={() => handleMarkdownInsert(step.key, "---\n")}
-      />
-    </WrapItem>
+                      {/* Horizontal Line */}
+                      <WrapItem>
+                        <IconButton
+                          icon={<FaMinus />}
+                          aria-label="Horizontal Line"
+                          size="sm"
+                          onClick={() => handleMarkdownInsert(step.key, "---\n")}
+                        />
+                      </WrapItem>
 
-  </Wrap>
-</HStack>
+                    </Wrap>
+                  </HStack>)}
 
   
   
 
-                  <Textarea
-                    placeholder={step.label}
-                    value={templateData[step.key] || ""}
-                    onChange={(e) => handleInputChange(step.key, e.target.value)}
-                    size="lg"
-                    resize="vertical"
-                    height="300px"
-                    width="100%"
-                    borderWidth="2px"
-                  />
+                  {step.label !== "Description" && (<Textarea
+  placeholder={step.label}
+  value={templateData[step.key] || ""}
+  onKeyDown={(e) => {
+    const inputValue = (e.target as HTMLTextAreaElement).value;
+
+    // Step 1: Detect when the user presses a period (.) or moves to the next field
+    if (e.key === " " || e.key === "." || e.key === "Tab") {
+      // Step 2: Strip all existing links and just keep the plain "EIP-xxxxx"
+      let plainValue = inputValue.replace(/\[EIP-(\d+)\]\(.*?eip-(\d+)\.md\)/gi, "EIP-$1");
+
+      // Step 3: Convert all "EIP-xxxxx" to the link format [EIP-xxxxx](./eip-xxxxx.md)
+      const updatedValue = plainValue.replace(
+        /\b(EIP-(\d+))\b(?!\]\(.*?\))/gi, // Match "EIP-xxxxx" not inside a link
+        (_, fullMatch, number) => {
+          return `[EIP-${number}](./eip-${number}.md)`;
+        }
+      );
+
+      // Update the value if it has changed
+      handleInputChange(step.key, updatedValue);
+    }
+  }}
+  onChange={(e) => handleInputChange(step.key, e.target.value)} // Normal change handling
+  size="lg"
+  resize="vertical"
+  height="300px"
+  width="100%"
+  borderWidth="2px"
+/>)}
+
+{step.label === "Description" && (<Textarea
+  placeholder={step.label}
+  value={templateData[step.key] || ""}
+  onChange={(e) => handleInputChange(step.key, e.target.value)} // Normal change handling
+  size="lg"
+  resize="vertical"
+  height="300px"
+  width="100%"
+  borderWidth="2px"
+/>)}
+
+
+
+
+
+
+
+
                 </Box>
               )}
+             
+              
               {step.type === "select" && (
                 <Select
                   placeholder={`Select ${step.label}`}
                   value={templateData[step.key] || ""}
                   onChange={(e) => handleInputChange(step.key, e.target.value)}
                   borderWidth="2px"
+                  disabled={
+                    step.key === "category" && templateData["type"] !== "Standards Track"
+                  }
                 >
                   {step.options?.map((option, idx) => (
                     <option key={idx} value={option}>

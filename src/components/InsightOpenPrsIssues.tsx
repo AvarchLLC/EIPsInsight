@@ -133,7 +133,7 @@ const fetchPRData = async (year: string) => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
-                  if (year === yearString) {
+                  // if (year === yearString) {
                     if (!target[key]) {
                       target[key] = { created: [], closed: [], merged: [], open: [], review: [] };
                     }
@@ -142,7 +142,7 @@ const fetchPRData = async (year: string) => {
                     target[key].merged.push(...source[key].merged);
                     target[key].open.push(...source[key].open);
                     target[key].review.push(...source[key].review);
-                  }
+                  // }
                 });
               };
     combineData(eipsTransformed, transformedData);
@@ -171,7 +171,7 @@ const fetchPRData2 = async (year: string) => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
-                  if (year === yearString) {
+                  // if (year === yearString) {
                     if (!target[key]) {
                       target[key] = { created: [], closed: [], merged: [], open: [], review: [] };
                     }
@@ -180,7 +180,7 @@ const fetchPRData2 = async (year: string) => {
                     target[key].merged.push(...source[key].merged);
                     target[key].open.push(...source[key].open);
                     target[key].review.push(...source[key].review);
-                  }
+                  // }
                 });
               };
     combineData(ercsTransformed, transformedData);
@@ -213,7 +213,7 @@ const fetchPRData3 = async (year: string) => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
-                  if (year === yearString) {
+                  // if (year === yearString) {
                     if (!target[key]) {
                       target[key] = { created: [], closed: [], merged: [], open: [], review: [] };
                     }
@@ -222,7 +222,7 @@ const fetchPRData3 = async (year: string) => {
                     target[key].merged.push(...source[key].merged);
                     target[key].open.push(...source[key].open);
                     target[key].review.push(...source[key].review);
-                  }
+                  // }
                 });
               };
     combineData(ripsTransformed, transformedData);
@@ -973,7 +973,7 @@ const csv = allData.map((item) => {
     textAlign="center"
     marginBottom="0.5rem"
   >
-    {`Open PRs and Issues (${selectedYear})`}
+    {`Open PRs and Issues`}
   </Text>
 
   {/* Download button next to the text */}
