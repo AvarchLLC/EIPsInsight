@@ -36,6 +36,7 @@ interface EIP {
   status: string;
   eips: {
     status: string;
+    repo:string;
     month: number;
     year: number;
     date: string;

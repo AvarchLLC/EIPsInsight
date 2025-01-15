@@ -26,13 +26,13 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
   const getCommitLink = () => {
     if (title.startsWith("EIP-")) {
       const eipNo = title.split("EIP-")[1];
-      return `https://github.com/ethereum/EIPs/commits/master/EIPS/eip-${eipNo}.md`;
+      return `https://github.com/ethereum/EIPs/commits/master/EIPS/eip-${eipNo.trim()}.md`;
     } else if (title.startsWith("ERC-")) {
       const eipNo = title.split("ERC-")[1];
-      return `https://github.com/ethereum/ERCs/commits/master/ERCS/erc-${eipNo}.md`;
+      return `https://github.com/ethereum/ERCs/commits/master/ERCS/erc-${eipNo.trim()}.md`;
     } else if (title.startsWith("RIP-")) {
       const eipNo = title.split("RIP-")[1];
-      return `https://github.com/ethereum/RIPs/commits/master/RIPS/rip-${eipNo}.md`;
+      return `https://github.com/ethereum/RIPs/commits/master/RIPS/rip-${eipNo.trim()}.md`;
     }
     return null;
   };

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Box,
   Button,
+  ButtonGroup,
   Input,
   Text,
   VStack,
@@ -18,12 +19,16 @@ import {
   Th, 
   Thead, 
   Tr,
+  Flex,
   Wrap, 
   WrapItem,
   Spinner
 } from "@chakra-ui/react";
+import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody} from "@chakra-ui/react";
+import { InfoOutlineIcon } from "@chakra-ui/icons";
 import {
   DownloadIcon,
+  CheckIcon,
   AddIcon,
 } from "@chakra-ui/icons";
 import { ViewIcon, EditIcon, ViewOffIcon } from "@chakra-ui/icons";
@@ -35,6 +40,30 @@ import { MarkdownViewer } from 'react-github-markdown';
 
 type TemplateData = typeof initialTemplateData;
 type TemplateDataKeys = keyof TemplateData;
+
+const instructions: Record<string, string> = {
+  "EIP": "EIP number",
+  "Title": "The EIP title is a few words, not a complete sentence",
+  "Description": "Description is one full (short) sentence",
+  "Author": "The list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Examples: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example: FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>",
+  "Discussions To": "The URL pointing to the official discussion thread",
+  "Status": "Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living",
+  "Last Call Deadline": "The date last call period ends on (Optional field, only needed when status is Last Call)",
+  "Type": "One of Standards Track, Meta, or Informational",
+  "Category": "One of Core, Networking, Interface, or ERC (Optional field, only needed for Standards Track EIPs)",
+  "Created": "Date the EIP was created on",
+  "Requires": "EIP number(s) (Optional field)",
+  "Abstract": "Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.",
+  "Motivation": "(optional) A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.",
+  "Specification": "The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).",
+  "Rationale": "The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.",
+  "Backwards Compatibility": "(optional) All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.",
+  "Test Cases": "(optional) Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in ../assets/eip-###/<filename>. This section may be omitted for non-Core proposals.",
+  "Reference Implementation": "(optional) An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all EIPs.",
+  "Security Considerations": "All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the Security Considerations section will be rejected. An EIP cannot proceed to status Final without a Security Considerations discussion deemed sufficient by the reviewers.",
+};
+
+
 
 const initialTemplateData = {
   title: "",
@@ -49,11 +78,11 @@ const initialTemplateData = {
   abstract: "",
   motivation: "",
   specification: "",
-  rationale: "",
-  backwardsCompatibility: "",
+  rationale: "TBD",
+  backwardsCompatibility: "No backward compatibility issues found.",
   testCases: "",
   referenceImplementation: "",
-  securityConsiderations: "",
+  securityConsiderations: "Needs discussion.",
 };
 
 type Step = {
@@ -63,34 +92,72 @@ type Step = {
   options?: string[];
 };
 
-const initialSteps: Step[] = [
-  { label: "Title", key: "title", type: "input" },
-  { label: "Description", key: "description", type: "textarea" },
-  { label: "Author", key: "author", type: "input" },
-  { label: "Discussions To", key: "discussionsTo", type: "input" },
-  { label: "Status", key: "status", type: "select", options: ["Draft"] },
-  { label: "Type", key: "type", type: "select", options: ["Standards Track", "Meta", "Informational"] },
-  { label: "Category", key: "category", type: "select", options: ["Core", "Networking", "Interface", "ERC"] },
-  { label: "Created", key: "created", type: "input" },
-  { label: "Requires", key: "requires", type: "input" },
-  { label: "Abstract", key: "abstract", type: "textarea" },
-  { label: "Motivation", key: "motivation", type: "textarea" },
-  { label: "Specification", key: "specification", type: "textarea" },
-  { label: "Rationale", key: "rationale", type: "textarea" },
-  { label: "Compatibility", key: "backwardsCompatibility", type: "textarea" },
-  { label: "Test Cases", key: "testCases", type: "textarea" },
-  { label: "Reference Implementation", key: "referenceImplementation", type: "textarea" },
-  { label: "Security Considerations", key: "securityConsiderations", type: "textarea" },
-];
+
+
 
 const EipTemplateEditor = () => {
-  const [steps, setSteps] = useState<Step[]>(initialSteps);
-  const [templateData, setTemplateData] = useState<TemplateData>(initialTemplateData);
+  
   const [viewMode, setViewMode] = useState<"edit" | "output" | "split">("split");
   const [preview, setPreview] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'eip' | 'erc' | 'rip'>('eip');
+  const [validated, setValidated] = useState<boolean>(false);
 
   const toast = useToast();
+
+  const getInitialSteps = (type: 'eip' | 'erc' | 'rip'): Step[] => {
+    const commonStepsBeforeStatus: Step[] = [
+      { label: "Title", key: "title", type: "input" },
+      { label: "Description", key: "description", type: "textarea" },
+      { label: "Author", key: "author", type: "input" },
+      { label: "Discussions To", key: "discussionsTo", type: "input" },
+      { label: "Status", key: "status", type: "select", options: ["Draft"] },
+    ];
+  
+    const typeSpecificSteps: Step[] = 
+    type === "eip"
+      ? [
+          { label: "Type", key: "type", type: "select", options: ["Standards Track", "Meta", "Informational", "TBD"] },
+          { label: "Category", key: "category", type: "select", options: ["Core", "Networking", "Interface", "TBD"] },
+        ]
+      : type === "erc"
+      ? [
+          { label: "Type", key: "type", type: "select", options: ["Standards Track", "Meta", "TBD"] },
+          { label: "Category", key: "category", type: "select", options: ["ERC", "Interface", "TBD"] },
+        ]
+      : type === "rip"
+      ? [
+          { label: "Type", key: "type", type: "select", options: ["Standards Track", "Meta", "TBD"] },
+          { label: "Category", key: "category", type: "select", options: ["Core", "RRC", "TBD"] },
+        ]
+      : [];
+
+
+  
+    const commonStepsAfterStatus: Step[] = [
+      { label: "Created", key: "created", type: "input" },
+      { label: "Requires", key: "requires", type: "input" },
+      { label: "Abstract", key: "abstract", type: "textarea" },
+      { label: "Motivation", key: "motivation", type: "textarea" },
+      { label: "Specification", key: "specification", type: "textarea" },
+      { label: "Rationale", key: "rationale", type: "textarea" },
+      { label: "Backwards Compatibility", key: "backwardsCompatibility", type: "textarea" },
+      { label: "Test Cases", key: "testCases", type: "textarea" },
+      { label: "Reference Implementation", key: "referenceImplementation", type: "textarea" },
+      { label: "Security Considerations", key: "securityConsiderations", type: "textarea" },
+    ];
+  
+    return [...commonStepsBeforeStatus, ...typeSpecificSteps, ...commonStepsAfterStatus];
+  };
+  
+
+
+  const [steps, setSteps] = useState<Step[]>(getInitialSteps(activeTab));
+  const [templateData, setTemplateData] = useState<TemplateData>(initialTemplateData);
+
+  useEffect(() => {
+    setSteps(getInitialSteps(activeTab));
+  }, [activeTab]);
 
   
 
@@ -234,10 +301,8 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
   });
 
 
-    const handleDownload = async () => {
-      // const [isLoading, setIsLoading] = useState(false);
-      // to check: created description other fields
-      // done: author dicussions title eip category type status 
+    const handleValidate = async () => {
+      
     
       const requiredHeaders: TemplateDataKeys[] = [
         "title",
@@ -265,7 +330,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       // Author field validation
       const authorRegex = /@\w+/;
       if (!authorRegex.test(templateData.author)) {
-        errorMessages.push("The authors field should contain at least one GitHub handle in the format @xyz.");
+        errorMessages.push("The authors field should contain at least one GitHub handle in the format @xyz or an email.");
       }
     
       // DiscussionsTo field validation
@@ -330,22 +395,49 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     
     for (const field of requiredFieldsToCheck) {
       const fieldValue = templateData[field];
-  
-      // Check if the field contains references like [EIP-1000](./eip-1000.md)
-      const regex = /\[EIP-(\d+)\]\(.*?eip-(\d+)\.md\)/g;
+    
+      // Define all regexes
+      const regexERC = /\[ERC-(\d+)\]\(.*?eip-(\d+)\.md\)/g;
+      const regexEIPStandalone = /\[EIP-(\d+)\]/g;
+      const regexEIPWithLink = /\[EIP-(\d+)\]\(https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+)\)/g; // Match EIP links
+      const regexERCWithLink = /\[ERC-(\d+)\]\(https:\/\/eips\.ethereum\.org\/ERCS\/erc-(\d+)\)/g; // Match ERC links
+
+      // Array to store all matches
+      const matches = [];
+
+      // Collect matches from each regex
       let match;
-  
-      // Loop through all matches in the field
-      while ((match = regex.exec(fieldValue)) !== null) {
-        const num = match[1]; // Extract the number (e.g., 1000)
-  
+      while ((match = regexERC.exec(fieldValue)) !== null) {
+        matches.push({ type: "ERC", num: match[1] });
+      }
+
+      while ((match = regexEIPStandalone.exec(fieldValue)) !== null) {
+        matches.push({ type: "EIP", num: match[1] });
+      }
+
+      while ((match = regexEIPWithLink.exec(fieldValue)) !== null) {
+        matches.push({ type: "EIP", num: match[1] });
+      }
+
+      while ((match = regexERCWithLink.exec(fieldValue)) !== null) {
+        matches.push({ type: "ERC", num: match[1] });
+      }
+
+      // Now 'matches' contains the extracted numbers and types
+      console.log(matches);
+
+    
+      // Process all collected matches
+      for (const { type, num } of matches) {
+        console.log(`Type: ${type}, Number: ${num}`);
+    
         // Check if the reference is valid
         const links = [
           `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${num}.md`,
           `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${num}.md`,
           `https://raw.githubusercontent.com/ethereum/ERCs/master/EIPS/erc-${num}.md`,
         ];
-  
+    
         let isValid = false;
         for (const link of links) {
           try {
@@ -358,13 +450,14 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
             // Ignore fetch errors
           }
         }
-  
+    
         // If the reference is invalid, push an error message
         if (!isValid) {
-          errorMessages.push(`Invalid reference in ${field}: EIP-${num}`);
+          errorMessages.push(`Invalid reference in ${field}: ${type}-${num}`);
         }
       }
     }
+    
 
     
       // Check for unrecognized headers (like category)
@@ -387,12 +480,28 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
           duration: 5000,
           isClosable: true,
         });
+        setValidated(false);
     
         setIsLoading(false); // Hide spinner
         return; // Stop execution if errors are present
       }
+
+      setValidated(true);
     
-      // Proceed with template generation if no errors
+      
+    
+      toast({
+        title: "Succesfully Validated, you can download the template now!",
+        status: "success",
+        duration: 2000,
+      });
+    
+      setIsLoading(false); // Hide spinner
+    };
+    
+
+    const handleDownload = async () => {
+
       const template = `---
 eip: <TBD>
 title: ${templateData.title}
@@ -455,8 +564,6 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         status: "success",
         duration: 2000,
       });
-    
-      setIsLoading(false); // Hide spinner
     };
     
     
@@ -478,6 +585,55 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     gap={4} // Adds spacing between rows when wrapped
   >
     <HStack spacing={4} flexWrap="wrap">
+    <Flex align="center" justify="space-between">
+  <ButtonGroup size="md" isAttached>
+    <Button
+      colorScheme="blue"
+      variant={activeTab === "eip" ? "solid" : "outline"}
+      onClick={() => setActiveTab("eip")}
+      flex="1" // Equal size buttons
+    >
+      EIPs
+    </Button>
+    <Button
+      colorScheme="blue"
+      variant={activeTab === "erc" ? "solid" : "outline"}
+      onClick={() => setActiveTab("erc")}
+      flex="1" // Equal size buttons
+    >
+      ERCs
+    </Button>
+    <Button
+      colorScheme="blue"
+      variant={activeTab === "rip" ? "solid" : "outline"}
+      onClick={() => setActiveTab("rip")}
+      flex="1" // Equal size buttons
+    >
+      RIPs
+    </Button>
+  </ButtonGroup>
+
+  {/* Popover for instructions */}
+  <Popover>
+    <PopoverTrigger>
+    <IconButton
+            aria-label="More info"
+            icon={<InfoOutlineIcon />}
+            size="md"
+            colorScheme="blue"
+            variant="ghost"
+          />
+    </PopoverTrigger>
+    <PopoverContent>
+      <PopoverArrow />
+      <PopoverCloseButton />
+      <PopoverHeader>Instructions</PopoverHeader>
+      <PopoverBody>
+        This form is for EIPs and ERCs and not for RIPs.
+      </PopoverBody>
+    </PopoverContent>
+  </Popover>
+</Flex>
     <Button
         leftIcon={<BiColumns />}
         colorScheme="blue"
@@ -522,8 +678,23 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       </Button>
       
     </HStack>
+    {/* <HStack spacing={4} flexWrap="wrap">
     <Button
-    rightIcon={isLoading ? <Spinner size="sm" /> : <DownloadIcon />}
+    rightIcon={isLoading ? <Spinner size="sm" /> : <CheckIcon />}
+    colorScheme="blue"
+    mt={[4, 0]} // Adds spacing for smaller screens
+    _dark={{
+      bg: "blue.600",
+      color: "white",
+      _hover: { bg: "blue.700" },
+    }}
+    onClick={handleValidate}
+    isDisabled={isLoading} // Disable button while loading
+  >
+    {isLoading ? "Validating..." : "Validate"}
+  </Button>
+  <Button
+    rightIcon={<DownloadIcon />}
     colorScheme="blue"
     mt={[4, 0]} // Adds spacing for smaller screens
     _dark={{
@@ -532,10 +703,11 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       _hover: { bg: "blue.700" },
     }}
     onClick={handleDownload}
-    isDisabled={isLoading} // Disable button while loading
+    isDisabled={!validated} // Disable button while loading
   >
-    {isLoading ? "Validating..." : "Download"}
+    {"Download"}
   </Button>
+  </HStack> */}
   </Box>
 
   <Box
@@ -578,14 +750,58 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         }}
       >
         <VStack spacing={5}>
-          <Text fontSize={["sm", "md", "3xl"]} fontWeight="bold">
-            Create an EIP Template
-          </Text>
+        <Text fontSize={["sm", "md", "3xl"]} fontWeight="bold">
+          {activeTab === 'eip' 
+            ? 'Create an EIP Template' 
+            : activeTab === 'erc' 
+            ? 'Create an ERC Template' 
+            : activeTab === 'rip' 
+            ? 'Create an RIP Template' 
+            : 'Create a Template'}
+        </Text>
+
+
           {steps.map((step, index) => (
             <Box key={index} w="100%">
-              <Text fontSize="lg" fontWeight="bold" mb={2}>
-                {step.label}
-              </Text>
+              <Box mb={4}>
+      <Text fontSize="lg" fontWeight="bold" display="inline-block" mr={2}>
+        {step.label}
+      </Text>
+      <Popover>
+        <PopoverTrigger>
+          <IconButton
+            aria-label="More info"
+            icon={<InfoOutlineIcon />}
+            size="sm"
+            colorScheme="blue"
+            variant="ghost"
+          />
+        </PopoverTrigger>
+        <PopoverContent>
+          <PopoverArrow />
+          <PopoverCloseButton />
+          <PopoverHeader>{step.label} Instruction</PopoverHeader>
+          <PopoverBody fontSize="xs">
+            {instructions[step.label] || "No instructions available for this label."}
+            {step.label === "Test Cases" && (
+              <>
+                <br />
+                <br />
+                For linking external resources properly, visit:{" "}
+                <a
+                  href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#linking-to-external-resources"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "blue", textDecoration: "underline" }}
+                >
+                  Link
+                </a>
+              </>
+            )}
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
+    </Box>
               {step.type === "input" && (
                 <Input
                 placeholder={
@@ -594,12 +810,14 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
                     : step.label === "Description"
                     ? "Enter description"
                     : step.label === "Author"
-                    ? "Enter author names, Ex: Sam Wilson(@SamWilsn)"
+                    ? "Ex: FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>"
                     : step.label === "Discussions To"
-                    ? "Enter discussion link, Ex: https://ethereum-magicians.org/t/eip-...."
+                    ? "Ex: https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205"
                     : step.label === "Created"
-                    ? "Enter date, Ex: 2024-01-18"
-                    : step.label
+                    ? "YYYY-MM-DD; Ex: 2024-01-18"
+                    : step.label === "Requires"
+                    ? "2537, 2935, 6110, 7002, 7251, 7549, 7594, 7685, 7702"
+                    :step.label
                 }
                   value={templateData[step.key] || ""}
                   onChange={(e) => handleInputChange(step.key, e.target.value)}
@@ -751,28 +969,96 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
   
 
                   {step.label !== "Description" && (<Textarea
-  placeholder={step.label}
+  placeholder={
+    step.label === "Abstract"
+      ? "Provide a short, technical summary of the EIP"
+      : step.label === "Motivation"
+      ? "Explain why the current protocol is inadequate and the problem this EIP solves"
+      : step.label === "Specification"
+      ? "Describe the syntax and semantics of the proposed change in detail"
+      : step.label === "Rationale"
+      ? "Describe why design decisions were made and any alternatives considered"
+      : step.label === "Backwards Compatibility"
+      ? "Explain any incompatibilities and how they are addressed"
+      : step.label === "Test Cases"
+      ? "Include input/expected output pairs or refer to test files"
+      : step.label === "Reference Implementation"
+      ? "Provide an example or reference implementation"
+      : step.label === "Security Considerations"
+      ? "Discuss security implications, risks, and how they are addressed"
+      : step.label
+  }
   value={templateData[step.key] || ""}
+
   onKeyDown={(e) => {
     const inputValue = (e.target as HTMLTextAreaElement).value;
-
-    // Step 1: Detect when the user presses a period (.) or moves to the next field
+  
     if (e.key === " " || e.key === "." || e.key === "Tab") {
-      // Step 2: Strip all existing links and just keep the plain "EIP-xxxxx"
-      let plainValue = inputValue.replace(/\[EIP-(\d+)\]\(.*?eip-(\d+)\.md\)/gi, "EIP-$1");
-
-      // Step 3: Convert all "EIP-xxxxx" to the link format [EIP-xxxxx](./eip-xxxxx.md)
-      const updatedValue = plainValue.replace(
-        /\b(EIP-(\d+))\b(?!\]\(.*?\))/gi, // Match "EIP-xxxxx" not inside a link
-        (_, fullMatch, number) => {
-          return `[EIP-${number}](./eip-${number}.md)`;
+      if (activeTab === "eip") {
+        // For 'eip'
+        let plainValue = inputValue.replace(
+          /\[EIP-(\d+)\]\(.*?eip-(\d+)\.md\)/gi,
+          "EIP-$1"
+        );
+  
+        const updatedValue = plainValue.replace(
+          /\b(EIP-(\d+))\b(?!\]\(.*?\))/gi,
+          (_, fullMatch, number) => `[EIP-${number}](./eip-${number}.md)`
+        );
+  
+        handleInputChange(step.key, updatedValue);
+      } else if(activeTab === 'erc') {
+        let newvalue=inputValue;
+        if (inputValue.match(/\b(EIP-\d+)\b/i)) {
+          // Match 'EIP-xxxx' or 'eip-xxxx' but ignore cases where it is already in square brackets '[EIP-xxxx]' or './eip-xxxx'
+          let updatedValue = inputValue.replace(
+            /(^|[^./\[\]])\b(EIP-(\d+))\b(?!\]\(.*?\))/gi, // Refined regex to handle './eip-xxxx' and '[EIP-xxxx]'
+            (match, prefix, fullMatch, number) => `${prefix}[EIP-${number}]` // Add brackets around EIP-xxxx
+          );
+          newvalue=updatedValue;
         }
-      );
-
-      // Update the value if it has changed
-      handleInputChange(step.key, updatedValue);
+          let plainValue = newvalue.replace(
+            /\[ERC-(\d+)\]\(.*?eip-(\d+)\.md\)/gi,
+            "ERC-$1"
+          );
+    
+          const updatedValue = plainValue.replace(
+            /\b(ERC-(\d+))\b(?!\]\(.*?\))/gi,
+            (_, fullMatch, number) => `[ERC-${number}](./eip-${number}.md)`
+          );
+          handleInputChange(step.key, updatedValue);
+      }
+      else{
+        let newvalue=inputValue;
+        if (inputValue.match(/\b(EIP-\d+)\b/i)) {
+          // Match 'EIP-xxxx' or 'eip-xxxx' but ignore cases where it is already in square brackets '[EIP-xxxx]' or '/eip-xxxx'
+          newvalue = inputValue.replace(
+            /(^|[^./\[\]])\b(EIP-(\d+))\b(?!\]\(.*?\))(?!\/eip-\d+)/gi, // Refined regex to handle './eip-xxxx', '[EIP-xxxx]' and '/eip-xxxx'
+            (match, prefix, fullMatch, number) => `${prefix}[EIP-${number}](https://eips.ethereum.org/EIPS/eip-${number})` // Convert to link format
+          );
+        }
+        
+        if (newvalue.match(/\b(ERC-\d+)\b/i)) {
+          // Match 'ERC-xxxx' or 'erc-xxxx' but ignore cases where it is already in square brackets '[ERC-xxxx]' or '/erc-xxxx'
+          newvalue = newvalue.replace(
+            /(^|[^./\[\]])\b(ERC-(\d+))\b(?!\]\(.*?\))(?!\/erc-\d+)/gi, // Refined regex to handle './erc-xxxx', '[ERC-xxxx]' and '/erc-xxxx'
+            (match, prefix, fullMatch, number) => `${prefix}[ERC-${number}](https://eips.ethereum.org/ERCS/erc-${number})` // Convert to link format
+          );
+        }
+          let plainValue = newvalue.replace(
+            /\[RIP-(\d+)\]\(.*?Rip-(\d+)\.md\)/gi,
+            "RIP-$1"
+          );
+    
+          const updatedValue = plainValue.replace(
+            /\b(RIP-(\d+))\b(?!\]\(.*?\))/gi,
+            (_, fullMatch, number) => `[RIP-${number}](./Rip-${number}.md)`
+          );
+          handleInputChange(step.key, updatedValue);
+      }
     }
   }}
+  
   onChange={(e) => handleInputChange(step.key, e.target.value)} // Normal change handling
   size="lg"
   resize="vertical"
@@ -782,12 +1068,12 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 />)}
 
 {step.label === "Description" && (<Textarea
-  placeholder={step.label}
+  placeholder={"Provide a simple summary of your proposal in one sentence"}
   value={templateData[step.key] || ""}
   onChange={(e) => handleInputChange(step.key, e.target.value)} // Normal change handling
   size="lg"
   resize="vertical"
-  height="300px"
+  height="200px"
   width="100%"
   borderWidth="2px"
 />)}
@@ -946,6 +1232,143 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     </Box>
       </Box>
     )}
+  </Box>
+  <br/>
+  <Box
+    p={4}
+    bg="gray.300"
+    _dark={{ bg: "gray.800" }}
+    borderRadius="md"
+    display="flex"
+    flexWrap="wrap"
+    justifyContent="space-between"
+    alignItems="center"
+    gap={4} // Adds spacing between rows when wrapped
+  >
+    <HStack spacing={4} flexWrap="wrap">
+    <Flex align="center" justify="space-between">
+  {/* <ButtonGroup size="md" isAttached>
+    <Button
+      colorScheme="blue"
+      variant={activeTab === "eip" ? "solid" : "outline"}
+      onClick={() => setActiveTab("eip")}
+      flex="1" // Equal size buttons
+    >
+      EIPs
+    </Button>
+    <Button
+      colorScheme="blue"
+      variant={activeTab === "erc" ? "solid" : "outline"}
+      onClick={() => setActiveTab("erc")}
+      flex="1" // Equal size buttons
+    >
+      ERCs
+    </Button>
+    <Button
+      colorScheme="blue"
+      variant={activeTab === "rip" ? "solid" : "outline"}
+      onClick={() => setActiveTab("rip")}
+      flex="1" // Equal size buttons
+    >
+      RIPs
+    </Button>
+  </ButtonGroup> */}
+
+  {/* Popover for instructions */}
+  {/* <Popover>
+    <PopoverTrigger>
+    <IconButton
+            aria-label="More info"
+            icon={<InfoOutlineIcon />}
+            size="md"
+            colorScheme="blue"
+            variant="ghost"
+          />
+    </PopoverTrigger>
+    <PopoverContent>
+      <PopoverArrow />
+      <PopoverCloseButton />
+      <PopoverHeader>Instructions</PopoverHeader>
+      <PopoverBody>
+        This form is for EIPs and ERCs and not for RIPs.
+      </PopoverBody>
+    </PopoverContent>
+  </Popover> */}
+</Flex>
+    {/* <Button
+        leftIcon={<BiColumns />}
+        colorScheme="blue"
+        variant={viewMode === "split" ? "solid" : "outline"}
+        _hover={{ bg: viewMode !== "split" ? "blue.700" : undefined }}
+        _dark={{
+          bg: viewMode === "split" ? "blue.500" : "transparent",
+          color: viewMode === "split" ? "white" : "blue.300",
+          borderColor: "blue.300",
+        }}
+        onClick={() => setViewMode("split")}
+      >
+        Split
+      </Button>
+      <Button
+        leftIcon={<EditIcon />}
+        colorScheme="blue"
+        variant={viewMode === "edit" ? "solid" : "outline"}
+        _hover={{ bg: viewMode !== "edit" ? "blue.700" : undefined }}
+        _dark={{
+          bg: viewMode === "edit" ? "blue.500" : "transparent",
+          color: viewMode === "edit" ? "white" : "blue.300",
+          borderColor: "blue.300",
+        }}
+        onClick={() => setViewMode("edit")}
+      >
+        Edit
+      </Button>
+      <Button
+        leftIcon={<ViewIcon />}
+        colorScheme="blue"
+        variant={viewMode === "output" ? "solid" : "outline"}
+        _hover={{ bg: viewMode !== "output" ? "blue.700" : undefined }}
+        _dark={{
+          bg: viewMode === "output" ? "blue.500" : "transparent",
+          color: viewMode === "output" ? "white" : "blue.300",
+          borderColor: "blue.300",
+        }}
+        onClick={() => setViewMode("output")}
+      >
+        Output
+      </Button> */}
+      
+    </HStack>
+    <HStack spacing={4} flexWrap="wrap">
+    <Button
+    rightIcon={isLoading ? <Spinner size="sm" /> : <CheckIcon />}
+    colorScheme="blue"
+    mt={[4, 0]} // Adds spacing for smaller screens
+    _dark={{
+      bg: "blue.600",
+      color: "white",
+      _hover: { bg: "blue.700" },
+    }}
+    onClick={handleValidate}
+    isDisabled={isLoading} // Disable button while loading
+  >
+    {isLoading ? "Validating..." : "Validate"}
+  </Button>
+  <Button
+    rightIcon={<DownloadIcon />}
+    colorScheme="blue"
+    mt={[4, 0]} // Adds spacing for smaller screens
+    _dark={{
+      bg: "blue.600",
+      color: "white",
+      _hover: { bg: "blue.700" },
+    }}
+    onClick={handleDownload}
+    isDisabled={!validated} // Disable button while loading
+  >
+    {"Download"}
+  </Button>
+  </HStack>
   </Box>
 </Box>
 

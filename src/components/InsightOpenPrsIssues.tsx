@@ -82,7 +82,7 @@ const InsightsOpenPrsIssues: React.FC = () => {
   const [loading2,setLoading2]=useState<boolean>(false);
 
 
-
+  const [sliderValue3, setSliderValue3] = useState<number>(0);
 
   const [showCategory, setShowCategory] = useState<{ [key: string]: boolean }>({
     created: false,
@@ -840,6 +840,21 @@ const config = {
       },
   ]
 ,  
+slider: {
+  start: sliderValue3, // Set the start value from the state
+  end: 1, // End of the slider
+  step: 0.01, // Define the step value for the slider
+  min: 0, // Minimum value for the slider
+  max: 1, // Maximum value for the slider
+  onChange: (value:any) => {
+    setSliderValue3(value); // Update state when slider value changes
+  },
+  // Optionally handle when sliding stops
+  onAfterChange: (value:any) => {
+    // Perform any additional actions after the slider is changed
+    // console.log('Slider moved to:', value);
+  },
+},
   
     legend: { position: 'top-right' as const },
 };
@@ -1013,11 +1028,11 @@ const csv = allData.map((item) => {
         >
           {`Open PRs and Issues (${selectedYear})`}
         </Text> */}
-        <LI href="/Analytics">
+        {/* <LI href="/Analytics"> */}
           <Box padding="1rem" borderRadius="0.55rem">
             {renderChart()}
           </Box>
-        </LI>
+        {/* </LI> */}
         <Box className="w-full">
           <DateTime />
         </Box>

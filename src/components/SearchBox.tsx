@@ -462,6 +462,16 @@ return (
         size={10}
         onChange={(e) => console.log(e.target.value)}
       >
+        {filteredAuthors.map((result) => (
+          <option
+            key={result.name}
+            value={result.name}
+            onClick={() => handleAuthorSearchResultClick(result.name)}
+            className="text-lg py-3" // Increase font size and vertical padding
+          >
+            {result.name} ({result.count})
+          </option>
+        ))}
         {uniqueResults.map((result) => (
           <option
             key={result.prNumber}
@@ -496,16 +506,7 @@ return (
             {result.repo.toUpperCase()} Number: {result.eip}
           </option>
         ))}
-        {filteredAuthors.map((result) => (
-          <option
-            key={result.name}
-            value={result.name}
-            onClick={() => handleAuthorSearchResultClick(result.name)}
-            className="text-lg py-3" // Increase font size and vertical padding
-          >
-            {result.name} ({result.count})
-          </option>
-        ))}
+        
       </select>
     )}
   </div>

@@ -11,13 +11,13 @@ const ResourcesPage: React.FC = () => {
   const textColor2 = useColorModeValue("black", "white"); // Light mode: black, Dark mode: white
 
   const handleSelection = (hash:any) => {
-    if (hash === "EIPsInsight") {
+    if (hash === "FAQ") {
       setTabIndex(0);
-    } else if (hash === "EIPs") {
+    } else if (hash === "Blogs") {
       setTabIndex(1);
-    } else if (hash === "PECTRA") {
+    } else if (hash === "Videos") {
       setTabIndex(2);
-    } else if (hash === "RIPs") {
+    } else if (hash === "News") {
       setTabIndex(3);
     }
     window.location.hash = hash; // Update the hash in the URL
@@ -28,13 +28,13 @@ const ResourcesPage: React.FC = () => {
     console.log("Current hash:", hash);
 
     // Match the hash to the corresponding tab index
-    if (hash === "EIPsInsight") {
+    if (hash === "FAQ") {
       setTabIndex(0);
-    } else if (hash.toUpperCase() === "EIPs") {
+    } else if (hash.toUpperCase() === "BLOGS") {
       setTabIndex(1);
-    } else if (hash.toUpperCase() === "PECTRA") {
+    } else if (hash.toUpperCase() === "VIDEOS") {
       setTabIndex(2);
-    } else if (hash.toUpperCase() === "RIPs") {
+    } else if (hash.toUpperCase() === "NEWS") {
       setTabIndex(3);
     }
   }, []);
@@ -174,8 +174,8 @@ const PECTRA= [
 ]
 const INSIGHT= [
   {
-      image: "EIPsInsightRecap.jpg",
-      title: "EIPsInsight milestones 2024",
+      image: "EipsInsightRecap.jpg",
+      title: "Eipsinsight milestones 2024",
       content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities, which together streamline workflows, promote accountability, and optimize the management of proposals.",
       link: "/milestones2024"
   },

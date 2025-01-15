@@ -75,6 +75,7 @@ interface EIP {
     date: string;
     count: number;
     category: string;
+    repo:string;
     eips: any[];
   }[];
 }
@@ -135,7 +136,7 @@ const Month = () => {
   let filteredData6 = data.filter((item) => item.status === "Stagnant");
   let filteredData7 = data.filter((item) => item.status === "Withdrawn");
   
-  console.log("meta data:",filteredData4)
+  console.log("meta data:",filteredData3)
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const prevMonth = Number(month) - 1;
@@ -168,7 +169,7 @@ const Month = () => {
   return (
     <AllLayout>
       {isLoading ? ( // Check if the data is still loading
-        // Show loader if data is loading
+        // Show loader if data is loading 
         <Box
           display="flex"
           justifyContent="center"
@@ -282,6 +283,11 @@ const Month = () => {
       <Text fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
         Last Call <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#LastCall`} />
       </Text>
+
+      <Text fontSize="sm" color="gray.500" paddingTop={2}>
+       Note:  Due to some technical issues, a few of the Last Call deadlines are missing in the downloaded report. We are working on it and will get back to it ASAP.
+      </Text>
+
       <Box paddingY={"8"} id="LastCall">
         <StackedColumnChart dataset={filteredData3} status="Last Call" />
       </Box>

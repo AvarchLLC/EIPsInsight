@@ -95,6 +95,10 @@ const Navbar: React.FC = () => {
           //   },
           // ],
         },
+        {
+          label: "EIP Proposal Builder",
+          href: `/proposalbuilder`,
+    },
       ],
     },    
     {

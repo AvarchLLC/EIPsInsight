@@ -289,17 +289,20 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
         const year = eipGroup.date.split("-")[0]; // Extract year from date
         const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Deduplicate EIPs if needed
         const repo =  eipGroup.repo;
+        const month = eipGroup.month;
+
     
         return uniqueEips.map((uniqueEip) => ({
           category,
           year,
+          month,
           eip: uniqueEip.eip, // EIP number
           author: uniqueEip.author, // Author of the EIP
           repo,
           discussion: uniqueEip.discussion, // Discussion link
           status: uniqueEip.status, // Status of the EIP
           created: uniqueEip.created, // Creation date
-          deadline: uniqueEip.deadline || "", // Deadline if exists, else empty
+          deadline: uniqueEip.deadline === "undefined" ? "" : uniqueEip.deadline || "", // Deadline if exists, else empty
           type: uniqueEip.type, // Type of the EIP
           title: uniqueEip.title, // Title of the EIP
         }));
@@ -315,14 +318,14 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   }
 
   // Define the CSV header
-  const header = " Repo, EIP, Title, Author, Status, Type, Category, Created at, Link\n";
+  const header = " Year, Month, Repo, EIP, Title, Author, Status, Type, Category, deadline, Created at, Link\n";
 
   // Prepare the CSV content
   const csvContent =
       "data:text/csv;charset=utf-8," + 
       header +
       transformedData
-          .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+          .map(({ year, month, repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
               // Generate the correct URL based on the repo type
               const url = repo === "erc"
               ? `https://eipsinsight.com/ercs/erc-${eip}`
@@ -333,10 +336,29 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
                       
 
               // Handle the 'deadline' field, use empty string if not available
-              const deadlineValue = deadline || "";
+              const deadlineValue = deadline ?? "";
 
-              // Wrap fields in double quotes to handle commas
-              return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${created.replace(/"/g, '""')}",,"${url}"`;
+              const baseFields = [
+                year,
+                month,
+                repo,
+                eip,
+                title.replace(/"/g, '""'),
+                author.replace(/"/g, '""'),
+                status.replace(/"/g, '""'),
+                type.replace(/"/g, '""'),
+                category.replace(/"/g, '""'),
+                created.replace(/"/g, '""'),
+                url
+            ];
+
+            // Include deadline only if status is "Last Call"
+            if (status === "Last Call") {
+                baseFields.splice(7, 0, deadline ?? ""); // Insert deadline at the correct position
+            }
+
+            // Wrap fields in double quotes and join with commas
+            return baseFields.map(field => `"${field}"`).join(",");
           })
           .join("\n");
   
