@@ -89,9 +89,87 @@ const ResourcesPage: React.FC = () => {
       </Flex>
     );
   };
+
+  const Card2 = ({ image, title,link }: { image: string; title: string; link: string }) => {
+    return (
+      <Flex
+  direction={{ base: "column", md: "column", lg:"row" }} // Default: column on small screens, row on larger
+  wrap="nowrap" // Prevent wrapping of content within the Flex container
+  bg={bg2}
+  p={5}
+  borderRadius="lg"
+  boxShadow="lg"
+  height="auto" // Allow height to adjust dynamically
+  align="center"
+  justify="space-between"
+  minWidth="300px" // Minimum width for the entire box
+  w="100%" // Full width of the parent container
+>
+  <Image
+    src={image}
+    alt={title}
+    height="150px" // Fixed height for the image
+    width={{ base: "100%", md: "300px" }} // Responsive width for the image
+    objectFit="cover"
+    borderRadius="lg"
+    mr={{ base: 0, md: 5 }} // Add margin-right for row layout
+    mb={{ base: 3, md: 0 }} // Add margin-bottom for column layout
+  />
+  <Box
+    flex="1"
+    overflow="hidden"
+    flexShrink={0} // Prevent shrinking below the minimum width
+  >
+    <Text
+      fontSize={{ base: "md", sm: "lg", md: "xl" }} // Adjust font size for responsiveness
+      fontWeight="bold"
+      color={textColor2}
+      mb={1}
+      whiteSpace="normal" // Allow multi-line wrapping
+      wordBreak="break-word" // Handle long words
+      overflow="hidden" // Prevent content overflow
+      textOverflow="ellipsis" // Add ellipsis for truncated text
+    >
+      {title}
+    </Text>
+  </Box>
+</Flex>
+
+
+
+
+
+    );
+  };
   
   // export default Card;
   
+  const FAQs= [
+    {
+        image: "FAQ1.png",
+        title: "What is an Ethereum Improvement Proposal (EIP)?",
+        content: "An overview of account abstraction, EOA, Contract, EIP-86, EIP-2938, EIP-4337, sponsored transaction and more.",
+        link: "https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
+    },
+    {
+        image: "FAQ2.png",
+        title: "What is an Ethereum Request for Change (ERC)?",
+        content: "Need, Proposal, Churn Limit, Managing Validator Exits & Activations",
+        link: "https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
+    },
+    {
+        image: "FAQ3.png",
+        title: "What is an Ethereum Improvement Proposal (EIP)?",
+        content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
+        link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
+    },
+    {
+        image: "Blockchain_Future.png",
+        title: "What is EIPsInsight?",
+        content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
+        link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
+    },
+]
   
 
  const EIPS= [
@@ -190,19 +268,18 @@ const INSIGHT= [
 
   const tabContent = [
     {
-      label: "EIPsInsight",
+      label: "FAQ",
       content: (
         <>
             <SimpleGrid 
                 columns={{ base: 1, md: 2 }}  // 1 column on small screens, 2 columns on medium and larger screens
                 spacing={4}  // Adjust the space between cards
             >
-                {INSIGHT.map((eip, index) => (
+                {FAQs.map((eip, index) => (
                 <div key={index}>
-                    {Card({ 
+                    {Card2({ 
                     image: eip.image, 
                     title: eip.title, 
-                    content: eip.content, 
                     link: eip.link 
                     })}
                 </div>
@@ -212,7 +289,7 @@ const INSIGHT= [
       ),
     },
     {
-        label: "EIPs",
+        label: "Blogs",
         content: (
             <>
             <SimpleGrid 
@@ -234,7 +311,7 @@ const INSIGHT= [
         ),
       },
       {
-        label: "PECTRA",
+        label: "Videos",
         content: (
             <>
             <SimpleGrid 
@@ -258,7 +335,7 @@ const INSIGHT= [
       },
       
     {
-      label: "RIPs",
+      label: "News",
       content: (
         <Box bg={bg} p={5} borderRadius="lg" boxShadow="lg">
   <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl text-blue-400 font-semibold text-left" textAlign="justify">

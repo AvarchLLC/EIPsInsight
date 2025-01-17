@@ -134,8 +134,14 @@ const ReviewTracker = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
-  
-      return reviewers;
+      const additionalReviewers = ["CarlBeek", "nconsigny", "yoavw", "adietrichs"];
+
+      // Merge the two arrays and ensure uniqueness
+      const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
+
+      console.log("updated reviewers:", updatedReviewers);
+
+      return updatedReviewers;
     } catch (error) {
       console.error("Error fetching reviewers:", error);
       return [];
@@ -439,7 +445,7 @@ const generateCSVData3 = (reviewer: string) => {
 
       // console.log("reviewers:",reviewers);
       // const githubHandles = await fetchReviewers();
-      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu",];
+      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","CarlBeek", "nconsigny", "yoavw", "adietrichs"];
       const githubHandles2 = await fetchReviewers();
       // console.log("active:",activereviewers);
       
@@ -1337,15 +1343,24 @@ const fetchData4 = async () => {
       throw new Error('Failed to fetch timelines!');
     }
     const timelines = await timelineResponse.json();
+    const additionalTimelines = [
+      { reviewer: "CarlBeek", startDate: new Date('2023-10-01'), endDate: null },
+      { reviewer: "nconsigny", startDate: new Date('2023-10-01'), endDate: null },
+      { reviewer: "yoavw", startDate: new Date('2023-10-01'), endDate: null },
+      { reviewer: "adietrichs", startDate: new Date('2023-10-01'), endDate: null }
+    ];
+    const allTimelines = [...timelines, ...additionalTimelines];
 
     // Format the timeline data for easy access
-    const timelineMap = timelines.reduce((map: any, reviewer: any) => {
+    const timelineMap = allTimelines.reduce((map: any, reviewer: any) => {
       map[reviewer.reviewer] = {
         startDate: new Date(reviewer.startDate),
         endDate: reviewer.endDate ? new Date(reviewer.endDate) : null, // null means no end date
       };
       return map;
     }, {});
+
+    console.log("timeline map:",timelineMap);
 
     // Step 3: Filter reviews based on timeline
     const filteredData = Object.keys(data).reduce((filtered: ReviewerData, reviewerName: string) => {
@@ -1360,6 +1375,8 @@ const fetchData4 = async () => {
       if (reviews.length > 0) {
         filtered[reviewerName] = reviews; // Include only reviewers with valid reviews
       }
+
+      console.log("filtered data:",filtered);
       return filtered;
     }, {});
 
@@ -1549,7 +1566,7 @@ const editorsSpecialityChart = () => {
   const yearlyChartData3 = formatChartData(processData3);
   // console.log("new chart data:",yearlyChartData1)
 
-  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech"];
+  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech","CarlBeek", "nconsigny", "yoavw", "adietrichs"];
 
   // Step 1: Filter the data to include only target reviewers
   const filteredEIPData = yearlyChartData1.filter((item) =>

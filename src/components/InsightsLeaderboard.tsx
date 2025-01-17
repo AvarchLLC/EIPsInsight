@@ -28,13 +28,6 @@ const InsightsLeaderboard = () => {
   const [downloaddata, setdownloadData] = useState<any[]>([]);
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
   const [reviewers, setReviewers] = useState<string[]>([]);
-  const [reviewerData, setReviewerData] = useState<any[]>([]);
-  const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [selectedStartYear, setSelectedStartYear] = useState<string | null>(null);
-  const [selectedStartMonth, setSelectedStartMonth] = useState<string | null>(null);
-  const [selectedEndYear, setSelectedEndYear] = useState<string | null>(null);
-  const [selectedEndMonth, setSelectedEndMonth] = useState<string | null>(null);
   const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -51,27 +44,27 @@ const InsightsLeaderboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!selectedYear || !selectedMonth) return; // Ensure year and month are selected
-
+  
       setLoading2(true);
-
-      // Format the key to 'yyyy-mm' format
-      const key = `${selectedYear}-${selectedMonth}`;
-
+  
+      const formattedMonth = selectedMonth.length === 1 ? `0${selectedMonth}` : selectedMonth;
+      const key = `${selectedYear}-${formattedMonth}`;
+      console.log("key1: ", key);
+  
       // Define the API endpoint based on activeTab ('PRs' or 'Issues')
-      const endpoint =`/api/ReviewersCharts/data/${activeTab.toLowerCase()}/${key}`
-        
-
+      const endpoint = `/api/ReviewersCharts/data/${activeTab.toLowerCase()}/${key}`;
+  
       try {
         const response = await fetch(endpoint);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
         const result = await response.json();
-        // console.log(result)
-
-        console.log("result:",result[0].PRs);
-
-        setData2(result[0].PRs)
+        console.log("response format:", result);
+  
+        console.log("result:", result[0].PRs);
+  
+        setData2(result[0].PRs);
         // console.log(formattedData); 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -79,10 +72,11 @@ const InsightsLeaderboard = () => {
         setLoading2(false); // Reset loading state after fetching
       }
     };
-
+  
     fetchData(); // Invoke the fetch function
-
-  }, [selectedYear, selectedMonth]);
+  
+  }, [selectedYear, selectedMonth, activeTab]); // Add dependencies here
+  
 
   
   useEffect(() => {
@@ -108,9 +102,18 @@ const InsightsLeaderboard = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
-      console.log("reviewers from github:", reviewers);
+      const additionalReviewers = ["CarlBeek", "nconsigny", "yoavw", "adietrichs"];
+
+      // Merge the two arrays and ensure uniqueness
+      const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
+
+      console.log("updated reviewers:", updatedReviewers);
+
+      return updatedReviewers;
+      
+      // console.log("reviewers from github:", reviewers);
   
-      return reviewers;
+      // return reviewers;
     } catch (error) {
       console.error("Error fetching reviewers:", error);
       return [];
@@ -140,9 +143,6 @@ const InsightsLeaderboard = () => {
       );
       console.log("show reviewers data:",initialShowReviewer)
   
-      // setShowReviewer(initialShowReviewer);
-
-      
      
       setchart1Data(formattedData);
     } catch (error) {
@@ -310,9 +310,7 @@ const generateCSVData = () => {
     return;
   }
 
-  console.log(data2)
-
-  const filteredData = data2
+  console.log("recieved data:",data2)
 
   const csv = data2.map((pr: PR) => ({
       PR_Number: pr.prNumber,

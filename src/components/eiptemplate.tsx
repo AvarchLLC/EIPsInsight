@@ -128,7 +128,7 @@ const EipTemplateEditor = () => {
       : type === "rip"
       ? [
           { label: "Type", key: "type", type: "select", options: ["Standards Track", "Meta", "TBD"] },
-          { label: "Category", key: "category", type: "select", options: ["Core", "RRC", "TBD"] },
+          { label: "Category", key: "category", type: "select", options: ["Core", "RRC", "Others", "TBD"] },
         ]
       : [];
 

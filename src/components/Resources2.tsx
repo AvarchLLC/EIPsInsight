@@ -174,7 +174,7 @@ const PECTRA= [
 ]
 const INSIGHT= [
   {
-      image: "EIPsInsightRecap.jpg",
+      image: "EipsInsightRecap.jpg",
       title: "EIPsInsight milestones 2024",
       content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities, which together streamline workflows, promote accountability, and optimize the management of proposals.",
       link: "/milestones2024"

@@ -81,7 +81,7 @@ const EIPReviewDetails = mongoose.models.EIPReviewDetails || mongoose.model('EIP
 export default async (req: Request, res: Response) => {
     try {
         // GitHub handles to filter by
-        const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu", "arachnid", "nicksavers", "vbuterin"];
+        const githubHandles = ["CarlBeek","nconsigny","yoavw", "adietrichs","axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu", "arachnid", "nicksavers", "vbuterin"];
 
         // Create an object to store the results for each reviewer
         const resultByReviewer: { [key: string]: any[] } = {};
