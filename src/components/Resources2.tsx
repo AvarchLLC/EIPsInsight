@@ -188,6 +188,7 @@ const INSIGHT= [
  
 ]
 
+
   const tabContent = [
     {
       label: "EIPsInsight",

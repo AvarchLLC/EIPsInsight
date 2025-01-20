@@ -1,6 +1,6 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
-import Resources from "@/components/Resources2";
+import Resources from "@/components/Resources3";
 import FeaturedVideos from "@/components/FeaturedVideos";
 import { useColorModeValue } from "@chakra-ui/react";
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {useColorModeValue, Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Image, Link, Flex } from "@chakra-ui/react";
+import {useColorModeValue, Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Image, Link, Flex, Grid } from "@chakra-ui/react";
 import Header from "./Header";
 import { SimpleGrid } from "@chakra-ui/react";
 
@@ -92,8 +92,9 @@ const ResourcesPage: React.FC = () => {
 
   const Card2 = ({ image, title,link }: { image: string; title: string; link: string }) => {
     return (
+      <Link href={link}>
       <Flex
-  direction={{ base: "column", md: "column", lg:"row" }} // Default: column on small screens, row on larger
+  direction="row" // Default: column on small screens, row on larger
   wrap="nowrap" // Prevent wrapping of content within the Flex container
   bg={bg2}
   p={5}
@@ -102,19 +103,11 @@ const ResourcesPage: React.FC = () => {
   height="auto" // Allow height to adjust dynamically
   align="center"
   justify="space-between"
-  minWidth="300px" // Minimum width for the entire box
+  minWidth="200px" // Minimum width for the entire box
+  minHeight="100px" 
   w="100%" // Full width of the parent container
 >
-  <Image
-    src={image}
-    alt={title}
-    height="150px" // Fixed height for the image
-    width={{ base: "100%", md: "300px" }} // Responsive width for the image
-    objectFit="cover"
-    borderRadius="lg"
-    mr={{ base: 0, md: 5 }} // Add margin-right for row layout
-    mb={{ base: 3, md: 0 }} // Add margin-bottom for column layout
-  />
+  
   <Box
     flex="1"
     overflow="hidden"
@@ -134,6 +127,7 @@ const ResourcesPage: React.FC = () => {
     </Text>
   </Box>
 </Flex>
+</Link>
 
 
 
@@ -146,85 +140,36 @@ const ResourcesPage: React.FC = () => {
   
   const FAQs= [
     {
-        image: "FAQ1.png",
+        image: "faq_resources1.png",
         title: "What is an Ethereum Improvement Proposal (EIP)?",
         content: "An overview of account abstraction, EOA, Contract, EIP-86, EIP-2938, EIP-4337, sponsored transaction and more.",
-        link: "https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
+        link: "/FAQs/EIP"
     },
     {
-        image: "FAQ2.png",
+        image: "faq_resources2.png",
         title: "What is an Ethereum Request for Change (ERC)?",
         content: "Need, Proposal, Churn Limit, Managing Validator Exits & Activations",
-        link: "https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
+        link: "/FAQs/ERC"
     },
     {
-        image: "FAQ3.png",
-        title: "What is an Ethereum Improvement Proposal (EIP)?",
+        image: "faq_resources3.png",
+        title: "What is an Rollup Improvement Proposal (RIP)?",
         content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
-        link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
+        link: "/FAQs/RIP"
     },
     {
         image: "Blockchain_Future.png",
         title: "What is EIPsInsight?",
         content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
-        link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
+        link: "/About"
     },
 ]
   
 
- const EIPS= [
-    {
-        image: "resources1.jpg",
-        title: "An overview of Account Abstraction in Ethereum blockchain",
-        content: "An overview of account abstraction, EOA, Contract, EIP-86, EIP-2938, EIP-4337, sponsored transaction and more.",
-        link: "https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
-    },
-    {
-        image: "resources2.jpg",
-        title: "New Ethereum Proposal to Cap the Growth of Active Validators",
-        content: "Need, Proposal, Churn Limit, Managing Validator Exits & Activations",
-        link: "https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
-    },
-    {
-        image: "resources3.jpg",
-        title: "Ethereum's Dencun upgrade moving towards Devnet 8",
-        content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
-        link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
-    },
-    {
-        image: "resources7.png",
-        title: "Eip - 7516 : BLOBBASEFEE opcode",
-        content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
-        link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
-    },
-    {
-        image: "resources9.jpg",
-        title: "EIP - 7045 Increase Max Attestation Inclusion Slot",
-        content: "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security and efficiency. The article delves into its motivation, technical changes, implications, and impact on consensus and security.",
-        link: "https://etherworld.co/2024/01/09/eip-7045/"
-    },
-    {
-        image: "resources10.png",
-        title: "EIP-1153 and Transient storage",
-        content: "EIP-1153 introduces transient storage, revolutionizing Ethereum's data handling. It addresses gas inefficiencies, enhancing smart contract performance. Explore its impact on inter-frame communication and gas cost efficiency.",
-        link: "https://etherworld.co/2024/01/08/eip-1153-and-transient-storage/"
-    },
-    {
-        image: "resources12.png",
-        title: "EIP-5656: MCOPY - An efficient EVM instruction",
-        content: "EIP-5656 introduces MCOPY. Addressing gas cost challenges, MCOPY benefits, use cases, and impact, presenting a promising upgrade for Ethereum's ecosystem.",
-        link: "https://etherworld.co/2023/11/15/eip-5656-mcopy-an-efficient-evm-instruction/"
-    },
-    {
-        image: "resources15.jpg",
-        title: "Transient Storage for Beginners",
-        content: "EIP-1153: Need, Effects, Pros & Cons, Future Plans",
-        link: "https://etherworld.co/2022/12/13/transient-storage-for-beginners/"
-    }
-]
 
 
-const PECTRA= [
+
+const NEWS= [
     {
         image: "pectra4.png",
         title: "EtherWorld Weekly — Edition 301",
@@ -248,7 +193,55 @@ const PECTRA= [
         title: "Consensus-layer Call 144: EIPs, Pectra, and Blob Scaling",
         content: "Ethereum developers discussed key updates on Pectra, EIPs 7742 and 7782, and strategies for scaling blobs, focusing on network performance, PeerDAS, and upcoming changes for the Pectra hard fork.",
         link: "https://etherworld.co/2024/10/17/consensus-layer-call-144/"
-    }
+    },
+    {
+      image: "resources1.jpg",
+      title: "An overview of Account Abstraction in Ethereum blockchain",
+      content: "An overview of account abstraction, EOA, Contract, EIP-86, EIP-2938, EIP-4337, sponsored transaction and more.",
+      link: "https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
+  },
+  {
+      image: "resources2.jpg",
+      title: "New Ethereum Proposal to Cap the Growth of Active Validators",
+      content: "Need, Proposal, Churn Limit, Managing Validator Exits & Activations",
+      link: "https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
+  },
+  {
+      image: "resources3.jpg",
+      title: "Ethereum's Dencun upgrade moving towards Devnet 8",
+      content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
+      link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
+  },
+  {
+      image: "resources7.png",
+      title: "Eip - 7516 : BLOBBASEFEE opcode",
+      content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
+      link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
+  },
+  {
+      image: "resources9.jpg",
+      title: "EIP - 7045 Increase Max Attestation Inclusion Slot",
+      content: "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security and efficiency. The article delves into its motivation, technical changes, implications, and impact on consensus and security.",
+      link: "https://etherworld.co/2024/01/09/eip-7045/"
+  },
+  {
+      image: "resources10.png",
+      title: "EIP-1153 and Transient storage",
+      content: "EIP-1153 introduces transient storage, revolutionizing Ethereum's data handling. It addresses gas inefficiencies, enhancing smart contract performance. Explore its impact on inter-frame communication and gas cost efficiency.",
+      link: "https://etherworld.co/2024/01/08/eip-1153-and-transient-storage/"
+  },
+  {
+      image: "resources12.png",
+      title: "EIP-5656: MCOPY - An efficient EVM instruction",
+      content: "EIP-5656 introduces MCOPY. Addressing gas cost challenges, MCOPY benefits, use cases, and impact, presenting a promising upgrade for Ethereum's ecosystem.",
+      link: "https://etherworld.co/2023/11/15/eip-5656-mcopy-an-efficient-evm-instruction/"
+  },
+  {
+      image: "resources15.jpg",
+      title: "Transient Storage for Beginners",
+      content: "EIP-1153: Need, Effects, Pros & Cons, Future Plans",
+      link: "https://etherworld.co/2022/12/13/transient-storage-for-beginners/"
+  }
 ]
 const INSIGHT= [
   {
@@ -257,34 +250,93 @@ const INSIGHT= [
       content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities, which together streamline workflows, promote accountability, and optimize the management of proposals.",
       link: "/milestones2024"
   },
-  {
-      image: "Blockchain_Future.png",
-      title: "What is EIPsInsight?",
-      content: "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs),  Ethereum Request for Comments (ERCs), Rollup Improvement Proposals (RIPs) over a specified period.",
-      link: "/About"
-  },
- 
+  // {
+  //     image: "Blockchain_Future.png",
+  //     title: "What is EIPsInsight?",
+  //     content: "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs),  Ethereum Request for Comments (ERCs), Rollup Improvement Proposals (RIPs) over a specified period.",
+  //     link: "/About"
+  // },
 ]
+
+const Links = [
+  "https://www.youtube.com/embed/AyidVR6X6J8?start=8",
+  "https://youtu.be/sIr6XX8yR8o?si=csIwXAls_fm7Hfcx",
+  "https://youtu.be/dEgBVAzY6Eg?si=1CVqeBFXepeji-Ik",
+  "https://www.youtube.com/watch?v=nJ57mkttCH0",
+  "https://youtu.be/V75TPvK-K_s?si=KDQI5kP4y-2-9bka",
+  "https://youtu.be/fwxkbUaa92w?si=uHze3y_--2JfYMjD",
+  "https://www.youtube.com/embed/YuEA-jE2Z8c",
+  "https://www.youtube.com/watch?v=sIr6XX8yR8o",
+  "https://www.youtube.com/watch?v=dEgBVAzY6Eg",
+  "https://www.youtube.com/watch?v=pO8fmZd4Mjw",
+  "https://www.youtube.com/watch?v=V75TPvK-K_s",
+  "https://www.youtube.com/watch?v=fwxkbUaa92w",
+  "https://www.youtube.com/embed/pyfKM_hOKaM",
+];
+
+// Convert URLs to the embed format
+const embedLinks = Links.map((link) => {
+  if (link.includes("youtube.com/watch?v=")) {
+    return link.replace("watch?v=", "embed/");
+  } else if (link.includes("youtu.be")) {
+    return link.replace("youtu.be/", "www.youtube.com/embed/");
+  }
+  return link;
+});
+
 
   const tabContent = [
     {
       label: "FAQ",
       content: (
         <>
-            <SimpleGrid 
-                columns={{ base: 1, md: 2 }}  // 1 column on small screens, 2 columns on medium and larger screens
-                spacing={4}  // Adjust the space between cards
-            >
-                {FAQs.map((eip, index) => (
-                <div key={index}>
-                    {Card2({ 
-                    image: eip.image, 
-                    title: eip.title, 
-                    link: eip.link 
-                    })}
-                </div>
-                ))}
-            </SimpleGrid>
+           <Flex 
+      direction={{ base: "column", md: "row" }} 
+      align="center" 
+      gap={4} 
+      p={4}
+    >
+      {/* Left Half: Image */}
+      <Box 
+        flex={{ base: "none", md: "1" }} 
+        display={{ base: "block", md: "flex" }} 
+        justifyContent="center" 
+        alignItems="center"
+      >
+        <Image 
+            src="/faq_resources4.png" 
+            alt="FAQs Illustration" 
+            maxW="100%" 
+            minH="100%"
+            borderRadius="md" 
+            shadow="md" 
+        />
+
+      </Box>
+
+      {/* Right Half: FAQ Cards */}
+      <Box 
+        flex={{ base: "none", md: "2" }} 
+        mt={{ base: 4, md: 0 }}
+        w="100%"
+  maxW={{ lg: "50%" }} 
+      >
+        <SimpleGrid 
+    columns={{ base: 1, md: 1, lg: 1 }} // Stacks based on screen size
+    spacing={4}
+  >
+    {FAQs.map((eip, index) => (
+      <Box key={index}>
+        {Card2({ 
+          image: eip.image, 
+          title: eip.title, 
+          link: eip.link 
+        })}
+      </Box>
+    ))}
+  </SimpleGrid>
+      </Box>
+    </Flex>
           </>
       ),
     },
@@ -293,10 +345,10 @@ const INSIGHT= [
         content: (
             <>
             <SimpleGrid 
-                columns={{ base: 1, md: 2 }}  // 1 column on small screens, 2 columns on medium and larger screens
-                spacing={4}  // Adjust the space between cards
+                columns={{ base: 1, md: 2 }} 
+                spacing={4} 
             >
-                {EIPS.map((eip, index) => (
+                {INSIGHT.map((eip, index) => (
                 <div key={index}>
                     {Card({ 
                     image: eip.image, 
@@ -313,238 +365,110 @@ const INSIGHT= [
       {
         label: "Videos",
         content: (
-            <>
-            <SimpleGrid 
-                columns={{ base: 1, md: 2 }}  // 1 column on small screens, 2 columns on medium and larger screens
-                spacing={4}  // Adjust the space between cards
+          <>
+            <Grid 
+              templateColumns={{ base: "1fr", lg: "2fr 3fr" }} // Single column for small screens, 2:3 split for large screens
+              gap={4}
             >
-                {PECTRA.map((pectra: { image: string; title: string; content: string; link: string }, index: number) => (
+              {/* Left Section: Small Videos */}
+              <SimpleGrid 
+                columns={{ base: 1, lg: 2 }} 
+                spacing={4} 
+                display={{ base: "none", md:"none", lg: "grid" }} // Visible only on large screens
+              >
+                {embedLinks.slice(1, 5).map((link, index) => (
+                  <iframe
+                    key={index}
+                    src={link}
+                    title={`Video ${index + 2}`}
+                    style={{ borderRadius: "8px" }}
+                    width="100%"
+                    height="200px"
+                    allowFullScreen
+                  />
+                ))}
+              </SimpleGrid>
+      
+              {/* Right Section: Featured Video */}
+              <Box 
+                bg="gray.900" 
+                borderRadius="lg" 
+                overflow="hidden"
+              >
+                <iframe
+                  src={Links[0]}
+                  title="Featured Video"
+                  style={{ borderRadius: "8px" }}
+                  width="100%"
+                  height="400px"
+                  allowFullScreen
+                />
+              </Box>
+            </Grid>
+      
+            {/* Second Row: Remaining Videos */}
+            <SimpleGrid 
+              columns={{ base: 1, sm: 2, lg: 4 }} 
+              spacing={4} 
+              mt={{ base: 4, lg: 8 }}
+            >
+              {embedLinks.slice(5).map((link, index) => (
+                <iframe
+                  key={index}
+                  src={link}
+                  title={`Video ${index + 6}`}
+                  style={{ borderRadius: "8px" }}
+                  width="100%"
+                  height="200px"
+                  allowFullScreen
+                />
+              ))}
+            </SimpleGrid>
+      
+            {/* Responsive Stacked View for Small Screens */}
+            <SimpleGrid 
+              columns={1} 
+              spacing={4} 
+              display={{ base: "grid", lg: "none" }} // Visible only on small/medium screens
+              mt={4}
+            >
+              {embedLinks.map((link, index) => (
+                <iframe
+                  key={index}
+                  src={link}
+                  title={`Video ${index + 1}`}
+                  style={{ borderRadius: "8px" }}
+                  width="100%"
+                  height="200px"
+                  allowFullScreen
+                />
+              ))}
+            </SimpleGrid>
+          </>
+        ),
+      },
+      
+      
+    {
+      label: "News",
+      content: (
+        <>
+            <SimpleGrid 
+                columns={{ base: 1, md: 2 }} 
+                spacing={4} 
+            >
+                {NEWS.map((eip, index) => (
                 <div key={index}>
                     {Card({ 
-                    image: pectra.image, 
-                    title: pectra.title, 
-                    content: pectra.content, 
-                    link: pectra.link 
+                    image: eip.image, 
+                    title: eip.title, 
+                    content: eip.content, 
+                    link: eip.link 
                     })}
                 </div>
                 ))}
             </SimpleGrid>
           </>
-          
-        ),
-      },
-      
-    {
-      label: "News",
-      content: (
-        <Box bg={bg} p={5} borderRadius="lg" boxShadow="lg">
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl text-blue-400 font-semibold text-left" textAlign="justify">
-    What is a Rollup Improvement Proposal (RIP)?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem. RIPs act as specifications to improve rollups, enhance interoperability, and standardize development processes.
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    <Link  href="https://ethereum-magicians.org/t/about-the-rips-category/19805"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>All RIPs are optional</Link>. RIPs are and will always remain optional standards for Rollups and participants in the larger EVM ecosystem.
-  </Text>
-  
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    Why are RIPs Important?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    RIPs help coordinate technical improvements for rollups in a transparent, collaborative way. They:
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Propose <b>new features</b> and optimizations.</li>
-    <li>Collect <b>community feedback</b> on rollup-related issues.</li>
-    <li>Serve as a <b>historical record</b> of design decisions.</li>
-    <li>Help rollups track progress, especially for multi-client implementations.</li>
-  </ul>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    By adopting RIPs, rollups can align on standards and ensure better <b>interoperability</b> across Layer 2 solutions. The goal of the RIP project is to standardize and provide high-quality documentation for Rollups in the Ethereum ecosystem.
-  </Text>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10">
-    What are the Different Types of RIPs?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    <strong>Standards Track RIPs</strong> - Changes that impact most or all rollup implementations, including:
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li><b>Core</b>: Changes to network rules, block validity, EVM opcodes, cryptographic updates.</li>
-    <li><b>RRC (Rollup Request for Comments)</b>: Application-level standards like token or wallet formats.</li>
-    <li><b>Other</b>: Improvements relevant to core developer discussions.</li>
-  </ul>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    <strong>Meta RIPs</strong> - Proposals related to rollup processes, governance, or the RIP process itself. These are not technical but focus on <b>procedures, tools, or guidelines</b>.
-  </Text>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    What is the RIP Process?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    The RIP process follows these steps:
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li><b>Idea Stage</b>: Share your proposal idea for initial feedback (e.g., Ethereum Magicians forum).</li>
-    <li><b>Draft</b>: Submit a formal RIP using the template provided.</li>
-    <li><b>Review</b>: Invite community discussion and peer review.</li>
-    <li><b>Final</b>: Once accepted, the RIP becomes the standard and is ready for implementation.</li>
-    <li><b>Stagnant</b>: RIPs inactive for 6+ months may be labeled as stagnant.</li>
-    <li><b>Withdrawn</b>: Proposals that authors decide to discontinue.</li>
-    <li><b>Living</b>: RIPs continually updated without reaching a final state.</li>
-  </ul>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    <b>Tip</b>: For Core RIPs, presenting your proposal during  <Link  href="https://github.com/ethereum/pm/issues"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>Rollcall meetings</Link> is the best way to gather technical feedback and consensus from rollup core teams.
-  </Text>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    Who Can Submit a RIP?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    Anyone! Whether you're a developer, researcher, or rollup enthusiast, you can submit an RIP. Before drafting:
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li>Discuss your idea on the <Link  href="https://ethereum-magicians.org/"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>Ethereum Magicians Forum</Link>.</li>
-    <li>Collaborate with rollup teams early to build consensus.</li>
-  </ul>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    What Makes a Successful RIP?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    A strong RIP includes:
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li><b>Clear Specification</b>: Detailed syntax and semantics of the proposed change.</li>
-    <li><b>Motivation</b>: Why the change is necessary.</li>
-    <li><b>Rationale</b>: Design decisions and alternatives considered.</li>
-    <li><b>Security Considerations</b>: Risks, mitigations, and guidance.</li>
-    <li><b>Backwards Compatibility</b>: Notes on how the proposal impacts existing implementations.</li>
-  </ul>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    How Do I Format a RIP?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    RIPs must follow a specific template and structure in Markdown format. Each RIP includes:
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li><b>Preamble</b>: Metadata such as RIP number, title, author(s), and status.</li>
-    <li><b>Abstract</b>: A brief technical summary.</li>
-    <li><b>Specification</b>: A detailed technical description of the proposal.</li>
-    <li><b>Rationale</b>: Explanation of design choices.</li>
-    <li><b>Security Considerations</b>: Assessment of potential risks.</li>
-    <li><b>Test Cases (if applicable)</b>: Mandatory for consensus changes.</li>
-    <li><b>Reference Implementation (optional)</b>: Code to aid understanding.</li>
-  </ul>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    Refer to the <Link  href="https://github.com/ethereum/RIPs/blob/master/rip-template.md"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>RIP Template</Link> for guidelines.
-  </Text>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    Who Oversees the RIP Process?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    RIP Editors ensure proposals are well-formatted and ready for review. They do not decide the merits of a proposal. Current RIP editors include:
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li><b>Ansgar Dietrichs</b></li>
-    <li><b>Carl Beekhuizen</b></li>
-    <li><b>Yoav Weiss</b></li>
-    <li><b>Nicolas Consigny</b></li>
-  </ul>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    Where Can I Track RIPs and Rollup Progress?
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li><b>GitHub Repository</b>: <Link  href="https://github.com/ethereum/RIPs"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>RIP Repository</Link></li>
-    <li><b>Discussions</b>: 
-    <Link  href="https://ethereum-magicians.org/"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>
-      Ethereum Magicians Forum</Link></li>
-    <li><b>Rollup Status</b>: <Link  href="https://l2beat.com/scaling/summary"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>
-      L2BEAT</Link></li>
-    <li><b>Comparison of Rollups</b>: <Link  href="https://www.rollup.codes/"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>
-      rollup.codes</Link></li>
-  </ul>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    What Happens After a RIP is Final?
-  </Text>
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-    Once an RIP is accepted and implemented by at least one rollup on their mainnet, it becomes a <b>Final RIP</b>. Care is taken to resolve any conflicts before deployment to avoid competing standards.
-  </Text>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
-    How Do I Stay Involved?
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li><b>Contribute</b>: Submit your RIP or provide feedback on existing proposals.</li>
-    <li><b>Discuss</b>: Join community discussions on forums and GitHub.</li>
-    <li><b>Engage</b>: Present your RIP at Rollcall meetings to build consensus.</li>
-  </ul>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10"textAlign="justify">
-    Where Can I Find More Information?
-  </Text>
-  <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-    <li><b>RIP Template</b>: <Link  href="https://github.com/ethereum/RIPs/blob/master/rip-template.md"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>Link to Template</Link></li>
-    <li><b>RIP Discussions</b>: <Link  href="https://ethereum-magicians.org/"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>
-      Ethereum Magicians Forum</Link></li>
-    <li><b>Rollup Specifications</b>: <Link  href="https://www.rollup.codes/"
-    isExternal
-    color="blue.500"
-    textDecoration="underline"
-    _hover={{  color: "blue.700" }}>
-      rollup.codes</Link></li>
-  </ul>
-
-  <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={6} textAlign="justify">
-    By collaborating through RIPs, we can drive innovation and ensure a shared, open-source approach to improving Ethereum rollup solutions.
-  </Text>
-</Box>
-
       ),
     },
   ];
@@ -561,10 +485,10 @@ const INSIGHT= [
       <Tabs isFitted variant="soft-rounded" index={tabIndex} // Control the active tab
       onChange={(key) => {
         // Update the tab index and hash when the tab is changed
-        if (key === 0) handleSelection("EIPsInsight");
-        if (key === 1) handleSelection("EIPs");
-        if (key === 2) handleSelection("PECTRA");
-        if (key === 3) handleSelection("RIPs");
+        if (key === 0) handleSelection("FAQ");
+        if (key === 1) handleSelection("Blogs");
+        if (key === 2) handleSelection("Videos");
+        if (key === 3) handleSelection("News");
       }}>
      <Box mt={2} borderRadius="10px 10px 0 0">
   <Flex
@@ -585,7 +509,7 @@ const INSIGHT= [
         <Tab
           key={index}
           _selected={{
-            bg: "gray.800",
+            bg: "blue.300",
             color: "white",
             borderColor: "lightblue",
             paddingY: 2,
