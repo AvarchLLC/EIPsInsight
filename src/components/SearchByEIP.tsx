@@ -49,7 +49,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/graphsv3`);
+        const response = await fetch(`/api/new/graphsv4`);
         const jsonData = await response.json();
 
         const getEarliestEntries = (data: any[], key: string) => {
@@ -241,6 +241,9 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
         </MenuItem>
         <MenuItem onClick={() => window.location.href = '/SearchEipTitle'}>
           Title
+        </MenuItem>
+        <MenuItem onClick={() => window.location.href = '/SearchPRSandISSUES'}>
+        PR/ISSUE
         </MenuItem>
       </MenuList>
     </Menu>

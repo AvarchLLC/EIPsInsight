@@ -108,7 +108,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
         } else if (type === "eip") {
           setData(jsonData.eip);
         } else {
-          setData(jsonData.eip.concat(jsonData.erc));
+          setData(jsonData.rip);
         }
         setIsLoading(false); // Set isLoading to false after data is fetched
 
@@ -344,7 +344,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -357,7 +357,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${cat === "ERC" ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -375,7 +375,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/eips/eip-${item.eip}`}
+                        href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"

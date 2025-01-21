@@ -12,7 +12,7 @@ if (mongoose.connection.readyState === 0) {
 
 const IssueDetailsSchema = new Schema({
     issueNumber: { type: Number },
-    IssueTitle: { type: String },
+    issueTitle: { type: String },
     IssueDescription: { type: String },
     labels: { type: [String] },
     conversations: { type: [Object] },
@@ -35,15 +35,15 @@ const RipIssueDetails = mongoose.models.allripsissuedetails || mongoose.model('a
 export default async (req: Request, res: Response) => {
     try {
         // Retrieve unique Issue numbers from each collection with repository information
-        const eipIssueNumbers = await EipIssueDetails.find({}, { issueNumber: 1, _id: 0 }).lean();
-        const ercIssueNumbers = await ErcIssueDetails.find({}, { issueNumber: 1, _id: 0 }).lean();
-        const ripIssueNumbers = await RipIssueDetails.find({}, { issueNumber: 1, _id: 0 }).lean();
+        const eipIssueNumbers = await EipIssueDetails.find({}, { issueTitle: 1, issueNumber: 1, _id: 0 }).lean();
+        const ercIssueNumbers = await ErcIssueDetails.find({}, { issueTitle: 1, issueNumber: 1, _id: 0 }).lean();
+        const ripIssueNumbers = await RipIssueDetails.find({}, { issueTitle: 1, issueNumber: 1, _id: 0 }).lean();
 
         // Add repository information to each Issue number
         const formattedIssueNumbers = [
-            ...eipIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, repo: 'EIPs' })),
-            ...ercIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, repo: 'ERCs' })),
-            ...ripIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, repo: 'RIPs' })),
+            ...eipIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'EIPs' })),
+            ...ercIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'ERCs' })),
+            ...ripIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'RIPs' })),
         ];
 
         // Send the consolidated list as a JSON response

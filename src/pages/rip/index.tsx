@@ -116,7 +116,12 @@ const RIP = () => {
       try {
         const response = await fetch(`/api/new/all`);
         console.log(response);
-        const jsonData = await response.json();
+        let jsonData = await response.json();
+        jsonData.rip.forEach((item: EIP) => {
+          if (item.eip === "7859") {
+              item.status = "Draft"; // Update the status
+          }
+      });   
         setData(jsonData.rip);
         setData4(jsonData.rip);
         
@@ -134,8 +139,9 @@ const RIP = () => {
         const fetchData = async () => {
           try {
             const response = await fetch(`/api/new/graphsv2`);
-            const jsonData = await response.json();
+            let jsonData = await response.json();
             setData2(jsonData);
+            console.log("check data:", jsonData);
             setData3(jsonData);
             setIsLoading(false); // Set loader state to false after data is fetched
           } catch (error) {
@@ -323,7 +329,7 @@ const RIP = () => {
           
           <Box mt={2}>
           <LI 
-            href="/resources#RIPs" 
+            href="/FAQs/RIP" 
             fontSize="md" 
             color="blue.500" 
             fontWeight="semibold" 
@@ -361,13 +367,14 @@ const RIP = () => {
       </Box>
     </Box>
 
-    <Box paddingTop={8}>
+    {/* <Box paddingTop={8}>
           {selected === "status" ? (
            <></>
           ) : (
             <RIPStatusGraph />
           )}
-    </Box>
+    </Box> */}
+    <br/>
 
     {selected === "status" && (
               <Box paddingY="8">
@@ -384,7 +391,7 @@ const RIP = () => {
             <Box className={"flex gap-3"}>
               <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
-                <NextLink href={`/tableStatus/erc/${status}`}>
+                <NextLink href={`/tableStatus/rip/${status}`}>
                   [{data.filter((item) => item.status === status).length}]
                 </NextLink>
               </Text>
@@ -420,6 +427,7 @@ const RIP = () => {
             <CatTable2 dataset={data4} cat="All" status="Networking" />
             <CatTable2 dataset={data4} cat="All" status="Interface" />
             <CatTable2 dataset={data4} cat="All" status="RIP" />
+            <CatTable2 dataset={data4} cat="All" status="RRC" />
           </>
         )}
         <Box

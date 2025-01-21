@@ -26,6 +26,8 @@ const getCat = (cat: string) => {
       return "Meta";
     case "Informational":
       return "Informational";
+    case "RRC":
+      return "RRCs";
     default:
       return "Core";
   }
@@ -153,6 +155,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
           setTypeData(jsonData.erc);
         }
         else if(type === "RIPs" && jsonData.rip){
+          
             setTypeData(jsonData.rip);
             console.log(" test erc data:", jsonData.rip)
         }
