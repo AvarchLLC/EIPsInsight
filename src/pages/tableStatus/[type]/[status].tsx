@@ -13,6 +13,8 @@ const getStatus = (status: string) => {
   switch (status) {
     case "LastCall":
       return "Last Call";
+    case "Last%20Call":
+      return "Last Call";
     default:
       return status;
   }

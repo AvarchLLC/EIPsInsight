@@ -46,8 +46,15 @@ const EIPStatusDonut = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
+        let jsonData = await response.json();
+        jsonData.rip.forEach((item: EIP) => {
+          if (item.eip === "7859") {
+              item.status = "Draft"; 
+          }
+      });
+      
         setData(jsonData.rip);
+        console.log("rip donut data:", jsonData.rip);
         setIsReady(true);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -86,6 +93,7 @@ const EIPStatusDonut = () => {
       status: "Withdrawn",
       value: data.filter((item) => item.status === "Withdrawn").length,
     },
+   
   ].filter((item) => item.value > 0);
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Pie),

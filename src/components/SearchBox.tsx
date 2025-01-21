@@ -66,7 +66,7 @@ const SearchBox: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/graphsv3`);
+        const response = await fetch(`/api/new/graphsv4`);
         const jsonData = await response.json();
 
         const getEarliestEntries = (data: any[], key: string) => {
@@ -91,7 +91,7 @@ const SearchBox: React.FC = () => {
         );
 
         setauthorData(filteredData);
-        // console.log("author data: ", filteredData);
+        console.log("author data: ", filteredData);
         // setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -154,7 +154,7 @@ const SearchBox: React.FC = () => {
   );
 
 
-  // console.log("filtered author data:", filteredAuthors)
+  console.log("filtered author data:", filteredAuthors)
 
   useEffect(() => {
       const fetchData = async () => {
@@ -435,7 +435,7 @@ return (
   <div className="relative w-full">
     <input
       type="text"
-      placeholder="Search EIP/ERC/RIP/PR/ISSUE/Author"
+      placeholder="Search EIP/ERC/RIP/Author"
       value={query}
       onChange={(e) => {
         setQuery(e.target.value);
@@ -472,14 +472,14 @@ return (
             {result.name} ({result.count})
           </option>
         ))}
-        {uniqueResults.map((result) => (
+        {/* {uniqueResults.map((result) => (
           <option
             key={result.prNumber}
             value={result.prNumber}
             onClick={() =>
               handleSearchResultClick(result.prNumber, result.repo)
             }
-            className="text-lg py-3" // Increase font size and vertical padding
+            className="text-lg py-3" 
           >
             {result.repo} PR: {result.prNumber}
           </option>
@@ -491,11 +491,11 @@ return (
             onClick={() =>
               handleSearchIssueResultClick(result.issueNumber, result.repo)
             }
-            className="text-lg py-3" // Increase font size and vertical padding
+            className="text-lg py-3" 
           >
             {result.repo} ISSUE: {result.issueNumber}
           </option>
-        ))}
+        ))} */}
         {filteredEIPResults.map((result) => (
           <option
             key={result.eip}

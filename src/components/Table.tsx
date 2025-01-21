@@ -174,7 +174,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
         //   setData(jsonData.rip);
         // }
 
-        const response2 = await fetch(`/api/new/graphsv3`);
+        const response2 = await fetch(`/api/new/graphsv4`);
         const jsonData5 = await response2.json();
 
         // Function to filter only the first occurrence of each unique entry based on eip ID and changeDate

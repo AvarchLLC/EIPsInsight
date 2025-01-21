@@ -51,12 +51,17 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
+        let jsonData = await response.json();
         if (type === "EIP") {
           setData(jsonData.eip);
         } else if (type === "ERC") {
           setData(jsonData.erc);
         } else if (type === "RIP") {
+          jsonData.rip.forEach((item: EIP) => {
+            if (item.eip === "7859") {
+                item.status = "Draft"; // Update the status
+            }
+        });        
           setData(jsonData.rip);
         } else if (type === "Total") {
           setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));

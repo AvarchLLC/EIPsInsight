@@ -61,6 +61,8 @@ const getCat = (cat: string) => {
         return "Meta";
       case "Informational":
         return "Informational";
+      case "RRC":
+        return "RRCs";
       default:
         return "Core";
     }
@@ -110,6 +112,10 @@ const EIPStatusDonut = () => {
       {
         status: "RIPs",
         value: data.filter((item) => getCat(item.category) === "RIPs").length,
+      },
+      {
+        status: "RRCs",
+        value: data.filter((item) => getCat(item.category) === "RRCs").length,
       },
     
   ].filter((item) => item.value > 0);
