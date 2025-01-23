@@ -36,7 +36,7 @@ import { BiColumns } from "react-icons/bi";
 import { FaBold, FaItalic, FaLink, FaListUl, FaListOl, FaCheckSquare, FaCode, FaQuoteLeft, FaHeading, FaTable, FaMinus, FaImage } from 'react-icons/fa';
 // import { IconButton, Text, HStack } from '@chakra-ui/react';
 import { MarkdownViewer } from 'react-github-markdown';
-
+import { ErrorList } from "./ErrorToast";
 
 type TemplateData = typeof initialTemplateData;
 type TemplateDataKeys = keyof TemplateData;
@@ -301,53 +301,135 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
   });
 
 
-    const handleValidate = async () => {
-      
+  const handleValidate = async () => {
+    const requiredHeaders: TemplateDataKeys[] = [
+      "title",
+      "description",
+      "author",
+      "status",
+      "type",
+      "created",
+    ];
+  
+    const missingHeaders: string[] = [];
+    const unrecognizedHeaders: string[] = [];
+    const errorMessages: string[] = [];
+  
+    setIsLoading(true); // Show spinner
+  
+    // Check if any required header is missing
+    requiredHeaders.forEach((header) => {
+      if (!templateData[header] || templateData[header].trim() === "") {
+        missingHeaders.push(header);
+      }
+    });
+  
+    interface ValidationResponse {
+      success: boolean;
+      messages?: Array<{ level: string; message: string }>;
+      error?: string;
+    }
+  
+    const template = `---
+eip: <TBD>
+title: ${templateData.title}
+description: ${templateData.description}
+author: ${templateData.author}
+discussions-to: ${templateData.discussionsTo}
+status: ${templateData.status}
+type: ${templateData.type}
+${templateData.type === "Standards Track" && templateData.category ? `category: ${templateData.category}` : ""}
+created: ${templateData.created}
+${templateData.requires ? `requires: ${templateData.requires}` : ""}
+---
+  
+## Abstract
+${templateData.abstract}
+  
+## Motivation
+${templateData.motivation}
+  
+## Specification
+${templateData.specification}
+  
+## Rationale
+${templateData.rationale}
+  
+## Backwards Compatibility
+${templateData.backwardsCompatibility}
+  
+## Test Cases
+${templateData.testCases}
+  
+## Reference Implementation
+${templateData.referenceImplementation}
+  
+## Security Considerations
+${templateData.securityConsiderations}
+  
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
+`;
     
-      const requiredHeaders: TemplateDataKeys[] = [
-        "title",
-        "description",
-        "author",
-        "status",
-        "type",
-        "created",
-      ];
-    
-      const missingHeaders: string[] = [];
-      const unrecognizedHeaders: string[] = [];
-      const errorMessages: string[] = [];
-    
-      setIsLoading(true); // Show spinner
-
-    
-      // Check if any required header is missing
-      requiredHeaders.forEach((header) => {
-        if (!templateData[header] || templateData[header].trim() === "") {
-          missingHeaders.push(header);
-        }
+      const cleanedTemplate = template.replace(/---\n([\s\S]*?)\n---/, (match, content) => {
+        const cleanedContent = content
+          .split("\n")
+          .filter((line: any) => line.trim() !== "") // Remove empty lines
+          .join("\n");
+        return `---\n${cleanedContent}\n---`;
       });
-    
-      // Author field validation
-      const authorRegex = /@\w+/;
-      if (!authorRegex.test(templateData.author)) {
-        errorMessages.push("The authors field should contain at least one GitHub handle in the format @xyz or an email.");
+  
+    console.log(cleanedTemplate);
+  
+    try {
+      const response = await fetch("/api/ValidateEip", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ markdownContent: cleanedTemplate }),
+      });
+  
+      const data: ValidationResponse = await response.json();
+  
+      if (!data.success) {
+        // Push all error messages into the array
+        if (data.messages) {
+          for (const message of data.messages) {
+            if (message.level === "Error") {
+              // Skip errors related to "unable to read file"
+              if (message.message.includes("unable to read file")) {
+                continue; // Skip this error
+              }
+  
+              // Skip errors related to the `eip` field
+              if (
+                message.message.includes("error[preamble-eip]") ||
+                message.message.includes("error[preamble-file-name]")
+              ) {
+                continue; // Skip this error
+              }
+  
+              // Remove file paths and clean up the message
+              const cleanedMessage = message.message
+                .replace(/-->.*$/, "") // Remove everything after `-->`
+                .replace(/C:\\.*\.md/, "") // Remove file paths like `C:\...\temp_eip.md`
+                .replace(/\s+/g, " ") // Replace multiple spaces with a single space
+                .trim();
+  
+              errorMessages.push(cleanedMessage); // Push the cleaned error message
+            }
+          }
+        }
       }
-    
-      // DiscussionsTo field validation
-      const discussionsRegex = /^https:\/\/ethereum-magicians\.org\/t\/.+$/;
-      if (templateData.discussionsTo && !discussionsRegex.test(templateData.discussionsTo)) {
-        errorMessages.push("The discussions-to field should contain a valid link to ethereum-magicians.org.");
-      }
-
-      const createdRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (templateData.created && !createdRegex.test(templateData.created)) {
-        errorMessages.push("The created field should be in the format yyyy-mm-dd.");
-      }
-    
-      // Requires field validation
-      if (templateData.requires) {
-        const isValidFormat = /^[\d\s,]*$/.test(templateData.requires);
-
+    } catch (error) {
+      console.error("Error during validation:", error);
+    }
+  
+    // Requires field validation
+    if (templateData.requires) {
+      const isValidFormat = /^[\d\s,]*$/.test(templateData.requires);
+  
       if (!isValidFormat) {
         errorMessages.push("The 'requires' field should only contain numbers, commas, and spaces.");
       } else {
@@ -355,14 +437,14 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
           .split(",")
           .map((num) => num.trim())
           .filter((num) => /^\d+$/.test(num));
-    
+  
         for (const num of requiresNumbers) {
           const links = [
             `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${num}.md`,
             `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${num}.md`,
             `https://raw.githubusercontent.com/ethereum/ERCs/master/EIPS/erc-${num}.md`,
           ];
-    
+  
           let isValid = false;
           for (const link of links) {
             try {
@@ -375,14 +457,14 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
               // Ignore fetch errors
             }
           }
-    
+  
           if (!isValid) {
             errorMessages.push(`The requires field contains an invalid reference: ${num}.`);
           }
         }
       }
     }
-
+  
     const requiredFieldsToCheck: (keyof TemplateData)[] = [
       "abstract",
       "motivation",
@@ -392,52 +474,48 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       "referenceImplementation",
       "securityConsiderations",
     ];
-    
+  
     for (const field of requiredFieldsToCheck) {
       const fieldValue = templateData[field];
-    
+  
       // Define all regexes
       const regexERC = /\[ERC-(\d+)\]\(.*?eip-(\d+)\.md\)/g;
       const regexEIPStandalone = /\[EIP-(\d+)\]/g;
       const regexEIPWithLink = /\[EIP-(\d+)\]\(https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+)\)/g; // Match EIP links
       const regexERCWithLink = /\[ERC-(\d+)\]\(https:\/\/eips\.ethereum\.org\/ERCS\/erc-(\d+)\)/g; // Match ERC links
-
+  
       // Array to store all matches
       const matches = [];
-
+  
       // Collect matches from each regex
       let match;
       while ((match = regexERC.exec(fieldValue)) !== null) {
         matches.push({ type: "ERC", num: match[1] });
       }
-
+  
       while ((match = regexEIPStandalone.exec(fieldValue)) !== null) {
         matches.push({ type: "EIP", num: match[1] });
       }
-
+  
       while ((match = regexEIPWithLink.exec(fieldValue)) !== null) {
         matches.push({ type: "EIP", num: match[1] });
       }
-
+  
       while ((match = regexERCWithLink.exec(fieldValue)) !== null) {
         matches.push({ type: "ERC", num: match[1] });
       }
-
-      // Now 'matches' contains the extracted numbers and types
-      console.log(matches);
-
-    
+  
       // Process all collected matches
       for (const { type, num } of matches) {
         console.log(`Type: ${type}, Number: ${num}`);
-    
+  
         // Check if the reference is valid
         const links = [
           `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${num}.md`,
           `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${num}.md`,
           `https://raw.githubusercontent.com/ethereum/ERCs/master/EIPS/erc-${num}.md`,
         ];
-    
+  
         let isValid = false;
         for (const link of links) {
           try {
@@ -450,54 +528,51 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
             // Ignore fetch errors
           }
         }
-    
+  
         // If the reference is invalid, push an error message
         if (!isValid) {
           errorMessages.push(`Invalid reference in ${field}: ${type}-${num}`);
         }
       }
     }
-    
-
-    
-      // Check for unrecognized headers (like category)
-      if (templateData.type === "Standards Track" && !templateData.category) {
-        unrecognizedHeaders.push("category");
-      }
-    
-      if (missingHeaders.length > 0 || unrecognizedHeaders.length > 0 || errorMessages.length > 0) {
-        // Compile error messages
-        const numberedErrors = [
-          ...missingHeaders.map((header, index) => `${index + 1}. Missing Header: ${header}`),
-          ...unrecognizedHeaders.map((header, index) => `${missingHeaders.length + index + 1}. Unrecognized Header: ${header}`),
-          ...errorMessages.map((message, index) => `${missingHeaders.length + unrecognizedHeaders.length + index + 1}. ${message}`),
-        ];
-    
-        toast({
-          title: "Error in Template",
-          description: numberedErrors.join("\n"), // Separate each error with a new line
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-        setValidated(false);
-    
-        setIsLoading(false); // Hide spinner
-        return; // Stop execution if errors are present
-      }
-
-      setValidated(true);
-    
-      
-    
+  
+    // Check for unrecognized headers (like category)
+    if (templateData.type === "Standards Track" && !templateData.category) {
+      unrecognizedHeaders.push("category");
+    }
+  
+    if (missingHeaders.length > 0 || unrecognizedHeaders.length > 0 || errorMessages.length > 0) {
+      // Compile error messages
+      const numberedErrors = [
+        ...missingHeaders.map((header, index) => `${index + 1}. Missing Header: ${header}`),
+        ...unrecognizedHeaders.map((header, index) => `${missingHeaders.length + index + 1}. Unrecognized Header: ${header}`),
+        ...errorMessages.map((message, index) => `${missingHeaders.length + unrecognizedHeaders.length + index + 1}. ${message}`),
+      ];
+  
+      // Display errors in a custom toast
       toast({
-        title: "Succesfully Validated, you can download the template now!",
-        status: "success",
-        duration: 2000,
+        title: "Error in Template",
+        description: <ErrorList errors={numberedErrors} />,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
       });
-    
+      setValidated(false);
+  
       setIsLoading(false); // Hide spinner
-    };
+      return; // Stop execution if errors are present
+    }
+  
+    setValidated(true);
+  
+    toast({
+      title: "Succesfully Validated, you can download the template now!",
+      status: "success",
+      duration: 2000,
+    });
+  
+    setIsLoading(false); // Hide spinner
+  };
     
 
     const handleDownload = async () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -6,86 +6,68 @@ import {
   HStack,
   VStack,
   useColorModeValue,
-  Icon,
-  Button,
+  Tooltip,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { FaFlagCheckered } from "react-icons/fa";
-
-const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
 const All = () => {
+  const [currentSlot, setCurrentSlot] = useState(0);
+  const [currentEpoch, setCurrentEpoch] = useState(0);
   const [currentBlock, setCurrentBlock] = useState(0);
-  const [targetBlock, setTargetBlock] = useState(0);
-  const [timer, setTimer] = useState(20); // 10-second timer
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  
-  const bg = useColorModeValue("gray.100", "gray.900");
-  const blockBg = useColorModeValue("white", "gray.700");
+  const [timer, setTimer] = useState(13); // 13-second timer
 
+  // Fetch the current slot, epoch, and block number
   useEffect(() => {
-    if (bg === "gray.100") {
-      setIsDarkMode(false);
-    } else {
-      setIsDarkMode(true);
-    }
-  }, [bg]);
-
-  const calculateTargetBlock = (currentBlock: number) => {
-    const targetDate = new Date("2025-02-15T00:00:00Z");
-    const currentDate = new Date();
-
-    // Calculate the time difference in seconds
-    const secondsDifference = (targetDate.getTime() - currentDate.getTime()) / 1000;
-
-    // Average block time in seconds (12 seconds per block)
-    const averageBlockTime = 12;
-
-    // Calculate the target block number
-    const targetBlock = currentBlock + Math.floor(secondsDifference / averageBlockTime);
-
-    return targetBlock;
-  };
-
-  // Fetch the current block number from Sepolia every 10 seconds
-  useEffect(() => {
-    const fetchBlockNumber = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(sepolia_key, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            method: "eth_blockNumber",
-            params: [],
-            id: 1,
-            jsonrpc: "2.0",
-          }),
-        });
-        const data = await response.json();
-        const blockNumber = parseInt(data.result, 16);
-        setCurrentBlock(blockNumber);
+        // Fetch the latest block header to get the current slot
+        const beaconResponse = await fetch(
+          "https://ethereum-sepolia-beacon-api.publicnode.com/eth/v1/beacon/headers/head"
+        );
+        const beaconData = await beaconResponse.json();
+        const slot = parseInt(beaconData.data.header.message.slot);
 
-        // Calculate the target block based on current block number
-        const calculatedTargetBlock = calculateTargetBlock(blockNumber);
-        setTargetBlock(calculatedTargetBlock);
+        // Calculate the epoch from the slot (1 epoch = 32 slots)
+        const epoch = Math.floor(slot / 32);
+
+        // Fetch the current block number from the execution layer
+        const executionResponse = await fetch(
+          "https://ethereum-sepolia-rpc.publicnode.com",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              method: "eth_blockNumber",
+              params: [],
+              id: 1,
+            }),
+          }
+        );
+        const executionData = await executionResponse.json();
+        const blockNumber = parseInt(executionData.result, 16);
+
+        setCurrentSlot(slot);
+        setCurrentEpoch(epoch);
+        setCurrentBlock(blockNumber);
       } catch (error) {
-        console.error("Error fetching block number:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
     const interval = setInterval(() => {
-      fetchBlockNumber();
-      setTimer(20); // Reset the timer to 10 seconds after each fetch
-    }, 20000); // Fetch every 20 seconds
+      fetchData();
+      setTimer(13); // Reset the timer to 13 seconds after each fetch
+    }, 13000); // Fetch every 13 seconds
 
-    // Countdown timer that resets every 10 seconds
+    // Countdown timer that resets every second
     const countdownInterval = setInterval(() => {
-      setTimer((prev) => (prev === 0 ? 20 : prev - 1)); // Countdown logic
+      setTimer((prev) => (prev === 0 ? 13 : prev - 1)); // Countdown logic
     }, 1000);
 
-    fetchBlockNumber(); // Fetch on initial load
+    fetchData(); // Fetch on initial load
 
     // Cleanup intervals on component unmount
     return () => {
@@ -93,6 +75,18 @@ const All = () => {
       clearInterval(countdownInterval);
     };
   }, []);
+
+  // Calculate the slots in the current epoch
+  const startSlot = currentEpoch * 32;
+  const endSlot = startSlot + 32;
+  const slotsInEpoch = Array.from({ length: 32 }, (_, i) => startSlot + i);
+
+  // Split the slots into two rows
+  const firstRowSlots = slotsInEpoch.slice(0, 18);
+  const secondRowSlots = slotsInEpoch.slice(18);
+
+  // Calculate the slots remaining until the target
+  const slotsRemaining = 999999999 - currentSlot; // Placeholder for target slot
 
   return (
     <AllLayout>
@@ -104,14 +98,13 @@ const All = () => {
         <Box
           textAlign="center"
           p={6}
-          maxWidth="700px"
+          maxWidth="1200px"
           mx="auto"
           mt={1}
           borderRadius="lg"
           boxShadow="xl"
           bg="gray.500"
           color="white"
-          display={{ base: "none", md: "block" }}
         >
           <Text
             as={motion.div}
@@ -125,6 +118,7 @@ const All = () => {
             PECTRA Upgrade (Sepolia)
           </Text>
 
+          {/* Epoch Progress Visualization */}
           <Box
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
@@ -132,182 +126,150 @@ const All = () => {
             bg="gray.600"
             color="white"
             borderRadius="md"
-            p={2}
+            p={4}
             mb={4}
             fontSize="xs"
             fontWeight="normal"
           >
-            <HStack align="center" spacing={3}>
-              <Box
-                p="5"
-                borderRadius="md"
-                boxShadow={useColorModeValue("md", "dark-lg")}
-                textAlign="center"
-                minH="80px"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                bg={blockBg}
-                color={"black"}
-              >
-                <VStack>
-                <Text fontSize="xs" fontWeight="normal" color={"black"}>Previous</Text>
-                <Text fontWeight="bold">{currentBlock - 1}</Text>
-                </VStack>
-              </Box>
+            {/* First Row: 19 Boxes */}
+            <HStack spacing={1} wrap="wrap" justify="center" mb={2}>
+              {firstRowSlots.map((slot) => {
+                const isProcessed = slot < currentSlot;
+                const isCurrent = slot === currentSlot;
 
-              <Text>-----</Text>
+                return (
+                  <Tooltip
+                    key={slot}
+                    label={`Epoch: ${currentEpoch}, Block: ${currentBlock}`}
+                    isDisabled={!isProcessed}
+                  >
+                    <Box
+                      w={{ base: "45px", md: "55px" }} // Revert to previous box size
+                      h={{ base: "45px", md: "55px" }} // Revert to previous box size
+                      borderRadius="md"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      bg={
+                        isCurrent
+                          ? "blue.500"
+                          : isProcessed
+                          ? "green.500"
+                          : "gray.500"
+                      }
+                      color="white"
+                      fontSize={{ base: "10px", md: "9px" }} // Smaller numbers
+                      fontWeight="bold"
+                      animation={isCurrent ? "blink 1s infinite" : "none"}
+                      _hover={{
+                        transform: "scale(1.1)",
+                        transition: "transform 0.2s",
+                      }}
+                    >
+                      {slot}
+                    </Box>
+                  </Tooltip>
+                );
+              })}
+            </HStack>
 
-              <Box
-                p="5"
-                borderRadius="md"
-                boxShadow={useColorModeValue("md", "dark-lg")}
-                textAlign="center"
-                minH="80px"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                bg={currentBlock === currentBlock ? "blue.500" : blockBg}
-                color={currentBlock === currentBlock ? "white" : "black"}
-              >
-                <VStack>
-                <Text fontSize="xs" fontWeight="normal" color={"white"}>Current</Text>
-                <Text fontWeight="bold">{currentBlock}</Text>
-                </VStack>
-              </Box>
+            {/* Second Row: 13 Boxes + Text + Golden Box */}
+            <HStack spacing={1} wrap="wrap" justify="center">
+              {secondRowSlots.map((slot) => {
+                const isProcessed = slot < currentSlot;
+                const isCurrent = slot === currentSlot;
 
-              <Text>-----</Text>
+                return (
+                  <Tooltip
+                    key={slot}
+                    label={`Epoch: ${currentEpoch}, Block: ${currentBlock}`}
+                    isDisabled={!isProcessed}
+                  >
+                    <Box
+                      w={{ base: "45px", md: "55px" }} // Revert to previous box size
+                      h={{ base: "45px", md: "55px" }} // Revert to previous box size
+                      borderRadius="md"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      bg={
+                        isCurrent
+                          ? "blue.500"
+                          : isProcessed
+                          ? "green.500"
+                          : "gray.500"
+                      }
+                      color="white"
+                      fontSize={{ base: "10px", md: "9px" }} // Smaller numbers
+                      fontWeight="bold"
+                      animation={isCurrent ? "blink 1s infinite" : "none"}
+                      _hover={{
+                        transform: "scale(1.1)",
+                        transition: "transform 0.2s",
+                      }}
+                    >
+                      {slot}
+                    </Box>
+                  </Tooltip>
+                );
+              })}
 
-              <Box
-                p="5"
-                borderRadius="md"
-                boxShadow={useColorModeValue("md", "dark-lg")}
-                textAlign="center"
-                minH="80px"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                bg={ blockBg}
-                color={"black"}
-              >
-                <VStack>
-                <Text fontSize="xs" fontWeight="normal" color={"black"}>Next</Text>
-                <Text fontWeight="bold">{currentBlock + 1}</Text>
-                </VStack>
-              </Box>
-
-              
-
-              <VStack>
-                <Text fontWeight="bold" color="white">
-                  {targetBlock - currentBlock} blocks away
+              {/* Vertical Stacked Text */}
+              <VStack spacing={0} align="center" justify="center" ml={2}>
+                <Text fontSize="xs" fontWeight="bold" color="white">
+                  {slotsRemaining} slots away
                 </Text>
-                <Text>..............................</Text>
+                <Text fontSize="xs" color="white">
+                  ..................
+                </Text>
               </VStack>
-              <Box
-                p="5"
-                borderRadius="md"
-                boxShadow={useColorModeValue("md", "dark-lg")}
-                textAlign="center"
-                minH="80px"
-                display="flex"
-                flexDirection="column"  // Use column direction for vertical alignment
-                alignItems="center"     // Center horizontally
-                justifyContent="center" // Center vertically
-                bg="green.500"
-                color="white"
-                >
-                <Text fontSize="xs" fontWeight="normal" color="white" mb={1}>Target</Text>  {/* Add margin to space out text from number */}
-                <HStack spacing={2}>
-                    <Text fontWeight="bold">{targetBlock}</Text>  {/* Add margin to space out text from icon */}
-                    <Icon as={FaFlagCheckered} color="white" />
-                </HStack>
-                </Box>
 
-
-
-                    </HStack>
-
-                
-                </Box>
-
-                <Text fontSize="sm" color="white" mb={4}>
-                    Refreshes in {timer} seconds
-                </Text>
-
-                <Text fontSize="sm" color="gray.300">
-                    * The scheduled block number is not announced yet, and this is an approximation.
-                </Text>
-           </Box>
-
-           <Box
-            textAlign="center"
-            p={6}
-            maxWidth="700px"
-            mx="auto"
-            mt={1}
-            borderRadius="lg"
-            boxShadow="xl"
-            bg="blue.500"
-            color="white"
-            display={{ base: "block", md: "none" }}
-            >
-            <Text
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                fontSize={{ base: "2xl", md: "2xl", lg: "2xl" }}
-                fontWeight="bold"
-                color="white"
-                mb={4}
-            >
-                PECTRA Upgrade (Sepolia)
-            </Text>
-
-            
+              {/* Golden Box */}
+              <Tooltip
+                label={`Target Epoch: 999999999, Target Block: 999999999, Target Slot: 999999999`}
+              >
                 <Box
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                bg="blue.600"
-                color="white"
-                borderRadius="md"
-                p={2}
-                mb={4}
-                fontSize="xs"
-                fontWeight="normal"
-            >
-                <Text
-                fontSize="4xl"
-                fontWeight="bold"
-                color="white"
-                mb={4}
-                as={motion.div}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                // transition={{ duration: 1 }}
-            >
-                {targetBlock - currentBlock} blocks away
-                </Text>
+                  w={{ base: "45px", md: "55px" }} // Revert to previous box size
+                  h={{ base: "45px", md: "55px" }} // Revert to previous box size
+                  borderRadius="md"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  bg="gold"
+                  color="white"
+                  fontSize={{ base: "10px", md: "9px" }} // Smaller numbers
+                  fontWeight="bold"
+                  _hover={{
+                    transform: "scale(1.1)",
+                    transition: "transform 0.2s",
+                  }}
+                >
+                  PECTRA
                 </Box>
-            
-            
-            <Text
-                fontSize="sm"
-                color="white"
-                mb={4}
-                as={motion.div}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-            >
-                Refreshes in {timer} seconds
-                </Text>
+              </Tooltip>
+            </HStack>
+          </Box>
 
-            <Text fontSize="sm" color="gray.300">
-                * The scheduled block number is not announced yet, and this is an approximation.
-            </Text>
-            </Box>
+          {/* Additional Info */}
+          <Text fontSize="sm" color="white" mb={4}>
+            Refreshes in {timer} seconds
+          </Text>
+          <Text fontSize="sm" color="gray.300">
+            * The slot, epoch, and block numbers are updated every 13 seconds.
+          </Text>
+        </Box>
       </motion.div>
+
+      {/* Blinking Animation */}
+      <style>
+        {`
+          @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
     </AllLayout>
   );
 };
