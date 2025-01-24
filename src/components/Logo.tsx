@@ -15,6 +15,7 @@ function Logo() {
     height={50}
     alt="logo"
     priority
+    className="h-6 w-6"
     style={{ color: 'inherit', backgroundColor: 'transparent' }}
 />
 

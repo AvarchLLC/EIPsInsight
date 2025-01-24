@@ -4,6 +4,7 @@ import AllLayout from "@/components/Layout";
 import Dashboard from "@/components/Dashboard"
 import Head from "next/head"
 import ViewsShare from "@/components/ViewsNShare";
+import Dashboard2 from "@/components/layout/Dashboard";
 
 
 const Home = () => {
@@ -26,7 +27,7 @@ const Home = () => {
                     Home
                 </title>
             </Head>
-      <Dashboard/>
+      <Dashboard2/>
       <ViewsShare path={'/home'}/>
     </AllLayout>
   );

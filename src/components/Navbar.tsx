@@ -278,7 +278,6 @@ const Navbar: React.FC = () => {
             </Box>
 
             <Spacer />
-
             <div className={"flex space-x-2 font-bold"} >
               {NAV_ITEMS.map((navItem) => (
                 <Box key={navItem.label}>
