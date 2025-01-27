@@ -16,6 +16,7 @@ import {
   SimpleGrid,
   Grid
 } from "@chakra-ui/react";
+import SlotCountdown from "@/components/SlotCountdown";
 import NLink from "next/link";
 import CatTable from "@/components/CatTable";
 import Header from "@/components/Header";
@@ -344,77 +345,7 @@ const All = () => {
       // },
   ];
 
-  // console.log("sepolia key:",sepolia_key);
-  const calculateTargetBlock = (currentBlock: number) => {
-    const targetDate = new Date("2025-02-15T00:00:00Z");
-    const currentDate = new Date();
-    
-    // Calculate the time difference in seconds
-    const secondsDifference = (targetDate.getTime() - currentDate.getTime()) / 1000;
-    
-    // Average block time in seconds (12 seconds per block)
-    const averageBlockTime = 12;
-    
-    // Calculate the target block number
-    const targetBlock = currentBlock + Math.floor(secondsDifference / averageBlockTime);
-    
-    return targetBlock;
-  };
-
-  const [targetBlock, setTargetBlock] = useState(0);
-  const [currentBlock, setCurrentBlock] = useState(0);
-  const [timer, setTimer] = useState(20); // 10-second timer
-  
-
-  // Fetch the current block number from Sepolia every 10 seconds
-  useEffect(() => {
-    const fetchBlockNumber = async () => {
-      try {
-        const response = await fetch(
-          sepolia_key,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              method: "eth_blockNumber",
-              params: [],
-              id: 1,
-              jsonrpc: "2.0",
-            }),
-          }
-        );
-        const data = await response.json();
-        const blockNumber = parseInt(data.result, 16);
-        setCurrentBlock(blockNumber);
-
-        // Calculate the target block based on current block number
-        const calculatedTargetBlock = calculateTargetBlock(blockNumber);
-        setTargetBlock(calculatedTargetBlock);
-      } catch (error) {
-        console.error("Error fetching block number:", error);
-      }
-    };
-
-    const interval = setInterval(() => {
-      fetchBlockNumber();
-      setTimer(20); // Reset the timer to 10 seconds after each fetch
-    }, 20000); // Fetch every 10 seconds
-
-    // Countdown timer that resets every 10 seconds
-    const countdownInterval = setInterval(() => {
-      setTimer((prev) => (prev === 0 ? 20 : prev - 1)); // Countdown logic
-    }, 1000);
-
-    // Initial fetch
-    fetchBlockNumber(); // Fetch on initial load
-    // Cleanup intervals on component unmount
-    return () => {
-      clearInterval(interval);
-      clearInterval(countdownInterval);
-    };
-  }, []);
+ 
 
   const router = useRouter();
   
@@ -577,6 +508,8 @@ const All = () => {
 </Flex>
 
         </Flex>
+        <SlotCountdown/>
+        <br/>
 
 
 

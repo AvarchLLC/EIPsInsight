@@ -849,64 +849,68 @@ const DesktopSubNav = ({ label, href, subLabel, children }: NavItem) => {
 const DesktopSubNav2 = ({ label, href, subLabel, children }: NavItem) => {
   return (
     <Box>
-      <Popover trigger={"hover"} placement={"top-start"}>
-        <PopoverTrigger>
-          <Link
-            role={"group"}
-            display={"block"}
-            p={2}
-            rounded={"md"}
-            _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
+  <Popover trigger="hover" placement="top-end">
+    <PopoverTrigger>
+      <Link
+        role="group"
+        display="block"
+        p={2}
+        rounded="md"
+        _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
+      >
+        <VStack spacing={1} align="start">
+          <Text
+            transition="all .3s ease"
+            _groupHover={{ color: "pink.400" }}
+            fontWeight={500}
           >
-            <VStack spacing={1} align="start">
-              <Text
-                transition={"all .3s ease"}
-                _groupHover={{ color: "pink.400" }}
-                fontWeight={500}
-              >
-                {label}
-              </Text>
-              <Text fontSize={"sm"}>{subLabel}</Text>
-            </VStack>
-          </Link>
-        </PopoverTrigger>
+            {label}
+          </Text>
+          <Text fontSize="sm">{subLabel}</Text>
+        </VStack>
+      </Link>
+    </PopoverTrigger>
 
-        <PopoverContent
-          bg={useColorModeValue("white", "gray.800")}
-          border={0}
-          boxShadow="lg"
-          p={4}
-          maxWidth="200px"
+    <PopoverContent
+      bg={useColorModeValue("white", "gray.800")}
+      border={0}
+      boxShadow="lg"
+      p={4}
+      maxWidth="200px"
+      zIndex="popover"
+      overflow="visible"
+      transform="translateY(0)" /* Ensure no offset issues */
+    >
+      <PopoverArrow />
+      <PopoverBody>
+        <Stack
+          mt={2}
+          pl={4}
+          borderLeft={1}
+          borderStyle="solid"
+          borderColor={useColorModeValue("gray.200", "gray.700")}
+          align="start"
         >
-          <PopoverArrow />
-          <PopoverBody>
-            <Stack
-              mt={2}
-              pl={4}
-              borderLeft={1}
-              borderStyle={"solid"}
-              borderColor={useColorModeValue("gray.200", "gray.700")}
-              align={"start"}
-            >
-              {children &&
-                children.map((subNavItem) => (
-                  <Link
-                    key={subNavItem.label}
-                    py={2}
-                    href={subNavItem.href}
-                    _hover={{
-                      textDecoration: "none",
-                      color: "pink.400",
-                    }}
-                  >
-                    {subNavItem.label}
-                  </Link>
-                ))}
-            </Stack>
-          </PopoverBody>
-        </PopoverContent>
-      </Popover>
-    </Box>
+          {children &&
+            children.map((subNavItem) => (
+              <Link
+                key={subNavItem.label}
+                py={2}
+                href={subNavItem.href}
+                _hover={{
+                  textDecoration: "none",
+                  color: "pink.400",
+                }}
+              >
+                {subNavItem.label}
+              </Link>
+            ))}
+        </Stack>
+      </PopoverBody>
+    </PopoverContent>
+  </Popover>
+</Box>
+
   );
 };
 

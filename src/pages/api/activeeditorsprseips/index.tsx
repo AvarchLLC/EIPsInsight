@@ -21,8 +21,14 @@ const fetchReviewers = async (): Promise<string[]> => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
-  
-      return reviewers;
+      const additionalReviewers = ["CarlBeek", "nconsigny", "yoavw", "adietrichs"];
+
+      // Merge the two arrays and ensure uniqueness
+      const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
+
+      console.log("updated reviewers:", updatedReviewers);
+
+      return updatedReviewers;
     } catch (error) {
       console.error("Error fetching reviewers:", error);
       return [];

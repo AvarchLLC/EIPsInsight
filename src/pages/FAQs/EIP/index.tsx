@@ -62,7 +62,7 @@ const EIPsInsightRecap = () => {
                 width={{ base: "100%", lg: "40%" }} // Image takes up 40% of the width on large screens
             >
                <Image 
-  src="/faq_resources1.png" 
+  src="/EIPsFAQ.png" 
   alt="Image 1" 
   borderRadius="md" 
   width={{ base: "250px", md: "350px", lg: "100%" }}

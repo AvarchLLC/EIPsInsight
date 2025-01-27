@@ -13,18 +13,27 @@ if (mongoose.connection.readyState === 0) {
 // Fetch reviewers from GitHub configuration
 const fetchReviewers = async (): Promise<string[]> => {
     try {
-        const response = await fetch(
-            "https://raw.githubusercontent.com/ethereum/EIPs/master/config/eip-editors.yml"
-        );
-        const text = await response.text();
-        const matches = text.match(/-\s(\w+)/g);
-        const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
-        return reviewers;
+      const response = await fetch(
+        "https://raw.githubusercontent.com/ethereum/EIPs/master/config/eip-editors.yml"
+      );
+      const text = await response.text();
+  
+      // Match unique reviewers using a regex to handle YAML structure
+      const matches = text.match(/-\s(\w+)/g);
+      const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
+      const additionalReviewers = ["CarlBeek", "nconsigny", "yoavw", "adietrichs"];
+
+      // Merge the two arrays and ensure uniqueness
+      const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
+
+      console.log("updated reviewers:", updatedReviewers);
+
+      return updatedReviewers;
     } catch (error) {
-        console.error("Error fetching reviewers:", error);
-        return [];
+      console.error("Error fetching reviewers:", error);
+      return [];
     }
-};
+  };
 
 // Common schema for EIP, ERC, and RIP review collections
 const reviewSchema = new mongoose.Schema({
