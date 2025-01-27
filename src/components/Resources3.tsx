@@ -304,7 +304,7 @@ const embedLinks = Links.map((link) => {
         alignItems="center"
       >
         <Image 
-            src="/faq_resources4.png" 
+            src="/EIPsInsightFAQ.png" 
             alt="FAQs Illustration" 
             maxW="100%" 
             minH="100%"
@@ -491,9 +491,9 @@ const embedLinks = Links.map((link) => {
         if (key === 3) handleSelection("News");
       }}>
      <Box mt={2} borderRadius="10px 10px 0 0">
-  <Flex
+     <Flex
     justify="space-between"
-    bg="gray.700"
+    // bg="gray.700"
     p={1}
     mb={1}
     borderRadius="md"
@@ -511,21 +511,24 @@ const embedLinks = Links.map((link) => {
           _selected={{
             bg: "blue.300",
             color: "white",
-            borderColor: "lightblue",
-            paddingY: 2,
+            borderColor: "lightblue", // Border color for selected state
+            paddingY: 3, // Increased padding for height
           }}
           _hover={{
-            bg: "gray.600",
+            bg: "blue.100",
           }}
-          p={2}
+          p={3} // Increased padding for height
           flex={{ base: "1 1 calc(50% - 1rem)", md: "1 1 calc(25% - 1rem)" }} // Responsive flex basis
           textAlign="center"
           borderRadius="md"
           boxShadow="sm"
           cursor="pointer"
-          color="white"
+          color={textColor2} // Use textColor2 for text color
           whiteSpace="normal" // Allow text wrapping
           wordBreak="break-word" // Handle long words
+          fontSize="lg" // Increased font size
+          border="2px solid" // Thicker border
+          borderColor={textColor2} // Use textColor2 for border color
         >
           {tab.label}
         </Tab>

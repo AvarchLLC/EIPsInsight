@@ -21,14 +21,19 @@ const fetchReviewers = async (): Promise<string[]> => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
-  
-      return reviewers;
+      const additionalReviewers = ["CarlBeek", "nconsigny", "yoavw", "adietrichs"];
+
+      // Merge the two arrays and ensure uniqueness
+      const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
+
+      console.log("updated reviewers:", updatedReviewers);
+
+      return updatedReviewers;
     } catch (error) {
       console.error("Error fetching reviewers:", error);
       return [];
     }
   };
-
 // EIP Review Schema
 const ripReviewSchema = new mongoose.Schema({
     reviewerName: {
@@ -100,6 +105,7 @@ export default async (req: Request, res: Response) => {
     try {
         // GitHub handles to filter by
         const githubHandles = await fetchReviewers();
+        console.log(githubHandles);
 
         // Create an object to store the results for each reviewer
         const resultByReviewer: { [key: string]: any[] } = {};

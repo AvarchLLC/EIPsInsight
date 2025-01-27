@@ -1343,13 +1343,8 @@ const fetchData4 = async () => {
       throw new Error('Failed to fetch timelines!');
     }
     const timelines = await timelineResponse.json();
-    const additionalTimelines = [
-      { reviewer: "CarlBeek", startDate: new Date('2023-10-01'), endDate: null },
-      { reviewer: "nconsigny", startDate: new Date('2023-10-01'), endDate: null },
-      { reviewer: "yoavw", startDate: new Date('2023-10-01'), endDate: null },
-      { reviewer: "adietrichs", startDate: new Date('2023-10-01'), endDate: null }
-    ];
-    const allTimelines = [...timelines, ...additionalTimelines];
+    
+    const allTimelines = timelines;
 
     // Format the timeline data for easy access
     const timelineMap = allTimelines.reduce((map: any, reviewer: any) => {
@@ -1361,6 +1356,7 @@ const fetchData4 = async () => {
     }, {});
 
     console.log("timeline map:",timelineMap);
+    console.log("data before:", data);
 
     // Step 3: Filter reviews based on timeline
     const filteredData = Object.keys(data).reduce((filtered: ReviewerData, reviewerName: string) => {
@@ -1380,7 +1376,7 @@ const fetchData4 = async () => {
       return filtered;
     }, {});
 
-    // console.log('Filtered scatterplot data:', filteredData);
+    console.log('Filtered scatterplot data:', filteredData);
     setActiveData(filteredData); // Update state with filtered data
   } catch (err) {
     console.error(err);
@@ -1469,6 +1465,7 @@ const handleFilterData2 = () => {
 
 const editorsActivity = () => {
   const activityData: any = handleFilterData2();
+  console.log("activity data:",activityData);
 
   const convertTo24Hour = (time: string): string => {
     const [hours, minutes, period] = time.match(/(\d+):(\d+)\s?(AM|PM)/i)!.slice(1);

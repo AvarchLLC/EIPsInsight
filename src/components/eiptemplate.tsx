@@ -827,12 +827,12 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         <VStack spacing={5}>
         <Text fontSize={["sm", "md", "3xl"]} fontWeight="bold">
           {activeTab === 'eip' 
-            ? 'Create an EIP Template' 
+            ? 'Document an EIP Template' 
             : activeTab === 'erc' 
-            ? 'Create an ERC Template' 
+            ? 'Document an ERC Template' 
             : activeTab === 'rip' 
-            ? 'Create an RIP Template' 
-            : 'Create a Template'}
+            ? 'Document an RIP Template' 
+            : 'Document a Template'}
         </Text>
 
 
