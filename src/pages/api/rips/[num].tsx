@@ -26,7 +26,7 @@ const mdFilesSchema = new mongoose.Schema({
 });
 
 const RIPMdFiles =
-  mongoose.models.RipMdFiles || mongoose.model("RipMdFiles", mdFilesSchema);
+  mongoose.models.RipMdFiles3 || mongoose.model("RipMdFiles3", mdFilesSchema);
 
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");

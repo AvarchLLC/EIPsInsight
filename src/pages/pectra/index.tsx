@@ -508,6 +508,7 @@ const All = () => {
 </Flex>
 
         </Flex>
+        <br/>
         <SlotCountdown/>
         <br/>
 

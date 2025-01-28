@@ -45,7 +45,7 @@ mongoose.connect(process.env.MONGODB_URI, {
     });
     
     
-const EipHistory = mongoose.models.EipHistory ||  mongoose.model('EipHistory', eipHistorySchema);
+const EipHistory = mongoose.models.EipHistory ||  mongoose.model('EipHistory3', eipHistorySchema);
 
 
 export default async (req: Request, res: Response) => {

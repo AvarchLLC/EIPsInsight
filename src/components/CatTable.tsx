@@ -99,7 +99,7 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
   const filteredData = dataset
     .filter((item) => (cat === "All" || item.category === cat) && item.status === status)
     .map((item) => {
-      const { eip, title, author, repo, type, category, status } = item;
+      const { eip, title, author, repo, type, category, status, deadline } = item;
       return {
         eip,
         title,
@@ -108,6 +108,7 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
         type,
         category,
         status,
+        deadline,
       };
     });
 
@@ -223,6 +224,19 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
                       fontWeight: 'bold',
                     }
                   },
+                  ...(status === "Last Call" ? [ // Conditionally add the deadline column
+                    {
+                      key: 'deadline',
+                      label: 'Deadline',
+                      _style: {
+                        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                        color: isDarkMode ? 'white' : 'black',
+                        fontWeight: 'bold',
+                        padding: '12px',
+                        borderTopRightRadius: "0.55rem", // Add border radius to the last column
+                      }
+                    }
+                  ] : [])
                   ]}
                 scopedColumns={{
                   "#": (item: any) => (
@@ -335,6 +349,15 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
                       </Wrap>
                     </td>
                   ),
+                  ...(status === "Last Call" ? { // Conditionally add the deadline column renderer
+                    deadline: (item: any) => (
+                      <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                        <div className={isDarkMode ? "text-white" : "text-black"}>
+                          {item.deadline || "N/A"}
+                        </div>
+                      </td>
+                    )
+                  } : {})
                 }}
                 
               />

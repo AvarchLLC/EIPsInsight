@@ -29,15 +29,15 @@ const categoryChangeSchema = new mongoose.Schema({
 
 const EipCategoryChange =
   mongoose.models.EipCategoryChange ||
-  mongoose.model("EipCategoryChange", categoryChangeSchema, "eipcategorychange2");
+  mongoose.model("EipCategoryChange", categoryChangeSchema, "eipcategorychange3");
 
 const ErcCategoryChange =
   mongoose.models.ErcCategoryChange ||
-  mongoose.model("ErcCategoryChange", categoryChangeSchema, "erccategorychange2");
+  mongoose.model("ErcCategoryChange", categoryChangeSchema, "erccategorychange3");
 
 const RipCategoryChange =
   mongoose.models.RipCategoryChange ||
-  mongoose.model("RipCategoryChange", categoryChangeSchema, "ripcategorychange2");
+  mongoose.model("RipCategoryChange", categoryChangeSchema, "ripcategorychange3");
 
 export default async (req: Request, res: Response) => {
   try {
