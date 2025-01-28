@@ -26,11 +26,11 @@ const mdFilesSchema = new mongoose.Schema({
 });
 
 const EIPMdFiles =
-  mongoose.models.EipMdFiles || mongoose.model("EipMdFiles3", mdFilesSchema);
+  mongoose.models.EipMdFiles3 || mongoose.model("EipMdFiles3", mdFilesSchema);
 const ERCMdFiles =
-  mongoose.models.ErcMdFiles || mongoose.model("ErcMdFiles3", mdFilesSchema);
+  mongoose.models.ErcMdFiles3 || mongoose.model("ErcMdFiles3", mdFilesSchema);
 const RIPMdFiles =
-  mongoose.models.RipMdFiles || mongoose.model("RipMdFiles3", mdFilesSchema);
+  mongoose.models.RipMdFiles3 || mongoose.model("RipMdFiles3", mdFilesSchema);
 
 // export default async (req: Request, res: Response) => {
 // const EIPResult = await EIPMdFiles.aggregate([
