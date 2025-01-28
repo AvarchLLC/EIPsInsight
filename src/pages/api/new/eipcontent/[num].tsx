@@ -26,7 +26,7 @@ const eipcontentsSchema = new mongoose.Schema({
 
 const eip_contents =
   mongoose.models.eip_contents ||
-  mongoose.model("eip_contents", eipcontentsSchema);
+  mongoose.model("eip_contents3", eipcontentsSchema);
 
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");

@@ -26,7 +26,7 @@ const ripcontentsSchema = new mongoose.Schema({
 
 const rip_contents =
   mongoose.models.rip_contents ||
-  mongoose.model("rip_contents", ripcontentsSchema);
+  mongoose.model("rip_contents3", ripcontentsSchema);
 
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");

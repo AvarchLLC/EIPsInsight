@@ -26,7 +26,7 @@ const mdFilesSchema = new mongoose.Schema({
 });
 
 const ERCMdFiles =
-  mongoose.models.ErcMdFiles || mongoose.model("ErcMdFiles", mdFilesSchema);
+  mongoose.models.ErcMdFiles3 || mongoose.model("ErcMdFiles3", mdFilesSchema);
 
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");

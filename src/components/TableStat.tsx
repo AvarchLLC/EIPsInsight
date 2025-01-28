@@ -138,7 +138,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
 
   const filteredData = data
     .map((item: any) => {
-      const { eip, title, author, status, type, category,repo } = item;
+      const { eip, title, author, status, type, category,repo,deadline } = item;
       return {
         eip,
         title,
@@ -147,6 +147,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
         type,
         category,
         repo,
+        deadline,
       };
     })
     .filter((item: any) => item.status === cat);
@@ -256,205 +257,227 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
           </Box>
         ) : (
           <CSmartTable
-                items={filteredDataWithMergedYearsAndMonths.sort(
-                  (a, b) => parseInt(a["#"]) - parseInt(b["#"])
-                )}
-                activePage={1}
-                clickableRows
-                columnFilter
-                columnSorter
-                itemsPerPage={5}
-                pagination
-                tableProps={{
-                  hover: true,
-                  responsive: true,
-                  style: {
-                    borderRadius: "0.55rem", // Add rounded corners
-                    overflow: "hidden",      // Ensure the border-radius is applied cleanly
-                  },
-                }}
-                columns={[
-                  {
-                    key: '#',
-                    label: '#',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', 
-                      color: isDarkMode ? 'white' : 'black',              
-                      fontWeight: 'bold',                                  
-                      padding: '12px',                                     
-                      borderTopLeftRadius: "0.55rem",                      
-                    }
-                  },
-                  {
-                    key: 'eip',
-                    label: 'EIP',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                      color: isDarkMode ? 'white' : 'black',
-                      fontWeight: 'bold',
-                    }
-                  },
-                  {
-                    key: 'title',
-                    label: 'Title',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                      color: isDarkMode ? 'white' : 'black',
-                      fontWeight: 'bold',
-                    }
-                  },
-                  {
-                    key: 'author',
-                    label: 'Author',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                      color: isDarkMode ? 'white' : 'black',
-                      fontWeight: 'bold',
-                    }
-                  },
-                  {
-                    key: 'type',
-                    label: 'Type',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                      color: isDarkMode ? 'white' : 'black',
-                      fontWeight: 'bold',
-                    }
-                  },
-                  {
-                    key: 'category',
-                    label: 'Category',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                      color: isDarkMode ? 'white' : 'black',
-                      fontWeight: 'bold',
-                    }
-                  },
-                  {
-                    key: 'status',
-                    label: 'Status',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                      color: isDarkMode ? 'white' : 'black',
-                      fontWeight: 'bold',
-                      padding: '12px',                                     
-                      borderTopRightRadius: "0.55rem",   
-                    }
-                  },]}
-                scopedColumns={{
-                  "#": (item: any) => (
-                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
-                        <Wrap>
-                          <WrapItem>
-                            <Badge colorScheme={getStatusColor(item.status)}>
-                              {item["#"]}
-                            </Badge>
-                          </WrapItem>
-                        </Wrap>
-                      </Link>
-                    </td>
-                  ),
-                  eip: (item: any) => (
-                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
-                        <Wrap>
-                          <WrapItem>
-                            <Badge colorScheme={getStatusColor(item.status)}>
-                              {item.eip}
-                            </Badge>
-                          </WrapItem>
-                        </Wrap>
-                      </Link>
-                    </td>
-                  ),
-                  title: (item: any) => (
-                    <td
-                      key={item.eip}
-                      style={{ fontWeight: "bold", height: "100%",  backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
-                      className="hover:text-[#1c7ed6]"
+  items={filteredDataWithMergedYearsAndMonths.sort(
+    (a, b) => parseInt(a["#"]) - parseInt(b["#"])
+  )}
+  activePage={1}
+  clickableRows
+  columnFilter
+  columnSorter
+  itemsPerPage={5}
+  pagination
+  tableProps={{
+    hover: true,
+    responsive: true,
+    style: {
+      borderRadius: "0.55rem", // Add rounded corners
+      overflow: "hidden", // Ensure the border-radius is applied cleanly
+    },
+  }}
+  columns={[
+    {
+      key: '#',
+      label: '#',
+      _style: {
+        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+        color: isDarkMode ? 'white' : 'black',
+        fontWeight: 'bold',
+        padding: '12px',
+        borderTopLeftRadius: "0.55rem",
+      }
+    },
+    {
+      key: 'eip',
+      label: 'EIP',
+      _style: {
+        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+        color: isDarkMode ? 'white' : 'black',
+        fontWeight: 'bold',
+      }
+    },
+    {
+      key: 'title',
+      label: 'Title',
+      _style: {
+        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+        color: isDarkMode ? 'white' : 'black',
+        fontWeight: 'bold',
+      }
+    },
+    {
+      key: 'author',
+      label: 'Author',
+      _style: {
+        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+        color: isDarkMode ? 'white' : 'black',
+        fontWeight: 'bold',
+      }
+    },
+    {
+      key: 'type',
+      label: 'Type',
+      _style: {
+        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+        color: isDarkMode ? 'white' : 'black',
+        fontWeight: 'bold',
+      }
+    },
+    {
+      key: 'category',
+      label: 'Category',
+      _style: {
+        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+        color: isDarkMode ? 'white' : 'black',
+        fontWeight: 'bold',
+      }
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      _style: {
+        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+        color: isDarkMode ? 'white' : 'black',
+        fontWeight: 'bold',
+        padding: '12px',
+        borderTopRightRadius: cat === "Last Call" ? "0" : "0.55rem", // Adjust border radius
+      }
+    },
+    ...(cat === "Last Call" ? [ // Conditionally add the deadline column
+      {
+        key: 'deadline',
+        label: 'Deadline',
+        _style: {
+          backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+          color: isDarkMode ? 'white' : 'black',
+          fontWeight: 'bold',
+          padding: '12px',
+          borderTopRightRadius: "0.55rem", // Add border radius to the last column
+        }
+      }
+    ] : [])
+  ]}
+  scopedColumns={{
+    "#": (item: any) => (
+      <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+        <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+          <Wrap>
+            <WrapItem>
+              <Badge colorScheme={getStatusColor(item.status)}>
+                {item["#"]}
+              </Badge>
+            </WrapItem>
+          </Wrap>
+        </Link>
+      </td>
+    ),
+    eip: (item: any) => (
+      <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+        <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+          <Wrap>
+            <WrapItem>
+              <Badge colorScheme={getStatusColor(item.status)}>
+                {item.eip}
+              </Badge>
+            </WrapItem>
+          </Wrap>
+        </Link>
+      </td>
+    ),
+    title: (item: any) => (
+      <td
+        key={item.eip}
+        style={{ fontWeight: "bold", height: "100%", backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
+        className="hover:text-[#1c7ed6]"
+      >
+        <Link
+          href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}
+          className={
+            isDarkMode
+              ? "hover:text-[#1c7ed6] text-[13px] text-white"
+              : "hover:text-[#1c7ed6] text-[13px] text-black"
+          }
+        >
+          {item.title}
+        </Link>
+      </td>
+    ),
+    author: (it: any) => (
+      <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+        <div>
+          {factorAuthor(it.author).map(
+            (item: any, index: any) => {
+              let t = item[item.length - 1].substring(
+                1,
+                item[item.length - 1].length - 1
+              );
+              return (
+                <Wrap key={index}>
+                  <WrapItem>
+                    <Link
+                      href={`${
+                        item[item.length - 1].substring(
+                          item[item.length - 1].length - 1
+                        ) === ">"
+                          ? "mailto:" + t
+                          : "https://github.com/" + t.substring(1)
+                      }`}
+                      target="_blank"
+                      className={
+                        isDarkMode
+                          ? "hover:text-[#1c7ed6] text-[13px] text-white"
+                          : "hover:text-[#1c7ed6] text-[13px] text-black"
+                      }
                     >
-                      <Link
-                        href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}
-                        className={
-                          isDarkMode
-                            ? "hover:text-[#1c7ed6] text-[13px] text-white"
-                            : "hover:text-[#1c7ed6] text-[13px] text-black"
-                        }
-                      >
-                        {item.title}
-                      </Link>
-                    </td>
-                  ),
-                  author: (it: any) => (
-                    <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <div>
-                        {factorAuthor(it.author).map(
-                          (item: any, index: any) => {
-                            let t = item[item.length - 1].substring(
-                              1,
-                              item[item.length - 1].length - 1
-                            );
-                            return (
-                              <Wrap key={index}>
-                                <WrapItem>
-                                  <Link
-                                    href={`${
-                                      item[item.length - 1].substring(
-                                        item[item.length - 1].length - 1
-                                      ) === ">"
-                                        ? "mailto:" + t
-                                        : "https://github.com/" + t.substring(1)
-                                    }`}
-                                    target="_blank"
-                                    className={
-                                      isDarkMode
-                                        ? "hover:text-[#1c7ed6] text-[13px] text-white"
-                                        : "hover:text-[#1c7ed6] text-[13px] text-black"
-                                    }
-                                  >
-                                    {item}
-                                  </Link>
-                                </WrapItem>
-                              </Wrap>
-                            );
-                          }
-                        )}
-                      </div>
-                    </td>
-                  ),
-                  type: (item: any) => (
-                    <td
-                      key={item.eip}
-                      className={isDarkMode ? "text-white" : "text-black"}
-                      style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
-                    >
-                      {item.type}
-                    </td>
-                  ),
-                  category: (item: any) => (
-                    <td
-                      key={item.eip}
-                      className={isDarkMode ? "text-white" : "text-black"}
-                      style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
-                    >
-                      {item.category}
-                    </td>
-                  ),
-                  status: (item: any) => (
-                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>
-                            {item.status}
-                          </Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </td>
-                  ),
-                }}
-                
-              />
+                      {item}
+                    </Link>
+                  </WrapItem>
+                </Wrap>
+              );
+            }
+          )}
+        </div>
+      </td>
+    ),
+    type: (item: any) => (
+      <td
+        key={item.eip}
+        className={isDarkMode ? "text-white" : "text-black"}
+        style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
+      >
+        {item.type}
+      </td>
+    ),
+    category: (item: any) => (
+      <td
+        key={item.eip}
+        className={isDarkMode ? "text-white" : "text-black"}
+        style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
+      >
+        {item.category}
+      </td>
+    ),
+    status: (item: any) => (
+      <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+        <Wrap>
+          <WrapItem>
+            <Badge colorScheme={getStatusColor(item.status)}>
+              {item.status}
+            </Badge>
+          </WrapItem>
+        </Wrap>
+      </td>
+    ),
+    ...(cat === "Last Call" ? { // Conditionally add the deadline column renderer
+      deadline: (item: any) => (
+        <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+          <div className={isDarkMode ? "text-white" : "text-black"}>
+            {item.deadline || "N/A"}
+          </div>
+        </td>
+      )
+    } : {})
+  }}
+/>
         )}
       </CCardBody>
     </Box>

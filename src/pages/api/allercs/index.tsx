@@ -26,7 +26,7 @@ const mdFilesSchema = new mongoose.Schema({
 });
 
 const MdFiles =
-  mongoose.models.ErcMdFiles || mongoose.model("ErcMdFiles", mdFilesSchema);
+  mongoose.models.ErcMdFiles || mongoose.model("ErcMdFiles3", mdFilesSchema);
 
 export default async (req: Request, res: Response) => {
   MdFiles.aggregate([

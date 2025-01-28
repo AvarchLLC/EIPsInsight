@@ -284,9 +284,9 @@ const Month = () => {
         Last Call <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#LastCall`} />
       </Text>
 
-      <Text fontSize="sm" color="gray.500" paddingTop={2}>
+      {/* <Text fontSize="sm" color="gray.500" paddingTop={2}>
        Note:  Due to some technical issues, a few of the Last Call deadlines are missing in the downloaded report. We are working on it and will get back to it ASAP.
-      </Text>
+      </Text> */}
 
       <Box paddingY={"8"} id="LastCall">
         <StackedColumnChart dataset={filteredData3} status="Last Call" />

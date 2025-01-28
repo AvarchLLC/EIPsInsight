@@ -318,7 +318,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   }
 
   // Define the CSV header
-  const header = " Year, Month, Repo, EIP, Title, Author, Status, Type, Category, deadline, Created at, Link\n";
+  const header = " Year, Month, Repo, EIP, Title, Author, Status, deadline, Type, Category, Created at, Link\n";
 
   // Prepare the CSV content
   const csvContent =

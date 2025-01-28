@@ -89,6 +89,8 @@ const All = () => {
         }
 
         setData2(filteredData);
+        console.log("all data:",alldata);
+        console.log("filtered data:", filteredData);
 
         let filteredData2 = alldata
         .filter((item:any) => item.repo === 'rip');
@@ -123,16 +125,16 @@ const All = () => {
     filteredData = data
         .filter((item) => (selected==="All"||item.category === selected))
         .map((item) => {
-            const { repo, eip, title, author, discussion, status, type, category,created } = item;
-            return { repo, eip, title, author, discussion, status, type, category,created };
+            const { repo, eip, title, author, discussion, status, deadline, type, category,created } = item;
+            return { repo, eip, title, author, discussion, status, deadline, type, category,created };
         });
       }
     else{
     filteredData=data
     .filter((item) => item.repo === 'rip')
         .map((item) => {
-            const { repo, eip, title, author, discussion, status, type, category,created } = item;
-            return { repo, eip, title, author, discussion, status, type, category,created };
+            const { repo, eip, title, author, discussion, status, deadline, type, category,created } = item;
+            return { repo, eip, title, author, discussion, status, deadline, type, category,created };
         });
     }
 
@@ -143,12 +145,12 @@ const All = () => {
     }
 
     // Define the CSV header
-    const header = "Repo, EIP, Title, Author,Status, Type, Category, Discussion, Created at, Link\n";
+    const header = "Repo, EIP, Title, Author,Status, deadline, Type, Category, Discussion, Created at, Link\n";
 
     // Prepare the CSV content
     const csvContent = "data:text/csv;charset=utf-8,"
     + header
-    + filteredData.map(({ repo, eip, title, author, discussion, status, type, category, created }) => {
+    + filteredData.map(({ repo, eip, title, author, discussion, status, deadline, type, category, created }) => {
         // Generate the correct URL based on the repo type
         const url = repo === "eip"
             ? `https://eipsinsight.com/eips/eip-${eip}`
@@ -157,7 +159,7 @@ const All = () => {
             : `https://eipsinsight.com/rips/rip-${eip}`;
 
         // Wrap title and author in double quotes to handle commas
-        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${url}"`;
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${deadline.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${url}"`;
     }).join("\n");
 
   
