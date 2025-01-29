@@ -80,7 +80,7 @@ async function fetchLastCreatedYearAndMonthFromAPI(
 }
 
 const TableStat: React.FC<TabProps> = ({ cat, type }) => {
-  const [data, setData] = useState<EIP[]>([]);
+  const [data, setData] = useState<EIP[]>([]); 
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mergedData, setMergedData] = useState<

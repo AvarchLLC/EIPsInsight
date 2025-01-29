@@ -43,8 +43,11 @@ const MyComponent = () => {
     marginBottom={{ base: "1rem", md: "0" }}
     overflowX="auto"  // Enable horizontal scrolling if needed
     maxWidth="100%"  // Make sure the width doesn’t exceed available space
-  >
+    minHeight="550px"
+  ><Box paddingTop={3}>
     <InsightSummary />
+    <DateTime/>
+  </Box> 
   </Box>
 
   {/* Right Side: Editors Leaderboard */}
@@ -60,7 +63,7 @@ const MyComponent = () => {
     <Box
       bgColor={bg}
       borderRadius="0.55rem"
-      minHeight="470px"  // Set minimum height
+      minHeight="550px"  // Set minimum height
       overflowX="auto"  // Enable horizontal scrolling when overflow occurs
       paddingX={2}  // Optional: Padding to prevent content from touching the edges
       maxWidth="100%"  // Ensure the chart doesn’t overflow horizontally

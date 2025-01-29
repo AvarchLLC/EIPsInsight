@@ -247,7 +247,7 @@ const InsightTable: React.FC<TabProps> = ({
       let srNo = 1; // Initialize the serial number
 
       newData = finalStatusChanges.map((item: StatusChange) => {
-        const { eip, title, author, status, type, category } = item;
+        const { eip, title, author, status, type, category, deadline } = item;
         const commitLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
         }/commits/master/${
@@ -260,6 +260,7 @@ const InsightTable: React.FC<TabProps> = ({
           title,
           author,
           status,
+          deadline,
           type,
           category,
           commitLink,
@@ -280,11 +281,6 @@ const InsightTable: React.FC<TabProps> = ({
       headers.push(`${Tabletype.toUpperCase()} Link`);
       const csvRows = filteredData.map((item) => {
         const values = Object.values(item);
-        // const commitLink = `https://github.com/ethereum/${
-        //   Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
-        // }/commits/master/${
-        //   Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
-        // }/${Tabletype}-${item.eip}.md`;
         const eipLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
         }/blob/master/${
@@ -393,17 +389,6 @@ const InsightTable: React.FC<TabProps> = ({
                 }}
                 columns={[
                   {
-                    key: 'sr',
-                    label: 'sr',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', 
-                      color: isDarkMode ? 'white' : 'black',              
-                      fontWeight: 'bold',                                  
-                      padding: '12px',                                     
-                      borderTopLeftRadius: "0.55rem",                      
-                    }
-                  },
-                  {
                     key: 'eip',
                     label: 'EIP',
                     _style: {
@@ -459,6 +444,19 @@ const InsightTable: React.FC<TabProps> = ({
                       borderTopRightRadius: "0.55rem",   
                     }
                   },
+                  ...(status === "LastCall" ? [ // Conditionally add the deadline column
+                    {
+                      key: 'deadline',
+                      label: 'Deadline',
+                      _style: {
+                        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                        color: isDarkMode ? 'white' : 'black',
+                        fontWeight: 'bold',
+                        padding: '12px',
+                        borderTopRightRadius: "0.55rem", // Add border radius to the last column
+                      }
+                    }
+                  ] : []),
                   {
                     key: 'commitLink',
                     label: 'commitLink',
@@ -472,19 +470,7 @@ const InsightTable: React.FC<TabProps> = ({
                   },
                   ]}
               scopedColumns={{
-                sr: (item: any) => (
-                  <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                    <Link href={`/${Tabletype}s/${Tabletype}-${item.eip}`}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>
-                            {item.sr}
-                          </Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </Link>
-                  </td>
-                ),
+                
                 eip: (item: any) => (
                   <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <Link href={`/${Tabletype}s/${Tabletype}-${item.eip}`}>
@@ -580,6 +566,15 @@ const InsightTable: React.FC<TabProps> = ({
                     </Wrap>
                   </td>
                 ),
+                ...(status === "LastCall" ? { // Conditionally add the deadline column renderer
+                  deadline: (item: any) => (
+                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                      <div className={isDarkMode ? "text-white" : "text-black"}>
+                        {item.deadline || "N/A"}
+                      </div>
+                    </td>
+                  )
+                } : {}),
                 commitLink: (item: any) => (
                   <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <Link href={item.commitLink} target="_blank">

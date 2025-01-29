@@ -159,8 +159,7 @@ const All = () => {
             : `https://eipsinsight.com/rips/rip-${eip}`;
 
         // Wrap title and author in double quotes to handle commas
-        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${deadline.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${url}"`;
-    }).join("\n");
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${deadline ? deadline.replace(/"/g, '""') : '-'}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${url}"`; }).join("\n");
 
   
     // Check the generated CSV content before download

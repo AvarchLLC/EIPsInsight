@@ -32,6 +32,7 @@ import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 import { FaSyncAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
+import Graph from "@/components/NetworkUpgradesGraph";
 
 
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
@@ -384,8 +385,8 @@ const All = () => {
           >
         <Box
           paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-          marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-          paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          marginX={{ lg: "10", md: "2", sm: "2", base: "2" }}
+          paddingX={{ lg: "5", md: "5", sm: "5", base: "5" }}
           marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
        <Box>
@@ -516,7 +517,9 @@ const All = () => {
 
 
 
-
+        {/* <Box id="NetworkUpgradesChart" mt={2}>
+          <Graph/>
+        </Box> */}
 
 
         <Box id="NetworkUpgrades" mt={2}>
