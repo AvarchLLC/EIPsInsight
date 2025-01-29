@@ -136,10 +136,16 @@ const All = () => {
 
   const PectraPosts= [
     {
-      image: "pectra4.png",
-      title: "EtherWorld Weekly — Edition 301",
-      content: "EtherWorld Weekly Edition 301 kicks off the new year with Ethereum’s top 2024 updates, Vitalik’s insights, and upcoming blockchain events. Dive into client releases, governance standards, and the future of AI x crypto!",
-      link: "https://etherworld.co/2025/01/05/etherworld-weekly-edition-301/"
+      image: "pectra2.jpg",
+      title: "Ethereum Launches Mekong Testnet: A Guide",
+      content: "Ethereum’s Mekong testnet offers developers and stakers a sandbox to explore the Pectra upgrade’s UX and staking changes, shaping the upcoming mainnet deployment.",
+      link: "https://etherworld.co/2024/11/08/mekong-testnet/"
+  },
+  {
+      image: "pectra3.jpg",
+      title: "Consensus-layer Call 144: EIPs, Pectra, and Blob Scaling",
+      content: "Ethereum developers discussed key updates on Pectra, EIPs 7742 and 7782, and strategies for scaling blobs, focusing on network performance, PeerDAS, and upcoming changes for the Pectra hard fork.",
+      link: "https://etherworld.co/2024/10/17/consensus-layer-call-144/"
   },
     {
         image: "pectra1.jpg",
@@ -147,18 +153,6 @@ const All = () => {
         content: "Gossip Limit in Blockchain Networks, Current Setup, Reasons for 10 MiB Limit, Challenges, Proposal Objectives, Implementation & Alternatives.",
         link: "https://etherworld.co/2024/12/15/ethereum-developers-push-proposal-to-increase-gossip-limit/"
     },
-    {
-        image: "pectra2.jpg",
-        title: "Ethereum Launches Mekong Testnet: A Guide",
-        content: "Ethereum’s Mekong testnet offers developers and stakers a sandbox to explore the Pectra upgrade’s UX and staking changes, shaping the upcoming mainnet deployment.",
-        link: "https://etherworld.co/2024/11/08/mekong-testnet/"
-    },
-    {
-        image: "pectra3.jpg",
-        title: "Consensus-layer Call 144: EIPs, Pectra, and Blob Scaling",
-        content: "Ethereum developers discussed key updates on Pectra, EIPs 7742 and 7782, and strategies for scaling blobs, focusing on network performance, PeerDAS, and upcoming changes for the Pectra hard fork.",
-        link: "https://etherworld.co/2024/10/17/consensus-layer-call-144/"
-    }
 ]
 
   const pectraData = [
@@ -531,12 +525,12 @@ const All = () => {
         </Box>
 
 
-      <Grid
+      {/* <Grid
       templateColumns={{ base: "1fr", md: "1fr 1fr" }} // Stack vertically on small screens
       gap={6}
       p={6}
     >
-      {/* Left Side - Motion Text and Table */}
+     
       <Box>
         <Text
           as={motion.div}
@@ -624,7 +618,7 @@ const All = () => {
 
   </Box>
 
-  {/* Right Side - YouTube Video */}
+
   <Box
     border="2px solid" // Adds a solid border
     borderColor="blue.500" // Border color
@@ -659,7 +653,7 @@ const All = () => {
       ></iframe>
     </Box>
   </Box>
-</Grid>
+</Grid> */}
 
 
         </Box>
