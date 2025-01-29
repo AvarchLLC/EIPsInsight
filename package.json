@@ -17,6 +17,7 @@
     "@chakra-ui/react": "^2.7.0",
     "@coreui/coreui": "^4.2.6",
     "@coreui/react-pro": "^4.12.0",
+    "@cosmograph/react": "^1.4.2",
     "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.0",

@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { CSVLink } from "react-csv";
 import axios from "axios";
+import DateTime from "./DateTime";
 
 interface StatusChange {
   _id: string;
@@ -452,12 +453,12 @@ export default function InsightSummary() {
     console.log("input data", data)
     const csvData = data.flatMap((item) =>
       item.statusChanges.map((statusChange) => ({
-        _id: item._id,
         repo: item.repo,
         eip: statusChange.eip,
         title: statusChange.title,
         fromStatus: statusChange.fromStatus,
         toStatus: statusChange.toStatus,
+        deadline: statusChange.deadline !== "undefined" ? statusChange.deadline : "-",
         link: `https://eipsinsight.com/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${statusChange.eip}`,
       }))
     );
@@ -520,7 +521,7 @@ export default function InsightSummary() {
 </Flex>
       <TableContainer bg={bg} padding={4} rounded={"xl"} marginTop={8}>
         <Table variant="simple" size="md" bg={bg} padding={8}>
-          <TableCaption>eipsinsight.com</TableCaption>
+          {/* <TableCaption>eipsinsight.com</TableCaption> */}
           <Thead>
             <Tr>
               <Th>Status</Th>

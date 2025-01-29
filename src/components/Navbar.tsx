@@ -19,6 +19,7 @@ import {
   useColorModeValue,
   useDisclosure,
   VStack,
+  Portal,
 } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
@@ -309,7 +310,7 @@ const Navbar: React.FC = () => {
                         rounded={"xl"}
                         minW={"sm"}
                         className={"overflow-y-auto"}
-                        maxH={"900px"}
+                        maxH={"1500px"}
                       >
                         <Stack direction={"column"} spacing={2}>
                           {navItem.children.map((child) => (
@@ -329,7 +330,7 @@ const Navbar: React.FC = () => {
                         rounded={"xl"}
                         minW={"sm"}
                         className={"overflow-y-auto"}
-                        maxH={"900px"}
+                        maxH={"1500px"}
                       >
                         <Stack direction={"column"} spacing={2}>
                           {navItem.children.map((child) => (
@@ -365,7 +366,7 @@ const Navbar: React.FC = () => {
                         rounded={"xl"}
                         minW={"sm"}
                         className={"overflow-y-auto"}
-                        maxH={"900px"}
+                        maxH={"1500px"}
                       >
                         <Stack direction={"column"} spacing={2}>
                           {navItem.children.map((child) => (
@@ -402,7 +403,7 @@ const Navbar: React.FC = () => {
                         rounded={"xl"}
                         minW={"sm"}
                         className={"overflow-y-auto"}
-                        maxH={"900px"}
+                        maxH={"1500px"}
                       >
                         <Stack direction={"column"} spacing={2}>
                           {navItem.children.map((child) =>
@@ -636,7 +637,7 @@ const Navbar: React.FC = () => {
                             rounded={"xl"}
                             minW={"sm"}
                             className={"overflow-y-auto"}
-                            maxH={"900px"}
+                            maxH={"1500px"}
                           >
                             <Stack direction={"column"} spacing={2}>
                               {navItem.children.map((child) => (
@@ -675,7 +676,7 @@ const Navbar: React.FC = () => {
                             rounded={"xl"}
                             minW={"sm"}
                             className={"overflow-y-auto"}
-                            maxH={"900px"}
+                            maxH={"1500px"}
                           >
                             <Stack direction={"column"} spacing={2}>
                             {navItem.children.map((child) =>
@@ -714,7 +715,7 @@ const Navbar: React.FC = () => {
                             rounded={"xl"}
                             minW={"sm"}
                             className={"overflow-y-auto"}
-                            maxH={"900px"}
+                            maxH={"1500px"}
                           >
                             <Stack direction={"column"} spacing={2}>
                             {navItem.children.map((child) =>
@@ -846,72 +847,97 @@ const DesktopSubNav = ({ label, href, subLabel, children }: NavItem) => {
   );
 };
 
+
 const DesktopSubNav2 = ({ label, href, subLabel, children }: NavItem) => {
   return (
-    <Box>
-  <Popover trigger="hover" placement="top-end">
-    <PopoverTrigger>
-      <Link
-        role="group"
-        display="block"
-        p={2}
-        rounded="md"
-        _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
-      >
-        <VStack spacing={1} align="start">
-          <Text
-            transition="all .3s ease"
-            _groupHover={{ color: "pink.400" }}
-            fontWeight={500}
-          >
-            {label}
-          </Text>
-          <Text fontSize="sm">{subLabel}</Text>
-        </VStack>
-      </Link>
-    </PopoverTrigger>
-
-    <PopoverContent
-      bg={useColorModeValue("white", "gray.800")}
-      border={0}
-      boxShadow="lg"
-      p={4}
-      maxWidth="200px"
-      zIndex="popover"
-      overflow="visible"
-      transform="translateY(0)" /* Ensure no offset issues */
+    <Popover
+      trigger="hover"
+      placement="bottom-start"
+      modifiers={[
+        {
+          name: "preventOverflow",
+          options: { boundary: "viewport" },
+        },
+        {
+          name: "offset",
+          options: { offset: [0, 8] }, // Adds spacing below the trigger
+        },
+      ]}
     >
-      <PopoverArrow />
-      <PopoverBody>
-        <Stack
-          mt={2}
-          pl={4}
-          borderLeft={1}
-          borderStyle="solid"
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-          align="start"
+      <PopoverTrigger>
+        <Link
+          href={href || "#"}
+          style={{ textDecoration: "none" }}
+          _hover={{ textDecoration: "none" }}
         >
-          {children &&
-            children.map((subNavItem) => (
-              <Link
-                key={subNavItem.label}
-                py={2}
-                href={subNavItem.href}
-                _hover={{
-                  textDecoration: "none",
-                  color: "pink.400",
-                }}
+          <Box
+            role="group"
+            display="block"
+            p={2}
+            rounded="md"
+            _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
+            cursor="pointer"
+            transition="background-color 0.3s ease"
+          >
+            <VStack spacing={1} align="start">
+              <Text
+                transition="all .3s ease"
+                _groupHover={{ color: "pink.400" }}
+                fontWeight={500}
               >
-                {subNavItem.label}
-              </Link>
-            ))}
-        </Stack>
-      </PopoverBody>
-    </PopoverContent>
-  </Popover>
-</Box>
+                {label}
+              </Text>
+              <Text fontSize="sm">{subLabel}</Text>
+            </VStack>
+          </Box>
+        </Link>
+      </PopoverTrigger>
 
+      <Portal>
+        <PopoverContent
+          border="1px solid"
+          borderColor={useColorModeValue("gray.200", "gray.700")}
+          boxShadow="md"
+          bg={useColorModeValue("white", "gray.800")}
+          rounded="md"
+          p={4}
+          zIndex={10}
+        >
+          <PopoverArrow />
+          <PopoverBody>
+            <Stack align="start">
+              {children &&
+                children.map((subNavItem) => (
+                  <Link
+                    key={subNavItem.label}
+                    href={subNavItem.href}
+                    _hover={{
+                      textDecoration: "none",
+                      color: "pink.400",
+                    }}
+                    style={{ textDecoration: "none" }} 
+                  >
+                    <Box
+                      py={2}
+                      
+                      fontWeight={500}
+                      transition="background-color 0.3s ease" 
+                    >
+                      {subNavItem.label}
+                    </Box>
+                  </Link>
+                  
+                ))}
+            </Stack>
+          </PopoverBody>
+        </PopoverContent>
+      </Portal>
+    </Popover>
   );
 };
+
+
+
+
 
 export default Navbar;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -60,6 +60,8 @@ const SlotCountdown: React.FC = () => {
   const [countdown, setCountdown] = useState<string>(""); // Countdown for days, hours, minutes
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false); // Track if the upgrade is live
 
+  const countdownInterval = useRef<NodeJS.Timeout | null>(null); // Store interval reference
+
   const fetchData = async () => {
     try {
       const { beaconApi, rpc, target } = networks[network];
@@ -67,17 +69,15 @@ const SlotCountdown: React.FC = () => {
       // Fetch the latest block header to get the current slot
       const beaconResponse = await fetch(`${beaconApi}/eth/v1/beacon/headers/head`);
       const beaconData = await beaconResponse.json();
-      const slot = parseInt(beaconData.data.header.message.slot);
+      const slot: number = parseInt(beaconData.data.header.message.slot);
 
       // Calculate the epoch from the slot (1 epoch = 32 slots)
-      const epoch = Math.floor(slot / 32);
+      const epoch: number = Math.floor(slot / 32);
 
       // Fetch the current block number from the execution layer
       const executionResponse = await fetch(rpc, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jsonrpc: "2.0",
           method: "eth_blockNumber",
@@ -85,8 +85,9 @@ const SlotCountdown: React.FC = () => {
           id: 1,
         }),
       });
+
       const executionData = await executionResponse.json();
-      const blockNumber = parseInt(executionData.result, 16);
+      const blockNumber: number = parseInt(executionData.result, 16);
 
       setCurrentSlot(slot);
       setCurrentEpoch(epoch);
@@ -95,18 +96,37 @@ const SlotCountdown: React.FC = () => {
       // Check if the upgrade is live
       if (target !== 999999999 && slot >= target) {
         setIsUpgradeLive(true);
+        setCountdown("");
+        return;
       } else {
         setIsUpgradeLive(false);
       }
 
-      // Calculate countdown if target is not 999999999
+      // Countdown logic with live updates
       if (target !== 999999999 && !isUpgradeLive) {
-        const slotsRemaining = target - slot;
-        const secondsRemaining = slotsRemaining * 12; // 12 seconds per slot
-        const days = Math.floor(secondsRemaining / (3600 * 24));
-        const hours = Math.floor((secondsRemaining % (3600 * 24)) / 3600);
-        const minutes = Math.floor((secondsRemaining % 3600) / 60);
-        setCountdown(`${days}D ${hours}H ${minutes}M`);
+        let slotsRemaining: number = target - slot;
+        let totalSecondsRemaining: number = slotsRemaining * 12; // 12 seconds per slot
+
+        // Clear previous interval if it exists
+        if (countdownInterval.current) {
+          clearInterval(countdownInterval.current);
+        }
+
+        countdownInterval.current = setInterval(() => {
+          if (totalSecondsRemaining <= 0) {
+            clearInterval(countdownInterval.current!);
+            setCountdown("0D 0H 0M 0S");
+            return;
+          }
+
+          totalSecondsRemaining -= 1; // Decrement every second
+          const days: number = Math.floor(totalSecondsRemaining / (3600 * 24));
+          const hours: number = Math.floor((totalSecondsRemaining % (3600 * 24)) / 3600);
+          const minutes: number = Math.floor((totalSecondsRemaining % 3600) / 60);
+          const seconds: number = Math.floor(totalSecondsRemaining % 60);
+
+          setCountdown(`${days}D ${hours}H ${minutes}M ${seconds}S`);
+        }, 1000);
       } else {
         setCountdown("");
       }
@@ -163,7 +183,7 @@ const SlotCountdown: React.FC = () => {
         <Box
           textAlign="center"
           p={6}
-          maxWidth="1200px"
+          maxWidth="1250px"
           mx="auto"
           mt={1}
           borderRadius="lg"
@@ -186,17 +206,17 @@ const SlotCountdown: React.FC = () => {
 
           {/* Network Toggle Buttons */}
           <HStack spacing={4} justify="center" mb={4}>
+          <Button
+              colorScheme={network === "holesky" ? "blue" : "gray"}
+              onClick={() => handleNetworkChange("holesky")}
+            >
+              Holesky
+            </Button>
             <Button
               colorScheme={network === "sepolia" ? "blue" : "gray"}
               onClick={() => handleNetworkChange("sepolia")}
             >
               Sepolia
-            </Button>
-            <Button
-              colorScheme={network === "holesky" ? "blue" : "gray"}
-              onClick={() => handleNetworkChange("holesky")}
-            >
-              Holesky
             </Button>
             <Button
               colorScheme={network === "mainnet" ? "blue" : "gray"}
@@ -327,14 +347,14 @@ const SlotCountdown: React.FC = () => {
                   })}
 
                   {/* Vertical Stacked Text */}
-                  <VStack spacing={0} align="center" justify="center" ml={2}>
+                  <VStack spacing={0} align="center" justify="center" ml={2} pt={2} pb={2}>
                     {networks[network].target !== 999999999 ? (
                       <>
                         <Text fontSize="xs" fontWeight="bold" color="white">
                           {slotsRemaining} slots away
                         </Text>
                         <Text fontSize="xs" color="white">
-                          ..................
+                          .................
                         </Text>
                         <Text fontSize="s" fontWeight="bold" color="white">
                           {countdown}
@@ -349,7 +369,12 @@ const SlotCountdown: React.FC = () => {
 
                   {/* Golden Box */}
                   <Tooltip
-                    label={`Target Slot: ${networks[network].target}`}
+                    // label={`Target Slot: ${networks[network].target}`}
+                    label={
+                      (networks[network].target !== 999999999)
+                        ? `Target Slot: ${networks[network].target}`
+                        : undefined
+                    }
                   >
                     <Box
                       w={{ base: "45px", md: "55px" }}

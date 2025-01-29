@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-
+import { DownloadIcon } from "@chakra-ui/icons";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 
 interface EIP {
@@ -169,7 +169,15 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
                   },
                 }}
                 columns={[
-                  
+                  {
+                    key: 'repo',
+                    label: 'Repo',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
                   {
                     key: 'eip',
                     label: 'EIP',
@@ -239,13 +247,13 @@ const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
                   ] : [])
                   ]}
                 scopedColumns={{
-                  "#": (item: any) => (
-                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                  repo: (item: any) => (
+                    <td key={item.repo} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <Link href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : item.repo==='rip'? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
-                              {item["#"]}
+                              {item.repo}
                             </Badge>
                           </WrapItem>
                         </Wrap>
