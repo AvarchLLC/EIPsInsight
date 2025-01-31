@@ -158,7 +158,7 @@ const Navbar: React.FC = () => {
       ],
     },
     {
-      label: "More",
+      label: "Resources",
       // children: [
       //   {
       //     label: "Resources",
@@ -321,7 +321,7 @@ const Navbar: React.FC = () => {
                     )}
 
 
-                    {navItem.children && navItem.label === "More" && (
+                    {navItem.children && navItem.label === "Resources" && (
                       <PopoverContent
                         border={0}
                         boxShadow={"xl"}
@@ -436,7 +436,7 @@ const Navbar: React.FC = () => {
 
                     {navItem.children &&
                       navItem.label !== "Insight" &&
-                      navItem.label !== "More" && 
+                      navItem.label !== "Resources" && 
                       navItem.label !=="All-EIPS" &&
                       navItem.label !=="Tools" &&(
                         <PopoverContent
@@ -628,7 +628,7 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                        {navItem.children && (navItem.label === "More") && (
+                        {navItem.children && (navItem.label === "Resources") && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -747,7 +747,7 @@ const Navbar: React.FC = () => {
 
                         {navItem.children &&
                           navItem.label !== "Insight" &&
-                          navItem.label !== "More" &&
+                          navItem.label !== "Resources" &&
                           navItem.label !== "Tools" && 
                           navItem.label !== "All-EIPS" &&(
                             <PopoverContent

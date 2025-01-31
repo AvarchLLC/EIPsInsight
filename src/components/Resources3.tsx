@@ -171,85 +171,92 @@ const ResourcesPage: React.FC = () => {
 
 const NEWS= [
     {
-        image: "pectra4.png",
-        title: "EtherWorld Weekly — Edition 301",
-        content: "EtherWorld Weekly Edition 301 kicks off the new year with Ethereum’s top 2024 updates, Vitalik’s insights, and upcoming blockchain events. Dive into client releases, governance standards, and the future of AI x crypto!",
-        link: "https://etherworld.co/2025/01/05/etherworld-weekly-edition-301/"
+        image: "news1.jpg",
+        title: "The EIP Proposal Builder: Simplify, Streamline, Succeed",
+        content: "Introducing the EIP Proposal Builder: Simplify the creation of Ethereum Improvement Proposals with ease. Enjoy real-time editing, intuitive features, and streamlined workflows—empowering everyone to contribute effortlessly to Ethereum.",
+        link: "https://etherworld.co/2025/01/20/the-eip-proposal-builder-simplify-streamline-succeed/"
     },
     {
-        image: "pectra1.jpg",
-        title: "Ethereum Developers Push Proposal to increase Gossip Limit",
-        content: "Gossip Limit in Blockchain Networks, Current Setup, Reasons for 10 MiB Limit, Challenges, Proposal Objectives, Implementation & Alternatives.",
-        link: "https://etherworld.co/2024/12/15/ethereum-developers-push-proposal-to-increase-gossip-limit/"
+        image: "news2.jpg",
+        title: "Unveiling the Analytics Tool on EIPsInsight",
+        content: "Discover EIPsInsight Analytics – a tool designed to streamline project management with visualized GitHub data. Track trends, customize charts, and download reports effortlessly for precise insights into PRs and issues.",
+        link: "https://etherworld.co/2025/01/07/unveiling-the-analytics-tool-on-eipsinsight/"
     },
     {
-        image: "pectra2.jpg",
-        title: "Ethereum Launches Mekong Testnet: A Guide",
-        content: "Ethereum’s Mekong testnet offers developers and stakers a sandbox to explore the Pectra upgrade’s UX and staking changes, shaping the upcoming mainnet deployment.",
-        link: "https://etherworld.co/2024/11/08/mekong-testnet/"
+        image: "news3.png",
+        title: "Boosting EIP Contributions: Unleashing the Power of Editors Leaderboard and EIP Board",
+        content: "The Editors Leaderboard and EIP Board streamline EIP reviews by tracking individual contributions and prioritizing open pull requests, fostering collaboration, efficiency, and recognition within the Ethereum Improvement Proposal process.",
+        link: "https://etherworld.co/2024/12/26/boosting-eip-contributions-unleashing-the-power-of-editors-leaderboard-and-eip-board/"
     },
     {
-        image: "pectra3.jpg",
-        title: "Consensus-layer Call 144: EIPs, Pectra, and Blob Scaling",
-        content: "Ethereum developers discussed key updates on Pectra, EIPs 7742 and 7782, and strategies for scaling blobs, focusing on network performance, PeerDAS, and upcoming changes for the Pectra hard fork.",
-        link: "https://etherworld.co/2024/10/17/consensus-layer-call-144/"
+        image: "news4.jpg",
+        title: "Introducing EIP-Board: Simplifying Pull Request Management for EIP Editors",
+        content: "EIP-Board simplifies Ethereum Improvement Proposal management by prioritizing pull requests based on editor responses and author interactions. Discover how this innovative tool supports EIP editors and enhances collaboration within the Ethereum ecosystem.",
+        link: "https://etherworld.co/2024/12/04/introducing-eip-board-simplifying-pull-request-management-for-eip-editors/"
     },
     {
-      image: "resources1.jpg",
-      title: "An overview of Account Abstraction in Ethereum blockchain",
-      content: "An overview of account abstraction, EOA, Contract, EIP-86, EIP-2938, EIP-4337, sponsored transaction and more.",
-      link: "https://etherworld.co/2021/10/06/an-overview-of-account-abstraction-in-ethereum-blockchain/"
+      image: "news5.jpg",
+      title: "Introducing ‘Search by Author’ Feature on EIPsInsight",
+      content: "Tracking and exploring Ethereum proposals just got a whole lot easier. EtherWorld is thrilled to announce the latest update to EIPsInsight: the Search by Author feature.",
+      link: "https://etherworld.co/2024/11/26/search-by-author-eipsinsight/"
   },
   {
-      image: "resources2.jpg",
-      title: "New Ethereum Proposal to Cap the Growth of Active Validators",
-      content: "Need, Proposal, Churn Limit, Managing Validator Exits & Activations",
-      link: "https://etherworld.co/2023/07/16/new-ethereum-proposal-to-cap-the-growth-of-active-validators/"
+      image: "news6.jpg",
+      title: "Introducing EIPsInsight: Your Go-To Tool for Navigating Ethereum Proposals",
+      content: "EIPsInsight simplifies tracking Ethereum proposals with visual dashboards, real-time PR updates, and trend insights, empowering developers and editors to navigate EIP progress efficiently and collaboratively.",
+      link: "https://etherworld.co/2024/11/07/eipsinsight/"
   },
-  {
-      image: "resources3.jpg",
-      title: "Ethereum's Dencun upgrade moving towards Devnet 8",
-      content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
-      link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
-  },
-  {
-      image: "resources7.png",
-      title: "Eip - 7516 : BLOBBASEFEE opcode",
-      content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
-      link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
-  },
-  {
-      image: "resources9.jpg",
-      title: "EIP - 7045 Increase Max Attestation Inclusion Slot",
-      content: "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security and efficiency. The article delves into its motivation, technical changes, implications, and impact on consensus and security.",
-      link: "https://etherworld.co/2024/01/09/eip-7045/"
-  },
-  {
-      image: "resources10.png",
-      title: "EIP-1153 and Transient storage",
-      content: "EIP-1153 introduces transient storage, revolutionizing Ethereum's data handling. It addresses gas inefficiencies, enhancing smart contract performance. Explore its impact on inter-frame communication and gas cost efficiency.",
-      link: "https://etherworld.co/2024/01/08/eip-1153-and-transient-storage/"
-  },
-  {
-      image: "resources12.png",
-      title: "EIP-5656: MCOPY - An efficient EVM instruction",
-      content: "EIP-5656 introduces MCOPY. Addressing gas cost challenges, MCOPY benefits, use cases, and impact, presenting a promising upgrade for Ethereum's ecosystem.",
-      link: "https://etherworld.co/2023/11/15/eip-5656-mcopy-an-efficient-evm-instruction/"
-  },
-  {
-      image: "resources15.jpg",
-      title: "Transient Storage for Beginners",
-      content: "EIP-1153: Need, Effects, Pros & Cons, Future Plans",
-      link: "https://etherworld.co/2022/12/13/transient-storage-for-beginners/"
-  }
+  
 ]
 const INSIGHT= [
   {
-      image: "EipsInsightRecap.jpg",
-      title: "Eipsinsight milestones 2024",
-      content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities, which together streamline workflows, promote accountability, and optimize the management of proposals.",
-      link: "/milestones2024"
-  },
+    image: "EipsInsightRecap.jpg",
+    title: "Eipsinsight milestones 2024",
+    content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities, which together streamline workflows, promote accountability, and optimize the management of proposals.",
+    link: "/milestones2024"
+},
+{
+  image: "blog1.jpg",
+  title: "ERC-7779: Understanding & Redefining Wallet Interoperability",
+  content: "ERC-7779 revolutionizes Ethereum by enhancing wallet interoperability, simplifying user transitions, and enabling advanced features like gas sponsorship and batch execution. It empowers users and developers with seamless, secure, and flexible account management.",
+  link: "https://etherworld.co/2025/01/24/erc-7779-understanding-redefining-wallet-interoperability/"
+},
+  {
+    image: "resources3.jpg",
+    title: "Ethereum's Dencun upgrade moving towards Devnet 8",
+    content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
+    link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
+},
+{
+    image: "resources7.png",
+    title: "Eip - 7516 : BLOBBASEFEE opcode",
+    content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
+    link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
+},
+{
+    image: "resources9.jpg",
+    title: "EIP - 7045 Increase Max Attestation Inclusion Slot",
+    content: "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security and efficiency. The article delves into its motivation, technical changes, implications, and impact on consensus and security.",
+    link: "https://etherworld.co/2024/01/09/eip-7045/"
+},
+{
+    image: "resources10.png",
+    title: "EIP-1153 and Transient storage",
+    content: "EIP-1153 introduces transient storage, revolutionizing Ethereum's data handling. It addresses gas inefficiencies, enhancing smart contract performance. Explore its impact on inter-frame communication and gas cost efficiency.",
+    link: "https://etherworld.co/2024/01/08/eip-1153-and-transient-storage/"
+},
+{
+    image: "resources12.png",
+    title: "EIP-5656: MCOPY - An efficient EVM instruction",
+    content: "EIP-5656 introduces MCOPY. Addressing gas cost challenges, MCOPY benefits, use cases, and impact, presenting a promising upgrade for Ethereum's ecosystem.",
+    link: "https://etherworld.co/2023/11/15/eip-5656-mcopy-an-efficient-evm-instruction/"
+},
+{
+    image: "resources15.jpg",
+    title: "Transient Storage for Beginners",
+    content: "EIP-1153: Need, Effects, Pros & Cons, Future Plans",
+    link: "https://etherworld.co/2022/12/13/transient-storage-for-beginners/"
+}
   // {
   //     image: "Blockchain_Future.png",
   //     title: "What is EIPsInsight?",
@@ -266,12 +273,9 @@ const Links = [
   "https://youtu.be/V75TPvK-K_s?si=KDQI5kP4y-2-9bka",
   "https://youtu.be/fwxkbUaa92w?si=uHze3y_--2JfYMjD",
   "https://www.youtube.com/embed/YuEA-jE2Z8c",
-  "https://www.youtube.com/watch?v=sIr6XX8yR8o",
-  "https://www.youtube.com/watch?v=dEgBVAzY6Eg",
-  "https://www.youtube.com/watch?v=pO8fmZd4Mjw",
-  "https://www.youtube.com/watch?v=V75TPvK-K_s",
-  "https://www.youtube.com/watch?v=fwxkbUaa92w",
-  "https://www.youtube.com/embed/pyfKM_hOKaM",
+  "https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpnKFDl1KzGOKqwux5JaLlv",
+  "https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpok0smGmq-dFGVHQzW84a2",
+ 
 ];
 
 // Convert URLs to the embed format
