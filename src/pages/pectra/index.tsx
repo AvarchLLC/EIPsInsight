@@ -136,6 +136,37 @@ const All = () => {
 
   const PectraPosts= [
     {
+      image: "pectra5.jpg",
+      title: "Highlights of Ethereum's All Core Devs Meeting (ACDE) #204",
+      content: "Pectra Devnet 5 & 6 Updates, Mainnet Timeline, Geth Bug, System Contract Audits, Retrospective, Fusaka Planning, Hardware Requirements, EIP 7823, ACD Bot",
+      link: "https://etherworld.co/2025/01/30/highlights-of-ethereums-all-core-devs-meeting-acde-204/"
+  },
+  {
+    image: "pectra6.jpg",
+    title: "Highlights of Ethereum's All Core Devs Meeting (ACDC) #149",
+    content: "Devnet 5 Updates, Devnet 6 Preparation, Pectra Testnet Forks Blob Scaling & Hard Fork Coordination",
+    link: "https://etherworld.co/2025/01/23/highlights-of-ethereums-all-core-devs-meeting-acdc-149/"
+},
+{
+  image: "pectra7.jpg",
+  title: "Highlights of Ethereum's All Core Devs Meeting (ACDE) #203",
+  content: "Pectra Devnet 5 Launch, Pectra Spec Updates & Pectra Testing Timeline",
+  link: "https://etherworld.co/2025/01/17/highlights-of-ethereums-all-core-devs-meeting-acde-203/"
+},
+{
+  image: "pectra8.jpg",
+  title: "Glamsterdam: The Next Upgrade After Fusaka",
+  content: "Glamsterdam - merges the star Gloas with Amsterdam for Ethereum’s next upgrade. Explore its origins, naming traditions, and why Devconnect cities might shape future upgrade names.",
+  link: "https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/"
+},
+{
+  image: "pectra10.jpg",
+  title: "Highlights of Ethereum's All Core Devs Meeting #148",
+  content: "Pectra Testing Updates, Merged PRs, Hardware Requirements for Validator & Post Pectra Ethereum",
+  link: "https://etherworld.co/2025/01/09/highlights-of-ethereums-all-core-devs-consenus-meeting-148/"
+},
+
+    {
       image: "pectra2.jpg",
       title: "Ethereum Launches Mekong Testnet: A Guide",
       content: "Ethereum’s Mekong testnet offers developers and stakers a sandbox to explore the Pectra upgrade’s UX and staking changes, shaping the upcoming mainnet deployment.",
@@ -231,13 +262,13 @@ const All = () => {
         discussion:"https://ethereum-magicians.org/t/eip-set-eoa-account-code-for-one-transaction/19923"
       },
       {
-        eip: "7742",
-        title: "Uncouple blob count between CL and EL",
-        author: "Alex Stokes (@ralexstokes)",
-        link: "https://eipsinsight.com/eips/eip-7742",
+        eip: "7691",
+        title: "Blob throughput increase",
+        author: "Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation), Sam Calder-Mason (@samcm), Andrew Davis (@savid), Ansgar Dietrichs (@adietrichs)",
+        link: "https://eipsinsight.com/eips/eip-7691",
         type:"Standards Track",
         category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7742-uncouple-blob-count-between-cl-and-el/20550"
+        discussion:"https://ethereum-magicians.org/t/eip-7691-blob-throughput-increase/19694"
       },
       {
         eip: "7623",
@@ -249,13 +280,13 @@ const All = () => {
         discussion:"https://ethereum-magicians.org/t/eip-7623-increase-calldata-cost/18647"
       },
       {
-          eip: "7762",
-          title: "Increase MIN_BASE_FEE_PER_BLOB_GAS",
-          author: "Max Resnick (@MaxResnick)",
-          link: "https://eipsinsight.com/eips/eip-7762",
+          eip: "7840",
+          title: "Add blob schedule to EL config files",
+          author: "lightclient (@lightclient)",
+          link: "https://eipsinsight.com/eips/eip-7840",
           type:"Standards Track",
         category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7762-increase-min-base-fee-per-blob-gas/20949"
+        discussion:"https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182"
       },
       //   {
       //     eip: "3670",
@@ -395,7 +426,12 @@ const All = () => {
           >
             Ethereum Network Upgrades
           </Text>
-          <Text
+
+        <br/>
+        {/* <br/> */}
+        <SlotCountdown/>
+        <br/>
+        <Text
           as={motion.div}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -407,8 +443,6 @@ const All = () => {
         >
           PECTRA
         </Text>
-
-        <br/>
 
         <Flex
            direction={{ base: "column", md: "row" }}
@@ -503,17 +537,15 @@ const All = () => {
 </Flex>
 
         </Flex>
-        <br/>
-        <SlotCountdown/>
-        <br/>
+        
 
 
 
 
 
-        {/* <Box id="NetworkUpgradesChart" mt={2}>
+        <Box id="NetworkUpgradesChart" mt={2}>
           <Graph/>
-        </Box> */}
+        </Box>
 
 
         <Box id="NetworkUpgrades" mt={2}>
@@ -663,7 +695,7 @@ const All = () => {
             <Box display={{ base: "none", md: "block" }}>
               <PectraTable PectraData={pectraData}/>
               <br/>
-              <Text
+              {/* <Text
            as={motion.div}
            initial={{ opacity: 0, y: -20 }}
            animate={{ opacity: 1, y: 0 }}
@@ -673,12 +705,12 @@ const All = () => {
            color="#30A0E0"
           >
             Related Videos
-          </Text>
+          </Text> */}
             </Box>
           }
         </Box>
        
-        <Box display={{ base: "none", md: "block" }} className="w-3/4 mx-auto" id="carousel-section"> {/* Width set to 50% of the screen */}
+        {/* <Box display={{ base: "none", md: "block" }} className="w-3/4 mx-auto" id="carousel-section"> 
         
         <Carousel 
   showThumbs={false} 
@@ -880,7 +912,7 @@ const All = () => {
 
 <br/>
 
-</Box>
+</Box> */}
 
         </motion.div>
       </AllLayout>
