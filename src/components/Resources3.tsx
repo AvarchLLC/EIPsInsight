@@ -170,6 +170,12 @@ const ResourcesPage: React.FC = () => {
 
 
 const NEWS= [
+  {
+    image: "EIP_blog1.png",
+    title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
+    content: "Bringing You the Latest in Ethereum Improvement Proposals",
+    link: "/Blogs/blog1"
+},
     {
         image: "news1.jpg",
         title: "The EIP Proposal Builder: Simplify, Streamline, Succeed",

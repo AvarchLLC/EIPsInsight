@@ -82,7 +82,7 @@ const ReviewTracker = () => {
   const [Linechart, setLinechart] = useState<boolean>(false);
   const [loading4, setLoading4] = useState<boolean>(false);
 
-  const years = Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString());
+  const years = Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString());
   const months = [
     { name: 'Jan', value: '01' },
     { name: 'Feb', value: '02' },
@@ -513,9 +513,9 @@ const getYearlyData = (data: PRData[]) => {
   // Initialize an accumulator to hold yearly data
   const yearlyData: Record<string, number> = data
     .filter(item => {
-      // Extract the year from 'monthYear' and check if it falls between 2015 and 2024
+      // Extract the year from 'monthYear' and check if it falls between 2015 and 2025
       const itemYear = parseInt(item.monthYear.split('-')[0], 10);
-      return itemYear >= 2015 && itemYear <= 2024;
+      return itemYear >= 2015 && itemYear <= 2025;
     })
     .reduce((acc, item) => {
       // Only count if the reviewer is shown
@@ -533,7 +533,7 @@ const getYearlyData = (data: PRData[]) => {
       return acc;
     }, {} as Record<string, number>);
 
-  // console.log("Combined data from 2015 to 2024:", sortedYearlyData);
+  // console.log("Combined data from 2015 to 2025:", sortedYearlyData);
   return sortedYearlyData;
 };
 
@@ -1980,7 +1980,7 @@ const router = useRouter();
                 {selectedStartYear ? `${selectedStartYear}` : 'Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
                   <MenuItem
                     key={year}
                     onClick={() => setSelectedStartYear(year)}
@@ -2038,7 +2038,7 @@ const router = useRouter();
                 {selectedEndYear ? `${selectedEndYear}` : 'Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
                   <MenuItem
                     key={year}
                     onClick={() => setSelectedEndYear(year)}
@@ -2444,7 +2444,7 @@ const router = useRouter();
                 {selectedStartYear2 ? `${selectedStartYear2}` : 'Select Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
                   <MenuItem key={year} onClick={() => setSelectedStartYear2(year)} bg="white" color="black">
                     {year}
                   </MenuItem>
@@ -2497,7 +2497,7 @@ const router = useRouter();
                   {selectedEndYear2 ? `${selectedEndYear2}` : 'Select Year'}
                 </MenuButton>
                 <MenuList bg="white" color="black" borderColor="blue.500">
-                  {Array.from({ length: 2024 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
                     <MenuItem
                       key={year}
                       onClick={() => setSelectedEndYear2(year)}
