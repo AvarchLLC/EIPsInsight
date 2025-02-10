@@ -7,6 +7,7 @@ import NLink from "next/link";
 import { motion } from "framer-motion";
 import React from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import SearchBox from "@/components/SearchBox";
 import {
   Container,
   Box,
@@ -164,8 +165,11 @@ const TestComponent = () => {
             RIP Not Found
           </Heading>
           <Text color="gray.500" fontSize="xl" mb={6}>
-            This RIP might not exist or could be an EIP or ERC. Please check again.
+            This RIP might not exist or could be an <Link color="blue.300" href={`/eips/eip-${RIPNo}`}>EIP</Link> or <Link color="blue.300" href={`/ercs/erc-${RIPNo}`}>ERC</Link>. Please check again.
           </Text>
+          <br/>
+          <SearchBox/>
+          <br/>
           <Button
             colorScheme="blue"
             size="lg"
