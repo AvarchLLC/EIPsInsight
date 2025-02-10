@@ -82,7 +82,7 @@ const ReviewTracker = () => {
   const [Linechart, setLinechart] = useState<boolean>(false);
   const [loading4, setLoading4] = useState<boolean>(false);
 
-  const years = Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString());
+  const years = Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString());
   const months = [
     { name: 'Jan', value: '01' },
     { name: 'Feb', value: '02' },
@@ -134,7 +134,7 @@ const ReviewTracker = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
-      const additionalReviewers = ["CarlBeek", "nconsigny", "yoavw", "adietrichs"];
+      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
       // Merge the two arrays and ensure uniqueness
       const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
@@ -178,10 +178,31 @@ const ReviewTracker = () => {
     setShowReviewer(updatedReviewers);
   };
 
-  // Function to select only the active reviewers from the list
+  // Function to select only the active reviewers from the list selectEmeritusReviewers
   const selectActiveReviewers = () => {
+    const reviewers3=[ "lightclient", "SamWilsn", "xinbenlv", "g11tech","CarlBeek","nconsigny","yoavw", "adietrichs"];
     const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
-      acc[reviewer] = reviewers.includes(reviewer);
+      acc[reviewer] = reviewers3.includes(reviewer);
+      return acc;
+    }, {} as ShowReviewerType);
+  
+    setShowReviewer(updatedReviewers);
+  };
+
+  const selectEmeritusReviewers = () => {
+    const reviewers3=["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu"];
+    const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
+      acc[reviewer] = reviewers3.includes(reviewer);
+      return acc;
+    }, {} as ShowReviewerType);
+  
+    setShowReviewer(updatedReviewers);
+  };
+
+  const selectReviewers = () => {
+    const reviewers2= ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner"]
+    const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
+      acc[reviewer] = reviewers2.includes(reviewer);
       return acc;
     }, {} as ShowReviewerType);
   
@@ -445,7 +466,7 @@ const generateCSVData3 = (reviewer: string) => {
 
       // console.log("reviewers:",reviewers);
       // const githubHandles = await fetchReviewers();
-      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","CarlBeek", "nconsigny", "yoavw", "adietrichs"];
+      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
       const githubHandles2 = await fetchReviewers();
       // console.log("active:",activereviewers);
       
@@ -1563,7 +1584,7 @@ const editorsSpecialityChart = () => {
   const yearlyChartData3 = formatChartData(processData3);
   // console.log("new chart data:",yearlyChartData1)
 
-  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech","CarlBeek", "nconsigny", "yoavw", "adietrichs"];
+  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
   // Step 1: Filter the data to include only target reviewers
   const filteredEIPData = yearlyChartData1.filter((item) =>
@@ -1980,7 +2001,7 @@ const router = useRouter();
                 {selectedStartYear ? `${selectedStartYear}` : 'Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
                   <MenuItem
                     key={year}
                     onClick={() => setSelectedStartYear(year)}
@@ -2038,7 +2059,7 @@ const router = useRouter();
                 {selectedEndYear ? `${selectedEndYear}` : 'Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
                   <MenuItem
                     key={year}
                     onClick={() => setSelectedEndYear(year)}
@@ -2107,17 +2128,28 @@ const router = useRouter();
                 </Text>
               </MenuItem>
 
-              
-              {/* <MenuItem onClick={selectAllReviewers}>
+              <MenuItem onClick={selectAllReviewers}>
                 <Text as="span" fontWeight="bold" textDecoration="underline">
-                Emeritus Editors
+                Select All
                 </Text>
-              </MenuItem> */}
+              </MenuItem>
 
               
               <MenuItem onClick={selectActiveReviewers}>
                 <Text as="span" fontWeight="bold" textDecoration="underline">
-                  Select All
+                  Select Active
+                </Text>
+              </MenuItem>
+
+              <MenuItem onClick={selectEmeritusReviewers}>
+                <Text as="span" fontWeight="bold" textDecoration="underline">
+                  Select Emeritus
+                </Text>
+              </MenuItem>
+
+              <MenuItem onClick={selectReviewers}>
+                <Text as="span" fontWeight="bold" textDecoration="underline">
+                Select Reviewers
                 </Text>
               </MenuItem>
 
@@ -2444,7 +2476,7 @@ const router = useRouter();
                 {selectedStartYear2 ? `${selectedStartYear2}` : 'Select Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
                   <MenuItem key={year} onClick={() => setSelectedStartYear2(year)} bg="white" color="black">
                     {year}
                   </MenuItem>
@@ -2497,7 +2529,7 @@ const router = useRouter();
                   {selectedEndYear2 ? `${selectedEndYear2}` : 'Select Year'}
                 </MenuButton>
                 <MenuList bg="white" color="black" borderColor="blue.500">
-                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2015 + i).toString()).map((year) => (
+                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
                     <MenuItem
                       key={year}
                       onClick={() => setSelectedEndYear2(year)}

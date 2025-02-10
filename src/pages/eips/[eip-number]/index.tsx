@@ -7,6 +7,7 @@ import NLink from "next/link";
 import { motion } from "framer-motion";
 import React from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import SearchBox from "@/components/SearchBox";
 import {
   Container,
   Box,
@@ -209,8 +210,11 @@ const TestComponent = () => {
             EIP Not Found
           </Heading>
           <Text color="gray.500" fontSize="xl" mb={6}>
-            This EIP might not exist or could be an ERC or an RIP. Please check again.
+            This EIP might not exist or could be an <Link color="blue.300" href={`/ercs/erc-${eipNo}`}>ERC</Link> or an <Link color="blue.300" href={`/rips/rip-${eipNo}`}>RIP</Link>. Please check again.
           </Text>
+          <br/>
+          <SearchBox/>
+          <br/>
           <Button
             colorScheme="blue"
             size="lg"
