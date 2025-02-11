@@ -19,6 +19,8 @@ import { usePathname } from "next/navigation";
 import { CSVLink } from "react-csv";
 import axios from "axios";
 import DateTime from "./DateTime";
+import * as XLSX from "xlsx";
+
 
 interface StatusChange {
   _id: string;
@@ -49,6 +51,16 @@ interface StatusChange {
     repo: string;
   }[];
   repo: string;
+}
+
+interface CSVData {
+  repo: string;
+  eip: string;
+  title: string;
+  fromStatus: string;
+  toStatus: string;
+  deadline: string;
+  link: string;
 }
 
 interface APIData {
@@ -449,8 +461,9 @@ export default function InsightSummary() {
     };
   });
 
-  const generateCSVData = () => {
-    console.log("input data", data)
+  const generateCSVData = (data: StatusChange[]): CSVData[] => {
+    console.log("Input data:", data);
+  
     const csvData = data.flatMap((item) =>
       item.statusChanges.map((statusChange) => ({
         repo: item.repo,
@@ -462,11 +475,115 @@ export default function InsightSummary() {
         link: `https://eipsinsight.com/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${statusChange.eip}`,
       }))
     );
-    console.log("Oputput data:", csvData)
-    setCsvData(csvData)
   
+    console.log("Output data:", csvData);
     return csvData;
   };
+
+  const handleDownload = async (e: React.MouseEvent, data: StatusChange[], year: number, month: number) => {
+    e.preventDefault(); // Prevent default CSVLink behavior
+  
+    try {
+      // Generate the CSV data
+      const csvData = generateCSVData(data);
+  
+      // Check if CSV data is empty
+      if (csvData.length === 0) {
+        console.error("CSV data is empty or not generated correctly.");
+        return;
+      }
+  
+      // Generate the summary
+      const summary = generateSummary(csvData);
+  
+      // Create and download the Excel file with the summary
+      downloadExcelWithSummary(csvData, summary, year, month);
+  
+      // Trigger the API call to update the download counter
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error during download process:", error);
+    }
+  };
+  
+  const generateSummary = (csvData: CSVData[]): string => {
+    const summary: Record<string, Record<string, number>> = {
+        eip: {},
+        erc: {},
+        rip: {},
+    };
+
+    // Count transitions for each repo
+    csvData.forEach((item) => {
+        const { repo, toStatus } = item;
+
+        if (repo in summary) {
+            if (!summary[repo][toStatus]) {
+                summary[repo][toStatus] = 0;
+            }
+            summary[repo][toStatus] += 1;
+        }
+    });
+
+    // Format the summary text
+    let summaryText = "📊:\n\n";
+    let hasData = false;
+
+    const formatSummary = (repo: string, label: string) => {
+        if (Object.keys(summary[repo]).length > 0) {
+            hasData = true;
+            const text = Object.entries(summary[repo])
+                .map(([status, count]) => `${count} proposals transitioned to ${status}`)
+                .join(", ");
+            return `#${label}: ${text}.\n\n`;
+        }
+        return "";
+    };
+
+    summaryText += formatSummary("eip", "EIPs");
+    summaryText += formatSummary("erc", "ERCs");
+    summaryText += formatSummary("rip", "RIPs");
+
+    return hasData ? "Summary "+summaryText.trim() : "No summary available.";
+};
+
+  
+const downloadExcelWithSummary = (csvData: CSVData[], summary: string, year: number, month: number) => {
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
+
+  // Convert CSV data to a worksheet
+  const worksheet = XLSX.utils.json_to_sheet(csvData);
+
+  // Determine the row index where the summary should be placed (below data)
+  const lastRowIndex = csvData.length + 2;
+
+  // Add summary text to the merged cell
+  XLSX.utils.sheet_add_aoa(worksheet, [[summary]], { origin: `A${lastRowIndex}` });
+
+  // Merge 5 columns (A to E) and 6 rows (lastRowIndex to lastRowIndex + 5)
+  if (!worksheet['!merges']) worksheet['!merges'] = [];
+  worksheet['!merges'].push({ 
+      s: { r: lastRowIndex - 1, c: 0 }, // Start at A
+      e: { r: lastRowIndex + 1, c: 10 }  // Merge 5 columns (A to E) and 6 rows
+  });
+
+  // Adjust row heights for better visibility
+  if (!worksheet['!rows']) worksheet['!rows'] = [];
+  for (let i = 0; i < 6; i++) {
+      worksheet['!rows'][lastRowIndex - 1 + i] = { hpt: 20 }; // Increase height for better visibility
+  }
+
+  // Apply styles: bold text, yellow background, text wrapping, and top-left alignment
+  
+
+  // Append the worksheet to the workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+
+  // Write the workbook to a file
+  XLSX.writeFile(workbook, `StatusChanges-${year}-${month}.xlsx`);
+};
+
 
   return (
     <>
@@ -492,32 +609,38 @@ export default function InsightSummary() {
   </Text>
 
   {/* Download button next to the text */}
-  <CSVLink 
+  {/* <CSVLink 
     data={csvData.length ? csvData : []} 
     filename={`StatusChanges-${year}-${month}.csv`} 
     onClick={async (e: any) => {
       try {
-        // Generate the CSV data
+        
         generateCSVData();
   
-        // Check if CSV data is empty and prevent default behavior
+        
         if (csvData.length === 0) {
           e.preventDefault();
           console.error("CSV data is empty or not generated correctly.");
           return;
         }
   
-        // Trigger the API call to update the download counter
+       
         await axios.post("/api/DownloadCounter");
       } catch (error) {
         console.error("Error triggering download counter:", error);
       }
     }}
-  >
-    <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue">
+  > */}
+    {/* <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue">
       {loading2 ? <Spinner size="sm" /> : "Download CSV"}
-    </Button>
-  </CSVLink>
+    </Button> */}
+    <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue" onClick={async (e) =>{
+      handleDownload(e, data, parseInt(year), parseInt(month))
+      await axios.post("/api/DownloadCounter");
+    } }>
+  Download Report
+</Button>
+  {/* </CSVLink> */}
 </Flex>
       <TableContainer bg={bg} padding={4} rounded={"xl"} marginTop={8}>
         <Table variant="simple" size="md" bg={bg} padding={8}>
