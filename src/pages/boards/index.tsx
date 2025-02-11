@@ -30,6 +30,72 @@ import {
     const prMatch = url.match(/\/pull\/(\d+)/);
     return prMatch ? prMatch[1] : "N/A";
   };
+
+  const labelColors: { [key: string]: { color: string; description: string } } = {
+    // General or Unlabeled
+    "unlabeled": { color: "gray.500", description: "No specific label applied." },
+    "1272989785": { color: "gray.600", description: "No specific description available." },
+  
+    // Review/Waiting Labels
+    "a-review": { color: "yellow.500", description: "Waiting on author to review." },
+    "e-review": { color: "blue.400", description: "Waiting on editor to review." },
+    "e-consensus": { color: "orange.400", description: "Waiting on editor consensus." },
+    "w-response": { color: "yellow.600", description: "Waiting on author response." },
+    "w-ci": { color: "red.500", description: "Waiting on CI to pass." },
+    "w-stale": { color: "gray.900", description: "Waiting on activity." },
+  
+    // Bug and Enhancements
+    "bug": { color: "red.600", description: "Fixes or reports a bug." },
+    "enhancement": { color: "green.500", description: "Adds new features or improvements." },
+  
+    // Creation and Modification Labels
+    "c-new": { color: "teal.500", description: "Creates a brand new proposal." },
+    "c-status": { color: "blue.600", description: "Changes a proposal's status." },
+    "c-update": { color: "cyan.500", description: "Modifies an existing proposal." },
+  
+    // Dependencies
+    "dependencies": { color: "purple.500", description: "Pull requests that update a dependency file." },
+    "e-blocked": { color: "red.700", description: "Requires another open PR to be merged." },
+    "e-blocking": { color: "pink.500", description: "Required to be merged by another open PR." },
+    "e-circular": { color: "orange.600", description: "Circular dependency requires manual merging." },
+    "w-dependency": { color: "orange.700", description: "This EIP depends on another EIP with a less stable status." },
+  
+    // Status Labels
+    "s-draft": { color: "purple.700", description: "This EIP is a Draft." },
+    "s-final": { color: "green.600", description: "This EIP is Final." },
+    "s-lastcall": { color: "orange.500", description: "This EIP is in Last Call." },
+    "s-review": { color: "blue.500", description: "This EIP is in Review." },
+    "s-stagnant": { color: "gray.800", description: "This EIP is Stagnant." },
+    "s-withdrawn": { color: "red.800", description: "This EIP is Withdrawn." },
+    "stagnant": { color: "gray.700", description: "Marked as stagnant." },
+    "stale": { color: "gray.600", description: "No recent activity." },
+  
+    // Topics/Types
+    "t-core": { color: "blue.600", description: "Related to core functionality." },
+    "t-erc": { color: "teal.600", description: "Related to ERC standards." },
+    "t-informational": { color: "cyan.600", description: "Provides informational guidance." },
+    "t-interface": { color: "purple.600", description: "Related to interface design." },
+    "t-meta": { color: "yellow.500", description: "Meta-related proposals." },
+    "t-networking": { color: "green.700", description: "Networking-related proposals." },
+    "t-process": { color: "pink.600", description: "Relates to EIP process." },
+    "t-security": { color: "red.600", description: "Relates to security." },
+  
+    // Miscellaneous
+    "created-by-bot": { color: "gray.500", description: "Created by a bot." },
+    "discussions-to": { color: "cyan.700", description: "Points to related discussions." },
+    "e-number": { color: "blue.700", description: "Waiting on EIP Number assignment." },
+    "question": { color: "purple.700", description: "Denotes a question or inquiry." },
+    "javascript": { color: "orange.600", description: "Pull requests that update Javascript code." },
+    "ruby": { color: "red.600", description: "Pull requests that update Ruby code." },
+  
+    // Repository-Specific Labels
+    "r-ci": { color: "gray.400", description: "Relates to the CI." },
+    "r-eips": { color: "cyan.500", description: "Relates to EIP formatting or repository." },
+    "r-other": { color: "gray.600", description: "Relates to other parts of the EIPs repository." },
+    "r-process": { color: "blue.500", description: "Relates to the EIP process." },
+    "r-website": { color: "green.600", description: "Relates to the EIPs website." },
+  };
+  
   
   const DashboardPage = () => {
     const [eipData, setEipData] = useState([]);
@@ -45,7 +111,7 @@ import {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.get("/api/all_board");
+          const response = await axios.get("/api/FullBoards");
           setEipData(response.data.eips || []);
           setErcData(response.data.ercs || []);
           setIsLoading(false);
@@ -91,27 +157,24 @@ import {
 
 
 
-    const convertToCSV = (filteredData: any, type: string) => { 
+    const convertToCSV = (filteredData: any, type: string) => {
       const csvRows = [];
     
-      // Define the headers for the CSV: Serial Number, PR Number, URL
-      const headers = ['Serial Number', 'PR Number', 'URL'];
+      // Define the headers for the CSV
+      const headers = ['Serial Number', 'PR Number', 'PR Title', 'Labels', 'Created Date', 'URL'];
     
       // Add headers to CSV rows
       csvRows.push(headers.join(','));
     
-      // Combine arrays for EIPs or ERCs
-      const items = [
-        ...(Array.isArray(filteredData) ? filteredData : [])
-      ];
-    
-      // Add data to CSV rows
-      items.forEach((item: any, index: number) => {
-        const prNumber = extractPrNumber(item.url); // Extract the PR number from the URL
+      // Iterate over the filtered data and extract necessary fields
+      filteredData.forEach((item: any, index: number) => {
         const row = [
-          index + 1,          // Serial Number
-          prNumber,           // PR Number
-          item.url            // URL
+          index + 1,                              // Serial Number
+          item.prNumber,                          // PR Number
+          item.prTitle,                           // PR Title
+          item.labels.join('; '),                 // Labels (joined with semicolon)
+          new Date(item.prCreatedDate).toLocaleDateString(), // Created Date        
+          item.prLink                             // URL
         ].join(',');
     
         csvRows.push(row);
@@ -119,6 +182,7 @@ import {
     
       return csvRows.join('\n');
     };
+    
     
   
     if (isLoading) {
@@ -345,6 +409,12 @@ import {
         <Th textAlign="center" minWidth="10rem" color="white">
           PR Number
         </Th>
+        <Th textAlign="center" minWidth="10rem" color="white">
+          PR Date
+        </Th>
+        <Th textAlign="center" minWidth="10rem" color="white">
+          Labels
+        </Th>
         <Th textAlign="center" borderTopRightRadius="10px" minWidth="10rem" color="white">
           PR Link
         </Th>
@@ -361,19 +431,7 @@ import {
       ) : (
         displayedData.map((item: any, index: number) => (
           <Tr key={item._id} height="40px"> {/* Adjust row height */}
-            <Td textAlign="center">
-              <Box
-                bg="gray.600"
-                color="white"
-                borderRadius="md"
-                paddingX="8px" // Smaller horizontal padding
-                paddingY="4px" // Smaller vertical padding
-                fontSize="md" // Adjust text size
-                display="inline-block"
-              >
-                {index + 1}
-              </Box>
-            </Td>
+            {/* Index */}
             <Td textAlign="center">
               <Box
                 bg="gray.600"
@@ -384,29 +442,87 @@ import {
                 fontSize="md"
                 display="inline-block"
               >
-                {extractPrNumber(item.url)}
+                {index + 1}
               </Box>
             </Td>
+      
+            {/* PR Number */}
+            <Td textAlign="center">
+              <Box
+                bg="gray.600"
+                color="white"
+                borderRadius="md"
+                paddingX="8px"
+                paddingY="4px"
+                fontSize="md"
+                display="inline-block"
+              >
+                {item.prNumber}
+              </Box>
+            </Td>
+      
+            {/* PR Created Date */}
+            <Td textAlign="center">
+              <Box
+                bg="gray.600"
+                color="white"
+                borderRadius="md"
+                paddingX="8px"
+                paddingY="4px"
+                fontSize="md"
+                display="inline-block"
+              >
+                {new Date(item.prCreatedDate).toLocaleDateString()}
+              </Box>
+            </Td>
+      
+            {/* Labels */}
+            <Td textAlign="center">
+              <Box display="flex" flexWrap="wrap" gap="8px" justifyContent="center">
+              {item.labels.map((label: string, idx: number) => {
+              // Use the mapped color or a fallback color if the label is not in labelColors
+              const { color } = labelColors[label.toLowerCase()] || { color: "gray.400" };
+
+              return (
+                <Box
+                  key={idx}
+                  bg={color}
+                  color="white"
+                  borderRadius="full"
+                  paddingX="10px"
+                  paddingY="4px"
+                  fontSize="sm"
+                >
+                  {label}
+                </Box>
+              );
+            })}
+
+              </Box>
+            </Td>
+      
+            {/* View PR Button */}
             <Td textAlign="center">
               <button
                 style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
                   border: 'none',
-                  padding: '4px 8px', // Smaller padding
-                  fontSize: '0.85rem', // Smaller font size
+                  padding: '6px 12px',
+                  fontSize: '0.85rem',
                   cursor: 'pointer',
                   borderRadius: '5px',
                 }}
               >
-                <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ color: '#ffffff', textDecoration: 'none' }}>
+                <a href={item.prLink} target="_blank" rel="noopener noreferrer" style={{ color: '#ffffff', textDecoration: 'none' }}>
                   View PR
                 </a>
               </button>
             </Td>
           </Tr>
         ))
-      )}
+      )
+      }
     </Tbody>
   </Table>
 </TableContainer>
