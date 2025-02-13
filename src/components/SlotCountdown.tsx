@@ -26,13 +26,13 @@ const networks: Record<string, NetworkConfig> = {
   sepolia: {
     beaconApi: "https://ethereum-sepolia-beacon-api.publicnode.com",
     rpc: "https://ethereum-sepolia-rpc.publicnode.com",
-    target: 7020544,
+    target: 7118848,
     name: "Sepolia",
   },
   holesky: {
     beaconApi: "https://ethereum-holesky-beacon-api.publicnode.com",
     rpc: "https://ethereum-holesky-rpc.publicnode.com",
-    target: 3620864,
+    target: 3710976,
     name: "Holesky",
   },
   mainnet: {
