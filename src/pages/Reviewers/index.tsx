@@ -273,24 +273,99 @@ const ReviewTracker = () => {
     setCsvData(csv); 
   };
 
-  const generateCSVData2 = () => {
-    
-    const filteredData =downloaddata;
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+
+  const generateCSVData11 = () => {
+    if (!selectedYear || !selectedMonth) {
+      console.error('Year and Month must be selected to generate CSV');
+      return;
+    }
+
+    // console.log(data)
+  
+    const filteredData = data.filter((pr: PR) => reviewersList.includes(pr.reviewer));
   
     const csv = filteredData.map((pr: PR) => ({
-      PR_Number: pr.prNumber,
-      Title: pr.prTitle,
-      Reviewer: pr.reviewer,
-      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-    }));
-
+        PR_Number: pr.prNumber,
+        Title: pr.prTitle,
+        Reviewer: pr.reviewer,
+        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+      }))
+    ;
+  
     setCsvData(csv); 
+  };
+
+  const generateCSVData12 = () => {
+    if (!selectedYear || !selectedMonth) {
+      console.error('Year and Month must be selected to generate CSV');
+      return;
+    }
+
+    // console.log(data)
+  
+    const filteredData = data.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
+  
+    const csv = filteredData.map((pr: PR) => ({
+        PR_Number: pr.prNumber,
+        Title: pr.prTitle,
+        Reviewer: pr.reviewer,
+        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+      }))
+    ;
+  
+    setCsvData(csv); 
+  };
+
  
+
+
+const generateCSVData9 = () => {
+  // Filter data for reviewers only
+  const filteredData = downloaddata.filter((pr: PR) => reviewersList.includes(pr.reviewer));
+
+  const csv = filteredData.map((pr: PR) => ({
+    PR_Number: pr.prNumber,
+    Title: pr.prTitle,
+    Reviewer: pr.reviewer,
+    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+    Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+    Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+  }));
+
+  setCsvData(csv); // Set the CSV data for reviewers
+};
+
+const generateCSVData10 = () => {
+  // Filter data for editors only (exclude reviewers)
+  const filteredData = downloaddata.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
+
+  const csv = filteredData.map((pr: PR) => ({
+    PR_Number: pr.prNumber,
+    Title: pr.prTitle,
+    Reviewer: pr.reviewer,
+    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+    Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+    Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+  }));
+
+  setCsvData(csv); // Set the CSV data for editors
 };
 
 const generateCSVData5 = () => {
@@ -628,104 +703,164 @@ const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => 
 
 
 
-// // Function to render Leaderboard Charts
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
+  // List of reviewers (others are editors)
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+
+  // Get yearly data and format it
   const yearlyData = getYearlyData(data);
   const yearlyChartData = formatChartData(yearlyData);
 
-  return( 
-  <Box padding="2rem">
- 
-    <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
-      {/* Yearly Leaderboard Chart */}
-      <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color="black">
-            {`Editors Leaderboard`}<CopyLink link={`https://eipsinsight.com/Reviewers#Leaderboard`} />
-          </Heading>
-          {/* Assuming a download option exists for the yearly data as well */}
-          <CSVLink 
-            data={csvData.length ? csvData : []} 
-            filename={`reviews_data.csv`} 
-            // onClick={(e:any) => {
-            //   generateCSVData2();
-            //   if (csvData.length === 0) {
-            //     e.preventDefault(); 
-            //     console.error("CSV data is empty or not generated correctly.");
-            //   }
-            // }}
-            onClick={async () => {
-              try {
-                // Trigger the CSV conversion and download
-                generateCSVData2();
-          
-                // Trigger the API call
-                await axios.post("/api/DownloadCounter");
-              } catch (error) {
-                console.error("Error triggering download counter:", error);
-              }
-            }}
-          >
-            <Button fontSize={{ base: "0.6rem", md: "md" }}  colorScheme="blue">{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
-          </CSVLink>
-        </Flex>
-        <br/>
-        <Bar {...getBarChartConfig(yearlyChartData)} />
-      </Box>
-    </Flex>
-  
-</Box>
-)
+  // Separate data into reviewers and editors
+  const reviewersData = yearlyChartData?.filter((item: any) => reviewersList.includes(item.reviewer));
+  const editorsData = yearlyChartData?.filter((item: any) => !reviewersList.includes(item.reviewer));
+
+  return (
+    <Box padding="2rem">
+      <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap="2rem">
+        {/* Editors Chart */}
+        <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+            <Heading size="md" color="black">
+              {`Editors Leaderboard`}
+              <CopyLink link={`https://eipsinsight.com/Editors#Leaderboard`} />
+            </Heading>
+            <CSVLink
+              data={csvData.length ? csvData : []} 
+              filename={`editors_yearly_data.csv`}
+              onClick={async () => {
+                try {
+                  // Trigger the API call
+                  generateCSVData10();
+
+                  await axios.post("/api/DownloadCounter");
+                } catch (error) {
+                  console.error("Error triggering download counter:", error);
+                }
+              }}
+            >
+              <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue">
+                {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+              </Button>
+            </CSVLink>
+          </Flex>
+          <br />
+          <Bar {...getBarChartConfig(editorsData)} />
+        </Box>
+        {/* Reviewers Chart */}
+        <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+            <Heading size="md" color="black">
+              {`Reviewers Leaderboard`}
+              <CopyLink link={`https://eipsinsight.com/Reviewers#Leaderboard`} />
+            </Heading>
+            <CSVLink
+              data={csvData.length ? csvData : []} 
+              filename={`reviewers_yearly_data.csv`}
+              onClick={async () => {
+                try {
+                  // Trigger the API call
+                  generateCSVData9();
+
+                  await axios.post("/api/DownloadCounter");
+                } catch (error) {
+                  console.error("Error triggering download counter:", error);
+                }
+              }}
+            >
+              <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue">
+                {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+              </Button>
+            </CSVLink>
+          </Flex>
+          <br />
+          <Bar {...getBarChartConfig(reviewersData)} />
+        </Box>
+
+        
+      </Flex>
+    </Box>
+  );
 };
 
 
 const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
-  
-  
+  // List of reviewers (others are editors)
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+
   let monthlyChartData: any; // Declare monthlyChartData
   if (selectedMonth != null) {
     const monthlyData = getMonthlyData(data, selectedYear, selectedMonth);
     monthlyChartData = formatChartData(monthlyData); // Assign to the declared variable
   }
+  console.log("chartdata1: ", monthlyChartData);
 
-  // const yearlyChartData = formatChartData(yearlyData);
+  // Separate data into reviewers and editors
+  const reviewersData = monthlyChartData?.filter((item: any) => reviewersList.includes(item.reviewer));
+  const editorsData = monthlyChartData?.filter((item: any) => !reviewersList.includes(item.reviewer));
 
-  return( 
-  <Box padding="2rem">
-  {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
-    <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
-    <Box width={{ base: "100%", md: "45%" }} padding="1rem">
-      <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-        <Heading size="md" color="black">
-            {`Editors Leaderboard (Monthly)`}
-          </Heading>
-          <CSVLink 
-            data={csvData.length ? csvData : []} 
-            filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
-           
-            onClick={async () => {
-              try {
-                // Trigger the CSV conversion and download
-                generateCSVData();
+  return (
+    <Box padding="2rem">
+      {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
+        <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap="2rem">
+          {/* Editors Chart */}
+          <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+              <Heading size="md" color="black">
+                {`Editors Leaderboard (Monthly)`}
+              </Heading>
+              <CSVLink
+                data={csvData.length ? csvData : []}
+                filename={`editors_${selectedYear}_${selectedMonth}.csv`}
+                onClick={async () => {
+                  try {
+                    generateCSVData12();
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
+              >
+                <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }}>
+                  {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+                </Button>
+              </CSVLink>
+            </Flex>
+            <br />
+            <Bar {...getBarChartConfig(editorsData)} />
+          </Box>
+          {/* Reviewers Chart */}
+          <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+              <Heading size="md" color="black">
+                {`Reviewers Leaderboard (Monthly)`}
+              </Heading>
+              <CSVLink
+                data={csvData.length ? csvData : []} 
+                filename={`reviewers_${selectedYear}_${selectedMonth}.csv`}
+                onClick={async () => {
+                  try {
+                    generateCSVData11();
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
+              >
+                <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }}>
+                  {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+                </Button>
+              </CSVLink>
+            </Flex>
+            <br />
+            <Bar {...getBarChartConfig(reviewersData)} />
+          </Box>
+
           
-                // Trigger the API call
-                await axios.post("/api/DownloadCounter");
-              } catch (error) {
-                console.error("Error triggering download counter:", error);
-              }
-            }}
-          >
-            <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }} >{loading3 ? <Spinner size="sm" /> : "Download CSV"}</Button>
-          </CSVLink>
         </Flex>
-        <br/>
-        <Bar {...getBarChartConfig(monthlyChartData)} />
-      </Box>
-    </Flex>
-  )}
-  
-</Box>
-)
+      )}
+    </Box>
+  );
 };
 
 
