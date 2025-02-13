@@ -24,6 +24,7 @@ import {
   import {ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
   import { DownloadIcon } from "@chakra-ui/icons";
   import Comments from "@/components/comments";
+  import LabelFilter from "@/components/LabelFilter";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {
@@ -96,6 +97,14 @@ import {
     "r-website": { color: "green.600", description: "Relates to the EIPs website." },
   };
   
+  interface EIPData {
+    _id: string;
+    prNumber: string;
+    prTitle: string;
+    labels: string[];
+    prCreatedDate: string;
+    prLink: string;
+  }
   
   const DashboardPage = () => {
     const [eipData, setEipData] = useState([]);
@@ -104,8 +113,22 @@ import {
     const [hasError, setHasError] = useState(false);
     const [activeTab, setActiveTab] = useState('EIPs'); // Default to 'EIPs'
     const [show, setShow] = useState(false);
+    const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
     const toggleCollapse = () => setShow(!show);
+  
+    const handleLabelToggle = (label: string) => {
+      setSelectedLabels((prev) =>
+        prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
+      );
+    };
+  
+    const filteredData = (data: EIPData[]) => {
+      if (selectedLabels.length === 0) return data;
+      return data.filter((item) =>
+        item.labels.some((label) => selectedLabels.includes(label))
+      );
+    };
   
     // Fetch data from the API
     useEffect(() => {
@@ -124,6 +147,11 @@ import {
   
       fetchData();
     }, []);
+
+    const displayedData = activeTab === "EIPs" ? filteredData(eipData) : filteredData(ercData);
+
+  // Extract unique labels for the filter
+  const allLabels = Array.from(new Set([...eipData, ...ercData].flatMap((item:EIPData) => item.labels)));
 
     const handleDownload = () => {
       
@@ -208,7 +236,7 @@ import {
     }
   
     // Determine which data to show based on the active tab
-    const displayedData = activeTab === 'EIPs' ? eipData : ercData;
+    // const displayedData = activeTab === 'EIPs' ? eipData : ercData;
   
     return (
       <AllLayout>
@@ -414,6 +442,11 @@ import {
         </Th>
         <Th textAlign="center" minWidth="10rem" color="white">
           Labels
+          <LabelFilter
+                      labels={allLabels}
+                      selectedLabels={selectedLabels}
+                      onLabelToggle={handleLabelToggle}
+          />
         </Th>
         <Th textAlign="center" borderTopRightRadius="10px" minWidth="10rem" color="white">
           PR Link

@@ -81,55 +81,55 @@ const EIPsInsightRecap = () => {
             The goal of Ethereum Request for Change (ERCs) is to standardize and provide high-quality documentation for the Ethereum application layer. This repository tracks past and ongoing improvements application standards in the form of ERCs.
               </Text>
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-                <Link  href="/eips/eip-1"
+                <Link  href="/ercs/erc-1"
                 isExternal
                 color="blue.500"
                 textDecoration="underline"
-                _hover={{  color: "blue.700" }}>EIP-1</Link> governs how EIPs and ERCs are published.
+                _hover={{  color: "blue.700" }}>ERC-1</Link> governs how ERCs are published.
               </Text>
             </Box>
             </Stack>
 
             <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-  The <Link href="/status">status page</Link> tracks and lists both EIPs and ERCs, which can be divided into the following categories:
+  The <Link href="/status">status page</Link> tracks and lists ERCs, which can be divided into the following categories:
 </Text>
 <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
-  <li>
+  {/* <li>
     <b>
       <Link href="/core" className="text-blue-500 underline">Core EIPs</Link>
     </b> are improvements to the Ethereum consensus protocol.
-  </li>
-  <li>
+  </li> */}
+  {/* <li>
     <b>
       <Link href="/networking" className="text-blue-500 underline">Networking EIPs</Link>
     </b> specify the peer-to-peer networking layer of Ethereum.
-  </li>
-  <li>
+  </li> */}
+   <li>
     <b>
-      <Link href="/interface" className="text-blue-500 underline">Interface EIPs</Link>
+      <Link href="/interface" className="text-blue-500 underline">Interface ERCs</Link>
     </b> standardize interfaces to Ethereum, determining how users and applications interact with the blockchain.
   </li>
-  <li>
+  {/*<li>
     <b>
       <Link href="/erc" className="text-blue-500 underline">ERCs</Link>
     </b> specify application layer standards, determining how applications running on Ethereum can interact with each other.
-  </li>
+  </li> */}
   <li>
     <b>
-      <Link href="/meta" className="text-blue-500 underline">Meta EIPs</Link>
+      <Link href="/meta" className="text-blue-500 underline">Meta ERCs</Link>
     </b> are miscellaneous improvements that nonetheless require some sort of consensus.
   </li>
   <li>
     <b>
-      <Link href="/informational" className="text-blue-500 underline">Informational EIPs</Link>
+      <Link href="/informational" className="text-blue-500 underline">Informational ERCs</Link>
     </b> are non-standard improvements that do not require any form of consensus.
   </li>
 </ul>
 <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
   Before you write an ERC, ideas MUST be thoroughly discussed on <Link href="https://ethereum-magicians.org/" className="text-blue-500 underline">Ethereum Magicians</Link> or <Link href="https://ethresear.ch/t/read-this-before-posting/8" className="text-blue-500 underline">Ethereum Research</Link>. Once consensus is reached, thoroughly read and review 
-  {" "}<Link href="/eips/eip-1" className="text-blue-500 underline">
-    EIP-1
-  </Link>, which describes the EIP/ERC process.
+  {" "}<Link href="/ercs/erc-1" className="text-blue-500 underline">
+    ERC-1
+  </Link>, which describes the ERC process.
 </Text>
 
               

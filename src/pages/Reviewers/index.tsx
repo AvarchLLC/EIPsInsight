@@ -641,7 +641,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
       <Box width={{ base: "100%", md: "45%" }} padding="1rem">
         <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
-            {`Editors Leaderboard`}<CopyLink link={`https://eipsinsight.com//Reviewers#Leaderboard`} />
+            {`Editors Leaderboard`}<CopyLink link={`https://eipsinsight.com/Reviewers#Leaderboard`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <CSVLink 
@@ -694,7 +694,6 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
   <Box padding="2rem">
   {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
     <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
-    {/* Yearly Leaderboard Chart */}
     <Box width={{ base: "100%", md: "45%" }} padding="1rem">
       <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
         <Heading size="md" color="black">
@@ -703,13 +702,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
           <CSVLink 
             data={csvData.length ? csvData : []} 
             filename={`reviews_${selectedYear}_${selectedMonth}.csv`} 
-            // onClick={(e:any) => {
-            //   generateCSVData();
-            //   if (csvData.length === 0) {
-            //     e.preventDefault(); 
-            //     console.error("CSV data is empty or not generated correctly.");
-            //   }
-            // }}
+           
             onClick={async () => {
               try {
                 // Trigger the CSV conversion and download
@@ -1029,7 +1022,7 @@ const reviewerCharts = reviewers.map((reviewer) => {
     >
       {reviewer}
     </a>
-    {/* <CopyLink link={`https://eipsinsight.com//Reviewers#${reviewer}`}/> */}
+    {/* <CopyLink link={`https://eipsinsight.com/Reviewers#${reviewer}`}/> */}
   </Flex>
 
   {/* CSV Download Button */}
@@ -1679,9 +1672,14 @@ const router = useRouter();
 
   useEffect(() => {
     if (!loading) {
-      scrollToHash();
+      const timeout = setTimeout(() => {
+        scrollToHash();
+      }, 1000); // 1 second delay
+  
+      return () => clearTimeout(timeout); // Cleanup timeout on unmount
     }
   }, [loading]);
+  
 
   useLayoutEffect(() => {
     router.events.on("routeChangeComplete", scrollToHash);
@@ -1898,7 +1896,7 @@ const router = useRouter();
   <Box id="Monthly" className={"w-full"}>
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
       <Heading size="md" color="black">
-        {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com//Reviewers#Monthly`} />
+        {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com/Reviewers#Monthly`} />
       </Heading>
       <Flex alignItems="center">
         <CSVLink
@@ -2420,7 +2418,9 @@ const router = useRouter();
     )}
             <br/>
             <Box className="w-full">
+            {/* <br/> */}
               {renderCharts3()} 
+              {/* <br/> */}
             </Box>
             <br/>
 
@@ -2443,7 +2443,7 @@ const router = useRouter();
               marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com//Reviewers#ActivityTimeline`} />
+            > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
             </Heading> 
               <Flex alignItems="center">
                 <Button
@@ -2606,7 +2606,7 @@ const router = useRouter();
               marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors PR reviews in each Repository <CopyLink link={`https://eipsinsight.com//Reviewers#Speciality`} />
+            > Active Editors PR reviews in each Repository <CopyLink link={`https://eipsinsight.com/Reviewers#Speciality`} />
             </Heading>
               {editorsSpecialityChart()}
             </Box>
