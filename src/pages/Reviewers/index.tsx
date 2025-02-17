@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import CopyLink from "@/components/CopyLink";
 import { useRouter } from "next/router";
 import { DownloadIcon } from "@chakra-ui/icons";
+import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -1198,7 +1199,7 @@ const reviewerCharts = reviewers.map((reviewer) => {
 
   {/* DateTime Component */}
   <Box className="w-full" style={{ marginTop: "20px" }}>
-    <DateTime />
+    <LastUpdatedDateTime  name="EditorsTool"/>
   </Box>
 </Box>
 
@@ -2010,7 +2011,7 @@ const router = useRouter();
             
             <Box id="Leaderboard" className="w-full">
               {renderCharts(chart1data, selectedYear, selectedMonth)}
-              <DateTime />
+              <LastUpdatedDateTime  name="EditorsTool"/>
             </Box>
           </Box>
           <br />
@@ -2312,7 +2313,7 @@ const router = useRouter();
 
    
     {Linechart ? renderChart4() : renderChart()}
-    <DateTime />
+    <LastUpdatedDateTime  name="EditorsTool"/>
   </Box>
 
 
@@ -2508,7 +2509,7 @@ const router = useRouter();
           >
             <Box className="w-full">
               {renderCharts2(chart1data, selectedYear, selectedMonth)}
-              <DateTime />
+              <LastUpdatedDateTime  name="EditorsTool"/>
             </Box>
           </Box>
         </Box>
