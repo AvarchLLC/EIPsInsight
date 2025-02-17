@@ -4,6 +4,7 @@ import InsightsOpenPrsIssues from "@/components/InsightOpenPrsIssues";
 import InsightSummary from "@/components/InsightSummaryTable";
 import { usePathname } from "next/navigation";
 import DateTime from "./DateTime";
+import LastUpdatedDateTime from "./LastUpdatedDateTime";
 
 const MyComponent = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -46,7 +47,8 @@ const MyComponent = () => {
     minHeight="550px"
   ><Box paddingTop={3}>
     <InsightSummary />
-    <DateTime/>
+    {/* <DateTime/> */}
+    <LastUpdatedDateTime name="RIPScheduler"/>
   </Box> 
   </Box>
 
@@ -72,7 +74,8 @@ const MyComponent = () => {
     </Box>
 
     <Box className={"w-full"} maxWidth="100%">
-      <DateTime />
+      {/* <DateTime /> */}
+      <LastUpdatedDateTime name="EditorsTool"/>
     </Box>
   </Box>
 </Flex>
@@ -93,6 +96,7 @@ const MyComponent = () => {
         overflowX="auto" // Enable horizontal scrolling if content overflows
       >
         <InsightsOpenPrsIssues />
+        <LastUpdatedDateTime name='AnalyticsScheduler'/>
       </Box>
     </Box>
   </>

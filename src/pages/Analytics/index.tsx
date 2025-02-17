@@ -34,6 +34,7 @@ import {ChevronUpIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import Comments from "@/components/comments";
 import { useRouter } from "next/router";
+import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 
 import CopyLink from "@/components/CopyLink";
 
@@ -1286,7 +1287,7 @@ const router = useRouter();
 
             {renderChart()}
             <Box className={"w-full"}>
-              <DateTime />
+              <LastUpdatedDateTime  name="AnalyticsScheduler"/>
             </Box>
             <Box mt={2}>
         <Text color="gray.500" fontStyle="italic" textAlign="center">
