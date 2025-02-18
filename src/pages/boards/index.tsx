@@ -104,6 +104,7 @@ import {
     labels: string[];
     prCreatedDate: string;
     prLink: string;
+    state: string;
   }
   
   const DashboardPage = () => {
@@ -124,11 +125,36 @@ import {
     };
   
     const filteredData = (data: EIPData[]) => {
-      if (selectedLabels.length === 0) return data;
-      return data.filter((item) =>
+      const filterAndSort = (items: EIPData[]) => {
+        return items
+          .filter((item) => {
+            // Ignore items with state 'closed'
+            if (item.state === "closed") return false;
+    
+            // Ignore items with both 'dependencies' and 'ruby' labels
+            const hasDependencies = item.labels.includes("dependencies");
+            const hasRuby = item.labels.includes("ruby");
+            if (hasDependencies && hasRuby) return false;
+    
+            return true;
+          })
+          .sort((a, b) => {
+            const aHasWithdrawn = a.labels.includes("s-withdrawn") ? 1 : 0;
+            const bHasWithdrawn = b.labels.includes("s-withdrawn") ? 1 : 0;
+            return aHasWithdrawn - bHasWithdrawn;
+          });
+      };
+    
+      if (selectedLabels.length === 0) {
+        return filterAndSort(data);
+      }
+    
+      return filterAndSort(data).filter((item) =>
         item.labels.some((label) => selectedLabels.includes(label))
       );
     };
+    
+    
   
     // Fetch data from the API
     useEffect(() => {
@@ -391,7 +417,7 @@ import {
         > */}
            <Flex justify="space-between" align="center" p={4}>
         <Heading as="h2" size="lg" color={useColorModeValue("#3182CE", "blue.300")}>
-          {activeTab} BOARD ({activeTab === 'EIPs' ? eipData.length : ercData.length})
+          {activeTab} BOARD ({displayedData.length})
         </Heading>
         <Button
           colorScheme="blue"
