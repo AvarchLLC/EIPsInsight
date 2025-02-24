@@ -17,6 +17,8 @@ import {
   Tbody, 
   Td, 
   Th, 
+  InputGroup,
+  InputRightElement,
   Thead, 
   Tr,
   Flex,
@@ -25,7 +27,7 @@ import {
   Spinner
 } from "@chakra-ui/react";
 import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody} from "@chakra-ui/react";
-import { InfoOutlineIcon } from "@chakra-ui/icons";
+import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   DownloadIcon,
   CheckIcon,
@@ -37,6 +39,29 @@ import { FaBold, FaItalic, FaLink, FaListUl, FaListOl, FaCheckSquare, FaCode, Fa
 // import { IconButton, Text, HStack } from '@chakra-ui/react';
 import { MarkdownViewer } from 'react-github-markdown';
 import { ErrorList } from "./ErrorToast";
+import axios from "axios";
+
+var initialTemplateData = {
+  eip:"<TBD>",
+  title: "",
+  description: "",
+  author: "",
+  discussionsTo: "",
+  status: "Draft",
+  "last-call-deadline": "",
+  type: "",
+  category: "",
+  created: "",
+  requires: "",
+  abstract: "",
+  motivation: "",
+  specification: "",
+  rationale: "TBD",
+  backwardsCompatibility: "No backward compatibility issues found.",
+  testCases: "",
+  referenceImplementation: "",
+  securityConsiderations: "Needs discussion.",
+};
 
 type TemplateData = typeof initialTemplateData;
 type TemplateDataKeys = keyof TemplateData;
@@ -48,7 +73,7 @@ const instructions: Record<string, string> = {
   "Author": "The list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Examples: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example: FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>",
   "Discussions To": "The URL pointing to the official discussion thread",
   "Status": "Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living",
-  "Last Call Deadline": "The date last call period ends on (Optional field, only needed when status is Last Call)",
+  "last-call-deadline": "The date last call period ends on (Optional field, only needed when status is Last Call)",
   "Type": "One of Standards Track, Meta, or Informational",
   "Category": "One of Core, Networking, Interface, or ERC (Optional field, only needed for Standards Track EIPs)",
   "Created": "Date the EIP was created on",
@@ -64,26 +89,6 @@ const instructions: Record<string, string> = {
 };
 
 
-
-const initialTemplateData = {
-  title: "",
-  description: "",
-  author: "",
-  discussionsTo: "",
-  status: "Draft",
-  type: "",
-  category: "",
-  created: "",
-  requires: "",
-  abstract: "",
-  motivation: "",
-  specification: "",
-  rationale: "TBD",
-  backwardsCompatibility: "No backward compatibility issues found.",
-  testCases: "",
-  referenceImplementation: "",
-  securityConsiderations: "Needs discussion.",
-};
 
 type Step = {
   label: string;
@@ -101,17 +106,106 @@ const EipTemplateEditor = () => {
   const [preview, setPreview] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'eip' | 'erc' | 'rip'>('eip');
+  const [activeTab2, setActiveTab2] = useState<'new' | 'import'>('new');
   const [validated, setValidated] = useState<boolean>(false);
+  const [searchNumber, setSearchNumber] = useState("");
+  const [isLoading2, setIsLoading2] = useState(false); 
+
 
   const toast = useToast();
 
+
+  // get back
+
+  useEffect(()=>{
+    if(initialTemplateData.status!=="Last Call"){
+      initialTemplateData["last-call-deadline"]="";
+    }
+  },[initialTemplateData]);
+
+
+const handleImport = async () => {
+  if (!searchNumber) return; // Do nothing if the search number is empty
+
+  setIsLoading(true);
+
+  // Construct the URLs based on the active tab
+  const urls = {
+    eip: `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${searchNumber}.md`,
+    erc: `https://raw.githubusercontent.com/ethereum/ERCs/master/ERCS/erc-${searchNumber}.md`,
+    rip: `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${searchNumber}.md`,
+  };
+
+  try {
+    const response = await axios.get(urls[activeTab]);
+    if (response.status === 200) {
+      const markdownContent = response.data;
+
+      // Extract fields from the markdown content
+      const extractedData = extractEIPData(markdownContent);
+
+      // Update the global variable with the extracted fields
+      Object.assign(initialTemplateData, extractedData);
+
+      console.log("Updated initialTemplateData:", initialTemplateData);
+    }
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+    // Handle error (e.g., show a toast notification)
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// Helper function to extract fields from the markdown content
+const extractEIPData = (markdownContent:any) => {
+  const extractedData:any = {};
+
+  // Regex patterns to extract fields
+  const patterns = {
+    eip: /eip:\s*(\d+)/i,
+    title: /title:\s*(.*)/i,
+    description: /description:\s*(.*)/i,
+    author: /author:\s*(.*)/i,
+    discussionsTo: /discussions-to:\s*(.*)/i,
+    status: /status:\s*(.*)/i,
+    "last-call-deadline": /last-call-deadline:\s*(.*)/i,
+    type: /type:\s*(.*)/i,
+    category: /category:\s*(.*)/i,
+    created: /created:\s*(.*)/i,
+    requires: /requires:\s*(.*)/i,
+    abstract: /## Abstract\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+    motivation: /## Motivation\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+    specification: /## Specification\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+    rationale: /## Rationale\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+    backwardsCompatibility: /## Backwards Compatibility\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+    testCases: /## Test Cases\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+    referenceImplementation: /## Reference Implementation\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+    securityConsiderations: /## Security Considerations\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+  };
+
+  // Extract data using regex patterns
+  for (const [key, pattern] of Object.entries(patterns)) {
+    const match = markdownContent.match(pattern);
+    if (match) {
+      extractedData[key] = match[1].trim();
+    } else {
+      extractedData[key] = ""; // Set to empty if not found
+    }
+  }
+
+  return extractedData;
+};
+
   const getInitialSteps = (type: 'eip' | 'erc' | 'rip'): Step[] => {
     const commonStepsBeforeStatus: Step[] = [
+      { label: "EIP", key: "eip", type: "input" },
       { label: "Title", key: "title", type: "input" },
       { label: "Description", key: "description", type: "textarea" },
       { label: "Author", key: "author", type: "input" },
       { label: "Discussions To", key: "discussionsTo", type: "input" },
-      { label: "Status", key: "status", type: "select", options: ["Draft"] },
+      { label: "Status", key: "status", type: "select", options: ["Draft", "Review", "Last Call", "Final", "Stagnant", "Withdrawn", "Living"] },
+      { label: "last-call-deadline", key: "last-call-deadline", type: "input" },
     ];
   
     const typeSpecificSteps: Step[] = 
@@ -176,40 +270,41 @@ const EipTemplateEditor = () => {
   const renderTemplate = () => {
 
     const template = `---
-eip: <TBD>
+eip: ${templateData.eip}
 title: ${templateData.title}
 description: ${templateData.description}
 author: ${templateData.author}
 discussions-to: ${templateData.discussionsTo}
 status: ${templateData.status}
+${templateData["last-call-deadline"] ? `last-call-deadline: ${templateData["last-call-deadline"]}` : ""}
 type: ${templateData.type}
 ${templateData.type === "Standards Track" && templateData.category ? `category: ${templateData.category}` : ""}
 created: ${templateData.created}
 ${templateData.requires ? `requires: ${templateData.requires}` : ""}
 ---
   
-## Abstract
+${templateData.abstract ? `## Abstract` : ""}
 ${templateData.abstract}
   
-## Motivation
+${templateData.motivation ? `## Motivation` : ""}
 ${templateData.motivation}
   
-## Specification
+${templateData.specification ? `## Specification` : ""}
 ${templateData.specification}
   
-## Rationale
+${templateData.rationale ? `## Rationale` : ""}
 ${templateData.rationale}
   
-## Backwards Compatibility
+${templateData.backwardsCompatibility ? `## Backwards Compatibility` : ""}
 ${templateData.backwardsCompatibility}
   
-## Test Cases
+${templateData.testCases ? `## Test Cases` : ""}
 ${templateData.testCases}
   
-## Reference Implementation
+${templateData.referenceImplementation ? `## Reference Implementation` : ""}
 ${templateData.referenceImplementation}
-  
-## Security Considerations
+
+${templateData.securityConsiderations ? `## Security Considerations` : ""}
 ${templateData.securityConsiderations}
   
 ## Copyright
@@ -224,46 +319,58 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       return `---\n${cleanedContent}\n---`;
     });
 
-    return cleanedTemplate
+    const cleanedContent2 = cleanedTemplate
+    .split("\n")
+    .filter((line, index, array) => {
+      // Remove empty lines if the previous line is also empty
+      if (line.trim() === "" && array[index - 1]?.trim() === "") {
+        return false;
+      }
+      return true;
+    })
+    .join("\n");
+
+    return cleanedContent2;
   };
 
   const rendermdfile = () => {
 
     const template = `---
-eip: <TBD>
+eip: ${templateData.eip}
 title: ${templateData.title}
 description: ${templateData.description}
 author: ${templateData.author}
 discussions-to: ${templateData.discussionsTo}
 status: ${templateData.status}
+${templateData["last-call-deadline"] ? `last-call-deadline: ${templateData["last-call-deadline"]}` : ""}
 type: ${templateData.type}
 ${templateData.type === "Standards Track" && templateData.category ? `category: ${templateData.category}` : ""}
 created: ${templateData.created}
 ${templateData.requires ? `requires: ${templateData.requires}` : ""}
 ---
   
-## Abstract
+${templateData.abstract ? `## Abstract` : ""}
 ${templateData.abstract}
   
-## Motivation
+${templateData.motivation ? `## Motivation` : ""}
 ${templateData.motivation}
   
-## Specification
+${templateData.specification ? `## Specification` : ""}
 ${templateData.specification}
   
-## Rationale
+${templateData.rationale ? `## Rationale` : ""}
 ${templateData.rationale}
   
-## Backwards Compatibility
+${templateData.backwardsCompatibility ? `## Backwards Compatibility` : ""}
 ${templateData.backwardsCompatibility}
   
-## Test Cases
+${templateData.testCases ? `## Test Cases` : ""}
 ${templateData.testCases}
   
-## Reference Implementation
+${templateData.referenceImplementation ? `## Reference Implementation` : ""}
 ${templateData.referenceImplementation}
-  
-## Security Considerations
+
+${templateData.securityConsiderations ? `## Security Considerations` : ""}
 ${templateData.securityConsiderations}
   
 ## Copyright
@@ -277,8 +384,18 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         .join("\n");
       return `---\n${cleanedContent}\n---`;
     });
+    const cleanedContent2 = cleanedTemplate
+    .split("\n")
+    .filter((line, index, array) => {
+      // Remove empty lines if the previous line is also empty
+      if (line.trim() === "" && array[index - 1]?.trim() === "") {
+        return false;
+      }
+      return true;
+    })
+    .join("\n");
 
-    return cleanedTemplate
+    return cleanedContent2;
   };
 
   const markdownContent = rendermdfile();
@@ -331,40 +448,41 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     }
   
     const template = `---
-eip: <TBD>
+eip: ${templateData.eip}
 title: ${templateData.title}
 description: ${templateData.description}
 author: ${templateData.author}
 discussions-to: ${templateData.discussionsTo}
 status: ${templateData.status}
+${templateData["last-call-deadline"] ? `last-call-deadline: ${templateData["last-call-deadline"]}` : ""}
 type: ${templateData.type}
 ${templateData.type === "Standards Track" && templateData.category ? `category: ${templateData.category}` : ""}
 created: ${templateData.created}
 ${templateData.requires ? `requires: ${templateData.requires}` : ""}
 ---
   
-## Abstract
+${templateData.abstract ? `## Abstract` : ""}
 ${templateData.abstract}
   
-## Motivation
+${templateData.motivation ? `## Motivation` : ""}
 ${templateData.motivation}
   
-## Specification
+${templateData.specification ? `## Specification` : ""}
 ${templateData.specification}
   
-## Rationale
+${templateData.rationale ? `## Rationale` : ""}
 ${templateData.rationale}
   
-## Backwards Compatibility
+${templateData.backwardsCompatibility ? `## Backwards Compatibility` : ""}
 ${templateData.backwardsCompatibility}
   
-## Test Cases
+${templateData.testCases ? `## Test Cases` : ""}
 ${templateData.testCases}
   
-## Reference Implementation
+${templateData.referenceImplementation ? `## Reference Implementation` : ""}
 ${templateData.referenceImplementation}
-  
-## Security Considerations
+
+${templateData.securityConsiderations ? `## Security Considerations` : ""}
 ${templateData.securityConsiderations}
   
 ## Copyright
@@ -378,6 +496,19 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
           .join("\n");
         return `---\n${cleanedContent}\n---`;
       });
+
+      const cleanedContent2 = cleanedTemplate
+    .split("\n")
+    .filter((line, index, array) => {
+      // Remove empty lines if the previous line is also empty
+      if (line.trim() === "" && array[index - 1]?.trim() === "") {
+        return false;
+      }
+      return true;
+    })
+    .join("\n");
+
+    // return cleanedContent2;
   
     console.log(cleanedTemplate);
   
@@ -387,7 +518,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ markdownContent: cleanedTemplate }),
+        body: JSON.stringify({ markdownContent: cleanedContent2 }),
       });
   
       const data: ValidationResponse = await response.json();
@@ -402,7 +533,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
                 continue; // Skip this error
               }
   
-              // Skip errors related to the `eip` field
+              // Skip errors related to the `eip` field (get back to this at the end)
               if (
                 message.message.includes("error[preamble-eip]") ||
                 message.message.includes("error[preamble-file-name]")
@@ -578,40 +709,41 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     const handleDownload = async () => {
 
       const template = `---
-eip: <TBD>
+eip: ${templateData.eip}
 title: ${templateData.title}
 description: ${templateData.description}
 author: ${templateData.author}
 discussions-to: ${templateData.discussionsTo}
 status: ${templateData.status}
+${templateData["last-call-deadline"] ? `last-call-deadline: ${templateData["last-call-deadline"]}` : ""}
 type: ${templateData.type}
 ${templateData.type === "Standards Track" && templateData.category ? `category: ${templateData.category}` : ""}
 created: ${templateData.created}
 ${templateData.requires ? `requires: ${templateData.requires}` : ""}
 ---
   
-## Abstract
+${templateData.abstract ? `## Abstract` : ""}
 ${templateData.abstract}
   
-## Motivation
+${templateData.motivation ? `## Motivation` : ""}
 ${templateData.motivation}
   
-## Specification
+${templateData.specification ? `## Specification` : ""}
 ${templateData.specification}
   
-## Rationale
+${templateData.rationale ? `## Rationale` : ""}
 ${templateData.rationale}
   
-## Backwards Compatibility
+${templateData.backwardsCompatibility ? `## Backwards Compatibility` : ""}
 ${templateData.backwardsCompatibility}
   
-## Test Cases
+${templateData.testCases ? `## Test Cases` : ""}
 ${templateData.testCases}
   
-## Reference Implementation
+${templateData.referenceImplementation ? `## Reference Implementation` : ""}
 ${templateData.referenceImplementation}
-  
-## Security Considerations
+
+${templateData.securityConsiderations ? `## Security Considerations` : ""}
 ${templateData.securityConsiderations}
   
 ## Copyright
@@ -625,8 +757,23 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
           .join("\n");
         return `---\n${cleanedContent}\n---`;
       });
+
+      const cleanedContent2 = cleanedTemplate
+    .split("\n")
+    .filter((line, index, array) => {
+      // Remove empty lines if the previous line is also empty
+      if (line.trim() === "" && array[index - 1]?.trim() === "") {
+        return false;
+      }
+      return true;
+    })
+    .join("\n");
+
+    // return cleanedContent2;
+
+      
     
-      const blob = new Blob([cleanedTemplate], { type: "text/plain" });
+      const blob = new Blob([cleanedContent2], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -751,38 +898,76 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       >
         Output
       </Button>
+
+      <Flex align="center" justify="space-between">
+        <ButtonGroup size="md" isAttached>
+          <Button
+            colorScheme="blue"
+            variant={activeTab2 === "new" ? "solid" : "outline"}
+            onClick={() => setActiveTab2("new")}
+            flex="1" // Equal size buttons
+          >
+            {activeTab === 'eip' 
+            ? 'New EIP' 
+            : activeTab === 'erc' 
+            ? 'New ERC' 
+            : activeTab === 'rip' 
+            ? 'New RIP' 
+            : 'New'}
+          </Button>
+          <Button
+            colorScheme="blue"
+            variant={activeTab2 === "import" ? "solid" : "outline"}
+            onClick={() => setActiveTab2("import")}
+            flex="1" // Equal size buttons
+          >
+             {activeTab === 'eip' 
+            ? 'Import an EIP' 
+            : activeTab === 'erc' 
+            ? 'Import and ERC' 
+            : activeTab === 'rip' 
+            ? 'Import an RIP' 
+            : 'Import'}
+          </Button>
+        </ButtonGroup>
+
+       
+
+
+  
+</Flex>
+
       
     </HStack>
-    {/* <HStack spacing={4} flexWrap="wrap">
-    <Button
-    rightIcon={isLoading ? <Spinner size="sm" /> : <CheckIcon />}
-    colorScheme="blue"
-    mt={[4, 0]} // Adds spacing for smaller screens
-    _dark={{
-      bg: "blue.600",
-      color: "white",
-      _hover: { bg: "blue.700" },
-    }}
-    onClick={handleValidate}
-    isDisabled={isLoading} // Disable button while loading
+    {activeTab2 === "import" && (
+  <InputGroup 
+    maxW={{ base: "100%", sm: "300px" }} 
+    minW="200px" 
+    colorScheme="blue" 
+    px={2} // Adds horizontal padding
   >
-    {isLoading ? "Validating..." : "Validate"}
-  </Button>
-  <Button
-    rightIcon={<DownloadIcon />}
-    colorScheme="blue"
-    mt={[4, 0]} // Adds spacing for smaller screens
-    _dark={{
-      bg: "blue.600",
-      color: "white",
-      _hover: { bg: "blue.700" },
-    }}
-    onClick={handleDownload}
-    isDisabled={!validated} // Disable button while loading
-  >
-    {"Download"}
-  </Button>
-  </HStack> */}
+    <Input
+      placeholder={`Enter ${activeTab.toUpperCase()} number`}
+      value={searchNumber}
+      onChange={(e) => setSearchNumber(e.target.value)}
+      _placeholder={{ color: "blue.500" }} 
+      borderColor="blue.500"
+      _hover={{ borderColor: "blue.600" }}
+      _focus={{ borderColor: "blue.700", boxShadow: "0 0 0 1px blue.700" }}
+      width="100%" // Ensures it takes full width inside its container
+    />
+    <InputRightElement>
+      <IconButton
+        aria-label="Search"
+        icon={<SearchIcon />}
+        colorScheme="blue"
+        onClick={handleImport}
+        isLoading={isLoading}
+      />
+    </InputRightElement>
+  </InputGroup>
+)}
+    
   </Box>
 
   <Box
@@ -827,11 +1012,11 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         <VStack spacing={5}>
         <Text fontSize={["sm", "md", "3xl"]} fontWeight="bold">
           {activeTab === 'eip' 
-            ? 'Document an EIP Template' 
+            ? 'Document an EIP' 
             : activeTab === 'erc' 
-            ? 'Document an ERC Template' 
+            ? 'Document an ERC' 
             : activeTab === 'rip' 
-            ? 'Document an RIP Template' 
+            ? 'Document an RIP' 
             : 'Document a Template'}
         </Text>
 
@@ -879,6 +1064,9 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     </Box>
               {step.type === "input" && (
                 <Input
+                disabled={
+                  step.key === "last-call-deadline" && templateData["status"] !== "Last Call"
+                }
                 placeholder={
                   step.label === "Title"
                     ? "Enter title"
@@ -1322,96 +1510,9 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
   >
     <HStack spacing={4} flexWrap="wrap">
     <Flex align="center" justify="space-between">
-  {/* <ButtonGroup size="md" isAttached>
-    <Button
-      colorScheme="blue"
-      variant={activeTab === "eip" ? "solid" : "outline"}
-      onClick={() => setActiveTab("eip")}
-      flex="1" // Equal size buttons
-    >
-      EIPs
-    </Button>
-    <Button
-      colorScheme="blue"
-      variant={activeTab === "erc" ? "solid" : "outline"}
-      onClick={() => setActiveTab("erc")}
-      flex="1" // Equal size buttons
-    >
-      ERCs
-    </Button>
-    <Button
-      colorScheme="blue"
-      variant={activeTab === "rip" ? "solid" : "outline"}
-      onClick={() => setActiveTab("rip")}
-      flex="1" // Equal size buttons
-    >
-      RIPs
-    </Button>
-  </ButtonGroup> */}
-
-  {/* Popover for instructions */}
-  {/* <Popover>
-    <PopoverTrigger>
-    <IconButton
-            aria-label="More info"
-            icon={<InfoOutlineIcon />}
-            size="md"
-            colorScheme="blue"
-            variant="ghost"
-          />
-    </PopoverTrigger>
-    <PopoverContent>
-      <PopoverArrow />
-      <PopoverCloseButton />
-      <PopoverHeader>Instructions</PopoverHeader>
-      <PopoverBody>
-        This form is for EIPs and ERCs and not for RIPs.
-      </PopoverBody>
-    </PopoverContent>
-  </Popover> */}
+  
 </Flex>
-    {/* <Button
-        leftIcon={<BiColumns />}
-        colorScheme="blue"
-        variant={viewMode === "split" ? "solid" : "outline"}
-        _hover={{ bg: viewMode !== "split" ? "blue.700" : undefined }}
-        _dark={{
-          bg: viewMode === "split" ? "blue.500" : "transparent",
-          color: viewMode === "split" ? "white" : "blue.300",
-          borderColor: "blue.300",
-        }}
-        onClick={() => setViewMode("split")}
-      >
-        Split
-      </Button>
-      <Button
-        leftIcon={<EditIcon />}
-        colorScheme="blue"
-        variant={viewMode === "edit" ? "solid" : "outline"}
-        _hover={{ bg: viewMode !== "edit" ? "blue.700" : undefined }}
-        _dark={{
-          bg: viewMode === "edit" ? "blue.500" : "transparent",
-          color: viewMode === "edit" ? "white" : "blue.300",
-          borderColor: "blue.300",
-        }}
-        onClick={() => setViewMode("edit")}
-      >
-        Edit
-      </Button>
-      <Button
-        leftIcon={<ViewIcon />}
-        colorScheme="blue"
-        variant={viewMode === "output" ? "solid" : "outline"}
-        _hover={{ bg: viewMode !== "output" ? "blue.700" : undefined }}
-        _dark={{
-          bg: viewMode === "output" ? "blue.500" : "transparent",
-          color: viewMode === "output" ? "white" : "blue.300",
-          borderColor: "blue.300",
-        }}
-        onClick={() => setViewMode("output")}
-      >
-        Output
-      </Button> */}
+  
       
     </HStack>
     <HStack spacing={4} flexWrap="wrap">
