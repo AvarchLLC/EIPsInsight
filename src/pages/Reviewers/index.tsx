@@ -135,7 +135,7 @@ const ReviewTracker = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
-      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
       // Merge the two arrays and ensure uniqueness
       const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
@@ -201,7 +201,7 @@ const ReviewTracker = () => {
   };
 
   const selectReviewers = () => {
-    const reviewers2= ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner"]
+    const reviewers2= ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner"]
     const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
       acc[reviewer] = reviewers2.includes(reviewer);
       return acc;
@@ -274,7 +274,7 @@ const ReviewTracker = () => {
     setCsvData(csv); 
   };
 
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "bomanaps","daniellehrner"];
 
   const generateCSVData11 = () => {
     if (!selectedYear || !selectedMonth) {
@@ -542,7 +542,7 @@ const generateCSVData3 = (reviewer: string) => {
 
       // console.log("reviewers:",reviewers);
       // const githubHandles = await fetchReviewers();
-      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
       const githubHandles2 = await fetchReviewers();
       // console.log("active:",activereviewers);
       
@@ -740,7 +740,7 @@ const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) =>
 
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
   // Get yearly data and format it
   const yearlyData = getYearlyData(data);
@@ -823,7 +823,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 
 const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
   let monthlyChartData: any; // Declare monthlyChartData
   if (selectedMonth != null) {
@@ -1078,7 +1078,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
   const yearlyData = getYearlyData(reviewsdata);
   const yearlyChartData = formatChartData(yearlyData);
 
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
   // Separate data into reviewers and editors
   // const reviewersData2 = yearlyChartData?.filter((item: any) => reviewersList.includes(item.reviewer));
@@ -1124,7 +1124,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
   });
 
   // Separate reviewers and editors
-  // const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+  // const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
   const editorsData = filledData.filter(item => !reviewersList.includes(item.reviewer));
   const reviewersData = filledData.filter(item => reviewersList.includes(item.reviewer));
 
@@ -1795,7 +1795,7 @@ const editorsSpecialityChart = () => {
   const yearlyChartData3 = formatChartData(processData3);
   // console.log("new chart data:",yearlyChartData1)
 
-  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
   // Step 1: Filter the data to include only target reviewers
   const filteredEIPData = yearlyChartData1.filter((item) =>
