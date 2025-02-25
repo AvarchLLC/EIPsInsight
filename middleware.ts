@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
 
   if (path.toLowerCase() === '/analytics') {
     console.log("redirected");
-    return NextResponse.redirect(new URL('/Analytics', request.url));
+    return NextResponse.redirect(new URL('/analytics', request.url));
   }
 
 
