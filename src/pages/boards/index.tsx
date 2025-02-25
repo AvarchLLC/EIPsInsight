@@ -25,6 +25,7 @@ import {
   import { DownloadIcon } from "@chakra-ui/icons";
   import Comments from "@/components/comments";
   import LabelFilter from "@/components/LabelFilter";
+  import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {
@@ -182,7 +183,7 @@ import {
     const handleDownload = () => {
       
       // Check the active tab and fetch the appropriate data
-      const filteredData = activeTab === 'EIPs' ? eipData : ercData;
+      const filteredData = displayedData;
     
       if (!filteredData || filteredData.length === 0) {
         alert(`No data available for the selected month in ${activeTab}.`);
@@ -322,6 +323,25 @@ import {
         >
           The table below lists all Open Pull Requests (till date) in a order such that it uses oldest author interaction after the most recent editor response.
         </Text>
+      
+        <Heading as="h4" size="md" mb={4} color={useColorModeValue("#3182CE", "blue.300")}>
+          How do label filters work?
+        </Heading>
+        <Text fontSize="md" mb={2} color={useColorModeValue("gray.800", "gray.200")} className="text-justify">
+          You can filter table data using label filters, and the same filters will apply to the downloaded reports.
+        </Text>
+
+        <Heading as="h4" size="md" mb={4} color={useColorModeValue("#3182CE", "blue.300")}>
+          How is prioritization determined?
+        </Heading>
+        <Text fontSize="md" mb={2} color={useColorModeValue("gray.800", "gray.200")} className="text-justify">
+          PRs with the "s-withdrawn" label are given the lowest priority and moved to the bottom of the table. The remaining PRs are ranked based on the longest-waiting interaction time, with those having the oldest interaction appearing at the top.
+        </Text>
+
+
+
+
+
         <Text
           fontSize="md"
           marginBottom={4}
@@ -584,7 +604,17 @@ import {
       }
     </Tbody>
   </Table>
+  
 </TableContainer>
+<Box
+          bg={useColorModeValue("blue.50", "gray.700")} // Background color for the box
+          color="black" // Text color
+          borderRadius="md" // Rounded corners
+          padding={2} // Padding inside the box
+          marginTop={2} // Margin above the box
+        >
+  <LastUpdatedDateTime  name="Boards"/>
+  </Box>
 
 
 

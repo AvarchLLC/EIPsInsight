@@ -1393,9 +1393,10 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
 
   const renderTable = (year: string, month: string, reviewerFilter: any) => {
     // console.log(data);
-    const filteredData = data;
+    const filteredData = data.filter(item => showReviewer[item.reviewer]);;
 
-        // console.log("filtered data:",filteredData);
+        console.log("filtered data:",filteredData);
+        console.log("show reviewers:", showReviewer);
 
     return (
         <Box mt={2} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
@@ -1972,8 +1973,8 @@ const router = useRouter();
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          This tool provides a comprehensive overview of all EIP editor reviews conducted to date. 
-          It displays the total number of reviews each month for each editor, allowing you to easily track and analyze review activity across different months and editors.
+          This tool provides a comprehensive overview of all EIP editor/reviewer reviews conducted to date. 
+          It displays the total number of reviews each month for each editor/reviewer, allowing you to easily track and analyze review activity across different months and editors.
         </Text>
 
         <Heading
@@ -2006,11 +2007,30 @@ const router = useRouter();
           fontSize="md"
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
+          marginBottom={2}
         >
           You can refine the data by selecting or deselecting specific editors from the checkbox list. 
           This will filter the chart and table to show data only for the selected editors, enabling you to focus on individual contributions.
         </Text>
+
+        <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          How does this tool work?
+        </Heading>
+        <Text
+          fontSize="md"
+          color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
+        >
+          The tool will be going through all the reviews made by the editor/reviewer and update the database every 24 hours.
+          This tool captures reviews only if the person is marked as a reviewer and has performed a review activity on the PR. If no review is made, it won't be counted, even if the person is listed as a reviewer.
+          </Text>
         <br/>
+
         <Text
           fontSize="md"
           color={useColorModeValue("gray.800", "gray.200")}
@@ -2018,6 +2038,7 @@ const router = useRouter();
         >
           Note: The reviews made by the editor during their active time as an editor are considered for plotting the charts 
         </Text>
+        
         <br/>
       </Collapse>
 
