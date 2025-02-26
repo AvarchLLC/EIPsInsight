@@ -123,6 +123,38 @@ const EipTemplateEditor = () => {
     }
   },[initialTemplateData]);
 
+  useEffect(() => {
+    // Get the hash from the URL (e.g., "#split#eip#import#1234")
+    const hash = window.location.hash;
+
+    // Split the hash into parts
+    const parts = hash.split("#").filter(Boolean); // Remove empty strings
+
+    // Assign values from the URL hash to state variables
+    if (parts.length > 0) {
+      setViewMode(parts[0] as "edit" | "output" | "split");
+    }
+    if (parts.length > 1) {
+      setActiveTab(parts[1] as "eip" | "erc" | "rip");
+    }
+    if (parts.length > 2) {
+      setActiveTab2(parts[2] as "new" | "import");
+    }
+    if (parts.length > 3) {
+      setSearchNumber(parts[3]);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Construct the new hash based on the current state
+    const newHash = `#${viewMode}#${activeTab}#${activeTab2}${
+      searchNumber ? `#${searchNumber}` : ""
+    }`;
+
+    // Update the URL hash
+    window.location.hash = newHash;
+  }, [viewMode, activeTab, activeTab2, searchNumber]);
+
 
 const handleImport = async () => {
   if (!searchNumber) return; // Do nothing if the search number is empty
@@ -807,8 +839,76 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     gap={4} // Adds spacing between rows when wrapped
   >
     <HStack spacing={4} flexWrap="wrap">
+
     <Flex align="center" justify="space-between">
-  <ButtonGroup size="md" isAttached>
+        <ButtonGroup size="md" isAttached>
+          <Button
+            colorScheme="green"
+            variant={activeTab2 === "new" ? "solid" : "outline"}
+            onClick={() => setActiveTab2("new")}
+            flex="1" // Equal size buttons
+          >
+            {activeTab === 'eip' 
+            ? 'New EIP' 
+            : activeTab === 'erc' 
+            ? 'New ERC' 
+            : activeTab === 'rip' 
+            ? 'New RIP' 
+            : 'New'}
+          </Button>
+          <Button
+            colorScheme="green"
+            variant={activeTab2 === "import" ? "solid" : "outline"}
+            onClick={() => setActiveTab2("import")}
+            flex="1" // Equal size buttons
+          >
+             {activeTab === 'eip' 
+            ? 'Import an EIP' 
+            : activeTab === 'erc' 
+            ? 'Import and ERC' 
+            : activeTab === 'rip' 
+            ? 'Import an RIP' 
+            : 'Import'}
+          </Button>
+        </ButtonGroup>
+</Flex>
+
+
+
+
+    <Flex align="center" justify="space-between">
+    {activeTab2 === "import" && (
+  <InputGroup 
+    maxW="300px" 
+    // minW="200px" 
+    colorScheme="green" 
+   
+  >
+    <Input
+      placeholder={`Enter ${activeTab.toUpperCase()} number`}
+      value={searchNumber}
+      onChange={(e) => setSearchNumber(e.target.value)}
+      _placeholder={{ color: "blue.500" }} 
+      borderColor="blue.500"
+      _hover={{ borderColor: "blue.600" }}
+      _focus={{ borderColor: "blue.700", boxShadow: "0 0 0 1px blue.700" }}
+      width="100%" // Ensures it takes full width inside its container
+    />
+    <InputRightElement>
+      <IconButton
+        aria-label="Search"
+        icon={<SearchIcon />}
+        colorScheme="blue"
+        onClick={handleImport}
+        isLoading={isLoading}
+      />
+    </InputRightElement>
+  </InputGroup>
+)}
+
+</Flex>
+
+  <ButtonGroup size="md" isAttached pl={2}>
     <Button
       colorScheme="blue"
       variant={activeTab === "eip" ? "solid" : "outline"}
@@ -855,7 +955,8 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       </PopoverBody>
     </PopoverContent>
   </Popover>
-</Flex>
+
+  <ButtonGroup  paddingLeft={2} size="md" isAttached>
     <Button
         leftIcon={<BiColumns />}
         colorScheme="blue"
@@ -898,75 +999,15 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       >
         Output
       </Button>
-
-      <Flex align="center" justify="space-between">
-        <ButtonGroup size="md" isAttached>
-          <Button
-            colorScheme="blue"
-            variant={activeTab2 === "new" ? "solid" : "outline"}
-            onClick={() => setActiveTab2("new")}
-            flex="1" // Equal size buttons
-          >
-            {activeTab === 'eip' 
-            ? 'New EIP' 
-            : activeTab === 'erc' 
-            ? 'New ERC' 
-            : activeTab === 'rip' 
-            ? 'New RIP' 
-            : 'New'}
-          </Button>
-          <Button
-            colorScheme="blue"
-            variant={activeTab2 === "import" ? "solid" : "outline"}
-            onClick={() => setActiveTab2("import")}
-            flex="1" // Equal size buttons
-          >
-             {activeTab === 'eip' 
-            ? 'Import an EIP' 
-            : activeTab === 'erc' 
-            ? 'Import and ERC' 
-            : activeTab === 'rip' 
-            ? 'Import an RIP' 
-            : 'Import'}
-          </Button>
-        </ButtonGroup>
-
-       
+    </ButtonGroup>
 
 
-  
-</Flex>
+
+      
 
       
     </HStack>
-    {activeTab2 === "import" && (
-  <InputGroup 
-    maxW={{ base: "100%", sm: "300px" }} 
-    minW="200px" 
-    colorScheme="blue" 
-    px={2} // Adds horizontal padding
-  >
-    <Input
-      placeholder={`Enter ${activeTab.toUpperCase()} number`}
-      value={searchNumber}
-      onChange={(e) => setSearchNumber(e.target.value)}
-      _placeholder={{ color: "blue.500" }} 
-      borderColor="blue.500"
-      _hover={{ borderColor: "blue.600" }}
-      _focus={{ borderColor: "blue.700", boxShadow: "0 0 0 1px blue.700" }}
-      width="100%" // Ensures it takes full width inside its container
-    />
-    <InputRightElement>
-      <IconButton
-        aria-label="Search"
-        icon={<SearchIcon />}
-        colorScheme="blue"
-        onClick={handleImport}
-        isLoading={isLoading}
-      />
-    </InputRightElement>
-  </InputGroup>
-)}
+   
     
   </Box>
 

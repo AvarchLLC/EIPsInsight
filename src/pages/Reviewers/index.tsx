@@ -2117,15 +2117,181 @@ const router = useRouter();
               
             </Box>
           </Box>
-          <br />
-          <br />
+          {/* <br /> */}
+          {/* <br /> */}
         </Box>
+
+        {/* <br/> */}
+
+            <Box
+              bgColor={bg}
+              padding="2rem"
+              borderRadius="0.55rem"
+              // _hover={{
+              //   border: "1px",
+              //   borderColor: "#30A0E0",
+              // }}
+            >
+            <Box id="ActivityTimeline" className="w-full">
+
+            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+            <Heading
+              as="h3"
+              size="lg"
+              marginBottom={2}
+              marginTop={2}
+              fontWeight="bold"
+              color={useColorModeValue("#3182CE", "blue.300")}
+            > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
+            </Heading> 
+              <Flex alignItems="center">
+                <Button
+                  colorScheme="blue"
+                  onClick={() => setShowFilters2(!showFilters2)}
+                  leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
+                  fontSize={{ base: "0.6rem", md: "md" }} 
+                  mr="1rem"
+                >
+                  {showFilters2 ? "Hide Filters" : "Show Filters"}
+                </Button>
+              </Flex>
+            </Flex>
+
+            {showFilters2 && (
+      <Box
+        bg="blue.50"
+        borderRadius="md"
+        p={4}
+        mt="1rem"
+      >
+        <Flex justifyContent="flex-start" flexDirection={{ base: "column", md: "row" }} gap="2rem" mb="1rem">
+          
+          <Box>
+            <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
+            <Flex>
+            <HStack spacing={4}>
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedStartYear2 ? `${selectedStartYear2}` : 'Select Year'}
+              </MenuButton>
+              <MenuList bg="white" color="black" borderColor="blue.500">
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
+                  <MenuItem key={year} onClick={() => setSelectedStartYear2(year)} bg="white" color="black">
+                    {year}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+              {selectedStartMonth2 ? `${selectedStartMonth2}` : 'Select Month'}
+            </MenuButton>
+            <MenuList bg="white" color="black" borderColor="blue.500">
+              {[
+                { name: 'Jan', value: '01' },
+                { name: 'Feb', value: '02' },
+                { name: 'Mar', value: '03' },
+                { name: 'Apr', value: '04' },
+                { name: 'May', value: '05' },
+                { name: 'Jun', value: '06' },
+                { name: 'Jul', value: '07' },
+                { name: 'Aug', value: '08' },
+                { name: 'Sep', value: '09' },
+                { name: 'Oct', value: '10' },
+                { name: 'Nov', value: '11' },
+                { name: 'Dec', value: '12' },
+              ].map((month) => (
+                <MenuItem
+                  key={month.value}
+                  onClick={() => setSelectedStartMonth2(month.value)}
+                  bg="white"
+                  color="black"
+                >
+                  {month.name}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+            </HStack>
+            </Flex>
+          </Box>
+
+          
+          <Box>
+            <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
+            <Flex>
+            <HStack spacing={4}>
+              {/* Year Dropdown */}
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                  {selectedEndYear2 ? `${selectedEndYear2}` : 'Select Year'}
+                </MenuButton>
+                <MenuList bg="white" color="black" borderColor="blue.500">
+                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
+                    <MenuItem
+                      key={year}
+                      onClick={() => setSelectedEndYear2(year)}
+                      bg="white"
+                      color="black"
+                    >
+                      {year}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+
+              {/* Month Dropdown */}
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                  {selectedEndMonth2 ? `${selectedEndMonth2}` : 'Select Month'}
+                </MenuButton>
+                <MenuList bg="white" color="black" borderColor="blue.500">
+                  {[
+                    { name: 'Jan', value: '01' },
+                    { name: 'Feb', value: '02' },
+                    { name: 'Mar', value: '03' },
+                    { name: 'Apr', value: '04' },
+                    { name: 'May', value: '05' },
+                    { name: 'Jun', value: '06' },
+                    { name: 'Jul', value: '07' },
+                    { name: 'Aug', value: '08' },
+                    { name: 'Sep', value: '09' },
+                    { name: 'Oct', value: '10' },
+                    { name: 'Nov', value: '11' },
+                    { name: 'Dec', value: '12' },
+                  ].map((month) => (
+                    <MenuItem
+                      key={month.value}
+                      onClick={() => setSelectedEndMonth2(month.value)}
+                      bg="white"
+                      color="black"
+                    >
+                      {month.name}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+            </HStack>
+
+            </Flex>
+          </Box>
+          <Box>
+        </Box>
+        </Flex>
+      </Box>
+    )}
+
+               {editorsActivity()}
+            </Box>
+            </Box>
  
 
         <Box
   bgColor={bg}
   padding="2rem"
   borderRadius="0.55rem"
+  mt={2}
   // _hover={{
   //   border: "1px",
   //   borderColor: "#30A0E0",
@@ -2543,7 +2709,7 @@ const router = useRouter();
        </HStack>
       </Flex>
 
-      <Flex justify="center" mt={4}>
+      <Flex justify="center" mt={2}>
         
       <HStack spacing={4}>
          
@@ -2622,7 +2788,7 @@ const router = useRouter();
         <>
       
             {selectedYear && selectedMonth && (
-                <Box mt={8} display="flex" justifyContent="flex-end">
+                <Box mt={4} display="flex" justifyContent="flex-end">
                 <CSVLink
                   data={csvData.length ? csvData : []}
                   filename={`reviews_${selectedYear}_${selectedMonth}.csv`}
@@ -2661,170 +2827,7 @@ const router = useRouter();
               {renderCharts3(chart1data)} 
               {/* <br/> */}
             </Box>
-            <br/>
-
-            <Box
-              bgColor={bg}
-              padding="2rem"
-              borderRadius="0.55rem"
-              // _hover={{
-              //   border: "1px",
-              //   borderColor: "#30A0E0",
-              // }}
-            >
-            <Box id="ActivityTimeline" className="w-full">
-
-            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-            <Heading
-              as="h3"
-              size="lg"
-              marginBottom={2}
-              marginTop={2}
-              fontWeight="bold"
-              color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
-            </Heading> 
-              <Flex alignItems="center">
-                <Button
-                  colorScheme="blue"
-                  onClick={() => setShowFilters2(!showFilters2)}
-                  leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
-                  fontSize={{ base: "0.6rem", md: "md" }} 
-                  mr="1rem"
-                >
-                  {showFilters2 ? "Hide Filters" : "Show Filters"}
-                </Button>
-              </Flex>
-            </Flex>
-
-            {showFilters2 && (
-      <Box
-        bg="blue.50"
-        borderRadius="md"
-        p={4}
-        mt="1rem"
-      >
-        <Flex justifyContent="flex-start" flexDirection={{ base: "column", md: "row" }} gap="2rem" mb="1rem">
-          
-          <Box>
-            <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
-            <Flex>
-            <HStack spacing={4}>
-            <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
-                {selectedStartYear2 ? `${selectedStartYear2}` : 'Select Year'}
-              </MenuButton>
-              <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
-                  <MenuItem key={year} onClick={() => setSelectedStartYear2(year)} bg="white" color="black">
-                    {year}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-
-            <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
-              {selectedStartMonth2 ? `${selectedStartMonth2}` : 'Select Month'}
-            </MenuButton>
-            <MenuList bg="white" color="black" borderColor="blue.500">
-              {[
-                { name: 'Jan', value: '01' },
-                { name: 'Feb', value: '02' },
-                { name: 'Mar', value: '03' },
-                { name: 'Apr', value: '04' },
-                { name: 'May', value: '05' },
-                { name: 'Jun', value: '06' },
-                { name: 'Jul', value: '07' },
-                { name: 'Aug', value: '08' },
-                { name: 'Sep', value: '09' },
-                { name: 'Oct', value: '10' },
-                { name: 'Nov', value: '11' },
-                { name: 'Dec', value: '12' },
-              ].map((month) => (
-                <MenuItem
-                  key={month.value}
-                  onClick={() => setSelectedStartMonth2(month.value)}
-                  bg="white"
-                  color="black"
-                >
-                  {month.name}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-            </HStack>
-            </Flex>
-          </Box>
-
-          
-          <Box>
-            <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
-            <Flex>
-            <HStack spacing={4}>
-              {/* Year Dropdown */}
-              <Menu>
-                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
-                  {selectedEndYear2 ? `${selectedEndYear2}` : 'Select Year'}
-                </MenuButton>
-                <MenuList bg="white" color="black" borderColor="blue.500">
-                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
-                    <MenuItem
-                      key={year}
-                      onClick={() => setSelectedEndYear2(year)}
-                      bg="white"
-                      color="black"
-                    >
-                      {year}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-
-              {/* Month Dropdown */}
-              <Menu>
-                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
-                  {selectedEndMonth2 ? `${selectedEndMonth2}` : 'Select Month'}
-                </MenuButton>
-                <MenuList bg="white" color="black" borderColor="blue.500">
-                  {[
-                    { name: 'Jan', value: '01' },
-                    { name: 'Feb', value: '02' },
-                    { name: 'Mar', value: '03' },
-                    { name: 'Apr', value: '04' },
-                    { name: 'May', value: '05' },
-                    { name: 'Jun', value: '06' },
-                    { name: 'Jul', value: '07' },
-                    { name: 'Aug', value: '08' },
-                    { name: 'Sep', value: '09' },
-                    { name: 'Oct', value: '10' },
-                    { name: 'Nov', value: '11' },
-                    { name: 'Dec', value: '12' },
-                  ].map((month) => (
-                    <MenuItem
-                      key={month.value}
-                      onClick={() => setSelectedEndMonth2(month.value)}
-                      bg="white"
-                      color="black"
-                    >
-                      {month.name}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-            </HStack>
-
-            </Flex>
-          </Box>
-          <Box>
-        </Box>
-        </Flex>
-      </Box>
-    )}
-
-               {editorsActivity()}
-            </Box>
-            </Box>
+            
     <Box>
 
       <br/>
