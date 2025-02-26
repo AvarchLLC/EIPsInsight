@@ -183,7 +183,7 @@ const INSIGHT= [
       image: "Blockchain_Future.png",
       title: "What is EIPsInsight?",
       content: "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs),  Ethereum Request for Comments (ERCs), Rollup Improvement Proposals (RIPs) over a specified period.",
-      link: "/About"
+      link: "/about"
   },
  
 ]
