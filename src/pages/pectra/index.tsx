@@ -555,7 +555,7 @@ const All = () => {
                 <br/>
           <Flex justifyContent="center" alignItems="center">
             <Image
-              src="/Pectra_Relations.jpg"
+              src="/Pectra_Relations2.jpg"
               alt="Image 1"
               borderRadius="md"
               width={{ base: "250px", md: "350px", lg: "500px" }}
