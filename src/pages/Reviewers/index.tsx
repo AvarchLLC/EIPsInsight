@@ -1146,6 +1146,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
       xField: "monthYear",
       yField: "count",
       seriesField: "reviewer",
+      height: 200,
       geometryOptions: [
         {
           geometry: "line",
@@ -1262,7 +1263,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
               as="h3"
               size="lg"
               marginBottom={2}
-              marginTop={2}
+              // marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
         >
