@@ -8,8 +8,9 @@ import {
   Tooltip,
   Button,
   Spinner,
-  keyframes,
+  // keyframes,
 } from "@chakra-ui/react";
+import { keyframes } from '@chakra-ui/system';
 import { motion } from "framer-motion";
 
 // Define the structure of a network
