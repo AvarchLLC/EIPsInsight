@@ -1,0 +1,211 @@
+import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { Box, useColorModeValue, Spinner, Text,Button, Flex, Heading } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import DateTime from "@/components/DateTime";
+import NextLink from "next/link";
+import axios from "axios";
+
+interface EIP {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: Date;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  repo:string;
+  unique_ID: number;
+  __v: number;
+}
+
+
+const categoryColors: string[] = [
+  "rgb(255, 99, 132)",
+  "rgb(255, 159, 64)",
+  "rgb(255, 205, 86)",
+  "rgb(75, 192, 192)",
+  "rgb(54, 162, 235)",
+  "rgb(153, 102, 255)",
+  "rgb(255, 99, 255)",
+  "rgb(50, 205, 50)",
+  "rgb(255, 0, 0)",
+  "rgb(0, 128, 0)",
+];
+
+
+interface ChartProps {
+  type: string;
+} 
+
+const AllChart: React.FC<ChartProps> = ({ type }) => {
+  const [data, setData] = useState<EIP[]>([]);
+  const bg = useColorModeValue("#f6f6f7", "#171923");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/all`);
+        let jsonData = await response.json();
+        if (type === "EIP") {
+          setData(jsonData.eip);
+        } else if (type === "ERC") {
+          setData(jsonData.erc);
+        } else if (type === "RIP") {
+          jsonData.rip.forEach((item: EIP) => {
+            if (item.eip === "7859") {
+                item.status = "Draft"; // Update the status
+            }
+        });        
+          setData(jsonData.rip);
+        } else if (type === "Total") {
+          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        } else {
+          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  interface TransformedData {
+    status: string;
+    year: number;
+    value: number;
+  }
+  
+  const transformedData = data.reduce<TransformedData[]>((acc, item) => {
+    const year = new Date(item.created).getFullYear();
+    const status = item.status;
+  
+    // Check if a record for the same category and year already exists
+    const existingEntry = acc.find((entry) => entry.year === year && entry.status === status);
+  
+    if (existingEntry) {
+      // If it exists, increment the value
+      existingEntry.value += 1;
+    } else {
+      // Otherwise, create a new entry
+      acc.push({
+        status: status,
+        year: year,
+        value: 1,
+      });
+    }
+  
+    return acc;
+  }, []);
+  
+  
+
+  const Area = dynamic(
+    () => import("@ant-design/plots").then((item) => item.Column),
+    {
+      ssr: false,
+    }
+  );
+
+  console.log(transformedData);
+
+  const config = {
+    data: transformedData,
+    xField: "year",
+    yField: "value",
+    interactions: [{ type: "element-selected" }, { type: "element-active" }],
+    statistic: {
+      title: false as const,
+      content: {
+        style: {
+          whiteSpace: "pre-wrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        },
+      },
+    },
+    slider: {
+      start: 0,
+      end: 1,
+  },
+    color: categoryColors,
+    seriesField: "status",
+    isStack: true,
+    areaStyle: { fillOpacity: 0.6 },
+    legend: { position: "top-right" as const },
+    smooth: true,
+    
+  };
+  
+  const downloadData = () => {
+    // Convert the data to CSV format
+    const header = "Repo, EIP, Title, Author, Status, Type, Category, Discussion, Created at, Deadline, Link\n";
+
+// Prepare the CSV content
+const csvContent = header
+    + data.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+        // Generate the correct URL based on the repo type
+        const url = repo === "eip"
+            ? `https://eipsinsight.com/eips/eip-${eip}`
+            : repo === "erc"
+            ? `https://eipsinsight.com/ercs/erc-${eip}`
+            : `https://eipsinsight.com/rips/rip-${eip}`;
+
+        // Handle the 'deadline' field, use empty string if not available
+        const deadlineValue = deadline || "";
+
+        // Wrap title, author, discussion, and status in double quotes to handle commas
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
+    }).join("\n");
+  
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    
+    // Create a URL for the Blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create an anchor tag to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.csv";  // File name
+    a.click();
+    
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
+  
+
+  return (
+    <>
+      {isLoading ? ( // Show loader while data is loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="200px"
+        >
+          <Spinner />
+        </Box>
+      ) : (
+        <>
+
+      <Area {...config} />
+     <Box className={"w-full"}>
+          <DateTime />
+        
+    </Box>
+</>
+
+      )}
+    </>
+  );
+};
+
+export default AllChart;

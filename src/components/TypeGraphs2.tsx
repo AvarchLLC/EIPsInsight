@@ -8,7 +8,7 @@ import NextLink from "next/link";
 import StatusChart from "@/components/StatusColumnChart";
 import DateTime from "./DateTime";
 
-
+import AllChart3 from "@/components/AllChart3Alt";
 interface EIP {
   _id: string;
   eip: string;
@@ -35,32 +35,49 @@ interface APIResponse {
 const TypeGraphs = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
-  const [data2, setData2] = useState<APIResponse>({
-    eip: [],
-    erc: [],
-    rip: [],
-  });
-  const [isLoading, setIsLoading] = useState(true); // Loader state
+  const [data, setData] = useState<EIP[]>([]);
+  const [data2, setData2] = useState<APIResponse>({ eip: [], erc: [], rip: [] });
+  const [data3, setData3] = useState<APIResponse>({ eip: [], erc: [], rip: [] });
+  const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/all`);
-        console.log(response);
         const jsonData = await response.json();
-        setData(jsonData.eip);
-        setData2(jsonData);
-        setIsLoading(false); // Set loader state to false after data is fetched
+  
+        console.log("Fetched Data:", jsonData); // Debugging: Check API response
+  
+        // Ensure API response has expected keys before setting state
+        setData(jsonData?.eip || []);
+        setData2({
+          eip: jsonData?.eip || [],
+          erc: jsonData?.erc || [],
+          rip: jsonData?.rip || [],
+        });
+        setData3({
+          eip: jsonData?.eip || [],
+          erc: jsonData?.erc || [],
+          rip: jsonData?.rip || [],
+        });
+  
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setIsLoading(false); // Set loader state to false even if an error occurs
+        setIsLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
   
-  const allData: EIP[] = data2?.eip.concat(data2?.erc.concat(data2?.rip)) || [];
+  // ✅ Safer way to merge all data
+  const allData: EIP[] = [...(data2.eip || []), ...(data2.erc || []), ...(data2.rip || [])];
+  
+  // ✅ Correcting RIP count logic
+  const ripCount = new Set(allData.filter((item) => item.repo === "rip").map((item) => item.eip)).size;
+  
+  
 
   return (
     <>
@@ -190,32 +207,6 @@ const TypeGraphs = () => {
           </NextLink>
         </Grid>
         <Grid templateColumns="1fr 1fr 1fr" gap={8}>
-          {/*<Box*/}
-          {/*    marginTop={"2rem"}*/}
-          {/*    bg={bg}*/}
-          {/*    p="0.5rem"*/}
-          {/*    borderRadius="0.55rem"*/}
-          {/*    display="flex"*/}
-          {/*    flexDirection="column"*/}
-          {/*    justifyContent="center"*/}
-          {/*    alignItems="center"*/}
-          {/*    height={400}*/}
-          {/*    _hover={{*/}
-          {/*        border: "1px",*/}
-          {/*        borderColor: "#30A0E0",*/}
-          {/*    }}*/}
-          {/*    as={motion.div}*/}
-          {/*    initial={{ opacity: 0, y: -20 }}*/}
-          {/*    animate={{ opacity: 1, y: 0 }}*/}
-          {/*    transition={{ duration: 0.5 } as any}*/}
-          {/*    className="hover: cursor-pointer ease-in duration-200"*/}
-          {/*>*/}
-          {/*    <StatusColumnChart category={'ERCs'} />*/}
-          {/*    <Box className={'w-full'}>*/}
-          {/*        <DateTime />*/}
-          {/*    </Box>*/}
-          {/*</Box>*/}
-
           <Box
             marginTop={"2rem"}
             bg={bg}
@@ -296,38 +287,35 @@ const TypeGraphs = () => {
         </Grid>
       </Box>
 
-      <Box display={{ lg: "none", sm: "block" }}>
-        {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2">
-          Draft
-        </Text>
+      <Grid templateColumns="1fr" gap={8} paddingTop={8}>
+    <NextLink href={"/rip"}>
+      <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+        RIP - [{ripCount}]
+      </Text>
+    </NextLink>
+  </Grid>
+  <Grid templateColumns="1fr" gap={8}>
+      <Box
+        marginTop="2rem"
+        bg={bg}
+        p="0.5rem"
+        borderRadius="0.55rem"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        height={400}
+        _hover={{ border: "1px", borderColor: "#30A0E0" }}
+        as={motion.div}
 
-        <Box
-          marginTop={"2rem"}
-          paddingTop={"8"}
-          bg={bg}
-          p="0.5rem"
-          borderRadius="0.55rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={400}
-          overflowX="auto"
-          _hover={{
-            border: "1px",
-            borderColor: "#30A0E0",
-          }}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200"
-        >
-          <StackedColumnChart status="Draft" />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box> */}
+        className="hover:cursor-pointer ease-in duration-200"
+      >
+        <AllChart3 type="RIP" />
+      </Box>
+    </Grid>
+
+      <Box display={{ lg: "none", sm: "block" }}>
+
 
         <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
           Draft vs Final
