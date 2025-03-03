@@ -10,7 +10,7 @@ import {
   Tr,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { getStatusColorScheme } from "@chakra-ui/alert/dist/alert-context";
+// import { getStatusColorScheme } from "@chakra-ui/alert/dist/alert-context";
 import NextLink from "next/link";
 
 const getStatus = (status: string) => {
