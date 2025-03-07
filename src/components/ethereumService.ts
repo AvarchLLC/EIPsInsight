@@ -106,10 +106,10 @@ export const getBlockDetails = async (blockNumber: string | number, isSepolia: b
  * @param isSepolia - Whether to use the Sepolia network.
  * @returns The last 7200 blocks.
  */
-export const fetchLast7200Blocks = async (isSepolia: boolean = false) => {
+export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
     const provider = isSepolia ? sepoliaWeb3 : web3;
     const latestBlock = await provider.eth.getBlockNumber();
-    const blockNumbers = Array.from({ length: 310 }, (_, i) => Number(latestBlock) - i);
+    const blockNumbers = Array.from({ length: 10 }, (_, i) => Number(latestBlock) - i);
   
     const batchSize = 100; // Number of blocks per batch
     const totalBatches = Math.ceil(blockNumbers.length / batchSize); // Total batches (72)

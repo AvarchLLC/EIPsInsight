@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { Box, Text, Button, Flex, useColorModeValue } from '@chakra-ui/react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import dynamic from 'next/dynamic';
 
-type TransactionType = 'overall' | 'type1' | 'type2' | 'type3' | 'all';
+// Dynamically import the Line chart to avoid SSR issues
+const Line = dynamic(() => import('@ant-design/plots').then((mod) => mod.Line), { ssr: false });
+
+// Add 'type0' to the TransactionType type
+type TransactionType = 'overall' | 'type0' | 'type1' | 'type2' | 'type3' | 'all';
 
 const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
   const [transactionType, setTransactionType] = useState<TransactionType>('overall');
+  const [sliderValue, setSliderValue] = useState(0); // State for controlling the slider value
   const textColor = useColorModeValue('white', 'white');
   const buttonBg = useColorModeValue('rgba(159, 122, 234, 0.2)', 'rgba(159, 122, 234, 0.1)'); // Button background
   const activeButtonBg = useColorModeValue('rgba(159, 122, 234, 0.5)', 'rgba(159, 122, 234, 0.3)'); // Active button background
@@ -13,23 +18,65 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
 
   // Process data to count transactions per block
   const processData = () => {
-    return blocks.map((block) => {
-      const overall = block.transactions.length;
-      const type1 = block.transactions.filter((tx: any) => tx.type === '0x1').length;
-      const type2 = block.transactions.filter((tx: any) => tx.type === '0x2').length;
-      const type3 = block.transactions.filter((tx: any) => tx.type === '0x3').length;
-
-      return {
-        time: new Date(Number(block.timestamp) * 1000).toLocaleTimeString(),
-        overall,
-        type1,
-        type2,
-        type3,
-      };
-    }).reverse();
+    return blocks
+      .map((block) => ({
+        time: new Date(block.timestamp).toLocaleTimeString(), // Convert timestamp to readable time
+        blockNumber: block.blockNumber,
+        overall: block.total, // Use the total field for overall transactions
+        type0: block.type0, // Include type0
+        type1: block.type1,
+        type2: block.type2,
+        type3: block.type3,
+      }))
+      .reverse(); // Reverse to show latest data first
   };
 
-  const data = processData();
+  const sortedData = processData();
+  // const displayedData = sortedData.slice(0, Math.floor(sliderValue * sortedData.length));
+
+  // Chart configuration for @ant-design/plots
+  const chartConfig = {
+    data: sortedData,
+    xField: 'time',
+    yField: transactionType === 'all' ? undefined : transactionType,
+    seriesField: transactionType === 'all' ? 'type' : undefined,
+    color: transactionType === 'all' ? ['#FFD700', '#82ca9d', '#ff7300', '#ff0000'] : '#8884d8',
+    lineStyle: {
+      stroke: '#8884d8',
+      lineWidth: 2,
+    },
+    smooth: true,
+    slider: {
+      start: sliderValue, // Set the start value from the state
+      end: 1, // End of the slider
+      step: 0.01, // Define the step value for the slider
+      min: 0, // Minimum value for the slider
+      max: 1, // Maximum value for the slider
+      onChange: (value: number) => {
+        setSliderValue(value); // Update state when slider value changes
+      },
+      onAfterChange: (value: number) => {
+        console.log('Slider moved to:', value); // Optional: Perform actions after sliding stops
+      },
+    },
+    tooltip: {
+      customContent: (title: string, items: any[]) => {
+        const item = items?.[0];
+        const blockNumber = item?.data?.blockNumber; // Get block number from data
+        return (
+          <Box bg="white" p={3} borderRadius="md" border="1px solid" borderColor="gray.200">
+            <Text color="black">Time: {title}</Text>
+            <Text color="black">Block: {blockNumber}</Text>
+            {items?.map((item, index) => (
+              <Text key={index} color="black">
+                {item.name}: {item.value}
+              </Text>
+            ))}
+          </Box>
+        );
+      },
+    },
+  };
 
   return (
     <Box
@@ -51,105 +98,38 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
       >
         Transactions vs Type
       </Text>
-      <br/>
+      <br />
       <Flex mb={4} gap={2} wrap="wrap">
-      <Flex mb={4} gap={4} wrap="wrap"> {/* Increased gap between buttons */}
-  {(['overall', 'type1', 'type2', 'type3', 'all'] as TransactionType[]).map((type) => (
-    <Button
-      key={type}
-      onClick={() => setTransactionType(type)}
-      bg={transactionType === type ? activeButtonBg : buttonBg}
-      color={textColor}
-      borderRadius="full" // Fully rounded corners for a pill-like shape
-      _hover={{
-        bg: buttonHoverBg,
-        transform: 'scale(1.05)',
-        transition: 'transform 0.2s ease-in-out',
-      }}
-      _active={{
-        bg: activeButtonBg,
-      }}
-      textShadow="0 0 10px rgba(159, 122, 234, 0.8)"
-      boxShadow="0 0 10px rgba(159, 122, 234, 0.5)"
-      fontSize={15} // Increased font size
-      px={6} // Horizontal padding for better spacing
-      py={3} // Vertical padding for better spacing
-    >
-      {type.charAt(0).toUpperCase() + type.slice(1)}
-    </Button>
-  ))}
-</Flex>
+        <Flex mb={4} gap={4} wrap="wrap">
+          {(['overall', 'type0', 'type1', 'type2', 'type3'] as TransactionType[]).map((type) => (
+            <Button
+              key={type}
+              onClick={() => setTransactionType(type)}
+              bg={transactionType === type ? activeButtonBg : buttonBg}
+              color={textColor}
+              borderRadius="full" // Fully rounded corners for a pill-like shape
+              _hover={{
+                bg: buttonHoverBg,
+                transform: 'scale(1.05)',
+                transition: 'transform 0.2s ease-in-out',
+              }}
+              _active={{
+                bg: activeButtonBg,
+              }}
+              textShadow="0 0 10px rgba(159, 122, 234, 0.8)"
+              boxShadow="0 0 10px rgba(159, 122, 234, 0.5)"
+              fontSize={15} // Increased font size
+              px={6} // Horizontal padding for better spacing
+              py={3} // Vertical padding for better spacing
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </Button>
+          ))}
+        </Flex>
       </Flex>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke={useColorModeValue('whiteAlpha.300', 'whiteAlpha.300')} />
-          <XAxis dataKey="time" stroke={textColor} />
-          <YAxis stroke={textColor} />
-          <Tooltip contentStyle={{ backgroundColor: 'blackAlpha.800', borderColor: 'whiteAlpha.300', borderRadius: 'md' }} />
-          <Legend wrapperStyle={{ color: textColor }} />
-          {transactionType === 'overall' && (
-            <Line
-              type="basis"
-              dataKey="overall"
-              stroke="#8884d8"
-              strokeWidth={2}
-              dot={false}
-            />
-          )}
-          {transactionType === 'type1' && (
-            <Line
-              type="basis"
-              dataKey="type1"
-              stroke="#82ca9d"
-              strokeWidth={2}
-              dot={false}
-            />
-          )}
-          {transactionType === 'type2' && (
-            <Line
-              type="basis"
-              dataKey="type2"
-              stroke="#ff7300"
-              strokeWidth={2}
-              dot={false}
-            />
-          )}
-          {transactionType === 'type3' && (
-            <Line
-              type="basis"
-              dataKey="type3"
-              stroke="#ff0000"
-              strokeWidth={2}
-              dot={false}
-            />
-          )}
-          {transactionType === 'all' && (
-            <>
-              <Line
-                type="basis"
-                dataKey="type1"
-                stroke="#82ca9d"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                type="basis"
-                dataKey="type2"
-                stroke="#ff7300"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                type="basis"
-                dataKey="type3"
-                stroke="#ff0000"
-                strokeWidth={2}
-                dot={false}
-              />
-            </>
-          )}
-        </LineChart>
-      </ResponsiveContainer>
+      <Box width="100%" height={300}>
+        <Line {...chartConfig} />
+      </Box>
     </Box>
   );
 };
