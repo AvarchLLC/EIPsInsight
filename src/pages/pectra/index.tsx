@@ -543,9 +543,29 @@ const All = () => {
 
 
 
-        <Box id="NetworkUpgradesChart" mt={2}>
-          <Graph/>
+        <Box id="NetworkUpgradesChart" mt={2} mb={2}>
+          <Text
+                  fontSize={{ base: '2xl', md: '3xl', lg: '3xl' }}
+                  fontWeight="bold"
+                  color="#30A0E0"
+                  mt={2}
+                >
+                  Network Upgrades and EIPs Relationship Graph
+                </Text>
+                <br/>
+          <Flex justifyContent="center" alignItems="center">
+            <Image
+              src="/Pectra_Relations2.jpg"
+              alt="Image 1"
+              borderRadius="md"
+              width={{ base: "250px", md: "350px", lg: "500px" }}
+              height="auto"
+              objectFit="contain"
+            />
+          </Flex>
+          <br/>
         </Box>
+
 
 
         <Box id="NetworkUpgrades" mt={2}>

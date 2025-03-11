@@ -8,8 +8,9 @@ import {
   Tooltip,
   Button,
   Spinner,
-  keyframes,
+  // keyframes,
 } from "@chakra-ui/react";
+import { keyframes } from '@chakra-ui/system';
 import { motion } from "framer-motion";
 import { useColorModeValue } from "@chakra-ui/react";
 
@@ -55,7 +56,7 @@ const SlotCountdown: React.FC = () => {
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [currentBlock, setCurrentBlock] = useState<number>(0);
   const [timer, setTimer] = useState<number>(13); // 13-second timer
-  const [network, setNetwork] = useState<keyof typeof networks>("holesky"); // Default network
+  const [network, setNetwork] = useState<keyof typeof networks>("sepolia"); // Default network
   const [loading, setLoading] = useState<boolean>(true); // Show loader only on first load
   const [countdown, setCountdown] = useState<string>(""); // Countdown for days, hours, minutes
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false); // Track if the upgrade is live
@@ -226,9 +227,9 @@ const SlotCountdown: React.FC = () => {
             </Button>
           </HStack>
 
-          {loading ? (
+          {(loading) ? (
             <Spinner size="xl" color="blue.500" />
-          ) : isUpgradeLive ? (
+          ) : (isUpgradeLive || slotsRemaining<=0) ? (
             // Celebratory Animation
             <Text
               fontSize="2xl"
