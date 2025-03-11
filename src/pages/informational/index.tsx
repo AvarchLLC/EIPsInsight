@@ -1,6 +1,6 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
-import { Box, Tabs } from "@chakra-ui/react";
+import { Box, Tabs, useColorModeValue  } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
 
-
+import StatusColumnChart from "@/components/StatusColumnChart";
 
 interface EIP {
   _id: string;
@@ -43,6 +43,7 @@ const categories = [
 
 const Info = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const bg = useColorModeValue("#f6f6f7", "#171923");
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
   useEffect(() => {
     const fetchData = async () => {
@@ -116,8 +117,29 @@ const Info = () => {
               />
             </FlexBetween>
             <TableStatus cat="Informational" />
-            {/* <LineStatus cat="Informational" /> */}
+            <Box
+                        marginTop={"2rem"}
+                        bg={bg}
+                        p="0.5rem"
+                        borderRadius="0.55rem"
+                        display="flex"
+                        flexDirection="column"
+                        justifyContent="center"
+                        alignItems="center"
+                        height={400}
+                        _hover={{
+                          border: "1px",
+                          borderColor: "#30A0E0",
+                        }}
+                        as={motion.div}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 } as any}
+                        className="hover: cursor-pointer ease-in duration-200"
+                      ><StatusColumnChart category={"Core"} type={"EIPs"} /></Box>
+            
           </Box>
+
         </motion.div>
       )}
     </AllLayout>
@@ -125,3 +147,4 @@ const Info = () => {
 };
 
 export default Info;
+

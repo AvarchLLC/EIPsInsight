@@ -22,9 +22,25 @@ import EIPStatusDonut from "@/components/EIPStatusDonut";
 import EIPTypeDonut from "@/components/EIPTypeDonut";
 import AllChart from "@/components/AllChart";
 import AllChart3 from "@/components/AllChart3";
-import { Button, ButtonGroup, Flex} from "@chakra-ui/react";
+import { Button, Heading, ButtonGroup, Flex} from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
+
+
+const sections = [
+  { id: "living", text: "Living" },
+  { id: "final", text: "Final" },
+  { id: "last-call", text: "Last Call" },
+  { id: "review", text: "Review" },
+  { id: "draft", text: "Draft" },
+  { id: "withdrawn", text: "Withdrawn" },
+  { id: "stagnant", text: "Stagnant" },
+  { id: "meta", text: "Meta" },
+  { id: "informational", text: "Informational" },
+  { id: "core", text: "Core" },
+  { id: "networking", text: "Networking" },
+  { id: "interface", text: "Interface" },
+];
 
 interface EIP {
   _id: string;
@@ -118,6 +134,24 @@ const Type = () => {
   const [data3, setData3] = useState<Data>({eip:[],erc:[],rip:[]});
   const [isLoading, setIsLoading] = useState(true); 
   const [selected, setSelected] = useState<"status" | "type">("type");
+
+      const [isVisible, setIsVisible] = useState(false);
+      let timeout: string | number | NodeJS.Timeout | undefined;
+    
+      useEffect(() => {
+        const handleScroll = () => {
+          setIsVisible(true);
+          clearTimeout(timeout);
+          timeout = setTimeout(() => setIsVisible(false), 1000); // Hide after 1s of no scroll
+        };
+    
+        window.addEventListener("scroll", handleScroll);
+        return () => {
+          window.removeEventListener("scroll", handleScroll);
+          clearTimeout(timeout);
+        };
+      }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -189,6 +223,38 @@ const Type = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
+    <Box
+      as="aside"
+      p={4}
+      bg="gray.100"
+      borderRadius="lg"
+      position="fixed"
+      right="20px"
+      top="80px"
+      width="250px"
+      maxHeight="80vh"
+      overflowY="auto"
+      boxShadow="md"
+      zIndex="10"
+      display={{ base: "none", lg: "block" }} // Hide on mobile
+      opacity={isVisible ? 1 : 0}
+      transition="opacity 0.3s ease-in-out"
+      pointerEvents={isVisible ? "auto" : "none"} // Prevent interaction when hidden
+    >
+      <Heading as="h3" size="md" mb={2}>
+        On this page
+      </Heading>
+      <ul style={{ listStyleType: "none", padding: 0 }}>
+        {sections.map(({ id, text }) => (
+          <li key={id} style={{ marginBottom: "8px" }}>
+            <NextLink href={`#${id}`} color="blue.600" style={{ textDecoration: "none" }}>
+              {text}
+            </NextLink>
+          </li>
+        ))}
+      </ul>
+    </Box>
+
         <Box
           paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}
           marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
