@@ -1,6 +1,6 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
-import { Box, Tabs, TabList, Tab } from "@chakra-ui/react";
+import { Box, Tabs, TabList, Tab, useColorModeValue  } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
 import Link from "next/link";
+import StatusColumnChart from "@/components/StatusColumnChart";
+
 interface EIP {
   _id: string;
   eip: string;
@@ -42,6 +44,8 @@ const categories = [
 
 const Networking = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const bg = useColorModeValue("#f6f6f7", "#171923");
+
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
   useEffect(() => {
     const fetchData = async () => {
@@ -116,6 +120,26 @@ const Networking = () => {
               />
             </FlexBetween>
             <TableStatus cat="Networking" />
+            <Box
+                        marginTop={"2rem"}
+                        bg={bg}
+                        p="0.5rem"
+                        borderRadius="0.55rem"
+                        display="flex"
+                        flexDirection="column"
+                        justifyContent="center"
+                        alignItems="center"
+                        height={400}
+                        _hover={{
+                          border: "1px",
+                          borderColor: "#30A0E0",
+                        }}
+                        as={motion.div}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 } as any}
+                        className="hover: cursor-pointer ease-in duration-200"
+                      ><StatusColumnChart category={"Networking"} type={"EIPs"} /></Box>
             {/* <AreaStatus type={"EIPs"} /> */}
           </Box>
         </motion.div>
