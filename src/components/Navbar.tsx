@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
           href: `/boards`,
         },
         {
-          label: "Editors Leaderboard",
+          label: "Editors & Reviewers Leaderboard",
           href: `/Reviewers`,
         },
         {

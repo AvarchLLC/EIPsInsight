@@ -66,5 +66,5 @@ The Ethereum Insight Proposals Insights is deployed using Vercel for seamless ho
 
 Thank you for your interest in the Ethereum Insight Proposals Insights. Let's work together to make Ethereum even better through collaborative development and insightful proposals. If you have any questions or need assistance, feel free to open an issue or reach out to us.
 
-Happy buidl! 🚀🌐
+Happy build! 🚀🌐
 

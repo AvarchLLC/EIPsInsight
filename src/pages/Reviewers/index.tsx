@@ -135,7 +135,7 @@ const ReviewTracker = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
-      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
       // Merge the two arrays and ensure uniqueness
       const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
@@ -201,7 +201,7 @@ const ReviewTracker = () => {
   };
 
   const selectReviewers = () => {
-    const reviewers2= ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner"]
+    const reviewers2= ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner"]
     const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
       acc[reviewer] = reviewers2.includes(reviewer);
       return acc;
@@ -274,7 +274,7 @@ const ReviewTracker = () => {
     setCsvData(csv); 
   };
 
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "bomanaps","daniellehrner"];
 
   const generateCSVData11 = () => {
     if (!selectedYear || !selectedMonth) {
@@ -542,7 +542,7 @@ const generateCSVData3 = (reviewer: string) => {
 
       // console.log("reviewers:",reviewers);
       // const githubHandles = await fetchReviewers();
-      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
       const githubHandles2 = await fetchReviewers();
       // console.log("active:",activereviewers);
       
@@ -701,12 +701,46 @@ const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => 
   };
 };
 
+const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) => {
+  return {
+    data: chartData,
+    xField: "count",
+    yField: "reviewer",
+    color: (datum: any) => reviewerColorsMap[(datum as { reviewer: string }).reviewer],
+    barWidthRatio: 0.8,
+    label: {
+      position: "middle" as const,
+      style: { fill: "#FFFFFF", opacity: 0.7 },
+    },
+    xAxis: {
+      min: 0, // Ensure the axis starts at 0
+      max: 1500, // Set the maximum scale to 1500
+    },
+    yAxis: {
+      label: {
+        formatter: (reviewer: string) => reviewer, // Display reviewer names on Y-axis
+      },
+    },
+    annotations: chartData.map((datum) => ({
+      type: 'html',
+      position: { count: datum.count, reviewer: datum.reviewer }, // Correcting position
+      html: `
+        <div style="text-align: center;">
+          <img src="https://github.com/${datum.reviewer}.png?size=24" 
+               style="margin-left:1px; width: 24px; height: 24px; border-radius: 50%;" />
+        </div>
+      `,
+      offsetY: -12, // Adjust the vertical position to place above the bar
+    })),
+  };
+};
+
 
 
 
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
   // Get yearly data and format it
   const yearlyData = getYearlyData(data);
@@ -720,7 +754,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
     <Box padding="2rem">
       <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap="2rem">
         {/* Editors Chart */}
-        <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+        <Box width={{ base: "100%", md: "45%" }} padding="1rem" bgColor={bg} borderRadius="0.55rem">
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
             <Heading size="md" color="black">
               {`Editors Leaderboard`}
@@ -747,9 +781,10 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
           </Flex>
           <br />
           <Bar {...getBarChartConfig(editorsData)} />
+          <LastUpdatedDateTime  name="EditorsTool"/>
         </Box>
         {/* Reviewers Chart */}
-        <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+        <Box width={{ base: "100%", md: "45%" }} padding="1rem" bgColor={bg} borderRadius="0.55rem">
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
             <Heading size="md" color="black">
               {`Reviewers Leaderboard`}
@@ -775,7 +810,8 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
             </CSVLink>
           </Flex>
           <br />
-          <Bar {...getBarChartConfig(reviewersData)} />
+          <Bar {...getBarChartConfig2(reviewersData)} />
+          <LastUpdatedDateTime  name="EditorsTool"/>
         </Box>
 
         
@@ -787,7 +823,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 
 const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
   let monthlyChartData: any; // Declare monthlyChartData
   if (selectedMonth != null) {
@@ -1029,13 +1065,26 @@ const renderChart4 = () => {
 };
 
 
-const renderCharts3 = () => {
+const renderCharts3 = (reviewsdata: PRData[]) => {
   const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
   const filteredData = dataToUse.filter(item =>
     Object.keys(showReviewer)
       .filter(reviewer => showReviewer[reviewer])
       .includes(item.reviewer)
   );
+
+  console.log("new data:", reviewsdata);
+
+  const yearlyData = getYearlyData(reviewsdata);
+  const yearlyChartData = formatChartData(yearlyData);
+
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
+
+  // Separate data into reviewers and editors
+  // const reviewersData2 = yearlyChartData?.filter((item: any) => reviewersList.includes(item.reviewer));
+  // const editorsData2 = yearlyChartData?.filter((item: any) => !reviewersList.includes(item.reviewer));
+
+  // console.log("new data 2",reviewersData2);
 
   const generateMonthYearRange = (start: string, end: string) => {
     const range = [];
@@ -1049,6 +1098,8 @@ const renderCharts3 = () => {
   
     return range;
   };
+
+  
   
   const completeXAxisRange = generateMonthYearRange("2019-05", dayjs().format("YYYY-MM"));
 
@@ -1060,27 +1111,42 @@ const renderCharts3 = () => {
       reviewerColorsMap[item.reviewer] = `hsl(${(index * (360 / totalReviewers)) % 360}, 85%, 50%)`;
     }
   });
-  // console.log(reviewerColorsMap)
-const filledData = reviewers.flatMap((reviewer) => {
-  const reviewerData = filteredData.filter((item) => item.reviewer === reviewer);
-  const dataMap = new Map(reviewerData.map((item) => [item.monthYear, item]));
 
-  return completeXAxisRange.map((monthYear) => ({
-    monthYear,
-    reviewer,
-    count: dataMap.get(monthYear)?.count || 0, // Default to 0 if missing
-  }));
-});
+  const filledData = reviewers.flatMap((reviewer) => {
+    const reviewerData = filteredData.filter((item) => item.reviewer === reviewer);
+    const dataMap = new Map(reviewerData.map((item) => [item.monthYear, item]));
 
-// Generate chart configurations for each reviewer
-const reviewerCharts = reviewers.map((reviewer) => {
-  const reviewerData = filledData.filter((item) => item.reviewer === reviewer);
+    return completeXAxisRange.map((monthYear) => ({
+      monthYear,
+      reviewer,
+      count: dataMap.get(monthYear)?.count || 0, // Default to 0 if missing
+    }));
+  });
 
+  // Separate reviewers and editors
+  // const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
+  const editorsData = filledData.filter(item => !reviewersList.includes(item.reviewer));
+  const reviewersData = filledData.filter(item => reviewersList.includes(item.reviewer));
+
+  const getReviewerCount = (name: string) => {
+    console.log("name:",name);
+    const reviewerData = yearlyChartData.find((r) => r.reviewer === name);
+    console.log(reviewerData)
+    return reviewerData ? reviewerData.count : 0; // Return 0 if not found
+  };
+
+  // const getEditorCount = (name: string) => {
+  //   const reviewerData = yearlyChartData.find((r) => r.reviewer === name);
+  //   return reviewerData ? reviewerData.count : 0; // Return 0 if not found
+  // };
+
+  const generateChart = (reviewer:any, data:any) => {
     const config = {
-      data: reviewerData,
+      data: data,
       xField: "monthYear",
       yField: "count",
       seriesField: "reviewer",
+      height: 200,
       geometryOptions: [
         {
           geometry: "line",
@@ -1091,10 +1157,10 @@ const reviewerCharts = reviewers.map((reviewer) => {
           },
         },
       ],
-      xAxis: { label: { rotate: -45 } }, // Rotate X-axis labels for better readability
+      xAxis: { label: { rotate: -45 } },
       yAxis: {
-        max: 110, // Set a fixed maximum value for the Y-axis
-        min: 0, // Ensure the Y-axis always starts at 0
+        max: 110,
+        min: 0,
         label: {
           formatter: (text: string) => {
             const value = parseFloat(text);
@@ -1103,13 +1169,13 @@ const reviewerCharts = reviewers.map((reviewer) => {
         },
       },
       slider: {
-        start: sliderValue2[0], // Start value for the slider
-        end: sliderValue2[1], // End value for the slider
-        step: 0.01, // Define the step value for the slider
-        min: 0, // Minimum value for the slider
-        max: 1, // Maximum value for the slider
+        start: sliderValue2[0],
+        end: sliderValue2[1],
+        step: 0.01,
+        min: 0,
+        max: 1,
         onChange: (value: [number, number]) => {
-          setSliderValue2(value); // Update state when slider value changes
+          setSliderValue2(value);
         },
         onAfterChange: (value: [number, number]) => {
           // console.log("Slider moved to:", value);
@@ -1120,103 +1186,120 @@ const reviewerCharts = reviewers.map((reviewer) => {
 
     return (
       <Box
-      id={reviewer}
-  key={reviewer}
-  bgColor={bg}
-  padding="2rem"
-  borderRadius="0.55rem"
-  // _hover={{
-  //   border: "1px",
-  //   borderColor: "#30A0E0",
-  // }}
-  style={{ flex: "1 0 45%", minWidth: "300px", margin: "10px" }}
->
-  {/* Reviewer Name and CSV Download Button */}
-  <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-  {/* Reviewer Info (Image and GitHub Handle Link) */}
-  <Flex alignItems="center">
-    <img
-      src={`https://github.com/${reviewer}.png?size=24`}
-      alt={`${reviewer}'s avatar`}
-      style={{
-        marginRight: "8px",
-        width: "48px",
-        height: "48px",
-        borderRadius: "50%",
-      }}
-    />
-    <a
-      href={`https://github.com/${reviewer}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        fontWeight: "bold",
-        fontSize: "1rem",
-        textDecoration: "none",
-        color: "black",
-      }}
-    >
-      {reviewer}
-    </a>
-    {/* <CopyLink link={`https://eipsinsight.com/Reviewers#${reviewer}`}/> */}
-  </Flex>
-
-  {/* CSV Download Button */}
-  <CSVLink
-    data={csvData.length ? csvData : []}
-    filename={`${reviewer}_reviews_data.csv`}
-    // onClick={(e: any) => {
-    //   generateCSVData3(reviewer); // Pass the reviewer name to generateCSVData3
-    //   if (csvData.length === 0) {
-    //     e.preventDefault();
-    //     console.error("CSV data is empty or not generated correctly.");
-    //   }
-    // }}
-    onClick={async () => {
-      try {
-        // Trigger the CSV conversion and download
-        generateCSVData3(reviewer);
-  
-        // Trigger the API call
-        await axios.post("/api/DownloadCounter");
-      } catch (error) {
-        console.error("Error triggering download counter:", error);
-      }
-    }}
-  >
-    <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }} >
-      {loading3 ? <Spinner size="sm" /> : "Download CSV"}
-    </Button>
-  </CSVLink>
-</Flex>
-
-
-  {/* Chart Component */}
-  {/* <Box className="w-full" style={{ textAlign: "center" }}>
-    <h3>{reviewer}</h3>
-  </Box> */}
-  <Line {...config} />
-
-  {/* DateTime Component */}
-  <Box className="w-full" style={{ marginTop: "20px" }}>
-    <LastUpdatedDateTime  name="EditorsTool"/>
-  </Box>
-</Box>
-
+        id={reviewer}
+        key={reviewer}
+        bgColor={bg}
+        padding="0.5rem"
+        borderRadius="0.55rem"
+        style={{ flex: "1 0 22%", minWidth: "200px", margin: "2px" }}
+        // style={{ flex: "1 0 100%", minWidth: "100%", margin: "2px 0" }} 
+        sx={{
+          "@media (min-width: 480px)": { flex: "1 0 45%", minWidth: "45%" }, // 2 columns on medium screens
+          "@media (min-width: 768px)": { flex: "1 0 22%", minWidth: "22%" }, // 4 columns on large screens
+        }}
+      >
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" flexWrap="wrap">
+          <Flex alignItems="center" flex="1" minWidth="150px" marginBottom={{ base: "0.5rem", md: "0" }}>
+            <img
+              src={`https://github.com/${reviewer}.png?size=24`}
+              alt={`${reviewer}'s avatar`}
+              style={{
+                marginRight: "8px",
+                width: "48px",
+                height: "48px",
+                borderRadius: "50%",
+              }}
+            />
+            <a
+              href={`https://github.com/${reviewer}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontWeight: "bold",
+                fontSize: "1rem",
+                textDecoration: "none",
+                color: "black",
+              }}
+            >
+              {reviewer} ({getReviewerCount(reviewer)})
+            </a>
+          </Flex>
+          <CSVLink
+            data={csvData.length ? csvData : []}
+            filename={`${reviewer}_reviews_data.csv`}
+            onClick={async () => {
+              try {
+                generateCSVData3(reviewer);
+                await axios.post("/api/DownloadCounter");
+              } catch (error) {
+                console.error("Error triggering download counter:", error);
+              }
+            }}
+          >
+            <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }}>
+              {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+            </Button>
+          </CSVLink>
+        </Flex>
+        <Line {...config} />
+        {/* <Box className="w-full" style={{ marginTop: "20px" }}>
+          <LastUpdatedDateTime name="EditorsTool" />
+        </Box> */}
+      </Box>
     );
-  });
+  };
 
-  // Render charts in a responsive grid layout
+  const editorCharts = Array.from(new Set(editorsData.map(item => item.reviewer))).map(reviewer => 
+    generateChart(reviewer, editorsData.filter(item => item.reviewer === reviewer)))
+  ;
+
+  const reviewerCharts = Array.from(new Set(reviewersData.map(item => item.reviewer))).map(reviewer => 
+    generateChart(reviewer, reviewersData.filter(item => item.reviewer === reviewer))
+  );
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "space-around",
-        gap: "20px",
-      }}
-    >
-      {reviewerCharts}
+    <div>
+       <Heading
+              as="h3"
+              size="lg"
+              marginBottom={2}
+              // marginTop={2}
+              fontWeight="bold"
+              color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          Editors
+        </Heading>
+      
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-around",
+          gap: "20px",
+        }}
+      >
+        {editorCharts}
+      </div>
+      <Heading
+              as="h3"
+              size="lg"
+              marginBottom={2}
+              marginTop={2}
+              fontWeight="bold"
+              color={useColorModeValue("#3182CE", "blue.300")}
+        >
+        Reviewers
+      </Heading>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-around",
+          gap: "20px",
+        }}
+      >
+        {reviewerCharts}
+      </div>
     </div>
   );
 };
@@ -1311,9 +1394,10 @@ const reviewerCharts = reviewers.map((reviewer) => {
 
   const renderTable = (year: string, month: string, reviewerFilter: any) => {
     // console.log(data);
-    const filteredData = data;
+    const filteredData = data.filter(item => showReviewer[item.reviewer]);;
 
-        // console.log("filtered data:",filteredData);
+        console.log("filtered data:",filteredData);
+        console.log("show reviewers:", showReviewer);
 
     return (
         <Box mt={2} overflowX="auto" overflowY="auto" maxHeight="600px" border="2px solid #e2e8f0" borderRadius="10px 10px 10px 10px" boxShadow="lg">
@@ -1713,7 +1797,7 @@ const editorsSpecialityChart = () => {
   const yearlyChartData3 = formatChartData(processData3);
   // console.log("new chart data:",yearlyChartData1)
 
-  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+  const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
   // Step 1: Filter the data to include only target reviewers
   const filteredEIPData = yearlyChartData1.filter((item) =>
@@ -1838,7 +1922,7 @@ const router = useRouter();
           <Heading
             size="xl"
             marginBottom={10}
-            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Editors Leaderboard</Heading>
+            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Editors & Reviewers Leaderboard</Heading>
 
 
 <Box
@@ -1854,7 +1938,7 @@ const router = useRouter();
           size="lg"
           marginBottom={4}
           color={useColorModeValue("#3182CE", "blue.300")}
-        > Editors Leaderboard FAQ
+        > Editors & Reviewers Leaderboard FAQ
         </Heading>
         <Box
   bg="blue" // Gray background
@@ -1890,8 +1974,8 @@ const router = useRouter();
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
         >
-          This tool provides a comprehensive overview of all EIP editor reviews conducted to date. 
-          It displays the total number of reviews each month for each editor, allowing you to easily track and analyze review activity across different months and editors.
+          This tool provides a comprehensive overview of all EIP editor/reviewer reviews conducted to date. 
+          It displays the total number of reviews each month for each editor/reviewer, allowing you to easily track and analyze review activity across different months and editors.
         </Text>
 
         <Heading
@@ -1924,11 +2008,30 @@ const router = useRouter();
           fontSize="md"
           color={useColorModeValue("gray.800", "gray.200")}
           className="text-justify"
+          marginBottom={2}
         >
           You can refine the data by selecting or deselecting specific editors from the checkbox list. 
           This will filter the chart and table to show data only for the selected editors, enabling you to focus on individual contributions.
         </Text>
+
+        <Heading
+          as="h4"
+          size="md"
+          marginBottom={4}
+          color={useColorModeValue("#3182CE", "blue.300")}
+        >
+          How does this tool work?
+        </Heading>
+        <Text
+          fontSize="md"
+          color={useColorModeValue("gray.800", "gray.200")}
+          className="text-justify"
+        >
+          The tool will be going through all the reviews made by the editor/reviewer and update the database every 24 hours.
+          This tool captures reviews only if the person is marked as a reviewer and has performed a review activity on the PR. If no review is made, it won't be counted, even if the person is listed as a reviewer.
+          </Text>
         <br/>
+
         <Text
           fontSize="md"
           color={useColorModeValue("gray.800", "gray.200")}
@@ -1936,6 +2039,7 @@ const router = useRouter();
         >
           Note: The reviews made by the editor during their active time as an editor are considered for plotting the charts 
         </Text>
+        
         <br/>
       </Collapse>
 
@@ -1998,7 +2102,7 @@ const router = useRouter();
      
         <Box padding="0.5rem" borderRadius="0.55rem">
           <Box
-            bgColor={bg}
+            // bgColor={bg}
             // padding="2rem"
             borderRadius="0.55rem"
             // _hover={{
@@ -2011,18 +2115,184 @@ const router = useRouter();
             
             <Box id="Leaderboard" className="w-full">
               {renderCharts(chart1data, selectedYear, selectedMonth)}
-              <LastUpdatedDateTime  name="EditorsTool"/>
+              
             </Box>
           </Box>
-          <br />
-          <br />
+          {/* <br /> */}
+          {/* <br /> */}
         </Box>
+
+        {/* <br/> */}
+
+            <Box
+              bgColor={bg}
+              padding="2rem"
+              borderRadius="0.55rem"
+              // _hover={{
+              //   border: "1px",
+              //   borderColor: "#30A0E0",
+              // }}
+            >
+            <Box id="ActivityTimeline" className="w-full">
+
+            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+            <Heading
+              as="h3"
+              size="lg"
+              marginBottom={2}
+              marginTop={2}
+              fontWeight="bold"
+              color={useColorModeValue("#3182CE", "blue.300")}
+            > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
+            </Heading> 
+              <Flex alignItems="center">
+                <Button
+                  colorScheme="blue"
+                  onClick={() => setShowFilters2(!showFilters2)}
+                  leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
+                  fontSize={{ base: "0.6rem", md: "md" }} 
+                  mr="1rem"
+                >
+                  {showFilters2 ? "Hide Filters" : "Show Filters"}
+                </Button>
+              </Flex>
+            </Flex>
+
+            {showFilters2 && (
+      <Box
+        bg="blue.50"
+        borderRadius="md"
+        p={4}
+        mt="1rem"
+      >
+        <Flex justifyContent="flex-start" flexDirection={{ base: "column", md: "row" }} gap="2rem" mb="1rem">
+          
+          <Box>
+            <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
+            <Flex>
+            <HStack spacing={4}>
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                {selectedStartYear2 ? `${selectedStartYear2}` : 'Select Year'}
+              </MenuButton>
+              <MenuList bg="white" color="black" borderColor="blue.500">
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
+                  <MenuItem key={year} onClick={() => setSelectedStartYear2(year)} bg="white" color="black">
+                    {year}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+              {selectedStartMonth2 ? `${selectedStartMonth2}` : 'Select Month'}
+            </MenuButton>
+            <MenuList bg="white" color="black" borderColor="blue.500">
+              {[
+                { name: 'Jan', value: '01' },
+                { name: 'Feb', value: '02' },
+                { name: 'Mar', value: '03' },
+                { name: 'Apr', value: '04' },
+                { name: 'May', value: '05' },
+                { name: 'Jun', value: '06' },
+                { name: 'Jul', value: '07' },
+                { name: 'Aug', value: '08' },
+                { name: 'Sep', value: '09' },
+                { name: 'Oct', value: '10' },
+                { name: 'Nov', value: '11' },
+                { name: 'Dec', value: '12' },
+              ].map((month) => (
+                <MenuItem
+                  key={month.value}
+                  onClick={() => setSelectedStartMonth2(month.value)}
+                  bg="white"
+                  color="black"
+                >
+                  {month.name}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+            </HStack>
+            </Flex>
+          </Box>
+
+          
+          <Box>
+            <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
+            <Flex>
+            <HStack spacing={4}>
+              {/* Year Dropdown */}
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                  {selectedEndYear2 ? `${selectedEndYear2}` : 'Select Year'}
+                </MenuButton>
+                <MenuList bg="white" color="black" borderColor="blue.500">
+                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
+                    <MenuItem
+                      key={year}
+                      onClick={() => setSelectedEndYear2(year)}
+                      bg="white"
+                      color="black"
+                    >
+                      {year}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+
+              {/* Month Dropdown */}
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+                  {selectedEndMonth2 ? `${selectedEndMonth2}` : 'Select Month'}
+                </MenuButton>
+                <MenuList bg="white" color="black" borderColor="blue.500">
+                  {[
+                    { name: 'Jan', value: '01' },
+                    { name: 'Feb', value: '02' },
+                    { name: 'Mar', value: '03' },
+                    { name: 'Apr', value: '04' },
+                    { name: 'May', value: '05' },
+                    { name: 'Jun', value: '06' },
+                    { name: 'Jul', value: '07' },
+                    { name: 'Aug', value: '08' },
+                    { name: 'Sep', value: '09' },
+                    { name: 'Oct', value: '10' },
+                    { name: 'Nov', value: '11' },
+                    { name: 'Dec', value: '12' },
+                  ].map((month) => (
+                    <MenuItem
+                      key={month.value}
+                      onClick={() => setSelectedEndMonth2(month.value)}
+                      bg="white"
+                      color="black"
+                    >
+                      {month.name}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+            </HStack>
+
+            </Flex>
+          </Box>
+          <Box>
+        </Box>
+        </Flex>
+      </Box>
+    )}
+
+               {editorsActivity()}
+            </Box>
+            </Box>
  
 
         <Box
   bgColor={bg}
   padding="2rem"
   borderRadius="0.55rem"
+  mt={2}
   // _hover={{
   //   border: "1px",
   //   borderColor: "#30A0E0",
@@ -2440,7 +2710,7 @@ const router = useRouter();
        </HStack>
       </Flex>
 
-      <Flex justify="center" mt={4}>
+      <Flex justify="center" mt={2}>
         
       <HStack spacing={4}>
          
@@ -2519,7 +2789,7 @@ const router = useRouter();
         <>
       
             {selectedYear && selectedMonth && (
-                <Box mt={8} display="flex" justifyContent="flex-end">
+                <Box mt={4} display="flex" justifyContent="flex-end">
                 <CSVLink
                   data={csvData.length ? csvData : []}
                   filename={`reviews_${selectedYear}_${selectedMonth}.csv`}
@@ -2555,173 +2825,10 @@ const router = useRouter();
             <br/>
             <Box className="w-full">
             {/* <br/> */}
-              {renderCharts3()} 
+              {renderCharts3(chart1data)} 
               {/* <br/> */}
             </Box>
-            <br/>
-
-            <Box
-              bgColor={bg}
-              padding="2rem"
-              borderRadius="0.55rem"
-              // _hover={{
-              //   border: "1px",
-              //   borderColor: "#30A0E0",
-              // }}
-            >
-            <Box id="ActivityTimeline" className="w-full">
-
-            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-            <Heading
-              as="h3"
-              size="lg"
-              marginBottom={2}
-              marginTop={2}
-              fontWeight="bold"
-              color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
-            </Heading> 
-              <Flex alignItems="center">
-                <Button
-                  colorScheme="blue"
-                  onClick={() => setShowFilters2(!showFilters2)}
-                  leftIcon={showFilters ? <AiOutlineClose /> : <FiFilter />}
-                  fontSize={{ base: "0.6rem", md: "md" }} 
-                  mr="1rem"
-                >
-                  {showFilters2 ? "Hide Filters" : "Show Filters"}
-                </Button>
-              </Flex>
-            </Flex>
-
-            {showFilters2 && (
-      <Box
-        bg="blue.50"
-        borderRadius="md"
-        p={4}
-        mt="1rem"
-      >
-        <Flex justifyContent="flex-start" flexDirection={{ base: "column", md: "row" }} gap="2rem" mb="1rem">
-          
-          <Box>
-            <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
-            <Flex>
-            <HStack spacing={4}>
-            <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
-                {selectedStartYear2 ? `${selectedStartYear2}` : 'Select Year'}
-              </MenuButton>
-              <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
-                  <MenuItem key={year} onClick={() => setSelectedStartYear2(year)} bg="white" color="black">
-                    {year}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-
-            <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
-              {selectedStartMonth2 ? `${selectedStartMonth2}` : 'Select Month'}
-            </MenuButton>
-            <MenuList bg="white" color="black" borderColor="blue.500">
-              {[
-                { name: 'Jan', value: '01' },
-                { name: 'Feb', value: '02' },
-                { name: 'Mar', value: '03' },
-                { name: 'Apr', value: '04' },
-                { name: 'May', value: '05' },
-                { name: 'Jun', value: '06' },
-                { name: 'Jul', value: '07' },
-                { name: 'Aug', value: '08' },
-                { name: 'Sep', value: '09' },
-                { name: 'Oct', value: '10' },
-                { name: 'Nov', value: '11' },
-                { name: 'Dec', value: '12' },
-              ].map((month) => (
-                <MenuItem
-                  key={month.value}
-                  onClick={() => setSelectedStartMonth2(month.value)}
-                  bg="white"
-                  color="black"
-                >
-                  {month.name}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-            </HStack>
-            </Flex>
-          </Box>
-
-          
-          <Box>
-            <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
-            <Flex>
-            <HStack spacing={4}>
-              {/* Year Dropdown */}
-              <Menu>
-                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
-                  {selectedEndYear2 ? `${selectedEndYear2}` : 'Select Year'}
-                </MenuButton>
-                <MenuList bg="white" color="black" borderColor="blue.500">
-                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
-                    <MenuItem
-                      key={year}
-                      onClick={() => setSelectedEndYear2(year)}
-                      bg="white"
-                      color="black"
-                    >
-                      {year}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-
-              {/* Month Dropdown */}
-              <Menu>
-                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
-                  {selectedEndMonth2 ? `${selectedEndMonth2}` : 'Select Month'}
-                </MenuButton>
-                <MenuList bg="white" color="black" borderColor="blue.500">
-                  {[
-                    { name: 'Jan', value: '01' },
-                    { name: 'Feb', value: '02' },
-                    { name: 'Mar', value: '03' },
-                    { name: 'Apr', value: '04' },
-                    { name: 'May', value: '05' },
-                    { name: 'Jun', value: '06' },
-                    { name: 'Jul', value: '07' },
-                    { name: 'Aug', value: '08' },
-                    { name: 'Sep', value: '09' },
-                    { name: 'Oct', value: '10' },
-                    { name: 'Nov', value: '11' },
-                    { name: 'Dec', value: '12' },
-                  ].map((month) => (
-                    <MenuItem
-                      key={month.value}
-                      onClick={() => setSelectedEndMonth2(month.value)}
-                      bg="white"
-                      color="black"
-                    >
-                      {month.name}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-            </HStack>
-
-            </Flex>
-          </Box>
-          <Box>
-        </Box>
-        </Flex>
-      </Box>
-    )}
-
-               {editorsActivity()}
-            </Box>
-            </Box>
+            
     <Box>
 
       <br/>
