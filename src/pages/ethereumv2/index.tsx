@@ -98,10 +98,10 @@ const EthereumV2 = () => {
                   data2={gasUsed}
                   data3={gasBurntData}
                   // totalBurntLastHour={calculateTotalBurntLastHour(gasBurntData)}
-                  // ethPriceInUSD={ethPriceInUSD}
+                  ethPriceInUSD={ethPriceInUSD}
                 />
                 <TransactionCountChart blocks={allBlocks}/>
-                <RecentTransactions transactions={recentTransactions} ethPriceInUSD={ethPriceInUSD} />
+                <RecentTransactions transactions={recentTransactions} timestamp={last10Blocks[0].timestamp} ethPriceInUSD={ethPriceInUSD} />
                 <RecentBlocks blocks={last10Blocks} ethPriceInUSD={ethPriceInUSD} />
               </>
             )}

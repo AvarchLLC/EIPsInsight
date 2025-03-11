@@ -159,7 +159,7 @@ export const fetchEthPriceInUSD = async (): Promise<number> => {
 
 // utils/conversion.ts
 export const convertEthToUSD = (eth: number, ethPriceInUSD: number): string => {
-    return (eth * ethPriceInUSD).toFixed(2);
+    return (eth * ethPriceInUSD).toFixed(6);
   };
   
   export const convertGweiToUSD = (gwei: number, ethPriceInUSD: number): string => {

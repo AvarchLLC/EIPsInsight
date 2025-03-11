@@ -45,6 +45,16 @@ export default function AllLayout({
             });
           `}
         </Script>
+      
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></script>
+        <script>
+          {`window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-R36R5NJFTW');
+          `}
+        </script>
       </head>
       <body className={`${mont.className}`}>
         <ColorModeScript initialColorMode="dark" />
