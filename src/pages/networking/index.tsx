@@ -1,6 +1,6 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Tabs, TabList, Tab } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
@@ -12,6 +12,7 @@ import AreaStatus from "@/components/AreaStatus";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
+import Link from "next/link";
 interface EIP {
   _id: string;
   eip: string;
@@ -27,6 +28,18 @@ interface EIP {
   unique_ID: number;
   __v: number;
 }
+
+
+
+const categories = [
+  { name: "Core", path: "/core" },
+  { name: "Networking", path: "/networking" },
+  { name: "Interface", path: "/interface" },
+  { name: "Meta", path: "/meta" },
+  { name: "Informational", path: "/informational" },
+  { name: "ERC", path: "/erc" },
+];
+
 const Networking = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
@@ -81,6 +94,15 @@ const Networking = () => {
           transition={{ duration: 0.5 }}
         >
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
+          <Tabs isFitted variant="enclosed">
+              <TabList>
+                {categories.map((category) => (
+                  <Link key={category.name} href={category.path} passHref>
+                    <Tab as="a">{category.name}</Tab>
+                  </Link>
+                ))}
+              </TabList>
+            </Tabs>
             <FlexBetween>
               <Header
                 title={`Standard Tracks - Networking [ ${
