@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 import ConsentBanner from '@/components/ConsenstBanner';
+import FloatingContributionIcon from '@/components/FloatingContributionIcon';
 
 const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
@@ -25,26 +26,16 @@ export default function AllLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Analytics Script */}
-        <Script
-          strategy="afterInteractive"
-          src="https://www.googletagmanager.com/gtag/js?id=G-N59QCDB9WN"
-        />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-        >
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-N59QCDB9WN', { anonymize_ip: true });
-            gtag('consent', 'default', {
-              ad_storage: 'denied',
-              analytics_storage: 'denied',
-            });
+      
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></script>
+        <script>
+          {`window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-R36R5NJFTW');
           `}
-        </Script>
+        </script>
       </head>
       <body className={`${mont.className}`}>
         <ColorModeScript initialColorMode="dark" />
@@ -74,6 +65,7 @@ export default function AllLayout({
               <Navbar />
               <Suspense>{children}</Suspense>
               <ConsentBanner />
+              <FloatingContributionIcon />
               <Footer />
             </Providers>
           </motion.div>
