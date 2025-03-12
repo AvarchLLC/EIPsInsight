@@ -259,6 +259,7 @@ const ReviewTracker = () => {
     const filteredData = data
   
     const csv = data.map((pr: PR) => ({
+        Repo: pr.repo,
         PR_Number: pr.prNumber,
         Title: pr.prTitle,
         Reviewer: pr.reviewer,
@@ -287,6 +288,7 @@ const ReviewTracker = () => {
     const filteredData = data.filter((pr: PR) => reviewersList.includes(pr.reviewer));
   
     const csv = filteredData.map((pr: PR) => ({
+        Repo: pr.repo,
         PR_Number: pr.prNumber,
         Title: pr.prTitle,
         Reviewer: pr.reviewer,
@@ -313,6 +315,7 @@ const ReviewTracker = () => {
     const filteredData = data.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
   
     const csv = filteredData.map((pr: PR) => ({
+        Repo: pr.repo,
         PR_Number: pr.prNumber,
         Title: pr.prTitle,
         Reviewer: pr.reviewer,
@@ -336,6 +339,7 @@ const generateCSVData9 = () => {
   const filteredData = downloaddata.filter((pr: PR) => reviewersList.includes(pr.reviewer));
 
   const csv = filteredData.map((pr: PR) => ({
+    Repo: pr.repo,
     PR_Number: pr.prNumber,
     Title: pr.prTitle,
     Reviewer: pr.reviewer,
@@ -355,6 +359,7 @@ const generateCSVData10 = () => {
   const filteredData = downloaddata.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
 
   const csv = filteredData.map((pr: PR) => ({
+    Repo: pr.repo,
     PR_Number: pr.prNumber,
     Title: pr.prTitle,
     Reviewer: pr.reviewer,
@@ -409,6 +414,7 @@ const generateCSVData5 = () => {
     // console.log("Filtered Data 5:", filteredData);
 
     const csv = filteredData.map((pr: PR) => ({
+      Repo: pr.repo,
       PR_Number: pr.prNumber,
       Title: pr.prTitle,
       Reviewer: pr.reviewer,
@@ -469,6 +475,7 @@ const generateCSVData3 = (reviewer: string) => {
 
     // Map the filtered data to CSV format
     const csv = filteredData.map((pr: PR) => ({
+      Repo: pr.repo,
       PR_Number: pr.prNumber,
       Title: pr.prTitle,
       Reviewer: pr.reviewer,

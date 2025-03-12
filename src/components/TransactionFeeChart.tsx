@@ -1,8 +1,9 @@
-import { Box, Text, useColorModeValue, Flex, Button } from "@chakra-ui/react";
+import { Box, Text, useColorModeValue, Flex, Button, Heading, Collapse, IconButton } from "@chakra-ui/react";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { convertGweiToUSD } from "./ethereumService";
 import CalendarHeatmap from 'react-calendar-heatmap';
+import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 
 // Dynamically import the Line chart to avoid SSR issues
 const Line = dynamic(() => import("@ant-design/plots").then((mod) => mod.Line), { ssr: false });
@@ -20,6 +21,11 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
 
   // State for controlling the selected data type
   const [dataType, setDataType] = useState<DataType>("fee");
+
+  // State for controlling the collapse of the FAQ section
+  const [show, setShow] = useState(false);
+
+  const toggleCollapse = () => setShow(!show);
 
   // Get the selected data based on the data type
   const getSelectedData = () => {
@@ -136,6 +142,111 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
 
   return (
     <Box p={5} shadow="md" borderWidth="1px" borderRadius="md" m={20}>
+      <Box
+            pl={4}
+            bg={"white"}
+            borderRadius="5"
+            pr="8px"
+            paddingLeft="20px"
+            marginBottom={2}
+            pb="15px"
+          >
+            <Flex justify="space-between" align="center">
+              <Heading
+                as="h3"
+                size="lg"
+                marginBottom={4}
+                color={useColorModeValue("#3182CE", "blue.300")}
+              > Transaction fee Chart FAQ
+              </Heading>
+              <Box
+        bg="blue" // Gray background
+        borderRadius="md" // Rounded corners
+        padding={2} // Padding inside the box
+      >
+        <IconButton
+          onClick={toggleCollapse}
+          icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+          variant="ghost"
+          h="24px" // Smaller height
+           w="20px"
+          aria-label="Toggle Instructions"
+         bg="blue"
+        />
+      </Box>
+            </Flex>
+      
+            <Collapse in={show}>
+  <Heading
+    as="h4"
+    size="md"
+    marginBottom={4}
+    color={useColorModeValue("#3182CE", "blue.300")}
+  >
+    How to calculate the gas for a transaction?
+  </Heading>
+  <Text
+    fontSize="md"
+    marginBottom={2}
+    color={useColorModeValue("gray.800", "gray.200")}
+    className="text-justify"
+  >
+    The total gas cost for a transaction depends on three factors:
+    <br />
+    1. <strong>Gas Limit</strong>: The maximum amount of gas you're willing to spend. Simple ETH transfers use 21,000 gas, while smart contract interactions can use 100,000–500,000 gas or more.
+    <br />
+    2. <strong>Base Fee</strong>: The minimum gas price required to include your transaction in a block. This fluctuates based on network demand.
+    <br />
+    3. <strong>Priority Fee (Tip)</strong>: An additional amount paid to miners to prioritize your transaction.
+    <br />
+    <br />
+    The total gas cost is calculated as:
+    <br />
+    <strong>Total Gas Cost = (Base Fee + Priority Fee) * Gas Limit</strong>
+    <br />
+    <br />
+    For example, if the base fee is 10 Gwei, the priority fee is 2 Gwei, and the gas limit is 21,000, the total gas cost would be:
+    <br />
+    <strong>(10 + 2) * 21,000 = 252,000 Gwei = 0.000252 ETH</strong>
+    <br />
+    At an ETH price of $3,000, this would be <strong>$0.756</strong>.
+  </Text>
+
+  <Heading
+    as="h4"
+    size="md"
+    marginBottom={4}
+    color={useColorModeValue("#3182CE", "blue.300")}
+  >
+    Why do transactions often cost $3–$4 or more?
+  </Heading>
+  <Text
+    fontSize="md"
+    marginBottom={2}
+    color={useColorModeValue("gray.800", "gray.200")}
+    className="text-justify"
+  >
+    Transactions often cost $3–$4 or more because:
+    <br />
+    1. <strong>Complex Transactions</strong>: Interacting with smart contracts (e.g., swapping tokens or minting NFTs) requires more gas (e.g., 100,000–500,000 gas units).
+    <br />
+    2. <strong>Network Congestion</strong>: During high demand, the base fee can spike (e.g., 50–100 Gwei or more).
+    <br />
+    3. <strong>Priority Fees</strong>: To ensure fast processing, you may need to pay a higher priority fee (e.g., 5–10 Gwei).
+    <br />
+    <br />
+    For example, a transaction with a base fee of 50 Gwei, a priority fee of 5 Gwei, and a gas limit of 100,000 would cost:
+    <br />
+    <strong>(50 + 5) * 100,000 = 5,500,000 Gwei = 0.0055 ETH</strong>
+    <br />
+    At an ETH price of $3,000, this would be <strong>$16.50</strong>.
+  </Text>
+</Collapse>
+      
+           
+          </Box>
+      
+
       <Text
         fontSize={20}
         fontWeight="bold"

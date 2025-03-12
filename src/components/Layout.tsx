@@ -8,7 +8,8 @@ import "../app/globals.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
-// import Script from "next/script";
+import Script from "next/script";
+import FloatingContributionIcon from "./FloatingContributionIcon";
 
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
@@ -41,8 +42,19 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
       <Head>
         <title>EIPs Insights</title>
         <link rel="icon" href="/eipFavicon.png" />
-        
       </Head>
+
+      {/* Google Analytics */}
+      <Script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></Script>
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-R36R5NJFTW');
+        `}
+      </Script>
+
       <ColorModeScript initialColorMode="dark" />
       <Providers>
         <Navbar />
@@ -68,6 +80,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         </Box> */}
 
         {children}
+        <FloatingContributionIcon/>
         <LargeWithAppLinksAndSocial />
       </Providers>
     </motion.div>
