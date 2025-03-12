@@ -1,6 +1,6 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Tabs, useColorModeValue  } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
 
+import StatusColumnChart from "@/components/StatusColumnChart";
+
 interface EIP {
   _id: string;
   eip: string;
@@ -20,15 +22,28 @@ interface EIP {
   status: string;
   type: string;
   category: string;
-  created: string;
   discussion: string;
   deadline: string;
   requires: string;
   unique_ID: number;
   __v: number;
 }
+
+import {TabList, Tab } from "@chakra-ui/react";
+import Link from "next/link";
+
+const categories = [
+  { name: "Core", path: "/core" },
+  { name: "Networking", path: "/networking" },
+  { name: "Interface", path: "/interface" },
+  { name: "Meta", path: "/meta" },
+  { name: "Informational", path: "/informational" },
+  { name: "ERC", path: "/erc" },
+];
+
 const Info = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const bg = useColorModeValue("#f6f6f7", "#171923");
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
   useEffect(() => {
     const fetchData = async () => {
@@ -83,6 +98,16 @@ const Info = () => {
           transition={{ duration: 0.5 }}
         >
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
+                        {/* Navigation Tabs with Links */}
+                        <Tabs isFitted variant="enclosed">
+              <TabList>
+                {categories.map((category) => (
+                  <Link key={category.name} href={category.path} passHref>
+                    <Tab as="a">{category.name}</Tab>
+                  </Link>
+                ))}
+              </TabList>
+            </Tabs>
             <FlexBetween>
               <Header
                 title={`Informational [ ${
@@ -92,8 +117,29 @@ const Info = () => {
               />
             </FlexBetween>
             <TableStatus cat="Informational" />
-            {/* <LineStatus cat="Informational" /> */}
+            <Box
+                        marginTop={"2rem"}
+                        bg={bg}
+                        p="0.5rem"
+                        borderRadius="0.55rem"
+                        display="flex"
+                        flexDirection="column"
+                        justifyContent="center"
+                        alignItems="center"
+                        height={400}
+                        _hover={{
+                          border: "1px",
+                          borderColor: "#30A0E0",
+                        }}
+                        as={motion.div}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 } as any}
+                        className="hover: cursor-pointer ease-in duration-200"
+                      ><StatusColumnChart category={"Core"} type={"EIPs"} /></Box>
+            
           </Box>
+
         </motion.div>
       )}
     </AllLayout>
@@ -101,3 +147,4 @@ const Info = () => {
 };
 
 export default Info;
+
