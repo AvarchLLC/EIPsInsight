@@ -254,7 +254,7 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
         color={textColor}
         textShadow="0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8)"
       >
-        {getDisplayName(dataType)} vs Time
+        {getDisplayName(dataType)} Trend
       </Text>
 
       {/* Tabs for selecting data type */}

@@ -104,7 +104,7 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
         color={textColor}
         textShadow="0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8)"
       >
-        Transactions vs Type
+        Transactions Trend
       </Text>
       <br />
       <Flex mb={4} gap={2} wrap="wrap">
