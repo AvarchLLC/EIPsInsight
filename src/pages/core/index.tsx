@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import AllLayout from "@/components/Layout";
-import { Box, Tabs, TabList, Tab, useColorModeValue } from "@chakra-ui/react";
+import { Box, Tabs, TabList, Tab } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
 import TableStatus from "@/components/TableStatus";
 import Link from "next/link";
-import StatusColumnChart from "@/components/StatusColumnChart";
 
 interface EIP {
   _id: string;
@@ -37,7 +36,6 @@ const categories = [
 const Core = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]);
-  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,27 +85,6 @@ const Core = () => {
               />
             </FlexBetween>
             <TableStatus cat="Core" />
-                      <Box
-                        marginTop={"2rem"}
-                        bg={bg}
-                        p="0.5rem"
-                        borderRadius="0.55rem"
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                        alignItems="center"
-                        height={400}
-                        _hover={{
-                          border: "1px",
-                          borderColor: "#30A0E0",
-                        }}
-                        as={motion.div}
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 } as any}
-                        className="hover: cursor-pointer ease-in duration-200"
-                      ><StatusColumnChart category={"Core"} type={"EIPs"} /></Box>
-            
           </Box>
         </motion.div>
       )}

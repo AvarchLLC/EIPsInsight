@@ -32,15 +32,9 @@ import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 import { FaSyncAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
-import NextLink from "next/link";
 import Graph from "@/components/NetworkUpgradesGraph";
 
-const sections = [
-  { id: "pectra-upgrade", text: "PECTRA Upgrade" },
-  { id: "network-upgrades-graph", text: "Network Upgrades and EIPs Relationship Graph" },
-  { id: "author-contributions", text: "Author Contributions" },
-  { id: "pectra-table", text: "Pectra Table" },
-];
+
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
 
@@ -404,23 +398,6 @@ const All = () => {
       };
     }, [router]);
 
-        const [isVisible, setIsVisible] = useState(false);
-        let timeout: string | number | NodeJS.Timeout | undefined;
-      
-        useEffect(() => {
-          const handleScroll = () => {
-            setIsVisible(true);
-            clearTimeout(timeout);
-            timeout = setTimeout(() => setIsVisible(false), 1000); // Hide after 1s of no scroll
-          };
-      
-          window.addEventListener("scroll", handleScroll);
-          return () => {
-            window.removeEventListener("scroll", handleScroll);
-            clearTimeout(timeout);
-          };
-        }, []);
-
 
 
   return (
@@ -431,37 +408,6 @@ const All = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-    <Box
-      as="aside"
-      p={4}
-      bg="gray.100"
-      borderRadius="lg"
-      position="fixed"
-      right="20px"
-      top="80px"
-      width="250px"
-      maxHeight="80vh"
-      overflowY="auto"
-      boxShadow="md"
-      zIndex="10"
-      display={{ base: "none", lg: "block" }} // Hide on mobile
-      opacity={isVisible ? 1 : 0}
-      transition="opacity 0.3s ease-in-out"
-      pointerEvents={isVisible ? "auto" : "none"} // Prevent interaction when hidden
-    >
-      <Heading as="h3" size="md" mb={2}>
-        On this page
-      </Heading>
-      <List spacing={2}>
-        {sections.map(({ id, text }) => (
-          <ListItem key={id}>
-            <NextLink href={`#${id}`} color="blue.600">
-              {text}
-            </NextLink>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
         <Box
           paddingBottom={{ lg: "10", sm: "10", base: "10" }}
           marginX={{ lg: "10", md: "2", sm: "2", base: "2" }}

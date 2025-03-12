@@ -49,7 +49,6 @@ import ToolsSection from "./AvailableTools";
 import TypeGraphs from "@/components/TypeGraphs2";
 import CopyLink from "./CopyLink";
 import OnThisPage from "./ui/OnThisPage";
-import { List, ListItem,} from "@chakra-ui/react";
 
 interface EIP {
   _id: string;
@@ -68,14 +67,6 @@ interface EIP {
   __v: number;
 }
 
-const sections = [
-  { id: "our-tools", text: "Our Tools" },
-  { id: "what-is-eipsinsights", text: "What is EIPs Insights" },
-  { id: "draft-vs-final", text: "Draft vs Final" },
-  { id: "status-graphs", text: "Status Graphs" },
-  { id: "dashboard", text: "Dashboard" },
-];
-
 interface APIResponse {
   eip: EIP[];
   erc: EIP[];
@@ -88,24 +79,6 @@ const Dashboard = () => {
     erc: [],
     rip: [],
   });
-
-
-  const [isVisible, setIsVisible] = useState(false);
-  let timeout: string | number | NodeJS.Timeout | undefined;
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsVisible(true);
-      clearTimeout(timeout);
-      timeout = setTimeout(() => setIsVisible(false), 1000); // Hide after 1s of no scroll
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      clearTimeout(timeout);
-    };
-  }, []);
   
   const [isLoading, setIsLoading] = useState(true); // Loader state
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -210,37 +183,7 @@ const Dashboard = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-    <Box
-      as="aside"
-      p={4}
-      bg="gray.100"
-      borderRadius="lg"
-      position="fixed"
-      right="20px"
-      top="80px"
-      width="250px"
-      maxHeight="80vh"
-      overflowY="auto"
-      boxShadow="md"
-      zIndex="10"
-      display={{ base: "none", lg: "block" }} // Hide on mobile
-      opacity={isVisible ? 1 : 0}
-      transition="opacity 0.3s ease-in-out"
-      pointerEvents={isVisible ? "auto" : "none"} // Prevent interaction when hidden
-    >
-      <Heading as="h3" size="md" mb={2}>
-        On this page
-      </Heading>
-      <List spacing={2}>
-        {sections.map(({ id, text }) => (
-          <ListItem key={id}>
-            <NextLink href={`#${id}`} color="blue.600">
-              {text}
-            </NextLink>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+            <OnThisPage /> {/* Add this component here */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -374,7 +317,7 @@ const Dashboard = () => {
                     Ethereum <br /> Improvement <br /> Proposals <br /> Insight
                   </Text>
                   <Stack direction={"row"} spacing={"6"} paddingTop={"20"} justifyContent={"center"}>
-                    <Box  id="dashboard" >
+                    <Box>
                       <NextLink href={"/home#1"}>
                             <Button
                               colorScheme="white"
