@@ -11,16 +11,15 @@ export default async function handler(req: any, res: any) {
     await client.connect();
     const db = client.db('test');
 
-    // Fetch base fee data
-    const baseFeeData = await db.collection('base_fee').find().sort({ timestamp: -1 }).limit(7200).toArray();
-    const fees = baseFeeData.map((data) => ({
+    // Fetch priority fee data
+    const priorityFeeData = await db.collection('priority_fee').find().sort({ timestamp: -1 }).limit(7200).toArray();
+    const priorityFee = priorityFeeData.map((data) => ({
       time: new Date(data.timestamp).toLocaleTimeString(),
       block: Number(data.blockNumber),
-      fee: Number(Web3.utils.fromWei(data.baseFeePerGas || '0', 'gwei')), // Convert to Gwei
+      priorityFee: Number(Web3.utils.fromWei(data.priorityFeePerGas || '0', 'gwei')), // Convert to Gwei
     }));
 
-   
-    res.status(200).json({ fees });
+    res.status(200).json({  priorityFee});
   } catch (err) {
     console.error('Error fetching data from MongoDB:', err);
     res.status(500).json({ message: 'Failed to fetch data' });

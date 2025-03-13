@@ -141,11 +141,11 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
         if (cat === "ERC") {
           setData(jsonData.erc);
         } 
-        else if( cat==="Meta"){
-          setData(jsonData.eip.concat(jsonData.erc));
+        else if( cat==="RIP"){
+          setData(jsonData.rip);
         }
         else {
-          setData(jsonData.eip);
+          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         }
         setIsLoading(false); // Set isLoading to false after data is fetched
 
