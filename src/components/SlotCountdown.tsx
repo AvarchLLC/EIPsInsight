@@ -56,7 +56,7 @@ const SlotCountdown: React.FC = () => {
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [currentBlock, setCurrentBlock] = useState<number>(0);
   const [timer, setTimer] = useState<number>(13); // 13-second timer
-  const [network, setNetwork] = useState<keyof typeof networks>("sepolia"); // Default network
+  const [network, setNetwork] = useState<keyof typeof networks>("mainnet"); // Default network
   const [loading, setLoading] = useState<boolean>(true); // Show loader only on first load
   const [countdown, setCountdown] = useState<string>(""); // Countdown for days, hours, minutes
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false); // Track if the upgrade is live

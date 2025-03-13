@@ -4,6 +4,7 @@
 import React from 'react';
 import { Box, IconButton, Tooltip } from '@chakra-ui/react';
 import { FaBug } from 'react-icons/fa';
+import { FaGithub } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
 
 const FloatingContributionIcon = () => {
@@ -32,10 +33,10 @@ const FloatingContributionIcon = () => {
         animation: 'float 3s ease-in-out infinite',
       }}
     >
-      <Tooltip label="Found a Bug? Try to fix it!" placement="left">
+      <Tooltip label="View in Github!" placement="left">
         <IconButton
           aria-label="Contribute"
-          icon={<FaBug />}
+          icon={<FaGithub />}
           size="lg"
           colorScheme="teal"
           borderRadius="50%"

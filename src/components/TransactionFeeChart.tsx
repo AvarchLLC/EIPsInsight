@@ -294,7 +294,7 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
       </Box>
 
       {/* Render the Heatmap */}
-      <Box width="100%" mt={10}>
+      {/* <Box width="100%" mt={10}>
         <Text fontSize={16} fontWeight="bold" mb={2} color={textColor}>
           Hourly Averages (Past 20 Hours)
         </Text>
@@ -329,16 +329,11 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
               }
               return `color-scale-${Math.min(Math.floor(value.count / 10), 4)}`;
             }}
-            // tooltipDataAttrs={(value) => {
-            //   return {
-            //     'data-tip': `${value.date}: ${value.count.toFixed(2)} Gwei (${convertGweiToUSD(value.count, ethPriceInUSD)}$)`,
-            //   };
-            // }}
             showWeekdayLabels={false} // Hide weekday labels for compactness
             horizontal // Display in a single row
           />
         </Box>
-      </Box>
+      </Box> */}
     </Box>
   );
 };
