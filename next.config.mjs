@@ -51,13 +51,13 @@ const nextConfig = withMDX(
         },
         {
           source: '/analytics',
-          destination: '/anlytics',
+          destination: '/Analytics',
           permanent: true,
           has: [{ type: 'header', key: 'x-original-path', value: '/analytics' }]
         },
         {
           source: '/ANALYTICS',
-          destination: '/analytics',
+          destination: '/Analytics',
           permanent: true,
           has: [{ type: 'header', key: 'x-original-path', value: '/ANALYTICS' }]
         },

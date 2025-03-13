@@ -1226,7 +1226,7 @@ const router = useRouter();
           <Box id="GithubAnalytics" borderRadius={"0.55rem"}>
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
-            {`Github PR Analytics (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com/analytics#GithubAnalytics`} />
+            {`Github PR Analytics (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com//Analytics#GithubAnalytics`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
           <Button

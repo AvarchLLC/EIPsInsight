@@ -109,7 +109,7 @@ const EIPsInsightRecap = () => {
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           The 
-          {" "} <Link href="https://eipsinsight.com/analytics" color="blue.400" isExternal className="underline">
+          {" "} <Link href="https://eipsinsight.com/Analytics" color="blue.400" isExternal className="underline">
           Analytics Scheduler</Link> {" "}
            is a powerful tool designed to monitor and
           analyze the performance of Ethereum-based GitHub repositories. Its
@@ -143,7 +143,7 @@ const EIPsInsightRecap = () => {
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           The 
-          {" "} <Link href="https://eipsinsight.com//analytics#GithubAnalytics" color="blue.400" isExternal className="underline">
+          {" "} <Link href="https://eipsinsight.com//Analytics#GithubAnalytics" color="blue.400" isExternal className="underline">
           Analytics Scheduler</Link> {" "}
            tracks the creation, closure, and merging of
           PRs and issues. By presenting this data on a monthly and yearly
@@ -167,7 +167,7 @@ const EIPsInsightRecap = () => {
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           The tool maintains a 
-          {" "} <Link href="https://eipsinsight.com//analytics#GithubAnalytics" color="blue.400" isExternal className="underline">
+          {" "} <Link href="https://eipsinsight.com//Analytics#GithubAnalytics" color="blue.400" isExternal className="underline">
           historical record of PRs</Link> {" "}
           and issues, enabling
           users to visualize activity over extended periods. By examining
@@ -188,7 +188,7 @@ const EIPsInsightRecap = () => {
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           The Analytics Scheduler transforms raw GitHub data into intuitive
-          {" "} <Link href="https://eipsinsight.com//analytics#GithubAnalytics" color="blue.400" isExternal className="underline">
+          {" "} <Link href="https://eipsinsight.com//Analytics#GithubAnalytics" color="blue.400" isExternal className="underline">
           visual reports</Link> {" "}
            and charts. These visualizations offer a quick
           snapshot, making it easier for teams to communicate progress to

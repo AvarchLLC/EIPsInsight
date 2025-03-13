@@ -48,7 +48,6 @@ import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 import ToolsSection from "./AvailableTools";
 import TypeGraphs from "@/components/TypeGraphs2";
 import CopyLink from "./CopyLink";
-import OnThisPage from "./ui/OnThisPage";
 
 interface EIP {
   _id: string;
@@ -175,15 +174,12 @@ const Dashboard = () => {
             </motion.div>
           </Box>
         ) : (
-
-          
           // Show dashboard content if data is loaded
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <OnThisPage /> {/* Add this component here */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -493,6 +489,16 @@ const Dashboard = () => {
 </Box>
 
                 <Box>
+                  {/*<Button*/}
+                  {/*    colorScheme="blue"*/}
+                  {/*    variant="outline"*/}
+                  {/*    fontSize={{lg:'14px',md:'12px', sm:'12px',base:'10px'}}*/}
+                  {/*    fontWeight={'bold'}*/}
+                  {/*    padding={{lg:'10px 20px',md:'5px 10px', sm:'5px 10px',base:'5px 10px'}}*/}
+                  {/*>*/}
+                  {/*  <DownloadIcon marginEnd={'1.5'} />*/}
+                  {/*  Download Reports*/}
+                  {/*</Button>*/}
                 </Box>
               </FlexBetween>
 

@@ -12,19 +12,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
 
-
-import {TabList, Tabs } from "@chakra-ui/react";
-import Link from "next/link";
-
-const categories = [
-  { name: "Core", path: "/core" },
-  { name: "Networking", path: "/networking" },
-  { name: "Interface", path: "/interface" },
-  { name: "Meta", path: "/meta" },
-  { name: "Informational", path: "/informational" },
-  { name: "ERC", path: "/erc" },
-];
-
 interface EIP {
   _id: string;
   eip: string;
@@ -96,15 +83,6 @@ const Meta = () => {
           transition={{ duration: 0.5 }}
         >
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
-          <Tabs isFitted variant="enclosed">
-              <TabList>
-                {categories.map((category) => (
-                  <Link key={category.name} href={category.path} passHref>
-                    <Tabs as="a">{category.name}</Tabs>
-                  </Link>
-                ))}
-              </TabList>
-            </Tabs>
             <FlexBetween>
               <Header
                 title={`Meta - [ ${

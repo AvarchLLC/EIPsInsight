@@ -632,7 +632,7 @@ import {
         >
           <Text>
             For other details, check{' '}
-            <LI href="/analytics" color="blue" isExternal>
+            <LI href="/Analytics" color="blue" isExternal>
               PRs Analytics
             </LI>{' '}
             and{' '}

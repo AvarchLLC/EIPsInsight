@@ -18,6 +18,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  if (path === 'analytics') {
+    return {
+      redirect: {
+        destination: '/Analytics',
+        permanent: false, // Set to true if this is a permanent redirect
+      },
+    };
+  }
 
   // Fallback in case no match
   return {

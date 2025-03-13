@@ -161,7 +161,7 @@ const ResourcesPage: React.FC = () => {
         image: "Blockchain_Future.png",
         title: "What is EIPsInsight?",
         content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
-        link: "/about"
+        link: "/About"
     },
 ]
   
