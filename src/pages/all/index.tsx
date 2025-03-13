@@ -8,16 +8,16 @@ import {
   Button,
   Wrap,
   WrapItem,
-  Heading,
 } from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 import RipCatTable from "@/components/RipCatTable";
 import SearchBox from "@/components/SearchBox";
+import { CCardBody, CSmartTable } from "@coreui/react-pro";
+// import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
 import { DownloadIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
-import OnThisPage from "@/components/ui/OnThisPage";
 
 const MotionBox = motion(Box);
 
@@ -192,7 +192,6 @@ const All = () => {
           paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
           marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
-          <OnThisPage /> {/* Add this component here */}
           <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold py-8">
             <div className="flex justify-between w-full">
             <Box>
@@ -390,6 +389,7 @@ const All = () => {
     </Box>
   )}
 </Box>
+
 
               <CatTable dataset={data2} cat={selected} status={"Living"} />
               <CatTable dataset={data2} cat={selected} status={"Final"} />

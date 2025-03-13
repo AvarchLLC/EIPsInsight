@@ -27,7 +27,6 @@ const Dasboard = () => {
     const router = useRouter()
     return (
         <AllLayout>
-            
             <Head>
                 <title>
                     Home

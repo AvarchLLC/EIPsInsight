@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 
 interface PRItem {
   prNumber: number;
-  repo: string;
+  repo:string;
 }
 
 interface IssueItem {
   issueNumber: number;
-  repo: string;
+  repo:string;
 }
 
 interface EIP {
@@ -33,7 +33,7 @@ interface EIP2 {
   _id: string;
   eip: string;
   type: string;
-  title: string;
+  title:string;
   category: string;
   author: string;
   repo: string;
@@ -52,7 +52,8 @@ const SearchBox: React.FC = () => {
   const [data, setData] = useState<PRItem[]>([]);
   const [authordata, setauthorData] = useState<EIP2[]>([]);
   const [authorCounts, setAuthorCounts] = useState<AuthorCount[]>([]);
-  const [IssueData, setIssueData] = useState<IssueItem[]>([]);
+ 
+  const [IssueData, setIssueData]=useState<IssueItem[]>([]);
   const [eipData, setEipData] = useState<EIP[]>([]);
   const [query, setQuery] = useState("");
   const router = usePathname();
@@ -61,9 +62,6 @@ const SearchBox: React.FC = () => {
   const [filteredResults, setFilteredResults] = useState<PRItem[]>([]);
   const [filteredIssueResults, setFilteredIssueResults] = useState<IssueItem[]>([]);
   const [filteredEIPResults, setFilteredEIPResults] = useState<EIP[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +71,7 @@ const SearchBox: React.FC = () => {
 
         const getEarliestEntries = (data: any[], key: string) => {
           const uniqueEntries: Record<string, any> = {};
-          data.forEach((entry) => {
+          data.forEach(entry => {
             const entryKey = entry[key];
             if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
               uniqueEntries[entryKey] = entry;
@@ -83,13 +81,13 @@ const SearchBox: React.FC = () => {
         };
 
         let filteredData = [
-          ...getEarliestEntries(jsonData.eip, "eip"),
-          ...getEarliestEntries(jsonData.erc, "eip"),
-          ...getEarliestEntries(jsonData.rip, "eip"),
+          ...getEarliestEntries(jsonData.eip, 'eip'),
+          ...getEarliestEntries(jsonData.erc, 'eip'),
+          ...getEarliestEntries(jsonData.rip, 'eip'),
         ];
         filteredData = filteredData.filter(
           (entry: EIP, index: number, self: EIP2[]) =>
-            entry.eip !== "1" || index === self.findIndex((e: EIP2) => e.eip === "1")
+            entry.eip !== '1' || index === self.findIndex((e: EIP2) => e.eip === '1')
         );
 
         setauthorData(filteredData);
@@ -106,25 +104,25 @@ const SearchBox: React.FC = () => {
 
   useEffect(() => {
     const authorMap: Record<string, number> = {};
-
+  
     authordata.forEach((eip) => {
       const authors = eip.author.split(",").map((author) => author.trim());
       authors.forEach((author) => {
         if (author) {
           // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
           const handleMatch = author.match(/(.+?)\s\(@([a-zA-Z0-9-_]+)\)$/);
-
+          
           if (handleMatch) {
             // Add counts for the full name and the GitHub handle
             const fullName = handleMatch[1].trim(); // Extract full name
-            const handle = handleMatch[2].trim(); // Extract handle
-
+            const handle = handleMatch[2].trim();  // Extract handle
+        
             authorMap[fullName] = (authorMap[fullName] || 0) + 1;
             authorMap[`@${handle}`] = (authorMap[`@${handle}`] || 0) + 1;
           } else {
             // Match email address in the format: Vitalik Buterin <vitalik.buterin@ethereum.org>
             const emailMatch = author.match(/(.+?)\s<.+?>$/);
-
+        
             if (emailMatch) {
               const fullName = emailMatch[1].trim(); // Ignore email part, extract only the name
               authorMap[fullName] = (authorMap[fullName] || 0) + 1;
@@ -134,13 +132,14 @@ const SearchBox: React.FC = () => {
             }
           }
         }
+        
       });
     });
-
+  
     const authorArray = Object.entries(authorMap)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
-
+  
     setAuthorCounts(authorArray);
   }, [authordata]);
 
@@ -154,37 +153,39 @@ const SearchBox: React.FC = () => {
     author.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  console.log("filtered author data:", filteredAuthors);
+
+  console.log("filtered author data:", filteredAuthors)
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/allprs`);
-        // console.log(response);
-        const jsonData = await response.json();
-        setData(jsonData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+      const fetchData = async () => {
+          try {
+              const response = await fetch(`/api/allprs`);
+              // console.log(response);
+              const jsonData = await response.json();
+              setData(jsonData);
+          } catch (error) {
+              console.error('Error fetching data:', error);
+          }
+      };
+  
+      fetchData();
   }, []);
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/allissues`);
-        // console.log(response);
-        const jsonData = await response.json();
-        setIssueData(jsonData);
-        // console.log('IssueData:', jsonData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+        try {
+            const response = await fetch(`/api/allissues`);
+            // console.log(response);
+            const jsonData = await response.json();
+            setIssueData(jsonData);
+            // console.log('IssueData:', jsonData);
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
     fetchData();
-  }, []);
+}, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -201,20 +202,21 @@ const SearchBox: React.FC = () => {
 
   useEffect(() => {
     var queryStr = query.trim();
-    let queryStr2 = ""; // To store the non-numeric part at the beginning
+    let queryStr2 = ''; // To store the non-numeric part at the beginning
 
     // Regular expression to split the query into numeric and non-numeric parts
     const match = queryStr.match(/^(\D+)?(\d+)?/);
 
     if (match) {
-      queryStr2 = match[1]?.trim() || ""; // Non-numeric prefix
-      queryStr = match[2]?.trim() || ""; // Numeric part
+      queryStr2 = match[1]?.trim() || ''; // Non-numeric prefix
+      queryStr = match[2]?.trim() || '';  // Numeric part
     }
 
-    console.log("Query Numeric Part:", queryStr);
-    console.log("Query Non-Numeric Part:", queryStr2);
+    console.log('Query Numeric Part:', queryStr);
+    console.log('Query Non-Numeric Part:', queryStr2);
 
-    if (queryStr || queryStr2) {
+
+    if (queryStr ||queryStr2) {
       // Deduplicate using a Set to track unique (prNumber, repo) combinations
       const seenPRs = new Set<string>();
 
@@ -259,7 +261,8 @@ const SearchBox: React.FC = () => {
       });
 
       // Filter PR results for partial matches (those that start with the query)
-      const partialIssueMatches = IssueData.filter((item) => item.issueNumber.toString().startsWith(queryStr))
+      const partialIssueMatches = IssueData
+        .filter((item) => item.issueNumber.toString().startsWith(queryStr))
         .filter((item) => item.issueNumber.toString() !== queryStr) // Exclude exact matches
         .filter((item) => {
           const key = `${item.issueNumber}-${item.repo}`;
@@ -291,19 +294,20 @@ const SearchBox: React.FC = () => {
       });
 
       // Filter EIP results for partial matches (those that start with the query)
-      const partialEIPMatches = queryStr
-        ? eipData
-            .filter((item) => item.eip.startsWith(queryStr)) // Match the partial query
-            .filter((item) => item.eip !== queryStr) // Exclude exact matches
-            .filter((item) => {
-              const key = `${item.eip}-${item.repo}`;
-              if (seenEIPs.has(key)) return false; // Skip if already seen
-              seenEIPs.add(key); // Mark as seen
-              return true;
-            })
-        : eipData; // If queryStr is empty, return the full data
+      const partialEIPMatches = queryStr 
+  ? eipData
+      .filter((item) => item.eip.startsWith(queryStr)) // Match the partial query
+      .filter((item) => item.eip !== queryStr) // Exclude exact matches
+      .filter((item) => {
+        const key = `${item.eip}-${item.repo}`;
+        if (seenEIPs.has(key)) return false; // Skip if already seen
+        seenEIPs.add(key); // Mark as seen
+        return true;
+      })
+  : eipData; // If queryStr is empty, return the full data
 
-      // Continue with the rest of your logic as before
+// Continue with the rest of your logic as before
+
 
       // Combine exact EIP matches and partial matches, sorting by length
       const newFilteredEIPResults = [
@@ -317,26 +321,29 @@ const SearchBox: React.FC = () => {
 
       // Update the state with the filtered and sorted results
       // Update the state with the filtered and sorted results
-      // if (["p", "pr", ""].includes(queryStr2.toLowerCase())) {
-      setFilteredResults(newFilteredResults);
-      // }
+// if (["p", "pr", ""].includes(queryStr2.toLowerCase())) {
+  setFilteredResults(newFilteredResults);
+// }
 
-      // if (["i", "is", "iss", "issu", "issue", ""].includes(queryStr2.toLowerCase())) {
-      setFilteredIssueResults(newFilteredIssueResults);
-      // }
-      console.log("final data:", newFilteredEIPResults);
+// if (["i", "is", "iss", "issu", "issue", ""].includes(queryStr2.toLowerCase())) {
+  setFilteredIssueResults(newFilteredIssueResults);
+// }
+console.log("final data:",newFilteredEIPResults)
 
-      if (queryStr2.toLowerCase() === "e") {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => ["eip", "erc"].includes(item.repo)));
-      } else if (["r", "ri", "rip", "rip n", "rip nu", "rip num", "rip numb", "rip number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "rip"));
-      } else if (["e", "ei", "eip", "eip n", "eip nu", "eip num", "eip numb", "eip number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "eip"));
-      } else if (["er", "erc", "erc n", "erc nu", "erc num", "erc numb", "erc number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "erc"));
-      } else {
-        setFilteredEIPResults(newFilteredEIPResults);
-      }
+if (queryStr2.toLowerCase() === "e") {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => ["eip", "erc"].includes(item.repo)));
+} else if (["r", "ri", "rip", "rip n", "rip nu", "rip num", "rip numb", "rip number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "rip"));
+} else if (["e", "ei", "eip", "eip n", "eip nu", "eip num", "eip numb", "eip number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "eip"));
+} else if (["er", "erc", "erc n", "erc nu", "erc num", "erc numb", "erc number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "erc"));
+} else {
+  setFilteredEIPResults(newFilteredEIPResults);
+}
+
+      
+      
     } else {
       // If query is empty, clear the results
       setFilteredResults([]);
@@ -345,25 +352,27 @@ const SearchBox: React.FC = () => {
     }
   }, [query]);
 
-  const handleSearchResultClick = async (selectedNumber: number, repo: string) => {
+
+
+  const handleSearchResultClick = async (selectedNumber: number,repo:string) => {
     try {
-      window.location.href = `/PR/${repo}/${selectedNumber}`;
+          window.location.href = `/PR/${repo}/${selectedNumber}`;
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const handleSearchIssueResultClick = async (selectedNumber: number, repo: string) => {
+  const handleSearchIssueResultClick = async (selectedNumber: number,repo:string) => {
     try {
-      window.location.href = `/issue/${repo}/${selectedNumber}`;
+          window.location.href = `/issue/${repo}/${selectedNumber}`;
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const handleAuthorSearchResultClick = async (author: string) => {
+  const handleAuthorSearchResultClick = async (author:string) => {
     try {
-      window.location.href = `/authors/${author}`;
+          window.location.href = `/authors/${author}`;
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -372,7 +381,7 @@ const SearchBox: React.FC = () => {
   const EIPhandleSearchResultClick = (selectedEIPNumber: string, type: string) => {
     // console.log(selectedEIPNumber);
     // console.log(type);
-
+  
     if (type === "erc") {
       window.location.href = `/ercs/erc-${selectedEIPNumber}`;
     } else if (type === "rip") {
@@ -382,30 +391,36 @@ const SearchBox: React.FC = () => {
     } else {
       console.error("Unknown type: ", type);
     }
-
+  
     return selectedEIPNumber;
   };
 
   const queryStr = query.trim(); // Remove spaces from the query string
 
-  const uniqueResults = filteredResults.filter((result, index, self) => {
-    // Remove spaces from the PR number for comparison
-    const prNumberStr = result.prNumber.toString().trim();
+const uniqueResults = filteredResults.filter((result, index, self) => {
+  // Remove spaces from the PR number for comparison
+  const prNumberStr = result.prNumber.toString().trim();
 
-    // Ensure the PR number length is greater than or equal to the query string length
-    const isLengthValid = prNumberStr.length >= queryStr.length;
+  // Ensure the PR number length is greater than or equal to the query string length
+  const isLengthValid = prNumberStr.length >= queryStr.length;
 
-    // Ensure the PR is unique based on both repo and PR number
-    const isUnique = index === self.findIndex((r) => r.prNumber === result.prNumber && r.repo === result.repo);
+  // Ensure the PR is unique based on both repo and PR number
+  const isUnique = index === self.findIndex((r) => 
+    r.prNumber === result.prNumber && r.repo === result.repo
+  );
 
-    return isLengthValid && isUnique;
-  });
+  return isLengthValid && isUnique;
+});
 
-  const [showDropdown, setShowDropdown] = useState(false);
+const [showDropdown, setShowDropdown] = useState(false);
+const dropdownRef = useRef<HTMLDivElement | null>(null); // Type the ref
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !(dropdownRef.current as HTMLDivElement).contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !(dropdownRef.current as HTMLDivElement).contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -414,145 +429,91 @@ const SearchBox: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowDown") {
-        setSelectedIndex((prevIndex) => {
-          const newIndex = prevIndex < filteredAuthors.length + filteredResults.length + filteredIssueResults.length + filteredEIPResults.length - 1
-            ? prevIndex + 1
-            : prevIndex;
-          if (dropdownRef.current) {
-            const option = dropdownRef.current.querySelectorAll("option")[newIndex];
-            if (option) {
-              option.scrollIntoView({ block: "nearest" });
+return (
+  <div className="relative w-full">
+    <input
+      type="text"
+      placeholder="Search EIP/ERC/RIP/Author"
+      value={query}
+      onChange={(e) => {
+        setQuery(e.target.value);
+        setShowDropdown(true); // Show dropdown when typing
+      }}
+      className="border p-2 rounded w-full text-center focus:border-blue-100"
+    />
+
+{showDropdown && query && (
+  <div
+    ref={dropdownRef}
+    className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto"
+  >
+    {filteredResults.length === 0 &&
+    filteredEIPResults.length === 0 &&
+    filteredIssueResults.length === 0 &&
+    filteredAuthors.length === 0 ? (
+      <p className="p-2 text-red-500 text-center font-bold">
+        Invalid EIP/ERC/RIP/PR/Issue/Author
+      </p>
+    ) : (
+      <select
+        className="w-full p-2 rounded text-center"
+        size={10}
+        onChange={(e) => console.log(e.target.value)}
+      >
+        {filteredAuthors.map((result) => (
+          <option
+            key={result.name}
+            value={result.name}
+            onClick={() => handleAuthorSearchResultClick(result.name)}
+            className="text-lg py-3" // Increase font size and vertical padding
+          >
+            {result.name} ({result.count})
+          </option>
+        ))}
+        {/* {uniqueResults.map((result) => (
+          <option
+            key={result.prNumber}
+            value={result.prNumber}
+            onClick={() =>
+              handleSearchResultClick(result.prNumber, result.repo)
             }
-          }
-          return newIndex;
-        });
-      } else if (event.key === "ArrowUp") {
-        setSelectedIndex((prevIndex) => {
-          const newIndex = prevIndex > 0 ? prevIndex - 1 : prevIndex;
-          if (dropdownRef.current) {
-            const option = dropdownRef.current.querySelectorAll("option")[newIndex];
-            if (option) {
-              option.scrollIntoView({ block: "nearest" });
+            className="text-lg py-3" 
+          >
+            {result.repo} PR: {result.prNumber}
+          </option>
+        ))}
+        {filteredIssueResults.map((result) => (
+          <option
+            key={result.issueNumber}
+            value={result.issueNumber}
+            onClick={() =>
+              handleSearchIssueResultClick(result.issueNumber, result.repo)
             }
-          }
-          return newIndex;
-        });
-      } else if (event.key === "Enter" && selectedIndex >= 0) {
-        const allResults = [
-          ...filteredAuthors,
-          ...filteredResults,
-          ...filteredIssueResults,
-          ...filteredEIPResults,
-        ];
-        const selectedResult = allResults[selectedIndex];
-        if (selectedResult) {
-          if ("name" in selectedResult) {
-            handleAuthorSearchResultClick(selectedResult.name);
-          } else if ("prNumber" in selectedResult) {
-            handleSearchResultClick(selectedResult.prNumber, selectedResult.repo);
-          } else if ("issueNumber" in selectedResult) {
-            handleSearchIssueResultClick(selectedResult.issueNumber, selectedResult.repo);
-          } else if ("eip" in selectedResult) {
-            EIPhandleSearchResultClick(selectedResult.eip, selectedResult.repo);
-          }
-        }
-      }
-    };
+            className="text-lg py-3" 
+          >
+            {result.repo} ISSUE: {result.issueNumber}
+          </option>
+        ))} */}
+        {filteredEIPResults.map((result) => (
+          <option
+            key={result.eip}
+            value={result.eip}
+            onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
+            className="text-lg py-3" // Increase font size and vertical padding
+          >
+            {result.repo.toUpperCase()} Number: {result.eip}
+          </option>
+        ))}
+        
+      </select>
+    )}
+  </div>
+)}
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [selectedIndex, filteredAuthors, filteredResults, filteredIssueResults, filteredEIPResults]);
-
-  return (
-    <div className="relative w-full">
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder="Search EIP/ERC/RIP/Author"
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setShowDropdown(true); // Show dropdown when typing
-          setSelectedIndex(-1); // Reset selected index
-        }}
-        className="border p-2 rounded w-full text-center focus:border-blue-100"
-      />
-
-      {showDropdown && query && (
-        <div
-          ref={dropdownRef}
-          className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto"
-        >
-          {filteredResults.length === 0 &&
-          filteredEIPResults.length === 0 &&
-          filteredIssueResults.length === 0 &&
-          filteredAuthors.length === 0 ? (
-            <p className="p-2 text-red-500 text-center font-bold">
-              Invalid EIP/ERC/RIP/PR/Issue/Author
-            </p>
-          ) : (
-            <select
-              className="w-full p-2 rounded text-center"
-              size={10}
-              onChange={(e) => console.log(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-                  e.preventDefault();
-                }
-              }}
-            >
-              {filteredAuthors.map((result, index) => (
-                <option
-                  key={result.name}
-                  value={result.name}
-                  onClick={() => handleAuthorSearchResultClick(result.name)}
-                  className={`text-lg py-3 ${selectedIndex === index ? "bg-blue-100" : ""}`}
-                >
-                  {result.name} ({result.count})
-                </option>
-              ))}
-              {uniqueResults.map((result, index) => (
-                <option
-                  key={result.prNumber}
-                  value={result.prNumber}
-                  onClick={() => handleSearchResultClick(result.prNumber, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + index ? "bg-blue-100" : ""}`}
-                >
-                  {result.repo} PR: {result.prNumber}
-                </option>
-              ))}
-              {filteredIssueResults.map((result, index) => (
-                <option
-                  key={result.issueNumber}
-                  value={result.issueNumber}
-                  onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + index ? "bg-blue-100" : ""}`}
-                >
-                  {result.repo} ISSUE: {result.issueNumber}
-                </option>
-              ))}
-              {filteredEIPResults.map((result, index) => (
-                <option
-                  key={result.eip}
-                  value={result.eip}
-                  onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + filteredIssueResults.length + index ? "bg-blue-100" : ""}`}
-                >
-                  {result.repo.toUpperCase()} Number: {result.eip}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-      )}
-    </div>
-  );
+  </div>
+);
 };
 
 export default SearchBox;
