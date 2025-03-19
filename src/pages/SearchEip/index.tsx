@@ -6,7 +6,6 @@ const Authors: React.FC = () => {
     return (
         <>
             <AllLayout>
-              
                 <SearchByEip defaultQuery=''/>
             </AllLayout>
         </>

@@ -1033,9 +1033,9 @@ const csv = allData.map((item) => {
             {renderChart()}
           </Box>
         {/* </LI> */}
-        <Box className="w-full">
+        {/* <Box className="w-full">
           <DateTime />
-        </Box>
+        </Box> */}
       </Box>
     )}
   </>
