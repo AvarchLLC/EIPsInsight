@@ -62,31 +62,23 @@ const TestComponent = () => {
   const toggleCollapse2 = () => setShow2(!show2);
 
   const networkUpgrades: Record<string, number[]> = {
-    Homestead: [2, 7, 8, 606],
-    "Spurious Dragon": [155, 160, 161, 170, 7],
-    "Tangerine Whistle": [150, 608],
-    Byzantium: [100, 140, 196, 197, 198, 211, 214, 649, 658, 609],
-    "DAO Fork": [779],
-    Constantinople: [145, 1014, 1052, 1234, 1283, 1013],
-    Istanbul: [152, 1108, 1344, 1884, 2028, 2200, 1679],
-    Petersburg: [2726, 1283], 
-    "Muir Glacier": [2384, 2387],
-    "Backfill - Berlin to Shapella": [7568, 2070, 2982, 6122, 6953],
-    Dencun: [1153, 4788, 4844, 5656, 6780, 7044, 7045, 7514, 7516, 7569],
-    Pectra: [
-      7762, 7623,7742,7702,7685,7549,7251,7002,6110,2935,2537
-    ],
-    "Ethereum ProgPoW": [1057, 1588],
-    Osaka: [7607],
-    "Beacon Chain Launch": [2982],
-    Berlin: [2565, 2929, 2718, 2930, 2070],
+    Homestead: [2, 7, 8],
+    "Spurious Dragon": [155, 160, 161, 170],
+    "Tangerine Whistle": [150],
+    Byzantium: [100, 140, 196, 197, 198, 211, 214, 649, 658],
+    Petersburg: [145, 1014, 1052, 1234, 1283],
+    Istanbul: [152, 1108, 1344, 1844, 2028, 2200],
+    "Muir Glacier": [2384],
+    Dencun: [1153, 4788, 4844, 5656, 6780, 7044, 7045, 7514, 7516],
+    Pectra: [7691, 7623, 7840, 7702, 7685, 7549, 7251, 7002, 6110, 2935, 2537],
+    Berlin: [2565, 2929, 2718, 2930],
     London: [1559, 3198, 3529, 3541, 3554],
     "Arrow Glacier": [4345],
     "Gray Glacier": [5133],
     Paris: [3675, 4399],
-    Shapella: [6953, 6122],
-    Shanghai: [3651, 3855, 3860, 4895, 6049],
-  };
+    Shapella: [3651, 3855, 3860, 4895, 6049],
+};
+
   
   const getNetworkUpgrades = (eipNo: number) => {
     console.log("eip:", eipNo);

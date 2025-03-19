@@ -18,6 +18,8 @@ import Link from "next/link";
 import axios from "axios";
 import { DownloadIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
+import Author from "@/components/Author";
+import SearchByEip from '@/components/SearchByEIP2';
 
 const MotionBox = motion(Box);
 
@@ -186,12 +188,19 @@ const All = () => {
   return (
     <>
       <AllLayout>
+        <Box 
+        marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}>
+        <SearchByEip defaultQuery=''/>
+        </Box>
         <Box
           paddingBottom={{ lg: "10", sm: "10", base: "10" }}
           marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
           paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-          marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          // marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
+
+          {/* <Author defaultQuery=''/> */}
+          <br/>
           <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold py-8">
             <div className="flex justify-between w-full">
             <Box>
