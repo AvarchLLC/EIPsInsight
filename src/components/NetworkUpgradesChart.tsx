@@ -26,7 +26,6 @@ const rawData = [
     { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2929" },
     { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2718" },
     { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2930" },
-    { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2070" },
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-100" },
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-140" },
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-196" },
@@ -36,7 +35,6 @@ const rawData = [
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-214" },
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-649" },
     { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-658" },
-    { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-609" },
     { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-1153" },
     { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-4788" },
     { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-4844" },
@@ -46,12 +44,11 @@ const rawData = [
     { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7045" },
     { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7514" },
     { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7516" },
-    { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7569" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-145" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1014" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1052" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1234" },
-    { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1283" },
+    { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1283" },
     { date: "2022-06-30", upgrade: "Gray Glacier", eip: "EIP-5133" },
     { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-2" },
     { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-7" },
@@ -134,7 +131,7 @@ const NetworkUpgradesChart = React.memo(() => {
 
   const downloadData = useCallback(async () => {
     setIsLoading(true); // Activate loader
-    const header = "Date,Network Upgrade,EIP Link,Requires\n";
+    const header = "Date,Network Upgrade,EIP Link,Requires,Type, Category,GITHUB\n";
     
     try {
       const csvContent = "data:text/csv;charset=utf-8," + header
@@ -150,15 +147,21 @@ const NetworkUpgradesChart = React.memo(() => {
             const requiresMatch = eipData.match(/requires:\s*(.+)/);
             let requires = requiresMatch ? requiresMatch[1].trim() : 'None';
 
+            const TypeMatch = eipData.match(/type:\s*(.+)/);
+            let Type = TypeMatch?.[1]?.trim() ?? 'None';            
+
+            const CategoryMatch = eipData.match(/category:\s*(.+)/);
+            let Category = CategoryMatch ? CategoryMatch[1].trim() : 'None';
+
             // Escape requires field if it contains commas
             if (requires.includes(",")) {
               requires = `"${requires}"`;
             }
 
-            return `${date},${upgrade},https://eipsinsight.com/eips/eip-${eipNo},${requires}`;
+            return `${date},${upgrade},https://eipsinsight.com/eips/eip-${eipNo},${requires},${Type}, ${Category}, "EIPs`;
           } catch (error) {
             console.error(`Error fetching data for EIP-${eipNo}:`, error);
-            return `${date},${upgrade},https://eipsinsight.com/eips/eip-${eipNo},"Error fetching requires"`;
+            return `${date},${upgrade},-,-,-,-,-`;
           }
         })).then(rows => rows.join("\n"));
 
