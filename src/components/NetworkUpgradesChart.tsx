@@ -151,14 +151,14 @@ const NetworkUpgradesChart = React.memo(() => {
             let Type = TypeMatch?.[1]?.trim() ?? 'None';            
 
             const CategoryMatch = eipData.match(/category:\s*(.+)/);
-            let Category = CategoryMatch ? CategoryMatch[1].trim() : 'None';
+            let Category = CategoryMatch ? CategoryMatch[1].trim() : '-';
 
             // Escape requires field if it contains commas
             if (requires.includes(",")) {
               requires = `"${requires}"`;
             }
 
-            return `${date},${upgrade},https://eipsinsight.com/eips/eip-${eipNo},${requires},${Type}, ${Category}, "EIPs`;
+            return `${date},${upgrade},https://eipsinsight.com/eips/eip-${eipNo},${requires},${Type}, ${Category}, EIPs`;
           } catch (error) {
             console.error(`Error fetching data for EIP-${eipNo}:`, error);
             return `${date},${upgrade},-,-,-,-,-`;
