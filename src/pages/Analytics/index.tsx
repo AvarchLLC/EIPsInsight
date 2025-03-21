@@ -79,6 +79,9 @@ interface ChartDataItem {
   monthYear: string;
   type: 'Created' | 'Merged' | 'Closed' | 'Open' | 'Review';
   count: number;
+  eips: number;
+  ercs: number;
+  rips: number;
 }
 const GitHubPRTracker: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -250,7 +253,7 @@ useEffect(() => {
           throw new Error('Failed to fetch data');
         }
         const result = await response.json();
-        console.log(result);
+        // console.log(result);
 
         // Reduce the data by combining entries with the same monthYear
         const formattedData = result.reduce((acc: any, item: any) => {
@@ -279,7 +282,7 @@ useEffect(() => {
 
         // Set the fetched and formatted data
         setdownloadData(formattedData); 
-        console.log(formattedData); // Debugging output
+        // console.log(formattedData); 
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -860,22 +863,32 @@ useEffect(() => {
 
   const renderChart = () => {
    // Assuming `chartData` is your data array
-// console.log(chartdata);
+console.log("chart data:",chartdata);
 
 const transformedData = Array.isArray(chartdata) // Check if chartdata is an array
   ? chartdata.reduce<{
       [key: string]: { [key: string]: number };
-    }>((acc, { monthYear, type, count }) => {
+    }>((acc, { monthYear, type, count, eips, ercs, rips }) => {
       if (showCategory[type.toLowerCase()]) { // Ensure the category is selected
         if (!acc[monthYear]) {
           acc[monthYear] = {};
         }
         // Update the count for the current type
         acc[monthYear][type] = (acc[monthYear][type] || 0) + count;
+
+        if(selectedRepo === "All"){
+        acc[monthYear][`${type}-eips`] = (acc[monthYear][`${type}-eips`] || 0) + eips;
+        acc[monthYear][`${type}-ercs`] = (acc[monthYear][`${type}-ercs`] || 0) + ercs;
+        acc[monthYear][`${type}-rips`] = (acc[monthYear][`${type}-rips`] || 0) + rips;
+        }
+
       }
+
       return acc;
     }, {})
   : {}; // If chartdata is not an array, return an empty object
+
+  console.log("transformed data:", transformedData);
 
 
 const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYear => {
@@ -961,12 +974,28 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
                   radius: [0, 0, 0, 0],
               },
               tooltip: {
-                fields: ['type', 'count'],
-                formatter: ({ type, count }: { type: string; count: number }) => ({
-                    name: type,
-                    value: `${Math.abs(count)}`, // Adjust hover display for bar chart
-                }),
-            },
+                fields: ['type', 'count', 'monthYear'], // Include monthYear to access the transformed data
+                formatter: ({ type, count, monthYear }: { type: string; count: number; monthYear: string }) => {
+                  const name = type; // Tooltip name remains the type (e.g., Created, Merged, etc.)
+                  let value;
+              
+                  if (selectedRepo === "All") {
+                    // For "All" repo, format the value as `count(eips: X, ercs: Y, rips: Z)`
+                    const eips = transformedData[monthYear]?.[`${type}-eips`] || 0;
+                    const ercs = transformedData[monthYear]?.[`${type}-ercs`] || 0;
+                    const rips = transformedData[monthYear]?.[`${type}-rips`] || 0;
+                    value = `${Math.abs(count)}(eips: ${Math.abs(eips)}, ercs: ${Math.abs(ercs)}, rips: ${Math.abs(rips)})`;
+                  } else {
+                    // For non-"All" repos, just display the absolute count
+                    value = `${Math.abs(count)}`;
+                  }
+              
+                  return {
+                    name,
+                    value,
+                  };
+                },
+              },
             color: (datum: any) => {
               switch (datum.type) {
                   case 'Closed':
@@ -988,12 +1017,35 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
         stroke: '#ff00ff', // Magenta line color
         lineWidth: 2,
       },
+      // tooltip: {
+      //   fields: ['monthYear', 'Open'], // Change to use 'Open'
+      //   formatter: ({ monthYear, Open }: { monthYear: string; Open: number }) => ({
+      //     name: 'Open',
+      //     value: `${Open - getmin}`, // Adjust hover display for line chart
+      //   }),
+      // },
       tooltip: {
-        fields: ['monthYear', 'Open'], // Change to use 'Open'
-        formatter: ({ monthYear, Open }: { monthYear: string; Open: number }) => ({
-          name: 'Open',
-          value: `${Open - getmin}`, // Adjust hover display for line chart
-        }),
+        fields: ['Open', 'monthYear'], // Include monthYear to access the transformed data
+        formatter: ( { monthYear, Open }: { monthYear: string; Open: number  }) => {
+          const name = 'Open'; // Tooltip name remains the type (e.g., Created, Merged, etc.)
+          let value;
+      
+          if (selectedRepo === "All") {
+            // For "All" repo, format the value as `count(eips: X, ercs: Y, rips: Z)`
+            const eips = transformedData[monthYear]?.[`Open-eips`] || 0;
+            const ercs = transformedData[monthYear]?.[`Open-ercs`] || 0;
+            const rips = transformedData[monthYear]?.[`Open-rips`] || 0;
+            value = `${Open - getmin}(eips: ${Math.abs(eips)}, ercs: ${Math.abs(ercs)}, rips: ${Math.abs(rips)})`;
+          } else {
+            // For non-"All" repos, just display the absolute count
+            value = `${Open - getmin}`;
+          }
+      
+          return {
+            name,
+            value,
+          };
+        },
       },
       color: '#ff00ff',
     },

@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import { connectToDatabase } from '@/lib/mongodb'; // Use named export
+import { connectToDatabase } from '@/lib/mongodb';
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -8,7 +8,7 @@ import bcrypt from "bcryptjs";
 
 export default NextAuth({
   // Use the MongoDB adapter
-  adapter: MongoDBAdapter(connectToDatabase()), // Call the function to get the promise
+  adapter: MongoDBAdapter(connectToDatabase()),
 
   // Configure authentication providers
   providers: [
@@ -20,8 +20,8 @@ export default NextAuth({
 
     // Google OAuth
     GoogleProvider({
-      clientId: process.env.GOOGLE_ID as string,
-      clientSecret: process.env.GOOGLE_SECRET as string,
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
 
     // Email/Password (Normal Login)
@@ -35,8 +35,8 @@ export default NextAuth({
         if (!credentials) return null;
 
         // Connect to MongoDB
-        const client = await connectToDatabase() // Use the clientPromise directly
-        const db = client.db(); // Access the database
+        const client = await connectToDatabase();
+        const db = client.db();
         const usersCollection = db.collection("users");
 
         // Find the user by email
@@ -69,18 +69,18 @@ export default NextAuth({
     signIn: "/auth/signin", // Custom sign-in page
   },
 
-  // Callbacks (optional)
+  // Callbacks
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user.id; // Ensure `token.id` is a string
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        // Assign `token.id` to `session.user.id` (not `session.user.name`)
-        session.user.name = token.id as string; // Cast `token.id` to a string
+        // Assign `token.id` to `session.user.id`
+        session.user.email = token.id as string; // Cast `token.id` to a string
       }
       return session;
     },
