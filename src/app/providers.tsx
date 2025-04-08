@@ -4,6 +4,8 @@
 import { CacheProvider } from '@chakra-ui/next-js';
 import { ChakraProvider, ColorModeScript, extendTheme, StyleFunctionProps } from '@chakra-ui/react';
 import { usePathname } from 'next/navigation';
+import SessionWrapper from '@/components/SessionWrapper';
+import { AuthLocalStorageInitializer } from '@/components/AuthLocalStorageInitializer';
 
 const theme = extendTheme({
   config: {
@@ -51,11 +53,16 @@ export function Providers({
   children: React.ReactNode 
 }) {
   return (
-    <CacheProvider>
-      <ChakraProvider theme={theme}>
-        <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-        {children}
-      </ChakraProvider>
-    </CacheProvider>
+    // <AuthLocalStorageInitializer>
+    // {/* <SessionWrapper> */}
+      <CacheProvider>
+        <ChakraProvider theme={theme}>
+          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+          <AuthLocalStorageInitializer /> 
+          {children}
+        </ChakraProvider>
+      </CacheProvider>
+    // {/* </SessionWrapper> */}
+    // </AuthLocalStorageInitializer>
   );
 }

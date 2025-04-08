@@ -216,6 +216,12 @@ const NEWS= [
 ]
 const INSIGHT= [
   {
+    image: "blog3.jpg",
+    title: "ICYMI: New Features on EIPsInsight",
+    content: "EIPsInsight introduces new features, including filters, reviewer tracking, Pectra countdown, and improved analytics, enhancing Ethereum proposal navigation.",
+    link: "https://etherworld.co/2025/04/01/icymi-new-features-on-eipsinsight/"
+  },
+  {
     image: "EipsInsightRecap.jpg",
     title: "Eipsinsight milestones 2024",
     content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities, which together streamline workflows, promote accountability, and optimize the management of proposals.",
