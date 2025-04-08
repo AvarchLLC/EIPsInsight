@@ -35,7 +35,7 @@ import axios from "axios";
 import Comments from "@/components/comments";
 import { useRouter } from "next/router";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
-
+import EipsLabelChart from "@/components/PrLabelsChart";
 import CopyLink from "@/components/CopyLink";
 
 
@@ -1490,6 +1490,10 @@ const router = useRouter();
                   )}
                 </>
                 )}
+
+                <Box mt={2}>
+                  <EipsLabelChart/>
+                </Box>
 
 <Box>
           <br/>

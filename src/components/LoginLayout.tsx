@@ -14,12 +14,11 @@ import { SessionProvider } from "next-auth/react";
 import SessionWrapper from '@/components/SessionWrapper';
 import { AuthLocalStorageInitializer } from "./AuthLocalStorageInitializer";
 
-
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const router = usePathname();
   return (
-    <SessionWrapper>
+    <SessionWrapper> 
     <motion.div
       key={router}
       initial="initialState"
@@ -50,7 +49,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
       </Head>
 
       {/* Google Analytics */}
-      <Script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></Script>
+      {/* <Script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></Script>
       <Script id="google-analytics" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
@@ -58,11 +57,11 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
           gtag('js', new Date());
           gtag('config', 'G-R36R5NJFTW');
         `}
-      </Script>
+      </Script> */}
 
-      <ColorModeScript initialColorMode="dark" />
+      <ColorModeScript initialColorMode="light" />
       <Providers>
-        <Navbar />
+        {/* <Navbar /> */}
 
         {/* New Section with Highlighted Background and Emojis */}
         {/* <Box 
@@ -89,7 +88,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         <LargeWithAppLinksAndSocial />
       </Providers>
     </motion.div>
-    </SessionWrapper>
+    </SessionWrapper> 
   );
 };
 

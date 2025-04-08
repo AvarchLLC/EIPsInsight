@@ -26,6 +26,7 @@ import {
   import Comments from "@/components/comments";
   import LabelFilter from "@/components/LabelFilter";
   import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+  import EipsLabelChart from "@/components/PrLabelsChart";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {

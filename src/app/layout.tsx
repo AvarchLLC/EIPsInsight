@@ -10,6 +10,8 @@ import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 import ConsentBanner from '@/components/ConsenstBanner';
 import FloatingContributionIcon from '@/components/FloatingContributionIcon';
+import SessionWrapper from '@/components/SessionWrapper';
+
 
 const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
@@ -24,8 +26,9 @@ export default function AllLayout({
   const pathname = usePathname();
 
   return (
+    <SessionWrapper>
     <html lang="en">
-      <head>
+      {/* <head>
       
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></script>
         <script>
@@ -36,7 +39,7 @@ export default function AllLayout({
           gtag('config', 'G-R36R5NJFTW');
           `}
         </script>
-      </head>
+      </head> */}
       <body className={`${mont.className}`}>
         <ColorModeScript initialColorMode="dark" />
         <AnimatePresence>
@@ -72,5 +75,6 @@ export default function AllLayout({
         </AnimatePresence>
       </body>
     </html>
+    </SessionWrapper>
   );
 }

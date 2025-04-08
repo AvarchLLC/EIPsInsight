@@ -104,6 +104,12 @@ const Dashboard = () => {
     fetchData();
   }, []);
   const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const uniqueStatuses = [...new Set(allData.map(item => item.status))];
+  console.log(uniqueStatuses);
+  const uniqueeip = allData.filter((item) => item.status === "");
+  console.log("unique eip1:", uniqueeip);
+  const uniqueeip2 = allData.filter((item) => item.status === " ");
+  console.log("unique eip2:", uniqueeip2);
 
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
@@ -633,7 +639,7 @@ const Dashboard = () => {
                     marginRight="6"
                     paddingBottom={6}
                   >
-                  {`Status - [${allData.length}]`}
+                  {`Status - [${allData.length} ${uniqueStatuses}]`}
                   </Text>
                 </NextLink>
                 <DashboardDonut dataset={data} />
