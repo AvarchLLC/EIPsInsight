@@ -39,7 +39,7 @@ const networks: Record<string, NetworkConfig> = {
   mainnet: {
     beaconApi: "https://ethereum-beacon-api.publicnode.com",
     rpc: "https://ethereum-rpc.publicnode.com",
-    target: 11591680,
+    target: 11649024,
     name: "Mainnet",
   },
 };
