@@ -52,6 +52,7 @@ const TestComponent = () => {
   const [markdownFileURL, setMarkdownFileURL] = useState<string>("");
   const [metadataJson, setMetadataJson] = useState<EipMetadataJson>();
   const [markdown, setMarkdown] = useState<string>("");
+  const [Repo, setRepo] =useState("");
   const [data, setData] = useState<{ status: string; date: string }[]>([]);
   const [data2, setData2] = useState<{ type: string; date: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -102,7 +103,9 @@ const TestComponent = () => {
     if (eipNo) {
       const fetchData = async () => {
         try {
-          const response = await fetch(`/api/new/eipshistory/${eipNo}`);
+          const repoPath = Repo.toLowerCase() === 'eip' ? 'eipshistory' : `${Repo.toLowerCase()}history`;
+          const response = await fetch(`/api/new/${repoPath}/${eipNo}`);
+        //   const response = await fetch(`/api/new/${Repo.toLowerCase()}history/${eipNo}`);
           const jsonData = await response.json();
           const statusWithDates = extractLastStatusDates(jsonData);
           const typeWithDates = extractLastTypesDates(jsonData);
@@ -116,15 +119,57 @@ const TestComponent = () => {
 
       fetchData();
     }
-  }, [eipNo]);
+  }, [Repo, eipNo]);
+
+  const getValid = async (num: string): Promise<string> => {
+    const links = [
+      {
+        url: `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${num}.md`,
+        path: `rip`
+      },
+      {
+        url: `https://raw.githubusercontent.com/ethereum/ERCs/master/ERCS/erc-${num}.md`,
+        path: `erc`
+      },
+      {
+        url: `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${num}.md`,
+        path: `eip`
+      },
+    ];
+  
+    for (const link of links) {
+      try {
+        const response = await fetch(link.url);
+        if (response.ok) {
+          
+          return link.path;
+        }
+      } catch (error) {
+        console.error(`Error checking link ${link.url}:`, error);
+      }
+    }
+    return `/eips/eip-${num}`;
+  };
+
 
   const fetchEIPData = useCallback(async () => {
     if (!eipNo) return;
 
-    let _markdownFileURL = `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${eipNo}.md`;
-    setMarkdownFileURL(_markdownFileURL);
+    setIsLoading(true); // Set loading state at the beginning
 
     try {
+      const getRepo = await getValid(eipNo);
+      if (!getRepo) {
+        setIsLoading(false);
+        return; // Exit if no repo is returned
+      }
+
+      setRepo(getRepo);
+
+      let _markdownFileURL = `https://raw.githubusercontent.com/ethereum/${getRepo.toUpperCase()}s/master/${getRepo.toUpperCase()}S/${getRepo}-${eipNo}.md`;
+      console.log("final url:", _markdownFileURL);
+      setMarkdownFileURL(_markdownFileURL);
+
       const eipMarkdownRes = await fetch(_markdownFileURL).then((response) =>
         response.text()
       );
@@ -132,7 +177,6 @@ const TestComponent = () => {
       const { metadata, markdown: _markdown } = extractMetadata(eipMarkdownRes);
       const metadataJson = convertMetadataToJson(metadata);
 
-      
       if (!metadataJson?.author || !metadataJson?.created) {
         setIsDataNotFound(true);
       } else {
@@ -140,12 +184,13 @@ const TestComponent = () => {
         setMarkdown(_markdown);
         setIsDataNotFound(false);
       }
-
-      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching EIP data:", error);
+      setIsDataNotFound(true);
+    } finally {
+      setIsLoading(false);
     }
-  }, [eipNo]);
+  }, [eipNo]); // Make sure to include all dependencies here, [Repo, eipNo]);
 
   useEffect(() => {
     if (eipNo) {
@@ -230,7 +275,7 @@ const TestComponent = () => {
               marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
             >
               <Header
-                title={`EIP- ${eipNo}`}
+                title={`${Repo.toUpperCase()}- ${eipNo}`}
                 subtitle={metadataJson?.title || ""}
               />
               <Box overflowX="auto">
