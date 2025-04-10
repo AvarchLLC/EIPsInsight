@@ -35,36 +35,42 @@ const nextConfig = withMDX(
 
     // Add the redirects method here
     async redirects() {
-      const properCaseRoutes = ['Reviewers', 'Analytics', 'Boards', 'proposalbuilder', 'home', 'pectra', 'all', 'eip', 'erc', 'rip', 'authors', 'SearchEip', 'SearchEipTitle', 'SearchPRSandISSUES', 'resources', ]; // Add more as needed
+      return [
+        // Pectra redirects (all case variations)
+        { source: '/pectra', destination: '/upgrade', permanent: true },
+        { source: '/Pectra', destination: '/upgrade', permanent: true },
+        { source: '/PEctra', destination: '/upgrade', permanent: true },
+        { source: '/PECtra', destination: '/upgrade', permanent: true },
+        { source: '/PECTra', destination: '/upgrade', permanent: true },
+        { source: '/PECTRa', destination: '/upgrade', permanent: true },
+        { source: '/PECTRA', destination: '/upgrade', permanent: true },
     
-      return properCaseRoutes.flatMap(properPath => {
-        const lowerPath = properPath.toLowerCase();
-        const upperPath = properPath.toUpperCase();
-        
-        return [
-          // Redirect lowercase version
-          {
-            source: `/${lowerPath}`,
-            destination: `/${properPath}`,
-            permanent: true,
-            has: [{ type: 'header', key: 'x-original-path', value: `/${lowerPath}` }]
-          },
-          // Redirect uppercase version (if different from lowercase)
-          ...(upperPath !== lowerPath ? [{
-            source: `/${upperPath}`,
-            destination: `/${properPath}`,
-            permanent: true,
-            has: [{ type: 'header', key: 'x-original-path', value: `/${upperPath}` }]
-          }] : []),
-          // Redirect mixed case version (if different from both)
-          ...(properPath !== lowerPath && properPath !== upperPath ? [{
-            source: `/${properPath}`,
-            destination: `/${properPath}`,
-            permanent: true,
-            has: [{ type: 'header', key: 'x-original-path', value: `/${properPath}` }]
-          }] : [])
-        ];
-      });
+        // Reviewers redirects
+        { source: '/reviewers', destination: '/Reviewers', permanent: true },
+        { source: '/REVIEWERS', destination: '/Reviewers', permanent: true },
+    
+        // Analytics redirects
+        { source: '/analytics', destination: '/Analytics', permanent: true },
+        { source: '/ANalytics', destination: '/Analytics', permanent: true },
+        { source: '/ANAlytics', destination: '/Analytics', permanent: true },
+        { source: '/ANALytics', destination: '/Analytics', permanent: true },
+        { source: '/ANALYtics', destination: '/Analytics', permanent: true },
+        { source: '/ANALYTics', destination: '/Analytics', permanent: true },
+        { source: '/ANALYTIcs', destination: '/Analytics', permanent: true },
+        { source: '/ANALYTICs', destination: '/Analytics', permanent: true },
+        { source: '/ANALYTICS', destination: '/Analytics', permanent: true },
+    
+        // Boards redirects
+        { source: '/BOARDS', destination: '/boards', permanent: true },
+        { source: '/BOARDs', destination: '/boards', permanent: true },
+        { source: '/BOARds', destination: '/boards', permanent: true },
+        { source: '/BOArds', destination: '/boards', permanent: true },
+        { source: '/BOards', destination: '/boards', permanent: true },
+        { source: '/Boards', destination: '/boards', permanent: true },
+    
+        // Proposal Builder redirects
+        { source: '/PROPOSALBUILDER', destination: '/proposalbuilder', permanent: true }
+      ];
     }
   })
 );

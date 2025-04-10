@@ -28,15 +28,10 @@ const availableLabels = [
   'a-review',
   'e-review',
   'e-consensus',
-  's-draft',
-  's-final',
-  's-lastcall',
-  's-review',
-  's-stagnant',
-  's-withdrawn',
   'stagnant',
   'stale',
   'created-by-bot',
+  "miscellaneous"
 ];
 
 const EipsLabelChart = () => {
@@ -137,17 +132,41 @@ const EipsLabelChart = () => {
       if (!Array.isArray(chartData)) return null;
   
       // Transform data to group by monthYear and count by label
+      // const transformedData = chartData.reduce<{
+      //   [key: string]: { [key: string]: number };
+      // }>((acc, { monthYear, type, count }) => {
+      //   if (showLabels[type]) {
+      //     if (!acc[monthYear]) {
+      //       acc[monthYear] = {};
+      //     }
+      //     acc[monthYear][type] = (acc[monthYear][type] || 0) + count;
+      //   }
+      //   return acc;
+      // }, {});
+
       const transformedData = chartData.reduce<{
         [key: string]: { [key: string]: number };
       }>((acc, { monthYear, type, count }) => {
-        if (showLabels[type]) {
+        // Determine the actual type to use
+        let effectiveType = type;
+        
+        // If the type isn't in availableLabels AND miscellaneous is enabled in showLabels
+        if (!availableLabels.includes(type) && showLabels.miscellaneous) {
+          effectiveType = 'miscellaneous';
+        }
+        
+        // Only process if the effective type is enabled in showLabels
+        if (showLabels[effectiveType]) {
           if (!acc[monthYear]) {
             acc[monthYear] = {};
           }
-          acc[monthYear][type] = (acc[monthYear][type] || 0) + count;
+          acc[monthYear][effectiveType] = (acc[monthYear][effectiveType] || 0) + count;
         }
+        
         return acc;
       }, {});
+
+      console.log("transformed data:",transformedData);
   
       // Convert to array format for the chart
       const finalData = Object.keys(transformedData).flatMap(monthYear => {

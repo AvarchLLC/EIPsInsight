@@ -26,10 +26,18 @@ import {
   Heading,
   Button,
   useColorModeValue,
+  Popover,
+  PopoverTrigger,
+  PopoverArrow,
+  PopoverContent,
+  PopoverHeader,
+  PopoverCloseButton,
+  PopoverBody
 } from "@chakra-ui/react";
 import { Markdown } from "@/components/MarkdownEIP";
 import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
+import { InfoOutlineIcon } from "@chakra-ui/icons";
 
 interface EipMetadataJson {
   eip: number;
@@ -365,6 +373,28 @@ const TestComponent = () => {
               {/* Heading on the Left */}
               <Heading size="md" color={"#30A0E0"}>
                 Status Timeline
+
+                <Popover>
+                    <PopoverTrigger>
+                    <IconButton
+                            aria-label="More info"
+                            icon={<InfoOutlineIcon />}
+                            size="md"
+                            colorScheme="blue"
+                            variant="ghost"
+                          />
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <PopoverArrow />
+                      <PopoverCloseButton />
+                      <PopoverHeader>Instructions</PopoverHeader>
+                      <PopoverBody>
+                      The timeline tracks status changes using the merged date as the reference point.
+                      </PopoverBody>
+                    </PopoverContent>
+                  </Popover>
+
+
               </Heading>
 
               {/* Dropdown Button on the Right */}
