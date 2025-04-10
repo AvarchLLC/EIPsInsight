@@ -639,7 +639,7 @@ const Dashboard = () => {
                     marginRight="6"
                     paddingBottom={6}
                   >
-                  {`Status - [${allData.length} ${uniqueStatuses}]`}
+                  {`Status - [${allData.length}]`}
                   </Text>
                 </NextLink>
                 <DashboardDonut dataset={data} />
