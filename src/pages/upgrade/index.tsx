@@ -33,9 +33,14 @@ import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 import { FaSyncAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
 import Graph from "@/components/NetworkUpgradesGraph";
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { IconButton } from '@chakra-ui/react';
+import { useRef } from 'react';
 
 
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
+
+
 
 
 const All = () => {
@@ -59,6 +64,23 @@ const All = () => {
       setIsDarkMode(true);
     }
   });
+
+  // const containerRef = useRef(null);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
@@ -445,7 +467,7 @@ const All = () => {
             fontSize={{ base: "md", md: "lg", lg: "2xl" }}
             textAlign="justify"
             lineHeight="1.6"
-            maxWidth="1200px" // Limit text width for better readability
+            
           >
             Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
             collectively known as{" "}
@@ -476,59 +498,121 @@ const All = () => {
               <Text as="span" color="blue.500" textDecor="underline">
                 Devnet 6
               </Text>
-            </NLink>{" "} 
-            and has finalized the specifications for {" "}
-            <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-5">
-              <Text as="span" color="blue.500" textDecor="underline">
-            Devnet 5
-            </Text>
-            </NLink>. Specs and other details can be followed below.{" "}
-            <NLink href="#carousel-section">
-              <Text as="span" color="blue.500" textDecor="underline">
-                View more
-              </Text>
             </NLink>.
           </Text>
 
           {/* Cards Section */}
-          <Flex
-  flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
-  wrap="wrap" // Ensure cards can wrap onto new rows if needed
-  justify="flex-start" // Align cards to the left
-  gap={4} // Add spacing between cards
-  width="100%" // Ensure cards section takes up full width
-  maxHeight="300px" // Limit the height of the container
-  overflowY="auto" // Make the container vertically scrollable
-  overflowX="hidden" // Prevent horizontal scrolling
-  p={4} // Add padding for better spacing inside the scroll area
-  sx={{
-    "&::-webkit-scrollbar": {
-      width: "8px", // Width of the scrollbar
-    },
-    "&::-webkit-scrollbar-thumb": {
-      background: "#3182ce", // Color of the scrollbar thumb
-      borderRadius: "4px", // Rounded edges for the thumb
-    },
-    "&::-webkit-scrollbar-thumb:hover": {
-      background: "#2b6cb0", // Darker color on hover
-    },
-    "&::-webkit-scrollbar-track": {
-      background: "#edf2f7", // Light background for the track
-    },
-  }}
->
-  {PectraPosts.map((pectra, index) => (
-    <Card
-      key={index}
-      image={pectra.image}
-      title={pectra.title}
-      content={pectra.content}
-      link={pectra.link}
-    />
-  ))}
-</Flex>
+          {/* <Flex
+              flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
+              wrap="wrap" // Ensure cards can wrap onto new rows if needed
+              justify="flex-start" // Align cards to the left
+              gap={4} // Add spacing between cards
+              width="100%" // Ensure cards section takes up full width
+              maxHeight="300px" // Limit the height of the container
+              overflowY="auto" // Make the container vertically scrollable
+              overflowX="hidden" // Prevent horizontal scrolling
+              p={4} // Add padding for better spacing inside the scroll area
+              sx={{
+                "&::-webkit-scrollbar": {
+                  width: "8px", // Width of the scrollbar
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "#3182ce", // Color of the scrollbar thumb
+                  borderRadius: "4px", // Rounded edges for the thumb
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  background: "#2b6cb0", // Darker color on hover
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: "#edf2f7", // Light background for the track
+                },
+              }}
+            >
+              {PectraPosts.map((pectra, index) => (
+                <Card
+                  key={index}
+                  image={pectra.image}
+                  title={pectra.title}
+                  content={pectra.content}
+                  link={pectra.link}
+                />
+              ))}
+            </Flex> */}
 
-        </Flex>
+
+
+          </Flex>
+
+          <Flex position="relative" width="100%" align="center">
+  {/* Left arrow with proper spacing */}
+  <IconButton
+    aria-label="Scroll left"
+    icon={<ChevronLeftIcon />}
+    position="absolute"
+    left={0}
+    zIndex={2}  // Higher z-index to ensure it's above content
+    onClick={scrollLeft}
+    bg="#30A0E0"
+    boxShadow="md"
+    _hover={{ bg: "gray.100" }}
+  />
+
+  {/* Cards container with hidden scrollbar */}
+  <Flex
+    ref={containerRef}
+    flex="1"
+    overflow="hidden"  // Completely hide overflow
+    py={4}
+    pl={10}  // Left padding for arrow space
+    pr={10}  // Right padding for arrow space
+    _hover={{
+      overflowX: "auto",  // Only show scroll on hover
+    }}
+    sx={{
+      scrollbarWidth: "none",  // Hide scrollbar for Firefox
+      "&::-webkit-scrollbar": {
+        display: "none",  // Hide scrollbar for Chrome/Safari
+      },
+      // Additional space for last card
+      "& > div": {
+        paddingRight: "40px",
+      },
+    }}
+  >
+    <Flex gap={6} flexWrap="nowrap">
+      {PectraPosts.map((pectra, index) => (
+        <Box 
+          key={index}
+          flex="0 0 auto"
+          width={{ base: "280px", md: "320px" }}
+          // Add margin to first and last items for arrow clearance
+          ml={index === 0 ? 2 : 0}
+          mr={index === PectraPosts.length - 1 ? 2 : 0}
+        >
+          <Card
+            image={pectra.image}
+            title={pectra.title}
+            content={pectra.content}
+            link={pectra.link}
+          />
+        </Box>
+      ))}
+    </Flex>
+  </Flex>
+
+  {/* Right arrow with proper spacing */}
+  <IconButton
+    aria-label="Scroll right"
+    icon={<ChevronRightIcon />}
+    position="absolute"
+    right={0}
+    zIndex={2}  // Higher z-index
+    onClick={scrollRight}
+    bg="#30A0E0"
+    boxShadow="md"
+    _hover={{ bg: "gray.100" }}
+  />
+</Flex>
         
 
 

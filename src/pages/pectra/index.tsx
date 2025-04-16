@@ -33,9 +33,14 @@ import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 import { FaSyncAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
 import Graph from "@/components/NetworkUpgradesGraph";
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { IconButton } from '@chakra-ui/react';
+import { useRef } from 'react';
 
 
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
+
+
 
 
 const All = () => {
@@ -59,6 +64,23 @@ const All = () => {
       setIsDarkMode(true);
     }
   });
+
+  // const containerRef = useRef(null);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
@@ -476,13 +498,7 @@ const All = () => {
               <Text as="span" color="blue.500" textDecor="underline">
                 Devnet 6
               </Text>
-            </NLink>{" "} 
-            and has finalized the specifications for {" "}
-            <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-5">
-              <Text as="span" color="blue.500" textDecor="underline">
-            Devnet 5
-            </Text>
-            </NLink>. Specs and other details can be followed below.{" "}
+            </NLink>.Specs and other details can be followed below.{" "}
             <NLink href="#carousel-section">
               <Text as="span" color="blue.500" textDecor="underline">
                 View more
@@ -491,44 +507,118 @@ const All = () => {
           </Text>
 
           {/* Cards Section */}
-          <Flex
-  flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
-  wrap="wrap" // Ensure cards can wrap onto new rows if needed
-  justify="flex-start" // Align cards to the left
-  gap={4} // Add spacing between cards
-  width="100%" // Ensure cards section takes up full width
-  maxHeight="300px" // Limit the height of the container
-  overflowY="auto" // Make the container vertically scrollable
-  overflowX="hidden" // Prevent horizontal scrolling
-  p={4} // Add padding for better spacing inside the scroll area
-  sx={{
-    "&::-webkit-scrollbar": {
-      width: "8px", // Width of the scrollbar
-    },
-    "&::-webkit-scrollbar-thumb": {
-      background: "#3182ce", // Color of the scrollbar thumb
-      borderRadius: "4px", // Rounded edges for the thumb
-    },
-    "&::-webkit-scrollbar-thumb:hover": {
-      background: "#2b6cb0", // Darker color on hover
-    },
-    "&::-webkit-scrollbar-track": {
-      background: "#edf2f7", // Light background for the track
-    },
-  }}
->
-  {PectraPosts.map((pectra, index) => (
-    <Card
-      key={index}
-      image={pectra.image}
-      title={pectra.title}
-      content={pectra.content}
-      link={pectra.link}
-    />
-  ))}
-</Flex>
+          {/* <Flex
+              flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
+              wrap="wrap" // Ensure cards can wrap onto new rows if needed
+              justify="flex-start" // Align cards to the left
+              gap={4} // Add spacing between cards
+              width="100%" // Ensure cards section takes up full width
+              maxHeight="300px" // Limit the height of the container
+              overflowY="auto" // Make the container vertically scrollable
+              overflowX="hidden" // Prevent horizontal scrolling
+              p={4} // Add padding for better spacing inside the scroll area
+              sx={{
+                "&::-webkit-scrollbar": {
+                  width: "8px", // Width of the scrollbar
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "#3182ce", // Color of the scrollbar thumb
+                  borderRadius: "4px", // Rounded edges for the thumb
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  background: "#2b6cb0", // Darker color on hover
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: "#edf2f7", // Light background for the track
+                },
+              }}
+            >
+              {PectraPosts.map((pectra, index) => (
+                <Card
+                  key={index}
+                  image={pectra.image}
+                  title={pectra.title}
+                  content={pectra.content}
+                  link={pectra.link}
+                />
+              ))}
+            </Flex> */}
 
+
+
+          </Flex>
+
+          <Flex
+      position="relative"
+      width="100%"
+      align="center"
+    >
+      {/* Left arrow */}
+      <IconButton
+        aria-label="Scroll left"
+        icon={<ChevronLeftIcon />}
+        position="absolute"
+        left={0}
+        zIndex={1}
+        onClick={scrollLeft}
+        bg="white"
+        boxShadow="md"
+        _hover={{ bg: "gray.100" }}
+      />
+
+      {/* Cards container */}
+      <Flex
+        ref={containerRef}
+        flex="1"
+        overflowX="auto"
+        overflowY="hidden"
+        py={4}
+        px={8}
+        scrollBehavior="smooth"
+        sx={{
+          "&::-webkit-scrollbar": {
+            height: "8px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#3182ce",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "#2b6cb0",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "#edf2f7",
+          },
+        }}
+      >
+        <Flex gap={4} flexWrap="nowrap">
+          {PectraPosts.map((pectra, index) => (
+            <Card
+              key={index}
+              image={pectra.image}
+              title={pectra.title}
+              content={pectra.content}
+              link={pectra.link}
+              // minWidth="300px"
+              // flex="0 0 auto"
+            />
+          ))}
         </Flex>
+      </Flex>
+
+      {/* Right arrow */}
+      <IconButton
+        aria-label="Scroll right"
+        icon={<ChevronRightIcon />}
+        position="absolute"
+        right={0}
+        zIndex={1}
+        onClick={scrollRight}
+        bg="white"
+        boxShadow="md"
+        _hover={{ bg: "gray.100" }}
+      />
+    </Flex>
         
 
 

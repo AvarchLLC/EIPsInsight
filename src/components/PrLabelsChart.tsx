@@ -262,7 +262,7 @@ const EipsLabelChart = () => {
           if (label === 'dependencies') return '#FFFF00';  // Yellow
           if (label === 'stagnant') return '#8B008B';  // Dark Magenta
           if (label === 'stale') return '#B22222';  // Fire Brick
-          if (label === 'created-by-bot') return '#D3D3D3';  // Light Gray
+          if (label === 'created-by-bot') return 'green';  // Light Gray
           if (label === 'discussions-to') return '#778899';  // Light Slate Gray
           if (label === 'question') return '#98FB98';  // Pale Green
           if (label === 'javascript') return '#F0E68C';  // Khaki

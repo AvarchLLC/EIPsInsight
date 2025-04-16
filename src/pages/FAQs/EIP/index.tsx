@@ -78,7 +78,7 @@ const EIPsInsightRecap = () => {
                 textAlign="justify"
             >     
             <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-            EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
+            <Link href="/eip" color="blue.300" isExternal>EIP</Link>{" "} stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
               </Text>
               
             </Box>
@@ -92,24 +92,24 @@ const EIPsInsightRecap = () => {
     <b>Standards Track EIP</b>: Describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, block or transaction validity rules, proposed application standards/conventions, or any change that affects interoperability of applications using Ethereum. Standards Track EIPs include:
     <ul className="list-disc list-inside ml-5 space-y-2">
       <li>
-        <b>Core</b>: Improvements requiring a consensus fork (e.g., <a href="/eips/eip-5">EIP-5</a>, <a href="/eips/eip-101">EIP-101</a>), as well as changes relevant to <a href="https://github.com/ethereum/pm">“core dev” discussions</a>.
+        <b><Link href="/core" color="blue.300" isExternal>Core</Link></b>: Improvements requiring a consensus fork (e.g., <a href="/eips/eip-5">EIP-5</a>, <a href="/eips/eip-101">EIP-101</a>), as well as changes relevant to <a href="https://github.com/ethereum/pm">“core dev” discussions</a>.
       </li>
       <li>
-        <b>Networking</b>: Includes improvements to <a href="https://github.com/ethereum/devp2p/blob/readme-spec-links/rlpx.md">devp2p</a> (e.g., <a href="/eips/eip-8">EIP-8</a>), the <a href="https://ethereum.org/en/developers/docs/nodes-and-clients/#light-node">Light Ethereum Subprotocol</a>, and network protocol specifications like <a href="https://github.com/ethereum/go-ethereum/issues/16013#issuecomment-364639309">Whisper</a> and <a href="https://github.com/ethereum/go-ethereum/pull/2959">Swarm</a>.
+        <b><Link href="/networking" color="blue.300" isExternal>Networking</Link></b>: Includes improvements to <a href="https://github.com/ethereum/devp2p/blob/readme-spec-links/rlpx.md">devp2p</a> (e.g., <a href="/eips/eip-8">EIP-8</a>), the <a href="https://ethereum.org/en/developers/docs/nodes-and-clients/#light-node">Light Ethereum Subprotocol</a>, and network protocol specifications like <a href="https://github.com/ethereum/go-ethereum/issues/16013#issuecomment-364639309">Whisper</a> and <a href="https://github.com/ethereum/go-ethereum/pull/2959">Swarm</a>.
       </li>
       <li>
-        <b>Interface</b>: Includes language-level standards such as method names (e.g., <a href="/eips/eip-6">EIP-6</a>) and <a href="https://docs.soliditylang.org/en/develop/abi-spec.html">contract ABIs</a>.
+        <b><Link href="/interface" color="blue.300" isExternal>Interface</Link></b>: Includes language-level standards such as method names (e.g., <a href="/eips/eip-6">EIP-6</a>) and <a href="https://docs.soliditylang.org/en/develop/abi-spec.html">contract ABIs</a>.
       </li>
       <li>
-        <b>ERC</b>: Application-level standards and conventions, including token standards (e.g., <a href="/eips/eip-20">ERC-20</a>), name registries (e.g., <a href="/eips/eip-137">ERC-137</a>), URI schemes, and wallet formats.
+        <b><Link href="/erc" color="blue.300" isExternal>ERC</Link></b>: Application-level standards and conventions, including token standards (e.g., <a href="/eips/eip-20">ERC-20</a>), name registries (e.g., <a href="/eips/eip-137">ERC-137</a>), URI schemes, and wallet formats.
       </li>
     </ul>
   </li>
   <li>
-    <b>Meta EIP</b>: Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. These EIPs apply to areas other than the Ethereum protocol itself and often require community consensus. Examples include procedures, guidelines, and tools used in Ethereum development.
+    <b><Link href="/meta" color="blue.300" isExternal>Meta EIP</Link></b>: Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. These EIPs apply to areas other than the Ethereum protocol itself and often require community consensus. Examples include procedures, guidelines, and tools used in Ethereum development.
   </li>
   <li>
-    <b>Informational EIP</b>: Provides general guidelines or information to the Ethereum community but does not propose new features. Informational EIPs are non-binding recommendations and do not necessarily represent community consensus.
+    <b><Link href="/informational" color="blue.300" isExternal>Informational EIP</Link></b>: Provides general guidelines or information to the Ethereum community but does not propose new features. Informational EIPs are non-binding recommendations and do not necessarily represent community consensus.
   </li>
 </ul>
 

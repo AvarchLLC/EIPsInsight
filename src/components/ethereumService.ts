@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import axios from 'axios';
 
 // Initialize Web3 instances for Mainnet and Sepolia
-const web3 = new Web3('https://ethereum-rpc.publicnode.com');
+const web3 = new Web3('https://ethereum-hoodi-rpc.publicnode.com');
 const sepoliaWeb3 = new Web3('https://ethereum-sepolia-rpc.publicnode.com');
 
 // Define types for Block and TransactionReceipt
@@ -51,7 +51,7 @@ export const getGasBurnt = (block: Block): bigint => {
 export const fetchBeaconChainData = async (isSepolia: boolean = false) => {
   const endpoint = isSepolia
     ? 'https://ethereum-sepolia-beacon-api.publicnode.com/eth/v1/beacon/headers/head'
-    : 'https://ethereum-beacon-api.publicnode.com/eth/v1/beacon/headers/head';
+    : 'https://ethereum-hoodi-beacon-api.publicnode.com/eth/v1/beacon/headers/head';
 
   try {
     const response = await fetch(endpoint);
@@ -114,7 +114,7 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
     const batchSize = 100; // Number of blocks per batch
     const totalBatches = Math.ceil(blockNumbers.length / batchSize); // Total batches (72)
   
-    const endpoint = isSepolia ? 'https://ethereum-sepolia-rpc.publicnode.com' : 'https://ethereum-rpc.publicnode.com';
+    const endpoint = isSepolia ? 'https://ethereum-sepolia-rpc.publicnode.com' : 'https://ethereum-hoodi-rpc.publicnode.com';
   
     const allBlocks: any[] = [];
   
