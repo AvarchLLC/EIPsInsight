@@ -18,6 +18,7 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
   const buttonBg = useColorModeValue("rgba(159, 122, 234, 0.2)", "rgba(159, 122, 234, 0.1)");
   const activeButtonBg = useColorModeValue("rgba(159, 122, 234, 0.5)", "rgba(159, 122, 234, 0.3)");
   const buttonHoverBg = useColorModeValue("rgba(159, 122, 234, 0.3)", "rgba(159, 122, 234, 0.2)");
+  const [sliderValue, setSliderValue] = useState(0.98); 
 
   // State for controlling the selected data type
   const [dataType, setDataType] = useState<DataType>("fee");
@@ -124,6 +125,19 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
     lineStyle: {
       stroke: "#8884d8",
       lineWidth: 2,
+    },
+    slider: {
+      start: sliderValue, // Set the start value from the state
+      end: 1, // End of the slider
+      step: 0.01, // Define the step value for the slider
+      min: 0, // Minimum value for the slider
+      max: 1, // Maximum value for the slider
+      onChange: (value: number) => {
+        setSliderValue(value); // Update state when slider value changes
+      },
+      onAfterChange: (value: number) => {
+        console.log('Slider moved to:', value); // Optional: Perform actions after sliding stops
+      },
     },
     smooth: true,
     tooltip: {

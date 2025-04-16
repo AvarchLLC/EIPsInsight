@@ -78,7 +78,7 @@ const EIPsInsightRecap = () => {
                 textAlign="justify"
             >     
             <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-            The goal of Ethereum Request for Change (ERCs) is to standardize and provide high-quality documentation for the Ethereum application layer. This repository tracks past and ongoing improvements application standards in the form of ERCs.
+            The goal of Ethereum Request for Change (<Link href="/erc" color="blue.300" isExternal>ERCs</Link>) is to standardize and provide high-quality documentation for the Ethereum application layer. This repository tracks past and ongoing improvements application standards in the form of ERCs.
               </Text>
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
                 <Link  href="/ercs/erc-1"

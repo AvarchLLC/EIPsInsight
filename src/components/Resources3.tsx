@@ -335,7 +335,7 @@ const embedLinks = Links.map((link) => {
         flex={{ base: "none", md: "2" }} 
         mt={{ base: 4, md: 0 }}
         w="100%"
-  maxW={{ lg: "50%" }} 
+       maxW={{ lg: "50%" }} 
       >
         <SimpleGrid 
     columns={{ base: 1, md: 1, lg: 1 }} // Stacks based on screen size
@@ -353,6 +353,8 @@ const embedLinks = Links.map((link) => {
   </SimpleGrid>
       </Box>
     </Flex>
+
+    
           </>
       ),
     },
