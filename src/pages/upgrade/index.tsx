@@ -640,7 +640,7 @@ const All = () => {
   </Text>
   <br />
   <Flex justifyContent="center" alignItems="center" width="100%">
-    <Box width="100%" maxWidth="100%" overflowX="auto">
+    <Box width="100%" maxWidth="100%" overflow="hidden">
       <Graph />
     </Box>
   </Flex>

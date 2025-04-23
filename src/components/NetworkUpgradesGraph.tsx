@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import ForceGraph3D, { ForceGraphMethods } from 'react-force-graph-3d';
 import * as THREE from 'three';
 import SpriteText from 'three-spritetext';
+import { Button, IconButton, VStack } from '@chakra-ui/react';
+import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
 
 const networkUpgradesData = {
   networkUpgrades: [
@@ -146,6 +148,24 @@ const networkUpgradesData = {
 
 const EIP3DGraph = () => {
   const fgRef = useRef<ForceGraphMethods>();
+  const [showResetZoom, setShowResetZoom] = useState(true);
+
+  const handleZoomIn = () => {
+    if (fgRef.current) {
+      const distance = fgRef.current.camera().position.length();
+      fgRef.current.camera().position.setLength(distance * 0.8); // zoom in
+      setShowResetZoom(true);
+    }
+  };
+  
+  const handleZoomOut = () => {
+    if (fgRef.current) {
+      const distance = fgRef.current.camera().position.length();
+      fgRef.current.camera().position.setLength(distance * 1.2); // zoom out
+      setShowResetZoom(true);
+    }
+  };
+  
 
   const graphData = useMemo(() => {
     const nodes: any[] = [];
@@ -237,6 +257,38 @@ const EIP3DGraph = () => {
         </ul>
       </div>
 
+      {/* Zoom Controls */}
+      <VStack position="absolute" bottom={4} right={4} zIndex={10} spacing={2}>
+        {
+          <>
+            <IconButton
+              aria-label="Zoom in"
+              icon={<AddIcon />}
+              onClick={handleZoomIn}
+              size="sm"
+              colorScheme="gray"
+            />
+            <IconButton
+              aria-label="Zoom out"
+              icon={<MinusIcon />}
+              onClick={handleZoomOut}
+              size="sm"
+              colorScheme="gray"
+            />
+            <Button
+              leftIcon={<RepeatIcon />}
+              onClick={() => {
+                fgRef.current?.zoomToFit(1000);
+              }}
+              size="xs"
+              colorScheme="gray"
+            >
+              Reset
+            </Button>
+          </>
+        }
+      </VStack>
+
       <ForceGraph3D
         ref={fgRef}
         graphData={graphData}
@@ -251,9 +303,9 @@ const EIP3DGraph = () => {
           // Create sprite label
           const sprite = new SpriteText(node.label);
           sprite.color = '#ffffff';
-          sprite.backgroundColor = 'transparent'; // You can change this if you want a background
+          sprite.backgroundColor = 'transparent';
           sprite.textHeight = 4;
-          sprite.position.set(0, 10, 0); // Position label slightly above the sphere
+          sprite.position.set(0, 10, 0);
         
           // Combine into a group
           const group = new THREE.Group();
@@ -272,17 +324,12 @@ const EIP3DGraph = () => {
         linkDirectionalArrowLength={3}
         linkDirectionalArrowRelPos={0.9}
         forceEngine="d3"
-        // Controls how quickly node velocities decay (0-1)
         d3VelocityDecay={0.3}
-        // Controls how quickly the simulation stabilizes (0-1)
         d3AlphaDecay={0.02}
-        // Quality of node geometries (higher is better but slower)
         nodeResolution={32}
-        // Initial simulation iterations before rendering
         warmupTicks={100}
-        // Maximum simulation iterations after user interaction
         cooldownTicks={1000}
-        
+        // onZoom={() => setShowResetZoom(true)}
       />
     </div>
   );
