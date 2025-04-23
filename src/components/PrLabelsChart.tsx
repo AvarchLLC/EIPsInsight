@@ -3,6 +3,7 @@ import { Box, Heading, Checkbox, Menu, MenuList, MenuItem, MenuButton, Button, F
 import { ColumnConfig } from '@ant-design/plots';
 import dynamic from "next/dynamic";
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
+import CopyLink from './CopyLink';
 
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 
@@ -346,7 +347,9 @@ const EipsLabelChart = () => {
           mb={6}
         >
           {/* Title on the left */}
-          <Heading size="md" color="black" flexShrink={0}>EIPs Label Distribution</Heading>
+          <Heading size="md" color="black" flexShrink={0}>EIPs Label Distribution
+            <CopyLink link={`https://eipsinsight.com//Analytics#EIPsLabelChart`} />
+          </Heading>
           
           {/* Controls on the right */}
           <Flex direction={{ base: "column", md: "row" }} align="center" gap={6}>

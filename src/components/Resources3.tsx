@@ -1,14 +1,97 @@
 import React, { useState, useEffect } from "react";
-import {useColorModeValue, Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Image, Link, Flex, Grid } from "@chakra-ui/react";
+import {useColorModeValue, Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Image, Link, Flex, Grid, Heading, Icon } from "@chakra-ui/react";
 import Header from "./Header";
+import NextLink from 'next/link';
 import { SimpleGrid } from "@chakra-ui/react";
-
+import { FaTools } from "react-icons/fa";
 
 const ResourcesPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const bg2 = useColorModeValue("gray.50", "gray.700"); // Light mode: gray.50, Dark mode: gray.700
   const textColor2 = useColorModeValue("black", "white"); // Light mode: black, Dark mode: white
+  const cardBg = useColorModeValue("white", "gray.800");
+  const accentColor = useColorModeValue("blue.500", "blue.300");
+  const textColor = useColorModeValue("gray.700", "gray.200");
+
+  const TOOLS = [
+    {
+      title: "Analytics",
+      description: "Track and visualize EIP activity and trends",
+      link: "/Analytics",
+      icon: "📊"
+    },
+    {
+      title: "Boards",
+      description: "Manage and organize EIP proposals",
+      link: "/boards",
+      icon: "📋"
+    },
+    {
+      title: "Editors & Reviewers Leaderboard",
+      description: "See top contributors in the EIP ecosystem",
+      link: "/Reviewers",
+      icon: "🏆"
+    },
+    {
+      title: "EIP Proposal Builder",
+      description: "Create and format new EIP proposals easily",
+      link: "/proposalbuilder",
+      icon: "🛠️"
+    },
+    {
+      title: "Search by Author",
+      description: "Find EIPs by their authors",
+      link: "/authors",
+      icon: "🔍"
+    },
+    {
+      title: "Search by EIP",
+      description: "Quickly find specific EIPs",
+      link: "/SearchEip",
+      icon: "🔎"
+    }
+  ];
+
+  const ToolsSection = () => (
+    <Box mt={8}>
+      <Heading size="lg" mb={6} display="flex" alignItems="center" gap={2}>
+        <Icon as={FaTools} color={accentColor} /> Tools
+      </Heading>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+        {TOOLS.map((tool, index) => (
+          <Box
+            key={index}
+            bg={cardBg}
+            p={6}
+            borderRadius="xl"
+            boxShadow="md"
+            transition="all 0.2s ease"
+            _hover={{
+              transform: "translateY(-5px)",
+              boxShadow: "lg",
+            }}
+          >
+            <Flex align="center" mb={3}>
+              <Text fontSize="2xl" mr={3}>{tool.icon}</Text>
+              <Heading size="md">{tool.title}</Heading>
+            </Flex>
+            <Text mb={4} color={textColor}>{tool.description}</Text>
+            <NextLink href={tool.link} passHref legacyBehavior>
+              <Link
+                color={accentColor}
+                fontWeight="semibold"
+                display="inline-flex"
+                alignItems="center"
+              >
+                Open Tool →
+              </Link>
+            </NextLink>
+          </Box>
+        ))}
+      </SimpleGrid>
+    </Box>
+  );
 
   const handleSelection = (hash:any) => {
     if (hash === "FAQ") {
@@ -560,6 +643,7 @@ const embedLinks = Links.map((link) => {
         {tabContent.map((tab, index) => (
           <TabPanel key={index}>{tab.content}</TabPanel>
         ))}
+        <ToolsSection/>
       </TabPanels>
     </Tabs>
     </Box>

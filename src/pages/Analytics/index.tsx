@@ -1491,7 +1491,7 @@ const router = useRouter();
                 </>
                 )}
 
-                <Box mt={2}>
+                <Box mt={2} id="EIPsLabelChart">
                   <EipsLabelChart/>
                 </Box>
 

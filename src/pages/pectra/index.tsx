@@ -297,15 +297,15 @@ const All = () => {
         category:"Core",
         discussion:"https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182"
       },
-      //   {
-      //     eip: "3670",
-      //     title: "EOF - Code Validation",
-      //     author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-      //     link: "https://eipsinsight.com/eips/eip-3670",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693"
-      // },
+        {
+          eip: "7642",
+          title: "eth/69 - history expiry and simpler receipts",
+          author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
+          link: "https://eipsinsight.com/eips/eip-7642",
+          type:"Standards Track",
+        category:"Networking",
+        discussion:"https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+      },
       //   {
       //     eip: "4200",
       //     title: "EOF - Static relative jumps",
