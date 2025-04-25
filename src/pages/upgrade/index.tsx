@@ -37,6 +37,7 @@ import Graph from "@/components/EIP3DWrapper"
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { IconButton } from '@chakra-ui/react';
 import { useRef } from 'react';
+import UpgradesTimeline from "@/components/UpgradesTimeline";
 
 
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
@@ -647,8 +648,9 @@ const All = () => {
   <br />
 </Box>
 
-
-
+        <Box id="NetworkUpgrades" mt={2}>
+          <UpgradesTimeline/>
+        </Box>
 
         <Box id="NetworkUpgrades" mt={2}>
           <NetworkUpgradesChart/>

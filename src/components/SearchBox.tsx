@@ -491,6 +491,17 @@ return (
         size={10}
         onChange={(e) => console.log(e.target.value)}
       >
+        {filteredEIPResults.map((result) => (
+          <option
+            key={result.eip}
+            value={result.eip}
+            onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
+            className="text-lg py-3" // Increase font size and vertical padding
+          >
+            {result.repo.toUpperCase()} Number: {result.eip}
+          </option>
+        ))}
+        
         {filteredAuthors.map((result) => (
           <option
             key={result.name}
@@ -525,16 +536,6 @@ return (
             {result.repo} ISSUE: {result.issueNumber}
           </option>
         ))} */}
-        {filteredEIPResults.map((result) => (
-          <option
-            key={result.eip}
-            value={result.eip}
-            onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
-            className="text-lg py-3" // Increase font size and vertical padding
-          >
-            {result.repo.toUpperCase()} Number: {result.eip}
-          </option>
-        ))}
         
       </select>
     )}
