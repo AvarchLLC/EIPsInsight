@@ -69,7 +69,6 @@ const EIPTimelinePage = () => {
 
   return (
     <Box p={4}>
-      <Heading mb={4}>EIP Timeline</Heading>
       <TimelineChart data={processedData} data2={data2}/>
     </Box>
   );
