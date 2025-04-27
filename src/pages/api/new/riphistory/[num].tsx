@@ -46,7 +46,7 @@ const eipHistorySchema = new mongoose.Schema({
 });
 
 const ErcHistory =
-  mongoose.models.RipHistory || mongoose.model("RipHistory", eipHistorySchema);
+  mongoose.models.RipHistory || mongoose.model("RipHistory3", eipHistorySchema);
 
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");

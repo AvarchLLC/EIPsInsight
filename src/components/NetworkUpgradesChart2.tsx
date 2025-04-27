@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Box, useColorModeValue, Flex, Heading, Button } from "@chakra-ui/react";
-
+import axios from "axios";
+import CopyLink from "./CopyLink";
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 
 // Define the data structure for each entry
@@ -121,7 +122,7 @@ const colorMap = transformedData.reduce((map, author, index) => {
   return map;
 }, {} as Record<string, string>);
 
-const AuthorContributionsChart = () => {
+const AuthorContributionsChart = React.memo(() => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   // Chart configuration
@@ -161,14 +162,27 @@ const AuthorContributionsChart = () => {
   return (
     <Box bg={bg} p={5} borderRadius="lg">
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
-        <Heading size="md">Author Contributions</Heading>
-        <Button onClick={downloadData} colorScheme="blue">
+        <Heading size="md">Author Contributions  <CopyLink link={`https://eipsinsight.com//pectra#AuthorContributions`} /></Heading>
+        <Button 
+        fontSize={{ base: "0.6rem", md: "md" }}
+        onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadData();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }} 
+          colorScheme="blue">
           Download CSV
         </Button>
       </Flex>
       <Column {...config} />
     </Box>
   );
-};
+});
 
 export default AuthorContributionsChart;

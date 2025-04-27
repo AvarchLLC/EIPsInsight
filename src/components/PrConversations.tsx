@@ -2,15 +2,17 @@ import react, {useEffect, useState} from 'react';
 import {Box, Spinner, Text, useColorModeValue} from "@chakra-ui/react";
 import NextLink from "next/link";
 import React from "react";
+import ReactMarkdown from 'react-markdown';
 
 interface PrConversationsProps {
-    prNumber: string;
+    dataset: PR|null;
 }
 
 interface PR {
     type: string;
     title: string;
     url: string;
+    state:string;
     prDetails: {
         prNumber: number;
         prTitle: string;
@@ -37,6 +39,7 @@ interface Conversation {
         avatar_url: string;
     };
     created_at: string;
+    submitted_at:string;
     updated_at: string;
     author_association: string;
     body: string;
@@ -100,32 +103,17 @@ interface Parent {
 }
 
 
-const PrConversations: React.FC<PrConversationsProps> = ({prNumber}) => {
+const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
     const [data, setData] = useState<PR | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const bg = useColorModeValue('#f6f6f7', '#1F2937');
     const bg2 = useColorModeValue('#E5E7EB', '#374151');
+    const codeBg = useColorModeValue('#f5f5f5', '#2d3748'); // Light and dark mode background for code blocks
+    const preCodeBg = useColorModeValue('#f5f5f5', '#2d3748');
     useEffect(() => {
-        if (prNumber) {
-            const fetchData = async () => {
-                try {
-                    const response = await fetch(`/api/get-pr-or-issue-details/${prNumber}`);
-                    const jsonData = await response.json();
-
-                    if (jsonData && typeof jsonData === 'object') {
-                        setData(jsonData);
-                        setIsLoading(false);
-                    } else {
-                        console.error('API response is not an object:', jsonData);
-                        setIsLoading(false);
-                    }
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
-            };
-            fetchData();
-        }
-    }, [prNumber]);
+        setData(dataset);
+        setIsLoading(false);
+    }, [dataset]);
     return(
         <>
             <Box
@@ -178,9 +166,59 @@ const PrConversations: React.FC<PrConversationsProps> = ({prNumber}) => {
                                             className={'p-4 mx-8 mt-4 rounded-lg'}
                                             bgColor={bg2}
                                         >
-                                            <Text className={'text-lg'}>
-                                                {comment.body}
-                                            </Text>
+                                           <ReactMarkdown
+                                            components={{
+                                                code({ inline, children, ...props }) {
+                                                return inline ? (
+                                                    <code
+                                                    style={{
+                                                        whiteSpace: 'break-spaces',
+                                                        wordBreak: 'break-word',
+                                                        backgroundColor: codeBg, // Adjusted dynamic background color for inline code
+                                                        padding: '4px 6px', // Padding for inline code
+                                                        borderRadius: '4px',
+                                                        display: 'inline-block', // Ensure inline block behavior
+                                                    }}
+                                                    {...props}
+                                                    >
+                                                    {children}
+                                                    </code>
+                                                ) : (
+                                                    <pre
+                                                    style={{
+                                                        overflowX: 'auto',
+                                                        backgroundColor: preCodeBg, // Adjusted dynamic background color for block code
+                                                        padding: '12px 16px', // Padding for block code
+                                                        borderRadius: '4px',
+                                                        maxWidth: '100%',
+                                                        margin: 0, // Remove default <pre> margin
+                                                    }}
+                                                    {...props}
+                                                    >
+                                                    <code>{children}</code>
+                                                    </pre>
+                                                );
+                                                },
+                                            }}
+                                            >
+                                            {comment.body.split('\r\n\r\n')[0] || ''}
+                                            </ReactMarkdown>
+
+                                        </Box>
+                                        <Box
+                                        className={'mx-8'}
+                                        >
+                                        <Text className="text-sm font-bold mt-2">
+                                            {new Date(comment.created_at).toLocaleString('en-US', {
+                                                weekday: 'long',    // "Monday"
+                                                year: 'numeric',    // "2024"
+                                                month: 'long',      // "November"
+                                                day: 'numeric',     // "14"
+                                                hour: 'numeric',    // "10 AM"
+                                                minute: '2-digit',  // "30"
+                                                hour12: true        // 12-hour format
+                                            })}
+                                        </Text>
                                         </Box>
                                     </Box>
                                 ))

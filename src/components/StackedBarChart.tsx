@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Spinner } from "@chakra-ui/react";
+import { Box, useColorModeValue, Spinner, Flex, Heading, Button } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
+import axios from "axios";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -55,6 +56,23 @@ interface MappedDataItem {
   value: number;
 }
 
+interface EIP2 {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+  repo: string;
+}
+
 interface EIP {
   status: string;
   eips: {
@@ -64,6 +82,7 @@ interface EIP {
     date: string;
     count: number;
     category: string;
+    eips: EIP2[];
   }[];
 }
 
@@ -99,32 +118,37 @@ const categoryBorder: string[] = [
 ];
 
 interface AreaCProps {
+  dataset: APIResponse;
   status: string;
   type: string;
 }
 interface APIResponse {
   eip: EIP[];
   erc: EIP[];
+  rip: EIP[];
 }
 
-const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
+const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => {
   const [data, setData] = useState<APIResponse>();
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [isLoading, setIsLoading] = useState(true);
+  console.log(dataset);
+  console.log(status);
+  console.log(type);
 
   const [typeData, setTypeData] = useState<EIP[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/graphsv2`);
-        const jsonData = await response.json();
+        const jsonData = dataset;
         setData(jsonData);
         if (type === "EIPs" && jsonData.eip) {
           setTypeData(
             jsonData.eip.filter((item: any) => item.category !== "ERCs")
           );
+          console.log(jsonData.eip.filter((item: any) => item.category !== "ERCs"));
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
         }
@@ -135,7 +159,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
     };
 
     fetchData();
-  }, []);
+  }, [dataset]);
 
   useEffect(() => {
     if (type === "EIPs") {
@@ -152,6 +176,9 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
   }, []);
 
   const filteredData = typeData.filter((item) => item.status === status);
+  console.log(data);
+  console.log(typeData)
+  console.log(filteredData)
 
   const transformedData = filteredData
     .flatMap((item) =>
@@ -162,7 +189,8 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
       }))
     )
     .filter((item) => item.category !== "ERCs");
-
+    console.log(transformedData);
+  
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Column),
     {
@@ -196,6 +224,97 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
     } as any,
   };
 
+  const headingColor = useColorModeValue('black', 'white');
+
+  const downloadData = () => {
+    // Transform the `typeData` to extract the required details
+    const transformedData = filteredData.flatMap((item) => {
+        return item.eips.flatMap((eipGroup) => {
+            return eipGroup.eips.map((eip) => ({
+                month: eipGroup.month, // Assuming eipGroup includes 'month'
+                year: eipGroup.year,  // Assuming eipGroup includes 'year'
+                category: eipGroup.category, // Category from the group
+                eip: eip.eip, // EIP number
+                title: eip.title, // Title of the EIP
+                status: eip.status, // Status of the EIP
+                type: eip.type, // Type of the EIP
+                discussion: eip.discussion, // Discussion link
+                repo: eip.repo, // Repo type (e.g., "eip", "erc", "rip")
+                author: eip.author, // Author of the EIP
+                created: eip.created, // Creation date
+                deadline: eip.deadline || "", // Deadline if exists, else empty
+            }));
+        });
+    });
+
+    if (!transformedData.length) {
+        console.error("No data to transform.");
+        alert("No data available for download.");
+        return;
+    }
+
+    // Define the CSV header
+    const header =
+        "Month,Year,Category,EIP,Title,Author,Status,Type,Created at,Link\n";
+
+    // Prepare the CSV content
+    const csvContent =
+        "data:text/csv;charset=utf-8," +
+        header +
+        transformedData
+            .map(
+                ({
+                    month,
+                    year,
+                    category,
+                    repo,
+                    eip,
+                    title,
+                    author,
+                    status,
+                    type,
+                    discussion,
+                    created,
+                    deadline,
+                }) => {
+                    // Generate the correct URL based on the repo type
+                    const url =
+                        repo === "eip"
+                            ? `https://eipsinsight.com/eips/eip-${eip}`
+                            : repo === "erc"
+                            ? `https://eipsinsight.com/ercs/erc-${eip}`
+                            : `https://eipsinsight.com/rips/rip-${eip}`;
+
+                    // Return the CSV line with all fields
+                    return `${month},${year},"${category.replace(
+                        /"/g,
+                        '""'
+                    )}","${eip}","${title.replace(/"/g, '""')}","${author.replace(
+                        /"/g,
+                        '""'
+                    )}","${status.replace(/"/g, '""')}","${type.replace(
+                        /"/g,
+                        '""'
+                    )}","${created.replace(
+                        /"/g,
+                        '""'
+                    )}","${url}"`;
+                }
+            )
+            .join("\n");
+
+    // Encode the CSV content for downloading
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "eip_data.csv");
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+};
+
+
+
   return (
     <>
       {isLoading ? ( // Show loader while data is loading
@@ -208,29 +327,41 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status, type }) => {
           <Spinner />
         </Box>
       ) : (
-        <Box
-          bgColor={bg}
-          marginTop={"2rem"}
-          p="0.5rem"
-          borderRadius="0.35rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={400}
-          overflowX="auto"
-          overflowY="hidden"
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200 h-max"
-        >
-          <Area {...config} />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box>
+        <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
+  <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+    <Heading size="md" color={headingColor}>
+      {`${status}`}
+    </Heading>
+    {/* Assuming a download option exists for the yearly data as well */}
+    {/* <Button 
+      colorScheme="blue" 
+      onClick={async () => {
+        try {
+          // Trigger the CSV conversion and download
+          downloadData();
+
+          // Trigger the API call
+          await axios.post("/api/DownloadCounter");
+        } catch (error) {
+          console.error("Error triggering download counter:", error);
+        }
+      }}
+    >
+      Download CSV
+    </Button> */}
+  </Flex>
+
+  {/* Make the area chart scrollable on smaller screens */}
+  <Box overflowX="auto">
+    <Area {...config} />
+  </Box>
+
+  {/* Make the DateTime section scrollable in x-direction if necessary */}
+  <Box className={"w-full"} overflowX="auto">
+    <DateTime />
+  </Box>
+</Box>
+
       )}
     </>
   );

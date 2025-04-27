@@ -46,16 +46,16 @@ const statusChangeSchema = new mongoose.Schema({
   },
 });
 const EipStatusChange =
-  mongoose.models.EipStatusChange2 ||
-  mongoose.model("EipStatusChange2", statusChangeSchema, "eipstatuschange2");
+  mongoose.models.EipStatusChange3 ||
+  mongoose.model("EipStatusChange3", statusChangeSchema, "eipstatuschange3");
 
 const ErcStatusChange =
-  mongoose.models.ErcStatusChange2 ||
-  mongoose.model("ErcStatusChange2", statusChangeSchema, "ercstatuschange2");
+  mongoose.models.ErcStatusChange3 ||
+  mongoose.model("ErcStatusChange3", statusChangeSchema, "ercstatuschange3");
 
 const RipStatusChange =
-  mongoose.models.RipStatusChange2 ||
-  mongoose.model("RipStatusChange2", statusChangeSchema, "ripstatuschange2");
+  mongoose.models.RipStatusChange3 ||
+  mongoose.model("RipStatusChange3", statusChangeSchema, "ripstatuschange3");
 
 export default async (req: Request, res: Response) => {
   try {
@@ -242,7 +242,7 @@ export default async (req: Request, res: Response) => {
         $group: {
           _id: {
             status: "$status",
-            category: "RIP",
+            category: "$category",
             changedYear: { $year: "$changeDate" },
             changedMonth: { $month: "$changeDate" },
           },
@@ -255,7 +255,7 @@ export default async (req: Request, res: Response) => {
           _id: "$_id.status",
           eips: {
             $push: {
-              category: "RIP",
+              category: "$_id.category",
               changedYear: "$_id.changedYear",
               changedMonth: "$_id.changedMonth",
               count: "$count",
@@ -276,9 +276,9 @@ export default async (req: Request, res: Response) => {
         status: group._id,
         eips: group.eips
           .reduce((acc, eipGroup) => {
-            const { changedYear, changedMonth, count, eips } = eipGroup;
+            const { category,changedYear, changedMonth, count, eips } = eipGroup;
             acc.push({
-              category: "RIP",
+              category,
               month: changedMonth,
               year: changedYear,
               date: `${changedYear}-${changedMonth}`,

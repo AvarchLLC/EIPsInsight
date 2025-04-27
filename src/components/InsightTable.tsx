@@ -5,6 +5,7 @@ import {
   Wrap,
   WrapItem,
   Badge,
+  Flex,
   Link,
   Button,
 } from "@chakra-ui/react";
@@ -12,6 +13,7 @@ import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Spinner } from "@chakra-ui/react";
+import axios from "axios";
 
 const statusArr = [
   "Final",
@@ -245,7 +247,7 @@ const InsightTable: React.FC<TabProps> = ({
       let srNo = 1; // Initialize the serial number
 
       newData = finalStatusChanges.map((item: StatusChange) => {
-        const { eip, title, author, status, type, category } = item;
+        const { eip, title, author, status, type, category, deadline } = item;
         const commitLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
         }/commits/master/${
@@ -258,6 +260,7 @@ const InsightTable: React.FC<TabProps> = ({
           title,
           author,
           status,
+          deadline,
           type,
           category,
           commitLink,
@@ -278,11 +281,6 @@ const InsightTable: React.FC<TabProps> = ({
       headers.push(`${Tabletype.toUpperCase()} Link`);
       const csvRows = filteredData.map((item) => {
         const values = Object.values(item);
-        // const commitLink = `https://github.com/ethereum/${
-        //   Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
-        // }/commits/master/${
-        //   Tabletype === "eip" ? "EIPS" : Tabletype === "erc" ? "ERCS" : "RIPS"
-        // }/${Tabletype}-${item.eip}.md`;
         const eipLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
         }/blob/master/${
@@ -349,17 +347,29 @@ const InsightTable: React.FC<TabProps> = ({
         ) : (
           <>
             <Box>
+              <Flex justifyContent="flex-end">
               <Button
                 colorScheme="blue"
                 variant="outline"
                 fontSize={"14px"}
                 fontWeight={"bold"}
                 padding={"10px 20px"}
-                onClick={convertAndDownloadCSV}
+                onClick={async () => {
+                  try {
+                    // Trigger the CSV conversion and download
+                    convertAndDownloadCSV();
+              
+                    // Trigger the API call
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
               >
                 <DownloadIcon marginEnd={"1.5"} />
                 Download Reports
               </Button>
+              </Flex>
             </Box>
             <CSmartTable
               items={filteredData.sort((a, b) => a.sr - b.sr)}
@@ -378,17 +388,6 @@ const InsightTable: React.FC<TabProps> = ({
                   },
                 }}
                 columns={[
-                  {
-                    key: 'sr',
-                    label: 'sr',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', 
-                      color: isDarkMode ? 'white' : 'black',              
-                      fontWeight: 'bold',                                  
-                      padding: '12px',                                     
-                      borderTopLeftRadius: "0.55rem",                      
-                    }
-                  },
                   {
                     key: 'eip',
                     label: 'EIP',
@@ -445,6 +444,19 @@ const InsightTable: React.FC<TabProps> = ({
                       borderTopRightRadius: "0.55rem",   
                     }
                   },
+                  ...(status === "LastCall" ? [ // Conditionally add the deadline column
+                    {
+                      key: 'deadline',
+                      label: 'Deadline',
+                      _style: {
+                        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                        color: isDarkMode ? 'white' : 'black',
+                        fontWeight: 'bold',
+                        padding: '12px',
+                        borderTopRightRadius: "0.55rem", // Add border radius to the last column
+                      }
+                    }
+                  ] : []),
                   {
                     key: 'commitLink',
                     label: 'commitLink',
@@ -458,19 +470,7 @@ const InsightTable: React.FC<TabProps> = ({
                   },
                   ]}
               scopedColumns={{
-                sr: (item: any) => (
-                  <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                    <Link href={`/${Tabletype}s/${Tabletype}-${item.eip}`}>
-                      <Wrap>
-                        <WrapItem>
-                          <Badge colorScheme={getStatusColor(item.status)}>
-                            {item.sr}
-                          </Badge>
-                        </WrapItem>
-                      </Wrap>
-                    </Link>
-                  </td>
-                ),
+                
                 eip: (item: any) => (
                   <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <Link href={`/${Tabletype}s/${Tabletype}-${item.eip}`}>
@@ -566,6 +566,15 @@ const InsightTable: React.FC<TabProps> = ({
                     </Wrap>
                   </td>
                 ),
+                ...(status === "LastCall" ? { // Conditionally add the deadline column renderer
+                  deadline: (item: any) => (
+                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                      <div className={isDarkMode ? "text-white" : "text-black"}>
+                        {item.deadline || "N/A"}
+                      </div>
+                    </td>
+                  )
+                } : {}),
                 commitLink: (item: any) => (
                   <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <Link href={item.commitLink} target="_blank">

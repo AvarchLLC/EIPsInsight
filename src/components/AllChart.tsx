@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Spinner, Text } from "@chakra-ui/react";
-import { useWindowSize } from "react-use";
+import { Box, useColorModeValue, Spinner, Text,Button, Flex, Heading } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
-import Dashboard from "./Dashboard";
 import NextLink from "next/link";
+import axios from "axios";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -29,35 +28,13 @@ const getCat = (cat: string) => {
       return "Meta";
     case "Informational":
       return "Informational";
+    case "RRC":
+      return "RRCs";
     default:
       return "Core";
   }
 };
 
-interface AreaProps {
-  data: MappedDataItem[];
-  xField: string;
-  yField: string;
-  color: string[];
-  seriesField: string;
-  xAxis: {
-    range: number[];
-    tickCount: number;
-  };
-  areaStyle: {
-    fillOpacity: number;
-  };
-  legend: {
-    position: string;
-  };
-  smooth: boolean;
-}
-
-interface MappedDataItem {
-  category: string;
-  date: string;
-  value: number;
-}
 
 interface EIP {
   _id: string;
@@ -76,11 +53,6 @@ interface EIP {
   __v: number;
 }
 
-interface FormattedEIP {
-  category: string;
-  date: string;
-  value: number;
-}
 
 const categoryColors: string[] = [
   "rgb(255, 99, 132)",
@@ -94,24 +66,6 @@ const categoryColors: string[] = [
   "rgb(255, 0, 0)",
   "rgb(0, 128, 0)",
 ];
-const categoryBorder: string[] = [
-  "rgba(255, 99, 132, 0.2)",
-  "rgba(255, 159, 64, 0.2)",
-  "rgba(255, 205, 86, 0.2)",
-  "rgba(75, 192, 192, 0.2)",
-  "rgba(54, 162, 235, 0.2)",
-  "rgba(153, 102, 255, 0.2)",
-  "rgba(255, 99, 255, 0.2)",
-  "rgba(50, 205, 50, 0.2)",
-  "rgba(255, 0, 0, 0.2)",
-  "rgba(0, 128, 0, 0.2)",
-];
-
-interface APIResponse {
-  eip: EIP[];
-  erc: EIP[];
-  rip: EIP[];
-}
 
 interface ChartProps {
   type: string;
@@ -126,12 +80,17 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
+        let jsonData = await response.json();
         if (type === "EIP") {
           setData(jsonData.eip);
         } else if (type === "ERC") {
           setData(jsonData.erc);
         } else if (type === "RIP") {
+          jsonData.rip.forEach((item: EIP) => {
+            if (item.eip === "7859") {
+                item.status = "Draft"; // Update the status
+            }
+        });        
           setData(jsonData.rip);
         } else if (type === "Total") {
           setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
@@ -155,7 +114,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
   
   const transformedData = data.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
-    const category = item.repo === 'rip' ? 'RIPs' : getCat(item.category);
+    const category = getCat(item.category);
   
     // Check if a record for the same category and year already exists
     const existingEntry = acc.find((entry) => entry.year === year && entry.category === category);
@@ -213,17 +172,45 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     areaStyle: { fillOpacity: 0.6 },
     legend: { position: "top-right" as const },
     smooth: true,
-    // label: {
-    //   position: "middle",
-    //   style: {
-    //     fill: "#FFFFFF",
-    //     opacity: 0.6,
-    //   },
-    // } as any,
     
   };
   
+  const downloadData = () => {
+    // Convert the data to CSV format
+    const header = "Repo, EIP, Title, Author, Status, Type, Category, Discussion, Created at, Deadline, Link\n";
+
+// Prepare the CSV content
+const csvContent = header
+    + data.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+        // Generate the correct URL based on the repo type
+        const url = repo === "eip"
+            ? `https://eipsinsight.com/eips/eip-${eip}`
+            : repo === "erc"
+            ? `https://eipsinsight.com/ercs/erc-${eip}`
+            : `https://eipsinsight.com/rips/rip-${eip}`;
+
+        // Handle the 'deadline' field, use empty string if not available
+        const deadlineValue = deadline || "";
+
+        // Wrap title, author, discussion, and status in double quotes to handle commas
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
+    }).join("\n");
   
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    
+    // Create a URL for the Blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create an anchor tag to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.csv";  // File name
+    a.click();
+    
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
   
 
   return (
@@ -239,61 +226,80 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         </Box>
       ) : (
         <>
-          <Box
-            bgColor={bg}
-            paddingX="0.5rem"
-            borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
-          >
-            <NextLink
-              href={
-                type === "ERC"
-                  ? "/erctable"
-                  : type === "EIP"
-                  ? "/eiptable"
-                  : type === "RIP"
-                  ? "/riptable"
-                  : "/alltable"
-              }
-            >
-              <Text
-                fontSize="2xl"
-                fontWeight="bold"
-                color="#30A0E0"
-                className="text-left"
-                paddingY={4}
-                paddingLeft={4}
-                display="flex"
-                flexDirection="column"
-              >
-                {type === 'Total'
-    ? `Total Ethereum Proposals - [${data.length}]`
-    : `${type} - [${data.length}]`}
-              </Text>
-            </NextLink>
-            <Box
-            width={"100%"}       // Make the container full width
-            minWidth={"100px"}  // Set a minimum width
-            height={400}
-            overflowX="auto"     // Enable horizontal scrolling if necessary
-            overflowY="hidden"
-            as={motion.div}
-            padding={"2 rem"}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            // transition={{ duration: 0.5 }}
-          >
-            <Area {...config} />
-            <Box className={"w-full"}>
-              <DateTime />
-            </Box>
-          </Box>
+  <Box
+    bgColor={bg}
+    paddingX="0.5rem"
+    borderRadius="0.55rem"
+    minHeight="605px"
+    _hover={{
+      border: "1px",
+      borderColor: "#30A0E0",
+    }}
+  >
+    
 
-          </Box>
-        </>
+    {/* Flex container to place the Text and Button on opposite ends */}
+    <Flex justifyContent="space-between" alignItems="center" paddingX="1rem" marginBottom="1rem">
+    <NextLink
+      href={
+        type === "ERC"
+          ? "/erctable"
+          : type === "EIP"
+          ? "/eiptable"
+          : type === "RIP"
+          ? "/riptable"
+          : "/alltable"
+      }
+    >
+      <Text
+        fontSize="xl"
+        fontWeight="bold"
+        color="#30A0E0"
+        className="text-left"
+        paddingY={4}
+        paddingLeft={4}
+        display="flex"
+        flexDirection="column"
+      >
+        {type === 'Total'
+          ? `Total Ethereum Proposals - [${data.length}]`
+          : `${type} - [${data.length}]`}
+      </Text>
+    </NextLink>
+      <Button colorScheme="blue"  fontSize={{ base: "0.6rem", md: "md" }} onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData();
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>
+        Download CSV
+      </Button>
+    </Flex>
+
+    <Box
+      width={"100%"}       // Make the container full width
+      minWidth={"100px"}  // Set a minimum width
+      // height={400}
+      overflowX="auto"     // Enable horizontal scrolling if necessary
+      overflowY="hidden"
+      as={motion.div}
+      // padding={"2 rem"}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <Area {...config} />
+     <Box className={"w-full"}>
+          <DateTime />
+        </Box>
+    </Box>
+  </Box>
+</>
+
       )}
     </>
   );

@@ -50,11 +50,25 @@ interface APIResponse {
   rip: EIP[];
 }
 
+interface EIP2 {
+  status: string;
+  eips: {
+    status: string;
+    month: number;
+    year: number;
+    date: string;
+    count: number;
+    category: string;
+    eips:any[];
+  }[];
+}
+
+
 const Status = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<EIP[]>([]);
-
+  // const [data, setData] = useState<EIP[]>([]);
   const [data2, setData2] = useState<APIResponse>();
+  const [data3, setData3] = useState<EIP2[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,12 +117,28 @@ const Status = () => {
     },
   ];
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch(`/api/new/alleips`);
+  //       const jsonData = await response.json();
+  //       setData(jsonData);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
+        const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData);
+        console.log("rip data:",jsonData.rip);
+        setData3(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -116,6 +146,14 @@ const Status = () => {
 
     fetchData();
   }, []);
+
+  let filteredData1 = data3.filter((item) => item.status === "Draft");
+  let filteredData2 = data3.filter((item) => item.status === "Review");
+  let filteredData3 = data3.filter((item) => item.status === "Last Call");
+  let filteredData4 = data3.filter((item) => item.status === "Living");
+  let filteredData5 = data3.filter((item) => item.status === "Final");
+  let filteredData6 = data3.filter((item) => item.status === "Stagnant");
+  let filteredData7 = data3.filter((item) => item.status === "Withdrawn");
 
   useEffect(() => {
     // Simulating a loading delay
@@ -182,10 +220,10 @@ const Status = () => {
             <Box paddingTop={"8"}>
                <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
                 <Box flex="1">
-                  <StackedColumnChart status="Draft" />
+                  <StackedColumnChart status="Draft" dataset={filteredData1}/>
                 </Box>
                 <Box flex="1">
-                  <CBoxStatus status="Draft" />
+                  <CBoxStatus status="Draft" dataset={filteredData1}/>
                 </Box>
               </Flex>
             </Box>
@@ -203,10 +241,10 @@ const Status = () => {
             <Box paddingTop={"8"}>
                <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
                 <Box flex="1">
-                  <StackedColumnChart status="Review" />
+                  <StackedColumnChart status="Review" dataset={filteredData2}/>
                 </Box>
                 <Box flex="1">
-                  <CBoxStatus status="Review" />
+                  <CBoxStatus status="Review" dataset={filteredData2}/>
                 </Box>
               </Flex>
             </Box>
@@ -224,10 +262,10 @@ const Status = () => {
             <Box paddingTop={"8"}>
                <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
                 <Box flex="1">
-                  <StackedColumnChart status="Last Call" />
+                  <StackedColumnChart status="Last Call" dataset={filteredData3}/>
                 </Box>
                 <Box flex="1">
-                  <CBoxStatus status="Last Call" />
+                  <CBoxStatus status="Last Call" dataset={filteredData3}/>
                 </Box>
               </Flex>
             </Box>
@@ -246,10 +284,10 @@ const Status = () => {
             <Box paddingTop={"8"}>
                <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
                 <Box flex="1">
-                  <StackedColumnChart status="Final" />
+                  <StackedColumnChart status="Final" dataset={filteredData5}/>
                 </Box>
                 <Box flex="1">
-                  <CBoxStatus status="Final" />
+                  <CBoxStatus status="Final" dataset={filteredData5}/>
                 </Box>
               </Flex>
             </Box>
@@ -268,10 +306,10 @@ const Status = () => {
             <Box paddingTop={"8"}>
                <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
                 <Box flex="1">
-                  <StackedColumnChart status="Stagnant" />
+                  <StackedColumnChart status="Stagnant" dataset={filteredData6}/>
                 </Box>
                 <Box flex="1">
-                  <CBoxStatus status="Stagnant" />
+                  <CBoxStatus status="Stagnant" dataset={filteredData6} />
                 </Box>
               </Flex>
             </Box>
@@ -289,10 +327,10 @@ const Status = () => {
             <Box paddingTop={"8"}>
                <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
                 <Box flex="1">
-                  <StackedColumnChart status="Withdrawn" />
+                  <StackedColumnChart status="Withdrawn" dataset={filteredData7}/>
                 </Box>
                 <Box flex="1">
-                  <CBoxStatus status="Withdrawn" />
+                  <CBoxStatus status="Withdrawn" dataset={filteredData7}/>
                 </Box>
               </Flex>
             </Box>
@@ -309,10 +347,10 @@ const Status = () => {
             <Box paddingTop={"8"}>
                <Flex direction={{ base: "column", md: "row" }} gap="4" align="center">
                 <Box flex="1">
-                  <StackedColumnChart status="Living" />
+                  <StackedColumnChart status="Living" dataset={filteredData4}/>
                 </Box>
                 <Box flex="1">
-                  <CBoxStatus status="Living" />
+                  <CBoxStatus status="Living" dataset={filteredData4}/>
                 </Box>
               </Flex>
             </Box>

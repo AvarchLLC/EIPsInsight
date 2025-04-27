@@ -6,6 +6,8 @@ import AllLayout from "@/components/Layout";
 import NLink from "next/link";
 import { motion } from "framer-motion";
 import React from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import SearchBox from "@/components/SearchBox";
 import {
   Container,
   Box,
@@ -16,15 +18,25 @@ import {
   Td,
   Link,
   HStack,
+  Flex,
   Text,
   VStack,
   Spinner,
+  IconButton,
   Heading,
   Button,
   useColorModeValue,
+  Popover,
+  PopoverTrigger,
+  PopoverArrow,
+  PopoverContent,
+  PopoverHeader,
+  PopoverCloseButton,
+  PopoverBody
 } from "@chakra-ui/react";
+import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { Markdown } from "@/components/MarkdownEIP";
-import Header from "@/components/Header";
+import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
 
 interface EipMetadataJson {
@@ -33,6 +45,7 @@ interface EipMetadataJson {
   description: string;
   author: string[];
   "discussions-to": string;
+  "last-call-deadline":string;
   status: string;
   type: string;
   category: string;
@@ -48,17 +61,24 @@ const TestComponent = () => {
   const [metadataJson, setMetadataJson] = useState<EipMetadataJson>();
   const [markdown, setMarkdown] = useState<string>("");
   const [data, setData] = useState<{ status: string; date: string }[]>([]);
+  const [data2, setData2] = useState<{ type: string; date: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDataNotFound, setIsDataNotFound] = useState(false);
+  const [show, setShow] = useState(false); // State to toggle visibility
+  const toggleCollapse = () => setShow(!show);
+  const [show2, setShow2] = useState(false); // State to toggle visibility
+  const toggleCollapse2 = () => setShow2(!show2);
   
   useEffect(() => {
     if (RIPNo) {
       const fetchData = async () => {
         try {
-          const response = await fetch(`/api/new/ercshistory/${RIPNo}`);
+          const response = await fetch(`/api/new/riphistory/${RIPNo}`);
           const jsonData = await response.json();
           const statusWithDates = extractLastStatusDates(jsonData);
+          const typeWithDates = extractLastTypesDates(jsonData);
           setData(statusWithDates);
+          setData2(typeWithDates);
           console.log(statusWithDates);
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -153,8 +173,11 @@ const TestComponent = () => {
             RIP Not Found
           </Heading>
           <Text color="gray.500" fontSize="xl" mb={6}>
-            This RIP might not exist or could be an EIP or ERC. Please check again.
+            This RIP might not exist or could be an <Link color="blue.300" href={`/eips/eip-${RIPNo}`}>EIP</Link> or <Link color="blue.300" href={`/ercs/erc-${RIPNo}`}>ERC</Link>. Please check again.
           </Text>
+          <br/>
+          <SearchBox/>
+          <br/>
           <Button
             colorScheme="blue"
             size="lg"
@@ -233,6 +256,13 @@ const TestComponent = () => {
                         <Td>{metadataJson?.status}</Td>
                       </Tr>
                     )}
+                    {metadataJson?.["last-call-deadline"] && (
+                      <Tr>
+                        <Th>Last Call Deadline</Th>
+                        <Td>{metadataJson["last-call-deadline"]}</Td>
+                      </Tr>
+                    )}
+
                     {metadataJson?.type && (
                       <Tr>
                         <Th>Type</Th>
@@ -248,8 +278,254 @@ const TestComponent = () => {
                   </Thead>
                 </Table>
               </Box>
-              <br />
               
+              
+              
+     <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="1">
+                 <Flex justify="space-between" align="center">
+                   {/* Heading on the Left */}
+                   <Heading size="md" color={"#30A0E0"}>
+                     Status Timeline
+
+                     <Popover>
+                                         <PopoverTrigger>
+                                         <IconButton
+                                                 aria-label="More info"
+                                                 icon={<InfoOutlineIcon />}
+                                                 size="md"
+                                                 colorScheme="blue"
+                                                 variant="ghost"
+                                               />
+                                         </PopoverTrigger>
+                                         <PopoverContent>
+                                           <PopoverArrow />
+                                           <PopoverCloseButton />
+                                           <PopoverHeader>Instructions</PopoverHeader>
+                                           <PopoverBody>
+                                           The timeline tracks status changes using the merged date as the reference point.
+                                           </PopoverBody>
+                                         </PopoverContent>
+                                       </Popover>
+
+                   </Heading>
+     
+                   {/* Dropdown Button on the Right */}
+                   <Box
+                     bg="blue" // Gray background
+                     borderRadius="md" // Rounded corners
+                     padding={2} // Padding inside the box
+                   >
+                   <IconButton
+                     onClick={toggleCollapse}
+                     icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+                     variant="ghost"
+                     h="24px" // Smaller height
+                     w="20px"
+                     aria-label="Toggle Status Timeline"
+                     _hover={{ bg: 'blue' }} // Background color on hover
+                     _active={{ bg: 'blue' }} // Background color when active
+                     _focus={{ boxShadow: 'none' }} // Remove focus outline
+                   />
+                   </Box>
+                 </Flex>
+     
+                 {/* Status Timeline - This is shown only when `show` is true */}
+                 {show && (
+                   <motion.div
+                     initial={{ opacity: 0, y: 20 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ duration: 0.8 }}
+                   >
+                     <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
+                       {data
+                         .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
+                         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
+                         .map((item, index, sortedData) => {
+                           const currentDate = new Date(item.date);
+                           const nextItem = sortedData[index + 1];
+                           const nextDate = nextItem ? new Date(nextItem.date) : null;
+     
+                           // Calculate the day difference between current and next item
+                           const dayDifference = nextDate
+                             ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
+                             : null;
+     
+                           return (
+                             <React.Fragment key={index}>
+                               {/* Status and Date */}
+                               <VStack align="center" spacing={3} minW="120px" maxW="120px" mb={4}>
+                                 <Box
+                                   p="5"
+                                   bg={useColorModeValue("white", "gray.800")}
+                                   borderRadius="md"
+                                   boxShadow={useColorModeValue("md", "dark-lg")}
+                                   textAlign="center"
+                                   minH="80px"
+                                   display="flex"
+                                   flexDirection="column"
+                                   justifyContent="center"
+                                 >
+                                   <Text fontWeight="bold" color={statusColor}>
+                                     {item.status}
+                                   </Text>
+                                   <Text color={dateColor}>
+                                     {currentDate.toLocaleDateString("en-US", {
+                                       day: "numeric",
+                                       month: "long",
+                                       year: "numeric",
+                                     })}
+                                   </Text>
+                                 </Box>
+                               </VStack>
+     
+                               {/* Arrow design and days difference */}
+                               {nextItem && (
+                                 <VStack align="center" spacing={1}>
+                                   <Box
+                                     h="1px"
+                                     w="80px"
+                                     borderBottom="1px solid"
+                                     borderColor="gray.400"
+                                     position="relative"
+                                   >
+                                     {/* Arrow pointing forward */}
+                                     <Box
+                                       position="absolute"
+                                       right="-10px"
+                                       top="-4px"
+                                       borderTop="5px solid transparent"
+                                       borderBottom="5px solid transparent"
+                                       borderLeft="10px solid gray"
+                                     />
+                                   </Box>
+                                   <Text color="gray.500" fontSize="sm">
+                                     {dayDifference} days
+                                   </Text>
+                                 </VStack>
+                               )}
+                             </React.Fragment>
+                           );
+                         })}
+                     </Flex>
+             </motion.div>
+           )}
+         </Box>
+
+         {data2.length > 1 && (
+                 <motion.div
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   transition={{ duration: 0.8 }}
+                 >
+                   <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="1">
+                     {/* Heading on the Left */}
+                     <Flex justify="space-between" align="center">
+                       <Heading size="md" color={"#30A0E0"}>
+                         Type Timeline
+                       </Heading>
+         
+                       {/* Dropdown Button on the Right */}
+                        <Box
+                         bg="blue" // Gray background
+                         borderRadius="md" // Rounded corners
+                         padding={2} // Padding inside the box
+                       >
+                       <IconButton
+                         onClick={toggleCollapse2}
+                         icon={show2 ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+                         variant="ghost"
+                         h="24px" // Smaller height
+                         w="20px"
+                         aria-label="Toggle Type Timeline"
+                         _hover={{ bg: 'blue' }} // Background color on hover
+                         _active={{ bg: 'blue' }} // Background color when active
+                         _focus={{ boxShadow: 'none' }} // Remove focus outline
+                       />
+                       </Box>
+                     </Flex>
+         
+                     {/* Type Timeline - This is shown only when `show` is true */}
+                     {show2 && (
+                       <motion.div
+                         initial={{ opacity: 0, y: 20 }}
+                         animate={{ opacity: 1, y: 0 }}
+                         transition={{ duration: 0.8 }}
+                       >
+                         <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
+                           {data2
+                             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
+                             .map((item, index, sortedData) => {
+                               const currentDate = new Date(item.date);
+                               const nextItem = sortedData[index + 1];
+                               const nextDate = nextItem ? new Date(nextItem.date) : null;
+         
+                               // Calculate the day difference between current and next item
+                               const dayDifference = nextDate
+                                 ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
+                                 : null;
+         
+                               return (
+                                 <React.Fragment key={index}>
+                                   {/* Type and Date */}
+                                   <VStack align="center" spacing={3} minW="120px" maxW="120px" mb={4}>
+                                     <Box
+                                       p="5"
+                                       bg={useColorModeValue("white", "gray.800")}
+                                       borderRadius="md"
+                                       boxShadow={useColorModeValue("md", "dark-lg")}
+                                       textAlign="center"
+                                       minH="80px"
+                                       display="flex"
+                                       flexDirection="column"
+                                       justifyContent="center"
+                                     >
+                                       <Text fontWeight="bold" color={statusColor}>
+                                         {item.type}
+                                       </Text>
+                                       <Text color={dateColor}>
+                                         {currentDate.toLocaleDateString("en-US", {
+                                           day: "numeric",
+                                           month: "long",
+                                           year: "numeric",
+                                         })}
+                                       </Text>
+                                     </Box>
+                                   </VStack>
+         
+                                   {/* Arrow design and days difference */}
+                                   {nextItem && (
+                                     <VStack align="center" spacing={1}>
+                                       <Box
+                                         h="1px"
+                                         w="80px"
+                                         borderBottom="1px solid"
+                                         borderColor="gray.400"
+                                         position="relative"
+                                       >
+                                         {/* Arrow pointing forward */}
+                                         <Box
+                                           position="absolute"
+                                           right="-10px"
+                                           top="-4px"
+                                           borderTop="5px solid transparent"
+                                           borderBottom="5px solid transparent"
+                                           borderLeft="10px solid gray"
+                                         />
+                                       </Box>
+                                       <Text color="gray.500" fontSize="sm">
+                                         {dayDifference} days
+                                       </Text>
+                                     </VStack>
+                                   )}
+                                 </React.Fragment>
+                               );
+                             })}
+                         </Flex>
+                       </motion.div>
+                     )}
+                   </Box>
+                 </motion.div>
+               )}
               <Container maxW="1200px" mx="auto">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -293,6 +569,39 @@ const extractLastStatusDates = (data: any) => {
     status,
     date: statusDates[status],
   }));
+};
+
+const extractLastTypesDates = (data: any) => {
+  const typeDates: { type: string; date: string }[] = [];
+  const standardTrackTypes = [
+  "Standards Track",
+  "Standard Track",
+  "Standards Track (Core, Networking, Interface, ERC)",
+  "Standard"
+];
+  let lasttype = "";
+  const sortedData = Object.keys(data)
+    .filter((key) => key !== "repo") 
+    .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
+
+  sortedData.forEach((key) => {
+    let { type, mergedDate } = data[key];
+
+    if (type === "unknown") {
+      return;
+    }
+    if(standardTrackTypes.includes(type)){
+      type="Standards Track"
+    }
+
+    if (lasttype !== type) {
+      typeDates.push({ type, date: mergedDate });
+    }
+
+    lasttype = type;
+  });
+
+  return typeDates;
 };
 
 

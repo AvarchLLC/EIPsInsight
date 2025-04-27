@@ -63,42 +63,6 @@ export default function LargeWithAppLinksAndSocial() {
   const year = new Date().getFullYear();
 
   return (
-    // <Box
-    //   bg={useColorModeValue("gray.50", "gray.900")}
-    //   color={useColorModeValue("gray.700", "gray.200")}
-    // >
-    //   <Box
-    //     borderTopWidth={1}
-    //     borderStyle={"solid"}
-    //     borderColor={useColorModeValue("gray.200", "gray.700")}
-    //   >
-    //     <Container
-    //       as={Stack}
-    //       maxW={"6xl"}
-    //       py={4}
-    //       direction={'row'}
-    //       spacing={4}
-    //       justify={{ base: "space-between" }}
-    //       align={{ md: "center" }}
-    //     >
-    //       <Text paddingTop={{base:"1",md:"0"}}>
-    //         Build With <span> 💙 </span> by&nbsp; <NextLink href={'https://avarch.org/index.html#0'} target={'_blank'}>Avarch</NextLink>
-    //       </Text>
-    //       <Stack direction={"row"} spacing={6}>
-    //         <SocialButton label={"Twitter"} href={"https://twitter.com/ether_world"} >
-    //           <FaTwitter />
-    //         </SocialButton>
-    //         <SocialButton label={"YouTube"} href={"https://www.youtube.com/channel/UCnceAY-vAQsO8TgGAj5SGFA"}>
-    //           <FaYoutube />
-    //         </SocialButton>
-    //         <SocialButton label={"Instagram"} href={"https://www.instagram.com/etherworld.co/?hl=en"}>
-    //           <FaInstagram />
-    //         </SocialButton>
-    //       </Stack>
-    //     </Container>
-    //   </Box>
-    // </Box>
-
 
 
       <>
@@ -112,7 +76,7 @@ export default function LargeWithAppLinksAndSocial() {
             <Stack
                 direction={"column"}
             >
-              <h1 className={'font-bold text-2xl'}>EIPs Insights</h1>
+              <h1 className={'font-bold text-2xl'}>EIPs Insight</h1>
               <h2 className={'text-xl'}>Build With <span> 💙 </span> by&nbsp; <NextLink href={'https://avarch.org'} target={'_blank'}>Avarch</NextLink></h2>
               <div className={'flex space-x-5'}>
                 <Text className={'text-lg font-bold'}>Join us: </Text>
@@ -130,7 +94,7 @@ export default function LargeWithAppLinksAndSocial() {
               <NextLink href={`/insight/${year}/${getMonth(monthName)}`}>{monthName} {year} Insights</NextLink>
               <NextLink href={'/resources'}>Resources</NextLink>
               <NextLink href={'https://github.com/AvarchLLC/EIPsInsight/issues'}>Found a bug? Report here!</NextLink>
-              <NextLink href={'https://forms.gle/agMKc6orypdxC4Yn6'} target="_blank">Feedback Form</NextLink>
+              <NextLink href={'/Feedback'} target="_blank">Feedback Form</NextLink>
             </Stack>
 
             <Stack
@@ -144,7 +108,7 @@ export default function LargeWithAppLinksAndSocial() {
                 {/* <NextLink href={'https://www.instagram.com/etherworld.co/?hl=en'} target={'_blank'}><BsInstagram size={25} className={'hover:scale-125 duration-200'}/></NextLink> */}
                 <NextLink href={'https://www.youtube.com/channel/UCnceAY-vAQsO8TgGAj5SGFA'} target={'_blank'}><BsYoutube size={25} className={'hover:scale-125 duration-200'}/></NextLink>
                 <NextLink href={'https://www.linkedin.com/company/avarch-llc/'} target={'_blank'}><BsLinkedin size={25} className={'hover:scale-125 duration-200'}/></NextLink>
-                <NextLink href={'https://etherworld.co'} target={'_blank'}><BsNewspaper size={25} className={'hover:scale-125 duration-200'}/></NextLink>
+                <NextLink href={'https://etherworld.co/tag/eipsinsight/'} target={'_blank'}><BsNewspaper size={25} className={'hover:scale-125 duration-200'}/></NextLink>
               </div>
 
               <NextLink href={'https://builder.gitcoin.co/#/chains/1/registry/0x03506eD3f57892C85DB20C36846e9c808aFe9ef4/projects/738'} target={'_blank'}>

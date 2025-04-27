@@ -4,6 +4,7 @@ import { Flex, Button, Heading,Box, useColorModeValue, Spinner } from "@chakra-u
 import { useWindowSize } from "react-use";
 import DateTime from "@/components/DateTime";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -79,13 +80,31 @@ interface EIP {
   status: string;
   eips: {
     status: string;
+    repo:string;
     month: number;
     year: number;
     date: string;
     count: number;
     category: string;
-    eips:any[];
+    eips:EIP2[];
   }[];
+}
+
+interface EIP2 {
+  _id: string;
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  created: string;
+  discussion: string;
+  deadline: string;
+  requires: string;
+  unique_ID: number;
+  __v: number;
+  repo: string;
 }
 
 interface FormattedEIP {
@@ -121,7 +140,8 @@ const categoryBorder: string[] = [
 ];
 
 interface AreaCProps {
-  status: string;
+  dataset: EIP[];
+  status:string;
 }
 interface APIResponse {
   eip: EIP[];
@@ -129,34 +149,19 @@ interface APIResponse {
   rip: EIP[];
 }
 
-const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
+const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]);
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/graphsv2`);
-        const jsonData = await response.json();
-        console.log("rip data:",jsonData.rip);
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const [isChartReady, setIsChartReady] = useState(false);
 
   useEffect(() => {
+    setData(dataset);
     setIsChartReady(true);
+    setIsLoading(false);
   }, []);
   
   const removeDuplicatesFromEips = (eips: any[]) => {
@@ -171,7 +176,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
     });
   };
   
-  let filteredData = data.filter((item) => item.status === status);
+  let filteredData = dataset;
 
   const transformedData = filteredData.flatMap((item) => {
     console.log(item); // Log each item
@@ -272,34 +277,93 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
 
   const downloadData = () => {
     // Filter data based on the selected status
-    let filteredData = data.filter((item) => item.status === status);
+    let filteredData = dataset.slice(1).concat(dataset[0]);
+
+    console.log("new filtered data:",filteredData)
+
     
     // Transform the filtered data to get the necessary details
     const transformedData = filteredData.flatMap((item) => {
-        return item.eips.flatMap((eip) => {
-            const category = getCat(eip.category); // Assuming this function returns a string
-            const year = eip.year.toString(); // Convert year to string
-            const uniqueEips = removeDuplicatesFromEips(eip.eips); // Assuming this returns an array of EIPs
-            return uniqueEips.map(({ eip }) => ({
-                category,
-                year,
-                eip, // Individual EIP
-            }));
-        });
-    });
+      return item.eips.flatMap((eipGroup) => {
+        const category = getCat(eipGroup.category); // Assuming this function returns a string
+        const year = eipGroup.date.split("-")[0]; // Extract year from date
+        const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Deduplicate EIPs if needed
+        const repo =  eipGroup.repo;
+        const month = eipGroup.month;
 
-    // Define the CSV header
-    const header = "Category,Year,EIPs\n";
-  
-    // Prepare the CSV content
-    const csvContent = "data:text/csv;charset=utf-8,"
-        + header
-        + transformedData.map(({ category, year, eip }) => {
-            return `${category},${year},${eip}`; // Each EIP on a separate line
-        }).join("\n");
+    
+        return uniqueEips.map((uniqueEip) => ({
+          category,
+          year,
+          month,
+          eip: uniqueEip.eip, // EIP number
+          author: uniqueEip.author, // Author of the EIP
+          repo,
+          discussion: uniqueEip.discussion, // Discussion link
+          status: uniqueEip.status, // Status of the EIP
+          created: uniqueEip.created, // Creation date
+          deadline: uniqueEip.deadline === "undefined" ? "" : uniqueEip.deadline || "", // Deadline if exists, else empty
+          type: uniqueEip.type, // Type of the EIP
+          title: uniqueEip.title, // Title of the EIP
+        }));
+      });
+    });
+    
+
+
+  if (!transformedData.length) {
+      console.error("Transformed data is empty.");
+      alert("No transformed data available for download.");
+      return;
+  }
+
+  // Define the CSV header
+  const header = " Year, Month, Repo, EIP, Title, Author, Status, deadline, Type, Category, Created at, Link\n";
+
+  // Prepare the CSV content
+  const csvContent =
+      "data:text/csv;charset=utf-8," + 
+      header +
+      transformedData
+          .map(({ year, month, repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+              // Generate the correct URL based on the repo type
+              const url = repo === "erc"
+              ? `https://eipsinsight.com/ercs/erc-${eip}`
+              : repo === "rip"
+              ? `https://eipsinsight.com/rips/rip-${eip}`
+              : `https://eipsinsight.com/eips/eip-${eip}`;
+            
+                      
+
+              // Handle the 'deadline' field, use empty string if not available
+              const deadlineValue = deadline ?? "";
+
+              const baseFields = [
+                year,
+                month,
+                repo,
+                eip,
+                title.replace(/"/g, '""'),
+                author.replace(/"/g, '""'),
+                status.replace(/"/g, '""'),
+                type.replace(/"/g, '""'),
+                category.replace(/"/g, '""'),
+                created.replace(/"/g, '""'),
+                url
+            ];
+
+            // Include deadline only if status is "Last Call"
+            if (status === "Last Call") {
+                baseFields.splice(7, 0, deadline ?? ""); // Insert deadline at the correct position
+            }
+
+            // Wrap fields in double quotes and join with commas
+            return baseFields.map(field => `"${field}"`).join(",");
+          })
+          .join("\n");
   
     // Check the generated CSV content before download
-    console.log("CSV Content:", csvContent);
+    // console.log("CSV Content:", csvContent);
   
     // Encode the CSV content for downloading
     const encodedUri = encodeURI(csvContent);
@@ -341,7 +405,17 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ status }) => {
             {`${status}`}
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={downloadData}>Download CSV</Button>
+          <Button colorScheme="blue" onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData();
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>Download CSV</Button>
         </Flex>
           <Area {...config} />
           <Box className={"w-full"}>

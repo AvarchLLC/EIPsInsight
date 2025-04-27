@@ -10,9 +10,17 @@ import {
   TableContainer,
   useColorModeValue,
   Text,
+  Spinner,
+  Button,
+  Flex,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { CSVLink } from "react-csv";
+import axios from "axios";
+import DateTime from "./DateTime";
+import * as XLSX from "xlsx";
+
 
 interface StatusChange {
   _id: string;
@@ -45,6 +53,16 @@ interface StatusChange {
   repo: string;
 }
 
+interface CSVData {
+  repo: string;
+  eip: string;
+  title: string;
+  fromStatus: string;
+  toStatus: string;
+  deadline: string;
+  link: string;
+}
+
 interface APIData {
   erc: StatusChange[];
   eip: StatusChange[];
@@ -74,6 +92,8 @@ export default function InsightSummary() {
   const [data, setData] = useState<StatusChange[]>([]);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const path = usePathname();
+  const [csvData, setCsvData] = useState<any[]>([]);
+  const [loading2,setLoading2]=useState<boolean>(false);
 
   let year = "";
   let month = "";
@@ -340,35 +360,7 @@ export default function InsightSummary() {
           monthYearData[closedKey].closed.push(issue);
       }
   
-      // Set openDate to the creation date and endDate to the 1st of the closed month or current month
-      // let openDate = new Date(createdDate);
-      // let createdConstant = new Date(createdDate); // Store the creation date separately
-      // let endDate = issue.closed_at 
-      //     ? new Date(new Date(issue.closed_at).getUTCFullYear(), new Date(issue.closed_at).getUTCMonth(), 1) 
-      //     : new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, 1); // Include the current month
-      
-      // // Loop through each month the issue was open
-      // while (openDate <= endDate) { // Open until the start of the closed month or current month
-      //     const openKey = `${openDate.getUTCFullYear()}-${String(openDate.getUTCMonth() + 1).padStart(2, '0')}`;
-      
-      //     if (!monthYearData[openKey]) {
-      //         monthYearData[openKey] = { created: [], closed: [], open: [] };
-      //     }
-      
-      //     // Check if the issue was still open on the 1st of the month
-      //     const firstOfMonth = new Date(openDate.getUTCFullYear(), openDate.getUTCMonth(), 1);
-          
-      //     // Skip if the openDate corresponds to the created month
-      //     if (!(openDate.getUTCFullYear() === createdConstant.getUTCFullYear() && openDate.getUTCMonth() === createdConstant.getUTCMonth())) {
-      //         if (firstOfMonth <= openDate && (!issue.closed_at || firstOfMonth < new Date(issue.closed_at))) {
-      //             // Add to open only if it's still open on the first of that month
-      //             addIfNotExists(monthYearData[openKey].open, issue);
-      //         }
-      //     }
-      
-      //     // Move to the next month
-      //     openDate = incrementMonth(openDate);
-      // }
+
 
       if (createdDate) {
         let createdDateObj = new Date(createdDate);
@@ -447,38 +439,7 @@ export default function InsightSummary() {
     fetchData();
   }, [year, month]);
 
-  //   const eipData = data?.map((item) => {
-  //     const { count, _id, repo } = item;
-  //     if (repo === "eip") {
-  //       return {
-  //         count,
-  //         _id,
-  //         repo: "EIP",
-  //       };
-  //     }
-  //   });
 
-  //   const ercData = data?.map((item) => {
-  //     const { count, _id, repo } = item;
-  //     if (repo === "erc") {
-  //       return {
-  //         count,
-  //         _id,
-  //         repo: "ERC",
-  //       };
-  //     }
-  //   });
-  //   const ripData = data?.map((item) => {
-  //     const { count, _id, repo } = item;
-
-  //     if (repo === "rip") {
-  //       return {
-  //         count,
-  //         _id,
-  //         repo: "RIP",
-  //       };
-  //     }
-  //   });
 
   const statuses = [
     "Draft",
@@ -490,6 +451,7 @@ export default function InsightSummary() {
     "Withdrawn",
   ];
   const tableData = statuses.map((status) => {
+    console.log("table data:", data);
     const statusData = data.filter((item) => item._id === status);
     return {
       _id: status,
@@ -499,14 +461,190 @@ export default function InsightSummary() {
     };
   });
 
+  const generateCSVData = (data: StatusChange[]): CSVData[] => {
+    console.log("Input data:", data);
+  
+    const csvData = data.flatMap((item) =>
+      item.statusChanges.map((statusChange) => ({
+        repo: item.repo,
+        eip: statusChange.eip,
+        title: statusChange.title,
+        fromStatus: statusChange.fromStatus,
+        toStatus: statusChange.toStatus,
+        deadline: statusChange.deadline !== "undefined" ? statusChange.deadline : "-",
+        link: `https://eipsinsight.com/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${statusChange.eip}`,
+      }))
+    );
+  
+    console.log("Output data:", csvData);
+    return csvData;
+  };
+
+  const handleDownload = async (e: React.MouseEvent, data: StatusChange[], year: number, month: number) => {
+    e.preventDefault(); // Prevent default CSVLink behavior
+  
+    try {
+      // Generate the CSV data
+      const csvData = generateCSVData(data);
+  
+      // Check if CSV data is empty
+      if (csvData.length === 0) {
+        console.error("CSV data is empty or not generated correctly.");
+        return;
+      }
+  
+      // Generate the summary
+      const summary = generateSummary(csvData);
+  
+      // Create and download the Excel file with the summary
+      downloadExcelWithSummary(csvData, summary, year, month);
+  
+      // Trigger the API call to update the download counter
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error during download process:", error);
+    }
+  };
+  
+  const generateSummary = (csvData: CSVData[]): string => {
+    const summary: Record<string, Record<string, number>> = {
+        eip: {},
+        erc: {},
+        rip: {},
+    };
+
+    // Count transitions for each repo
+    csvData.forEach((item) => {
+        const { repo, toStatus } = item;
+
+        if (repo in summary) {
+            if (!summary[repo][toStatus]) {
+                summary[repo][toStatus] = 0;
+            }
+            summary[repo][toStatus] += 1;
+        }
+    });
+
+    // Format the summary text
+    let summaryText = "📊:\n\n";
+    let hasData = false;
+
+    const formatSummary = (repo: string, label: string) => {
+        if (Object.keys(summary[repo]).length > 0) {
+            hasData = true;
+            const text = Object.entries(summary[repo])
+                .map(([status, count]) => `${count} proposals transitioned to ${status}`)
+                .join(", ");
+            return `#${label}: ${text}.\n\n`;
+        }
+        return "";
+    };
+
+    summaryText += formatSummary("eip", "EIPs");
+    summaryText += formatSummary("erc", "ERCs");
+    summaryText += formatSummary("rip", "RIPs");
+
+    return hasData ? "Summary "+summaryText.trim() : "No summary available.";
+};
+
+  
+const downloadExcelWithSummary = (csvData: CSVData[], summary: string, year: number, month: number) => {
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
+
+  // Convert CSV data to a worksheet
+  const worksheet = XLSX.utils.json_to_sheet(csvData);
+
+  // Determine the row index where the summary should be placed (below data)
+  const lastRowIndex = csvData.length + 2;
+
+  // Add summary text to the merged cell
+  XLSX.utils.sheet_add_aoa(worksheet, [[summary]], { origin: `A${lastRowIndex}` });
+
+  // Merge 5 columns (A to E) and 6 rows (lastRowIndex to lastRowIndex + 5)
+  if (!worksheet['!merges']) worksheet['!merges'] = [];
+  worksheet['!merges'].push({ 
+      s: { r: lastRowIndex - 1, c: 0 }, // Start at A
+      e: { r: lastRowIndex + 1, c: 10 }  // Merge 5 columns (A to E) and 6 rows
+  });
+
+  // Adjust row heights for better visibility
+  if (!worksheet['!rows']) worksheet['!rows'] = [];
+  for (let i = 0; i < 6; i++) {
+      worksheet['!rows'][lastRowIndex - 1 + i] = { hpt: 20 }; // Increase height for better visibility
+  }
+
+  // Apply styles: bold text, yellow background, text wrapping, and top-left alignment
+  
+
+  // Append the worksheet to the workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+
+  // Write the workbook to a file
+  XLSX.writeFile(workbook, `StatusChanges-${year}-${month}.xlsx`);
+};
+
+
   return (
     <>
-      <Text fontSize="3xl" fontWeight="bold" color="blue.400" textAlign="center" paddingTop={8} paddingLeft={8}>
+      <Flex 
+  justifyContent="center" // Center items horizontally
+  alignItems="center" // Align items vertically
+  // marginBottom="0.5rem" 
+  gap={4} // Add some space between the items
+  paddingTop={8}
+>
+{/* <Text fontSize="3xl" fontWeight="bold" color="blue.400" textAlign="center" paddingTop={8} paddingLeft={8}>
         Summary
-      </Text>
+      </Text> */}
+  <Text
+    color="#30A0E0"
+    fontSize="2xl"
+    fontWeight="bold"
+    textAlign="center"
+    // marginBottom="0.5rem"
+     paddingLeft={8}
+  >
+    {`Summary`}
+  </Text>
+
+  {/* Download button next to the text */}
+  {/* <CSVLink 
+    data={csvData.length ? csvData : []} 
+    filename={`StatusChanges-${year}-${month}.csv`} 
+    onClick={async (e: any) => {
+      try {
+        
+        generateCSVData();
+  
+        
+        if (csvData.length === 0) {
+          e.preventDefault();
+          console.error("CSV data is empty or not generated correctly.");
+          return;
+        }
+  
+       
+        await axios.post("/api/DownloadCounter");
+      } catch (error) {
+        console.error("Error triggering download counter:", error);
+      }
+    }}
+  > */}
+    {/* <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue">
+      {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+    </Button> */}
+    <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue" onClick={async (e) =>{
+      handleDownload(e, data, parseInt(year), parseInt(month))
+      await axios.post("/api/DownloadCounter");
+    } }>
+  Download Report
+</Button>
+  {/* </CSVLink> */}
+</Flex>
       <TableContainer bg={bg} padding={4} rounded={"xl"} marginTop={8}>
         <Table variant="simple" size="md" bg={bg} padding={8}>
-          <TableCaption>eipsinsight.com</TableCaption>
+          {/* <TableCaption>eipsinsight.com</TableCaption> */}
           <Thead>
             <Tr>
               <Th>Status</Th>
@@ -549,62 +687,12 @@ export default function InsightSummary() {
                         {item.ripCount}
                       </a>
                     </Td>
-                    {/* <Td isNumeric>
-                      {item.eipCount + item.ercCount + item.ripCount}
-                    </Td> */}
+                   
                   </Tr>
                 </>
               );
             })}
-            {/* <Tr>
-              <Td>Open PRs</Td>
-              <Td>{prData.EIPs.open}</Td>
-              <Td>{prData.ERCs.open}</Td>
-              <Td>{prData.RIPs.open}</Td> */}
-              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Created PRs</Td>
-              <Td>{prData.EIPs.created}</Td>
-              <Td>{prData.ERCs.created}</Td>
-              <Td>{prData.RIPs.created}</Td> */}
-              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Closed PRs</Td>
-              <Td>{prData.EIPs.closed}</Td>
-              <Td>{prData.ERCs.closed}</Td>
-              <Td>{prData.RIPs.closed}</Td> */}
-              {/* <Td isNumeric>{prData.EIPs.open+prData.ERCs.open+prData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Merged PRs</Td>
-              <Td>{prData.EIPs.merged}</Td>
-              <Td>{prData.ERCs.merged}</Td>
-              <Td>{prData.RIPs.merged}</Td> */}
-              {/* <Td isNumeric>{prData.EIPs.merged+prData.ERCs.merged+prData.RIPs.merged}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Created Issues</Td>
-              <Td>{issueData.EIPs.created}</Td>
-              <Td>{issueData.ERCs.created}</Td>
-              <Td>{issueData.RIPs.created}</Td> */}
-              {/* <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Open Issues</Td>
-              <Td>{issueData.EIPs.open}</Td>
-              <Td>{issueData.ERCs.open}</Td>
-              <Td>{issueData.RIPs.open}</Td> */}
-              {/* <Td isNumeric>{issueData.EIPs.open+issueData.ERCs.open+issueData.RIPs.open}</Td> */}
-            {/* </Tr> */}
-            {/* <Tr>
-              <Td>Closed Issues</Td>
-              <Td>{issueData.EIPs.closed}</Td>
-              <Td>{issueData.ERCs.closed}</Td>
-              <Td>{issueData.RIPs.closed}</Td> */}
-              {/* <Td isNumeric>{issueData.EIPs.closed+issueData.ERCs.closed+issueData.RIPs.closed}</Td> */}
-            {/* </Tr> */}
+           
             
           </Tbody>
         </Table>

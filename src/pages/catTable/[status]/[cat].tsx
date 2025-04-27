@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion';
 import LoaderComponent from '@/components/Loader';
 import { usePathname } from 'next/navigation';
+import axios from 'axios';
 
 const StatTab = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +39,15 @@ const StatTab = () => {
             <FlexBetween>
               <Header title={pathname[2]} subtitle={pathname[3]} />
               <Box>
-                <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} padding={'10px 20px'}>
+                <Button colorScheme="blue" variant="outline" fontSize={'14px'} fontWeight={'bold'} 
+                onClick={async () => {
+                  try {
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
+                padding={'10px 20px'}>
                   <DownloadIcon marginEnd={'1.5'} />
                   Download Reports
                 </Button>

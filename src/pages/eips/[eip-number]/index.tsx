@@ -6,6 +6,8 @@ import AllLayout from "@/components/Layout";
 import NLink from "next/link";
 import { motion } from "framer-motion";
 import React from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import SearchBox from "@/components/SearchBox";
 import {
   Container,
   Box,
@@ -20,13 +22,22 @@ import {
   Text,
   VStack,
   Spinner,
+  IconButton,
   Heading,
   Button,
   useColorModeValue,
+  Popover,
+  PopoverTrigger,
+  PopoverArrow,
+  PopoverContent,
+  PopoverHeader,
+  PopoverCloseButton,
+  PopoverBody
 } from "@chakra-ui/react";
 import { Markdown } from "@/components/MarkdownEIP";
-import Header from "@/components/Header";
+import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
+import { InfoOutlineIcon } from "@chakra-ui/icons";
 
 interface EipMetadataJson {
   eip: number;
@@ -34,6 +45,7 @@ interface EipMetadataJson {
   description: string;
   author: string[];
   "discussions-to": string;
+  "last-call-deadline":string;
   status: string;
   type: string;
   category: string;
@@ -48,37 +60,34 @@ const TestComponent = () => {
   const [markdownFileURL, setMarkdownFileURL] = useState<string>("");
   const [metadataJson, setMetadataJson] = useState<EipMetadataJson>();
   const [markdown, setMarkdown] = useState<string>("");
+  const [Repo, setRepo] =useState("");
   const [data, setData] = useState<{ status: string; date: string }[]>([]);
+  const [data2, setData2] = useState<{ type: string; date: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDataNotFound, setIsDataNotFound] = useState(false);
+  const [show, setShow] = useState(false); // State to toggle visibility
+  const toggleCollapse = () => setShow(!show);
+  const [show2, setShow2] = useState(false); // State to toggle visibility
+  const toggleCollapse2 = () => setShow2(!show2);
 
   const networkUpgrades: Record<string, number[]> = {
-    Homestead: [2, 7, 8, 606],
-    "Spurious Dragon": [155, 160, 161, 170, 7],
-    "Tangerine Whistle": [150, 608],
-    Byzantium: [100, 140, 196, 197, 198, 211, 214, 649, 658, 609],
-    "DAO Fork": [779],
-    Constantinople: [145, 1014, 1052, 1234, 1283, 1013],
-    Istanbul: [152, 1108, 1344, 1884, 2028, 2200, 1679],
-    Petersburg: [2726, 1283], 
-    "Muir Glacier": [2384, 2387],
-    "Backfill - Berlin to Shapella": [7568, 2070, 2982, 6122, 6953],
-    Dencun: [1153, 4788, 4844, 5656, 6780, 7044, 7045, 7514, 7516, 7569],
-    Pectra: [
-      2537, 2935, 6110, 7002, 7251, 7549, 7685, 7702, 663, 3540, 3670, 4200,
-      4750, 5450, 6206, 7069, 7480, 7620, 7698, 7600, 7692,
-    ],
-    "Ethereum ProgPoW": [1057, 1588],
-    Osaka: [7607],
-    "Beacon Chain Launch": [2982],
-    Berlin: [2565, 2929, 2718, 2930, 2070],
+    Homestead: [2, 7, 8],
+    "Spurious Dragon": [155, 160, 161, 170],
+    "Tangerine Whistle": [150],
+    Byzantium: [100, 140, 196, 197, 198, 211, 214, 649, 658],
+    Petersburg: [145, 1014, 1052, 1234, 1283],
+    Istanbul: [152, 1108, 1344, 1844, 2028, 2200],
+    "Muir Glacier": [2384],
+    Dencun: [1153, 4788, 4844, 5656, 6780, 7044, 7045, 7514, 7516],
+    Pectra: [7691, 7623, 7840, 7702, 7685, 7549, 7251, 7002, 6110, 2935, 2537, 7642],
+    Berlin: [2565, 2929, 2718, 2930],
     London: [1559, 3198, 3529, 3541, 3554],
     "Arrow Glacier": [4345],
     "Gray Glacier": [5133],
     Paris: [3675, 4399],
-    Shapella: [6953, 6122],
-    Shanghai: [3651, 3855, 3860, 4895, 6049],
-  };
+    Shapella: [3651, 3855, 3860, 4895, 6049],
+};
+
   
   const getNetworkUpgrades = (eipNo: number) => {
     console.log("eip:", eipNo);
@@ -102,10 +111,14 @@ const TestComponent = () => {
     if (eipNo) {
       const fetchData = async () => {
         try {
-          const response = await fetch(`/api/new/eipshistory/${eipNo}`);
+          const repoPath = Repo.toLowerCase() === 'eip' ? 'eipshistory' : `${Repo.toLowerCase()}history`;
+          const response = await fetch(`/api/new/${repoPath}/${eipNo}`);
+        //   const response = await fetch(`/api/new/${Repo.toLowerCase()}history/${eipNo}`);
           const jsonData = await response.json();
           const statusWithDates = extractLastStatusDates(jsonData);
+          const typeWithDates = extractLastTypesDates(jsonData);
           setData(statusWithDates);
+          setData2(typeWithDates);
           console.log(statusWithDates);
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -114,15 +127,57 @@ const TestComponent = () => {
 
       fetchData();
     }
-  }, [eipNo]);
+  }, [Repo, eipNo]);
+
+  const getValid = async (num: string): Promise<string> => {
+    const links = [
+      {
+        url: `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${num}.md`,
+        path: `rip`
+      },
+      {
+        url: `https://raw.githubusercontent.com/ethereum/ERCs/master/ERCS/erc-${num}.md`,
+        path: `erc`
+      },
+      {
+        url: `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${num}.md`,
+        path: `eip`
+      },
+    ];
+  
+    for (const link of links) {
+      try {
+        const response = await fetch(link.url);
+        if (response.ok) {
+          
+          return link.path;
+        }
+      } catch (error) {
+        console.error(`Error checking link ${link.url}:`, error);
+      }
+    }
+    return `/eips/eip-${num}`;
+  };
+
 
   const fetchEIPData = useCallback(async () => {
     if (!eipNo) return;
 
-    let _markdownFileURL = `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${eipNo}.md`;
-    setMarkdownFileURL(_markdownFileURL);
+    setIsLoading(true); // Set loading state at the beginning
 
     try {
+      const getRepo = await getValid(eipNo);
+      if (!getRepo) {
+        setIsLoading(false);
+        return; // Exit if no repo is returned
+      }
+
+      setRepo(getRepo);
+
+      let _markdownFileURL = `https://raw.githubusercontent.com/ethereum/${getRepo.toUpperCase()}s/master/${getRepo.toUpperCase()}S/${getRepo}-${eipNo}.md`;
+      console.log("final url:", _markdownFileURL);
+      setMarkdownFileURL(_markdownFileURL);
+
       const eipMarkdownRes = await fetch(_markdownFileURL).then((response) =>
         response.text()
       );
@@ -130,7 +185,6 @@ const TestComponent = () => {
       const { metadata, markdown: _markdown } = extractMetadata(eipMarkdownRes);
       const metadataJson = convertMetadataToJson(metadata);
 
-      
       if (!metadataJson?.author || !metadataJson?.created) {
         setIsDataNotFound(true);
       } else {
@@ -138,12 +192,13 @@ const TestComponent = () => {
         setMarkdown(_markdown);
         setIsDataNotFound(false);
       }
-
-      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching EIP data:", error);
+      setIsDataNotFound(true);
+    } finally {
+      setIsLoading(false);
     }
-  }, [eipNo]);
+  }, [eipNo]); // Make sure to include all dependencies here, [Repo, eipNo]);
 
   useEffect(() => {
     if (eipNo) {
@@ -200,8 +255,11 @@ const TestComponent = () => {
             EIP Not Found
           </Heading>
           <Text color="gray.500" fontSize="xl" mb={6}>
-            This EIP might not exist or could be an ERC or an RIP. Please check again.
+            This EIP might not exist or could be an <Link color="blue.300" href={`/ercs/erc-${eipNo}`}>ERC</Link> or an <Link color="blue.300" href={`/rips/rip-${eipNo}`}>RIP</Link>. Please check again.
           </Text>
+          <br/>
+          <SearchBox/>
+          <br/>
           <Button
             colorScheme="blue"
             size="lg"
@@ -225,7 +283,7 @@ const TestComponent = () => {
               marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
             >
               <Header
-                title={`EIP- ${eipNo}`}
+                title={`${Repo.toUpperCase()}- ${eipNo}`}
                 subtitle={metadataJson?.title || ""}
               />
               <Box overflowX="auto">
@@ -280,6 +338,12 @@ const TestComponent = () => {
                         <Td>{metadataJson?.status}</Td>
                       </Tr>
                     )}
+                    {metadataJson?.["last-call-deadline"] && (
+                      <Tr>
+                        <Th>Last Call Deadline</Th>
+                        <Td>{metadataJson["last-call-deadline"]}</Td>
+                      </Tr>
+                    )}
                     {metadataJson?.type && (
                       <Tr>
                         <Th>Type</Th>
@@ -302,92 +366,255 @@ const TestComponent = () => {
                 </Table>
               </Box>
               <br />
+              <Box>
+      {/* Collapse Button */}
+       <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="1">
+            <Flex justify="space-between" align="center">
+              {/* Heading on the Left */}
+              <Heading size="md" color={"#30A0E0"}>
+                Status Timeline
+
+                <Popover>
+                    <PopoverTrigger>
+                    <IconButton
+                            aria-label="More info"
+                            icon={<InfoOutlineIcon />}
+                            size="md"
+                            colorScheme="blue"
+                            variant="ghost"
+                          />
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <PopoverArrow />
+                      <PopoverCloseButton />
+                      <PopoverHeader>Instructions</PopoverHeader>
+                      <PopoverBody>
+                      The timeline tracks status changes using the merged date as the reference point.
+                      </PopoverBody>
+                    </PopoverContent>
+                  </Popover>
+
+
+              </Heading>
+
+              {/* Dropdown Button on the Right */}
+              <Box
+                bg="blue" // Gray background
+                borderRadius="md" // Rounded corners
+                padding={2} // Padding inside the box
+              >
+              <IconButton
+                onClick={toggleCollapse}
+                icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+                variant="ghost"
+                h="24px" // Smaller height
+                w="20px"
+                aria-label="Toggle Status Timeline"
+                _hover={{ bg: 'blue' }} // Background color on hover
+                _active={{ bg: 'blue' }} // Background color when active
+                _focus={{ boxShadow: 'none' }} // Remove focus outline
+              />
+              </Box>
+            </Flex>
+
+            {/* Status Timeline - This is shown only when `show` is true */}
+            {show && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="10">
-  <Heading size="md" mb="4" color={"#30A0E0"}>
-    Status Timeline
-  </Heading>
+                <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
+                  {data
+                    .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
+                    .map((item, index, sortedData) => {
+                      const currentDate = new Date(item.date);
+                      const nextItem = sortedData[index + 1];
+                      const nextDate = nextItem ? new Date(nextItem.date) : null;
 
-  {/* Use Flex with flexWrap="wrap" to create new lines when the content overflows */}
-  <Flex w="100%" gap={6} align="center" flexWrap="wrap">
-    {data
-      .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
-      .map((item, index, sortedData) => {
-        const currentDate = new Date(item.date);
-        const nextItem = sortedData[index + 1];
-        const nextDate = nextItem ? new Date(nextItem.date) : null;
+                      // Calculate the day difference between current and next item
+                      const dayDifference = nextDate
+                        ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
+                        : null;
 
-        // Calculate the day difference between current and next item
-        const dayDifference = nextDate
-          ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
-          : null;
+                      return (
+                        <React.Fragment key={index}>
+                          {/* Status and Date */}
+                          <VStack align="center" spacing={3} minW="120px" maxW="120px" mb={4}>
+                            <Box
+                              p="5"
+                              bg={useColorModeValue("white", "gray.800")}
+                              borderRadius="md"
+                              boxShadow={useColorModeValue("md", "dark-lg")}
+                              textAlign="center"
+                              minH="80px"
+                              display="flex"
+                              flexDirection="column"
+                              justifyContent="center"
+                            >
+                              <Text fontWeight="bold" color={statusColor}>
+                                {item.status}
+                              </Text>
+                              <Text color={dateColor}>
+                                {currentDate.toLocaleDateString("en-US", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}
+                              </Text>
+                            </Box>
+                          </VStack>
 
-        return (
-          <React.Fragment key={index}>
-            {/* Status and Date */}
-            <VStack align="center" spacing={3} minW="120px" maxW="120px" mb={4}>
-              <Box
-                p="5"
-                bg={useColorModeValue("white", "gray.800")}
-                borderRadius="md"
-                boxShadow={useColorModeValue("md", "dark-lg")}
-                textAlign="center"
-                minH="80px"
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
+                          {/* Arrow design and days difference */}
+                          {nextItem && (
+                            <VStack align="center" spacing={1}>
+                              <Box
+                                h="1px"
+                                w="80px"
+                                borderBottom="1px solid"
+                                borderColor="gray.400"
+                                position="relative"
+                              >
+                                {/* Arrow pointing forward */}
+                                <Box
+                                  position="absolute"
+                                  right="-10px"
+                                  top="-4px"
+                                  borderTop="5px solid transparent"
+                                  borderBottom="5px solid transparent"
+                                  borderLeft="10px solid gray"
+                                />
+                              </Box>
+                              <Text color="gray.500" fontSize="sm">
+                                {dayDifference} days
+                              </Text>
+                            </VStack>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                </Flex>
+        </motion.div>
+      )}
+      </Box>
+    </Box>
+    
+              {data2.length > 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="1">
+            {/* Heading on the Left */}
+            <Flex justify="space-between" align="center">
+              <Heading size="md" color={"#30A0E0"}>
+                Type Timeline
+              </Heading>
+
+              {/* Dropdown Button on the Right */}
+               <Box
+                bg="blue" // Gray background
+                borderRadius="md" // Rounded corners
+                padding={2} // Padding inside the box
               >
-                <Text fontWeight="bold" color={statusColor}>
-                  {item.status}
-                </Text>
-                <Text color={dateColor}>
-                  {currentDate.toLocaleDateString("en-US", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </Text>
+              <IconButton
+                onClick={toggleCollapse2}
+                icon={show2 ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+                variant="ghost"
+                h="24px" // Smaller height
+                w="20px"
+                aria-label="Toggle Type Timeline"
+                _hover={{ bg: 'blue' }} // Background color on hover
+                _active={{ bg: 'blue' }} // Background color when active
+                _focus={{ boxShadow: 'none' }} // Remove focus outline
+              />
               </Box>
-            </VStack>
+            </Flex>
 
-            {/* Arrow design and days difference */}
-            {nextItem && (
-              <VStack align="center" spacing={1}>
-                <Box
-                  h="1px"
-                  w="80px"
-                  borderBottom="1px solid"
-                  borderColor="gray.400"
-                  position="relative"
-                >
-                  {/* Arrow pointing forward */}
-                  <Box
-                    position="absolute"
-                    right="-10px"
-                    top="-4px"
-                    borderTop="5px solid transparent"
-                    borderBottom="5px solid transparent"
-                    borderLeft="10px solid gray"
-                  />
-                </Box>
-                <Text color="gray.500" fontSize="sm">
-                  {dayDifference} days
-                </Text>
-              </VStack>
-            )}
-          </React.Fragment>
-        );
-      })}
-  </Flex>
-</Box>
+            {/* Type Timeline - This is shown only when `show` is true */}
+            {show2 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
+                  {data2
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
+                    .map((item, index, sortedData) => {
+                      const currentDate = new Date(item.date);
+                      const nextItem = sortedData[index + 1];
+                      const nextDate = nextItem ? new Date(nextItem.date) : null;
 
+                      // Calculate the day difference between current and next item
+                      const dayDifference = nextDate
+                        ? Math.abs(Math.ceil((nextDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)))
+                        : null;
 
+                      return (
+                        <React.Fragment key={index}>
+                          {/* Type and Date */}
+                          <VStack align="center" spacing={3} minW="120px" maxW="120px" mb={4}>
+                            <Box
+                              p="5"
+                              bg={useColorModeValue("white", "gray.800")}
+                              borderRadius="md"
+                              boxShadow={useColorModeValue("md", "dark-lg")}
+                              textAlign="center"
+                              minH="80px"
+                              display="flex"
+                              flexDirection="column"
+                              justifyContent="center"
+                            >
+                              <Text fontWeight="bold" color={statusColor}>
+                                {item.type}
+                              </Text>
+                              <Text color={dateColor}>
+                                {currentDate.toLocaleDateString("en-US", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}
+                              </Text>
+                            </Box>
+                          </VStack>
+
+                          {/* Arrow design and days difference */}
+                          {nextItem && (
+                            <VStack align="center" spacing={1}>
+                              <Box
+                                h="1px"
+                                w="80px"
+                                borderBottom="1px solid"
+                                borderColor="gray.400"
+                                position="relative"
+                              >
+                                {/* Arrow pointing forward */}
+                                <Box
+                                  position="absolute"
+                                  right="-10px"
+                                  top="-4px"
+                                  borderTop="5px solid transparent"
+                                  borderBottom="5px solid transparent"
+                                  borderLeft="10px solid gray"
+                                />
+                              </Box>
+                              <Text color="gray.500" fontSize="sm">
+                                {dayDifference} days
+                              </Text>
+                            </VStack>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                </Flex>
               </motion.div>
+            )}
+          </Box>
+        </motion.div>
+      )}
               <Container maxW="1200px" mx="auto">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -431,7 +658,40 @@ const extractLastStatusDates = (data: any) => {
 
   return statusDates;
 };
+// extractLastTypesDates
 
+const extractLastTypesDates = (data: any) => {
+  const typeDates: { type: string; date: string }[] = [];
+  const standardTrackTypes = [
+  "Standards Track",
+  "Standard Track",
+  "Standards Track (Core, Networking, Interface, ERC)",
+  "Standard"
+];
+  let lasttype = "";
+  const sortedData = Object.keys(data)
+    .filter((key) => key !== "repo") 
+    .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
+
+  sortedData.forEach((key) => {
+    let { type, mergedDate } = data[key];
+
+    if (type === "unknown") {
+      return;
+    }
+    if(standardTrackTypes.includes(type)){
+      type="Standards Track"
+    }
+
+    if (lasttype !== type) {
+      typeDates.push({ type, date: mergedDate });
+    }
+
+    lasttype = type;
+  });
+
+  return typeDates;
+};
 
 
 export const extractMetadata = (text: string) => {

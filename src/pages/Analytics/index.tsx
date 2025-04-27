@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import dynamic from "next/dynamic";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
@@ -26,24 +26,24 @@ import {
   Collapse,
   useColorModeValue
 } from "@chakra-ui/react";
+import { DownloadIcon } from "@chakra-ui/icons";
 import DateTime from "@/components/DateTime";
 import LoaderComponent from "@/components/Loader";
 import AllLayout from "@/components/Layout";
 import {ChevronUpIcon } from "@chakra-ui/icons";
 import axios from "axios";
+import Comments from "@/components/comments";
+import { useRouter } from "next/router";
+import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import EipsLabelChart from "@/components/PrLabelsChart";
+import CopyLink from "@/components/CopyLink";
 
 
 // Dynamic import for Ant Design's Column chart
 // const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualAxes), { ssr: false });
 
-const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails','/api/ripsprdetails'];
-const ISSUE_API_ENDPOINTS = ['/api/eipsissuedetails', '/api/ercsissuedetails', '/api/ripsissuedetails'];
-const API_ENDPOINTS = {
-  eips: '/api/editorsprseips',
-  ercs: '/api/editorsprsercs',
-  rips: '/api/editorsprsrips'
-}
+
 
 type PR = {
   repo:string;
@@ -79,6 +79,9 @@ interface ChartDataItem {
   monthYear: string;
   type: 'Created' | 'Merged' | 'Closed' | 'Open' | 'Review';
   count: number;
+  eips: number;
+  ercs: number;
+  rips: number;
 }
 const GitHubPRTracker: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -250,7 +253,7 @@ useEffect(() => {
           throw new Error('Failed to fetch data');
         }
         const result = await response.json();
-        console.log(result);
+        // console.log(result);
 
         // Reduce the data by combining entries with the same monthYear
         const formattedData = result.reduce((acc: any, item: any) => {
@@ -279,7 +282,7 @@ useEffect(() => {
 
         // Set the fetched and formatted data
         setdownloadData(formattedData); 
-        console.log(formattedData); // Debugging output
+        // console.log(formattedData); 
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -316,7 +319,7 @@ useEffect(() => {
 
 
     return (
-      <Box mt={8} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
+      <Box mt={2} border="1px solid #e2e8f0" borderRadius="10px 10px 0 0" boxShadow="lg">
       <Flex
       wrap="wrap"
       justify="space-around"
@@ -407,6 +410,7 @@ useEffect(() => {
           textAlign="center" 
           borderTopLeftRadius="10px" 
           minWidth="6rem"
+          p="8px"
         >
           Number
         </Th>
@@ -417,6 +421,7 @@ useEffect(() => {
           whiteSpace="normal" // Allow wrapping
           overflow="hidden"   // Prevent overflow
           textOverflow="ellipsis" // Add ellipsis for overflowed text
+          p="8px"
         >
           Title
         </Th>
@@ -424,6 +429,7 @@ useEffect(() => {
           color="white" 
           textAlign="center" 
           minWidth="6rem" 
+          p="8px"
         >
           State
         </Th>
@@ -431,6 +437,7 @@ useEffect(() => {
           color="white" 
           textAlign="center" 
           minWidth="6rem" 
+          p="8px"
         >
           Created At
         </Th>
@@ -438,6 +445,7 @@ useEffect(() => {
           color="white" 
           textAlign="center" 
           minWidth="6rem" 
+          p="8px"
           
         >
           Closed At
@@ -447,6 +455,7 @@ useEffect(() => {
             color="white" 
             textAlign="center" 
             minWidth="6rem" 
+            p="8px"
           >
             Merged At
           </Th>
@@ -455,6 +464,7 @@ useEffect(() => {
           color="white" 
           textAlign="center" 
           minWidth="10rem"
+          p="8px"
         >
           Link
         </Th>
@@ -464,22 +474,22 @@ useEffect(() => {
 
   
     <Tbody>
-      {items.created.length === 0 && items.closed.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
+      {items.created.length === 0 && items.closed.length === 0 && items.open.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
         <Tr>
-          <Td colSpan={type === 'PRs' ? 6 : 5} textAlign="center">No Data Available</Td>
+          <Td colSpan={type === 'PRs' ? 8 : 6} textAlign="center">No Data Available</Td>
         </Tr>
       ) : (
         <>
           {/* Render Created Items */}
           {showCategory.created && items.created.map((item: PR | Issue) => (
             <Tr key={`created-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
-              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-              <Td style={{ wordWrap: 'break-word', maxWidth: '200px' }}>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-              <Td textAlign="center" verticalAlign="middle">Created</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td p="8px"style={{ wordWrap: 'break-word', maxWidth: '200px' }}>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td p="8px"textAlign="center" verticalAlign="middle">Created</Td>
+              <Td p="8px"textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px"textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
               {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-              <Td>
+              <Td p="8px">
                 <button style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
@@ -489,7 +499,9 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${(item as PR).repo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    href={type === 'PRs' 
+                      ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
+                      : `/issue/${(item as Issue).repo}/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -503,13 +515,13 @@ useEffect(() => {
           {/* Render Closed Items */}
           {showCategory.closed && items.closed.map((item: PR | Issue) => (
             <Tr key={`closed-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
-              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-              <Td textAlign="center" verticalAlign="middle">Closed</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-              {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-              <Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">Closed</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              {type === 'PRs' && <Td p="8px" textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+              <Td p="8px">
                 <button style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
@@ -519,7 +531,9 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${selectedRepo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    href={type === 'PRs' 
+                      ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
+                      : `/issue/${(item as Issue).repo}/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -533,13 +547,13 @@ useEffect(() => {
           {/* Render Merged Items (only for PRs) */}
           {showCategory.merged && type === 'PRs' && (items as { merged: PR[] }).merged.map((item: PR) => (
             <Tr key={`merged-${item.prNumber}`} borderWidth="1px" borderColor="gray.200">
-              <Td textAlign="center" verticalAlign="middle">{item.prNumber}</Td>
-              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{item.prTitle}</Td>
-              <Td textAlign="center" verticalAlign="middle">Merged</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
-              <Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.prNumber}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{item.prTitle}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">Merged</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.merged_at ? new Date(item.merged_at!).toLocaleDateString() : '-'}</Td>
+              <Td p="8px">
                 <button style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
@@ -549,7 +563,7 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${(item as PR).repo}/pull/${item.prNumber}`} 
+                    href={`/PR/${(item as PR).repo}/${item.prNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -563,13 +577,13 @@ useEffect(() => {
           {/* Render Open Items */}
           {showCategory.open && items.open.map((item: PR | Issue) => (
             <Tr key={`open-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
-              <Td textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
-              <Td textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
-              <Td textAlign="center" verticalAlign="middle">Open</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
-              <Td textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
-              {type === 'PRs' && <Td textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
-              <Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">Open</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</Td>
+              <Td p="8px" textAlign="center" verticalAlign="middle">{item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-'}</Td>
+              {type === 'PRs' && <Td p="8px" textAlign="center" verticalAlign="middle">{(item as PR).merged_at ? new Date((item as PR).merged_at!).toLocaleDateString() : '-'}</Td>}
+              <Td p="8px">
                 <button style={{
                   backgroundColor: '#428bca',
                   color: '#ffffff',
@@ -579,7 +593,9 @@ useEffect(() => {
                   borderRadius: '5px',
                 }}>
                   <a 
-                    href={`https://github.com/ethereum/${(item as PR).repo}/${type === 'PRs' ? 'pull' : 'issues'}/${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} 
+                    href={type === 'PRs' 
+                      ? `/PR/${(item as PR).repo}/${(item as PR).prNumber}` 
+                      : `/issue/${(item as Issue).repo}/${(item as Issue).IssueNumber}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -847,22 +863,32 @@ useEffect(() => {
 
   const renderChart = () => {
    // Assuming `chartData` is your data array
-// console.log(chartdata);
+console.log("chart data:",chartdata);
 
 const transformedData = Array.isArray(chartdata) // Check if chartdata is an array
   ? chartdata.reduce<{
       [key: string]: { [key: string]: number };
-    }>((acc, { monthYear, type, count }) => {
+    }>((acc, { monthYear, type, count, eips, ercs, rips }) => {
       if (showCategory[type.toLowerCase()]) { // Ensure the category is selected
         if (!acc[monthYear]) {
           acc[monthYear] = {};
         }
         // Update the count for the current type
         acc[monthYear][type] = (acc[monthYear][type] || 0) + count;
+
+        if(selectedRepo === "All"){
+        acc[monthYear][`${type}-eips`] = (acc[monthYear][`${type}-eips`] || 0) + eips;
+        acc[monthYear][`${type}-ercs`] = (acc[monthYear][`${type}-ercs`] || 0) + ercs;
+        acc[monthYear][`${type}-rips`] = (acc[monthYear][`${type}-rips`] || 0) + rips;
+        }
+
       }
+
       return acc;
     }, {})
   : {}; // If chartdata is not an array, return an empty object
+
+  console.log("transformed data:", transformedData);
 
 
 const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYear => {
@@ -912,21 +938,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     })
   : [];
 
-  //   const trendData = showCategory.open
-  // ? chartdata?.map(item => {
-  //     // Ensure the item is defined and contains the necessary properties
-  //     const monthYear = item.monthYear;
-  //     const openCount = item.type === 'Open' ? item.count : 0; // Assuming 'Open' type for open PRs
-
-  //     // Ensure openCount is calculated correctly
-  //     const adjustedOpenCount = openCount + (activeTab === 'PRs' ? Math.abs(getmin) : Math.abs(closedMax));
-
-  //     return {
-  //       monthYear,
-  //       Open: adjustedOpenCount,
-  //     };
-  //   }) || [] // If chartdata is undefined, return an empty array
-  // : [];
+ 
   
 
 
@@ -962,12 +974,28 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
                   radius: [0, 0, 0, 0],
               },
               tooltip: {
-                fields: ['type', 'count'],
-                formatter: ({ type, count }: { type: string; count: number }) => ({
-                    name: type,
-                    value: `${Math.abs(count)}`, // Adjust hover display for bar chart
-                }),
-            },
+                fields: ['type', 'count', 'monthYear'], // Include monthYear to access the transformed data
+                formatter: ({ type, count, monthYear }: { type: string; count: number; monthYear: string }) => {
+                  const name = type; // Tooltip name remains the type (e.g., Created, Merged, etc.)
+                  let value;
+              
+                  if (selectedRepo === "All") {
+                    // For "All" repo, format the value as `count(eips: X, ercs: Y, rips: Z)`
+                    const eips = transformedData[monthYear]?.[`${type}-eips`] || 0;
+                    const ercs = transformedData[monthYear]?.[`${type}-ercs`] || 0;
+                    const rips = transformedData[monthYear]?.[`${type}-rips`] || 0;
+                    value = `${Math.abs(count)}(eips: ${Math.abs(eips)}, ercs: ${Math.abs(ercs)}, rips: ${Math.abs(rips)})`;
+                  } else {
+                    // For non-"All" repos, just display the absolute count
+                    value = `${Math.abs(count)}`;
+                  }
+              
+                  return {
+                    name,
+                    value,
+                  };
+                },
+              },
             color: (datum: any) => {
               switch (datum.type) {
                   case 'Closed':
@@ -989,25 +1017,46 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
         stroke: '#ff00ff', // Magenta line color
         lineWidth: 2,
       },
+      // tooltip: {
+      //   fields: ['monthYear', 'Open'], // Change to use 'Open'
+      //   formatter: ({ monthYear, Open }: { monthYear: string; Open: number }) => ({
+      //     name: 'Open',
+      //     value: `${Open - getmin}`, // Adjust hover display for line chart
+      //   }),
+      // },
       tooltip: {
-        fields: ['monthYear', 'Open'], // Change to use 'Open'
-        formatter: ({ monthYear, Open }: { monthYear: string; Open: number }) => ({
-          name: 'Open',
-          value: `${Open - getmin}`, // Adjust hover display for line chart
-        }),
+        fields: ['Open', 'monthYear'], // Include monthYear to access the transformed data
+        formatter: ( { monthYear, Open }: { monthYear: string; Open: number  }) => {
+          const name = 'Open'; // Tooltip name remains the type (e.g., Created, Merged, etc.)
+          let value;
+      
+          if (selectedRepo === "All") {
+            // For "All" repo, format the value as `count(eips: X, ercs: Y, rips: Z)`
+            const eips = transformedData[monthYear]?.[`Open-eips`] || 0;
+            const ercs = transformedData[monthYear]?.[`Open-ercs`] || 0;
+            const rips = transformedData[monthYear]?.[`Open-rips`] || 0;
+            value = `${Open - getmin}(eips: ${Math.abs(eips)}, ercs: ${Math.abs(ercs)}, rips: ${Math.abs(rips)})`;
+          } else {
+            // For non-"All" repos, just display the absolute count
+            value = `${Open - getmin}`;
+          }
+      
+          return {
+            name,
+            value,
+          };
+        },
       },
       color: '#ff00ff',
     },
       ],
       yAxis: [
+        {
+          min: -300, // Set the minimum value for the bar chart y-axis
+          max: 600,  // Set the maximum value for the bar chart y-axis
+      },
           {
-              min: yAxisMin, // Set min for bar chart y-axis
-              max: 0, // Set max based on negative values
-              
-            
-          },
-          {
-              min:  yAxisMin, // Start from 0 for the trend line
+              min:  0, 
               max: yAxisMax, // Set max for trend line y-axis
               label: {
                 formatter: () => '', // Completely hide labels
@@ -1029,6 +1078,31 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     return <DualAxes {...config} />;
 };
 
+const router = useRouter();
+
+  const scrollToHash = () => {
+    const hash = window.location.hash;
+    if (hash) {
+      const element = document.getElementById(hash.slice(1));
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      scrollToHash();
+    }
+  }, [loading]);
+
+  useLayoutEffect(() => {
+    router.events.on("routeChangeComplete", scrollToHash);
+    return () => {
+      router.events.off("routeChangeComplete", scrollToHash);
+    };
+  }, [router]);
+
 
 
 
@@ -1037,7 +1111,10 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       <LoaderComponent />
     ) : (
       <AllLayout>
-        <Box padding={8} margin={8}>
+        <Box 
+        padding={{ base: 1, md: 4 }}
+        margin={{ base: 2, md: 4 }}
+        >
           <Heading
             size="xl"
             marginBottom={10}
@@ -1048,10 +1125,11 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
           </Heading>
 
           <Box
-      padding={4}
+      pl={4}
       bg={useColorModeValue("blue.50", "gray.700")}
       borderRadius="md"
-      marginBottom={8}
+      pr="8px"
+      marginBottom={2}
     >
       <Flex justify="space-between" align="center">
         <Heading
@@ -1071,10 +1149,13 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     onClick={toggleCollapse}
     icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
     variant="ghost"
+     h="24px" // Smaller height
+     w="20px"
     aria-label="Toggle Instructions"
     _hover={{ bg: 'blue' }} // Maintain background color on hover
     _active={{ bg: 'blue' }} // Maintain background color when active
     _focus={{ boxShadow: 'none' }} // Remove focus outline
+    
   />
 </Box>
 
@@ -1153,6 +1234,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
           After selecting your preferred data using the View More option, you can download reports based on the filtered data for further analysis or record-keeping. 
           Simply click the download button to export the data in your chosen format.
         </Text>
+        <br/>
       </Collapse>
 
       {/* {!show && (
@@ -1165,7 +1247,7 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       )} */}
     </Box>
   
-          <Flex justify="center" mb={8}>
+          <Flex justify="center" mb={4}>
             <Button
               colorScheme="blue"
               onClick={() => setActiveTab('PRs')}
@@ -1186,45 +1268,78 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
          
           <Box
             bgColor={bg}
-            padding="2rem"
+            padding="1rem"
             borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
           >
-          <Box padding={"2rem"} borderRadius={"0.55rem"}>
+          <Box id="GithubAnalytics" borderRadius={"0.55rem"}>
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
           <Heading size="md" color="black">
-            {`Github PR Analytics (Monthly, since 2015)`}
+            {`Github PR Analytics (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com//Analytics#GithubAnalytics`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={handleDownload2} disabled={loading3}>
+          <Button
+            colorScheme="blue"
+            onClick={async () => {
+              try {
+                // Trigger the CSV conversion and download
+                handleDownload2();
+          
+                // Trigger the API call
+                await axios.post("/api/DownloadCounter");
+              } catch (error) {
+                console.error("Error triggering download counter:", error);
+              }
+            }}
+            disabled={loading3}
+            fontSize={{ base: "0.6rem", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
+          >
             {loading3 ? <Spinner size="sm" /> : "Download CSV"}
           </Button>
+
         </Flex>
         <Flex justify="center" mb={8}>
-            <Select
-              value={selectedRepo}
-              onChange={(e) => setSelectedRepo(e.target.value)}
-              placeholder="Select an option"
-              width="200px"
-              borderColor="gray.700" // Darker border color
-              color="gray.800" // Darker text color
-              bg="white" // White background for the dropdown
-              _placeholder={{ color: "gray.500" }} // Lighter color for placeholder
-              _focus={{ borderColor: "gray.500", bg: "white" }} // Border color on focus
-              _hover={{ borderColor: "gray.600" }} // Border color on hover
-            >
-              <option value="All">All</option>
-              <option value="EIPs">EIPs</option>
-              <option value="ERCs">ERCs</option>
-              <option value="RIPs">RIPs</option>
-            </Select>
-          </Flex>
+  <Menu>
+    <MenuButton
+      as={Button}
+      rightIcon={<ChevronDownIcon />}
+      colorScheme="blue"
+      size="md"
+      width="200px"
+    >
+      {selectedRepo || "Select an option"}
+    </MenuButton>
+
+    <MenuList maxHeight="200px" overflowY="auto">
+      {/* Option for All */}
+      <MenuItem onClick={() => setSelectedRepo('All')}>
+        All
+      </MenuItem>
+
+      {/* Option for EIPs */}
+      <MenuItem onClick={() => setSelectedRepo('EIPs')}>
+        EIPs
+      </MenuItem>
+
+      {/* Option for ERCs */}
+      <MenuItem onClick={() => setSelectedRepo('ERCs')}>
+        ERCs
+      </MenuItem>
+
+      {/* Option for RIPs */}
+      <MenuItem onClick={() => setSelectedRepo('RIPs')}>
+        RIPs
+      </MenuItem>
+    </MenuList>
+  </Menu>
+</Flex>
+
             {renderChart()}
             <Box className={"w-full"}>
-              <DateTime />
+              <LastUpdatedDateTime  name="AnalyticsScheduler"/>
             </Box>
             <Box mt={2}>
         <Text color="gray.500" fontStyle="italic" textAlign="center">
@@ -1236,11 +1351,14 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
       </Box>
       <br/>
          
-          <Flex justify="center" mb={8}>
+          <Flex justify="center" ml={3} mb={8}>
   <Checkbox
     isChecked={showCategory.created}
     onChange={() => setShowCategory(prev => ({ ...prev, created: !prev.created }))}
-    mr={4}
+    color="black"
+    borderColor="black"
+    mr={3}
+    fontSize={{ base: 'xs', md: 'sm' }}
   >
     {activeTab === 'PRs' ? 'Created PRs' : 'Created Issues'}
   </Checkbox>
@@ -1248,7 +1366,10 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     <Checkbox
       isChecked={showCategory.open}
       onChange={() => setShowCategory(prev => ({ ...prev, open: !prev.open }))}
-      mr={4}
+      color="black"
+      borderColor="black"
+      mr={3}
+      fontSize={{ base: 'xs', md: 'sm' }}
     >
       Open PRs
     </Checkbox>
@@ -1256,7 +1377,10 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
   <Checkbox
     isChecked={showCategory.closed}
     onChange={() => setShowCategory(prev => ({ ...prev, closed: !prev.closed }))}
-    mr={4}
+    color="black"
+    borderColor="black"
+    mr={3}
+    fontSize={{ base: 'xs', md: 'sm' }}
   >
     {activeTab === 'PRs' ? 'Closed PRs' : 'Closed Issues'}
   </Checkbox>
@@ -1264,7 +1388,10 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     <Checkbox
       isChecked={showCategory.merged}
       onChange={() => setShowCategory(prev => ({ ...prev, merged: !prev.merged }))}
-      mr={4}
+      color="black"
+      borderColor="black"
+      mr={3}
+      fontSize={{ base: 'xs', md: 'sm' }}
     >
       Merged PRs
     </Checkbox>
@@ -1327,30 +1454,54 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
           )}
   
           {selectedYear && selectedMonth && (
-                  <Box mt={8}>
+                  <Box mt={8} display="flex" justifyContent="flex-end">
                     {/* Download CSV section */}
-                    <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-                    <Text fontSize="lg"
+                    {/* <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}> */}
+                    {/* <Text fontSize="lg"
                     marginBottom={2}
                     color={useColorModeValue("gray.800", "gray.200")}>
                         You can download the data here:
-                      </Text>
-                      <Button colorScheme="blue" onClick={handleDownload} disabled={loading2}>
-                        {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+                      </Text> */}
+                      <Button colorScheme="blue" 
+                      onClick={async () => {
+                        try {
+                          // Trigger the CSV conversion and download
+                          handleDownload();
+                    
+                          // Trigger the API call
+                          await axios.post("/api/DownloadCounter");
+                        } catch (error) {
+                          console.error("Error triggering download counter:", error);
+                        }
+                      }} 
+                      disabled={loading2}>
+                       <DownloadIcon marginEnd={"1.5"} /> {loading2 ? <Spinner size="sm" /> : "Download CSV"}
                       </Button>
-                    </Box>
+                    {/* </Box> */}
                   </Box>
               )}
                {showDropdown && ( 
                 <>
           
                   {selectedYear && selectedMonth && (
-                    <Box mt={8}>
+                    <Box mt={2}>
                      {renderTable(selectedYear, selectedMonth, activeTab)}
                     </Box>
                   )}
                 </>
                 )}
+
+                <Box mt={2} id="EIPsLabelChart">
+                  <EipsLabelChart/>
+                </Box>
+
+<Box>
+          <br/>
+        <hr></hr>
+        <br/>
+        <Text fontSize="3xl" fontWeight="bold">Comments</Text>
+          <Comments page={"Analytics"}/>
+        </Box>
         </Box>
       </AllLayout>
     )

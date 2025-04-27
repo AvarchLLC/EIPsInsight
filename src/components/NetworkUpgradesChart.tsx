@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Flex, Heading, Button } from "@chakra-ui/react";
+import { Box, useColorModeValue, Flex, Heading, Button, Spinner } from "@chakra-ui/react";
+import axios from "axios";
+import CopyLink from "./CopyLink";
 
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 
@@ -46,7 +48,7 @@ const rawData = [
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1014" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1052" },
     { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1234" },
-    { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1283" },
+    { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1283" },
     { date: "2022-06-30", upgrade: "Gray Glacier", eip: "EIP-5133" },
     { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-2" },
     { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-7" },
@@ -77,8 +79,8 @@ const rawData = [
     { date: "2016-11-22", upgrade: "Spurious Dragon", eip: "EIP-161" },
     { date: "2016-11-22", upgrade: "Spurious Dragon", eip: "EIP-170" },
     { date: "2016-10-18", upgrade: "Tangerine Whistle", eip: "EIP-150" },
-    { date: "2022-09-15", upgrade: "The Merge", eip: "EIP-4895" },
-    { date: "2022-09-15", upgrade: "The Merge", eip: "EIP-6049" },
+    { date: "2022-09-15", upgrade: "The Merge", eip: "EIP-4399" },
+    { date: "2022-09-15", upgrade: "The Merge", eip: "EIP-3675" },
     { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "" },
     { date: "2015-07-30", upgrade: "Frontier", eip: "" },
     { date: "2021-10-21", upgrade: "Altair", eip: "" },
@@ -104,20 +106,8 @@ const transformedData: UpgradeData[] = Object.values(
   return new Date(a.date).getTime() - new Date(b.date).getTime();
 });
 
-const downloadData = () => {
-    const header = "Date,Network Upgrade,EIP link\n";
-    const csvContent = "data:text/csv;charset=utf-8,"+header
-      + rawData.map(({ date, upgrade, eip }) => `${date},${upgrade},https://eipsinsight.com/eips/eip-${eip.replace('EIP-', '')}`).join("\n");
 
-  
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "network_upgrades.csv"); // Name your CSV file here
-    document.body.appendChild(link); // Required for FF
-    link.click();
-    document.body.removeChild(link);
-  };
+
 
 // Function to generate distinct colors
 const generateDistinctColor = (index: number, total: number) => {
@@ -135,9 +125,59 @@ const colorMap = uniqueUpgrades.reduce((map, upgrade, index) => {
   return map;
 }, {} as Record<string, string>);
 
-const NetworkUpgradesChart = () => {
+const NetworkUpgradesChart = React.memo(() => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const [isLoading, setIsLoading] = useState(false);
 
+  const downloadData = useCallback(async () => {
+    setIsLoading(true); // Activate loader
+    const header = "Date,Network Upgrade,EIP Link,Requires,Type, Category,GITHUB\n";
+    
+    try {
+      const csvContent = "data:text/csv;charset=utf-8," + header
+        + await Promise.all(rawData.map(async ({ date, upgrade, eip }) => {
+          const eipNo = eip.replace('EIP-', '');
+          const url = `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${eipNo}.md`;
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Failed to fetch EIP-${eipNo}`);
+
+            const eipData = await response.text();
+            const requiresMatch = eipData.match(/requires:\s*(.+)/);
+            let requires = requiresMatch ? requiresMatch[1].trim() : 'None';
+
+            const TypeMatch = eipData.match(/type:\s*(.+)/);
+            let Type = TypeMatch?.[1]?.trim() ?? 'None';            
+
+            const CategoryMatch = eipData.match(/category:\s*(.+)/);
+            let Category = CategoryMatch ? CategoryMatch[1].trim() : '-';
+
+            // Escape requires field if it contains commas
+            if (requires.includes(",")) {
+              requires = `"${requires}"`;
+            }
+
+            return `${date},${upgrade},https://eipsinsight.com/eips/eip-${eipNo},${requires},${Type}, ${Category}, EIPs`;
+          } catch (error) {
+            console.error(`Error fetching data for EIP-${eipNo}:`, error);
+            return `${date},${upgrade},-,-,-,-,-`;
+          }
+        })).then(rows => rows.join("\n"));
+
+      // Trigger download
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "network_upgrades.csv");
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error("Error downloading data:", error);
+    } finally {
+      setIsLoading(false); // Deactivate loader
+    }
+  }, []);
   // Chart configuration
   const config = {
     data: transformedData,
@@ -173,14 +213,30 @@ const NetworkUpgradesChart = () => {
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
          <Heading size="md" color={headingColor}>
-            {`Network Upgrades`}
+            {`Network Upgrades`} <CopyLink link={`https://eipsinsight.com//pectra#NetworkUpgrades`} />
           </Heading>
           {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={downloadData}>Download CSV</Button>
+          <Button colorScheme="blue" 
+          fontSize={{ base: "0.6rem", md: "md" }}
+          // onClick={downloadData} 
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadData();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
+          isDisabled={isLoading}>
+            {isLoading ? <Spinner size="sm" /> : "Download CSV"}
+          </Button>
         </Flex>
       <Column {...config} />
     </Box>
   );
-};
+});
 
 export default NetworkUpgradesChart;

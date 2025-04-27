@@ -9,6 +9,7 @@ import {
   Tbody,
   Th,
   Tr,
+  Td,
   Thead,
   TableContainer,
   Text,
@@ -17,6 +18,7 @@ import {
 import { useWindowSize } from "react-use";
 import DateTime from "@/components/DateTime";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -45,6 +47,11 @@ const getCat = (cat: string) => {
   }
 };
 
+interface AreaCProps {
+  dataset: EIP[];
+  status:string;
+}
+
 interface EIP {
   status: string;
   eips: {
@@ -56,7 +63,7 @@ interface EIP {
   }[];
 }
 
-const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
+const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]);
   const windowSize = useWindowSize();
@@ -67,21 +74,21 @@ const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
   const years = Array.from(new Array(currentYear - 2014), (_, index) => index + 2015).reverse();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/graphsv2`);
-        const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+    // const fetchData = async () => {
+    //   try {
+    //     const response = await fetch(`/api/new/graphsv2`);
+    //     const jsonData = await response.json();
+        setData(dataset);
         setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
 
-    fetchData();
+    // fetchData();
   }, []);
 
-  let filteredData = data.filter((item) => item.status === status);
+  let filteredData = dataset;
 
   const removeDuplicatesFromEips = (eips: any[]) => {
     const seen = new Set();
@@ -195,22 +202,21 @@ const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
       ) : (
         <Box
         bgColor={bg}
-        // marginTop={"0.7rem"}
-        p="1.5rem" // Uniform padding or use px/rem as needed
-        pt="1.5rem"
-        pb="1.5rem"
-        borderRadius="0.55rem"
-        overflowX="auto"
-        _hover={{
-          border: "1px",
-          borderColor: "#30A0E0",
-        }}
-        maxH={maxHeight}
-        as={motion.div}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 } as any}
-        className="ease-in duration-200"
+                 // marginTop={"2rem"}
+                 p="1rem 1rem"
+                 borderRadius="0.55rem"
+                 overflowX="auto"
+                 _hover={{
+                   border: "1px",
+                   borderColor: "#30A0E0",
+                 }}
+                 maxH={maxHeight}
+                 as={motion.div}
+                 minHeight="600px"
+                 initial={{ opacity: 0, y: -20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 0.5 } as any}
+                 className="ease-in duration-200"
         >
           <Box className={"flex w-full gap-10"}>
             <Select
@@ -231,10 +237,20 @@ const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
             <Button
           colorScheme="blue"
           variant="outline"
-          fontSize={"14px"}
+          fontSize={{ base: "0.6rem", md: "md" }}
           fontWeight={"bold"}
           padding={"8px 20px"}
-          onClick={downloadCSV} // Updated here
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadCSV();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
         >
           Download Reports
         </Button>
@@ -243,25 +259,26 @@ const StackedColumnChart: React.FC<{ status: string }> = ({ status }) => {
           <br/>
 
           <TableContainer>
-            <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
-              <Thead>
-                <Tr>
-                  <Th minW="50px">Category</Th>
-                  <Th minW="200px">Numbers</Th>
-                  <Th minW="200px">Percentage</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {rows.map((row) => (
-                  <Tr key={`${row.category}-${row.year}`}>
-                    <Th>{`${row.category}`}</Th>
-                    <Th>{row.value}</Th>
-                    <Th>{((row.value / total) * 100).toFixed(2)}%</Th>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+  <Table variant="simple" minW="50%" maxW="100%" layout="fixed">
+    <Thead>
+      <Tr>
+        <Th minW="50px" style={{ wordWrap: 'break-word' }}>Category</Th>
+        <Th minW="200px" style={{ wordWrap: 'break-word' }}>Numbers</Th>
+        <Th minW="200px" style={{ wordWrap: 'break-word' }}>Percentage</Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {rows.map((row) => (
+        <Tr key={`${row.category}-${row.year}`}>
+          <Td style={{ wordWrap: 'break-word' }}>{`${row.category}`}</Td>
+          <Td style={{ wordWrap: 'break-word' }}>{row.value}</Td>
+          <Td style={{ wordWrap: 'break-word' }}>{((row.value / total) * 100).toFixed(2)}%</Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+</TableContainer>
+
           <Box className={"flex justify-center w-full text-center"}>
             <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
               Total: {total}

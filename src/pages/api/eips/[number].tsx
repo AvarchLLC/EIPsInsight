@@ -26,7 +26,7 @@ const mdFilesSchema = new mongoose.Schema({
 });
 
 const EIPMdFiles =
-  mongoose.models.EipMdFiles || mongoose.model("EipMdFiles", mdFilesSchema);
+  mongoose.models.EipMdFiles3 || mongoose.model("EipMdFiles3", mdFilesSchema);
 
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Box, Flex, Heading, useColorModeValue, Spinner, Link  } from "@chakra-ui/react";
+import { Box, Flex, Heading, useColorModeValue, Spinner, Link, Button, Text  } from "@chakra-ui/react";
+import { CSVLink } from "react-csv";
 import LoaderComponent from "@/components/Loader";
 import DateTime from "@/components/DateTime";
 import { usePathname } from "next/navigation";
+import axios from "axios";
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -21,33 +23,61 @@ type ShowReviewerType = { [key: string]: boolean };
 const InsightsLeaderboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
+  const [data2, setData2] = useState<any[]>([]);
   const [chart1data, setchart1Data] = useState<any[]>([]);
+  const [downloaddata, setdownloadData] = useState<any[]>([]);
   const [showReviewer, setShowReviewer] = useState<ShowReviewerType>({});
+  const [reviewers, setReviewers] = useState<string[]>([]);
+  const [csvData, setCsvData] = useState<any[]>([]); // State for storing CSV data
+  const [show, setShow] = useState(false);
+  const bg = useColorModeValue("#f6f6f7", "#171923");
+  const [sliderValue, setSliderValue] = useState<number>(0);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all'>('all');
-  const bg = useColorModeValue("#f6f6f7", "#171923");
   const path = usePathname();
-  let year = "";
-  let month = "";
+  const [loading3,setLoading3]=useState<boolean>(false);
+  const [loading2,setLoading2]=useState<boolean>(false);
 
-//   if (path) {
-//     const pathParts = path.split("/");
-//     year = pathParts[2];
-//     month = pathParts[3];
-//     setSelectedYear(year);
-//     setSelectedMonth(month);
-//   }
+ 
 
-  // Function to generate CSV data
-  type PR = {
-    prNumber: number;
-    prTitle: string;
-    reviewDate?: string;
-    created_at?: string;
-    closed_at?: string;
-    merged_at?: string;
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!selectedYear || !selectedMonth) return; // Ensure year and month are selected
+  
+      setLoading2(true);
+  
+      const formattedMonth = selectedMonth.length === 1 ? `0${selectedMonth}` : selectedMonth;
+      const key = `${selectedYear}-${formattedMonth}`;
+      console.log("key1: ", key);
+  
+      // Define the API endpoint based on activeTab ('PRs' or 'Issues')
+      const endpoint = `/api/ReviewersCharts/data/${activeTab.toLowerCase()}/${key}`;
+  
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const result = await response.json();
+        console.log("response format:", result);
+  
+        console.log("result:", result[0].PRs);
+  
+        setData2(result[0].PRs);
+        // console.log(formattedData); 
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading2(false); // Reset loading state after fetching
+      }
+    };
+  
+    fetchData(); // Invoke the fetch function
+  
+  }, [selectedYear, selectedMonth, activeTab]); // Add dependencies here
+  
+
   
   useEffect(() => {
     if (path) {
@@ -72,8 +102,18 @@ const InsightsLeaderboard = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
+      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+
+      // Merge the two arrays and ensure uniqueness
+      const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
+
+      console.log("updated reviewers:", updatedReviewers);
+
+      return updatedReviewers;
+      
+      // console.log("reviewers from github:", reviewers);
   
-      return reviewers;
+      // return reviewers;
     } catch (error) {
       console.error("Error fetching reviewers:", error);
       return [];
@@ -101,9 +141,8 @@ const InsightsLeaderboard = () => {
         (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
         {}
       );
-      console.log(initialShowReviewer)
+      console.log("show reviewers data:",initialShowReviewer)
   
-      setShowReviewer(initialShowReviewer);
      
       setchart1Data(formattedData);
     } catch (error) {
@@ -112,6 +151,35 @@ const InsightsLeaderboard = () => {
       setLoading(false); // Ensure loading state is set to false in all cases
     }
   };
+
+  useEffect(() => {
+    fetchReviewers().then((uniqueReviewers) => {
+      setReviewers(uniqueReviewers);
+      console.log("unique reviewers:", uniqueReviewers);
+  
+      // Initially, set all reviewers to true
+      const initialShowReviewer = uniqueReviewers.reduce(
+        (acc, reviewer) => ({
+          ...acc,
+          [reviewer]: true, // Set all fetched reviewers to true initially
+        }),
+        {} as ShowReviewerType
+      );
+  
+      // Set reviewers that aren't in the unique list to false
+      const finalShowReviewer = Object.keys(initialShowReviewer).reduce(
+        (acc, reviewer) => ({
+          ...acc,
+          [reviewer]: uniqueReviewers.includes(reviewer) ? true : false, // Set false for others
+        }),
+        {} as ShowReviewerType
+      );
+  
+      setShowReviewer(finalShowReviewer);
+      console.log(finalShowReviewer);
+    });
+  }, []);
+  
 
   useEffect(() => {
     fetchData();
@@ -224,6 +292,42 @@ const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => 
     reviewer: string;
     count: number; // Change this based on your actual data structure
 }
+type PR = {
+  repo:string;
+  prNumber: number;
+  reviewer:string;
+  prTitle: string;
+  reviewDate?: string;
+  created_at?: string;
+  closed_at?: string;
+  merged_at?: string;
+};
+
+
+const generateCSVData = () => {
+  if (!selectedYear || !selectedMonth) {
+    console.error('Year and Month must be selected to generate CSV');
+    return;
+  }
+
+  console.log("recieved data:",data2)
+
+  const csv = data2.map((pr: PR) => ({
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }))
+  ;
+  console.log("csv data:",csv);
+
+  setCsvData(csv); 
+};
 
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
     let monthlyChartData: MonthlyChartData[] | undefined;
@@ -260,6 +364,52 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
                 <Flex direction={{ base: "column", md: "row" }} justifyContent="center">
                     {/* Monthly Leaderboard Chart */}
                     <Box width={{ base: "100%", md: "100%" }} minHeight="250px" paddingTop={10}>
+                    <Flex 
+  justifyContent="center" // Center items horizontally
+  alignItems="center" // Align items vertically
+  marginBottom="0.5rem" 
+  gap={4} // Add some space between the items
+>
+  <Text
+    color="#30A0E0"
+    fontSize="2xl"
+    fontWeight="bold"
+    textAlign="center"
+    marginBottom="0.5rem"
+  >
+    {`Editors Leaderboard`}
+  </Text>
+
+  {/* Download button next to the text */}
+  <CSVLink 
+    data={csvData.length ? csvData : []} 
+    filename={`reviews_data.csv`} 
+    onClick={async (e: any) => {
+      try {
+        // Generate the CSV data
+        generateCSVData();
+  
+        // Check if CSV data is empty and prevent default behavior
+        if (csvData.length === 0) {
+          e.preventDefault();
+          console.error("CSV data is empty or not generated correctly.");
+          return;
+        }
+  
+        // Trigger the API call to update the download counter
+        await axios.post("/api/DownloadCounter");
+      } catch (error) {
+        console.error("Error triggering download counter:", error);
+      }
+    }}
+  >
+    <Button fontSize={{ base: "0.6rem", md: "md" }} colorScheme="blue">
+      {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+    </Button>
+  </CSVLink>
+</Flex>
+
+        <br/>
                         <Bar {...getBarChartConfig(monthlyChartData)} />
                     </Box>
                 </Flex>

@@ -10,7 +10,7 @@ import {
   Tr,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { getStatusColorScheme } from "@chakra-ui/alert/dist/alert-context";
+// import { getStatusColorScheme } from "@chakra-ui/alert/dist/alert-context";
 import NextLink from "next/link";
 
 const getStatus = (status: string) => {
@@ -52,8 +52,17 @@ interface EIP {
   deadline: string;
   requires: string;
   unique_ID: number;
+  repo:string;
   __v: number;
 }
+
+interface APIResponse {
+    eip: EIP[];
+    erc: EIP[];
+    rip: EIP[];
+}
+
+
 
 interface TableItems {
   status: string;
@@ -63,12 +72,20 @@ interface TableItems {
 
 const StatusBox = () => {
   const [data, setData] = useState<EIP[]>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/alleips`);
-        const jsonData = await response.json();
-        setData(jsonData);
+        const response = await fetch(`/api/new/all`);
+        const jsonData: APIResponse = await response.json();
+        console.log("status box data:", jsonData);
+
+        // Safely set data if `eips` is defined
+        if (jsonData.eip) {
+          setData(jsonData.eip);
+        } else {
+          console.error("Error: `eip` data is missing from the response.");
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -77,27 +94,31 @@ const StatusBox = () => {
     fetchData();
   }, []);
 
-  const draftCount = data.filter(
+  // Add a fallback for empty data to avoid runtime errors
+  const safeData = data || [];
+
+  const draftCount = safeData.filter(
     (item) => item.category !== "ERC" && item.status === "Draft"
   ).length;
-  const reviewCount = data.filter(
+  const reviewCount = safeData.filter(
     (item) => item.category !== "ERC" && item.status === "Review"
   ).length;
-  const lastCallCount = data.filter(
+  const lastCallCount = safeData.filter(
     (item) => item.category !== "ERC" && item.status === "Last Call"
   ).length;
-  const livingCount = data.filter(
+  const livingCount = safeData.filter(
     (item) => item.category !== "ERC" && item.status === "Living"
   ).length;
-  const finalCount = data.filter(
+  const finalCount = safeData.filter(
     (item) => item.category !== "ERC" && item.status === "Final"
   ).length;
-  const stagnantCount = data.filter(
+  const stagnantCount = safeData.filter(
     (item) => item.category !== "ERC" && item.status === "Stagnant"
   ).length;
-  const withdrawnCount = data.filter(
+  const withdrawnCount = safeData.filter(
     (item) => item.category !== "ERC" && item.status === "Withdrawn"
   ).length;
+
   const totalCount =
     draftCount +
     reviewCount +
@@ -106,7 +127,10 @@ const StatusBox = () => {
     finalCount +
     stagnantCount +
     withdrawnCount;
-  const TableItems: Array<TableItems> = [
+
+  console.log("total count:", totalCount);
+
+  const tableItems: Array<TableItems> = [
     {
       status: "Draft",
       count: draftCount,
@@ -148,47 +172,46 @@ const StatusBox = () => {
   ];
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
+
   return (
-    <>
-      <Box
-        borderRadius={"0.55rem"}
-        className={"hover:border hover:border-blue-400 duration-200 px-6 py-4"}
-        bgColor={bg}
-      >
-        <TableContainer>
-          <Table variant={"simple"} size={"md"}>
-            <Thead>
-              <Tr>
-                <Th>Status</Th>
-                <Th>Numbers</Th>
-                <Th>Percentage</Th>
+    <Box
+      borderRadius={"0.55rem"}
+      className={"hover:border hover:border-blue-400 duration-200 px-6 py-4"}
+      bgColor={bg}
+    >
+      <TableContainer>
+        <Table variant={"simple"} size={"md"}>
+          <Thead>
+            <Tr>
+              <Th>Status</Th>
+              <Th>Numbers</Th>
+              <Th>Percentage</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {tableItems.map((item, index) => (
+              <Tr key={index}>
+                <Td>
+                  <NextLink href={`/tableStatus/${item.status}`}>
+                    {item.status}
+                  </NextLink>
+                </Td>
+                <Td>
+                  <NextLink href={`/tableStatus/${item.status}`}>
+                    {item.count}
+                  </NextLink>
+                </Td>
+                <Td>
+                  <NextLink href={`/tableStatus/${item.status}`}>
+                    {item.per}%
+                  </NextLink>
+                </Td>
               </Tr>
-            </Thead>
-            <Tbody>
-              {TableItems.map((item) => (
-                <Tr>
-                  <Td>
-                    <NextLink href={`/tableStatus/${item.status}`}>
-                      {item.status}
-                    </NextLink>
-                  </Td>
-                  <Td>
-                    <NextLink href={`/tableStatus/${item.status}`}>
-                      {item.count}
-                    </NextLink>
-                  </Td>
-                  <Td>
-                    <NextLink href={`/tableStatus/${item.status}`}>
-                      {item.per}%
-                    </NextLink>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 

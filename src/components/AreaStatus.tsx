@@ -1,245 +1,296 @@
-import { mockEIP } from "@/data/eipdata";
-import {
-  Box,
-  Text,
-  useColorModeValue,
-  useColorMode,
-  Select,
-  Spinner,
-} from "@chakra-ui/react";
+// interface AreaCProps {
+//   type: string;
+// }
 
-import dynamic from "next/dynamic";
+// const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
+//   const [data, setData] = useState<APIResponse>();
+
+//   const [typeData, setTypeData] = useState<EIP[]>([]);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const response = await fetch(`/api/new/graphsv2`);
+//         const jsonData = await response.json();
+//         setData(jsonData);
+//         if (type === "EIPs" && jsonData.eip) {
+//           setTypeData(
+//             jsonData.eip.filter((item: any) => item.category !== "ERCs")
+//           );
+//         } else if (type === "ERCs" && jsonData.erc) {
+//           setTypeData(jsonData.erc);
+//         }
+//       } catch (error) {
+//         console.error("Error fetching data:", error);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+
+//   useEffect(() => {
+//     if (type === "EIPs") {
+//       setTypeData(data?.eip || []);
+//     } else if (type === "ERCs") {
+//       setTypeData(data?.erc || []);
+//     }
+//   });
+
+
 import React, { useEffect, useState } from "react";
-import FlexBetween from "./FlexBetween";
-import LoaderComponent from "./Loader";
-import DateTime from "./DateTime";
+import dynamic from "next/dynamic";
+import { Flex, Heading, Button,Box, useColorModeValue, Spinner } from "@chakra-ui/react";
+import { useWindowSize } from "react-use";
+import DateTime from "@/components/DateTime";
+import { motion } from "framer-motion";
+import axios from "axios";
 
-interface AreaProps {
-  data: MappedDataItem[];
-  xField: string;
-  yField: string;
-  color: string[];
-  seriesField: string;
-  xAxis: {
-    range: number[];
-    tickCount: number;
-  };
-  areaStyle: {
-    fillOpacity: number;
-  };
-  legend: any; // Adjust the type based on the actual props required by the library
-  smooth: boolean;
-}
-
-const Area = dynamic(
-  (): any => import("@ant-design/plots").then((item) => item.Column),
-  {
-    ssr: false,
+const getCat = (cat: string) => {
+  switch (cat) {
+    case "Standards Track":
+    case "Standard Track":
+    case "Standards Track (Core, Networking, Interface, ERC)":
+    case "Standard":
+    case "Process":
+    case "Core":
+    case "core":
+      return "Core";
+    case "RIP":
+      return "RIPs";
+    case "ERC":
+      return "ERCs";
+    case "Networking":
+      return "Networking";
+    case "Interface":
+      return "Interface";
+    case "Meta":
+      return "Meta";
+    case "Informational":
+      return "Informational";
+    default:
+      return "Core";
   }
-) as React.ComponentType<AreaProps>;
-
-interface MappedDataItem {
-  status: string;
-  date: string;
-  value: number;
-}
-
+};
 interface EIP {
-  status: string;
-  eips: {
-    category: string;
-    month: number;
-    year: number;
-    date: string;
-    count: number;
-  }[];
-}
-
-interface FormattedEIP {
-  status: string;
-  date: string;
-  value: number;
-}
+    status: string;
+    eips: {
+      status: string;
+      month: number;
+      year: number;
+      date: string;
+      count: number;
+      category: string;
+      eips:any[];
+    }[];
+  }
 
 function getMonthName(month: number): string {
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
   ];
   return months[month - 1];
 }
-
-interface APIResponse {
-  eip: EIP[];
-  erc: EIP[];
-}
-
-const categoryColors: string[] = [
-  "rgb(255, 99, 132)",
-  "rgb(255, 159, 64)",
-  "rgb(255, 205, 86)",
-  "rgb(75, 192, 192)",
-  "rgb(54, 162, 235)",
-  "rgb(153, 102, 255)",
-  "rgb(255, 99, 255)",
-  "rgb(50, 205, 50)",
-  "rgb(255, 0, 0)",
-  "rgb(0, 128, 0)",
-];
-const categoryBorder: string[] = [
-  "rgba(255, 99, 132, 0.2)",
-  "rgba(255, 159, 64, 0.2)",
-  "rgba(255, 205, 86, 0.2)",
-  "rgba(75, 192, 192, 0.2)",
-  "rgba(54, 162, 235, 0.2)",
-  "rgba(153, 102, 255, 0.2)",
-  "rgba(255, 99, 255, 0.2)",
-  "rgba(50, 205, 50, 0.2)",
-  "rgba(255, 0, 0, 0.2)",
-  "rgba(0, 128, 0, 0.2)",
-];
 
 interface AreaCProps {
   type: string;
 }
 
 const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
-  const [data, setData] = useState<APIResponse>();
-
-  const [typeData, setTypeData] = useState<EIP[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<EIP[]>([]);
+  const windowSize = useWindowSize();
+  const bg = useColorModeValue("#f6f6f7", "#171923");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData);
+        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         if (type === "EIPs" && jsonData.eip) {
-          setTypeData(
-            jsonData.eip.filter((item: any) => item.category !== "ERCs")
-          );
+          setData(
+          jsonData.eip.filter((item: any) => item.category !== "ERCs")
+        );
         } else if (type === "ERCs" && jsonData.erc) {
-          setTypeData(jsonData.erc);
+          setData(jsonData.erc);
         }
+        else{
+          setData(jsonData.rip)
+        }
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (type === "EIPs") {
-      setTypeData(data?.eip || []);
-    } else if (type === "ERCs") {
-      setTypeData(data?.erc || []);
-    }
+  const removeDuplicatesFromEips = (eips: any[]) => {
+    const seen = new Set();
+    return eips.filter((eip) => {
+      if (!seen.has(eip.eip)) {
+        seen.add(eip.eip);
+        return true;
+      }
+      return false;
+    });
+  };
+
+  type DataItem = {
+    status: string;
+    category: string;
+    year: string;
+    value: number;
+  };
+
+  type TransformedItem = {
+    status: string;
+    year: string;
+    value: number;
+  };
+
+  const consolidateData = (data: DataItem[]): TransformedItem[] => {
+    const result: { [key: string]: TransformedItem } = {};
+    data.forEach((item) => {
+      const key = `${item.status}-${item.year}`;
+      if (result[key]) {
+        result[key].value += item.value;
+      } else {
+        result[key] = { status: item.status, year: item.year, value: item.value };
+      }
+    });
+    return Object.values(result);
+  };
+  const status1="Draft";
+  const status2="Final";
+  let filteredData = data.filter((item) => item.status === status1);
+  let filteredData2 = data.filter((item) => item.status === status2);
+  const combinedFilteredData = [...filteredData, ...filteredData2];
+
+  const transformedData = combinedFilteredData.flatMap((item) => {
+    return item.eips.map((eip) => ({
+      status: item.status,
+      category: getCat(eip.category),
+      year: `${getMonthName(eip.month)} ${eip.year}`,
+      value: removeDuplicatesFromEips(eip.eips).length,
+    }));
   });
 
-  const [isChartReady, setIsChartReady] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
+  const finalData = consolidateData(transformedData);
 
-  useEffect(() => {
-    setIsLoading(true); // Set isLoading to true before rendering chart
-    setTimeout(() => {
-      setIsLoading(false); // Set isLoading to false after a small delay (simulating chart rendering)
-    }, 1000);
-  }, [selectedStatus]);
+  finalData.sort((a, b) => {
+    const months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+      ];
+    const [aMonth, aYear] = a.year.split(" ");
+    const [bMonth, bYear] = b.year.split(" ");
+    return parseInt(aYear, 10) - parseInt(bYear, 10) || 
+           months.indexOf(aMonth) - months.indexOf(bMonth);
+  });
 
-  useEffect(() => {
-    setIsChartReady(true);
-  }, []); // Trigger initial render
+  const downloadData = () => {
+    // Filter data based on the selected status
+    let filteredData = data.filter((item) => item.status === status1);
+    let filteredData2 = data.filter((item) => item.status === status2);
+    const combinedFilteredData = [...filteredData, ...filteredData2];
+    
+    // Transform the filtered data to get the necessary details
+    const transformedData = combinedFilteredData.flatMap((item) => {
+      const status = item.status;
+      return item.eips.flatMap((eip) => {
+          const category = getCat(eip.category);
+          const year = eip.year.toString(); 
+          const month=getMonthName(eip.month);
+          const uniqueEips = removeDuplicatesFromEips(eip.eips); 
+          return uniqueEips.map(({ eip }) => ({
+              status,         
+              category,       
+              year,           
+              month,
+              eip,           
+          }));
+      });
+  });
+  
 
-  const formattedData = typeData
-    .reduce((acc: FormattedEIP[], item: EIP) => {
-      if (item.status === "Final" || item.status === "Draft") {
-        const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
-          status: item.status,
-          date: `${getMonthName(eip.month)} ${eip.year}`,
-          value: eip.count,
-        }));
-        acc.push(...formattedEIPs);
-      }
-      return acc;
-    }, [])
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Define the CSV header
+    const header = "Status,Category,Year,Month,EIP\n";
+  
+    // Prepare the CSV content
+    const csvContent = "data:text/csv;charset=utf-8,"
+        + header
+        + transformedData.map(({ status,category, year,month, eip }) => {
+            return `${status},${category},${year},${month},${eip}`; // Each EIP on a separate line
+        }).join("\n");
+  
+    // Check the generated CSV content before download
+    console.log("CSV Content:", csvContent);
+  
+    // Encode the CSV content for downloading
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `DraftvsFinal.csv`); 
+    document.body.appendChild(link); 
+    link.click();
+    document.body.removeChild(link);
+};
 
-  const filteredData: FormattedEIP[] = formattedData;
+  const Area = dynamic(() => import("@ant-design/plots").then((item) => item.Column), { ssr: false });
 
   const config = {
-    data: formattedData,
-    xField: "date",
+    data: finalData,
+    xField: "year",
     yField: "value",
-    color: categoryColors,
     seriesField: "status",
-    xAxis: {
-      range: [0, 1],
-      tickCount: 5,
-    },
     isGroup: true,
     columnStyle: {
       radius: [20, 20, 0, 0],
     },
     areaStyle: { fillOpacity: 0.6 },
-    legend: { position: "top-right" },
-    line: {
-      visible: false, // Set line visibility to false to remove the points and make the graph non-pointy
-    },
-    smooth: true, // Set smooth to true to create a smooth curve
-    slider: {
-      start: 0,
-      end: 1,
-    },
+    slider: { start: 0, end: 1 },
+    legend: { position: "top-right" as const },
+    smooth: true,
   };
 
-  const bg = useColorModeValue("#f6f6f7", "#171923");
+  const headingColor = useColorModeValue('black', 'white');
 
   return (
-    <Box
-      bgColor={bg}
-      marginTop="6"
-      paddingEnd="6"
-      p="1rem 1rem"
-      borderRadius="0.55rem"
-      overflowX="auto"
-      _hover={{
-        border: "1px",
-        borderColor: "#30A0E0",
-      }}
-      className="hover: cursor-pointer ease-in duration-200"
-    >
-      <Box>
-        {isLoading ? (
-          // Show loading spinner while chart is rendering
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="200px"
-          >
+    <>
+      {isLoading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" className="h-full">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <Spinner />
-          </Box>
-        ) : (
-          // Show chart when it's ready
+          </motion.div>
+        </Box>
+      ) : (
+        <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color={headingColor}>
+            {`Draft vs Final`}
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <Button colorScheme="blue" onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData();
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>Download CSV</Button>
+        </Flex>
           <Area {...config} />
-        )}
-      </Box>
-      <Box className={"w-full"}>
-        <DateTime />
-      </Box>
-    </Box>
+          <Box className={"w-full"}>
+            <DateTime />
+          </Box>
+        </Box>
+      )}
+    </>
   );
 };
 

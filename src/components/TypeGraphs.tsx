@@ -1,32 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Box, Grid, Text, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import StackedColumnChart from "@/components/StackedColumnChart";
 import StatusColumnChart from "@/components/StatusColumnChart";
-import AreaC from "@/components/AreaStatus";
 import NextLink from "next/link";
-import StatusChart from "@/components/StatusColumnChart";
 import DateTime from "./DateTime";
-const getStatus = (status: string) => {
-  switch (status) {
-    case "Last Call":
-      return "LastCall";
-    default:
-      return status;
-  }
-};
 
-interface StatusChartData {
-  statusChanges: [
-    {
-      eip: string;
-      lastStatus: string;
-      eipTitle: string;
-      eipCategory: string;
-    }
-  ];
-  year: number;
-}
 
 interface EIP {
   _id: string;
@@ -265,7 +243,7 @@ const TypeGraphs = () => {
       </Box>
 
       <Box display={{ lg: "none", sm: "block" }}>
-        <Text fontSize="xl" fontWeight="bold" color="#4267B2">
+        {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2">
           Draft
         </Text>
 
@@ -294,14 +272,14 @@ const TypeGraphs = () => {
           <StackedColumnChart status="Draft" />
           <Box className={"w-full"}>
             <DateTime />
-          </Box>
-        </Box>
+          </Box> */}
+        {/* </Box> */}
 
-        <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
+        {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
           Draft vs Final
         </Text>
 
-        <AreaC type={"EIPs"} />
+        <AreaC type={"EIPs"} /> */}
 
         <NextLink href={"/core"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
@@ -401,7 +379,7 @@ const TypeGraphs = () => {
           </Box>
         </Box>
 
-        <NextLink href={"/erc"}>
+        {/* <NextLink href={"/erc"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
             ERC - [{data.filter((item) => item.category === "ERC").length}]
           </Text>
@@ -431,7 +409,7 @@ const TypeGraphs = () => {
           <Box className={"w-full"}>
             <DateTime />
           </Box>
-        </Box>
+        </Box> */}
 
         <NextLink href={"/meta"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">

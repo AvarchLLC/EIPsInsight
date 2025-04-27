@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useWindowSize } from "react-use";
-import { Box, useColorModeValue } from "@chakra-ui/react";
+import { Box, useColorModeValue, Button, Flex, Heading } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
+import axios from "axios";
 
 interface StatusChart {
   statusChanges: [
@@ -111,6 +112,7 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
         const response = await fetch(`/api/new/final-status-by-year`);
         const jsonData = await response.json();
         setData(jsonData);
+        console.log("chart data", jsonData);
         setTypeData(jsonData.eip);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -120,13 +122,7 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   if (type === "EIPs") {
-  //     setTypeData(data?.eip || []);
-  //   } else if (type === "ERCs") {
-  //     setTypeData(data?.erc || []);
-  //   }
-  // });
+
 
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -172,13 +168,85 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     } as any,
   };
 
-  return (
-    <>
-      <Box boxSize={"100%"} paddingX={"1rem"} overflowX={"hidden"}>
-        <Area {...config} />
+  const downloadData = () => {
+    // Define the eipCategory you want to filter by
+    const targetCategory = category; // Replace with the desired category value
+
+    // Transform the typeData to get the necessary details
+    const transformedData = typeData.flatMap(({ statusChanges, year }) => {
+        return statusChanges
+            .filter(({ eipCategory }) => eipCategory === targetCategory) // Filter by eipCategory
+            .map(({ eip, lastStatus, eipTitle, eipCategory }) => ({
+                eip,
+                lastStatus,
+                eipTitle,
+                eipCategory,
+                year: year.toString(), // Convert year to string
+            }));
+    });
+
+    // Define the CSV header
+    const header = "EIP,Last Status,EIP Title,EIP Category,Year,Link\n";
+
+    // Prepare the CSV content
+    const csvContent =
+        "data:text/csv;charset=utf-8," +
+        header +
+        transformedData
+        .map(({ eip, lastStatus, eipTitle, eipCategory, year }) => {
+            return `${eip},${lastStatus},${eipTitle},${eipCategory},${year},${
+              eipCategory === "ERC"
+                    ? `https://eipsinsight.com/ercs/erc-${eip}`
+                    : type === "EIPs"
+                    ? `https://eipsinsight.com/eips/eip-${eip}`
+                    : `https://eipsinsight.com/rips/rip-${eip}`
+            }`;
+        }).join("\n");
+
+    // Check the generated CSV content before download
+    console.log("CSV Content:", csvContent);
+
+    // Encode the CSV content for downloading
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "StatusChart.csv"); // Set the filename here
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+};
+
+const headingColor = useColorModeValue('black', 'white');
+
+return (
+  <>
+      <Flex justifyContent="space-between" alignItems="center" mb="0.5rem" width="100%">
+          <Heading size="md" color={headingColor}>
+              {category}
+          </Heading>
+          <Button colorScheme="blue" 
+          onClick={async () => {
+            try {
+              // Trigger the CSV conversion and download
+              downloadData();
+        
+              // Trigger the API call
+              await axios.post("/api/DownloadCounter");
+            } catch (error) {
+              console.error("Error triggering download counter:", error);
+            }
+          }}
+          >
+              Download CSV
+          </Button>
+      </Flex>
+      <Box boxSize="100%" overflowX="auto">
+          <Area {...config} />
       </Box>
-    </>
-  );
+  </>
+);
+
+
 };
 
 export default StatusChart;

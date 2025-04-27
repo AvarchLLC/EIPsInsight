@@ -34,7 +34,7 @@ const LoaderComponent = () => {
           repeatType: "reverse" // Makes the text fade in and out
         }}
       >
-        Loading Experience...
+        Loading...
       </motion.p>
     </div>
   );

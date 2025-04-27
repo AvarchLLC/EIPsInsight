@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -11,8 +11,12 @@ import {
   UnorderedList,
   ListItem,
   Heading,
+  Flex,
+  Image,
+  SimpleGrid,
   Grid
 } from "@chakra-ui/react";
+import SlotCountdown from "@/components/SlotCountdown";
 import NLink from "next/link";
 import CatTable from "@/components/CatTable";
 import Header from "@/components/Header";
@@ -20,12 +24,24 @@ import SearchBox from "@/components/SearchBox";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import { motion } from "framer-motion";
 import PectraTable from "@/components/PectraTable";
-import { Table, Thead, Tbody, Tr, Th, Td, Link } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, Link,TableContainer } from "@chakra-ui/react";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import Image from "next/image";
+// import Image from "next/image";
 import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
+import { FaSyncAlt } from "react-icons/fa";
+import { useRouter } from "next/router";
+import Graph from "@/components/NetworkUpgradesGraph";
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { IconButton } from '@chakra-ui/react';
+import { useRef } from 'react';
+
+
+const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
+
+
+
 
 const All = () => {
   const [selected, setSelected] = useState("Meta");
@@ -49,6 +65,23 @@ const All = () => {
     }
   });
 
+  // const containerRef = useRef(null);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
+
   const factorAuthor = (data: any) => {
     let list = data.split(",");
     for (let i = 0; i < list.length; i++) {
@@ -60,17 +93,110 @@ const All = () => {
     return list;
   };
 
-  const pectraData = [
+  // import { Flex, Image, Box, Text, Link, useColorModeValue } from "@chakra-ui/react";
+
+  const Card = ({
+    image,
+    title,
+    content,
+    link,
+  }: {
+    image: string;
+    title: string;
+    content: string;
+    link: string;
+  }) => {
+    const bg = useColorModeValue("gray.50", "gray.700"); // Light mode: gray.50, Dark mode: gray.700
+    const textColor = useColorModeValue("black", "white"); // Light mode: black, Dark mode: white
+  
+    return (
+      <Flex
+        direction="row"
+        bg={bg}
+        p={3}
+        borderRadius="md"
+        boxShadow="md"
+        width="100%"
+        minWidth="280px" // Prevent cards from shrinking too much
+        maxWidth="400px" // Limit card width
+        height="auto" // Allow flexible height for content
+        align="center"
+        justify="flex-start"
+        mb={4}
+      >
+        <Image
+          src={image}
+          alt={title}
+          boxSize="80px"
+          objectFit="cover"
+          borderRadius="md"
+          mr={4}
+        />
+        <Box>
+          <Text
+            fontSize="sm"
+            fontWeight="bold"
+            noOfLines={1}
+            mb={1}
+            color={textColor} // Dynamically set text color
+          >
+            {title}
+          </Text>
+          <Link href={link} color="blue.400" fontSize="xs" isExternal>
+            Read More
+          </Link>
+        </Box>
+      </Flex>
+    );
+  };
+  
+  
+  
+  
+  
+  
+
+  const PectraPosts= [
     {
-      
-      eip: "7600",
-      title: "Hardfork Meta - Pectra",
-      author: "Tim Beiko (@timbeiko)",
-      link: "https://eipsinsight.com/eips/eip-7600",
-      type: "Meta",
-      category: "Meta",
-      discussion: "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205",
-  },
+      image: "pectraimg1.jpg",
+      title: "Holesky Testnet Support Ends in September",
+      content: "Holesky testnet support ends in September as Ethereum transitions to Hoodi for improved validator testing & Pectra upgrade readiness.",
+      link: "https://etherworld.co/2025/03/19/holesky-testnet-support-ends-in-september/"
+    },
+    {
+      image: "pectraimg2.jpg",
+      title: "Ethereum's Hoodi Testnet Launched",
+      content: "Hoodi Testnet is live & finalizing.",
+      link: "https://etherworld.co/2025/03/17/ethereums-hoodi-testnet-launched/"
+    },
+    {
+      image: "pectraimg3.jpg",
+      title: "New Ethereum Testnet ‘Hoodi’ Announced for Pectra Testing",
+      content: "Hoodi is Ethereum’s new testnet, designed to replace Holesky with a mainnet-like environment for testing Pectra, validator exits, & staking operations.",
+      link: "https://etherworld.co/2025/03/14/new-ethereum-testnet-hoodi-announced-for-pectra-testing/"
+    },
+    {
+      image: "pectraimg4.jpg",
+      title: "How Holesky Finally Reached Stability",
+      content: "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
+      link: "https://etherworld.co/2025/03/11/how-holesky-finally-reached-stability/"
+    },
+    {
+      image: "pectraimg5.png",
+      title: "Holesky and Hoodi Testnet Updates",
+      content: "The Pectra testnet activation revealed issues in clients with deposit contract configurations changes on Ethereum testnets. While Sepolia's recovery was straightforward and the network has since fully recovered, Holesky experienced extensive inactivity leaks as pa...",
+      link: "https://blog.ethereum.org/2025/03/18/hoodi-holesky"
+    },
+    {
+      image: "pectraimg6.jpg",
+      title: "Sepolia Pectra Incident Update",
+      content: "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
+      link: "At 7:29 UTC today, on epoch 222464, the Pectra network upgrade went live on the Sepolia testnet. Unfortunately, an issue with Sepolia's permissioned deposit contract prevented many execution layer clients from including transactions in blocks."
+    },
+]
+
+  const pectraData = [
+
     {
         eip: "2537",
         title: "Precompile for BLS12-381 curve operations",
@@ -125,15 +251,7 @@ const All = () => {
         category:"Core",
         discussion:"https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
       },
-      {
-        eip: "7594",
-        title: "PeerDAS - Peer Data Availability Sampling",
-        author: "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
-        link: "https://eipsinsight.com/eips/eip-7594",
-        type:"Standards Track",
-        category:"Networking",
-        discussion:"https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
-      },
+      
       {
         eip: "7685",
         title: "General purpose execution layer requests",
@@ -153,41 +271,41 @@ const All = () => {
         discussion:"https://ethereum-magicians.org/t/eip-set-eoa-account-code-for-one-transaction/19923"
       },
       {
-        eip: "7692",
-        title: "EVM Object Format (EOFv1) Meta",
-        author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz), Danno Ferrin (@shemnon)",
-        link: "https://eipsinsight.com/eips/eip-7692",
-        type:"Meta",
-        category:"Meta",
-        discussion:"https://ethereum-magicians.org/t/eip-7692-evm-object-format-eof-meta/19686"
+        eip: "7691",
+        title: "Blob throughput increase",
+        author: "Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation), Sam Calder-Mason (@samcm), Andrew Davis (@savid), Ansgar Dietrichs (@adietrichs)",
+        link: "https://eipsinsight.com/eips/eip-7691",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7691-blob-throughput-increase/19694"
       },
-      // {
-      //   eip: "663",
-      //   title: "SWAPN, DUPN and EXCHANGE instructions",
-      //   author: "Alex Beregszaszi (@axic), Charles Cooper (@charles-cooper), Danno Ferrin (@shemnon)",
-      //   link: "https://eipsinsight.com/eips/eip-2537",
-      //   type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-663-unlimited-swap-and-dup-instructions/3346"
-      // },
-      // {
-      //     eip: "3540",
-      //     title: "EOF - EVM Object Format v1",
-      //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Matt Garnett (@lightclient)",
-      //     link: "https://eipsinsight.com/eips/eip-3540",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/evm-object-format-eof/5727"
-      // },
-      //   {
-      //     eip: "3670",
-      //     title: "EOF - Code Validation",
-      //     author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-      //     link: "https://eipsinsight.com/eips/eip-3670",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693"
-      // },
+      {
+        eip: "7623",
+        title: "Increase calldata cost",
+        author: "Toni Wahrstätter (@nerolation), Vitalik Buterin (@vbuterin)",
+        link: "https://eipsinsight.com/eips/eip-7623",
+        type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/eip-7623-increase-calldata-cost/18647"
+      },
+      {
+          eip: "7840",
+          title: "Add blob schedule to EL config files",
+          author: "lightclient (@lightclient)",
+          link: "https://eipsinsight.com/eips/eip-7840",
+          type:"Standards Track",
+        category:"Core",
+        discussion:"https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182"
+      },
+        {
+          eip: "7642",
+          title: "eth/69 - history expiry and simpler receipts",
+          author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
+          link: "https://eipsinsight.com/eips/eip-7642",
+          type:"Standards Track",
+        category:"Networking",
+        discussion:"https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+      },
       //   {
       //     eip: "4200",
       //     title: "EOF - Static relative jumps",
@@ -261,6 +379,36 @@ const All = () => {
       //   discussion:"https://ethereum-magicians.org/t/eip-7698-eof-creation-transaction/19784"
       // },
   ];
+
+ 
+
+  const router = useRouter();
+  
+    const scrollToHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.getElementById(hash.slice(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    };
+  
+    useEffect(() => {
+      if (!isLoading) {
+        scrollToHash();
+      }
+    }, [isLoading]);
+  
+    useLayoutEffect(() => {
+      router.events.on("routeChangeComplete", scrollToHash);
+      return () => {
+        router.events.off("routeChangeComplete", scrollToHash);
+      };
+    }, [router]);
+
+
+
   return (
     <>
       <AllLayout>
@@ -271,8 +419,8 @@ const All = () => {
           >
         <Box
           paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-          marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-          paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          marginX={{ lg: "10", md: "2", sm: "2", base: "2" }}
+          paddingX={{ lg: "5", md: "5", sm: "5", base: "5" }}
           marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
        <Box>
@@ -281,141 +429,330 @@ const All = () => {
            initial={{ opacity: 0, y: -20 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.5 } as any}
-           fontSize={{base: "4xl",md:"4xl", lg: "6xl"}}
-           fontWeight="bold"
+           fontSize={{base: "2xl",md:"4xl", lg: "6xl"}}
+           fontWeight={{ base: "extrabold", md: "bold", lg: "bold" }}
            color="#30A0E0"
           >
-            Pectra Upgrade
+            Ethereum Network Upgrades
           </Text>
-          <Text mb={4} fontSize="2xl" textAlign="justify">  {/* Justify text alignment */}
-  Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
-  collectively known as{" "}
-  <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
-        Pectra
-      </Text>
-  </NLink>. This upgrade will involve significant changes to both the{" "}
-  <NLink href={`https://www.youtube.com/watch?v=nJ57mkttCH0`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
-        Execution and Consensus layers
-      </Text>
-  </NLink>{" "}
-  on the mainnet. Given the complexities 
-  of testing and the scope of changes, including over 20{" "}
-  <NLink href={`https://www.youtube.com/watch?v=AyidVR6X6J8`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
-        Ethereum Improvement Proposals (EIPs)
-      </Text>
-  </NLink>, 
-  the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
-  now been shifted to the upcoming{" "}
-  <NLink href={`https://eipsinsight.com/eips/eip-7600`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
-        Fusaka
-      </Text>
-  </NLink>(a combination of Fulu and Osaka) upgrade. 
-  Currently, the testing team is working on Pectra Devnet 3 and has finalized the specifications for Devnet 4. Specs 
-  and other details can be followed below.{" "}
-  <NLink href={`#carousel-section`}>
-      <Text as={"span"} color="blue.500" textDecor={"underline"}>
-        View more
-      </Text>
-  </NLink>.
-</Text>
 
-<Box>
-  <NetworkUpgradesChart/>
-</Box>
-<br/>
-<Box>
-  <NetworkUpgradesChart2/>
-</Box>
+        <br/>
+        {/* <br/> */}
+        <SlotCountdown/>
+        <br/>
+        <Text
+          as={motion.div}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 } as any}
+          fontSize={{base: "2xl",md:"2xl", lg: "2xl"}}
+          fontWeight="bold"
+          color="#30A0E0"
+          mt={2}
+        >
+          PECTRA
+        </Text>
+
+        <Flex
+           direction={{ base: "column", md: "row" }}
+           align="flex-start"
+           gap={{ base: 4, md: 6 }}
+           width="100%"
+           justify="space-between"
+           wrap="wrap" 
+        >
+          {/* Text Section */}
+          <Text
+            flex={{ base: "1 1 auto", md: "3" }} // Text takes 3/5 width on larger screens
+            fontSize={{ base: "md", md: "lg", lg: "2xl" }}
+            textAlign="justify"
+            lineHeight="1.6"
+            maxWidth="1200px" // Limit text width for better readability
+          >
+            Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
+            collectively known as{" "}
+            <NLink href="https://eipsinsight.com/eips/eip-7600">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Pectra
+              </Text>
+            </NLink>. This upgrade will involve significant changes to both the{" "}
+            <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Execution and Consensus layers
+              </Text>
+            </NLink>{" "} 
+            on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
+            <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Ethereum Improvement Proposals (EIPs)
+              </Text>
+            </NLink>, 
+            the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
+            now been shifted to the upcoming{" "}
+            <NLink href="https://eipsinsight.com/eips/eip-7600">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Fusaka
+              </Text>
+            </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
+            <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
+              <Text as="span" color="blue.500" textDecor="underline">
+                Devnet 6
+              </Text>
+            </NLink>.Specs and other details can be followed below.{" "}
+            <NLink href="#carousel-section">
+              <Text as="span" color="blue.500" textDecor="underline">
+                View more
+              </Text>
+            </NLink>.
+          </Text>
+
+          {/* Cards Section */}
+          {/* <Flex
+              flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
+              wrap="wrap" // Ensure cards can wrap onto new rows if needed
+              justify="flex-start" // Align cards to the left
+              gap={4} // Add spacing between cards
+              width="100%" // Ensure cards section takes up full width
+              maxHeight="300px" // Limit the height of the container
+              overflowY="auto" // Make the container vertically scrollable
+              overflowX="hidden" // Prevent horizontal scrolling
+              p={4} // Add padding for better spacing inside the scroll area
+              sx={{
+                "&::-webkit-scrollbar": {
+                  width: "8px", // Width of the scrollbar
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "#3182ce", // Color of the scrollbar thumb
+                  borderRadius: "4px", // Rounded edges for the thumb
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  background: "#2b6cb0", // Darker color on hover
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: "#edf2f7", // Light background for the track
+                },
+              }}
+            >
+              {PectraPosts.map((pectra, index) => (
+                <Card
+                  key={index}
+                  image={pectra.image}
+                  title={pectra.title}
+                  content={pectra.content}
+                  link={pectra.link}
+                />
+              ))}
+            </Flex> */}
 
 
-      <Grid
-  templateColumns={{ base: "1fr", md: "1fr 1fr" }} // Stack vertically on small screens
-  gap={6}
-  p={6}
->
-  {/* Left Side - Motion Text and Table */}
-  <Box>
-    <Text
-      as={motion.div}
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      fontSize={{ base: "xl", md: "2xl", lg: "4xl" }}
-      fontWeight="bold"
-      color="#30A0E0"
+
+          </Flex>
+
+          <Flex
+      position="relative"
+      width="100%"
+      align="center"
     >
-      Devnets & Testnets
-    </Text>
+      {/* Left arrow */}
+      <IconButton
+        aria-label="Scroll left"
+        icon={<ChevronLeftIcon />}
+        position="absolute"
+        left={0}
+        zIndex={1}
+        onClick={scrollLeft}
+        bg="white"
+        boxShadow="md"
+        _hover={{ bg: "gray.100" }}
+      />
 
-    <Table
-  variant="striped"
-  colorScheme="gray"
-  size="lg"
-  mt={4}
-  style={{ border: "1px solid black", borderRadius: "md", boxShadow: "md", width: "100%" }}
->
-  <Thead>
-    <Tr style={{ border: "1px solid black" }}>
-      <Th style={{ border: "1px solid black" }}>Date</Th>
-      <Th style={{ border: "1px solid black" }}>Devnet Spec</Th>
-    </Tr>
-  </Thead>
-  <Tbody>
-    {[
-      {
-        date: "October 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-4",
-        specText: "Pectra Devnet 4 (Specs)",
-      },
-      {
-        date: "August 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
-        specText: "Pectra Devnet 3 (Specs)",
-        additionalLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
-        additionalText: "Tests Specs",
-      },
-      {
-        date: "July 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-2",
-        specText: "Pectra Devnet 2 (Specs)",
-      },
-      {
-        date: "June 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-1",
-        specText: "Pectra Devnet 1 (Specs)",
-      },
-      {
-        date: "May 2024",
-        specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
-        specText: "Pectra Devnet 0 (Specs)",
-      },
-    ].map((item, index) => (
-      <Tr style={{ border: "1px solid black" }} key={index}>
-        <Td style={{ border: "1px solid black" }}>{item.date}</Td>
-        <Td style={{ border: "1px solid black" }}>
-          <Link href={item.specLink} color="blue.500" textDecor="underline" isExternal>
-            {item.specText}
-          </Link>
-          {item.additionalLink && (
-            <>
-              ,{" "}
-              <Link href={item.additionalLink} color="blue.500" textDecor="underline" isExternal>
-                {item.additionalText}
-              </Link>
-            </>
-          )}
-        </Td>
-      </Tr>
-    ))}
-  </Tbody>
-</Table>
+      {/* Cards container */}
+      <Flex
+        ref={containerRef}
+        flex="1"
+        overflowX="auto"
+        overflowY="hidden"
+        py={4}
+        px={8}
+        scrollBehavior="smooth"
+        sx={{
+          "&::-webkit-scrollbar": {
+            height: "8px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#3182ce",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "#2b6cb0",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "#edf2f7",
+          },
+        }}
+      >
+        <Flex gap={4} flexWrap="nowrap">
+          {PectraPosts.map((pectra, index) => (
+            <Card
+              key={index}
+              image={pectra.image}
+              title={pectra.title}
+              content={pectra.content}
+              link={pectra.link}
+              // minWidth="300px"
+              // flex="0 0 auto"
+            />
+          ))}
+        </Flex>
+      </Flex>
+
+      {/* Right arrow */}
+      <IconButton
+        aria-label="Scroll right"
+        icon={<ChevronRightIcon />}
+        position="absolute"
+        right={0}
+        zIndex={1}
+        onClick={scrollRight}
+        bg="white"
+        boxShadow="md"
+        _hover={{ bg: "gray.100" }}
+      />
+    </Flex>
+        
+
+
+
+
+
+        <Box id="NetworkUpgradesChart" mt={2} mb={2}>
+          <Text
+                  fontSize={{ base: '2xl', md: '3xl', lg: '3xl' }}
+                  fontWeight="bold"
+                  color="#30A0E0"
+                  mt={2}
+                >
+                  Network Upgrades and EIPs Relationship Graph
+                </Text>
+                <br/>
+          <Flex justifyContent="center" alignItems="center">
+            <Image
+              src="/Pectra_Relations2.jpg"
+              alt="Image 1"
+              borderRadius="md"
+              width={{ base: "250px", md: "350px", lg: "500px" }}
+              height="auto"
+              objectFit="contain"
+            />
+          </Flex>
+          <br/>
+        </Box>
+
+
+
+        <Box id="NetworkUpgrades" mt={2}>
+          <NetworkUpgradesChart/>
+        </Box>
+        <br/>
+        <Box id="AuthorContributions">
+          <NetworkUpgradesChart2/>
+        </Box>
+
+
+      {/* <Grid
+      templateColumns={{ base: "1fr", md: "1fr 1fr" }} // Stack vertically on small screens
+      gap={6}
+      p={6}
+    >
+     
+      <Box>
+        <Text
+          as={motion.div}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          fontSize={{ base: "xl", md: "2xl", lg: "4xl" }}
+          fontWeight="bold"
+          color="#30A0E0"
+        >
+          Devnets & Testnets
+        </Text>
+
+        <TableContainer style={{ maxHeight: "400px", overflowY: "auto" }}>
+      <Table
+        variant="striped"
+        colorScheme="gray"
+        size="lg"
+        mt={4}
+        style={{
+          border: "1px solid black",
+          borderRadius: "md",
+          boxShadow: "md",
+          width: "100%",
+          tableLayout: "fixed", // Ensures consistent column width
+        }}
+      >
+        <Thead>
+          <Tr style={{ border: "1px solid black" }}>
+            <Th style={{ border: "1px solid black" }}>Date</Th>
+            <Th style={{ border: "1px solid black" }}>Devnet Spec</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {[
+            {
+              date: "November 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-5",
+              specText: "Pectra Devnet 5 (Specs)",
+            },
+            {
+              date: "October 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-4",
+              specText: "Pectra Devnet 4 (Specs)",
+            },
+            {
+              date: "August 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-3",
+              specText: "Pectra Devnet 3 (Specs)",
+            },
+            {
+              date: "August 2024",
+              specLink: "https://github.com/ethereum/execution-spec-tests/releases/tag/pectra-devnet-3%40v1.0.0",
+              specText: "Tests Specs",
+            },
+            {
+              date: "July 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-2",
+              specText: "Pectra Devnet 2 (Specs)",
+            },
+            {
+              date: "June 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-1",
+              specText: "Pectra Devnet 1 (Specs)",
+            },
+            {
+              date: "May 2024",
+              specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
+              specText: "Pectra Devnet 0 (Specs)",
+            },
+          ].map((item, index) => (
+            <Tr style={{ border: "1px solid black" }} key={index}>
+              <Td style={{ border: "1px solid black" }}>{item.date}</Td>
+              <Td style={{ border: "1px solid black" }}>
+                <Link href={item.specLink} color="blue.500" textDecor="underline" isExternal>
+                  {item.specText}
+                </Link>
+              
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </TableContainer>
+
 
   </Box>
 
-  {/* Right Side - YouTube Video */}
+
   <Box
     border="2px solid" // Adds a solid border
     borderColor="blue.500" // Border color
@@ -450,17 +787,17 @@ const All = () => {
       ></iframe>
     </Box>
   </Box>
-</Grid>
+</Grid> */}
 
 
         </Box>
 
 
           {
-            <Box>
+            <Box display={{ base: "none", md: "block" }}>
               <PectraTable PectraData={pectraData}/>
               <br/>
-              <Text
+              {/* <Text
            as={motion.div}
            initial={{ opacity: 0, y: -20 }}
            animate={{ opacity: 1, y: 0 }}
@@ -470,12 +807,12 @@ const All = () => {
            color="#30A0E0"
           >
             Related Videos
-          </Text>
+          </Text> */}
             </Box>
           }
         </Box>
        
-        <Box className="w-3/4 mx-auto" id="carousel-section"> {/* Width set to 50% of the screen */}
+        {/* <Box display={{ base: "none", md: "block" }} className="w-3/4 mx-auto" id="carousel-section"> 
         
         <Carousel 
   showThumbs={false} 
@@ -489,6 +826,7 @@ const All = () => {
     hasPrev && (
       <button
         type="button"
+        
         onClick={onClickHandler}
         title={label}
         style={{
@@ -551,7 +889,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%', height: '300px', border: 'none' }}
+        style={{ width: '500px', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/YuEA-jE2Z8c"
         title="Blog 1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -567,7 +905,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%', height: '300px', border: 'none' }}
+        style={{ width: '500px', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/pyfKM_hOKaM"
         title="Blog 2"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -583,7 +921,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%', height: '300px', border: 'none' }}
+        style={{ width: '500px', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpnKFDl1KzGOKqwux5JaLlv"
         title="Playlist 1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -599,7 +937,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%',  height: '300px', border: 'none' }}
+        style={{ width: '500px',  height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpok0smGmq-dFGVHQzW84a2"
         title="Playlist 2"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -615,7 +953,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%', height: '300px', border: 'none' }}
+        style={{ width: '500px', height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/nJ57mkttCH0"
         title="Video 1"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -631,7 +969,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%',  height: '300px', border: 'none' }}
+        style={{ width: '500px',  height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/0tEcFa9J5TM"
         title="Video 2"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -647,7 +985,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%',  height: '300px', border: 'none' }}
+        style={{ width: '500px',  height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/sIr6XX8yR8o"
         title="Video 3"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -663,7 +1001,7 @@ const All = () => {
       style={{ textDecoration: 'none' }}
     >
       <iframe
-        style={{ width: '100%',  height: '300px', border: 'none' }}
+        style={{ width: '500px',  height: '300px', border: 'none' }}
         src="https://www.youtube.com/embed/B69btfxKVks"
         title="Video 4"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -676,7 +1014,7 @@ const All = () => {
 
 <br/>
 
-</Box>
+</Box> */}
 
         </motion.div>
       </AllLayout>

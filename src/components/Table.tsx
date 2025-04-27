@@ -1,11 +1,13 @@
 import {
   Box,
   Text,
+  Input,
   useColorModeValue,
   Wrap,
   WrapItem,
   Badge,
   Link,
+  Flex,
   Button,
   Select,
 } from "@chakra-ui/react";
@@ -14,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Spinner } from "@chakra-ui/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/react";
+import axios from "axios";
 
 const statusArr = [
   "Final",
@@ -64,14 +67,7 @@ interface EIP {
   repo: string;
 }
 
-import "@coreui/coreui/dist/css/coreui.min.css";
-import LoaderComponent from "./Loader";
-import { DownloadIcon } from "@chakra-ui/icons";
-interface TabProps {
-  cat: string;
-}
-
-interface FilterDataProps {
+interface EIPData {
   _id: string;
   eip: string;
   title: string;
@@ -83,60 +79,62 @@ interface FilterDataProps {
   discussion: string;
   deadline: string;
   requires: string;
-  unique_ID: number;
+  commitSha: string;
+  commitDate: string;
+  mergedDate: string;
+  prNumber: number;
+  closedDate: string;
+  changes: number;
+  insertions: number;
+  deletions: number | null;
+  mergedDay: number;
+  changedDay: number;
+  mergedMonth: number;
+  mergedYear: number;
+  changedMonth: number;
+  changedYear: number;
+  createdMonth: number;
+  createdYear: number;
+  previousdeadline: string;
+  newdeadline: string;
+  message: string;
+  repo:string;
   __v: number;
-  mergedYear: string;
-  mergedMonth: string;
 }
-
-async function fetchLastCreatedYearAndMonthFromAPI(
-  eipNumber: number
-): Promise<{ mergedYear: string; mergedMonth: string } | null> {
-  try {
-     console.group("request recieved")
-    const apiUrl = `/api/new/eipshistory/${eipNumber}`;
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (Array.isArray(data) && data.length > 0) {
-      const lastElement = data[0];
-      const lastElementCreatedYear = lastElement.mergedYear;
-      const lastElementCreatedMonth = lastElement.mergedMonth;
-
-      // if(eipNumber===1053){
-        console.log("testing data:");
-        console.log(lastElementCreatedYear)
-        console.log(lastElementCreatedMonth);
-      // }
-      return {
-        mergedYear: lastElementCreatedYear,
-        mergedMonth: lastElementCreatedMonth,
-      };
-    } else {
-      throw new Error("No data found or data format is invalid.");
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-}
+import "@coreui/coreui/dist/css/coreui.min.css";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 interface TableProps {
   type: string;
 }
 
+interface EIPEntry {
+  eip: string;
+  title: string;
+  author: string;
+  status: string;
+  type: string;
+  category: string;
+  repo: string;
+  statusChanges: string;
+  TypeChanges:string;
+  CategoryChanges:string;
+}
+
+
+
 const Table: React.FC<TableProps> = ({ type }) => {
-  const [data, setData] = useState<EIP[]>([]);
+  // const [data, setData] = useState<EIP[]>([]);
+  const [data2, setData2] = useState<EIPData[]>([]);
+  const [data3, setData3] = useState<EIPEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mergedData, setMergedData] = useState<
-    { mergedYear: string; mergedMonth: string }[]
-  >([]);
+  // const [mergedData, setMergedData] = useState<
+  //   { mergedYear: string; mergedMonth: string }[]
+  // >([]);
+  // const [changedData, setchangedData] = useState<
+  //   { changedYear: string; changedMonth: string }[]
+  // >([]);
   // const [dataForFilter, setDataForFilter] = useState<FilterDataProps[]>([]);
   const [selectedYearRange, setSelectedYearRange] = useState({
     start: "",
@@ -148,6 +146,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
   });
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedAuthor, setSelectedAuthor] = useState("");
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
@@ -163,175 +162,204 @@ const Table: React.FC<TableProps> = ({ type }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
-        if (type === "EIP") {
-          setData(jsonData.eip);
-        } else if (type === "ERC") {
-          setData(jsonData.erc);
-        } else if (type === "Total") {
-          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
-        } else if (type === "RIP") {
-          setData(jsonData.rip);
-        }
-        setIsLoading(false); // Set isLoading to false after data is fetched
+        // const response = await fetch(`/api/new/all`);
+        // const jsonData = await response.json();
+        // if (type === "EIP") {
+        //   setData(jsonData.eip);
+        // } else if (type === "ERC") {
+        //   setData(jsonData.erc);
+        // } else if (type === "Total") {
+        //   setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        // } else if (type === "RIP") {
+        //   setData(jsonData.rip);
+        // }
 
-        // Fetch merged years and months for each item
-        const mergedDataValues = [];
-        const jsonData2=jsonData.eip;
-        const jsonData3=jsonData.erc;
-        const jsonData4=jsonData.rip;
-        console.log(jsonData2)
+        const response2 = await fetch(`/api/new/graphsv4`);
+        const jsonData5 = await response2.json();
 
-        interface EIPData {
-          _id: string;
-          eip: string;
-          title: string;
-          author: string;
-          status: string;
-          type: string;
-          category: string;
-          created: string;
-          discussion: string;
-          deadline: string;
-          requires: string;
-          commitSha: string;
-          commitDate: string;
-          mergedDate: string;
-          prNumber: number;
-          closedDate: string;
-          changes: number;
-          insertions: number;
-          deletions: number | null;
-          mergedDay: number;
-          mergedMonth: number;
-          mergedYear: number;
-          createdMonth: number;
-          createdYear: number;
-          previousdeadline: string;
-          newdeadline: string;
-          message: string;
-          __v: number;
+        // Function to filter only the first occurrence of each unique entry based on eip ID and changeDate
+        function getEarliestEntries(data:any, key:any) {
+          const uniqueEntries:any = {};
+
+          data.forEach((entry:any) => {
+            const entryKey = entry[key];
+            
+            // If this is the first time we see this `key` or if the current entry's date is earlier, store it
+            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
+              uniqueEntries[entryKey] = entry;
+            }
+          });
+
+          return Object.values(uniqueEntries);
         }
+
+        function getallEntries(data: any, key: any) {
+          const allEntries: EIPEntry[] = [];
         
-        // const mergedDataValues: { mergedYear: string; mergedMonth: string }[] = [];
+          // Create a map to store status changes for each eip
+          const eipStatusChangesMap: { [eip: string]: string[] } = {};
+          const eipTypeChangesMap: { [eip: string]: string[] } = {};
+          const eipCategoryChangesMap: { [eip: string]: string[] } = {};
+          const standardTrackTypes = [
+            "Standards Track",
+            "Standard Track",
+            "Standards Track (Core, Networking, Interface, ERC)",
+            "Standard"
+          ];
         
-        for (const item of jsonData2) {
-          try {
-            const apiUrl = `/api/new/eipshistory/${item.eip}`;
-            const response = await fetch(apiUrl);
-            console.log("Fetching data for EIP:", item.eip);
-        
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
+          data.forEach((entry: any) => {
+            const { eip, type,category,fromStatus, toStatus, changedDay, changedMonth, changedYear } = entry;
+
+            if(eip=='615'){
+              console.log('entry:', entry);
             }
         
-            const data = await response.json();
+            // Generate the status change string in the required format
+            
+            const statusChangeString = `${fromStatus === "unknown" ? "" : fromStatus + " -> "}${toStatus}(${changedDay}-${changedMonth}-${changedYear})`;
+
+            let eipType=`${type}`
+            const eipCategory=`${category}`
         
-            // Check if data is an object and has properties
-            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data as Record<string, EIPData>)
-              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
-          
-            const firstElement = values[0] as EIPData; 
-
-            // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
-            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
-
-            mergedDataValues.push({
-              mergedYear,
-              mergedMonth,
-            });
-              console.log("Merged data added:", mergedYear, mergedMonth);
+            // If we already have status changes for this eip, add the new change
+            if (eipStatusChangesMap[eip]) {
+              eipStatusChangesMap[eip].push(statusChangeString);
             } else {
-              console.error(`No data found for EIP: ${item.eip}`);
-              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
+              // Otherwise, start a new list for this eip
+              eipStatusChangesMap[eip] = [statusChangeString];
             }
-          } catch (error) {
-            console.error("Error fetching data:", error);
-            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
-          }
-        }
-        
-        
 
-        for (const item of jsonData3) {
-          try {
-            const apiUrl = `/api/new/erchistory/${item.eip}`;
-            const response = await fetch(apiUrl);
-            console.log("Fetching data for EIP:", item.eip);
-        
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
+            if (eipTypeChangesMap[eip]) {
+              let previousType = eipTypeChangesMap[eip][eipTypeChangesMap[eip].length - 1];
+              
+              if(standardTrackTypes.includes(eipType)){
+                eipType="Standards Track"
+              }
+              if(previousType===`->${eipType}`){
+                previousType=eipType
+              }
+              if ((previousType !== eipType)&& ("->"+previousType !== eipType)) {
+                eipTypeChangesMap[eip].push(`->${eipType}`);
+                if(eip=='615'){
+                  console.log(`${previousType}->${eipType}`);
+                }
+            
+              }
+            } else {
+              if(standardTrackTypes.includes(eipType)){
+                eipType="Standards Track"
+              }
+              eipTypeChangesMap[eip] = [eipType];
             }
-        
-            const data = await response.json();
-        
-            // Check if data is an object and has properties
-            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data as Record<string, EIPData>)
-              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
-          
-            const firstElement = values[0] as EIPData; 
+            
 
-            // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
-            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
+            if(eipCategoryChangesMap[eip]){
+              eipCategoryChangesMap[eip].push(`->${eipCategory}`)
+            }
+            else{
+              eipCategoryChangesMap[eip]= [eipCategory]
+            }
 
-            mergedDataValues.push({
-              mergedYear,
-              mergedMonth,
+          });
+        
+          // Now, build the final entries with status changes concatenated into one string for each EIP
+          data.forEach((entry: any) => {
+            const { eip, title, author, status, type, category, repo } = entry;
+            
+            // Join the status changes into a single string
+            const statusChanges = eipStatusChangesMap[eip]?.join(', ') || '';
+            const TypeChanges = eipTypeChangesMap[eip]?.join(' ') || '';
+            const CategoryChanges = eipCategoryChangesMap[eip]?.join(' ') || '';
+        
+            allEntries.push({
+              eip,
+              title,
+              author,
+              status,
+              type,
+              category,
+              repo,
+              statusChanges,
+              TypeChanges,
+              CategoryChanges
             });
-              console.log("Merged data added:", mergedYear, mergedMonth);
-            }else {
-              console.error(`No data found for EIP: ${item.eip}`);
-              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
-            }
-          } catch (error) {
-            console.error("Error fetching data:", error);
-            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
-          }
+          });
+        
+          return allEntries;
         }
 
-        for (const item of jsonData4) {
-          try {
-            const apiUrl = `/api/new/riphistory/${item.eip}`;
-            const response = await fetch(apiUrl);
-            console.log("Fetching data for EIP:", item.eip);
-        
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-        
-            const data = await response.json();
-        
-            // Check if data is an object and has properties
-            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-              const values = Object.values(data as Record<string, EIPData>)
-              .sort((a, b) => new Date(a.mergedDate).getTime() - new Date(b.mergedDate).getTime());
+        let filteredData:any;
+        let filteredData2:any;
+
+        if (type === "EIP") {
+          filteredData = getEarliestEntries(jsonData5.eip, 'eip');
+          // filteredData2 = getallEntries(jsonData5.eip, 'eip');
+        } else if (type === "ERC") {
+          filteredData = getEarliestEntries(jsonData5.erc, 'eip');
+          // filteredData2 = getallEntries(jsonData5.erc, 'eip');
+        } else if (type === "RIP") {
+          filteredData = getEarliestEntries(jsonData5.rip, 'eip');
+          // filteredData2 = getallEntries(jsonData5.rip, 'eip');
+        } else if (type === "Total") {
+          // Concatenate filtered data for all types
+          filteredData = [
+            ...getEarliestEntries(jsonData5.eip, 'eip'),
+            ...getEarliestEntries(jsonData5.erc, 'eip'),
+            ...getEarliestEntries(jsonData5.rip, 'eip'),
+          ];
+          // filteredData2 = [
+          //   ...getallEntries(jsonData5.eip, 'eip'),
+          //   ...getallEntries(jsonData5.erc, 'eip'),
+          //   ...getallEntries(jsonData5.rip, 'eip'),
+          // ];
           
-            const firstElement = values[0] as EIPData; 
-
-            // Check if mergedYear and mergedMonth are defined before accessing them
-            const mergedYear = firstElement.mergedYear !== undefined ? firstElement.mergedYear.toString() : "";
-            const mergedMonth = firstElement.mergedMonth !== undefined ? firstElement.mergedMonth.toString() : "";
-
-            mergedDataValues.push({
-              mergedYear,
-              mergedMonth,
-            });
-              console.log("Merged data added:", mergedYear, mergedMonth);
-            }else {
-              console.error(`No data found for EIP: ${item.eip}`);
-              mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle case where no data is returned
-            }
-          } catch (error) {
-            console.error("Error fetching data:", error);
-            mergedDataValues.push({ mergedYear: "", mergedMonth: "" }); // Handle fetch error
-          }
+          filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
+            entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
+          ); 
+          // filteredData2 = filteredData2.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
+          //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
+          // );          
         }
-        setMergedData(mergedDataValues);
+        // console.log(filteredData);
+
+        setData2(filteredData);
+        // setData3(filteredData2);
+        setIsLoading(false);
+
+        if (type === "EIP") {
+          // filteredData = getEarliestEntries(jsonData5.eip, 'eip');
+          filteredData2 = getallEntries(jsonData5.eip, 'eip');
+        } else if (type === "ERC") {
+          // filteredData = getEarliestEntries(jsonData5.erc, 'eip');
+          filteredData2 = getallEntries(jsonData5.erc, 'eip');
+        } else if (type === "RIP") {
+          // filteredData = getEarliestEntries(jsonData5.rip, 'eip');
+          filteredData2 = getallEntries(jsonData5.rip, 'eip');
+        } else if (type === "Total") {
+          // Concatenate filtered data for all types
+          // filteredData = [
+          //   ...getEarliestEntries(jsonData5.eip, 'eip'),
+          //   ...getEarliestEntries(jsonData5.erc, 'eip'),
+          //   ...getEarliestEntries(jsonData5.rip, 'eip'),
+          // ];
+          filteredData2 = [
+            ...getallEntries(jsonData5.eip, 'eip'),
+            ...getallEntries(jsonData5.erc, 'eip'),
+            ...getallEntries(jsonData5.rip, 'eip'),
+          ];
+          
+          filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
+            entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
+          ); 
+          // filteredData2 = filteredData2.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
+          //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
+          // );          
+        }
+        // console.log(filteredData);
+
+        // setData2(filteredData);
+        setData3(filteredData2);
+        // setIsLoading(false);
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -351,8 +379,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
     }
   });
 
-  const filteredData = data.map((item: any) => {
-    const { eip, title, author, status, type, category, repo } = item;
+  const filteredData = data2.map((item: any) => {
+    const { eip, title, author, status, type, category, repo, changedMonth, changedYear } = item;
     return {
       eip,
       title,
@@ -360,47 +388,60 @@ const Table: React.FC<TableProps> = ({ type }) => {
       status,
       type,
       category,
+      changedMonth,
+      changedYear,
       repo,
     };
   });
-  const filteredDataWithMergedYearsAndMonths = filteredData.map(
-    (item, index) => ({
-      "#": (index + 1).toString(), // Add the sr number
-      ...item,
-      mergedYear: mergedData[index]?.mergedYear || "", // Replace '' with a default value if needed
-      mergedMonth: mergedData[index]?.mergedMonth || "", // Replace '' with a default value if needed
-    })
-  );
+  const filteredDataWithMergedYearsAndMonths = filteredData;
 
   console.log("filtered data:", filteredDataWithMergedYearsAndMonths)
 
   const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
     const isYearInRange =
       (!selectedYearRange.start ||
-        item.mergedYear >= selectedYearRange.start) &&
-      (!selectedYearRange.end || item.mergedYear <= selectedYearRange.end);
+        item.changedYear >= selectedYearRange.start) &&
+      (!selectedYearRange.end || item.changedYear <= selectedYearRange.end);
 
     const isMonthInRange =
       (!selectedMonthRange.start ||
-        item.mergedMonth >= selectedMonthRange.start) &&
-      (!selectedMonthRange.end || item.mergedMonth <= selectedMonthRange.end);
+        item.changedMonth >= selectedMonthRange.start) &&
+      (!selectedMonthRange.end || item.changedMonth <= selectedMonthRange.end);
 
     const isStatusMatch = !selectedStatus || item.status === selectedStatus;
 
     const isCategoryMatch =
       !selectedCategory || item.category === selectedCategory;
-    return isYearInRange && isMonthInRange && isStatusMatch && isCategoryMatch;
+
+    const isAuthorMatch = !selectedAuthor || 
+      item.author.toLowerCase().includes(selectedAuthor.toLowerCase());
+  
+    return isYearInRange && isMonthInRange && isStatusMatch && isCategoryMatch && isAuthorMatch;
   });
+
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
+    // console.log(DataForFilter);
+    
     if (DataForFilter && DataForFilter.length > 0) {
       // Create CSV headers
-      const headers =
-        Object.keys(filteredDataWithMergedYearsAndMonths[0]).join(",") + "\n";
-
+      const mergedData = DataForFilter.map((item) => {
+        const matchingEntry = data3.find((entry) => entry.eip === item.eip);
+        return {
+          ...item,
+          statusChanges: matchingEntry ? matchingEntry.statusChanges : '',
+          TypeChanges: matchingEntry ? matchingEntry.TypeChanges : '',
+          // CategoryChanges: matchingEntry ? matchingEntry.CategoryChanges : '', 
+        };
+      });
+  
+      // Create CSV headers
+      const headers = Object.keys(mergedData[0]).join(",") + "\n";
+  
       // Convert data to CSV rows
-      const csvRows = DataForFilter.map((item) => {
+      const csvRows = mergedData.map((item) => {
         const values = Object.values(item).map((value) => {
           // Ensure values with commas are enclosed in double quotes
           if (typeof value === "string" && value.includes(",")) {
@@ -408,26 +449,28 @@ const Table: React.FC<TableProps> = ({ type }) => {
           }
           return value;
         });
-
+  
         return values.join(",");
       });
-
+  
       // Combine headers and rows
       const csvContent = headers + csvRows.join("\n");
-
+  
       // Trigger CSV download
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.style.display = "none";
       a.href = url;
+      
       if (
         selectedCategory === "" &&
         selectedStatus === "" &&
         selectedYearRange.start === "" &&
         selectedYearRange.end === "" &&
         selectedMonthRange.start === "" &&
-        selectedMonthRange.end === ""
+        selectedMonthRange.end === "" &&
+        selectedAuthor === ""
       ) {
         a.download = `All_${type.toUpperCase()}s.csv`;
       } else {
@@ -450,6 +493,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
   for (let year = startYear; year <= currentYear; year++) {
     yearsArr.push(year);
   }
+
+  // useEffect(()=>{
+  //   console.log(selectedAuthor);
+  // },[selectedAuthor]);
 
   return (
     <>
@@ -476,29 +523,53 @@ const Table: React.FC<TableProps> = ({ type }) => {
         >
           {isLoading ? ( // Show loader while data is loading
             <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              height="200px"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="column" // Stack spinner and text vertically
+            height="200px"
+          >
+            <Spinner size="xl" /> {/* Larger spinner */}
+            <Text 
+              mt={4}               // Add margin-top for spacing
+              fontSize="lg"        // Make the text larger
+              fontWeight="bold"    // Make the text bold
+              color="gray.600"     // Set a nice gray color
+              textAlign="center"   // Center the text
             >
-              <Spinner />
-            </Box>
+              Fetching data...
+            </Text>
+          </Box>
+          
           ) : (
             <>
+            <Flex justifyContent="flex-end">
               <Popover trigger={"hover"} placement={"bottom-start"}>
                 <PopoverTrigger>
                   <Box>
+                  
                     <Button
                       colorScheme="blue"
                       variant="outline"
                       fontSize={"14px"}
                       fontWeight={"bold"}
                       padding={"10px 20px"}
-                      onClick={convertAndDownloadCSV}
+                      onClick={async () => {
+                        try {
+                          // Trigger the CSV conversion and download
+                          convertAndDownloadCSV();
+                    
+                          // Trigger the API call
+                          await axios.post("/api/DownloadCounter");
+                        } catch (error) {
+                          console.error("Error triggering download counter:", error);
+                        }
+                      }}
                     >
                       <DownloadIcon marginEnd={"1.5"} />
                       Download Reports
                     </Button>
+                    {/* </Flex> */}
                   </Box>
                  
                 </PopoverTrigger>
@@ -506,6 +577,15 @@ const Table: React.FC<TableProps> = ({ type }) => {
 
                 <PopoverContent className={"px-4"}>
                   <div className={"space-y-10 py-4"}>
+                  <Box>
+                    <Text>Enter Author Name:</Text>
+                    <Input
+                      value={selectedAuthor}
+                      onChange={(e) => setSelectedAuthor(e.target.value)}
+                      placeholder="Type author name"
+                    />
+                    {/* <Text mt={4}>Selected Author: {selectedAuthor || "None"}</Text> */}
+                  </Box>
                     <Select
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value)}
@@ -600,11 +680,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   </div>
                 </PopoverContent>
               </Popover>
+              </Flex>
 
               <CSmartTable
-                items={filteredDataWithMergedYearsAndMonths.sort(
-                  (a, b) => parseInt(a["#"]) - parseInt(b["#"])
-                )}
+                items={filteredDataWithMergedYearsAndMonths}
                 activePage={1}
                 clickableRows
                 columnFilter
@@ -620,17 +699,6 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   },
                 }}
                 columns={[
-                  {
-                    key: '#',
-                    label: '#',
-                    _style: {
-                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC', 
-                      color: isDarkMode ? 'white' : 'black',              
-                      fontWeight: 'bold',                                  
-                      padding: '12px',                                     
-                      borderTopLeftRadius: "0.55rem",                      
-                    }
-                  },
                   {
                     key: 'eip',
                     label: 'EIP',
@@ -690,7 +758,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                 scopedColumns={{
                   "#": (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${type === "ERC" ? "ercs/erc" : type === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -703,7 +771,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${type === "ERC" ? "ercs/erc" : type === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>

@@ -59,8 +59,14 @@ import {
     cat: string;
     status: string;
   }
+
+  interface AreaCProps {
+    dataset: EIP[];
+    status:string;
+    cat:string;
+  }
   
-  const RipCatTable: React.FC<TableProps> = ({ cat, status }) => {
+  const RipCatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
     const [data, setData] = useState<EIP[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -69,6 +75,8 @@ import {
         setIsLoading(false);
       }, 2000);
     });
+
+    console.log(dataset);
   
     const factorAuthor = (data: any) => {
       let list = data.split(",");
@@ -84,9 +92,9 @@ import {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await fetch(`/api/new/all`);
-          const jsonData = await response.json();
-          setData(jsonData.rip);
+          // const response = await fetch(`/api/new/all`);
+          // const jsonData = await response.json();
+          setData(dataset);
           setIsLoading(false); // Set isLoading to false after data is fetched
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -104,7 +112,7 @@ import {
       }
     });
   
-    const filteredData = data
+    const filteredData = dataset
       .filter((item) => item.repo === "rip" && item.status === status)
       .map((item) => {
         const { eip, title, author } = item;
@@ -124,7 +132,7 @@ import {
         {filteredData.length > 0 ? (
           <Box
             bgColor={bg}
-            marginTop={"12"}
+            marginTop={"2"}
             p="1rem 1rem"
             borderRadius="0.55rem"
             _hover={{
@@ -153,6 +161,16 @@ import {
                 columnSorter
                 itemsPerPage={5}
                 pagination
+                paginationProps={{
+                  pages: Math.ceil(filteredData.length / 5), // Calculate the number of pages based on the items and items per page
+                  style: {
+                    display: 'flex',
+                    flexWrap: 'wrap', // Allow pagination to wrap in smaller screens
+                    justifyContent: 'center',
+                    gap: '8px', // Space between pagination items
+                    padding: '10px',
+                  },
+                }}
                 tableProps={{
                   hover: true,
                   responsive: true,

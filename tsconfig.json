@@ -24,6 +24,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/resources/index.jsx", "src/pages/api/eipsprdetails"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/resources/index.jsx", "src/pages/api/eipsprdetails", "src/pages/api/blockchain/live/transactions.tsx", "src/pages/api/blockchain/live/blocks.tsx"],
   "exclude": ["node_modules"]
 }

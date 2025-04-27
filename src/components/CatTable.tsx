@@ -6,31 +6,11 @@ import {
   WrapItem,
   Badge,
   Link,
-  Button,
-  Select,
+
 } from "@chakra-ui/react";
 import React, { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Spinner } from "@chakra-ui/react";
-import {
-  Column,
-  PaginationState,
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  ColumnDef,
-  OnChangeFn,
-  flexRender,
-} from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { DownloadIcon } from "@chakra-ui/icons";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 
 interface EIP {
@@ -50,6 +30,12 @@ interface EIP {
   __v: number;
 }
 
+interface AreaCProps {
+  dataset: EIP[];
+  status:string;
+  cat:string;
+}
+
 import "@coreui/coreui/dist/css/coreui.min.css";
 interface TabProps {
   cat: string;
@@ -61,7 +47,7 @@ interface TableProps {
   status: string;
 }
 
-const CatTable: React.FC<TableProps> = ({ cat, status }) => {
+const CatTable: React.FC<AreaCProps> =  ({ cat, dataset, status }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -70,6 +56,10 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
       setIsLoading(false);
     }, 2000);
   });
+  
+  console.log(dataset);
+  console.log(status);
+  console.log(cat);
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
@@ -85,9 +75,10 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc));
+        // const response = await fetch(`/api/new/all`);
+        // const jsonData = await response.json();
+        setData(dataset);
+        console.log("dataset:",dataset)
         setIsLoading(false); // Set isLoading to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -105,19 +96,23 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
     }
   });
 
-  const filteredData = data
-    .filter((item) => item.category === cat && item.status === status)
+  const filteredData = dataset
+    .filter((item) => (cat === "All" || item.category === cat) && item.status === status)
     .map((item) => {
-      const { eip, title, author, repo } = item;
+      const { eip, title, author, repo, type, category, status, deadline } = item;
       return {
         eip,
         title,
         author,
         repo,
+        type,
+        category,
+        status,
+        deadline,
       };
     });
 
-    console.log(filteredData);
+    console.log(" test filtered data:",filteredData);
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
@@ -126,7 +121,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
       {filteredData.length > 0 ? (
         <Box
           bgColor={bg}
-          marginTop={"12"}
+          marginTop={"2"}
           p="1rem 1rem"
           borderRadius="0.55rem"
           _hover={{
@@ -155,6 +150,16 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                 columnSorter
                 itemsPerPage={5}
                 pagination
+                paginationProps={{
+                  pages: Math.ceil(filteredData.length / 5), // Calculate the number of pages based on the items and items per page
+                  style: {
+                    display: 'flex',
+                    flexWrap: 'wrap', // Allow pagination to wrap in smaller screens
+                    justifyContent: 'center',
+                    gap: '8px', // Space between pagination items
+                    padding: '10px',
+                  },
+                }}
                 tableProps={{
                   hover: true,
                   responsive: true,
@@ -164,7 +169,15 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                   },
                 }}
                 columns={[
-                  
+                  {
+                    key: 'repo',
+                    label: 'Repo',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
                   {
                     key: 'eip',
                     label: 'EIP',
@@ -192,15 +205,55 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       fontWeight: 'bold',
                     }
                   },
+                  {
+                    key: 'type',
+                    label: 'Type',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'category',
+                    label: 'category',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  {
+                    key: 'status',
+                    label: 'status',
+                    _style: {
+                      backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                      color: isDarkMode ? 'white' : 'black',
+                      fontWeight: 'bold',
+                    }
+                  },
+                  ...(status === "Last Call" ? [ // Conditionally add the deadline column
+                    {
+                      key: 'deadline',
+                      label: 'Deadline',
+                      _style: {
+                        backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
+                        color: isDarkMode ? 'white' : 'black',
+                        fontWeight: 'bold',
+                        padding: '12px',
+                        borderTopRightRadius: "0.55rem", // Add border radius to the last column
+                      }
+                    }
+                  ] : [])
                   ]}
                 scopedColumns={{
-                  "#": (item: any) => (
-                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                  repo: (item: any) => (
+                    <td key={item.repo} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                      <Link href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : item.repo==='rip'? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
-                              {item["#"]}
+                              {item.repo}
                             </Badge>
                           </WrapItem>
                         </Wrap>
@@ -209,7 +262,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                   ),
                   eip: (item: any) => (
                     <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                      <Link href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                      <Link href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : item.repo==='rip' ? "rips/rip" : "eips/eip"}-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
                             <Badge colorScheme={getStatusColor(item.status)}>
@@ -227,7 +280,7 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       className="hover:text-[#1c7ed6]"
                     >
                       <Link
-                        href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : cat === "RIP" ? "rips/rip" : "eips/eip"}-${item.eip}`}
+                        href={`/${cat === "ERC" || item.repo==='erc' ? "ercs/erc" : item.repo==='rip' ? "rips/rip" : "eips/eip"}-${item.eip}`}
                         className={
                           isDarkMode
                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
@@ -304,6 +357,15 @@ const CatTable: React.FC<TableProps> = ({ cat, status }) => {
                       </Wrap>
                     </td>
                   ),
+                  ...(status === "Last Call" ? { // Conditionally add the deadline column renderer
+                    deadline: (item: any) => (
+                      <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                        <div className={isDarkMode ? "text-white" : "text-black"}>
+                          {item.deadline || "N/A"}
+                        </div>
+                      </td>
+                    )
+                  } : {})
                 }}
                 
               />

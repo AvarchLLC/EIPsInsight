@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { Box, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Text, useColorModeValue, Flex } from '@chakra-ui/react';
 import React from 'react';
 import { usePathname } from 'next/navigation'; // Import usePathname from next/navigation
+import CopyLink from './CopyLink';
 
 interface HeaderProps {
   title: string;
@@ -27,19 +28,27 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
 
   return (
     <Box>
-      <Text
-        as={motion.div}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 } as any}
-        fontSize={{ base: "2xl", md: "2xl", lg: "6xl" }}
-        fontWeight="bold"
-        color={useColorModeValue(headingColorLight, headingColorDark)} // Dynamic color
-        bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)} // Dynamic gradient
-        bgClip="text" // Clip gradient to text
-      >
-        {title}
-      </Text>
+      <Flex alignItems="center">
+        <Text
+          as={motion.div}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 } as any}
+          fontSize={{ base: "2xl", md: "2xl", lg: "6xl" }}
+          fontWeight="bold"
+          color={useColorModeValue(headingColorLight, headingColorDark)} // Dynamic color
+          bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)} // Dynamic gradient
+          bgClip="text" // Clip gradient to text
+        >
+          {title}
+        </Text>
+        {title === "DASHBOARD" && (
+          <CopyLink
+            link="https://eipsinsight.com//home#Dashboard"
+            style={{ marginLeft: "10px", marginBottom: "3px" }} // Add margin for better spacing
+          />
+        )}
+      </Flex>
       <Text
         as={motion.div}
         initial={{ opacity: 0, y: -20 }}

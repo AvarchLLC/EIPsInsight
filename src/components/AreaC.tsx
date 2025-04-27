@@ -4,12 +4,16 @@ import {
   useColorModeValue,
   Select,
   Spinner,
+  Button,
+  Flex,
+  Heading
 } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import LoaderComponent from "./Loader";
 import DateTime from "@/components/DateTime";
 import NextLink from "next/link";
+import axios from "axios";
 
 interface AreaProps {
   data: MappedDataItem[];
@@ -66,6 +70,12 @@ interface MappedDataItem {
   value: number;
 }
 
+interface GrpahsProps {
+  eip: EIP[];
+  erc: EIP[];
+  rip: EIP[];
+}
+
 interface EIP {
   status: string;
   eips: {
@@ -74,13 +84,8 @@ interface EIP {
     year: number;
     date: string;
     count: number;
+    eips: EIP2[];
   }[];
-}
-
-interface GrpahsProps {
-  eip: EIP[];
-  erc: EIP[];
-  rip: EIP[];
 }
 
 interface EIP2 {
@@ -303,7 +308,98 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     },
   };
 
+  const removeDuplicatesFromEips = (eips: EIP2[]) => {
+    const seen = new Set();
+    
+    return eips.filter((eip) => {
+      if (!seen.has(eip.eip)) {
+        seen.add(eip.eip); // Track seen eip numbers
+        return true;
+      }
+      return false; // Filter out duplicates
+    });
+  };
+
   const bg = useColorModeValue("#f6f6f7", "#171923");
+
+  const downloadData = () => {
+    // Filter data based on the selected status
+    const filteredData = typeData.filter((item) => item.status === selectedStatus);
+
+    if (!filteredData.length) {
+        console.error("No data available for the selected status.");
+        alert("No data available for download.");
+        return;
+    }
+
+    // Transform the filtered data to get the necessary details
+    const transformedData = filteredData.flatMap((item) => {
+        return item.eips.flatMap((eipGroup) => {
+            const category = getCat(eipGroup.category); // Assuming this function returns a string
+            const year = eipGroup.year.toString(); // Convert year to string
+            const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Assuming this returns an array of EIPs
+
+            return uniqueEips.map((eip) => ({
+                category,
+                year,
+                eip: eip.eip, // EIP number
+                author: eip.author, // Author of the EIP
+                repo: eip.repo, // Repo type (e.g., "eip", "erc", "rip")
+                discussion: eip.discussion, // Discussion link
+                status: eip.status, // Status of the EIP
+                created: eip.created, // Creation date
+                deadline: eip.deadline || "", // Deadline if exists, else empty
+                type: eip.type, // Type of the EIP
+                title: eip.title, // Title of the EIP
+            }));
+        });
+    });
+
+    if (!transformedData.length) {
+        console.error("Transformed data is empty.");
+        alert("No transformed data available for download.");
+        return;
+    }
+
+    // Define the CSV header
+    const header = "Repo, EIP, Title, Author, Status, Type, Category, Discussion, Created at, Deadline, Link\n";
+
+    // Prepare the CSV content
+    const csvContent =
+        "data:text/csv;charset=utf-8," + 
+        header +
+        transformedData
+            .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+                // Generate the correct URL based on the repo type
+                const url =
+                    category === "ERC"
+                        ? `https://eipsinsight.com/ercs/erc-${eip}`
+                        : `https://eipsinsight.com/eips/eip-${eip}`;
+                        
+
+                // Handle the 'deadline' field, use empty string if not available
+                const deadlineValue = deadline || "";
+
+                // Wrap fields in double quotes to handle commas
+                return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
+            })
+            .join("\n");
+
+    // Check the generated CSV content before download
+    console.log("CSV Content Preview:", csvContent);
+
+    // Encode the CSV content for downloading
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${selectedStatus}.csv`); // Name your CSV file here
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+};
+
+
+const headingColor = useColorModeValue('black', 'white');
 
   return (
     <Box
@@ -359,6 +455,24 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
         ) : (
           // Show chart when it's ready
           <>
+          <br/>
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Heading size="md" color={headingColor}>
+            {`${selectedStatus}`}
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <Button colorScheme="blue" onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData();
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>Download CSV</Button>
+        </Flex>
             <Area {...config} />
           </>
         )}

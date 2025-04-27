@@ -7,6 +7,7 @@ import {
   Badge,
   Link,
   Button,
+  Flex,
   Select,
 } from "@chakra-ui/react";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
@@ -14,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Spinner, useColorMode } from "@chakra-ui/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/react";
+import axios from "axios";
 
 const statusArr = [
   "Final",
@@ -139,11 +141,11 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
         if (cat === "ERC") {
           setData(jsonData.erc);
         } 
-        else if( cat==="Meta"){
-          setData(jsonData.eip.concat(jsonData.erc));
+        else if( cat==="RIP"){
+          setData(jsonData.rip);
         }
         else {
-          setData(jsonData.eip);
+          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
         }
         setIsLoading(false); // Set isLoading to false after data is fetched
 
@@ -190,12 +192,19 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
     })
     .filter((item: any) => item.category === cat);
 
-  const filteredDataWithMergedYearsAndMonths = filteredData.map(
-    (item, index) => ({
-      "#": (index + 1).toString(), // Add the sr number
-      ...item,
-    })
-  );
+    const filteredDataWithMergedYearsAndMonths = filteredData
+  .sort((a, b) => {
+    const eipA = parseInt(a.eip, 10); // Convert 'eip' field to a number
+    const eipB = parseInt(b.eip, 10);
+    return eipA - eipB; // Sort numerically based on the 'eip' field
+  })
+  .map((item, index) => ({
+    "#": (index + 1).toString(), // Add the sr number after sorting
+    ...item,
+  }));
+
+  
+  console.log("filtered data:", filteredDataWithMergedYearsAndMonths);
 
   const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
     const isYearInRange =
@@ -303,9 +312,11 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
             </Box>
           ) : (
             <>
+            <Flex justifyContent="flex-end">
               <Popover trigger={"hover"} placement={"bottom-start"}>
                 <PopoverTrigger>
                   <Box>
+                    {/* <Flex justifyContent="flex-end"> */}
                     <Button
                     
                       colorScheme="blue"
@@ -313,11 +324,22 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       fontSize={"14px"}
                       fontWeight={"bold"}
                       padding={"10px 20px"}
-                      onClick={convertAndDownloadCSV}
+                      onClick={async () => {
+                        try {
+                          // Trigger the CSV conversion and download
+                          convertAndDownloadCSV();
+                    
+                          // Trigger the API call
+                          await axios.post("/api/DownloadCounter");
+                        } catch (error) {
+                          console.error("Error triggering download counter:", error);
+                        }
+                      }}
                     >
                       <DownloadIcon marginEnd={"1.5"} />
                       Download Reports
                     </Button>
+                    {/* </Flex> */}
                   </Box>
                 </PopoverTrigger>
                 <br/>
@@ -417,10 +439,11 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                   </div>
                 </PopoverContent>
               </Popover>
+              </Flex>
               
               <CSmartTable
                 items={filteredDataWithMergedYearsAndMonths.sort(
-                  (a, b) => parseInt(a["#"]) - parseInt(b["#"])
+                  (a, b) => parseInt(a["eip"]) - parseInt(b["eip"])
                 )}
                 activePage={1}
                 clickableRows

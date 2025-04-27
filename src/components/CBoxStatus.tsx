@@ -21,6 +21,7 @@ import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
 import { DownloadIcon } from "@chakra-ui/icons";
 import { Spinner } from "@chakra-ui/react";
+import axios from "axios";
 
 interface EIP {
   _id: string;
@@ -63,9 +64,11 @@ interface APIResponse {
 interface Data {
   eip: APIResponse[];
   erc: APIResponse[];
+  rip: APIResponse[];
 }
 
 interface CBoxProps {
+  dataset: Data;
   status: string;
   type: string;
 }
@@ -121,17 +124,16 @@ const getCat = (cat: string) => {
   }
 };
 
-const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
+const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
   const [data, setData] = useState<Data>();
-  const [selectedYear, setSelectedYear] = useState<number>(2023);
+  const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [isLoading, setIsLoading] = useState(true);
   const [typeData, setTypeData] = useState<APIResponse[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/new/graphsv2`);
-        const jsonData = await response.json();
+        const jsonData = dataset;
         setData(jsonData);
         if (type === "EIPs" && jsonData.eip) {
           setTypeData(
@@ -150,7 +152,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
     };
 
     fetchData();
-  }, []);
+  }, [dataset]);
 
   useEffect(() => {
     if (type === "EIPs") {
@@ -216,9 +218,9 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
         "_id",
         "fromStatus",
         "toStatus",
-        "changeDate",
-        "type",
-        "discussion",
+        // "changeDate",
+        // "type",
+        // "discussion",
         "requires",
         "changedDay",
         "changedMonth",
@@ -276,70 +278,108 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
   };
 
   const numRows = typeData.length + 4;
-  const rowHeight = 40; // Assuming each row has a height of 40px
-  const maxHeight = `${numRows * rowHeight}px`;
-  const rows = [];
-  const standardTrackKeys = [];
+const rowHeight = 40; // Assuming each row has a height of 40px
+const maxHeight = `${numRows * rowHeight}px`;
+const rows = [];
+const standardTrackKeys = [];
 
-  var total = 0;
-  for (const key in result) {
-    total = total + result[key];
-  }
-  for (const key in result) {
-    let percentage = ((result[key] * 100) / total).toFixed(2);
-    if (key.startsWith("Standard")) {
-      standardTrackKeys.push(key);
-    } else {
-      rows.push(
-        <Tr key={key}>
-          <Td minW="100px">
-            <Wrap>
-              <WrapItem>
-                <Badge colorScheme="pink">{key}</Badge>
-              </WrapItem>
-            </Wrap>
-          </Td>
-          <Td>
-            {/*<Link*/}
-            {/*    href={`/table/${getCat(key)}/${status}`}*/}
-            {/*    className="text-blue-400 hover:cursor-pointer font-semibold"*/}
-            {/*>*/}
-            {/*    {result[key]}*/}
-            {/*</Link>*/}
-            {result[key]}
-          </Td>
-          <Td className={"ml-10 text-blue-400"}>{percentage}%</Td>
-        </Tr>
-      );
-    }
-  }
-
-  standardTrackKeys.sort();
-
-  for (const key of standardTrackKeys) {
-    let percentage = ((result[key] * 100) / total).toFixed(2);
-    rows.unshift(
+var total = 0;
+for (const key in result) {
+  total = total + result[key];
+}
+for (const key in result) {
+  let percentage = ((result[key] * 100) / total).toFixed(2);
+  if (key.startsWith("Standard")) {
+    standardTrackKeys.push(key);
+  } else {
+    rows.push(
       <Tr key={key}>
-        <Td minW="100px">
+        <Td
+          style={{
+            wordWrap: 'break-word',  // Allow word wrapping
+            overflowWrap: 'break-word', // For better wrapping behavior across browsers
+            whiteSpace: 'normal', // Enable text wrapping
+            minWidth: '120px', // Ensures it wraps correctly
+          }}
+          className="break-all"  // Force word break for long strings
+        >
           <Wrap>
             <WrapItem>
-              <Badge colorScheme="blue">{key}</Badge>
+              <Badge colorScheme="pink">{key}</Badge>
             </WrapItem>
           </Wrap>
         </Td>
-        <Td>
-          {/*<Link*/}
-          {/*    href={`/table/${getCat(key)}/${status}`}*/}
-          {/*    className="text-blue-400 hover:cursor-pointer font-semibold"*/}
-          {/*>*/}
-          {/*    {result[key]}*/}
-          {/*</Link>*/}
+        <Td
+          style={{
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            minWidth: '100px',
+          }}
+          className={"ml-20 text-blue-400"}
+        >
           {result[key]}
         </Td>
-        <Td className={"ml-10 text-blue-400"}>{percentage}%</Td>
+        <Td
+          style={{
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            minWidth: '150px',
+          }}
+          className={"ml-10 text-blue-400"}
+        >
+          {percentage}%
+        </Td>
       </Tr>
     );
   }
+}
+
+standardTrackKeys.sort();
+
+for (const key of standardTrackKeys) {
+  let percentage = ((result[key] * 100) / total).toFixed(2);
+  rows.unshift(
+    <Tr key={key}>
+      <Td
+        style={{
+          wordWrap: 'break-word',  // Allow word wrapping
+          overflowWrap: 'break-word', // For better wrapping behavior across browsers
+          whiteSpace: 'normal', // Enable text wrapping
+          minWidth: '120px', // Ensures it wraps correctly
+        }}
+        className="break-all"
+      >
+        <Wrap>
+          <WrapItem>
+            <Badge colorScheme="blue">{key}</Badge>
+          </WrapItem>
+        </Wrap>
+      </Td>
+      <Td
+        style={{
+          wordWrap: 'break-word',
+          overflowWrap: 'break-word',
+          minWidth: '100px',
+        }}
+        className={"ml-20 text-blue-400"}
+      >
+        {result[key]}
+      </Td>
+      <Td
+        style={{
+          wordWrap: 'break-word',
+          overflowWrap: 'break-word',
+          minWidth: '150px',
+        }}
+        className={"ml-10 text-blue-400"}
+      >
+        {percentage}%
+      </Td>
+    </Tr>
+  );
+}
+  
+  
 
   const currentYear = new Date().getFullYear();
   const years = Array.from(
@@ -366,7 +406,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
       ) : (
         <Box
           bgColor={bg}
-          marginTop={"2rem"}
+          // marginTop={"2rem"}
           p="1rem 1rem"
           borderRadius="0.55rem"
           overflowX="auto"
@@ -376,6 +416,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
           }}
           maxH={maxHeight}
           as={motion.div}
+          minHeight="600px"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 } as any}
@@ -396,7 +437,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
                 </option>
               ))}
             </Select>
-
+  
             <Box>
               <Button
                 colorScheme="blue"
@@ -404,36 +445,79 @@ const CBoxStatus: React.FC<CBoxProps> = ({ status, type }) => {
                 fontSize={"14px"}
                 fontWeight={"bold"}
                 padding={"8px 20px"}
-                onClick={convertAndDownloadCSV}
+                onClick={async () => {
+                  try {
+                    // Trigger the CSV conversion and download
+                    convertAndDownloadCSV();
+  
+                    // Trigger the API call
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
               >
                 <DownloadIcon marginEnd={"1.5"} />
                 Download Reports
               </Button>
             </Box>
           </Box>
-
+  
           <TableContainer>
-            <Table variant="simple" minW="50%" maxH={"50%"} layout="fixed">
-              <Thead>
-                <Tr>
-                  <Th minW="50px">Type - Category</Th>
-                  <Th minW="200px">Numbers</Th>
-                  <Th minW="200px">Percentage</Th>
-                </Tr>
-              </Thead>
-              <Tbody>{rows}</Tbody>
-            </Table>
-          </TableContainer>
-          <Box className={"flex justify-center w-full text-center"}>
+  <Table variant="simple" minW="50%" maxW="100%" layout="auto">
+    <Thead>
+      <Tr>
+        <Th
+          style={{
+            wordWrap: 'break-word',
+            minWidth: '120px',
+            paddingLeft: '10px', // Adding padding for spacing
+            paddingRight: '10px', // Adding padding for spacing
+          }}
+        >
+          Type - Category
+        </Th>
+        <Th
+          style={{
+            wordWrap: 'break-word',
+            minWidth: '100px',
+            paddingLeft: '10px', // Padding to ensure separation
+            paddingRight: '10px', // Padding to ensure separation
+          }}
+        >
+          Numbers
+        </Th>
+        <Th
+          style={{
+            wordWrap: 'break-word',
+            minWidth: '150px',
+            paddingLeft: '10px', // Padding to ensure separation
+            paddingRight: '10px', // Padding to ensure separation
+          }}
+        >
+          Percentage
+        </Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {rows}
+    </Tbody>
+  </Table>
+</TableContainer>
+
+  
+          <Box className="flex justify-center w-full text-center">
             <Text
               fontSize="xl"
               fontWeight="bold"
               color="#30A0E0"
               marginRight="6"
+              style={{ wordWrap: 'break-word' }}
             >
               Total: {total}
             </Text>
           </Box>
+  
           <Box className={"w-full"}>
             <DateTime />
           </Box>

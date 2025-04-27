@@ -6,7 +6,7 @@ const Authors: React.FC = () => {
     return (
         <>
             <AllLayout>
-                <Author />
+                <Author defaultQuery=''/>
             </AllLayout>
         </>
     );

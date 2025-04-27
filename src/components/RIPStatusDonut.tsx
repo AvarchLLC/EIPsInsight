@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Icon, useColorModeValue, Text } from "@chakra-ui/react";
+import { Box, Icon, useColorModeValue, Text, Spinner, Button, Flex, Heading } from "@chakra-ui/react";
 import DateTime from "@/components/DateTime";
 import {
   Chart as ChartJS,
@@ -19,6 +19,8 @@ ChartJS.register(
   Legend
 );
 import dynamic from "next/dynamic";
+import axios from "axios";
+import NextLink from "next/link";
 
 interface EIP {
   _id: string;
@@ -32,18 +34,28 @@ interface EIP {
   discussion: string;
   deadline: string;
   requires: string;
+  repo:string;
   unique_ID: number;
   __v: number;
-}
+} 
 
-const RIPStatusDonut = () => {
+const EIPStatusDonut = () => {
   const [data, setData] = useState<EIP[]>([]);
+  const [isReady, setIsReady] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
+        let jsonData = await response.json();
+        jsonData.rip.forEach((item: EIP) => {
+          if (item.eip === "7859") {
+              item.status = "Draft"; 
+          }
+      });
+      
         setData(jsonData.rip);
+        console.log("rip donut data:", jsonData.rip);
+        setIsReady(true);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -81,7 +93,8 @@ const RIPStatusDonut = () => {
       status: "Withdrawn",
       value: data.filter((item) => item.status === "Withdrawn").length,
     },
-  ];
+   
+  ].filter((item) => item.value > 0);
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Pie),
     {
@@ -144,28 +157,101 @@ const RIPStatusDonut = () => {
     },
   };
 
+  const downloadData = () => {
+    // Convert the data to CSV format
+    const header = "Repo, EIP, Title, Author, Status, Type, Category, Discussion, Created at, Deadline, Link\n";
+
+// Prepare the CSV content
+const csvContent = header
+    + data.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+        // Generate the correct URL based on the repo type
+        const url = repo === "eip"
+            ? `https://eipsinsight.com/eips/eip-${eip}`
+            : repo === "erc"
+            ? `https://eipsinsight.com/ercs/erc-${eip}`
+            : `https://eipsinsight.com/rips/rip-${eip}`;
+
+        // Handle the 'deadline' field, use empty string if not available
+        const deadlineValue = deadline || "";
+
+        // Wrap title, author, discussion, and status in double quotes to handle commas
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
+    }).join("\n");
+
+  
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    
+    // Create a URL for the Blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create an anchor tag to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.csv";  // File name
+    a.click();
+    
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
+  
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const headingColor = useColorModeValue('black', 'white');
   return (
     <>
-      <Box bg={bg} borderRadius="0.55rem">
-        <a href="/riptable">
-          <Text
-            fontSize="2xl"
-            fontWeight="bold"
-            color="#30A0E0"
-            marginX="6"
-            paddingY={4}
-          >
-            {` Status - [${data.length}]`}
-          </Text>
-        </a>
+      <Box
+        bg={bg}
+        borderRadius="0.55rem"
+        minHeight="605px"
+        _hover={{
+          border: "1px",
+          borderColor: "#30A0E0",
+        }}
+      >
+        <br/>
+        <Flex justifyContent="space-between" alignItems="center" paddingX="1rem">
+          <Heading size="md" color={headingColor}>
+          <NextLink
+      href={
+         "/riptable"
+      }
+    >
+      <Text
+        fontSize="xl"
+        fontWeight="bold"
+        color="#30A0E0"
+        className="text-left"
+        paddingLeft={4}
+        display="flex"
+        flexDirection="column"
+      >
+        {`RIP - [${data.length}]`}
+      </Text>
+    </NextLink>
+          </Heading>
+          {/* Assuming a download option exists for the yearly data as well */}
+          <Button colorScheme="blue"  fontSize={{ base: "0.6rem", md: "md" }} onClick={async () => {
+    try {
+      // Trigger the CSV conversion and download
+      downloadData();
+
+      // Trigger the API call
+      await axios.post("/api/DownloadCounter");
+    } catch (error) {
+      console.error("Error triggering download counter:", error);
+    }
+  }}>
+            Download CSV
+          </Button>
+        </Flex>
         <Area {...config} />
         <Box className={"w-full"}>
           <DateTime />
         </Box>
       </Box>
+
     </>
   );
 };
 
-export default RIPStatusDonut;
+export default EIPStatusDonut;

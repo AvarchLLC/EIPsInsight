@@ -2,17 +2,26 @@ import { Providers } from "@/app/providers";
 import React from "react";
 import LargeWithAppLinksAndSocial from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { Box, ColorModeScript, Text, Link } from "@chakra-ui/react";
+import { Box, ColorModeScript, Text, Link, Flex } from "@chakra-ui/react";
 import { Inter } from "next/font/google";
 import "../app/globals.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
+import Script from "next/script";
+import FloatingContributionIcon from "./FloatingContributionIcon";
+import BookmarkFloater from './BookmarkFloater';
+import { SessionProvider } from "next-auth/react";
+import SessionWrapper from '@/components/SessionWrapper';
+import { AuthLocalStorageInitializer } from "./AuthLocalStorageInitializer";
+import { BookmarkProvider } from './BookmarkContext';
+
 
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const router = usePathname();
   return (
+    <SessionWrapper>
     <motion.div
       key={router}
       initial="initialState"
@@ -41,8 +50,21 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         <title>EIPs Insights</title>
         <link rel="icon" href="/eipFavicon.png" />
       </Head>
+
+      {/* Google Analytics */}
+      <Script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></Script>
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-R36R5NJFTW');
+        `}
+      </Script>
+
       <ColorModeScript initialColorMode="dark" />
       <Providers>
+        <BookmarkProvider>
         <Navbar />
 
         {/* New Section with Highlighted Background and Emojis */}
@@ -64,11 +86,22 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
            Link
           </Link>
         </Box> */}
-
+        <AuthLocalStorageInitializer/>
         {children}
+        <Box position="fixed" bottom={4} right={4} zIndex={1000}>
+  <FloatingContributionIcon />
+</Box>
+
+<Box position="fixed" bottom={{ base: 20, md: 4 }} right={{ base: 4, md: 20 }} zIndex={1000}>
+  <BookmarkFloater />
+</Box>
+
+
         <LargeWithAppLinksAndSocial />
+        </BookmarkProvider>
       </Providers>
     </motion.div>
+    </SessionWrapper>
   );
 };
 

@@ -1,260 +1,615 @@
-import React, {useEffect, useState} from 'react';
-import {Box, useColorModeValue, Text} from "@chakra-ui/react";
-import {borderColor} from "@mui/system";
-import NextLink from "next/link";
-import {motion} from "framer-motion";
-import LoaderComponent from "@/components/Loader";
-
-// interface Author{
-//     login: string;
-//     id: number;
-//     node_id: string;
-//     avatar_url: string;
-//     gravatar_id: string;
-//     url: string;
-//     html_url: string;
-//     followers_url: string;
-//     following_url: string;
-//     gists_url: string;
-//     starred_url: string;
-//     subscriptions_url: string;
-//     organizations_url: string;
-//     repos_url: string;
-//     events_url: string;
-//     received_events_url: string;
-//     type: string;
-//     site_admin:boolean;
-//     contributions: number;
-// }
+import React, { useEffect, useState } from 'react';
+import { Box, useColorModeValue, Text, Select,Input, SimpleGrid, Button, Flex,IconButton, Tooltip, Spinner, Avatar,Menu, MenuButton, MenuList,MenuItem} from "@chakra-ui/react";
+import { saveAs } from 'file-saver';
+import AllLayout from './Layout';
+import NextLink from 'next/link';
+// import AuthorEIPCounter from './AuthorBoard';
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
+import axios from 'axios';
 
 interface EIP {
-    _id: string;
-    eip: string;
-    title: string;
-    author: string;
-    status: string;
-    type: string;
-    category: string;
-    created: string;
-    discussion: string;
-    deadline: string;
-    requires: string;
-    unique_ID: number;
-    __v: number;
+  _id: string;
+  eip: string;
+  type: string;
+  title:string;
+  status:string;
+  category: string;
+  author: string;
+  repo: string;
 }
 
-const Author: React.FC = () => {
+interface AuthorCount {
+  name: string;
+  count: number;
+}
 
-    // const [data, setData] = React.useState<Author[]>([]);
-    const [data, setData] = React.useState<EIP[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+interface AuthorProps {
+  defaultQuery: string;
+}
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(`/api/allcontributors`);
-    //             const jsonData = await response.json();
-    //             console.log(jsonData);
-    //             setData(jsonData);
-    //             setIsLoading(false);
-    //         } catch (error) {
-    //             console.error("Error fetching data:", error);
-    //             setIsLoading(false);
-    //         }
-    //     };
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`/api/alleips`);
-                const jsonData = await response.json();
-                console.log(jsonData);
-                setData(jsonData);
-                setIsLoading(false);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                setIsLoading(false);
+const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
+  const [data, setData] = useState<EIP[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedAuthor, setSelectedAuthor] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [filterVisible, setFilterVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const cardsPerPage = 25;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedAuthor]);
+
+  const [authorCounts, setAuthorCounts] = useState<AuthorCount[]>([]);
+  const [visibleCount, setVisibleCount] = useState(5);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/graphsv4`);
+        const jsonData = await response.json();
+
+        const getEarliestEntries = (data: any[], key: string) => {
+          const uniqueEntries: Record<string, any> = {};
+          data.forEach(entry => {
+            const entryKey = entry[key];
+            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
+              uniqueEntries[entryKey] = entry;
             }
+          });
+          return Object.values(uniqueEntries);
         };
 
-        fetchData();
-    }, []);
+        let filteredData = [
+          ...getEarliestEntries(jsonData.eip, 'eip'),
+          ...getEarliestEntries(jsonData.erc, 'eip'),
+          ...getEarliestEntries(jsonData.rip, 'eip'),
+        ];
+        filteredData = filteredData.filter(
+          (entry: EIP, index: number, self: EIP[]) =>
+            entry.eip !== '1' || index === self.findIndex((e: EIP) => e.eip === '1')
+        );
 
+        setData(filteredData);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
 
+    fetchData();
+    setSelectedAuthor(defaultQuery)
 
-    const uniqueAuthorNames = new Set<string>();
+  }, []);
 
-    const formattedAuthors : any[] = [];
-
-    data.forEach((item) => {
-        const authors = item.author.split(','); // Split authors by comma
-
-        authors.forEach((author) => {
-            const trimmedAuthor = author.trim();
-            if (trimmedAuthor) {
-                if (trimmedAuthor.includes('@') && trimmedAuthor.includes('(') && trimmedAuthor.includes(')')) {
-                    // It matches type 2 pattern
-                    const type2Match = trimmedAuthor.match(/^(.*?)\s?\((@.*?)\)$/);
-                    if (type2Match) {
-                        const name = type2Match[1].trim();
-                        const username = type2Match[2].replace(/[@()]/g, ''); // Remove "@" and brackets
-                        // Add the name to the set and to the result if it's unique
-                        if (!uniqueAuthorNames.has(name)) {
-                            uniqueAuthorNames.add(name);
-                            formattedAuthors.push({ name, username });
-                        }
-                    }
-                } else {
-
-                    const type1Match = trimmedAuthor.match(/^(.*?)\s?<.*?@.*?>$/);
-                    if (type1Match) {
-                        const name = type1Match[1].trim();
-                        // Add the name to the set and to the result if it's unique
-                        if (!uniqueAuthorNames.has(name)) {
-                            uniqueAuthorNames.add(name);
-                            formattedAuthors.push({ name });
-                        }
-                    }
-                }
+  useEffect(() => {
+    const authorMap: Record<string, number> = {};
+  
+    data.forEach((eip) => {
+      const authors = eip.author.split(",").map((author) => author.trim());
+      authors.forEach((author) => {
+        if (author) {
+          // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
+          const handleMatch = author.match(/(.+?)\s\(@([a-zA-Z0-9-_]+)\)$/);
+          
+          if (handleMatch) {
+            // Add counts for the full name and the GitHub handle
+            const fullName = handleMatch[1].trim(); // Extract full name
+            const handle = handleMatch[2].trim();  // Extract handle
+        
+            authorMap[fullName] = (authorMap[fullName] || 0) + 1;
+            authorMap[`@${handle}`] = (authorMap[`@${handle}`] || 0) + 1;
+          } else {
+            // Match email address in the format: Vitalik Buterin <vitalik.buterin@ethereum.org>
+            const emailMatch = author.match(/(.+?)\s<.+?>$/);
+        
+            if (emailMatch) {
+              const fullName = emailMatch[1].trim(); // Ignore email part, extract only the name
+              authorMap[fullName] = (authorMap[fullName] || 0) + 1;
+            } else {
+              // If no special format is found, count the entire string as the author's name
+              authorMap[author] = (authorMap[author] || 0) + 1;
             }
-        });
+          }
+        }
+        
+      });
+    });
+  
+    const authorArray = Object.entries(authorMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  
+    setAuthorCounts(authorArray);
+  }, [data]);
+  
+
+  const handleExpand = () => {
+    setVisibleCount((prev) => Math.min(prev + 5, authorCounts.length));
+  };
+
+  const handleCollapse = () => {
+    setVisibleCount(5);
+  };
+
+  // Filter and paginate data
+  const filteredData = data.filter(item =>
+    !selectedAuthor || item.author.toLowerCase().includes(selectedAuthor.toLowerCase())
+  );
+  // const totalPages = Math.ceil(filteredData.length / cardsPerPage);
+  const filteredData2 = searchTerm
+    ? filteredData.filter((item) =>
+        item.eip.toString().includes(searchTerm.trim())
+      )
+    : filteredData;
+    const totalPages = Math.ceil(filteredData2.length / cardsPerPage);
+  
+
+  const jsonToCsv = (data: EIP[]): string => { 
+    const csvRows: string[] = [];
+    const headers = ['EIP', 'Title', 'Author', 'Type', 'Category', 'Repo'];
+    
+    // Add headers to the CSV
+    csvRows.push(headers.join(','));
+  
+    // Add data rows
+    data.forEach((item: EIP) => {
+      const row = [
+        `EIP-${item.eip}`, // EIP ID
+        `"${item.title}"`, // Title (quoted to handle commas)
+        `"${item.author}"`, // Author(s) (quoted to handle commas)
+        item.type, // Type
+        item.category, // Category
+        item.repo.toUpperCase() // Repo in uppercase
+      ];
+      csvRows.push(row.join(','));
+    });
+  
+    return csvRows.join('\n');
+  };
+
+  const filteredAuthors = authorCounts.filter((author) =>
+    author.name.toLowerCase().includes(selectedAuthor.toLowerCase())
+  );
+  
+  const paginatedData = filteredData2.slice(
+    (currentPage - 1) * cardsPerPage,
+    currentPage * cardsPerPage
+  );
+  console.log("paginated data:", paginatedData);
+  
+  const handleDownload = () => {
+    if (!paginatedData.length) {
+      alert('No data to download.');
+      return;
+    }
+  
+    const csvData = jsonToCsv(paginatedData);
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'Author_data.csv');
+  };
+
+  const bg = useColorModeValue('#f7fafc', '#171923');
+  const cardBg = useColorModeValue('white', 'gray.700');
+  const border = useColorModeValue('gray.300', 'gray.600');
+
+
+
+
+  return (
+    <>
+      <Box p={5} maxW="1200px" mx="auto">
+  {/* Search Bar & Dropdown */}
+  <Flex justifyContent="center" mt={3} alignItems="center" gap={4}>
+    {/* Search Input */}
+    <Input
+      placeholder="Search Author"
+      value={selectedAuthor}
+      onChange={(e) => setSelectedAuthor(e.target.value)}
+      size="lg"
+      width={{ base: '80%', md: '50%' }}
+      borderRadius="full"
+      boxShadow="md"
+      bg={useColorModeValue('white', 'gray.800')}
+      borderColor={useColorModeValue('gray.300', 'gray.600')}
+      _focus={{
+        borderColor: useColorModeValue('blue.400', 'blue.600'),
+        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
+      }}
+    />
+
+    {/* Dropdown Menu */}
+    <Menu>
+      <MenuButton
+        as={Button}
+        rightIcon={<ChevronDownIcon />}
+        colorScheme="blue"
+        size="md"
+        width="200px" // Fixed width
+      >
+        Authors
+      </MenuButton>
+      <MenuList>
+        <MenuItem onClick={() => window.location.href = '/SearchEip'}>
+          EIP
+        </MenuItem>
+        <MenuItem onClick={() => window.location.href = '/SearchEipTitle'}>
+          Title
+        </MenuItem>
+        <MenuItem onClick={() => window.location.href = '/SearchPRSandISSUES'}>
+                PR/ISSUE
+        </MenuItem>
+      </MenuList>
+    </Menu>
+  </Flex>
+</Box>
+
+
+        <Box p={4}>
+
+        
+
+          {/* <AuthorEIPCounter eips={data}/> */}
+
+        {isLoading ? (
+          <Text textAlign="center">Loading...</Text>
+        ) : (
+          <>
+          <Flex
+      wrap="wrap"
+    //   direction="column"
+      alignItems="center"
+      justifyContent="center"
+      p={4}
+      mb={2}
+      borderRadius="lg"
+      overflowX="auto"
+    >
+      {filteredAuthors.slice(0, visibleCount).map((author) => (
+  <Box
+  key={author.name}
+  bg={selectedAuthor === author.name ? "blue.600" : "blue.500"}
+  color="white"
+  px={2} // Reduced padding
+  py={1} // Reduced padding
+  borderRadius="full"
+  m={1} // Reduced margin
+  border="1px solid"
+  borderColor="blue.500"
+  whiteSpace="nowrap"
+  transform={selectedAuthor === author.name ? "scale(1.1)" : "scale(1.0)"}
+  transition="all 0.2s ease"
+  _hover={{
+    bg: "blue.400",
+    transform: "scale(1.05)",
+    cursor: "pointer",
+  }}
+  onClick={() => setSelectedAuthor(author.name)}
+  display="flex"
+  alignItems="center"
+>
+  <Avatar
+    size="sm"
+    src={author.name.startsWith('@') ? `https://github.com/${author.name.slice(1)}.png` : ''}
+    bg={author.name.startsWith('@') ? undefined : 'black'}
+  />
+  <Text fontSize="xs" fontWeight="bold" ml={1} mr={1}>
+    {author.name} ({author.count})
+  </Text>
+</Box>
+
+))}
+
+
+
+
+      {visibleCount < authorCounts.length && (
+        <Tooltip label="Expand" fontSize="md">
+          <IconButton
+          icon={<ChevronDownIcon fontWeight="bold" />}
+          aria-label="View More"
+          onClick={handleExpand}
+          variant="ghost"
+          bg="blue.500"
+          color="white"
+          ml={2}
+          fontSize="xl"
+          borderRadius="full" // Corrected the property for rounded circle
+          w="40px" // Added fixed width
+          h="40px" // Added fixed height
+          _hover={{ bg: "blue.400", transform: "scale(1.1)" }} // Adjusted hover behavior
+        />
+
+        </Tooltip>
+      )}
+
+      {visibleCount > 20 && (
+        <Tooltip label="Collapse" fontSize="md">
+          <IconButton
+            icon={<ChevronUpIcon fontWeight="bold" />}
+            aria-label="View More"
+          onClick={handleCollapse}
+          variant="ghost"
+          bg="blue.500"
+          color="white"
+          ml={2}
+          fontSize="xl"
+          borderRadius="full" // Corrected the property for rounded circle
+          w="40px" // Added fixed width
+          h="40px" // Added fixed height
+          _hover={{ bg: "blue.400", transform: "scale(1.1)" }} // Adjusted hover behavior
+        />
+        </Tooltip>
+      )}
+    </Flex>
+
+                  {/* <Box mt={8}>
+                   
+                    <Box padding={1} marginBottom={1}>
+                    
+                      <Button colorScheme="blue" onClick={async () => {
+                      try {
+                       
+                        handleDownload()
+
+                       
+                        await axios.post("/api/DownloadCounter");
+                      } catch (error) {
+                        console.error("Error triggering download counter:", error);
+                      }
+                    }} disabled={isLoading}>
+                        {isLoading ? <Spinner size="sm" /> : "Download CSV"}
+                      </Button>
+                    </Box>
+                  </Box> */}
+            
+                  <Box
+  display="flex"
+  justifyContent="flex-start" // Align items to the start (left)
+  alignItems="center"
+  mb={4}
+  ml={2}
+  gap={4}
+>
+<Button colorScheme="blue" onClick={async () => {
+                      try {
+                        // Trigger the CSV conversion and download
+                        handleDownload()
+
+                        // Trigger the API call
+                        await axios.post("/api/DownloadCounter");
+                      } catch (error) {
+                        console.error("Error triggering download counter:", error);
+                      }
+                    }} disabled={isLoading}>
+                        {isLoading ? <Spinner size="sm" /> : "Download CSV"}
+                      </Button>
+  {/* Filter Button on the left */}
+  <Button
+    onClick={() => setFilterVisible((prev) => !prev)}
+    bg="blue.500"
+    color="white"
+    _hover={{ bg: "blue.600" }}
+  >
+    Filter EIP
+  </Button>
+
+  {/* Search Bar to the right of the filter button */}
+  {filterVisible && (
+    <Input
+      placeholder="Search EIP"
+      boxShadow="md"
+      bg={useColorModeValue('white', 'gray.800')}
+      borderColor={useColorModeValue('gray.300', 'gray.600')}
+      _focus={{
+        borderColor: useColorModeValue('blue.400', 'blue.600'),
+        boxShadow: '0 0 0 2px rgba(66, 153, 225, 0.6)',
+      }}
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      width="200px"
+    />
+  )}
+</Box>
+
+                  
+            {/* Display Cards */}
+            <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={6}>
+              {paginatedData.map((item) => (
+                <NextLink
+                  key={item._id}
+                  href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}
+                  target="_blank"
+                  passHref
+                >
+                  {/* <a target="_blank" rel="noopener noreferrer">  */}
+                  <Box
+  bg={bg}
+  paddingX="0.5rem"
+  borderRadius="0.55rem"
+  _hover={{
+    transform: "scale(1.05)",
+    outline: "2px solid #30A0E0",
+    outlineOffset: "-2px",
+    transition: "transform 0.2s ease, outline 0.2s ease",
+  }}
+  transition="transform 0.2s ease, outline 0.2s ease"
+  width="100%"
+  padding="1rem"
+  display="flex"
+  flexDirection="column"
+  minHeight="300px" // Fixed height for uniformity
+  justifyContent="space-between" // Align items evenly
+>
+  {/* Repo-EIP Title Section */}
+  <Text
+    fontSize="xl"
+    fontWeight="extrabold"
+    color={useColorModeValue('blue.500', 'blue.300')}
+    mb={3}
+    wordBreak="break-word"
+  >
+    {item.repo.toUpperCase()}-{item.eip}
+  </Text>
+
+  {/* Title Section */}
+  <Text
+    fontSize="sm"
+    fontWeight="bold"
+    color={useColorModeValue('gray.700', 'gray.300')}
+    isTruncated
+    maxWidth="100%"
+    marginBottom="0.5rem"
+  >
+    {item.title}
+  </Text>
+
+  {/* Type Section */}
+  <Text fontSize="sm" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+    <b>Type:</b> {item.type}
+  </Text>
+
+  {/* Category Section */}
+  <Text fontSize="sm" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+    <b>Category:</b> {item.category}
+  </Text>
+  <Text fontSize="sm" color={useColorModeValue('gray.700', 'gray.300')} mb={1}>
+    <b>Status:</b> {item.status}
+  </Text>
+
+  {/* Authors Section */}
+  <Text
+    fontSize="xs"
+    fontWeight="bold"
+    color={useColorModeValue('gray.700', 'gray.300')}
+    marginBottom="0.5rem"
+  >
+    Authors:
+  </Text>
+  <Box
+  display="flex"
+  alignItems="center"
+  gap="0.5rem"
+  marginBottom="1rem"
+  maxWidth="100%"
+>
+  {(() => {
+    const authors = item.author.split(",").map((author) =>
+      author.replace(/<.*?>/g, "").trim()
+    );
+
+    const sortedAuthors = authors.sort((a, b) => {
+      const aIsSelected = !!(
+        selectedAuthor &&
+        a.toLowerCase().includes(selectedAuthor.toLowerCase())
+      );
+      const bIsSelected = !!(
+        selectedAuthor &&
+        b.toLowerCase().includes(selectedAuthor.toLowerCase())
+      );
+      return Number(bIsSelected) - Number(aIsSelected);
     });
 
-    // console.log(formattedAuthors);
+    // Show only the first author with ...more if applicable
+    const firstAuthor = sortedAuthors[0];
+    const hasMoreAuthors = sortedAuthors.length > 1;
 
-
-    // const [githubData, setGithubData] = useState<any[]>([]);
-    //
-    // // Function to fetch GitHub profile data
-    // const fetchGitHubProfile = async (username: string) => {
-    //     try {
-    //         const response = await fetch(`https://api.github.com/users/${username}`);
-    //         if (response.ok) {
-    //             const userData = await response.json();
-    //             return userData;
-    //         } else {
-    //             throw new Error('GitHub API response not okay');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching GitHub profile:', error);
-    //         return null;
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         const githubProfiles = await Promise.all(
-    //             formattedAuthors.map((author) => {
-    //                 if (author.username) {
-    //                     return fetchGitHubProfile(author.username);
-    //                 } else {
-    //                     return Promise.resolve(null);
-    //                 }
-    //             })
-    //         );
-    //
-    //         setGithubData(githubProfiles);
-    //     };
-    //
-    //     fetchData();
-    // }, [formattedAuthors]);
-
-
-
-
-
-
-
-        const bg = useColorModeValue('#f7fafc', '#171923');
-    const border = useColorModeValue('#000000', '#ffffff')
-
-    return(
-        <>
-            {/*<Box*/}
-            {/*    paddingBottom={{lg:'10', sm: '10',base: '10'}}*/}
-            {/*    marginX={{lg:"40",md:'2', sm: '2', base: '2'}}*/}
-            {/*    paddingX={{lg:"10",md:'5', sm:'5',base:'5'}}*/}
-            {/*    marginTop={{lg:"10",md:'5', sm:'5',base:'5'}}*/}
-            {/*>*/}
-            {/*    {*/}
-            {/*        isLoading ? (*/}
-            {/*            <>*/}
-            {/*                <Box*/}
-            {/*                    display="flex"*/}
-            {/*                    justifyContent="center"*/}
-            {/*                    alignItems="center"*/}
-            {/*                    height="100vh"*/}
-            {/*                >*/}
-            {/*                    <motion.div*/}
-            {/*                        initial={{ opacity: 0, y: -20 }}*/}
-            {/*                        animate={{ opacity: 1, y: 0 }}*/}
-            {/*                        transition={{ duration: 0.5 }}*/}
-            {/*                    >*/}
-            {/*                        <LoaderComponent />*/}
-            {/*                    </motion.div>*/}
-            {/*                </Box>*/}
-            {/*            </>*/}
-            {/*        ):(*/}
-            {/*            <Box*/}
-            {/*                className={'grid grid-cols-3 gap-8'}*/}
-            {/*            >*/}
-
-            {/*                    {*/}
-            {/*                        formattedAuthors.map((author,index) => (*/}
-            {/*                            <>*/}
-            {/*                            <Box*/}
-            {/*                                bgColor={bg}*/}
-            {/*                                border={2}*/}
-            {/*                                borderColor={border}*/}
-            {/*                                borderRadius={'0.55rem'}*/}
-            {/*                                padding={4}*/}
-            {/*                            >*/}
-            {/*                                <div className={'space-y-8'} key={index}>*/}
-            {/*                                    /!*<div className={'flex justify-center w-full'}>*!/*/}
-            {/*                                    /!*    <NextLink href={authors.html_url} target={'_blank'}>*!/*/}
-            {/*                                    /!*        <img*!/*/}
-            {/*                                    /!*            src={authors.avatar_url}*!/*/}
-            {/*                                    /!*            alt={authors.login}*!/*/}
-            {/*                                    /!*            className={'w-20 h-20 rounded-full hover:scale-110 duration-200 ml-5 mt-3'}*!/*/}
-            {/*                                    /!*        />*!/*/}
-            {/*                                    /!*    </NextLink>*!/*/}
-            {/*                                    /!*</div>*!/*/}
-
-            {/*                                    /!*<div>*!/*/}
-            {/*                                    /!*    <Text className={'text-2xl font-bold text-center'}>{authors.login}</Text>*!/*/}
-            {/*                                    /!*</div>*!/*/}
-
-            {/*                                    /!*<div>*!/*/}
-            {/*                                    /!*    <Text className={'text-xl text-center'}>Contributions - {authors.contributions}</Text>*!/*/}
-            {/*                                    /!*</div>*!/*/}
-            {/*                                    <div className={'flex justify-center w-full'}>*/}
-            {/*                                        {*/}
-            {/*                                            author.username ? (*/}
-            {/*                                                <img*/}
-            {/*                                                    src={githubData[index]?.avatar_url}*/}
-            {/*                                                    alt={`${author.username}'s GitHub Avatar`}*/}
-            {/*                                                    className={'w-20 h-20 rounded-full hover:scale-110 duration-200 ml-5 mt-3'}*/}
-            {/*                                                />*/}
-            {/*                                            ): null*/}
-            {/*                                        }*/}
-            {/*                                    </div>*/}
-            {/*                                    <Text className={'text-2xl font-bold text-center'}>{author.name}</Text>*/}
-            {/*                                </div>*/}
-            {/*                            </Box>*/}
-            {/*                            </>*/}
-            {/*                        ))*/}
-            {/*                    }*/}
-
-            {/*            </Box>*/}
-            {/*        )*/}
-            {/*    }*/}
-            {/*</Box>*/}
-
-
-            {/*<Box>*/}
-
-            {/*</Box>*/}
-        </>
+    return (
+      <Box
+        display="flex"
+        alignItems="center"
+        gap="0.5rem"
+        maxWidth="100%"
+        bg="blue.500"
+        color="white"
+        px={2}
+        py={1}
+        borderRadius="full"
+        border="1px solid"
+        borderColor="blue.500"
+        wordBreak="break-word" // Allow wrapping
+        whiteSpace="normal"    // Ensure text can wrap
+        overflow="hidden"      // Prevent overflow
+        flexWrap="nowrap"      // Prevent splitting of content
+        transition="all 0.2s ease"
+        _hover={{
+          bg: "blue.400",
+          transform: "scale(1.05)",
+          cursor: "pointer",
+        }}
+        onClick={() => setSelectedAuthor(firstAuthor)} // Set selected author
+      >
+        <Avatar
+          size="xs"
+          src={
+            firstAuthor.includes("@") && firstAuthor.includes(")")
+              ? `https://github.com/${firstAuthor.slice(
+                  firstAuthor.indexOf("@") + 1,
+                  firstAuthor.indexOf(")")
+                )}.png`
+              : ""
+          }
+          bg={
+            firstAuthor.includes("@") && firstAuthor.includes(")")
+              ? undefined
+              : "black"
+          }
+        />
+        <Box
+          display="flex"
+          alignItems="center"
+          gap="0.25rem"
+          flexWrap="wrap"  // Allow wrapping of the text
+        >
+          <Text fontSize="xs" fontWeight="bold" isTruncated>
+            {firstAuthor}
+          </Text>
+          {hasMoreAuthors && (
+            <Text fontSize="xs" fontWeight="bold" ml={1} whiteSpace="nowrap">
+              ...more
+            </Text>
+          )}
+        </Box>
+      </Box>
     );
+  })()}
+</Box>
+
+</Box>
+
+
+                 
+                </NextLink>
+              ))}
+            </SimpleGrid>
+
+            {/* Pagination */}
+            <Box mt={8} display="flex" justifyContent="center" alignItems="center" gap={4}>
+              <Button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <Text>
+                Page {currentPage} of {totalPages}
+              </Text>
+              <Button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </Box>
+          </>
+        )}
+      </Box>
+    </>
+  );
 };
-//
+
 export default Author;

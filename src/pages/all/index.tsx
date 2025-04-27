@@ -13,8 +13,15 @@ import CatTable from "@/components/CatTable";
 import RipCatTable from "@/components/RipCatTable";
 import SearchBox from "@/components/SearchBox";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import Link from "next/link";
+import axios from "axios";
+import { DownloadIcon } from "@chakra-ui/icons";
+import { motion } from "framer-motion";
+import Author from "@/components/Author";
+import SearchByEip from '@/components/SearchByEIP2';
+
+const MotionBox = motion(Box);
 
 interface EIP {
   _id: string;
@@ -34,18 +41,29 @@ interface EIP {
 }
 
 const All = () => {
-  const [selected, setSelected] = useState("Meta");
+  const [selected, setSelected] = useState("All");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [data, setData] = useState<EIP[]>([]);
+  const [data2, setData2] = useState<EIP[]>([]);
+  const [data3, setData3] = useState<EIP[]>([]);
   const [loading, setLoading] = useState(false); 
   
-  
+  useEffect(() => {
+    // Check if a hash exists in the URL
+    const hash = window.location.hash.slice(1); // Remove the '#' character
+    if (hash && optionArr.includes(hash)) {
+      setSelected(hash);
+    }
+  }, []); // Empty dependency array to run only on component mount
+
+  const handleSelection = (item:any) => {
+    setSelected(item);
+    window.location.hash = item; // Update the hash in the URL
+  };
+
   const optionArr = [
-    "Meta",
-    "Informational",
-    "Core",
-    "Networking",
-    "Interface",
+    "All",
+    "EIP",
     "ERC",
     "RIP",
   ];
@@ -60,11 +78,27 @@ const All = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
+      try { 
         setLoading(true);
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
         setData(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip));
+        const alldata=jsonData.eip.concat(jsonData.erc).concat(jsonData.rip);
+        let filteredData = alldata
+        .filter((item:any) => item.category === selected);
+        if(selected==="All"){
+          filteredData=alldata;
+        }
+
+        setData2(filteredData);
+        console.log("all data:",alldata);
+        console.log("filtered data:", filteredData);
+
+        let filteredData2 = alldata
+        .filter((item:any) => item.repo === 'rip');
+
+        setData3(filteredData2);
+
         setLoading(false);
         setIsLoading(false); // Set isLoading to false after data is fetched
       } catch (error) {
@@ -75,23 +109,34 @@ const All = () => {
     fetchData();
   }, []);
 
+  useEffect(()=>{
+        let filteredData = data
+        .filter((item:any) => item.category === selected);
+        if(selected==="All"){
+          filteredData=data;
+        }
+        console.log("main data:", filteredData);
+
+        setData2(filteredData);
+  },[selected]);
+
   const handleDownload = () => {
     // Filter data based on the selected category
     let filteredData;
     if(selected!=='RIP'){
     filteredData = data
-        .filter((item) => item.category === selected)
+        .filter((item) => (selected==="All"||item.category === selected))
         .map((item) => {
-            const { eip, title, author, repo } = item;
-            return { eip, title, author, repo };
+            const { repo, eip, title, author, discussion, status, deadline, type, category,created } = item;
+            return { repo, eip, title, author, discussion, status, deadline, type, category,created };
         });
       }
     else{
     filteredData=data
     .filter((item) => item.repo === 'rip')
         .map((item) => {
-            const { eip, title, author, repo } = item;
-            return { eip, title, author, repo };
+            const { repo, eip, title, author, discussion, status, deadline, type, category,created } = item;
+            return { repo, eip, title, author, discussion, status, deadline, type, category,created };
         });
     }
 
@@ -102,15 +147,22 @@ const All = () => {
     }
 
     // Define the CSV header
-    const header = "EIP,Title,Author,Repo\n";
+    const header = "Repo, EIP, Title, Author,Status, deadline, Type, Category, Discussion, Created at, Link\n";
 
     // Prepare the CSV content
     const csvContent = "data:text/csv;charset=utf-8,"
-        + header
-        + filteredData.map(({ eip, title, author, repo }) => {
-            // Wrap title and author in double quotes to handle commas
-            return `${eip},"${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${repo}"`;
-        }).join("\n");
+    + header
+    + filteredData.map(({ repo, eip, title, author, discussion, status, deadline, type, category, created }) => {
+        // Generate the correct URL based on the repo type
+        const url = repo === "eip"
+            ? `https://eipsinsight.com/eips/eip-${eip}`
+            : repo === "erc"
+            ? `https://eipsinsight.com/ercs/erc-${eip}`
+            : `https://eipsinsight.com/rips/rip-${eip}`;
+
+        // Wrap title and author in double quotes to handle commas
+        return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${deadline ? deadline.replace(/"/g, '""') : '-'}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${url}"`; }).join("\n");
+
   
     // Check the generated CSV content before download
     console.log("CSV Content:", csvContent);
@@ -136,76 +188,225 @@ const All = () => {
   return (
     <>
       <AllLayout>
+        <Box 
+        marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}>
+        <SearchByEip defaultQuery=''/>
+        </Box>
         <Box
           paddingBottom={{ lg: "10", sm: "10", base: "10" }}
           marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
           paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-          marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          // marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
+
+          {/* <Author defaultQuery=''/> */}
+          <br/>
           <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold py-8">
             <div className="flex justify-between w-full">
-              <div className="space-x-12">
-                {optionArr.map((item, key) => (
-                  <button
-                    onClick={() => {
-                      setSelected(item);
-                    }}
-                    className={
-                      selected === item ? "underline underline-offset-4" : ""
-                    }
+            <Box>
+              {/* For larger screens, render buttons */}
+              <Box display={{ base: "none", md: "flex" }} className="space-x-6">
+              {optionArr.map((item, key) => {
+                if (item === "All") {
+                  return (
+                    <button
+                      key={key}
+                      className="underline underline-offset-4"
+                    >
+                      {item}
+                    </button>
+                  );
+                }
+
+                const link = `/${item.toLowerCase()}`;
+
+                return (
+                  <a
+                    href={link}
                     key={key}
+                    className="mr-4"
                   >
-                    {item}
-                  </button>
-                ))}
-              </div>
-              <div>
-                <SearchBox />
-              </div>
+                    <button>
+                      {item}
+                    </button>
+                  </a>
+                );
+              })}
+              </Box>
+
+              {/* For smaller screens, render a dropdown */}
+              <Box display={{ base: "block", md: "none" }}
+              className="w-full max-w-md" 
+              mx="auto" // Horizontal centering
+              textAlign="center" 
+              >
+                <select
+                  value={selected}
+                  onChange={(e) => setSelected(e.target.value)}
+                  style={{
+                    padding: "8px",
+                    borderRadius: "4px",
+                    borderColor: "gray",
+                    fontSize: "16px",
+                  }}
+                >
+                  {optionArr.map((item, key) => (
+                    <option value={item} key={key}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </Box>
+            </Box>
+
+            {/* <Box 
+              display={{ base: "none", lg: "block" }} 
+              className="w-full max-w-md" 
+              ml={4} // Adjust the value as needed
+            >
+              <SearchBox />
+            </Box> */}
+
             </div>
           </Box>
+          <Box 
+          display={{ base: "block", md: "block", lg: "none" }} 
+          className="w-full max-w-md" 
+          mx="auto" // Horizontal centering
+          textAlign="center" // Ensures content inside the box is centered
+        >
+          <SearchBox />
+        </Box>
 
-          {!loading && (
-                <Box mt={8}>
-                    {/* Download CSV section */}
-                    <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}>
-                        <Text fontSize="lg"
-                            marginBottom={2}
-                            color={useColorModeValue("gray.800", "gray.200")}>
-                            You can download the data here:
-                        </Text>
-                        <Button 
-                            colorScheme="blue" 
-                            onClick={handleDownload} 
-                            isLoading={loading} // Show loading spinner on button
-                            loadingText="Downloading" // Optional loading text
-                            isDisabled={loading} // Disable button when loading
-                        >
-                            Download CSV
-                        </Button>
-                    </Box>
-                </Box>
-            )}
+          <>
+      {loading ? (
+        <MotionBox
+          mt={8}
+          textAlign="center"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{
+            duration: 0.5,
+            repeat: Infinity,
+            repeatType: "reverse", // Pulsating effect
+          }}
+        >
+          <Spinner size="xl" color="blue.500" />
+          <Text
+            mt={4}
+            fontSize="lg"
+            color={useColorModeValue("gray.700", "gray.300")}
+          >
+            Fetching data...
+          </Text>
+        </MotionBox>
+      ) : (
+        <></>
+      )}
+    </>
 
           {selected === "RIP" ? (
             <Box>
-            <RipCatTable cat={selected} status={"Living"} />
-            <RipCatTable cat={selected} status={"Final"} />
-            <RipCatTable cat={selected} status={"Last Call"} />
-            <RipCatTable cat={selected} status={"Review"} />
-            <RipCatTable cat={selected} status={"Draft"} />
-            <RipCatTable cat={selected} status={"Withdrawn"} />
-            <RipCatTable cat={selected} status={"Stagnant"} />
+              {!loading && (
+    <Box mt={2} display="flex" justifyContent="flex-end" alignItems="center">
+      <Button
+        colorScheme="blue"
+        fontSize={{ base: "0.6rem", md: "md" }}
+        onClick={async () => {
+          try {
+            // Trigger the CSV conversion and download
+            handleDownload();
+
+            // Trigger the API call
+            await axios.post("/api/DownloadCounter");
+          } catch (error) {
+            console.error("Error triggering download counter:", error);
+          }
+        }}
+        isLoading={loading} // Show loading spinner on button
+        loadingText="Downloading" // Optional loading text
+        isDisabled={loading} // Disable button when loading
+      >
+       <DownloadIcon marginEnd={"1.5"} /> Download CSV
+      </Button>
+    
+</Box>)}
+
+
+            <RipCatTable dataset={data3} cat={selected} status={"Living"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Final"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Last Call"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Review"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Draft"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Withdrawn"} />
+            <RipCatTable dataset={data3} cat={selected} status={"Stagnant"} />
           </Box>
           ) : (
             <Box>
-              <CatTable cat={selected} status={"Living"} />
-              <CatTable cat={selected} status={"Final"} />
-              <CatTable cat={selected} status={"Last Call"} />
-              <CatTable cat={selected} status={"Review"} />
-              <CatTable cat={selected} status={"Draft"} />
-              <CatTable cat={selected} status={"Withdrawn"} />
-              <CatTable cat={selected} status={"Stagnant"} />
+              <Box>
+  {selected === "Meta" || selected === "All" ? (
+    <Box>
+     {!loading && (
+      <Box  mt={2} display="flex" justifyContent="space-between" alignItems="center">
+      <Box color="gray.500" fontStyle="italic">
+        * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can vary by 1.
+      </Box>
+      <Button
+        colorScheme="blue"
+        onClick={async () => {
+          try {
+            // Trigger the CSV conversion and download
+            handleDownload();
+
+            // Trigger the API call
+            await axios.post("/api/DownloadCounter");
+          } catch (error) {
+            console.error("Error triggering download counter:", error);
+          }
+        }}
+        isLoading={loading} // Show loading spinner on button
+        loadingText="Downloading" // Optional loading text
+        isDisabled={loading} // Disable button when loading
+      >
+       <DownloadIcon marginEnd={"1.5"} /> Download CSV
+      </Button>
+    </Box> )}
+    </Box>
+  ) : (
+    
+    <Box mt={2} display="flex" justifyContent="flex-end" alignItems="center">
+      <Button
+        colorScheme="blue"
+        onClick={async () => {
+          try {
+            // Trigger the CSV conversion and download
+            handleDownload();
+
+            // Trigger the API call
+            await axios.post("/api/DownloadCounter");
+          } catch (error) {
+            console.error("Error triggering download counter:", error);
+          }
+        }}
+        isLoading={loading} // Show loading spinner on button
+        loadingText="Downloading" // Optional loading text
+        isDisabled={loading} // Disable button when loading
+      >
+        Download CSV
+      </Button>
+    </Box>
+  )}
+</Box>
+
+
+              <CatTable dataset={data2} cat={selected} status={"Living"} />
+              <CatTable dataset={data2} cat={selected} status={"Final"} />
+              <CatTable dataset={data2} cat={selected} status={"Last Call"} />
+              <CatTable dataset={data2} cat={selected} status={"Review"} />
+              <CatTable dataset={data2} cat={selected} status={"Draft"} />
+              <CatTable dataset={data2} cat={selected} status={"Withdrawn"} />
+              <CatTable dataset={data2} cat={selected} status={"Stagnant"} />
             </Box>
           )}
         </Box>

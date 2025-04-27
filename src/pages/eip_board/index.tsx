@@ -15,7 +15,7 @@ import {
   import React, { useEffect, useState } from "react";
   import AllLayout from "@/components/Layout";
   import axios from "axios";
-import Comments from "@/components/comments";
+// import Comments from "@/components/comments";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {
@@ -137,7 +137,7 @@ import Comments from "@/components/comments";
               </Tbody>
             </Table>
           </TableContainer>
-          <Comments/>
+         {/* <Comments/> */}
         </Box>
       </AllLayout>
     );

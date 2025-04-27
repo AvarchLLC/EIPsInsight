@@ -96,7 +96,7 @@ const Interface = () => {
               />
             </FlexBetween>
             <TableStatus cat="Interface" />
-            <AreaStatus type={"EIPs"} />
+            {/* <AreaStatus type={"EIPs"} /> */}
           </Box>
         </motion.div>
       )}

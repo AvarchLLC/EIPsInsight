@@ -11,10 +11,13 @@ import {
   Link as LI,
   Stack,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import Header from "@/components/Header";
 import { DownloadIcon } from "@chakra-ui/icons";
+import DashboardDonut2 from "@/components/DashboardDonut2";
 import DashboardDonut from "@/components/DashboardDonut";
+// import { useRouter } from "next/router";
 import {
   Anchor,
   BookOpen,
@@ -27,7 +30,8 @@ import { BsArrowUpRight, BsGraphUp } from "react-icons/bs";
 import StackedColumnChart from "@/components/StackedBarChart";
 import AreaC from "@/components/AreaC";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { mockEIP } from "@/data/eipdata";
 import { usePathname } from "next/navigation";
 import FlexBetween from "./FlexBetween";
@@ -39,9 +43,11 @@ import SearchBox from "@/components/SearchBox";
 import BoyGirl from "@/components/BoyGirl";
 import BoyGirl2 from "@/components/BoyGirl2";
 import BoyGirl3 from "@/components/BoyGirl3";
-import AllChart from "./AllChart";
+import AllChart from "./AllChart2";
 import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 import ToolsSection from "./AvailableTools";
+import TypeGraphs from "@/components/TypeGraphs2";
+import CopyLink from "./CopyLink";
 
 interface EIP {
   _id: string;
@@ -51,7 +57,7 @@ interface EIP {
   status: string;
   type: string;
   category: string;
-  created: string;
+  created: Date;
   discussion: string;
   deadline: string;
   requires: string;
@@ -67,7 +73,12 @@ interface APIResponse {
 }
 
 const Dashboard = () => {
-  const [data, setData] = useState<APIResponse>(); // Set initial state as an empty array
+  const [data, setData] = useState<APIResponse>({
+    eip: [],
+    erc: [],
+    rip: [],
+  });
+  
   const [isLoading, setIsLoading] = useState(true); // Loader state
   const [isDarkMode, setIsDarkMode] = useState(false);
   
@@ -93,6 +104,12 @@ const Dashboard = () => {
     fetchData();
   }, []);
   const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const uniqueStatuses = [...new Set(allData.map(item => item.status))];
+  console.log(uniqueStatuses);
+  const uniqueeip = allData.filter((item) => item.status === "");
+  console.log("unique eip1:", uniqueeip);
+  const uniqueeip2 = allData.filter((item) => item.status === " ");
+  console.log("unique eip2:", uniqueeip2);
 
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
@@ -111,6 +128,31 @@ const Dashboard = () => {
     month: "long",
   });
   const year = new Date().getFullYear();
+
+  // const router = useRouter();
+  
+    const scrollToHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.getElementById(hash.slice(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    };
+  
+    useEffect(() => {
+      if (!isLoading) {
+        scrollToHash();
+      }
+    }, [isLoading]);
+  
+    useLayoutEffect(() => {
+      router.events.on("routeChangeComplete", scrollToHash);
+      return () => {
+        router.events.off("routeChangeComplete", scrollToHash);
+      };
+    }, [router]);
 
   return (
     <>
@@ -180,7 +222,7 @@ const Dashboard = () => {
         base: "xl",
       }}
     >
-      Ethereum <br /> Improvement <br /> Proposal <br /> Insights
+      Ethereum <br /> Improvement <br /> Proposal <br /> Insight
     </Text>
                       </Box>
                       <br/>
@@ -243,7 +285,7 @@ const Dashboard = () => {
                                 color: useColorModeValue("white", "#F5F5F5"),
                               }}
                             >
-                              {monthName} {year} Insights
+                              {monthName} {year} Insight
                             </Button>
                           </NextLink>
                         </Box>
@@ -260,7 +302,7 @@ const Dashboard = () => {
                       padding={4} // Padding around the text
                       boxShadow="md" 
                       >
-                  <AllChart type="Total" />
+                  <AllChart type="Total" dataset={data}/>
                   </Box>
                 </div>
                 
@@ -274,7 +316,7 @@ const Dashboard = () => {
                     bgGradient={useColorModeValue(bgGradientLight, bgGradientDark)} 
                     bgClip="text" 
                   >
-                    Ethereum <br /> Improvement <br /> Proposal <br /> Insights
+                    Ethereum <br /> Improvement <br /> Proposals <br /> Insight
                   </Text>
                   <Stack direction={"row"} spacing={"6"} paddingTop={"20"} justifyContent={"center"}>
                     <Box>
@@ -332,15 +374,28 @@ const Dashboard = () => {
                             color: useColorModeValue("white", "#F5F5F5"),
                           }}
                         >
-                          {monthName} {year} Insights
+                          {monthName} {year} Insight
                         </Button>
                       </NextLink>
                     </Box>
                   </Stack>
                   <br/><br/>
-                  <AllChart type="Total" />
+                  <AllChart type="Total"  dataset={data}/>
                 </div>
               </Box>
+
+              <Box
+                className="py-8"
+                display={{ base: "block", md: "block", lg:"none" }}
+              >
+                <Box
+                  className="w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
+                  bgColor={bg}
+                >
+                  <SearchBox />
+                </Box>
+              </Box>
+
 
               {/* <div className="py-8"> */}
                 {/* <Box
@@ -353,52 +408,27 @@ const Dashboard = () => {
                 {/* </Box> */}
               {/* </div> */}
 
-              <div className="py-8">
-                <Box
-                  className={
-                    "w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
-                  }
-                  bgColor={bg}
+
+              <Box
+                  className="grid grid-cols-1 lg:grid-cols-2 pb-10 gap-8 lg:gap-8"
+                  bg="rgba(0, 0, 0, 0.5)"
+                  borderRadius="md" // Rounded corners
+                  padding={5}
+                  boxShadow="md"
+                  marginTop={10}
                 >
-                  <SearchBox />
-                </Box>
-              </div>
-
-              {/* <Box className={"lg:grid grid-cols-2 hidden pb-20"}>
-                <div className={"pl-8"}>
-                  <BoyGirl />
-                </div>
-
-                <div className={" flex justify-center items-center"}>
-                  <div className={"pt-24 space-y-6"}>
-                    <h1 className={"text-5xl font-bold"}>
-                      What is <span className="text-blue-400">an EIP</span>?
+                  {/* Centered Heading */}
+                  <div className="col-span-full text-center">
+                    <h1 className="text-5xl font-bold">
+                      <span className="text-gray-200">What is</span>{" "}
+                      <span className="text-blue-400">EIPsInsight</span>
+                      <span className="text-gray-200">?</span>
                     </h1>
-                    <p className={"text-3xl max-w-xl"}>
-                      EIP is a design document providing information to the
-                      Ethereum community or describing a new feature or
-                      improvement for the{" "}
-                      <span className="text-blue-400">Ethereum blockchain</span>
-                      .
-                    </p>
-                    <NextLink href={"/resources"}>
-                      <span className="text-blue-400 text-xl flex space-x-5">
-                        Learn More{" "}
-                        <BsArrowUpRight className={"pt-2"} size={25} />
-                      </span>
-                    </NextLink>
+                    {/* <hr className="mt-4 border-gray-500" />  */}
                   </div>
-                </div>
-              </Box> */}
 
-                <Box className="grid grid-cols-1 lg:grid-cols-2 pb-20 gap-8 lg:gap-16"
-                bg="rgba(0, 0, 0, 0.5)"
-                borderRadius="md" // Rounded corners
-                padding={9} 
-                boxShadow="md" 
-                marginTop={4}>
                   {/* Left Side - YouTube Video */}
-                  <div className="flex justify-center lg:justify-center items-center">
+                  <div className="flex justify-center items-center">
                     <iframe
                       width="560"
                       height="315"
@@ -413,24 +443,41 @@ const Dashboard = () => {
                   {/* Right Side - EIPInsight Info */}
                   <div className="flex justify-center items-center">
                     <div className="text-center max-w-xl space-y-6">
-                    <h1 className="text-5xl font-bold">
-                    <span className="text-gray-200">What is</span> <span className="text-blue-400">EIPInsight</span><span className="text-gray-200">?</span>
-                    </h1>
-                    <p className="text-xl text-justify text-gray-200"> {/* Change to smoke white */}
-                      EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposal (EIP), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period. Data provided is used for tracking the progress and workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
+                    <p className="text-xl text-justify text-gray-200">
+                      EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposal (
+                      <NextLink href="/eip">
+                        <span className="text-blue-400">EIP</span>
+                      </NextLink>), 
+                      Ethereum Request for Comments (
+                      <NextLink href="/erc">
+                        <span className="text-blue-400">ERCs</span>
+                      </NextLink>), 
+                      and Rollup Improvement Proposals (
+                      <NextLink href="/rip">
+                        <span className="text-blue-400">RIPs</span>
+                      </NextLink>), 
+                      over a specified period. Data provided is used for tracking the progress and workload distribution among 
+                      <NextLink href="/eips/eip-1">
+                        <span className="text-blue-400"> EIP Editors</span>
+                      </NextLink>, ensuring transparency and efficiency in the proposal review process.
                     </p>
-                    <NextLink href="/resources">
-                      <span className="text-blue-400 text-xl flex items-center space-x-2">
-                        Learn More <BsArrowUpRight className="pt-1" size={25} />
-                      </span>
-                    </NextLink>
 
+
+                      <NextLink href="/resources">
+                        <span className="text-blue-400 text-xl flex items-center space-x-2">
+                          Learn More <BsArrowUpRight className="pt-1" size={25} />
+                        </span>
+                      </NextLink>
                     </div>
                   </div>
                 </Box>
+
                 <br/>
                 </motion.div>
                 <br/>
+                <Box paddingTop={8} paddingBottom={8}>
+              <TypeGraphs />
+            </Box>
 
                 <Box
                       bg="rgba(0, 0, 0, 0.5)"
@@ -440,11 +487,11 @@ const Dashboard = () => {
                       >
               <FlexBetween>
           
-              <Box id={"1"} color={"rgba(255, 255, 255, 0.7)"} >
+              <Box id={"Dashboard"} color={"rgba(255, 255, 255, 0.7)"} >
   <Header
     title="DASHBOARD"
     subtitle="Welcome to the dashboard"
-  />
+  /> 
 </Box>
 
                 <Box>
@@ -472,7 +519,7 @@ const Dashboard = () => {
                 <div className="col-span-2">
                   <StatBox
                     title="Meta EIPs"
-                    value={new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size}
+                    value={(new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size)}
                     description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
                     icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
                     url="meta"
@@ -547,6 +594,43 @@ const Dashboard = () => {
                 }}
                 className="hover: cursor-pointer ease-in duration-200"
               >
+                <NextLink href="/all">
+                  <Text
+                    fontSize="2xl"
+                    fontWeight="bold"
+                    color="#30A0E0"
+                    marginRight="6"
+                    paddingBottom={6}
+                  >
+                  {`Category - [${allData.length}]`}
+                  </Text>
+                </NextLink>
+                <DashboardDonut2 dataset={data} />
+              </Box>
+            </Box>
+
+            <Box
+              display="grid"
+              gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
+              gap={"6"}
+              marginTop={"20px"}
+            >
+
+             <Box
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 } as any}
+                bgColor={bg}
+                paddingY={{ lg: "2rem", sm: "2rem" }}
+                paddingX={{ lg: "2rem", sm: "0.5rem" }}
+                borderRadius="0.55rem"
+                _hover={{
+                  border: "1px",
+                  borderColor: "#30A0E0",
+                }}
+                className="hover: cursor-pointer ease-in duration-200"
+              >
                 <NextLink href="/status">
                   <Text
                     fontSize="2xl"
@@ -558,8 +642,70 @@ const Dashboard = () => {
                   {`Status - [${allData.length}]`}
                   </Text>
                 </NextLink>
-                <DashboardDonut />
+                <DashboardDonut dataset={data} />
               </Box>
+              
+              <div className="grid grid-cols-2 gap-6">
+                <div className="col-span-2">
+                <StatBox
+                  title="Draft"
+                  value={allData.filter((item) => item.status === "Draft").length}
+                  description="Draft EIPs are proposals still under initial consideration and open for feedback."
+                  icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+                  url="alltable"
+                />
+                </div>
+
+                <StatBox
+                  title="Review"
+                  value={allData.filter((item) => item.status === "Review").length}
+                  description="EIPs in the Review stage are being actively discussed and evaluated by the community."
+                  icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Last Call"
+                  value={allData.filter((item) => item.status === "Last Call").length}
+                  description="Last Call EIPs are nearing finalization, with a short period for final community comments."
+                  icon={<Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Final"
+                  value={allData.filter((item) => item.status === "Final").length}
+                  description="Final EIPs have been formally accepted and implemented as part of the Ethereum protocol."
+                  icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Withdrawn"
+                  value={allData.filter((item) => item.status === "Withdrawn").length}
+                  description="Withdrawn EIPs have been removed from consideration by the author or due to lack of support."
+                  icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Stagnant"
+                  value={allData.filter((item) => item.status === "Stagnant").length}
+                  description="Stagnant EIPs are inactive and have not progressed for a prolonged period."
+                  icon={<Icon as={Clipboard} fontSize={{ base: "10", lg: "15" }} />}
+                  url="alltable"
+                />
+
+                <StatBox
+                  title="Living"
+                  value={allData.filter((item) => item.status === "Living").length}
+                  description="Living EIPs are continuously updated and reflect evolving standards or documentation."
+                  icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+                  url="alltable"
+                />
+              </div>
+
+              
             </Box>
             </Box>
           

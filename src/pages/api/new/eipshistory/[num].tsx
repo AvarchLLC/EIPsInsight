@@ -46,7 +46,7 @@ const eipHistorySchema = new mongoose.Schema({
 });
 
 const EipHistory =
-  mongoose.models.EipHistory || mongoose.model("EipHistory", eipHistorySchema);
+  mongoose.models.EipHistory || mongoose.model("EipHistory3", eipHistorySchema);
 
 export default async (req: Request, res: Response) => {
   const parts = req.url.split("/");

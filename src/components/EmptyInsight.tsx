@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Badge,
   Box,
@@ -32,8 +32,23 @@ function getMonthName(monthNumber: number): string {
   return monthName;
 }
 
+interface EIP {
+  status: string;
+  eips: {
+    status: string;
+    repo:string;
+    month: number;
+    year: number;
+    date: string;
+    count: number;
+    category: string;
+    eips:any[];
+  }[];
+}
+
 const EmptyInsight = () => {
   const path = usePathname();
+  const [data, setData] = useState<EIP[]>([]);
   let year = "";
   let month = "";
   if (path) {
@@ -41,6 +56,28 @@ const EmptyInsight = () => {
     year = pathParts[2];
     month = pathParts[3];
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/new/graphsv2`);
+        const jsonData = await response.json();
+        console.log("rip data:",jsonData.rip);
+        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        // setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  let filteredData1 = data.filter((item) => item.status === "Draft");
+ 
+  let filteredData5 = data.filter((item) => item.status === "Final");
+  
+
   const prevMonth = Number(month) - 1;
   const prevMonthName = getMonthName(prevMonth);
   const getStatusColor = (status: string) => {
@@ -237,7 +274,7 @@ const EmptyInsight = () => {
             Draft
           </Text>
           <Box paddingTop={"8"}>
-            <StackedColumnChart status="Draft" />
+            <StackedColumnChart dataset={filteredData1} status="Draft" />
           </Box>
           <Text
             fontSize="3xl"
@@ -248,7 +285,7 @@ const EmptyInsight = () => {
             Final
           </Text>
           <Box paddingY={"8"}>
-            <StackedColumnChart status="Final" />
+            <StackedColumnChart dataset={filteredData5} status="Final" />
           </Box>
         </Box>
       </motion.div>

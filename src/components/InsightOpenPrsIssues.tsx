@@ -6,14 +6,15 @@ import {
   Flex,
   Text,
   Spinner,
-  Link as LI
+  Link as LI,
+  Button, 
 } from "@chakra-ui/react";
 import DateTime from "@/components/DateTime";
 import LoaderComponent from "@/components/Loader";
 import { usePathname } from "next/navigation";
+import { CSVLink } from "react-csv";
+import axios from "axios";
 
-// Dynamic import for Ant Design's Column chart
-// const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 const DualAxes = dynamic(() => import("@ant-design/plots").then(mod => mod.DualAxes), { ssr: false });
 const Line = dynamic(() => import("@ant-design/plots").then(mod => mod.Line), { ssr: false });
 
@@ -60,7 +61,7 @@ const InsightsOpenPrsIssues: React.FC = () => {
 
   const toggleCollapse = () => setShow(!show);
   const [selectedYear, setSelectedYear] = useState<string>('');
-  // const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [data, setData] = useState<{
     PRs: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open:PR[], review:PR[] } };
     Issues: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } };
@@ -76,6 +77,12 @@ const InsightsOpenPrsIssues: React.FC = () => {
     Issues: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } };
   }>({ PRs: {}, Issues: {} });
 
+  const [csvData, setCsvData] = useState<any[]>([]);
+
+  const [loading2,setLoading2]=useState<boolean>(false);
+
+
+  const [sliderValue3, setSliderValue3] = useState<number>(0);
 
   const [showCategory, setShowCategory] = useState<{ [key: string]: boolean }>({
     created: false,
@@ -91,15 +98,20 @@ const InsightsOpenPrsIssues: React.FC = () => {
   useEffect(() => {
     if (path) {
       const pathParts = path.split("/");
-      const year = pathParts[2]; // Extract year from the path
+      const year = pathParts[2];
+      const month = pathParts[3];
   
       // Only fetch data if the year has changed
       if (year !== selectedYear) {
         setSelectedYear(year); 
         fetchData(year)// Update the selected year
       }
+
+      if(month!=selectedMonth){
+        setSelectedMonth(month);
+      }
     }
-  }, [path, selectedYear]);
+  }, [path, selectedYear, selectedMonth]);
   
 
 // const PR_API_ENDPOINTS = ['/api/eipsprdetails', '/api/ercsprdetails', '/api/ripsprdetails'];
@@ -121,7 +133,7 @@ const fetchPRData = async (year: string) => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
-                  if (year === yearString) {
+                  // if (year === yearString) {
                     if (!target[key]) {
                       target[key] = { created: [], closed: [], merged: [], open: [], review: [] };
                     }
@@ -130,7 +142,7 @@ const fetchPRData = async (year: string) => {
                     target[key].merged.push(...source[key].merged);
                     target[key].open.push(...source[key].open);
                     target[key].review.push(...source[key].review);
-                  }
+                  // }
                 });
               };
     combineData(eipsTransformed, transformedData);
@@ -159,7 +171,7 @@ const fetchPRData2 = async (year: string) => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
-                  if (year === yearString) {
+                  // if (year === yearString) {
                     if (!target[key]) {
                       target[key] = { created: [], closed: [], merged: [], open: [], review: [] };
                     }
@@ -168,7 +180,7 @@ const fetchPRData2 = async (year: string) => {
                     target[key].merged.push(...source[key].merged);
                     target[key].open.push(...source[key].open);
                     target[key].review.push(...source[key].review);
-                  }
+                  // }
                 });
               };
     combineData(ercsTransformed, transformedData);
@@ -201,7 +213,7 @@ const fetchPRData3 = async (year: string) => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
-                  if (year === yearString) {
+                  // if (year === yearString) {
                     if (!target[key]) {
                       target[key] = { created: [], closed: [], merged: [], open: [], review: [] };
                     }
@@ -210,7 +222,7 @@ const fetchPRData3 = async (year: string) => {
                     target[key].merged.push(...source[key].merged);
                     target[key].open.push(...source[key].open);
                     target[key].review.push(...source[key].review);
-                  }
+                  // }
                 });
               };
     combineData(ripsTransformed, transformedData);
@@ -537,6 +549,7 @@ const fetchPRData3 = async (year: string) => {
     const dataToUse4=  data2.Issues;
     const dataToUse5 = data3.PRs;
     const dataToUse6=  data3.Issues;
+    console.log("data to use in charts:", dataToUse);
 
     // Transform data for chart rendering
     const transformedData = Object.keys(dataToUse).flatMap(monthYear => {
@@ -827,6 +840,21 @@ const config = {
       },
   ]
 ,  
+slider: {
+  start: sliderValue3, // Set the start value from the state
+  end: 1, // End of the slider
+  step: 0.01, // Define the step value for the slider
+  min: 0, // Minimum value for the slider
+  max: 1, // Maximum value for the slider
+  onChange: (value:any) => {
+    setSliderValue3(value); // Update state when slider value changes
+  },
+  // Optionally handle when sliding stops
+  onAfterChange: (value:any) => {
+    // Perform any additional actions after the slider is changed
+    // console.log('Slider moved to:', value);
+  },
+},
   
     legend: { position: 'top-right' as const },
 };
@@ -836,13 +864,108 @@ return <Line {...config} />;
 
   }  
 
+  const generateCSVData = () => {
+    if (!selectedYear || !selectedMonth) {
+      console.error('Year and month must be selected to generate CSV');
+      return;
+    }
+  
+   // Convert selectedMonth to a number for comparison
+const selectedMonthNumber = parseInt(selectedMonth, 10);
+
+// Generate keys for all months from 01 to selectedMonth
+const keys = Array.from({ length: selectedMonthNumber }, (_, i) =>
+  `${selectedYear}-${String(i + 1).padStart(2, '0')}` // Format as "YYYY-MM"
+);
+
+// Initialize arrays to accumulate combined data
+const combinedPRs: any[] = [];
+const combinedIssues: any[] = [];
+
+// Iterate through the generated month keys and accumulate data
+keys.forEach((key) => {
+  // Add the key as a field for each PR and Issue
+  const prData = [
+    ...(data.PRs[key]?.open || []),
+    ...(data2.PRs[key]?.open || []),
+    ...(data3.PRs[key]?.open || [])
+  ].map((item) => ({ ...item, key }));
+
+  const issueData = [
+    ...(data.Issues[key]?.open || []),
+    ...(data2.Issues[key]?.open || []),
+    ...(data3.Issues[key]?.open || [])
+  ].map((item) => ({ ...item, key }));
+
+  combinedPRs.push(...prData);
+  combinedIssues.push(...issueData);
+});
+
+// Combine PR and Issue data
+const allData = [...combinedPRs, ...combinedIssues];
+
+// Format data into CSV-friendly structure
+const csv = allData.map((item) => {
+  if ('prNumber' in item) {
+    const createdDate = item.created_at ? new Date(item.created_at) : null;
+    const createdMonth = createdDate ? createdDate.toLocaleString('default', { month: 'long' }) : '-';
+    const createdYear = createdDate ? createdDate.getFullYear() : '-';
+
+    return {
+      Key: item.key, // Add the month-year key
+      Number: item.prNumber,
+      Title: item.prTitle,
+      State: item.merged_at ? 'Merged' : item.closed_at ? 'Closed' : 'Open',
+      Created_Date: createdDate ? createdDate.toLocaleDateString() : '-',
+      // Created_Month: createdMonth,
+      // Created_Year: createdYear,
+      Closed_Date: item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+      Merged_Date: item.merged_at ? new Date(item.merged_at).toLocaleDateString() : '-',
+      Link: `https://github.com/ethereum/${item.repo}/pull/${item.prNumber}`,
+    };
+  } else {
+    const createdDate = item.created_at ? new Date(item.created_at) : null;
+    const createdMonth = createdDate ? createdDate.toLocaleString('default', { month: 'long' }) : '-';
+    const createdYear = createdDate ? createdDate.getFullYear() : '-';
+
+    return {
+      Key: item.key, // Add the month-year key
+      Number: item.IssueNumber,
+      Title: item.IssueTitle,
+      State: item.state,
+      Created_Date: createdDate ? createdDate.toLocaleDateString() : '-',
+      // Created_Month: createdMonth,
+      // Created_Year: createdYear,
+      Closed_Date: item.closed_at ? new Date(item.closed_at).toLocaleDateString() : '-',
+      Merged_Date: '-',
+      Link: `https://github.com/ethereum/${item.repo}/issues/${item.IssueNumber}`,
+    };
+  }
+});
+
+  
+    console.log("csv data:", csv);
+  
+    setCsvData(csv);
+  };
+  
+  
+
 
 
   return (
        
     <>
     {loading ? (
-      <></> // Return empty fragment when loading
+      <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Spinner size="lg" /> {/* Use a larger size */}
+    </div> // Return empty fragment when loading
     ) : (
       <Box
         bgColor={bg}
@@ -851,7 +974,52 @@ return <Line {...config} />;
         minHeight="400px" // Set minimum height
         marginTop={{ base: "1rem", md: "1rem" }} // Margin for separation
       >
-        <Text
+
+<Flex 
+  justifyContent="center" // Center items horizontally
+  alignItems="center" // Align items vertically
+  marginBottom="0.5rem" 
+  gap={4} // Add some space between the items
+>
+  <Text
+    color="#30A0E0"
+    fontSize="2xl"
+    fontWeight="bold"
+    textAlign="center"
+    marginBottom="0.5rem"
+  >
+    {`Open PRs and Issues`}
+  </Text>
+
+  {/* Download button next to the text */}
+  <CSVLink 
+    data={csvData.length ? csvData : []} 
+    filename={`OpenPRSAndIssues-${selectedYear}-${selectedMonth}.csv`} 
+    onClick={async (e: any) => {
+      try {
+        // Generate the CSV data
+        generateCSVData();
+  
+        // Check if CSV data is empty and prevent default behavior
+        if (csvData.length === 0) {
+          e.preventDefault();
+          console.error("CSV data is empty or not generated correctly.");
+          return;
+        }
+  
+        // Trigger the API call to update the download counter
+        await axios.post("/api/DownloadCounter");
+      } catch (error) {
+        console.error("Error triggering download counter:", error);
+      }
+    }}
+  >
+    <Button colorScheme="blue">
+      {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+    </Button>
+  </CSVLink>
+</Flex>
+        {/* <Text
           color="#30A0E0"
           fontSize="2xl"
           fontWeight="bold"
@@ -859,23 +1027,15 @@ return <Line {...config} />;
           marginBottom="0.5rem"
         >
           {`Open PRs and Issues (${selectedYear})`}
-        </Text>
-        <LI href="/Analytics">
+        </Text> */}
+        {/* <LI href="/Analytics"> */}
           <Box padding="1rem" borderRadius="0.55rem">
-            <Flex
-              justifyContent="center"
-              alignItems="center"
-              height="100%"
-              // marginTop="10rem"
-            >
-          {/* Centered Spinner */}
-            </Flex>
             {renderChart()}
           </Box>
-        </LI>
-        <Box className="w-full">
+        {/* </LI> */}
+        {/* <Box className="w-full">
           <DateTime />
-        </Box>
+        </Box> */}
       </Box>
     )}
   </>
