@@ -14,6 +14,8 @@ import {
   Flex,
   Image,
   SimpleGrid,
+  Badge,
+  AspectRatio,
   Grid
 } from "@chakra-ui/react";
 import SlotCountdown from "@/components/SlotCountdown";
@@ -38,6 +40,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { IconButton } from '@chakra-ui/react';
 import { useRef } from 'react';
 import UpgradesTimeline from "@/components/UpgradesTimeline";
+import { Card } from "@/components/pectraCards"
 
 
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
@@ -95,63 +98,52 @@ const All = () => {
     return list;
   };
 
-  // import { Flex, Image, Box, Text, Link, useColorModeValue } from "@chakra-ui/react";
+  // const cardBg = useColorModeValue("white", "gray.800");
+  // const textColor = useColorModeValue("gray.700", "gray.200");
+  // const accentColor = useColorModeValue("blue.500", "blue.300");
 
-  const Card = ({
-    image,
-    title,
-    content,
-    link,
-  }: {
-    image: string;
-    title: string;
-    content: string;
-    link: string;
-  }) => {
-    const bg = useColorModeValue("gray.50", "gray.700"); // Light mode: gray.50, Dark mode: gray.700
-    const textColor = useColorModeValue("black", "white"); // Light mode: black, Dark mode: white
-  
-    return (
-      <Flex
-        direction="row"
-        bg={bg}
-        p={3}
-        borderRadius="md"
-        boxShadow="md"
-        width="100%"
-        minWidth="280px" // Prevent cards from shrinking too much
-        maxWidth="400px" // Limit card width
-        height="auto" // Allow flexible height for content
-        align="center"
-        justify="flex-start"
-        mb={4}
-      >
-        <Image
-          src={image}
-          alt={title}
-          boxSize="80px"
-          objectFit="cover"
-          borderRadius="md"
-          mr={4}
-        />
-        <Box>
-          <Text
-            fontSize="sm"
-            fontWeight="bold"
-            noOfLines={1}
-            mb={1}
-            color={textColor} // Dynamically set text color
-          >
-            {title}
-          </Text>
-          <Link href={link} color="blue.400" fontSize="xs" isExternal>
-            Read More
-          </Link>
-        </Box>
-      </Flex>
-    );
-  };
-  
+
+  //  const Card = ({ image, title, content, link, tag }: { image?: string; title: string; content: string; link: string; tag?: string }) => (
+  //     <Box
+  //       bg={cardBg}
+  //       p={5}
+  //       borderRadius="xl"
+  //       boxShadow="md"
+  //       height="100%"
+  //       transition="all 0.2s ease"
+  //       _hover={{
+  //         transform: "translateY(-5px)",
+  //         boxShadow: "lg",
+  //       }}
+  //     >
+  //       {image && (
+  //         <AspectRatio ratio={16 / 9} mb={4} borderRadius="lg" overflow="hidden">
+  //           <Image src={image} alt={title} objectFit="cover" />
+  //         </AspectRatio>
+  //       )}
+  //       {tag && (
+  //         <Badge colorScheme="blue" mb={2}>
+  //           {tag}
+  //         </Badge>
+  //       )}
+  //       <Heading fontSize={{ base: "lg", md: "xl" }} mb={2} noOfLines={2}>
+  //         {title}
+  //       </Heading>
+  //       <Text fontSize="md" color={textColor} noOfLines={3} mb={4}>
+  //         {content}
+  //       </Text>
+  //       <Link
+  //         href={link}
+  //         color={accentColor}
+  //         fontWeight="semibold"
+  //         isExternal={!link.startsWith('/')}
+  //         display="inline-flex"
+  //         alignItems="center"
+  //       >
+  //         Read more →
+  //       </Link>
+  //     </Box>
+  //   );
   
   
   
@@ -164,12 +156,6 @@ const All = () => {
       title: "Holesky Testnet Support Ends in September",
       content: "Holesky testnet support ends in September as Ethereum transitions to Hoodi for improved validator testing & Pectra upgrade readiness.",
       link: "https://etherworld.co/2025/03/19/holesky-testnet-support-ends-in-september/"
-    },
-    {
-      image: "pectraimg2.jpg",
-      title: "Ethereum's Hoodi Testnet Launched",
-      content: "Hoodi Testnet is live & finalizing.",
-      link: "https://etherworld.co/2025/03/17/ethereums-hoodi-testnet-launched/"
     },
     {
       image: "pectraimg3.jpg",
@@ -447,13 +433,17 @@ const All = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 } as any}
-          fontSize={{base: "2xl",md:"2xl", lg: "2xl"}}
+          fontSize={{base: "2xl",md:"2xl", lg: "4xl"}}
           fontWeight="bold"
           color="#30A0E0"
           mt={2}
         >
           PECTRA
         </Text>
+
+        <Box id="NetworkUpgrades" mt={2}>
+          <UpgradesTimeline/>
+        </Box>
 
         <Flex
            direction={{ base: "column", md: "row" }}
@@ -561,46 +551,49 @@ const All = () => {
 
   {/* Cards container with hidden scrollbar */}
   <Flex
-    ref={containerRef}
-    flex="1"
-    overflow="hidden"  // Completely hide overflow
-    py={4}
-    pl={10}  // Left padding for arrow space
-    pr={10}  // Right padding for arrow space
-    _hover={{
-      overflowX: "auto",  // Only show scroll on hover
-    }}
-    sx={{
-      scrollbarWidth: "none",  // Hide scrollbar for Firefox
-      "&::-webkit-scrollbar": {
-        display: "none",  // Hide scrollbar for Chrome/Safari
-      },
-      // Additional space for last card
-      "& > div": {
-        paddingRight: "40px",
-      },
-    }}
+  ref={containerRef}
+  flex="1"
+  overflow="hidden"
+  py={4}
+  pl={6}  // Reduced left padding from 10 to 6 for left shift
+  pr={10}
+  _hover={{
+    overflowX: "auto",
+  }}
+  sx={{
+    scrollbarWidth: "none",
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
+    "& > div": {
+      paddingRight: "40px",
+    },
+  }}
+>
+  <Flex 
+    gap={6} 
+    flexWrap="nowrap"
+    ml={-2}  // Negative margin to pull content left
   >
-    <Flex gap={6} flexWrap="nowrap">
-      {PectraPosts.map((pectra, index) => (
-        <Box 
-          key={index}
-          flex="0 0 auto"
-          width={{ base: "280px", md: "320px" }}
-          // Add margin to first and last items for arrow clearance
-          ml={index === 0 ? 2 : 0}
-          mr={index === PectraPosts.length - 1 ? 2 : 0}
-        >
-          <Card
-            image={pectra.image}
-            title={pectra.title}
-            content={pectra.content}
-            link={pectra.link}
-          />
-        </Box>
-      ))}
-    </Flex>
+    {PectraPosts.map((pectra, index) => (
+      <Box 
+        key={index}
+        flex="0 0 auto"
+        width={{ base: "280px", md: "320px" }}
+        // Adjusted margins for arrow clearance
+        ml={index === 0 ? 4 : 0}  // Increased from 2 to 4 to compensate for negative margin
+        mr={index === PectraPosts.length - 1 ? 2 : 0}
+      >
+        <Card
+          image={pectra.image}
+          title={pectra.title}
+          content={pectra.content}
+          link={pectra.link}
+        />
+      </Box>
+    ))}
   </Flex>
+</Flex>
 
   {/* Right arrow with proper spacing */}
   <IconButton
@@ -647,10 +640,6 @@ const All = () => {
   </Flex>
   <br />
 </Box>
-
-        <Box id="NetworkUpgrades" mt={2}>
-          <UpgradesTimeline/>
-        </Box>
 
         <Box id="NetworkUpgrades" mt={2}>
           <NetworkUpgradesChart/>

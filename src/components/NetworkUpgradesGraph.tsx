@@ -226,36 +226,46 @@ const EIP3DGraph = () => {
 
   return (
     <div style={{ height: '100vh', position: 'relative' }}>
-      {/* Legend */}
-      <div style={{
-        position: 'absolute',
-        top: 20,
-        right: 20,
-        background: 'rgba(255, 255, 255, 0.9)',
-        padding: '12px',
-        borderRadius: '10px',
-        fontSize: '0.9rem',
-        boxShadow: '0 0 10px rgba(0,0,0,0.3)',
-        zIndex: 10,
-        maxWidth: '200px',
-      }}>
-        <strong>Network Upgrades</strong>
-        <ul style={{ listStyle: 'none', padding: 0, marginTop: 10 }}>
-          {uniqueGroups.map((group) => (
-            <li key={group} style={{ marginBottom: 6 }}>
-              <span style={{
-                display: 'inline-block',
-                width: 12,
-                height: 12,
-                borderRadius: '50%',
-                backgroundColor: colorScale.get(group),
-                marginRight: 8,
-              }} />
-              {group}
-            </li>
-          ))}
-        </ul>
-      </div>
+  {/* Legend */}
+  <div style={{
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    background: 'rgba(255, 255, 255, 0.9)',
+    padding: '12px',
+    borderRadius: '10px',
+    fontSize: '0.9rem',
+    boxShadow: '0 0 10px rgba(0,0,0,0.3)',
+    zIndex: 10,
+    maxWidth: '200px',
+    color: 'black' // Added this line to set all text to black
+  }}>
+    <strong style={{ color: 'black' }}>Network Upgrades</strong>
+    <ul style={{ 
+      listStyle: 'none', 
+      padding: 0, 
+      marginTop: 10,
+      color: 'black' // Ensures list items inherit black color
+    }}>
+      {uniqueGroups.map((group) => (
+        <li key={group} style={{ 
+          marginBottom: 6,
+          color: 'black' // Explicit black for list items
+        }}>
+          <span style={{
+            display: 'inline-block',
+            width: 12,
+            height: 12,
+            borderRadius: '50%',
+            backgroundColor: colorScale.get(group),
+            marginRight: 8,
+          }} />
+          {group}
+        </li>
+      ))}
+    </ul>
+  </div>
+
 
       {/* Zoom Controls */}
       <VStack position="absolute" bottom={4} right={4} zIndex={10} spacing={2}>

@@ -69,7 +69,7 @@ const EIPTimelinePage = () => {
 
   return (
     <Box p={4}>
-      <TimelineChart data={processedData} data2={data2}/>
+      <TimelineChart data={processedData.reverse()} data2={data2.reverse()}/>
     </Box>
   );
 };

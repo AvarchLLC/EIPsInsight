@@ -5,10 +5,11 @@ import {
   Text,
   HStack,
   VStack,
+  Flex,
   Tooltip,
   Button,
   Spinner,
-  // keyframes,
+  Select,
 } from "@chakra-ui/react";
 import { keyframes } from '@chakra-ui/system';
 import { motion } from "framer-motion";
@@ -19,6 +20,7 @@ interface NetworkConfig {
   beaconApi: string;
   rpc: string;
   target: number;
+  targetepoch:number;
   name: string;
 }
 
@@ -28,18 +30,21 @@ const networks: Record<string, NetworkConfig> = {
     beaconApi: "https://ethereum-sepolia-beacon-api.publicnode.com",
     rpc: "https://ethereum-sepolia-rpc.publicnode.com",
     target: 7118848,
+    targetepoch: 222464,
     name: "Sepolia",
   },
   holesky: {
     beaconApi: "https://ethereum-holesky-beacon-api.publicnode.com",
     rpc: "https://ethereum-holesky-rpc.publicnode.com",
     target: 3710976,
+    targetepoch: 115968,
     name: "Holesky",
   },
   mainnet: {
     beaconApi: "https://ethereum-beacon-api.publicnode.com",
     rpc: "https://ethereum-rpc.publicnode.com",
     target: 11649024,
+    targetepoch: 364032,
     name: "Mainnet",
   },
 };
@@ -60,6 +65,7 @@ const SlotCountdown: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true); // Show loader only on first load
   const [countdown, setCountdown] = useState<string>(""); // Countdown for days, hours, minutes
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false); // Track if the upgrade is live
+  const [viewMode, setViewMode] = useState<"slots" | "epochs">("epochs"); // Default to epochs view
 
   const countdownInterval = useRef<NodeJS.Timeout | null>(null); // Store interval reference
 
@@ -168,11 +174,281 @@ const SlotCountdown: React.FC = () => {
   const slotsInEpoch = Array.from({ length: 32 }, (_, i) => startSlot + i);
 
   // Split the slots into two rows
-  const firstRowSlots = slotsInEpoch.slice(0, 18);
-  const secondRowSlots = slotsInEpoch.slice(18);
+  const firstRowSlots = slotsInEpoch.slice(0, 20);
+  const secondRowSlots = slotsInEpoch.slice(20);
 
   // Calculate the slots remaining until the target
   const slotsRemaining = networks[network].target - currentSlot;
+  const epochsRemaining = networks[network].targetepoch - currentEpoch;
+
+  const renderSlotsView = () => (
+    <>
+      {/* First Row: 18 Boxes */}
+      <HStack spacing={1} wrap="wrap" justify="center" mb={2}>
+        {firstRowSlots.map((slot) => {
+          const isProcessed = slot < currentSlot;
+          const isCurrent = slot === currentSlot;
+          const epochOfSlot = Math.floor(slot / 32);
+          const blockOfSlot = currentBlock - (currentSlot - slot);
+  
+          return (
+            <Tooltip
+              key={slot}
+              label={isProcessed ? `Epoch: ${epochOfSlot}, Block: ${blockOfSlot}` : undefined}
+              hasArrow
+              placement="top"
+              bg="gray.700"
+              color="white"
+            >
+              <Box
+                w={{ base: "45px", md: "55px" }}
+                h={{ base: "45px", md: "55px" }}
+                borderRadius="md"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                bg={
+                  isCurrent
+                    ? "teal.500"
+                    : isProcessed
+                    ? "purple.500"
+                    : "blue.500"
+                }
+                color="white"
+                fontSize={{ base: "10px", md: "9px" }}
+                fontWeight="bold"
+                animation={isCurrent ? "blink 1s infinite" : "none"}
+                _hover={{
+                  transform: "scale(1.1)",
+                  transition: "transform 0.2s",
+                }}
+              >
+                {slot}
+              </Box>
+            </Tooltip>
+          );
+        })}
+      </HStack>
+  
+      {/* Second Row: 14 Boxes + Text + Golden Box */}
+      <HStack spacing={1} wrap="wrap" justify="center">
+        {secondRowSlots.map((slot) => {
+          const isProcessed = slot < currentSlot;
+          const isCurrent = slot === currentSlot;
+          const epochOfSlot = Math.floor(slot / 32);
+          const blockOfSlot = currentBlock - (currentSlot - slot);
+  
+          return (
+            <Tooltip
+              key={slot}
+              label={isProcessed ? `Epoch: ${epochOfSlot}, Block: ${blockOfSlot}` : undefined}
+              hasArrow
+              placement="top"
+              bg="gray.700"
+              color="white"
+            >
+              <Box
+                w={{ base: "45px", md: "55px" }}
+                h={{ base: "45px", md: "55px" }}
+                borderRadius="md"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                bg={
+                  isCurrent
+                    ? "green.500"
+                    : isProcessed
+                    ? "purple.500"
+                    : "blue.500"
+                }
+                color="white"
+                fontSize={{ base: "10px", md: "9px" }}
+                fontWeight="bold"
+                animation={isCurrent ? "blink 1s infinite" : "none"}
+                _hover={{
+                  transform: "scale(1.1)",
+                  transition: "transform 0.2s",
+                }}
+              >
+                {slot}
+              </Box>
+            </Tooltip>
+          );
+        })}
+  
+        {/* Vertical Stacked Text */}
+        <VStack spacing={0} align="center" justify="center" ml={2} pt={2} pb={2}>
+          {networks[network].target !== 999999999 ? (
+            <>
+              <Text fontSize="xs" fontWeight="bold" color="white">
+                {slotsRemaining} slots away
+              </Text>
+              <Text fontSize="xs" color="white">
+                .................
+              </Text>
+              <Text fontSize="s" fontWeight="bold" color="white">
+                {countdown}
+              </Text>
+            </>
+          ) : (
+            <Text fontSize="xs" fontWeight="bold" color="white">
+              Not announced yet!
+            </Text>
+          )}
+        </VStack>
+  
+        {/* Golden Box */}
+        <Tooltip
+        label={`Target Slot: ${networks[network].target}, Date: May 07, 2025 (10:05:11 UTC)`}
+        hasArrow
+        placement="top"
+        bg="gray.700"
+        color="white"
+      >
+        <Box
+          w={{ base: "45px", md: "55px" }}
+          h={{ base: "45px", md: "55px" }}
+          borderRadius="md"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          bg="gold"
+          color="black"
+          fontSize={{ base: "10px", md: "9px" }}
+          fontWeight="bold"
+          _hover={{
+            transform: "scale(1.1)",
+            transition: "transform 0.2s",
+          }}
+        >
+          PECTRA
+        </Box>
+        </Tooltip>
+      </HStack>
+    </>
+  );
+
+  const renderEpochsView = () => (
+    <HStack spacing={1} wrap="wrap" justify="center">
+      {/* Current Epoch */}
+      <Tooltip
+        label={`Epoch: ${currentEpoch}, Current Slot: ${currentSlot}`}
+        hasArrow
+        placement="top"
+        bg="gray.700"
+        color="white"
+      >
+        <Box
+          w={{ base: "45px", md: "55px" }}
+          h={{ base: "45px", md: "55px" }}
+          borderRadius="md"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          bg="teal.500"
+          color="white"
+          fontSize={{ base: "10px", md: "9px" }}
+          fontWeight="bold"
+          animation="blink 1s infinite"
+        >
+          {currentEpoch}
+        </Box>
+      </Tooltip>
+
+      {/* Future Epochs */}
+      {Array.from({ length: 17 }, (_, i) => currentEpoch + i + 1).map((epoch) => {
+        const isTarget = epoch === networks[network].targetepoch;
+        const isFuture = epoch > currentEpoch;
+        const isCurrent = epoch === currentEpoch;
+
+        return (
+          <Tooltip
+          key={epoch}
+          label={isCurrent ? `Epoch: ${currentEpoch}, Current Slot: ${currentSlot}` : undefined}
+          hasArrow
+          placement="top"
+          bg="gray.700"
+          color="white"
+        >
+          <Box
+            key={epoch}
+            w={{ base: "45px", md: "55px" }}
+            h={{ base: "45px", md: "55px" }}
+            borderRadius="md"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            bg={
+              isTarget
+                ? "gold"
+                : isFuture
+                ? "blue.500"
+                : "purple.500"
+            }
+            color="white"
+            fontSize={{ base: "10px", md: "9px" }}
+            fontWeight="bold"
+            _hover={{
+              transform: "scale(1.1)",
+              transition: "transform 0.2s",
+            }}
+          >
+            {epoch}
+          </Box>
+          </Tooltip>
+        );
+      })}
+
+      {/* Countdown Text */}
+      <VStack spacing={0} align="center" justify="center" ml={2} pt={2} pb={2}>
+        {networks[network].targetepoch !== 999999999 ? (
+          <>
+            <Text fontSize="xs" fontWeight="bold" color="white">
+              {epochsRemaining} epochs away
+            </Text>
+            <Text fontSize="xs" color="white">
+              ........................
+            </Text>
+            <Text fontSize="s" fontWeight="bold" color="white">
+              {countdown}
+            </Text>
+          </>
+        ) : (
+          <Text fontSize="xs" fontWeight="bold" color="white">
+            Not announced yet!
+          </Text>
+        )}
+      </VStack>
+
+      {/* Target Epoch Box */}
+      <Tooltip
+        label={`Target epoch: ${networks[network].targetepoch}, Date: May 07, 2025 (10:05:11 UTC)`}
+        hasArrow
+        placement="top"
+        bg="gray.700"
+        color="white"
+      >
+      <Box
+        w={{ base: "45px", md: "55px" }}
+        h={{ base: "45px", md: "55px" }}
+        borderRadius="md"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        bg="gold"
+        color="black"
+        fontSize={{ base: "10px", md: "9px" }}
+        fontWeight="bold"
+        _hover={{
+          transform: "scale(1.1)",
+          transition: "transform 0.2s",
+        }}
+      >
+        PECTRA
+      </Box>
+      </Tooltip>
+    </HStack>
+  );
 
   return (
     <>
@@ -184,30 +460,67 @@ const SlotCountdown: React.FC = () => {
         <Box
           textAlign="center"
           p={6}
-          maxWidth="1250px"
+          maxWidth="1370px"
           mx="auto"
           mt={1}
           borderRadius="lg"
           boxShadow="xl"
-          // bg="gray.800"
           bg={useColorModeValue("white","gray.800")}
           color="white"
         >
-          <Text
-            as={motion.div}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            fontSize={{ base: "2xl", md: "2xl", lg: "2xl" }}
-            fontWeight="bold"
-            color={useColorModeValue("black","white")}
-            mb={4}
-          >
-            PECTRA Upgrade ({networks[network].name})
-          </Text>
+         <Flex
+  position="relative"
+  width="full"
+  mb={4}
+  alignItems="center"
+  flexDirection={{ base: "column", md: "row" }} // Stack on mobile
+  gap={{ base: 3, md: 0 }} // Add gap when stacked
+>
+  {/* Centered Heading - full width when stacked */}
+  <Box
+    position={{ base: "static", md: "absolute" }} // Normal flow on mobile
+    left={{ md: "50%" }}
+    transform={{ md: "translateX(-50%)" }}
+    width={{ base: "100%", md: "auto" }}
+    textAlign={{ base: "center", md: "left" }}
+  >
+    <Text
+      as={motion.div}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      fontSize={{ base: "xl", md: "2xl", lg: "2xl" }} // Smaller on mobile
+      fontWeight="bold"
+      color={useColorModeValue("black", "white")}
+      whiteSpace="nowrap"
+    >
+      PECTRA Upgrade ({networks[network].name})
+    </Text>
+  </Box>
+
+  {/* Right-aligned Dropdown - full width when stacked */}
+  <Box 
+    ml={{ md: "auto" }} // Only auto margin on desktop
+    width={{ base: "100%", md: "auto" }} // Full width on mobile
+    textAlign={{ base: "center", md: "right" }} // Center on mobile
+  >
+    <Select
+      value={viewMode}
+      onChange={(e) => setViewMode(e.target.value as "slots" | "epochs")}
+      width={{ base: "100%", md: "150px" }} // Full width on mobile
+      maxWidth={{ base: "200px", md: "150px" }} // Constrain width
+      bg={useColorModeValue("white", "gray.700")}
+      color={useColorModeValue("black", "white")}
+      mx="auto" // Center on mobile
+    >
+      <option value="epochs">Epoch</option>
+      <option value="slots">Slot</option>
+    </Select>
+  </Box>
+</Flex>
 
           {/* Network Toggle Buttons */}
           <HStack spacing={4} justify="center" mb={4}>
-          <Button
+            <Button
               colorScheme={network === "holesky" ? "blue" : "gray"}
               onClick={() => handleNetworkChange("holesky")}
             >
@@ -227,10 +540,10 @@ const SlotCountdown: React.FC = () => {
             </Button>
           </HStack>
 
+
           {(loading) ? (
             <Spinner size="xl" color="blue.500" />
           ) : (isUpgradeLive || slotsRemaining<=0) ? (
-            // Celebratory Animation
             <Text
               fontSize="2xl"
               fontWeight="bold"
@@ -241,7 +554,7 @@ const SlotCountdown: React.FC = () => {
             </Text>
           ) : (
             <>
-              {/* Epoch Progress Visualization */}
+              {/* Progress Visualization */}
               <Box
                 as={motion.div}
                 initial={{ opacity: 0, y: -20 }}
@@ -254,149 +567,7 @@ const SlotCountdown: React.FC = () => {
                 fontSize="xs"
                 fontWeight="normal"
               >
-                {/* First Row: 19 Boxes */}
-                <HStack spacing={1} wrap="wrap" justify="center" mb={2}>
-                  {firstRowSlots.map((slot) => {
-                    const isProcessed = slot < currentSlot;
-                    const isCurrent = slot === currentSlot;
-                    const epochOfSlot = Math.floor(slot / 32);
-                    const blockOfSlot = currentBlock - (currentSlot - slot); // Approximate block number
-
-                    return (
-                      <Tooltip
-                        key={slot}
-                        label={
-                          (isProcessed || isCurrent)
-                            ? `Epoch: ${epochOfSlot}, Block: ${blockOfSlot}`
-                            : undefined
-                        }
-                      >
-                        <Box
-                          w={{ base: "45px", md: "55px" }}
-                          h={{ base: "45px", md: "55px" }}
-                          borderRadius="md"
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                          bg={
-                            isCurrent
-                              ? "teal.500" // Current slot
-                              : isProcessed
-                              ? "purple.500" // Processed slots
-                              : "blue.500" // Future slots
-                          }
-                          color="white"
-                          fontSize={{ base: "10px", md: "9px" }}
-                          fontWeight="bold"
-                          animation={isCurrent ? "blink 1s infinite" : "none"}
-                          _hover={{
-                            transform: "scale(1.1)",
-                            transition: "transform 0.2s",
-                          }}
-                        >
-                          {slot}
-                        </Box>
-                      </Tooltip>
-                    );
-                  })}
-                </HStack>
-
-                {/* Second Row: 13 Boxes + Text + Golden Box */}
-                <HStack spacing={1} wrap="wrap" justify="center">
-                  {secondRowSlots.map((slot) => {
-                    const isProcessed = slot < currentSlot;
-                    const isCurrent = slot === currentSlot;
-                    const epochOfSlot = Math.floor(slot / 32);
-                    const blockOfSlot = currentBlock - (currentSlot - slot); // Approximate block number
-
-                    return (
-                      <Tooltip
-                        key={slot}
-                        label={
-                          (isProcessed || isCurrent)
-                            ? `Epoch: ${epochOfSlot}, Block: ${blockOfSlot}`
-                            : undefined
-                        }
-                      >
-                        <Box
-                          w={{ base: "45px", md: "55px" }}
-                          h={{ base: "45px", md: "55px" }}
-                          borderRadius="md"
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                          bg={
-                            isCurrent
-                              ? "green.500" // Current slot
-                              : isProcessed
-                              ? "purple.500" // Processed slots
-                              : "blue.500" // Future slots
-                          }
-                          color="white"
-                          fontSize={{ base: "10px", md: "9px" }}
-                          fontWeight="bold"
-                          animation={isCurrent ? "blink 1s infinite" : "none"}
-                          _hover={{
-                            transform: "scale(1.1)",
-                            transition: "transform 0.2s",
-                          }}
-                        >
-                          {slot}
-                        </Box>
-                      </Tooltip>
-                    );
-                  })}
-
-                  {/* Vertical Stacked Text */}
-                  <VStack spacing={0} align="center" justify="center" ml={2} pt={2} pb={2}>
-                    {networks[network].target !== 999999999 ? (
-                      <>
-                        <Text fontSize="xs" fontWeight="bold" color="white">
-                          {slotsRemaining} slots away
-                        </Text>
-                        <Text fontSize="xs" color="white">
-                          .................
-                        </Text>
-                        <Text fontSize="s" fontWeight="bold" color="white">
-                          {countdown}
-                        </Text>
-                      </>
-                    ) : (
-                      <Text fontSize="xs" fontWeight="bold" color="white">
-                        Not announced yet!
-                      </Text>
-                    )}
-                  </VStack>
-
-                  {/* Golden Box */}
-                  <Tooltip
-                    // label={`Target Slot: ${networks[network].target}`}
-                    label={
-                      (networks[network].target !== 999999999)
-                        ? `Target Slot: ${networks[network].target}`
-                        : undefined
-                    }
-                  >
-                    <Box
-                      w={{ base: "45px", md: "55px" }}
-                      h={{ base: "45px", md: "55px" }}
-                      borderRadius="md"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      bg="gold"
-                      color="white"
-                      fontSize={{ base: "10px", md: "9px" }}
-                      fontWeight="bold"
-                      _hover={{
-                        transform: "scale(1.1)",
-                        transition: "transform 0.2s",
-                      }}
-                    >
-                      PECTRA
-                    </Box>
-                  </Tooltip>
-                </HStack>
+                {viewMode === "slots" ? renderSlotsView() : renderEpochsView()}
               </Box>
 
               {/* Additional Info */}
@@ -404,7 +575,9 @@ const SlotCountdown: React.FC = () => {
                 Refreshes in {timer} seconds
               </Text>
               <Text fontSize="sm" color={useColorModeValue("black","white")}>
-                * The slot, epoch, and block numbers are updated every 13 seconds.
+                {viewMode === "slots" 
+                  ? "* The slot numbers are updated every 12 seconds."
+                  : "* The epoch numbers are updated every 6.4 minutes (1 epoch)."}
               </Text>
             </>
           )}
