@@ -73,45 +73,9 @@ const MyComponent = () => {
       <InsightsLeaderboard />  {/* First chart */}
     </Box>
 
-<<<<<<< HEAD
-    {/* Right Side: Editors Leaderboard */}
-    <Box
-      flex="1"
-      display="flex"
-      flexDirection="column"
-      justifyContent="space-between"
-    >
-      {/* First Chart Box with fixed height and heading */}
-      <Box
-        bgColor={bg}
-        padding="1rem"
-        borderRadius="0.55rem"
-        minHeight="470px" // Set minimum height
-        // marginBottom="1rem"
-      >
-        <Text
-          color={"#30A0E0"}
-          fontSize="2xl"
-          fontWeight="bold"
-          textAlign="center"
-          // marginBottom="0.5rem"
-          paddingTop={5}
-          width="100%"
-          wordWrap="break-word"
-        >
-          Editors Leaderboard
-        </Text>
-        <InsightsLeaderboard /> {/* First chart */}
-        
-      </Box>
-      <Box className={"w-full"}>
-              <DateTime />
-            </Box>
-=======
     <Box className={"w-full"} maxWidth="100%">
       {/* <DateTime /> */}
       <LastUpdatedDateTime name="EditorsTool"/>
->>>>>>> a9cfbf8cb843690d71a1b0c7b73e235fa8cfe47b
     </Box>
   </Box>
 </Flex>
