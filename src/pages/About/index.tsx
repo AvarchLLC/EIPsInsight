@@ -18,6 +18,7 @@ import {
   Link
 } from "@chakra-ui/react";
 import NLink from "next/link";
+import { FiHome } from "react-icons/fi";
 const EIPsInsightRecap = () => {
     const bg = useColorModeValue("#f6f6f7", "#171923");
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -28,6 +29,7 @@ const EIPsInsightRecap = () => {
           setIsDarkMode(true);
         }
       });
+
 
   return (
     <>
@@ -40,7 +42,7 @@ const EIPsInsightRecap = () => {
     >
       <VStack spacing={6} align="start">
       <Text
-        
+        id="what"
            transition={{ duration: 0.5 } as any}
            fontSize={{base: "2xl",md:"4xl", lg: "6xl"}}
            fontWeight={{ base: "extrabold", md: "bold", lg: "bold" }}

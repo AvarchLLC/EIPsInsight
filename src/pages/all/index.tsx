@@ -20,6 +20,15 @@ import { DownloadIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
 import Author from "@/components/Author";
 import SearchByEip from '@/components/SearchByEIP2';
+import {
+  FiMenu,
+  FiHome,
+  FiSettings,
+  FiBarChart2,
+  FiTool,
+  FiInfo,
+  FiDatabase,
+} from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 
@@ -55,6 +64,7 @@ const All = () => {
       setSelected(hash);
     }
   }, []); // Empty dependency array to run only on component mount
+
 
   const handleSelection = (item:any) => {
     setSelected(item);
@@ -332,15 +342,28 @@ const All = () => {
       </Button>
     
 </Box>)}
+<div id="living">
+  <RipCatTable dataset={data3} cat={selected} status={"Living"} />
+</div>
+<div id="final">
+  <RipCatTable dataset={data3} cat={selected} status={"Final"} />
+</div>
+<div id="lastcall">
+  <RipCatTable dataset={data3} cat={selected} status={"Last Call"} />
+</div>
+<div id="review">
+  <RipCatTable dataset={data3} cat={selected} status={"Review"} />
+</div>
+<div id="draft">
+  <RipCatTable dataset={data3} cat={selected} status={"Draft"} />
+</div>
+<div id="withdrawn">
+  <RipCatTable dataset={data3} cat={selected} status={"Withdrawn"} />
+</div>
+<div id="stagnant">
+  <RipCatTable dataset={data3} cat={selected} status={"Stagnant"} />
+</div>
 
-
-            <RipCatTable dataset={data3} cat={selected} status={"Living"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Final"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Last Call"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Review"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Draft"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Withdrawn"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Stagnant"} />
           </Box>
           ) : (
             <Box>
@@ -400,13 +423,28 @@ const All = () => {
 </Box>
 
 
-              <CatTable dataset={data2} cat={selected} status={"Living"} />
-              <CatTable dataset={data2} cat={selected} status={"Final"} />
-              <CatTable dataset={data2} cat={selected} status={"Last Call"} />
-              <CatTable dataset={data2} cat={selected} status={"Review"} />
-              <CatTable dataset={data2} cat={selected} status={"Draft"} />
-              <CatTable dataset={data2} cat={selected} status={"Withdrawn"} />
-              <CatTable dataset={data2} cat={selected} status={"Stagnant"} />
+<div id="living">
+  <CatTable dataset={data2} cat={selected} status={"Living"} />
+</div>
+<div id="final">
+  <CatTable dataset={data2} cat={selected} status={"Final"} />
+</div>
+<div id="lastcall">
+  <CatTable dataset={data2} cat={selected} status={"Last Call"} />
+</div>
+<div id="review">
+  <CatTable dataset={data2} cat={selected} status={"Review"} />
+</div>
+<div id="draft">
+  <CatTable dataset={data2} cat={selected} status={"Draft"} />
+</div>
+<div id="withdrawn">
+  <CatTable dataset={data2} cat={selected} status={"Withdrawn"} />
+</div>
+<div id="stagnant">
+  <CatTable dataset={data2} cat={selected} status={"Stagnant"} />
+</div>
+
             </Box>
           )}
         </Box>

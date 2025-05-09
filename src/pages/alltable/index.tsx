@@ -88,10 +88,13 @@ const AllTable = () => {
             marginTop={{ md: "10", base: "5" }}
           >
             <FlexBetween>
+              <div id="table">
               <Header
                 title={`All EIPs,ERCs & RIPs - [ ${data.length} ]`}
                 subtitle=""
+                
               />
+              </div>
             </FlexBetween>
             <Table type="Total" />
             {/* <AreaC type={"EIPs"} /> */}

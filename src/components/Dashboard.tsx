@@ -58,7 +58,7 @@ import {
   FiDatabase,
 } from 'react-icons/fi';
 
-import { useSidebar } from "./ui/SideBarContext";
+import { useSidebar } from "@/components/Sidebar/SideBarContext";
 
 
 interface EIP {

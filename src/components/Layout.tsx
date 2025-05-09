@@ -20,11 +20,11 @@ import BookmarkFloater from "./BookmarkFloater";
 import SessionWrapper from "@/components/SessionWrapper";
 import { AuthLocalStorageInitializer } from "./AuthLocalStorageInitializer";
 import { BookmarkProvider } from "./BookmarkContext";
-import Sidebar from "@/components/ui/SideBar";
-import { SidebarProvider, useSidebar } from "./ui/SideBarContext";
+import Sidebar from "@/components/Sidebar/SideBar";
+import { SidebarProvider, useSidebar } from "./Sidebar/SideBarContext";
+import SidebarConfigLoader from "./Sidebar/SideBarConfigLoader";
 
 const mont = Inter({ subsets: ["latin"] });
-
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const router = usePathname();
 
@@ -89,10 +89,11 @@ const InnerLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Flex direction="row" minH="100vh">
+      <SidebarConfigLoader />
       <Sidebar />
       <Box
         flex="1"
-        ml={isCollapsed ? "60px" : "200px"}
+        ml={{ base: 0, md: isCollapsed ? '60px' : '200px' }}
         transition="margin 0.2s ease"
       >
         <Navbar />

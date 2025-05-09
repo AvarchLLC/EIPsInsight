@@ -11,8 +11,8 @@ import Script from 'next/script';
 import ConsentBanner from '@/components/ConsenstBanner';
 import FloatingContributionIcon from '@/components/FloatingContributionIcon';
 import SessionWrapper from '@/components/SessionWrapper';
-import Sidebar from '@/components/ui/SideBar';
-import { useSidebar } from '@/components/ui/SideBarContext';
+import Sidebar from '@/components/Sidebar/SideBar';
+import { useSidebar } from '@/components/Sidebar/SideBarContext';
 
 
 const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });

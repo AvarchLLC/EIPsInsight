@@ -1,7 +1,7 @@
-// SideBarContext.tsx
+'use client';
 import React, { createContext, useContext, useState } from 'react';
 
-interface SidebarItem {
+export interface SidebarItem {
   label: string;
   icon: React.ElementType;
   id: string;

@@ -13,7 +13,8 @@ import { useSidebar } from './SideBarContext';
 
 export default function Sidebar() {
   const { isCollapsed, toggleSidebar, sections } = useSidebar();
-  const { colorMode, toggleColorMode } = useColorMode(); // Hook for color mode
+  const { colorMode } = useColorMode();
+
   const handleScroll = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -24,13 +25,14 @@ export default function Sidebar() {
   return (
     <Flex
       direction="column"
-      bg={colorMode === 'dark' ? 'gray.800' : 'gray.100'} // Light and dark background
-      color={colorMode === 'dark' ? 'white' : 'black'} // Text color based on color mode
+      bg={colorMode === 'dark' ? 'gray.800' : 'gray.100'}
+      color={colorMode === 'dark' ? 'white' : 'black'}
       minH="100vh"
       width={sidebarWidth}
       transition="width 0.2s ease"
       position="fixed"
       zIndex="999"
+      display={{ base: 'none', md: 'flex' }}
     >
       <IconButton
         aria-label="Toggle Sidebar"
@@ -40,7 +42,7 @@ export default function Sidebar() {
         alignSelf="flex-end"
         size="sm"
         variant="ghost"
-        colorScheme={colorMode === 'dark' ? 'whiteAlpha' : 'blackAlpha'} // Icon button color scheme
+        colorScheme={colorMode === 'dark' ? 'whiteAlpha' : 'blackAlpha'}
       />
       <VStack spacing={4} align="stretch" mt={4}>
         {sections.map((section) => (
@@ -56,7 +58,7 @@ export default function Sidebar() {
               mx={2}
               borderRadius="md"
               _hover={{
-                bg: colorMode === 'dark' ? 'gray.700' : 'gray.300', // Hover background color
+                bg: colorMode === 'dark' ? 'gray.700' : 'gray.300',
                 cursor: 'pointer',
               }}
               onClick={() => handleScroll(section.id)}
