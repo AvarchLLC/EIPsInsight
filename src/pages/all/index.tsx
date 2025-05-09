@@ -8,29 +8,28 @@ import {
   Button,
   Wrap,
   WrapItem,
+  Heading,
 } from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 import RipCatTable from "@/components/RipCatTable";
 import SearchBox from "@/components/SearchBox";
-import { CCardBody, CSmartTable } from "@coreui/react-pro";
-// import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
 import { DownloadIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
-import Author from "@/components/Author";
-import SearchByEip from '@/components/SearchByEIP2';
-import {
-  FiMenu,
-  FiHome,
-  FiSettings,
-  FiBarChart2,
-  FiTool,
-  FiInfo,
-  FiDatabase,
-} from 'react-icons/fi';
+
+const sections = [
+  { id: "living", text: "Living" },
+  { id: "final", text: "Final" },
+  { id: "last-call", text: "Last Call" },
+  { id: "review", text: "Review" },
+  { id: "draft", text: "Draft" },
+  { id: "withdrawn", text: "Withdrawn" },
+  { id: "stagnant", text: "Stagnant" },
+];
 
 const MotionBox = motion(Box);
+
 
 interface EIP {
   _id: string;
@@ -56,6 +55,23 @@ const All = () => {
   const [data2, setData2] = useState<EIP[]>([]);
   const [data3, setData3] = useState<EIP[]>([]);
   const [loading, setLoading] = useState(false); 
+
+    const [isVisible, setIsVisible] = useState(false);
+    let timeout: string | number | NodeJS.Timeout | undefined;
+  
+    useEffect(() => {
+      const handleScroll = () => {
+        setIsVisible(true);
+        clearTimeout(timeout);
+        timeout = setTimeout(() => setIsVisible(false), 1000); // Hide after 1s of no scroll
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+        clearTimeout(timeout);
+      };
+    }, []);
   
   useEffect(() => {
     // Check if a hash exists in the URL
@@ -64,7 +80,6 @@ const All = () => {
       setSelected(hash);
     }
   }, []); // Empty dependency array to run only on component mount
-
 
   const handleSelection = (item:any) => {
     setSelected(item);
@@ -198,19 +213,43 @@ const All = () => {
   return (
     <>
       <AllLayout>
-        <Box 
-        marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}>
-        <SearchByEip defaultQuery=''/>
-        </Box>
         <Box
           paddingBottom={{ lg: "10", sm: "10", base: "10" }}
           marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
           paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-          // marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
-
-          {/* <Author defaultQuery=''/> */}
-          <br/>
+    <Box
+      as="aside"
+      p={4}
+      bg="gray.100"
+      borderRadius="lg"
+      position="fixed"
+      right="20px"
+      top="80px"
+      width="250px"
+      maxHeight="80vh"
+      overflowY="auto"
+      boxShadow="md"
+      zIndex="10"
+      display={{ base: "none", lg: "block" }} // Hide on mobile
+      opacity={isVisible ? 1 : 0}
+      transition="opacity 0.3s ease-in-out"
+      pointerEvents={isVisible ? "auto" : "none"} // Prevent interaction when hidden
+    >
+      <Heading as="h3" size="md" mb={2}>
+        On this page
+      </Heading>
+      <ul style={{ listStyleType: "none", padding: 0 }}>
+        {sections.map(({ id, text }) => (
+          <li key={id} style={{ marginBottom: "8px" }}>
+            <Link href={`#${id}`} color="blue.600" style={{ textDecoration: "none" }}>
+              {text}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Box>
           <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold py-8">
             <div className="flex justify-between w-full">
             <Box>
@@ -342,6 +381,7 @@ const All = () => {
       </Button>
     
 </Box>)}
+          
 <div id="living">
   <RipCatTable dataset={data3} cat={selected} status={"Living"} />
 </div>
@@ -421,7 +461,6 @@ const All = () => {
     </Box>
   )}
 </Box>
-
 
 <div id="living">
   <CatTable dataset={data2} cat={selected} status={"Living"} />
