@@ -1,263 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Network } from 'vis-network';
-import { DataSet } from 'vis-data';
-import { Edge, Node } from 'vis-network';
-import { Text, Select, Box, useColorModeValue, Button, Stack } from '@chakra-ui/react';
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Checkbox,
-} from "@chakra-ui/react";
-import { Filter } from "react-feather";
+'use client';
 
-// Define the data structure
-interface EIP {
-  eip: number;
-  requires: number[];
-}
-
-interface NetworkUpgrade {
-  name: string;
-  eips: EIP[];
-}
-
-interface NetworkUpgradesData {
-  networkUpgrades: NetworkUpgrade[];
-}
-
-// Props for the component
-interface NetworkGraphProps {
-  data: NetworkUpgradesData;
-}
-
-const NetworkGraph: React.FC<NetworkGraphProps> = ({ data }) => {
-  const graphRef = useRef<HTMLDivElement>(null);
-  const [selectedUpgrades, setSelectedUpgrades] = useState<string[]>([]);
-  const menuBg = useColorModeValue("gray.800", "gray.800"); // Dark background
-  const menuColor = useColorModeValue("white", "white"); // White text
-  const buttonBg = useColorModeValue("gray.700", "gray.700"); // Dark button background
-  const buttonColor = useColorModeValue("white", "white"); // White button text
-
-
-  // Dark mode colors
-  const dropdownBg = useColorModeValue('white', 'gray.800');
-  const dropdownColor = useColorModeValue('black', 'white');
-  const placeholderColor = useColorModeValue('gray.500', 'gray.400');
-
-  useEffect(() => {
-    if (!graphRef.current) return;
-
-    // Create nodes and edges for the graph
-    const nodes = new DataSet<Node>([]);
-    const edges = new DataSet<Edge>([]);
-
-    // Define colors for each network upgrade
-    const upgradeColors: { [key: string]: string } = {
-      Homestead: '#FF6F61',
-      'Spurious Dragon': '#6B5B95',
-      'Tangerine Whistle': '#88B04B',
-      Byzantium: '#FFA500',
-      Petersburg: '#92A8D1',
-      Istanbul: '#955251',
-      'Muir Glacier': '#B565A7',
-      Dencun: '#009B77',
-      Pectra: '#DD4124',
-      Berlin: '#D65076',
-      London: '#45B8AC',
-      'Arrow Glacier': '#EFC050',
-      'Gray Glacier': '#5B5EA6',
-      Paris: '#9B2335',
-      Shapella: '#BC243C',
-    };
-
-    // Add network upgrades as nodes (only if selected)
-    data.networkUpgrades.forEach((upgrade) => {
-      if (selectedUpgrades.includes(upgrade.name)) {
-        nodes.add({ id: upgrade.name, label: upgrade.name, group: 'upgrade' });
-
-        // Add EIPs as nodes and edges to their required EIPs
-        upgrade.eips.forEach((eip) => {
-          const eipId = `EIP-${eip.eip}`;
-          nodes.add({ id: eipId, label: eipId, group: 'eip' });
-
-          // Add edges for EIP dependencies
-          eip.requires.forEach((requiredEip) => {
-            edges.add({
-              from: eipId,
-              to: `EIP-${requiredEip}`,
-              arrows: 'to',
-              color: upgradeColors[upgrade.name], // Use upgrade-specific color
-            });
-          });
-
-          // Add edges from network upgrade to EIP
-          edges.add({
-            from: upgrade.name,
-            to: eipId,
-            arrows: 'to',
-            color: upgradeColors[upgrade.name], // Use upgrade-specific color
-          });
-        });
-      }
-    });
-
-    // Create the network graph
-    const network = new Network(
-      graphRef.current,
-      { nodes, edges },
-      {
-        nodes: {
-          shape: 'box',
-          font: {
-            size: 25, // Larger font size for labels
-            color: '#000000', // Black text for better visibility
-          },
-          size: 30, // Larger node size
-          color: {
-            background: '#FFFFFF', // White background for nodes
-            border: '#000000', // Black border for nodes
-            highlight: {
-              background: '#F0F0F0', // Light gray highlight
-              border: '#000000',
-            },
-          },
-        },
-        edges: {
-          color: '#cccccc',
-          arrows: {
-            to: { enabled: true, scaleFactor: 0.5 },
-          },
-        },
-        groups: {
-          upgrade: {
-            color: {
-              background: '#4CAF50', // Green background for upgrade nodes
-              border: '#388E3C', // Darker green border for upgrade nodes
-            },
-            font: {
-              color: '#000000', // White text for better contrast
-            },
-            highlight: {
-              background: '#C8E6C9', // Light green highlight
-              border: '#388E3C',
-            },
-          },
-          eip: {
-            color: {
-              background: '#2196F3', // Blue background for EIP nodes
-              border: '#1976D2', // Darker blue border for EIP nodes
-            },
-            font: {
-              color: '#000000', // White text for better contrast
-            },
-            highlight: {
-              background: '#BBDEFB', // Light blue highlight
-              border: '#1976D2',
-            },
-          },
-        },
-        layout: {
-          hierarchical: {
-            enabled: true,
-            direction: 'UD', // Up-Down layout
-            sortMethod: 'directed',
-            parentCentralization: false, // Prevent excessive centering
-            levelSeparation: 150, // Increase spacing between levels
-            nodeSpacing: 200, // Increase spacing between nodes
-          },
-        },
-        physics: {
-          enabled: false, // Disable physics for hierarchical layout
-        },
-        interaction: {
-          zoomView: true, // Allow zooming
-          dragView: true, // Allow dragging
-        },
-      }
-    );
-
-    // Set initial zoom level and position
-    network.moveTo({
-      scale: 0.5, // Zoom out initially
-      position: { x: -10000, y: 0 }, // Ensure the left side is visible
-    });
-
-    // Make the container scrollable
-    graphRef.current.style.overflow = 'auto';
-  }, [data, selectedUpgrades]);
-
-  useEffect(() => {
-    // Select all upgrades by default on mount
-    setSelectedUpgrades(data.networkUpgrades.map((upgrade) => upgrade.name));
-  }, [data.networkUpgrades]);
-
-  // Handle dropdown changes
-  // const handleUpgradeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const selected = Array.from(event.target.selectedOptions, (option) => option.value);
-  //   setSelectedUpgrades(selected);
-  // };
-  
-  const handleUpgradeToggle = (upgradeName:any) => {
-    setSelectedUpgrades(prev => 
-      prev.includes(upgradeName)
-        ? prev.filter(name => name !== upgradeName)
-        : [...prev, upgradeName]
-    );
-  };
-
-  // Select all upgrades
-  const selectAll = () => {
-    setSelectedUpgrades(data.networkUpgrades.map((upgrade) => upgrade.name));
-  };
-
-  // Remove all upgrades
-  const removeAll = () => {
-    setSelectedUpgrades([]);
-  };
-
-  return (
-    <Box>
-     <Menu closeOnSelect={false}>
-      <MenuButton as={Button} colorScheme="blue" leftIcon={<Filter />}>
-        Filter Network Upgrades
-      </MenuButton>
-      <MenuList maxH="300px" overflowY="auto">
-        <MenuItem onClick={selectAll} fontWeight="bold">
-          Select All
-        </MenuItem>
-        <MenuItem onClick={removeAll} fontWeight="bold">
-          Remove All
-        </MenuItem>
-        {data.networkUpgrades.map((upgrade) => (
-          <MenuItem key={upgrade.name}>
-            <Checkbox
-              isChecked={selectedUpgrades.includes(upgrade.name)}
-              onChange={() => handleUpgradeToggle(upgrade.name)}
-              colorScheme="blue"
-            >
-              {upgrade.name}
-            </Checkbox>
-          </MenuItem>
-        ))}
-      </MenuList>
-    </Menu>
-    <br/>
-    <div
-  ref={graphRef}
-  style={{
-    marginTop:10,
-    width: "100%",
-    height: "800px",
-    border: "1px solid #ccc",
-    backgroundColor: "#FFFFFF",
-  }}
-></div>
-
-    </Box>
-  );
-};
+import React, { useMemo, useRef, useState } from 'react';
+import ForceGraph3D, { ForceGraphMethods } from 'react-force-graph-3d';
+import * as THREE from 'three';
+import SpriteText from 'three-spritetext';
+import { Button, IconButton, VStack } from '@chakra-ui/react';
+import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
 
 const networkUpgradesData = {
   networkUpgrades: [
@@ -398,20 +146,203 @@ const networkUpgradesData = {
   ],
 };
 
-const App: React.FC = () => {
+const EIP3DGraph = () => {
+  const fgRef = useRef<ForceGraphMethods>();
+  const [showResetZoom, setShowResetZoom] = useState(true);
+
+  const handleZoomIn = () => {
+    if (fgRef.current) {
+      const distance = fgRef.current.camera().position.length();
+      fgRef.current.camera().position.setLength(distance * 0.8); // zoom in
+      setShowResetZoom(true);
+    }
+  };
+  
+  const handleZoomOut = () => {
+    if (fgRef.current) {
+      const distance = fgRef.current.camera().position.length();
+      fgRef.current.camera().position.setLength(distance * 1.2); // zoom out
+      setShowResetZoom(true);
+    }
+  };
+  
+
+  const graphData = useMemo(() => {
+    const nodes: any[] = [];
+    const links: any[] = [];
+    const seen = new Set<number>();
+
+    for (const upgrade of networkUpgradesData.networkUpgrades) {
+      for (const { eip } of upgrade.eips) {
+        if (!seen.has(eip)) {
+          nodes.push({
+            id: eip,
+            label: `${eip}`,
+            group: upgrade.name,
+            upgradeName: upgrade.name,
+          });
+          seen.add(eip);
+        }
+      }
+    }
+
+    for (const upgrade of networkUpgradesData.networkUpgrades) {
+      for (const { eip, requires } of upgrade.eips) {
+        for (const req of requires) {
+          links.push({ source: eip, target: req });
+          if (!seen.has(req)) {
+            nodes.push({
+              id: req,
+              label: `${req}`,
+              group: '',
+              upgradeName: '',
+            });
+            seen.add(req);
+          }
+        }
+      }
+    }
+
+    return { nodes, links };
+  }, []);
+
+  const uniqueGroups = useMemo(() => {
+    const groups = new Set<string>();
+    graphData.nodes.forEach((node) => groups.add(node.group));
+    return [...groups].filter((g) => g); // remove empty string group
+  }, [graphData]);
+
+  const colorScale = useMemo(() => {
+    const scale = new Map<string, string>();
+    const palette = [
+      '#FF6B6B', '#4ECDC4', '#FFD93D', '#6A0572', '#1B9CFC',
+      '#FF9F1C', '#2EC4B6', '#E71D36', '#A8DADC', '#457B9D',
+    ];
+    uniqueGroups.forEach((group, index) => {
+      scale.set(group, palette[index % palette.length]);
+    });
+    return scale;
+  }, [uniqueGroups]);
+
   return (
-    <div>
-      <Text
-        fontSize={{ base: '2xl', md: '2xl', lg: '2xl' }}
-        fontWeight="bold"
-        color="#30A0E0"
-        mt={2}
-      >
-        Network Upgrades and EIPs Relationship Graph
-      </Text>
-      <NetworkGraph data={networkUpgradesData} />
+    <div style={{ height: '100vh', position: 'relative' }}>
+  {/* Legend */}
+  <div style={{
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    background: 'rgba(255, 255, 255, 0.9)',
+    padding: '12px',
+    borderRadius: '10px',
+    fontSize: '0.9rem',
+    boxShadow: '0 0 10px rgba(0,0,0,0.3)',
+    zIndex: 10,
+    maxWidth: '200px',
+    color: 'black' // Added this line to set all text to black
+  }}>
+    <strong style={{ color: 'black' }}>Network Upgrades</strong>
+    <ul style={{ 
+      listStyle: 'none', 
+      padding: 0, 
+      marginTop: 10,
+      color: 'black' // Ensures list items inherit black color
+    }}>
+      {uniqueGroups.map((group) => (
+        <li key={group} style={{ 
+          marginBottom: 6,
+          color: 'black' // Explicit black for list items
+        }}>
+          <span style={{
+            display: 'inline-block',
+            width: 12,
+            height: 12,
+            borderRadius: '50%',
+            backgroundColor: colorScale.get(group),
+            marginRight: 8,
+          }} />
+          {group}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+
+      {/* Zoom Controls */}
+      <VStack position="absolute" bottom={4} right={4} zIndex={10} spacing={2}>
+        {
+          <>
+            <IconButton
+              aria-label="Zoom in"
+              icon={<AddIcon />}
+              onClick={handleZoomIn}
+              size="sm"
+              colorScheme="gray"
+            />
+            <IconButton
+              aria-label="Zoom out"
+              icon={<MinusIcon />}
+              onClick={handleZoomOut}
+              size="sm"
+              colorScheme="gray"
+            />
+            <Button
+              leftIcon={<RepeatIcon />}
+              onClick={() => {
+                fgRef.current?.zoomToFit(1000);
+              }}
+              size="xs"
+              colorScheme="gray"
+            >
+              Reset
+            </Button>
+          </>
+        }
+      </VStack>
+
+      <ForceGraph3D
+        ref={fgRef}
+        graphData={graphData}
+        nodeThreeObject={(node: any) => {
+          const color = colorScale.get(node.group) || '#999';
+        
+          // Create sphere mesh
+          const geometry = new THREE.SphereGeometry(6, 16, 16);
+          const material = new THREE.MeshBasicMaterial({ color });
+          const sphere = new THREE.Mesh(geometry, material);
+        
+          // Create sprite label
+          const sprite = new SpriteText(node.label);
+          sprite.color = '#ffffff';
+          sprite.backgroundColor = 'transparent';
+          sprite.textHeight = 4;
+          sprite.position.set(0, 10, 0);
+        
+          // Combine into a group
+          const group = new THREE.Group();
+          group.add(sphere);
+          group.add(sprite);
+        
+          return group;
+        }}
+        
+        nodeLabel={(node) => `${node.label} (Upgrade: ${node.upgradeName || 'N/A'})`}
+        linkColor={() => '#999'}
+        linkWidth={2}
+        linkDirectionalParticles={2}
+        linkDirectionalParticleWidth={2}
+        linkOpacity={0.6}
+        linkDirectionalArrowLength={3}
+        linkDirectionalArrowRelPos={0.9}
+        forceEngine="d3"
+        d3VelocityDecay={0.3}
+        d3AlphaDecay={0.02}
+        nodeResolution={32}
+        warmupTicks={100}
+        cooldownTicks={1000}
+        // onZoom={() => setShowResetZoom(true)}
+      />
     </div>
   );
 };
 
-export default App;
+export default EIP3DGraph;

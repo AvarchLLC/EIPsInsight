@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 const Column = dynamic(() => import('@ant-design/plots').then((mod) => mod.Column), { ssr: false });
 
 // Add 'type0' to the TransactionType type
-type TransactionType = 'overall' | 'type0' | 'type1' | 'type2' | 'type3' | 'all';
+type TransactionType = 'overall' | 'type0' | 'type1' | 'type2' | 'type3' | 'type4' | 'all';
 
 const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
   const [transactionType, setTransactionType] = useState<TransactionType>('all');
@@ -28,6 +28,7 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
         type1: block.type1,
         type2: block.type2,
         type3: block.type3,
+        type4: block.type4,
       }))
       .reverse(); // Reverse to show latest data first
   };
@@ -40,6 +41,7 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
     { time: block.time, blockNumber: block.blockNumber, type: 'type1', value: block.type1 },
     { time: block.time, blockNumber: block.blockNumber, type: 'type2', value: block.type2 },
     { time: block.time, blockNumber: block.blockNumber, type: 'type3', value: block.type3 },
+    { time: block.time, blockNumber: block.blockNumber, type: 'type4', value: block.type4 }
   ]);
 
   // Chart configuration for @ant-design/plots
@@ -49,7 +51,7 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
     yField: transactionType === 'all' ? 'value' : transactionType,
     seriesField: transactionType === 'all' ? 'type' : undefined,
     isStack: transactionType === 'all', // Enable stacking for the 'all' tab
-    color: transactionType === 'all' ? ['#FFD700', '#82ca9d', '#ff7300', '#ff0000'] : ['#8884d8'],
+    color: transactionType === 'all' ? ['#FFD700', '#82ca9d', '#ff7300', '#ff0000','green'] : ['#8884d8'],
     columnStyle: {
       radius: [4, 4, 0, 0], // Rounded corners for columns
     },
@@ -109,7 +111,7 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
       <br />
       <Flex mb={4} gap={2} wrap="wrap">
         <Flex mb={4} gap={4} wrap="wrap">
-          {(['all', 'type0', 'type1', 'type2', 'type3', 'overall'] as TransactionType[]).map((type) => (
+          {(['all', 'type0', 'type1', 'type2', 'type3', 'type4', 'overall'] as TransactionType[]).map((type) => (
             <Button
               key={type}
               onClick={() => setTransactionType(type)}

@@ -17,7 +17,10 @@ import dayjs from "dayjs";
 import CopyLink from "@/components/CopyLink";
 import { useRouter } from "next/router";
 import { DownloadIcon } from "@chakra-ui/icons";
+import TableOfContents from '@/components/TableOfContents';
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import FeedbackButton from "@/components/FeedbackButton";
+import { Tooltip } from "@chakra-ui/react";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -124,6 +127,8 @@ const ReviewTracker = () => {
 
 
   const toggleCollapse = () => setShow(!show);
+
+  const [showThumbs, setShowThumbs] = useState(false);
 
   const fetchReviewers = async (): Promise<string[]> => {
     try {
@@ -850,6 +855,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
           {/* Editors Chart */}
           <Box width={{ base: "100%", md: "45%" }} padding="1rem">
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+              
               <Heading size="md" color="black">
                 {`Editors Leaderboard (Monthly)`}
               </Heading>
@@ -1266,6 +1272,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
 
   return (
     <div>
+      <section id = "editors">
        <Heading
               as="h3"
               size="lg"
@@ -1276,7 +1283,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
         >
           Editors
         </Heading>
-      
+        </section>
       <div
         style={{
           display: "flex",
@@ -1287,6 +1294,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
       >
         {editorCharts}
       </div>
+      <section id = "Reviewers">
       <Heading
               as="h3"
               size="lg"
@@ -1297,6 +1305,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
         >
         Reviewers
       </Heading>
+      </section>
       <div
         style={{
           display: "flex",
@@ -1915,21 +1924,181 @@ const router = useRouter();
     };
   }, [router]);
 
+  // Scroll to the feedback section at the bottom of the page
+  const scrollToFeedbackSection = () => {
+    const feedbackSection = document.getElementById("comments"); // Ensure the case matches the HTML
+    if (feedbackSection) {
+      feedbackSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+// Handle thumbs up/down feedback
+const handleFeedbackClick = (type: 'positive' | 'negative') => {
+  const message =
+    type === 'positive'
+      ? 'Thank you for your positive feedback!'
+      : 'Thank you for your feedback!';
+  alert(message);
+};
+
 
   return (
+   
     loading ? (
       <LoaderComponent />
     ) : (
+      
       <AllLayout>
-        
-        <Box 
-        padding={{ base: 1, md: 4 }}
-        margin={{ base: 2, md: 4 }}
+   <Box
+  position="fixed"
+  right="0"
+  top="50%"
+  transform="translateY(-50%)"
+  zIndex="1000"
+  display="flex"
+  flexDirection="column" // Stack items vertically
+  alignItems="center" // Center-align items
+  gap="10px" // Space between elements
+  onMouseEnter={() => setShowThumbs(true)} // Show thumbs on hover
+  onMouseLeave={() => setShowThumbs(false)} // Hide thumbs when not hovering
+>
+  {/* Feedback Button */}
+  <Tooltip label="Give Feedback" aria-label="Feedback Tooltip">
+    <Box
+      bg="#48BB78" // Replace with your floating icons' color
+      color="white"
+      p="9px"
+      position="fixed" // Make the button fixed on the screen
+      right="-60px"
+      borderRadius="8px 8px 0px 0px"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      fontSize="12px"
+      cursor="pointer"
+      lineHeight="0.5"
+      minWidth="140px" 
+      transition="translateY(-55%), transform 0.3s ease, box-shadow 0.3s ease"
+      boxShadow="lg"
+      style={{
+        transform: "rotate(-90deg)", // Rotate text vertically
+        transformOrigin: "center center", // Rotate around the center
+      }}
+      _hover={{
+        transform: "scale(1.05) rotate(-90deg)", // Keep rotation on hover with scaling
+        bg: "#2B6CB0", // Slightly darker on hover
+        boxShadow: "xl",
+      }}
+      onClick={scrollToFeedbackSection} // Scroll to comments when the feedback button is clicked
+    >
+      Is this page helpful?
+    </Box>
+  </Tooltip>
+
+  {/* Thumbs-up and Thumbs-down Buttons */}
+  {showThumbs && (
+    <Box
+      bg="white"
+      color="#3182CE"
+      p="10px"
+      borderRadius="15px"
+      position= "fixed"
+      right = "25px"
+      top = "-70px"
+      display="flex"
+      flexDirection="column" // Stack thumbs vertically
+      alignItems="center"
+      justifyContent="center"
+      gap="12px" // Space between thumbs-up and thumbs-down
+      mt="10px"
+      boxShadow="lg"
+      border="1px solid #E2E8F0"
+      transition="transform 0.3s ease, box-shadow 0.3s ease"
+      _hover={{
+        transform: "scale(1.05)",
+      }}
+    >
+      {/* Thumbs-Up Button */}
+      <Tooltip label="I like this!" aria-label="Thumbs-Up Tooltip">
+        <Box
+          as="button"
+          bg="#E6FFFA" // Light green background
+          color="#2C7A7B"
+          borderRadius="50%" // Circular button
+          p="12px"
+          fontSize="20px"
+          boxShadow="md"
+          transition="background 0.3s ease, transform 0.3s ease"
+          _hover={{
+            bg: "#B2F5EA", // Slightly darker green on hover
+            transform: "scale(1.1)",
+          }}
+          onClick={scrollToFeedbackSection} // Scroll to comments when Thumbs-Up is clicked
+          aria-label="Thumbs up"
         >
-          <Heading
-            size="xl"
-            marginBottom={10}
-            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Editors & Reviewers Leaderboard</Heading>
+          👍
+        </Box>
+      </Tooltip>
+
+      {/* Thumbs-Down Button */}
+      <Tooltip label="Needs Improvement" aria-label="Thumbs-Down Tooltip">
+        <Box
+          as="button"
+          bg="#FED7D7" // Light red background
+          color="#C53030"
+          borderRadius="50%" // Circular button
+          p="12px"
+          fontSize="20px"
+          boxShadow="md"
+          transition="background 0.3s ease, transform 0.3s ease"
+          _hover={{
+            bg: "#FEB2B2", // Slightly darker red on hover
+            transform: "scale(1.1)",
+          }}
+          onClick={scrollToFeedbackSection} // Scroll to comments when Thumbs-Down is clicked
+          aria-label="Thumbs down"
+        >
+          👎
+        </Box>
+      </Tooltip>
+    </Box>
+  )}
+</Box>
+
+
+
+      {/* Rest of the component */}
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        gap={{ base: 4, md: 8 }}
+        p={{ base: 4, md: 8 }}
+      >
+        {/* Sidebar and other content */}
+        {/* ... */}
+      </Flex>
+         <Flex
+    direction={{ base: 'column', md: 'row' }}
+    gap={{ base: 4, md: 8 }}
+    p={{ base: 4, md: 8 }}
+  >
+    {/* Sidebar for Table of Contents */}
+    <Box flex="0 0 250px" display={{ base: 'none', md: 'block' }}>
+      <TableOfContents />
+      </Box>
+      
+      <Box flex="1" p={4}>
+        <section id = "LeaderBoard">
+          
+      <Heading
+        size="xl"
+        marginBottom={10}
+        textAlign="center"
+        color={useColorModeValue('blue.600', 'blue.300')}
+        fontWeight="bold"
+      >
+        Editors & Reviewers Leaderboard
+      </Heading>
+      </section>
 
 
 <Box
@@ -1940,6 +2109,7 @@ const router = useRouter();
       marginBottom={2}
     >
       <Flex justify="space-between" align="center">
+        <section id = "Leaderboard FAQ">
         <Heading
           as="h3"
           size="lg"
@@ -1947,6 +2117,7 @@ const router = useRouter();
           color={useColorModeValue("#3182CE", "blue.300")}
         > Editors & Reviewers Leaderboard FAQ
         </Heading>
+        </section>
         <Box
   bg="blue" // Gray background
   borderRadius="md" // Rounded corners
@@ -2143,6 +2314,7 @@ const router = useRouter();
             <Box id="ActivityTimeline" className="w-full">
 
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+            <section id="ActivityTimeline">
             <Heading
               as="h3"
               size="lg"
@@ -2151,7 +2323,9 @@ const router = useRouter();
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
             > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
+
             </Heading> 
+            </section>
               <Flex alignItems="center">
                 <Button
                   colorScheme="blue"
@@ -2308,9 +2482,11 @@ const router = useRouter();
   {/* The part that is breaking start */}
   <Box id="Monthly" className={"w-full"}>
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+      <section id = "PRs Reviewed" >
       <Heading size="md" color="black">
         {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com/Reviewers#Monthly`} />
       </Heading>
+      </section>
       <Flex alignItems="center">
         <CSVLink
           data={csvData.length ? csvData : []}
@@ -2849,6 +3025,7 @@ const router = useRouter();
               // }}
             >
             <Box id="Speciality" className="w-full">
+              <section id = "active editors">
             <Heading
               as="h3"
               size="lg"
@@ -2858,21 +3035,24 @@ const router = useRouter();
               color={useColorModeValue("#3182CE", "blue.300")}
             > Active Editors PR reviews in each Repository <CopyLink link={`https://eipsinsight.com/Reviewers#Speciality`} />
             </Heading>
+            </section>
               {editorsSpecialityChart()}
             </Box>
           </Box>
           <br/>
         <hr></hr>
         <br/>
-        <Text fontSize="3xl" fontWeight="bold">Comments</Text>
+        <section id="comments">
+        <Text fontSize="3xl" fontWeight="bold">Comments</Text></section>
           <Comments page={"Reviewers"}/>
+          
         </Box>
 
 
         
-    </Box>
-    {/* </motion.div> */}
-  </AllLayout>
+        </Box>
+  </Flex>
+</AllLayout>
 )
 ); };
 

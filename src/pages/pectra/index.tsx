@@ -33,9 +33,14 @@ import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 import { FaSyncAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
 import Graph from "@/components/NetworkUpgradesGraph";
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { IconButton } from '@chakra-ui/react';
+import { useRef } from 'react';
 
 
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
+
+
 
 
 const All = () => {
@@ -59,6 +64,23 @@ const All = () => {
       setIsDarkMode(true);
     }
   });
+
+  // const containerRef = useRef(null);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
@@ -136,53 +158,40 @@ const All = () => {
 
   const PectraPosts= [
     {
-      image: "pectra5.jpg",
-      title: "Highlights of Ethereum's All Core Devs Meeting (ACDE) #204",
-      content: "Pectra Devnet 5 & 6 Updates, Mainnet Timeline, Geth Bug, System Contract Audits, Retrospective, Fusaka Planning, Hardware Requirements, EIP 7823, ACD Bot",
-      link: "https://etherworld.co/2025/01/30/highlights-of-ethereums-all-core-devs-meeting-acde-204/"
-  },
-  {
-    image: "pectra6.jpg",
-    title: "Highlights of Ethereum's All Core Devs Meeting (ACDC) #149",
-    content: "Devnet 5 Updates, Devnet 6 Preparation, Pectra Testnet Forks Blob Scaling & Hard Fork Coordination",
-    link: "https://etherworld.co/2025/01/23/highlights-of-ethereums-all-core-devs-meeting-acdc-149/"
-},
-{
-  image: "pectra7.jpg",
-  title: "Highlights of Ethereum's All Core Devs Meeting (ACDE) #203",
-  content: "Pectra Devnet 5 Launch, Pectra Spec Updates & Pectra Testing Timeline",
-  link: "https://etherworld.co/2025/01/17/highlights-of-ethereums-all-core-devs-meeting-acde-203/"
-},
-{
-  image: "pectra8.jpg",
-  title: "Glamsterdam: The Next Upgrade After Fusaka",
-  content: "Glamsterdam - merges the star Gloas with Amsterdam for Ethereum’s next upgrade. Explore its origins, naming traditions, and why Devconnect cities might shape future upgrade names.",
-  link: "https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/"
-},
-{
-  image: "pectra10.jpg",
-  title: "Highlights of Ethereum's All Core Devs Meeting #148",
-  content: "Pectra Testing Updates, Merged PRs, Hardware Requirements for Validator & Post Pectra Ethereum",
-  link: "https://etherworld.co/2025/01/09/highlights-of-ethereums-all-core-devs-consenus-meeting-148/"
-},
-
+      image: "pectraimg1.jpg",
+      title: "Holesky Testnet Support Ends in September",
+      content: "Holesky testnet support ends in September as Ethereum transitions to Hoodi for improved validator testing & Pectra upgrade readiness.",
+      link: "https://etherworld.co/2025/03/19/holesky-testnet-support-ends-in-september/"
+    },
     {
-      image: "pectra2.jpg",
-      title: "Ethereum Launches Mekong Testnet: A Guide",
-      content: "Ethereum’s Mekong testnet offers developers and stakers a sandbox to explore the Pectra upgrade’s UX and staking changes, shaping the upcoming mainnet deployment.",
-      link: "https://etherworld.co/2024/11/08/mekong-testnet/"
-  },
-  {
-      image: "pectra3.jpg",
-      title: "Consensus-layer Call 144: EIPs, Pectra, and Blob Scaling",
-      content: "Ethereum developers discussed key updates on Pectra, EIPs 7742 and 7782, and strategies for scaling blobs, focusing on network performance, PeerDAS, and upcoming changes for the Pectra hard fork.",
-      link: "https://etherworld.co/2024/10/17/consensus-layer-call-144/"
-  },
+      image: "pectraimg2.jpg",
+      title: "Ethereum's Hoodi Testnet Launched",
+      content: "Hoodi Testnet is live & finalizing.",
+      link: "https://etherworld.co/2025/03/17/ethereums-hoodi-testnet-launched/"
+    },
     {
-        image: "pectra1.jpg",
-        title: "Ethereum Developers Push Proposal to increase Gossip Limit",
-        content: "Gossip Limit in Blockchain Networks, Current Setup, Reasons for 10 MiB Limit, Challenges, Proposal Objectives, Implementation & Alternatives.",
-        link: "https://etherworld.co/2024/12/15/ethereum-developers-push-proposal-to-increase-gossip-limit/"
+      image: "pectraimg3.jpg",
+      title: "New Ethereum Testnet ‘Hoodi’ Announced for Pectra Testing",
+      content: "Hoodi is Ethereum’s new testnet, designed to replace Holesky with a mainnet-like environment for testing Pectra, validator exits, & staking operations.",
+      link: "https://etherworld.co/2025/03/14/new-ethereum-testnet-hoodi-announced-for-pectra-testing/"
+    },
+    {
+      image: "pectraimg4.jpg",
+      title: "How Holesky Finally Reached Stability",
+      content: "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
+      link: "https://etherworld.co/2025/03/11/how-holesky-finally-reached-stability/"
+    },
+    {
+      image: "pectraimg5.png",
+      title: "Holesky and Hoodi Testnet Updates",
+      content: "The Pectra testnet activation revealed issues in clients with deposit contract configurations changes on Ethereum testnets. While Sepolia's recovery was straightforward and the network has since fully recovered, Holesky experienced extensive inactivity leaks as pa...",
+      link: "https://blog.ethereum.org/2025/03/18/hoodi-holesky"
+    },
+    {
+      image: "pectraimg6.jpg",
+      title: "Sepolia Pectra Incident Update",
+      content: "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
+      link: "At 7:29 UTC today, on epoch 222464, the Pectra network upgrade went live on the Sepolia testnet. Unfortunately, an issue with Sepolia's permissioned deposit contract prevented many execution layer clients from including transactions in blocks."
     },
 ]
 
@@ -288,15 +297,15 @@ const All = () => {
         category:"Core",
         discussion:"https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182"
       },
-      //   {
-      //     eip: "3670",
-      //     title: "EOF - Code Validation",
-      //     author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-      //     link: "https://eipsinsight.com/eips/eip-3670",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693"
-      // },
+        {
+          eip: "7642",
+          title: "eth/69 - history expiry and simpler receipts",
+          author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
+          link: "https://eipsinsight.com/eips/eip-7642",
+          type:"Standards Track",
+        category:"Networking",
+        discussion:"https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+      },
       //   {
       //     eip: "4200",
       //     title: "EOF - Static relative jumps",
@@ -485,12 +494,11 @@ const All = () => {
                 Fusaka
               </Text>
             </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
-            <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-5">
+            <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
               <Text as="span" color="blue.500" textDecor="underline">
-                Devnet 5
+                Devnet 6
               </Text>
-            </NLink>{" "} 
-            and has finalized the specifications for Devnet 4. Specs and other details can be followed below.{" "}
+            </NLink>.Specs and other details can be followed below.{" "}
             <NLink href="#carousel-section">
               <Text as="span" color="blue.500" textDecor="underline">
                 View more
@@ -499,44 +507,118 @@ const All = () => {
           </Text>
 
           {/* Cards Section */}
-          <Flex
-  flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
-  wrap="wrap" // Ensure cards can wrap onto new rows if needed
-  justify="flex-start" // Align cards to the left
-  gap={4} // Add spacing between cards
-  width="100%" // Ensure cards section takes up full width
-  maxHeight="300px" // Limit the height of the container
-  overflowY="auto" // Make the container vertically scrollable
-  overflowX="hidden" // Prevent horizontal scrolling
-  p={4} // Add padding for better spacing inside the scroll area
-  sx={{
-    "&::-webkit-scrollbar": {
-      width: "8px", // Width of the scrollbar
-    },
-    "&::-webkit-scrollbar-thumb": {
-      background: "#3182ce", // Color of the scrollbar thumb
-      borderRadius: "4px", // Rounded edges for the thumb
-    },
-    "&::-webkit-scrollbar-thumb:hover": {
-      background: "#2b6cb0", // Darker color on hover
-    },
-    "&::-webkit-scrollbar-track": {
-      background: "#edf2f7", // Light background for the track
-    },
-  }}
->
-  {PectraPosts.map((pectra, index) => (
-    <Card
-      key={index}
-      image={pectra.image}
-      title={pectra.title}
-      content={pectra.content}
-      link={pectra.link}
-    />
-  ))}
-</Flex>
+          {/* <Flex
+              flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
+              wrap="wrap" // Ensure cards can wrap onto new rows if needed
+              justify="flex-start" // Align cards to the left
+              gap={4} // Add spacing between cards
+              width="100%" // Ensure cards section takes up full width
+              maxHeight="300px" // Limit the height of the container
+              overflowY="auto" // Make the container vertically scrollable
+              overflowX="hidden" // Prevent horizontal scrolling
+              p={4} // Add padding for better spacing inside the scroll area
+              sx={{
+                "&::-webkit-scrollbar": {
+                  width: "8px", // Width of the scrollbar
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "#3182ce", // Color of the scrollbar thumb
+                  borderRadius: "4px", // Rounded edges for the thumb
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  background: "#2b6cb0", // Darker color on hover
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: "#edf2f7", // Light background for the track
+                },
+              }}
+            >
+              {PectraPosts.map((pectra, index) => (
+                <Card
+                  key={index}
+                  image={pectra.image}
+                  title={pectra.title}
+                  content={pectra.content}
+                  link={pectra.link}
+                />
+              ))}
+            </Flex> */}
 
+
+
+          </Flex>
+
+          <Flex
+      position="relative"
+      width="100%"
+      align="center"
+    >
+      {/* Left arrow */}
+      <IconButton
+        aria-label="Scroll left"
+        icon={<ChevronLeftIcon />}
+        position="absolute"
+        left={0}
+        zIndex={1}
+        onClick={scrollLeft}
+        bg="white"
+        boxShadow="md"
+        _hover={{ bg: "gray.100" }}
+      />
+
+      {/* Cards container */}
+      <Flex
+        ref={containerRef}
+        flex="1"
+        overflowX="auto"
+        overflowY="hidden"
+        py={4}
+        px={8}
+        scrollBehavior="smooth"
+        sx={{
+          "&::-webkit-scrollbar": {
+            height: "8px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#3182ce",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "#2b6cb0",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "#edf2f7",
+          },
+        }}
+      >
+        <Flex gap={4} flexWrap="nowrap">
+          {PectraPosts.map((pectra, index) => (
+            <Card
+              key={index}
+              image={pectra.image}
+              title={pectra.title}
+              content={pectra.content}
+              link={pectra.link}
+              // minWidth="300px"
+              // flex="0 0 auto"
+            />
+          ))}
         </Flex>
+      </Flex>
+
+      {/* Right arrow */}
+      <IconButton
+        aria-label="Scroll right"
+        icon={<ChevronRightIcon />}
+        position="absolute"
+        right={0}
+        zIndex={1}
+        onClick={scrollRight}
+        bg="white"
+        boxShadow="md"
+        _hover={{ bg: "gray.100" }}
+      />
+    </Flex>
         
 
 

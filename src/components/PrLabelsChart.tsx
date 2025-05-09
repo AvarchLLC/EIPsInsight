@@ -3,6 +3,7 @@ import { Box, Heading, Checkbox, Menu, MenuList, MenuItem, MenuButton, Button, F
 import { ColumnConfig } from '@ant-design/plots';
 import dynamic from "next/dynamic";
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
+import CopyLink from './CopyLink';
 
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 
@@ -28,15 +29,10 @@ const availableLabels = [
   'a-review',
   'e-review',
   'e-consensus',
-  's-draft',
-  's-final',
-  's-lastcall',
-  's-review',
-  's-stagnant',
-  's-withdrawn',
   'stagnant',
   'stale',
   'created-by-bot',
+  "miscellaneous"
 ];
 
 const EipsLabelChart = () => {
@@ -137,17 +133,41 @@ const EipsLabelChart = () => {
       if (!Array.isArray(chartData)) return null;
   
       // Transform data to group by monthYear and count by label
+      // const transformedData = chartData.reduce<{
+      //   [key: string]: { [key: string]: number };
+      // }>((acc, { monthYear, type, count }) => {
+      //   if (showLabels[type]) {
+      //     if (!acc[monthYear]) {
+      //       acc[monthYear] = {};
+      //     }
+      //     acc[monthYear][type] = (acc[monthYear][type] || 0) + count;
+      //   }
+      //   return acc;
+      // }, {});
+
       const transformedData = chartData.reduce<{
         [key: string]: { [key: string]: number };
       }>((acc, { monthYear, type, count }) => {
-        if (showLabels[type]) {
+        // Determine the actual type to use
+        let effectiveType = type;
+        
+        // If the type isn't in availableLabels AND miscellaneous is enabled in showLabels
+        if (!availableLabels.includes(type) && showLabels.miscellaneous) {
+          effectiveType = 'miscellaneous';
+        }
+        
+        // Only process if the effective type is enabled in showLabels
+        if (showLabels[effectiveType]) {
           if (!acc[monthYear]) {
             acc[monthYear] = {};
           }
-          acc[monthYear][type] = (acc[monthYear][type] || 0) + count;
+          acc[monthYear][effectiveType] = (acc[monthYear][effectiveType] || 0) + count;
         }
+        
         return acc;
       }, {});
+
+      console.log("transformed data:",transformedData);
   
       // Convert to array format for the chart
       const finalData = Object.keys(transformedData).flatMap(monthYear => {
@@ -243,7 +263,7 @@ const EipsLabelChart = () => {
           if (label === 'dependencies') return '#FFFF00';  // Yellow
           if (label === 'stagnant') return '#8B008B';  // Dark Magenta
           if (label === 'stale') return '#B22222';  // Fire Brick
-          if (label === 'created-by-bot') return '#D3D3D3';  // Light Gray
+          if (label === 'created-by-bot') return 'green';  // Light Gray
           if (label === 'discussions-to') return '#778899';  // Light Slate Gray
           if (label === 'question') return '#98FB98';  // Pale Green
           if (label === 'javascript') return '#F0E68C';  // Khaki
@@ -327,7 +347,9 @@ const EipsLabelChart = () => {
           mb={6}
         >
           {/* Title on the left */}
-          <Heading size="md" color="black" flexShrink={0}>EIPs Label Distribution</Heading>
+          <Heading size="md" color="black" flexShrink={0}>EIPs Label Distribution
+            <CopyLink link={`https://eipsinsight.com//Analytics#EIPsLabelChart`} />
+          </Heading>
           
           {/* Controls on the right */}
           <Flex direction={{ base: "column", md: "row" }} align="center" gap={6}>

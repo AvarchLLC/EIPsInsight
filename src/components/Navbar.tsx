@@ -38,7 +38,7 @@ const Navbar: React.FC = () => {
   const NAV_ITEMS: Array<NavItem> = [
     {
       label:"Pectra",
-      href:`/pectra`
+      href:`/upgrade`
     },
     {
       label:"All-EIPS",

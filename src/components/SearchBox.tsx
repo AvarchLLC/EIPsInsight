@@ -282,31 +282,60 @@ const SearchBox: React.FC = () => {
       ];
       // console.log(newFilteredIssueResults);
 
-      // Deduplicate for EIP data
-      const seenEIPs = new Set<string>();
+      // Replace the EIP filtering section with this:
 
-      // Filter EIP results based on exact match first
-      const exactEIPMatches = eipData.filter((item) => {
-        const key = `${item.eip}-${item.repo}`;
-        if (seenEIPs.has(key)) return false; // Skip if already seen
-        seenEIPs.add(key); // Mark as seen
-        return item.eip === queryStr;
-      });
+// Deduplicate for EIP data
+const seenEIPs = new Set<string>();
 
-      // Filter EIP results for partial matches (those that start with the query)
-      const partialEIPMatches = queryStr 
-  ? eipData
-      .filter((item) => item.eip.startsWith(queryStr)) // Match the partial query
-      .filter((item) => item.eip !== queryStr) // Exclude exact matches
-      .filter((item) => {
-        const key = `${item.eip}-${item.repo}`;
-        if (seenEIPs.has(key)) return false; // Skip if already seen
-        seenEIPs.add(key); // Mark as seen
-        return true;
-      })
-  : eipData; // If queryStr is empty, return the full data
+// Filter EIP results based on exact match first
+const exactEIPMatches = eipData.filter((item) => {
+  const key = `${item.eip}-${item.repo}`;
+  if (seenEIPs.has(key)) return false;
+  
+  // Check if query is numeric - then match EIP numbers
+  if (/^\d+$/.test(queryStr)) {
+    const eipNum = item.eip.replace(/\D/g, '');
+    if (eipNum === queryStr) {
+      seenEIPs.add(key);
+      return true;
+    }
+  } 
+  // For non-numeric queries, match title or author
+  else {
+    if (item.title.toLowerCase().includes(queryStr.toLowerCase()) || 
+        item.author.toLowerCase().includes(queryStr.toLowerCase())) {
+      seenEIPs.add(key);
+      return true;
+    }
+  }
+  return false;
+});
 
-// Continue with the rest of your logic as before
+// Filter EIP results for partial matches
+const partialEIPMatches = queryStr 
+  ? eipData.filter((item) => {
+      const key = `${item.eip}-${item.repo}`;
+      if (seenEIPs.has(key)) return false;
+      
+      // For numeric queries - match EIP numbers starting with query
+      if (/^\d+$/.test(queryStr)) {
+        const eipNum = item.eip.replace(/\D/g, '');
+        if (eipNum.startsWith(queryStr) && eipNum !== queryStr) {
+          seenEIPs.add(key);
+          return true;
+        }
+      }
+      // For non-numeric queries - match title or author containing query
+      else {
+        if (item.title.toLowerCase().includes(queryStr.toLowerCase()) || 
+            item.author.toLowerCase().includes(queryStr.toLowerCase())) {
+          seenEIPs.add(key);
+          return true;
+        }
+      }
+      return false;
+    })
+  : eipData;
 
 
       // Combine exact EIP matches and partial matches, sorting by length
@@ -462,6 +491,17 @@ return (
         size={10}
         onChange={(e) => console.log(e.target.value)}
       >
+        {filteredEIPResults.map((result) => (
+          <option
+            key={result.eip}
+            value={result.eip}
+            onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
+            className="text-lg py-3" // Increase font size and vertical padding
+          >
+            {result.repo.toUpperCase()} Number: {result.eip}
+          </option>
+        ))}
+        
         {filteredAuthors.map((result) => (
           <option
             key={result.name}
@@ -496,16 +536,6 @@ return (
             {result.repo} ISSUE: {result.issueNumber}
           </option>
         ))} */}
-        {filteredEIPResults.map((result) => (
-          <option
-            key={result.eip}
-            value={result.eip}
-            onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
-            className="text-lg py-3" // Increase font size and vertical padding
-          >
-            {result.repo.toUpperCase()} Number: {result.eip}
-          </option>
-        ))}
         
       </select>
     )}

@@ -78,7 +78,7 @@ const EIPsInsightRecap = () => {
                 textAlign="justify"
             >     
             <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
-                A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem. RIPs act as specifications to improve rollups, enhance interoperability, and standardize development processes.
+                A Rollup Improvement Proposal (<Link href="/rip" color="blue.300" isExternal>RIP</Link>) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem. RIPs act as specifications to improve rollups, enhance interoperability, and standardize development processes.
               </Text>
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
                 <Link  href="https://ethereum-magicians.org/t/about-the-rips-category/19805"
