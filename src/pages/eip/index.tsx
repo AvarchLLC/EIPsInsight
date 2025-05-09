@@ -27,21 +27,6 @@ import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
 
 
-const sections = [
-  { id: "living", text: "Living" },
-  { id: "final", text: "Final" },
-  { id: "last-call", text: "Last Call" },
-  { id: "review", text: "Review" },
-  { id: "draft", text: "Draft" },
-  { id: "withdrawn", text: "Withdrawn" },
-  { id: "stagnant", text: "Stagnant" },
-  { id: "meta", text: "Meta" },
-  { id: "informational", text: "Informational" },
-  { id: "core", text: "Core" },
-  { id: "networking", text: "Networking" },
-  { id: "interface", text: "Interface" },
-];
-
 interface EIP {
   _id: string;
   eip: string;
@@ -223,37 +208,6 @@ const Type = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-    <Box
-      as="aside"
-      p={4}
-      bg="gray.100"
-      borderRadius="lg"
-      position="fixed"
-      right="20px"
-      top="80px"
-      width="250px"
-      maxHeight="80vh"
-      overflowY="auto"
-      boxShadow="md"
-      zIndex="10"
-      display={{ base: "none", lg: "block" }} // Hide on mobile
-      opacity={isVisible ? 1 : 0}
-      transition="opacity 0.3s ease-in-out"
-      pointerEvents={isVisible ? "auto" : "none"} // Prevent interaction when hidden
-    >
-      <Heading as="h3" size="md" mb={2}>
-        On this page
-      </Heading>
-      <ul style={{ listStyleType: "none", padding: 0 }}>
-        {sections.map(({ id, text }) => (
-          <li key={id} style={{ marginBottom: "8px" }}>
-            <NextLink href={`#${id}`} color="blue.600" style={{ textDecoration: "none" }}>
-              {text}
-            </NextLink>
-          </li>
-        ))}
-      </ul>
-    </Box>
 
         <Box
           paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}
@@ -299,7 +253,7 @@ const Type = () => {
             <SearchBox />
           </Box>
 
-          <Box className="grid grid-cols-1 lg:grid-cols-3 pt-8 gap-5">
+          <Box className="grid grid-cols-1 lg:grid-cols-3 pt-8 gap-5" id="graphs">
           <Box className="h-fit">
           {selected === "status" ? (
             <EIPStatusDonut />
@@ -334,7 +288,7 @@ const Type = () => {
 
             {selected === "status" && (
               <Box paddingY="8">
-                <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
+                <Text id="draftvsfinal" fontSize="3xl" fontWeight="bold" color="#A020F0">
                   Draft vs Final (Over the Years)
                 </Text>
                 <AreaStatus type="EIPs" />
@@ -345,7 +299,7 @@ const Type = () => {
           <Box key={status} className={"group relative flex flex-col gap-3"} paddingBottom={8}>
             {/* Label Section aligned to the left */}
             <Box className={"flex gap-3"}>
-              <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+              <Text  id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/eip/${status}`}>
                   [{data.filter((item) => item.status === status).length}]
@@ -387,11 +341,11 @@ const Type = () => {
           </>
         ) : (
           <>
-            <CatTable2 dataset={data4} cat="All" status="Meta" />
-            <CatTable2 dataset={data4} cat="All" status="Informational" />
-            <CatTable2 dataset={data4} cat="All" status="Core" />
-            <CatTable2 dataset={data4} cat="All" status="Networking" />
-            <CatTable2 dataset={data4} cat="All" status="Interface" />
+{["Meta", "Informational", "Core", "Networking", "Interface"].map((status) => (
+  <div key={status} id={`${status.toLowerCase()}table`}>
+    <CatTable2 dataset={data4} cat="All" status={status} />
+  </div>
+))}
           </>
         )}
         <Box

@@ -23,6 +23,7 @@ import { BookmarkProvider } from "./BookmarkContext";
 import Sidebar from "@/components/Sidebar/SideBar";
 import { SidebarProvider, useSidebar } from "./Sidebar/SideBarContext";
 import SidebarConfigLoader from "./Sidebar/SideBarConfigLoader";
+import { sidebarConfig } from "./Sidebar/slidebarConfig";
 
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
@@ -84,16 +85,28 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+
+
 const InnerLayout = ({ children }: { children: React.ReactNode }) => {
   const { isCollapsed } = useSidebar();
+  const pathname = usePathname();
+
+  // Extract top-level path like 'eips' from '/eips/123'
+const topLevelRoute = pathname?.split("/")?.[1];
+const shouldShowSidebar = topLevelRoute && !!sidebarConfig[`/${topLevelRoute}`];
+
 
   return (
     <Flex direction="row" minH="100vh">
       <SidebarConfigLoader />
-      <Sidebar />
+      {shouldShowSidebar && <Sidebar />}
+
       <Box
         flex="1"
-        ml={{ base: 0, md: isCollapsed ? '60px' : '200px' }}
+        ml={{
+          base: 0,
+          md: shouldShowSidebar ? (isCollapsed ? "60px" : "200px") : 0,
+        }}
         transition="margin 0.2s ease"
       >
         <Navbar />
@@ -118,5 +131,6 @@ const InnerLayout = ({ children }: { children: React.ReactNode }) => {
     </Flex>
   );
 };
+
 
 export default AllLayout;

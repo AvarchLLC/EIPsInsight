@@ -202,7 +202,7 @@ const Status = () => {
             <Text
               fontSize="3xl" fontWeight="bold" color="#30A0E0"
             >
-              Draft vs Final
+              <div id="draft-vs-final"> Draft vs Final </div>
             </Text>
 
             <AreaStatus/>
@@ -210,11 +210,12 @@ const Status = () => {
             {/* <AreaC type={"EIPs"} /> */}
 
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Draft -{" "}
+              <div id="draft">Draft -{" "}
               <NextLink href={`/tableStatus/Draft`}>
                 {" "}
                 [ {allData.filter((item) => item.status === "Draft").length} ]
               </NextLink>
+</div>
             </Text>
 
             <Box paddingTop={"8"}>
@@ -231,11 +232,12 @@ const Status = () => {
               
             <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Review -{" "}
+              <div id="review">Review -{" "}
               <NextLink href={`/tableStatus/Review`}>
                 {" "}
                 [ {allData.filter((item) => item.status === "Review").length} ]
               </NextLink>
+</div>
             </Text>
 
             <Box paddingTop={"8"}>
@@ -251,12 +253,13 @@ const Status = () => {
             
             <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Last Call -
+              <div id="lastcall">Last Call -
               <NextLink href={`/tableStatus/LastCall`}>
                 {" "}
                 [ {allData.filter((item) => item.status ===  "Last Call").length
                 } ]{" "}
               </NextLink>
+              </div>
             </Text>
 
             <Box paddingTop={"8"}>
@@ -273,12 +276,13 @@ const Status = () => {
             
             <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Final -
+              <div id="final">Final -
               <NextLink href={`/tableStatus/Final`}>
                 {" "}
                 [ {allData.filter((item) => item.status === "Final").length
                 } ]{" "}
               </NextLink>
+              </div>
             </Text>
 
             <Box paddingTop={"8"}>
@@ -295,12 +299,13 @@ const Status = () => {
             
             <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Stagnant -
+              <div id="stagnant">Stagnant -
               <NextLink href={`/tableStatus/Stagnant`}>
                 {" "}
                 [ {allData.filter((item) => item.status === "Stagnant").length
                 } ]{" "}
               </NextLink>
+              </div>
             </Text>
 
             <Box paddingTop={"8"}>
@@ -316,12 +321,13 @@ const Status = () => {
             
             <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Withdrawn -
+              <div id="withdrawn">Withdrawn -
               <NextLink href={`/tableStatus/Withdrawn`}>
                 {" "}
                 [ {allData.filter((item) => item.status ===  "Withdrawn").length
                 } ]{" "}
               </NextLink>
+              </div>
             </Text>
 
             <Box paddingTop={"8"}>
@@ -337,11 +343,12 @@ const Status = () => {
 
             <br/>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Living -
+              <div id="living">Living -
               <NextLink href={`/tableStatus/Living`}>
                 {" "}
                 [ {allData.filter((item) => item.status === "Living").length} ]
               </NextLink>
+              </div>
             </Text>
 
             <Box paddingTop={"8"}>

@@ -9,7 +9,8 @@ export default function SidebarConfigLoader() {
   const { setSections } = useSidebar();
 
   useEffect(() => {
-    setSections(pathname ? sidebarConfig[pathname] || [] : []);
+    const firstSegment = '/' + pathname?.split('/')[1]; // Extracts '/issue' from '/issue/EIPs/70'
+    setSections(firstSegment ? sidebarConfig[firstSegment] || [] : []);
   }, [pathname, setSections]);
 
   return null;

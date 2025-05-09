@@ -359,7 +359,7 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
 
 
                                         <Box>
-                                            <Text className="text-3xl font-bold" paddingY={8}>
+                                            <Text id="description" className="text-3xl font-bold" paddingY={8}>
                                                 Description
                                             </Text>
                                             <MarkdownBox text={data?.issueDetails?.issueDescription}/>
@@ -369,7 +369,7 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
 
 
                                         <Box>
-                                            <Text className={'text-3xl font-bold'} paddingY={8}>
+                                            <Text id="conversations" className={'text-3xl font-bold'} paddingY={8}>
                                                 All Conversations
                                             </Text>
 

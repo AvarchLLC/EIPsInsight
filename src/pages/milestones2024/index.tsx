@@ -215,7 +215,7 @@ const EIPsInsightRecap = () => {
         </Text>
 
         <Heading as="h2" size="lg" textAlign="justify">
-          Reviewers Tracker
+          <div id="reviewers-tracker"> Reviewers Tracker </div>
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           The 
@@ -341,7 +341,7 @@ const EIPsInsightRecap = () => {
         </Text>
 
         <Heading as="h2" size="lg" textAlign="justify">
-          EIP Board
+          <div id="eip-board"> EIP Board </div>
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           The 
@@ -386,7 +386,7 @@ const EIPsInsightRecap = () => {
         </Text>
 
         <Heading as="h2" size="lg" textAlign="justify">
-          Search Tool
+          <div id="search-tool">Search Tool</div>
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           The 
@@ -485,7 +485,7 @@ const EIPsInsightRecap = () => {
         Authors drafting new EIPs can use the tool to find similar proposals by searching for relevant terms or past contributors in their domain. This allows them to reference and build upon existing proposals, ensuring continuity and reducing redundant submissions
         </Text>
         <Heading as="h1" size="xl" textAlign="justify">
-          Pectra Network Upgrade
+          <div id="pectra-upgrade"> Pectra Network Upgrade </div>
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           The 
@@ -521,7 +521,7 @@ const EIPsInsightRecap = () => {
           By having a canonical source for this information, the tool ensures that developers and stakeholders are aligned, minimizing confusion and reducing the risk of errors during upgrade deployments.
         </Text>
         <Heading as="h2" size="lg">
-          Detailed Network Upgrade Information
+          <div id="network-info"> Detailed Network Upgrade Information </div>
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           A prominent feature of the Pectra Page is the 
@@ -633,7 +633,7 @@ const EIPsInsightRecap = () => {
         Visualization simplifies complex data, allowing users to quickly assess the progress of various RIPs without needing to sift through raw text or code repositories.
         </Text>
         <Heading as="h2" size="lg">
-          Gratitude
+          <div id="gratitute">Gratitude</div> 
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           We also want to extend our gratitude to the Ethereum community for their unwavering support, particularly from the EIP Editors and Gitcoin Grants. Their contributions have been instrumental in driving the development and enhancement of EIPs Insight. This collaboration highlights the power of collective effort in fostering innovation and maintaining the integrity of the Ethereum ecosystem.
@@ -642,7 +642,7 @@ const EIPsInsightRecap = () => {
           We extend our heartfelt thanks to all contributors whose dedication and hard work have been pivotal in making EIPs Insight a success this year.
         </Text>
         <Heading as="h2" size="lg">
-          Conclusion
+          <div id="conclusion">Conclusion</div>
         </Heading>
         <Text fontSize={{base: "md",md:"xl", lg: "xl"}} textAlign="justify">
           These features by EIPs Insight not only simplify the EIP process but also strengthen the Ethereum ecosystem by fostering collaboration and improving visibility across all development stages. From monitoring individual editor contributions to prioritizing critical proposals, these tools reflect the community’s commitment to growth and innovation.

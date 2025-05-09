@@ -268,11 +268,41 @@ export const Markdown = ({
             {props.children}
           </Td>
         ),
-        th: (props) => (
-          <Th border="1px solid" borderColor="gray.300" p={3}>
-            {props.children}
-          </Th>
-        ),
+th: (props) => {
+  const headingToIdMap: Record<string, string> = {
+    'Status Timeline': 'timeline',
+    'Simple Summary': 'summary',
+    'Abstract': 'abstract',
+    'Motivation': 'motivation',
+    'Specification': 'specification',
+    'Rationale': 'rationale',
+    'Backwards Compatibility': 'compatibility',
+    'Copyright': 'copyright',
+  };
+
+  const label = String(props.children).trim();
+  const id = headingToIdMap[label];
+
+  return (
+    <Th
+      id={id || undefined}
+      border="1px solid"
+      borderColor="gray.300"
+      p={3}
+    >
+      {id ? (
+        <NLink href={`#${id}`} passHref>
+          <Text as="span" color="blue.500" _hover={{ textDecoration: "underline" }}>
+            {label}
+          </Text>
+        </NLink>
+      ) : (
+        label
+      )}
+    </Th>
+  );
+},
+
       }}
     >
       {md}

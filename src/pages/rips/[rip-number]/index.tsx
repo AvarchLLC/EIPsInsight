@@ -284,7 +284,7 @@ const TestComponent = () => {
      <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="1">
                  <Flex justify="space-between" align="center">
                    {/* Heading on the Left */}
-                   <Heading size="md" color={"#30A0E0"}>
+                   <Heading id="timeline" size="md" color={"#30A0E0"}>
                      Status Timeline
 
                      <Popover>
