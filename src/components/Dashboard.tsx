@@ -48,6 +48,18 @@ import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
 import ToolsSection from "./AvailableTools";
 import TypeGraphs from "@/components/TypeGraphs2";
 import CopyLink from "./CopyLink";
+import {
+  FiMenu,
+  FiHome,
+  FiSettings,
+  FiBarChart2,
+  FiTool,
+  FiInfo,
+  FiDatabase,
+} from 'react-icons/fi';
+
+import { useSidebar } from "./ui/SideBarContext";
+
 
 interface EIP {
   _id: string;
@@ -73,6 +85,7 @@ interface APIResponse {
 }
 
 const Dashboard = () => {
+    const { setSections } = useSidebar();
   const [data, setData] = useState<APIResponse>({
     eip: [],
     erc: [],
@@ -86,6 +99,17 @@ const Dashboard = () => {
   const textColorDark = "#F5F5F5"; // Light color for dark mode
   const bgGradientLight = "linear(to-r, #2980B9, #3498DB)"; // Clear gradient for better visibility in light mode
   const bgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)"; 
+
+useEffect(() => {
+  setSections([
+    { label: 'All EIPs', icon: FiHome, id: 'all' },
+    { label: 'Our Tools', icon: FiTool, id: 'ourtools' },
+    { label: 'What is EIPs Insights?', icon: FiInfo, id: 'what' },
+    { label: 'EIP Status Changes by Year', icon: FiBarChart2, id: 'statuschanges' },
+    { label: 'Dashboard', icon: FiDatabase, id: 'dashboard' },
+  ]);
+}, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -308,7 +332,7 @@ const Dashboard = () => {
                 
                 {/* <AllChart type="Total" /> */}
                 
-                <div className="lg:hidden block">
+                <div  className="lg:hidden block">
                   <Text
                     className="text-5xl text-center pb-5 sm:text-6xl md:text-7xl"
                     fontWeight={"bold"}
@@ -380,7 +404,10 @@ const Dashboard = () => {
                     </Box>
                   </Stack>
                   <br/><br/>
-                  <AllChart type="Total"  dataset={data}/>
+                  <div id="all">
+<AllChart type="Total"  dataset={data}/>
+                  </div>
+                  
                 </div>
               </Box>
 
@@ -395,7 +422,9 @@ const Dashboard = () => {
                   <SearchBox />
                 </Box>
               </Box>
-
+                          <div id="ourtools">
+<ToolsSection/>
+                          </div>
 
               {/* <div className="py-8"> */}
                 {/* <Box
@@ -404,7 +433,7 @@ const Dashboard = () => {
                   }
                   bgColor={bg}
                 > */}
-                 <ToolsSection/>
+                 
                 {/* </Box> */}
               {/* </div> */}
 
@@ -418,7 +447,7 @@ const Dashboard = () => {
                   marginTop={10}
                 >
                   {/* Centered Heading */}
-                  <div className="col-span-full text-center">
+                  <div className="col-span-full text-center" id="what">
                     <h1 className="text-5xl font-bold">
                       <span className="text-gray-200">What is</span>{" "}
                       <span className="text-blue-400">EIPsInsight</span>
@@ -487,7 +516,7 @@ const Dashboard = () => {
                       >
               <FlexBetween>
           
-              <Box id={"Dashboard"} color={"rgba(255, 255, 255, 0.7)"} >
+              <Box color={"rgba(255, 255, 255, 0.7)"} id="dashboard" >
   <Header
     title="DASHBOARD"
     subtitle="Welcome to the dashboard"
