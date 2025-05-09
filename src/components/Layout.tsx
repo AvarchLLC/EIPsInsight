@@ -90,10 +90,8 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
 const InnerLayout = ({ children }: { children: React.ReactNode }) => {
   const { isCollapsed } = useSidebar();
   const pathname = usePathname();
-
-  // Extract top-level path like 'eips' from '/eips/123'
-const topLevelRoute = pathname?.split("/")?.[1];
-const shouldShowSidebar = topLevelRoute && !!sidebarConfig[`/${topLevelRoute}`];
+const topLevelRoute = pathname === "/" ? "/" : `/${pathname?.split("/")?.[1]}`;
+const shouldShowSidebar = !!sidebarConfig[topLevelRoute];
 
 
   return (

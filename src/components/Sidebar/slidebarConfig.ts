@@ -41,7 +41,7 @@ export const sidebarConfig: Record<string, { label: string; icon: React.ElementT
     { label: 'EIP Status Changes by Year', icon: LuBarChartBig, id: 'statuschanges' },
     { label: 'Dashboard', icon: LuDatabase, id: 'dashboard' },
   ],
-      'home': [
+      '/home': [
     { label: 'All EIPs', icon: LuHome, id: 'all' },
     { label: 'Our Tools', icon: LuWrench, id: 'ourtools' },
     { label: 'What is EIPs Insights?', icon: LuInfo, id: 'what' },
