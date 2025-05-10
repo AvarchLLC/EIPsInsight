@@ -27,6 +27,21 @@ interface EIP {
   unique_ID: number;
   __v: number;
 }
+
+
+import {TabList, Tabs } from "@chakra-ui/react";
+import Link from "next/link";
+
+const categories = [
+  { name: "Core", path: "/core" },
+  { name: "Networking", path: "/networking" },
+  { name: "Interface", path: "/interface" },
+  { name: "Meta", path: "/meta" },
+  { name: "Informational", path: "/informational" },
+  { name: "ERC", path: "/erc" },
+];
+
+
 const Interface = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
@@ -83,6 +98,15 @@ const Interface = () => {
           transition={{ duration: 0.5 }}
         >
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
+          <Tabs isFitted variant="enclosed">
+              <TabList>
+                {categories.map((category) => (
+                  <Link key={category.name} href={category.path} passHref>
+                    <Tabs as="a">{category.name}</Tabs>
+                  </Link>
+                ))}
+              </TabList>
+            </Tabs>
             <FlexBetween>
               <Header
                 title={`Standard Tracks - Interface [ ${

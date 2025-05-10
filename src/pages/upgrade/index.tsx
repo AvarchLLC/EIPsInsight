@@ -437,6 +437,7 @@ const All = () => {
           fontWeight="bold"
           color="#30A0E0"
           mt={2}
+          id="pectra"
         >
           PECTRA
         </Text>
@@ -629,6 +630,7 @@ const All = () => {
     color="#30A0E0"
     mt={2}
     textAlign="center"
+    
   >
     Network Upgrades and EIPs Relationship Graph
   </Text>
@@ -785,7 +787,7 @@ const All = () => {
 
 
           {
-            <Box display={{ base: "none", md: "block" }}>
+            <Box id="pectra-table" display={{ base: "none", md: "block" }}>
               <PectraTable PectraData={pectraData}/>
               <br/>
               {/* <Text

@@ -1,4 +1,4 @@
-import _validRIPs from "@/data/valid-rips.json";
+import _validRIPs from "@/data/Valid-rips.json";
 import { ValidEIPs } from "@/types";
 
 export const validRIPs: ValidEIPs = _validRIPs;

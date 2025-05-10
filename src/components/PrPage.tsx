@@ -460,7 +460,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
                                         </Box>
 
                                         <Box>
-                                            <Text className="text-3xl font-bold" paddingY={8}>
+                                            <Text id="description" className="text-3xl font-bold" paddingY={8}>
                                                 Description
                                             </Text>
 
@@ -469,7 +469,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
 
 
                                         <Box>
-                                            <Text className={'text-3xl font-bold'} paddingY={8}>
+                                            <Text id="conversations" className={'text-3xl font-bold'} paddingY={8}>
                                                 All Conversations
                                             </Text>
 
@@ -477,7 +477,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
                                         </Box>
 
                                         <Box>
-                                            <Text className={'text-3xl font-bold'} paddingY={8}>
+                                            <Text id='review-comments' className={'text-3xl font-bold'} paddingY={8}>
                                                 Review Comments
                                             </Text>
 

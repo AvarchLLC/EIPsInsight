@@ -8,20 +8,28 @@ import {
   Button,
   Wrap,
   WrapItem,
+  Heading,
 } from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 import RipCatTable from "@/components/RipCatTable";
 import SearchBox from "@/components/SearchBox";
-import { CCardBody, CSmartTable } from "@coreui/react-pro";
-// import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
 import { DownloadIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
-import Author from "@/components/Author";
-import SearchByEip from '@/components/SearchByEIP2';
+
+const sections = [
+  { id: "living", text: "Living" },
+  { id: "final", text: "Final" },
+  { id: "last-call", text: "Last Call" },
+  { id: "review", text: "Review" },
+  { id: "draft", text: "Draft" },
+  { id: "withdrawn", text: "Withdrawn" },
+  { id: "stagnant", text: "Stagnant" },
+];
 
 const MotionBox = motion(Box);
+
 
 interface EIP {
   _id: string;
@@ -47,6 +55,23 @@ const All = () => {
   const [data2, setData2] = useState<EIP[]>([]);
   const [data3, setData3] = useState<EIP[]>([]);
   const [loading, setLoading] = useState(false); 
+
+    const [isVisible, setIsVisible] = useState(false);
+    let timeout: string | number | NodeJS.Timeout | undefined;
+  
+    useEffect(() => {
+      const handleScroll = () => {
+        setIsVisible(true);
+        clearTimeout(timeout);
+        timeout = setTimeout(() => setIsVisible(false), 1000); // Hide after 1s of no scroll
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+        clearTimeout(timeout);
+      };
+    }, []);
   
   useEffect(() => {
     // Check if a hash exists in the URL
@@ -188,19 +213,43 @@ const All = () => {
   return (
     <>
       <AllLayout>
-        <Box 
-        marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}>
-        <SearchByEip defaultQuery=''/>
-        </Box>
         <Box
           paddingBottom={{ lg: "10", sm: "10", base: "10" }}
           marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
           paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-          // marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
-
-          {/* <Author defaultQuery=''/> */}
-          <br/>
+    <Box
+      as="aside"
+      p={4}
+      bg="gray.100"
+      borderRadius="lg"
+      position="fixed"
+      right="20px"
+      top="80px"
+      width="250px"
+      maxHeight="80vh"
+      overflowY="auto"
+      boxShadow="md"
+      zIndex="10"
+      display={{ base: "none", lg: "block" }} // Hide on mobile
+      opacity={isVisible ? 1 : 0}
+      transition="opacity 0.3s ease-in-out"
+      pointerEvents={isVisible ? "auto" : "none"} // Prevent interaction when hidden
+    >
+      <Heading as="h3" size="md" mb={2}>
+        On this page
+      </Heading>
+      <ul style={{ listStyleType: "none", padding: 0 }}>
+        {sections.map(({ id, text }) => (
+          <li key={id} style={{ marginBottom: "8px" }}>
+            <Link href={`#${id}`} color="blue.600" style={{ textDecoration: "none" }}>
+              {text}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Box>
           <Box className="flex space-x-12 w-full justify-center items-center text-xl font-semibold py-8">
             <div className="flex justify-between w-full">
             <Box>
@@ -332,15 +381,29 @@ const All = () => {
       </Button>
     
 </Box>)}
+          
+<div id="living">
+  <RipCatTable dataset={data3} cat={selected} status={"Living"} />
+</div>
+<div id="final">
+  <RipCatTable dataset={data3} cat={selected} status={"Final"} />
+</div>
+<div id="lastcall">
+  <RipCatTable dataset={data3} cat={selected} status={"Last Call"} />
+</div>
+<div id="review">
+  <RipCatTable dataset={data3} cat={selected} status={"Review"} />
+</div>
+<div id="draft">
+  <RipCatTable dataset={data3} cat={selected} status={"Draft"} />
+</div>
+<div id="withdrawn">
+  <RipCatTable dataset={data3} cat={selected} status={"Withdrawn"} />
+</div>
+<div id="stagnant">
+  <RipCatTable dataset={data3} cat={selected} status={"Stagnant"} />
+</div>
 
-
-            <RipCatTable dataset={data3} cat={selected} status={"Living"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Final"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Last Call"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Review"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Draft"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Withdrawn"} />
-            <RipCatTable dataset={data3} cat={selected} status={"Stagnant"} />
           </Box>
           ) : (
             <Box>
@@ -399,14 +462,28 @@ const All = () => {
   )}
 </Box>
 
+<div id="living">
+  <CatTable dataset={data2} cat={selected} status={"Living"} />
+</div>
+<div id="final">
+  <CatTable dataset={data2} cat={selected} status={"Final"} />
+</div>
+<div id="lastcall">
+  <CatTable dataset={data2} cat={selected} status={"Last Call"} />
+</div>
+<div id="review">
+  <CatTable dataset={data2} cat={selected} status={"Review"} />
+</div>
+<div id="draft">
+  <CatTable dataset={data2} cat={selected} status={"Draft"} />
+</div>
+<div id="withdrawn">
+  <CatTable dataset={data2} cat={selected} status={"Withdrawn"} />
+</div>
+<div id="stagnant">
+  <CatTable dataset={data2} cat={selected} status={"Stagnant"} />
+</div>
 
-              <CatTable dataset={data2} cat={selected} status={"Living"} />
-              <CatTable dataset={data2} cat={selected} status={"Final"} />
-              <CatTable dataset={data2} cat={selected} status={"Last Call"} />
-              <CatTable dataset={data2} cat={selected} status={"Review"} />
-              <CatTable dataset={data2} cat={selected} status={"Draft"} />
-              <CatTable dataset={data2} cat={selected} status={"Withdrawn"} />
-              <CatTable dataset={data2} cat={selected} status={"Stagnant"} />
             </Box>
           )}
         </Box>

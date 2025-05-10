@@ -347,7 +347,7 @@ const RIP = () => {
       <SearchBox />
     </Box>
 
-    <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-8 gap-5">
+    <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-8 gap-5" id="graphs">
       <Box>
       {selected === "status" ? (
             <RIPStatusDonut />
@@ -378,7 +378,7 @@ const RIP = () => {
 
     {selected === "status" && (
               <Box paddingY="8">
-                <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
+                <Text id="draftvsfinal" fontSize="3xl" fontWeight="bold" color="#A020F0">
                   Draft vs Final (Over the Years)
                 </Text>
                 <AreaStatus type="RIPs" />
@@ -389,7 +389,7 @@ const RIP = () => {
           <Box key={status} className={"group relative flex flex-col gap-3"} paddingBottom={8}>
             {/* Label Section aligned to the left */}
             <Box className={"flex gap-3"}>
-              <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+              <Text id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/rip/${status}`}>
                   [{data.filter((item) => item.status === status).length}]
@@ -421,13 +421,20 @@ const RIP = () => {
           </>
         ) : (
           <>
-            <CatTable2 dataset={data4} cat="All" status="Meta" />
-            <CatTable2 dataset={data4} cat="All" status="Informational" />
-            <CatTable2 dataset={data4} cat="All" status="Core" />
-            <CatTable2 dataset={data4} cat="All" status="Networking" />
-            <CatTable2 dataset={data4} cat="All" status="Interface" />
-            <CatTable2 dataset={data4} cat="All" status="RIP" />
-            <CatTable2 dataset={data4} cat="All" status="RRC" />
+{[
+  "Meta",
+  "Informational",
+  "Core",
+  "Networking",
+  "Interface",
+  "RIP",
+  "RRC"
+].map((status) => (
+  <div key={status} id={`${status.toLowerCase()}`}>
+    <CatTable2 dataset={data4} cat="All" status={status} />
+  </div>
+))}
+
           </>
         )}
         <Box

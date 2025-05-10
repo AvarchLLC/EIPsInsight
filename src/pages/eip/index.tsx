@@ -22,9 +22,10 @@ import EIPStatusDonut from "@/components/EIPStatusDonut";
 import EIPTypeDonut from "@/components/EIPTypeDonut";
 import AllChart from "@/components/AllChart";
 import AllChart3 from "@/components/AllChart3";
-import { Button, ButtonGroup, Flex} from "@chakra-ui/react";
+import { Button, Heading, ButtonGroup, Flex} from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
+
 
 interface EIP {
   _id: string;
@@ -118,6 +119,24 @@ const Type = () => {
   const [data3, setData3] = useState<Data>({eip:[],erc:[],rip:[]});
   const [isLoading, setIsLoading] = useState(true); 
   const [selected, setSelected] = useState<"status" | "type">("type");
+
+      const [isVisible, setIsVisible] = useState(false);
+      let timeout: string | number | NodeJS.Timeout | undefined;
+    
+      useEffect(() => {
+        const handleScroll = () => {
+          setIsVisible(true);
+          clearTimeout(timeout);
+          timeout = setTimeout(() => setIsVisible(false), 1000); // Hide after 1s of no scroll
+        };
+    
+        window.addEventListener("scroll", handleScroll);
+        return () => {
+          window.removeEventListener("scroll", handleScroll);
+          clearTimeout(timeout);
+        };
+      }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -189,6 +208,7 @@ const Type = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
+
         <Box
           paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}
           marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
@@ -233,7 +253,7 @@ const Type = () => {
             <SearchBox />
           </Box>
 
-          <Box className="grid grid-cols-1 lg:grid-cols-3 pt-8 gap-5">
+          <Box className="grid grid-cols-1 lg:grid-cols-3 pt-8 gap-5" id="graphs">
           <Box className="h-fit">
           {selected === "status" ? (
             <EIPStatusDonut />
@@ -268,7 +288,7 @@ const Type = () => {
 
             {selected === "status" && (
               <Box paddingY="8">
-                <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
+                <Text id="draftvsfinal" fontSize="3xl" fontWeight="bold" color="#A020F0">
                   Draft vs Final (Over the Years)
                 </Text>
                 <AreaStatus type="EIPs" />
@@ -279,7 +299,7 @@ const Type = () => {
           <Box key={status} className={"group relative flex flex-col gap-3"} paddingBottom={8}>
             {/* Label Section aligned to the left */}
             <Box className={"flex gap-3"}>
-              <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+              <Text  id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/eip/${status}`}>
                   [{data.filter((item) => item.status === status).length}]
@@ -321,11 +341,11 @@ const Type = () => {
           </>
         ) : (
           <>
-            <CatTable2 dataset={data4} cat="All" status="Meta" />
-            <CatTable2 dataset={data4} cat="All" status="Informational" />
-            <CatTable2 dataset={data4} cat="All" status="Core" />
-            <CatTable2 dataset={data4} cat="All" status="Networking" />
-            <CatTable2 dataset={data4} cat="All" status="Interface" />
+{["Meta", "Informational", "Core", "Networking", "Interface"].map((status) => (
+  <div key={status} id={`${status.toLowerCase()}table`}>
+    <CatTable2 dataset={data4} cat="All" status={status} />
+  </div>
+))}
           </>
         )}
         <Box

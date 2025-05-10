@@ -147,7 +147,7 @@ import {
           >
             <CCardBody>
               <>
-                <h2 className="text-blue-400 font-semibold text-4xl">
+                <h2 id={status.toLowerCase().replace(" ", "")} className="text-blue-400 font-semibold text-4xl">
                   {" "}
                   {status}
                 </h2>

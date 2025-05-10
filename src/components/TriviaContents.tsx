@@ -89,7 +89,7 @@ const FactsSection: FC = () => {
         color={useColorModeValue(headingColorLight, headingColorDark)}
         mb={6}
       >
-        🌟 Cool EIP Facts 🌟
+        <div id="cool-facts"> 🌟 Cool EIP Facts 🌟 </div>
       </Heading>
 
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mb={10}>
@@ -104,7 +104,7 @@ const FactsSection: FC = () => {
         color={useColorModeValue(headingColorLight, headingColorDark)}
         mb={6}
       >
-        😄 Fun EIP Facts 😄
+        <div id="fun-facts"> 😄 Fun EIP Facts 😄 </div>
       </Heading>
 
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
