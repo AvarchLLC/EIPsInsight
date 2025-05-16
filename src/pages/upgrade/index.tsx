@@ -40,7 +40,8 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { IconButton } from '@chakra-ui/react';
 import { useRef } from 'react';
 import UpgradesTimeline from "@/components/UpgradesTimeline";
-import { Card } from "@/components/pectraCards"
+import { Card } from "@/components/pectraCards";
+import StatusGraph from "@/components/Statuschangesgraph";
 
 
 const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
@@ -407,7 +408,7 @@ const All = () => {
           >
         <Box
           paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-          marginX={{ lg: "10", md: "2", sm: "2", base: "2" }}
+          marginX={{ lg: "20", md: "2", sm: "2", base: "2" }}
           paddingX={{ lg: "5", md: "5", sm: "5", base: "5" }}
           marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
@@ -426,8 +427,8 @@ const All = () => {
 
         <br/>
         {/* <br/> */}
-        <SlotCountdown/>
-        <br/>
+        {/* <SlotCountdown/>
+        <br/> */}
         <Text
           as={motion.div}
           initial={{ opacity: 0, y: -20 }}
@@ -445,6 +446,7 @@ const All = () => {
         <Box id="NetworkUpgrades" mt={2}>
           <UpgradesTimeline/>
         </Box>
+
 
         <Flex
            direction={{ base: "column", md: "row" }}
@@ -642,6 +644,7 @@ const All = () => {
   </Flex>
   <br />
 </Box>
+
 
         <Box id="NetworkUpgrades" mt={2}>
           <NetworkUpgradesChart/>

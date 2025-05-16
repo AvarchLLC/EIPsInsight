@@ -25,7 +25,7 @@ import AllChart3 from "@/components/AllChart3";
 import { Button, Heading, ButtonGroup, Flex} from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
-
+import StatusGraph from "@/components/Statuschangesgraph";
 
 interface EIP {
   _id: string;
@@ -281,6 +281,34 @@ const Type = () => {
           ) : (
             <TypeGraphs/>
           )}
+          </Box>
+
+          <Box
+            id="StatusTimeline"
+            mt={2}
+            mb={2}
+            px={{ base: 2, md: 4, lg: 6 }}
+            width="100%"
+            maxWidth="100vw"
+            overflowX="auto"
+          >
+            <Text
+              fontSize={{ base: '2xl', md: '3xl', lg: '3xl' }}
+              fontWeight="bold"
+              color="#30A0E0"
+              mt={2}
+              textAlign="center"
+              
+            >
+              EIPs Status Timelines
+            </Text>
+            <br />
+            <Flex justifyContent="center" alignItems="center" width="100%">
+              <Box width="100%" maxWidth="100%" overflow="hidden">
+                <StatusGraph/>
+              </Box>
+            </Flex>
+            <br />
           </Box>
 
           <Box paddingBottom={{ lg: "5", md: "5", sm: "5", base: "5" }}>
