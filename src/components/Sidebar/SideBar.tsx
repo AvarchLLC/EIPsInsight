@@ -9,7 +9,7 @@ import {
   useColorMode,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { FiMenu } from 'react-icons/fi';
+import { FiMenu, FiX } from 'react-icons/fi';
 import { useSidebar } from './SideBarContext';
 import { useActiveSection } from './useActiveSection'; // Make sure this path is correct
 
@@ -46,14 +46,22 @@ export default function Sidebar() {
     >
       <IconButton
         aria-label="Toggle Sidebar"
-        icon={<FiMenu />}
+        icon={isCollapsed ? <FiMenu /> : <FiX />}
         onClick={toggleSidebar}
         m={2}
         alignSelf="flex-end"
         size="sm"
         variant="ghost"
-        colorScheme={colorMode === 'dark' ? 'whiteAlpha' : 'blackAlpha'}
+        color={colorMode === 'dark' ? 'white' : 'black'}
+        border="1px solid"
+        borderColor={colorMode === 'dark' ? 'white' : 'gray.400'}
+        borderRadius="md"
+        _hover={{
+          bg: colorMode === 'dark' ? 'gray.800' : 'gray.200',
+        }}
       />
+
+
       <VStack spacing={2} align="stretch" mt={4} px={2}>
         {sections.map((section) => {
           const isActive = section.id === activeSectionId;
@@ -71,7 +79,7 @@ export default function Sidebar() {
                 p={2}
                 borderRadius="md"
                 transition="background 0.2s"
-                bg={isActive ? (colorMode === 'dark' ? 'gray.700' : 'gray.300') : 'transparent'}
+                bg={isActive ? (colorMode === 'dark' ? 'gray' : 'gray.300') : 'transparent'}
                 _hover={{
                   bg: colorMode === 'dark' ? 'gray.700' : 'gray.300',
                   cursor: 'pointer',
