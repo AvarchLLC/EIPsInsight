@@ -16,7 +16,7 @@ async function fetchContributors(url: any, headers:any, allContributors = []) {
         throw new Error(`Failed to fetch contributors. Status code: ${response.status}`);
     }
     const contributors = await response.json();
-    allContributors = allContributors.concat(contributors);
+    allContributors = allContributors?.concat(contributors);
 
     // Check if there are more pages of contributors
     const nextPageLink = response.headers.get("link");

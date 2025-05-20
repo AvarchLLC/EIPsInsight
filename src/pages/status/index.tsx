@@ -84,7 +84,7 @@ const Status = () => {
     fetchData();
   }, []);
 
-  const allData: EIP[] = data2?.eip.concat(data2?.erc.concat(data2?.rip)) || [];
+  const allData: EIP[] = data2?.eip?.concat(data2?.erc?.concat(data2?.rip)) || [];
 
   const dat = [
     {
@@ -137,7 +137,7 @@ const Status = () => {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
         console.log("rip data:",jsonData.rip);
-        setData3(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData3(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);

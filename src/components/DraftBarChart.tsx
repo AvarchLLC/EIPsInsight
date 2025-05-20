@@ -277,7 +277,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
 
   const downloadData = () => {
     // Filter data based on the selected status
-    let filteredData = dataset.slice(1).concat(dataset[0]);
+    let filteredData = dataset.slice(1)?.concat(dataset[0]);
 
     console.log("new filtered data:",filteredData)
 

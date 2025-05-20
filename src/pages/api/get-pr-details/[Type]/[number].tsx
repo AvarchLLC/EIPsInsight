@@ -77,7 +77,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 let allConversations2 = commentsResponse.data;
                 console.log(commentsResponse.data);
 
-                allConversations2 = allConversations2.concat(commentsResponse);
+                allConversations2 = allConversations2?.concat(commentsResponse);
 
                 const participants2 = getParticipants2(allConversations2);
 
@@ -182,7 +182,7 @@ const fetchConversations = async (Type:string,number:number) => {
             });
 
             const conversations = conversationResponse.data;
-            allConversations = allConversations.concat(conversations);
+            allConversations = allConversations?.concat(conversations);
 
             if (conversations.length < 100) {
                 break;
@@ -202,7 +202,7 @@ const fetchConversations = async (Type:string,number:number) => {
             });
 
             const conversations = conversationResponse.data;
-            allConversations = allConversations.concat(conversations);
+            allConversations = allConversations?.concat(conversations);
 
             if (conversations.length < 100) {
                 break;

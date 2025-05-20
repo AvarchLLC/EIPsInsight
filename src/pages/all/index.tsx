@@ -107,8 +107,8 @@ const All = () => {
         setLoading(true);
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip));
-        const alldata=jsonData.eip.concat(jsonData.erc).concat(jsonData.rip);
+        setData(jsonData.eip?.concat(jsonData.erc)?.concat(jsonData.rip));
+        const alldata=jsonData.eip?.concat(jsonData.erc)?.concat(jsonData.rip);
         let filteredData = alldata
         .filter((item:any) => item.category === selected);
         if(selected==="All"){

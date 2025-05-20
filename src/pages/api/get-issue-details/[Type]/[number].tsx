@@ -116,7 +116,7 @@ const fetchIssueConversations = async (issueNumber: number) => {
       );
 
       const conversations = conversationResponse.data;
-      allConversations = allConversations.concat(conversations);
+      allConversations = allConversations?.concat(conversations);
 
       if (conversations.length < 100) {
         break;

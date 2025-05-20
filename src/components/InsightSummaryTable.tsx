@@ -430,7 +430,7 @@ export default function InsightSummary() {
         const uniqueErc = removeDuplicatePRs(jsonData.erc);
         const uniqueRip = removeDuplicatePRs(jsonData.rip);
 
-        setData(uniqueEip.concat(uniqueErc).concat(uniqueRip));
+        setData(uniqueEip?.concat(uniqueErc)?.concat(uniqueRip));
       }  catch (error) {
         console.error("Error fetching data:", error);
       }

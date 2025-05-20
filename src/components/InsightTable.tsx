@@ -135,7 +135,7 @@ const InsightTable: React.FC<TabProps> = ({
         } else if (Tabletype === "rip") {
           setData(removeDuplicatePRs(jsonData.rip));
         } else if (Tabletype === "all") {
-          setData(removeDuplicatePRs(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip)));
+          setData(removeDuplicatePRs(jsonData.eip?.concat(jsonData.erc)?.concat(jsonData.rip)));
         }
         setIsLoading(false);
       } catch (error) {

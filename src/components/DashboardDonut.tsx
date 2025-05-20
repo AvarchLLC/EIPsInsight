@@ -56,7 +56,7 @@ const DashboardDonut: React.FC<AreaCProps> =({dataset}) => {
     // fetchData();
   }, []);
 
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
 
   const dat = [
     {

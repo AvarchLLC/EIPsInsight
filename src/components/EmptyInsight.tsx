@@ -63,7 +63,7 @@ const EmptyInsight = () => {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
         console.log("rip data:",jsonData.rip);
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         // setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);

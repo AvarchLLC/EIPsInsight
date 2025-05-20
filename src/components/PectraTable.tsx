@@ -147,7 +147,7 @@ import {
         try {
           const response = await fetch(`/api/new/all`);
           const jsonData = await response.json();
-          setData(jsonData.eip.concat(jsonData.erc));
+          setData(jsonData.eip?.concat(jsonData.erc));
           setIsLoading(false); // Set isLoading to false after data is fetched
         } catch (error) {
           console.error("Error fetching data:", error);

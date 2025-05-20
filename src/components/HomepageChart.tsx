@@ -134,9 +134,9 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         } else if (type === "RIP") {
           setData(jsonData.rip);
         } else if (type === "Total") {
-          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+          setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         } else {
-          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+          setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         }
         setIsLoading(false);
       } catch (error) {

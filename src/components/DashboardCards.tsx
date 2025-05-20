@@ -167,7 +167,7 @@ const DashboardCards = () => {
     fetchData();
   }, []);
 
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
   const secondaryTextColor = useColorModeValue("gray.500", "gray.400");
 
 

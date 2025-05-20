@@ -122,9 +122,9 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
         } else if (type === "RIP") {
           setData(dataset.rip);
         } else if (type === "Total") {
-          setData(dataset.eip.concat(dataset.erc.concat(dataset.rip)));
+          setData(dataset.eip?.concat(dataset.erc?.concat(dataset.rip)));
         } else {
-          setData(dataset.eip.concat(dataset.erc.concat(dataset.rip)));
+          setData(dataset.eip?.concat(dataset.erc?.concat(dataset.rip)));
         }
         setIsLoading(false);
       } catch (error) {

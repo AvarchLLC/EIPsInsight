@@ -31,7 +31,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
           new Date(pr.merged_at) <= endDate
       );
 
-      mergedPRsThisMonth = mergedPRsThisMonth.concat(prsInDateRange);
+      mergedPRsThisMonth = mergedPRsThisMonth?.concat(prsInDateRange);
 
       if (prsInDateRange.length < 100) {
         break;

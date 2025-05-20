@@ -128,7 +128,7 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
   const uniqueStatuses = [...new Set(allData.map(item => item.status))];
   console.log(uniqueStatuses);
   const uniqueeip = allData.filter((item) => item.status === "");

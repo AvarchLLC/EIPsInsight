@@ -47,7 +47,7 @@ const EIPCatBoxGrid = () => {
     fetchData();
   }, []);
   const bg = useColorModeValue("#f6f6f7", "#171923");
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
 
   const MetaCount = new Set(
     allData.filter((item) => item.type === "Meta").map((item) => item.eip)

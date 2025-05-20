@@ -60,7 +60,7 @@ const TypeGraphs = () => {
     fetchData();
   }, []);
   
-  const allData: EIP[] = data2?.eip.concat(data2?.erc.concat(data2?.rip)) || [];
+  const allData: EIP[] = data2?.eip?.concat(data2?.erc?.concat(data2?.rip)) || [];
 
   return (
     <>

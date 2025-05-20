@@ -107,7 +107,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         if (type === "EIPs" && jsonData.eip) {
           setData(
           jsonData.eip.filter((item: any) => item.category !== "ERCs")

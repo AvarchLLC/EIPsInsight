@@ -191,7 +191,7 @@ const SearchBox: React.FC = () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setEipData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setEipData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
