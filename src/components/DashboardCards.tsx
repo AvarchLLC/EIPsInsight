@@ -215,12 +215,12 @@ const DashboardCards = () => {
   ];
 
   const statsByStatus = [
+    { title: "Living", description: "Living EIPs are continuously updated and reflect evolving standards or documentation.", url: "alltable", value: allData.filter((item) => item.status === "Living").length },
     { title: "Final", description: "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.", url: "alltable", value: allData.filter((item) => item.status === "Draft").length },
-    { title: "Stagnant", description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.", url: "alltable", value: allData.filter((item) => item.status === "Stagnant").length },
     { title: "Draft", description: "Draft EIPs are proposals still under initial consideration and open for feedback.", url: "alltable", value: allData.filter((item) => item.status === "Draft").length },
     { title: "Review", description: "EIPs in the Review stage are being actively discussed and evaluated by the community.", url: "alltable", value: allData.filter((item) => item.status === "Review").length },
     { title: "Last Call", description: "Last Call EIPs are nearing finalization, with a short period for final community comments.", url: "alltable", value: allData.filter((item) => item.status === "Last Call").length },
-    { title: "Living", description: "Living EIPs are continuously updated and reflect evolving standards or documentation.", url: "alltable", value: allData.filter((item) => item.status === "Living").length },
+    { title: "Stagnant", description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.", url: "alltable", value: allData.filter((item) => item.status === "Stagnant").length },
     { title: "Withdrawn", description: "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.", url: "alltable", value: allData.filter((item) => item.status === "Withdrawn").length },
   ];
   return (
