@@ -59,12 +59,12 @@ const LineChart: React.FC = () => {
 
   for (const key in groupedEips) {
     const eips = groupedEips[key];
-    const livingEips = eips.filter((eip) => eip.status === 'Final' && eip.category === 'Core');
-    const ercEips = eips.filter((eip) => eip.status === 'Final' && eip.category === 'ERC');
-    const NetEips = eips.filter((eip) => eip.status === 'Final' && eip.category === 'Networking');
-    const InterEips = eips.filter((eip) => eip.status === 'Final' && eip.category === 'Interface');
-    const MetaEips = eips.filter((eip) => eip.status === 'Final' && eip.category === 'Meta');
-    const InfoEips = eips.filter((eip) => eip.status === 'Final' && eip.category === 'Informational');
+    const livingEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'Core');
+    const ercEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'ERC');
+    const NetEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'Networking');
+    const InterEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'Interface');
+    const MetaEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'Meta');
+    const InfoEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'Informational');
     LivingCounts[key] = livingEips.length;
     ERCCounts[key] = ercEips.length;
     NetCounts[key] = NetEips.length;

@@ -87,7 +87,7 @@ const SearchBox: React.FC = () => {
           ...getEarliestEntries(jsonData.erc, "eip"),
           ...getEarliestEntries(jsonData.rip, "eip"),
         ];
-        filteredData = filteredData.filter(
+        filteredData = filteredData?.filter(
           (entry: EIP, index: number, self: EIP2[]) =>
             entry.eip !== "1" || index === self.findIndex((e: EIP2) => e.eip === "1")
         );
@@ -108,7 +108,7 @@ const SearchBox: React.FC = () => {
     const authorMap: Record<string, number> = {};
 
     authordata.forEach((eip) => {
-      const authors = eip.author.split(",").map((author) => author.trim());
+      const authors = eip.author.split(",")?.map((author) => author.trim());
       authors.forEach((author) => {
         if (author) {
           // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
@@ -138,19 +138,19 @@ const SearchBox: React.FC = () => {
     });
 
     const authorArray = Object.entries(authorMap)
-      .map(([name, count]) => ({ name, count }))
+      ?.map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
 
     setAuthorCounts(authorArray);
   }, [authordata]);
 
   // const filteredAuthorData = query
-  // ? authordata.filter(item =>
+  // ? authordata?.filter(item =>
   //     item.author.toLowerCase().includes(query.toLowerCase())
   //   )
   // : [];
 
-  const filteredAuthors = authorCounts.filter((author) =>
+  const filteredAuthors = authorCounts?.filter((author) =>
     author.name.toLowerCase().includes(query.toLowerCase())
   );
 
@@ -219,7 +219,7 @@ const SearchBox: React.FC = () => {
       const seenPRs = new Set<string>();
 
       // Filter PR results based on exact match first
-      const exactMatches = data.filter((item) => {
+      const exactMatches = data?.filter((item) => {
         const key = `${item.prNumber}-${item.repo}`;
         if (seenPRs.has(key)) return false; // Skip if already seen
         seenPRs.add(key); // Mark as seen
@@ -228,9 +228,9 @@ const SearchBox: React.FC = () => {
 
       // Filter PR results for partial matches (those that start with the query)
       const partialMatches = data
-        .filter((item) => item.prNumber.toString().startsWith(queryStr))
-        .filter((item) => item.prNumber.toString() !== queryStr) // Exclude exact matches
-        .filter((item) => {
+        ?.filter((item) => item.prNumber.toString().startsWith(queryStr))
+        ?.filter((item) => item.prNumber.toString() !== queryStr) // Exclude exact matches
+        ?.filter((item) => {
           const key = `${item.prNumber}-${item.repo}`;
           if (seenPRs.has(key)) return false; // Skip if already seen
           seenPRs.add(key); // Mark as seen
@@ -251,7 +251,7 @@ const SearchBox: React.FC = () => {
       const seenIssues = new Set<string>();
 
       // Filter PR results based on exact match first
-      const exactIssueMatches = IssueData.filter((item) => {
+      const exactIssueMatches = IssueData?.filter((item) => {
         const key = `${item.issueNumber}-${item.repo}`;
         if (seenIssues.has(key)) return false; // Skip if already seen
         seenIssues.add(key); // Mark as seen
@@ -259,9 +259,9 @@ const SearchBox: React.FC = () => {
       });
 
       // Filter PR results for partial matches (those that start with the query)
-      const partialIssueMatches = IssueData.filter((item) => item.issueNumber.toString().startsWith(queryStr))
-        .filter((item) => item.issueNumber.toString() !== queryStr) // Exclude exact matches
-        .filter((item) => {
+      const partialIssueMatches = IssueData?.filter((item) => item.issueNumber.toString().startsWith(queryStr))
+        ?.filter((item) => item.issueNumber.toString() !== queryStr) // Exclude exact matches
+        ?.filter((item) => {
           const key = `${item.issueNumber}-${item.repo}`;
           if (seenIssues.has(key)) return false; // Skip if already seen
           seenIssues.add(key); // Mark as seen
@@ -283,7 +283,7 @@ const SearchBox: React.FC = () => {
       const seenEIPs = new Set<string>();
 
       // Filter EIP results based on exact match first
-      const exactEIPMatches = eipData.filter((item) => {
+      const exactEIPMatches = eipData?.filter((item) => {
         const key = `${item.eip}-${item.repo}`;
         if (seenEIPs.has(key)) return false; // Skip if already seen
         seenEIPs.add(key); // Mark as seen
@@ -293,9 +293,9 @@ const SearchBox: React.FC = () => {
       // Filter EIP results for partial matches (those that start with the query)
       const partialEIPMatches = queryStr
         ? eipData
-            .filter((item) => item.eip.startsWith(queryStr)) // Match the partial query
-            .filter((item) => item.eip !== queryStr) // Exclude exact matches
-            .filter((item) => {
+            ?.filter((item) => item.eip.startsWith(queryStr)) // Match the partial query
+            ?.filter((item) => item.eip !== queryStr) // Exclude exact matches
+            ?.filter((item) => {
               const key = `${item.eip}-${item.repo}`;
               if (seenEIPs.has(key)) return false; // Skip if already seen
               seenEIPs.add(key); // Mark as seen
@@ -327,13 +327,13 @@ const SearchBox: React.FC = () => {
       console.log("final data:", newFilteredEIPResults);
 
       if (queryStr2.toLowerCase() === "e") {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => ["eip", "erc"].includes(item.repo)));
+        setFilteredEIPResults(newFilteredEIPResults?.filter((item) => ["eip", "erc"].includes(item.repo)));
       } else if (["r", "ri", "rip", "rip n", "rip nu", "rip num", "rip numb", "rip number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "rip"));
+        setFilteredEIPResults(newFilteredEIPResults?.filter((item) => item.repo === "rip"));
       } else if (["e", "ei", "eip", "eip n", "eip nu", "eip num", "eip numb", "eip number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "eip"));
+        setFilteredEIPResults(newFilteredEIPResults?.filter((item) => item.repo === "eip"));
       } else if (["er", "erc", "erc n", "erc nu", "erc num", "erc numb", "erc number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "erc"));
+        setFilteredEIPResults(newFilteredEIPResults?.filter((item) => item.repo === "erc"));
       } else {
         setFilteredEIPResults(newFilteredEIPResults);
       }
@@ -388,7 +388,7 @@ const SearchBox: React.FC = () => {
 
   const queryStr = query.trim(); // Remove spaces from the query string
 
-  const uniqueResults = filteredResults.filter((result, index, self) => {
+  const uniqueResults = filteredResults?.filter((result, index, self) => {
     // Remove spaces from the PR number for comparison
     const prNumberStr = result.prNumber.toString().trim();
 
@@ -507,7 +507,7 @@ const SearchBox: React.FC = () => {
                 }
               }}
             >
-              {filteredAuthors.map((result, index) => (
+              {filteredAuthors?.map((result, index) => (
                 <option
                   key={result.name}
                   value={result.name}
@@ -517,7 +517,7 @@ const SearchBox: React.FC = () => {
                   {result.name} ({result.count})
                 </option>
               ))}
-              {uniqueResults.map((result, index) => (
+              {uniqueResults?.map((result, index) => (
                 <option
                   key={result.prNumber}
                   value={result.prNumber}
@@ -527,7 +527,7 @@ const SearchBox: React.FC = () => {
                   {result.repo} PR: {result.prNumber}
                 </option>
               ))}
-              {filteredIssueResults.map((result, index) => (
+              {filteredIssueResults?.map((result, index) => (
                 <option
                   key={result.issueNumber}
                   value={result.issueNumber}
@@ -537,7 +537,7 @@ const SearchBox: React.FC = () => {
                   {result.repo} ISSUE: {result.issueNumber}
                 </option>
               ))}
-              {filteredEIPResults.map((result, index) => (
+              {filteredEIPResults?.map((result, index) => (
                 <option
                   key={result.eip}
                   value={result.eip}

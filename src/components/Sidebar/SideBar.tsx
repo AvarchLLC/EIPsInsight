@@ -22,7 +22,7 @@ export default function Sidebar() {
     md: isCollapsed ? '60px' : '220px',
   });
 
-  const activeSectionId = useActiveSection(sections.map((s) => s.id));
+  const activeSectionId = useActiveSection(sections?.map((s) => s.id));
 
   const handleScroll = (id: string) => {
     const el = document.getElementById(id);
@@ -63,7 +63,7 @@ export default function Sidebar() {
 
 
       <VStack spacing={2} align="stretch" mt={4} px={2}>
-        {sections.map((section) => {
+        {sections?.map((section) => {
           const isActive = section.id === activeSectionId;
           return (
             <Tooltip

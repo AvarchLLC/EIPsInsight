@@ -15,7 +15,7 @@ const shinyAnimation = keyframes`
 
 export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactions }) => {
   // Extract gas fees for each transaction type
-  const gasFeesByType = Object.entries(transactions).reduce((acc, [type, txs]) => {
+  const gasFeesByType = Object.entries(transactions)?.reduce((acc, [type, txs]) => {
     if (type !== '4') {
       acc[type] = extractGasFees(txs);
     }
@@ -23,15 +23,15 @@ export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactio
   }, {} as Record<string, number[]>);
 
   // Calculate gas fee stats for each transaction type
-  const gasFeeStats = Object.entries(gasFeesByType).reduce((acc, [type, gasFees]) => {
+  const gasFeeStats = Object.entries(gasFeesByType)?.reduce((acc, [type, gasFees]) => {
     acc[type] = calculateGasFeeStats(gasFees);
     return acc;
   }, {} as Record<string, { avg: string; high: string; low: string }>);
 
   // Prepare data for the pie chart
   const data = Object.entries(transactions)
-    .filter(([type]) => type !== '4' && type !== 'all')
-    .map(([type, txs]) => ({
+    ?.filter(([type]) => type !== '4' && type !== 'all')
+    ?.map(([type, txs]) => ({
       name: `Type ${type}`,
       value: txs.length,
       type,
@@ -73,7 +73,7 @@ export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactio
                 animationDuration={1000}
                 animationBegin={0}
               >
-                {data.map((entry, index) => (
+                {data?.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -81,7 +81,7 @@ export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactio
                 content={({ payload }) => {
                   if (payload && payload.length > 0) {
                     const { name, value, type } = payload[0].payload;
-                    const percentage = ((value / data.reduce((sum, d) => sum + d.value, 0)) * 100).toFixed(2);
+                    const percentage = ((value / data?.reduce((sum, d) => sum + d.value, 0)) * 100).toFixed(2);
                     return (
                       <Box bg={boxBg} p={2} borderRadius="md" boxShadow="md">
                         <Text fontWeight="bold">{name}</Text>
@@ -139,8 +139,8 @@ export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactio
             {/* Other Boxes (2x2 Grid) */}
             <SimpleGrid columns={2} spacing={4}>
               {Object.entries(gasFeeStats)
-                .filter(([type]) => type !== 'all')
-                .map(([type, stats], index) => (
+                ?.filter(([type]) => type !== 'all')
+                ?.map(([type, stats], index) => (
                     <Box
                     key={type}
                     bg={COLORS[index % COLORS.length]}
@@ -186,7 +186,7 @@ export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactio
 
 // Utility function to extract gas fees
 const extractGasFees = (transactions: any[]) => {
-  return transactions.map((tx) => Number(tx.gasPrice || tx.maxFeePerGas || 0));
+  return transactions?.map((tx) => Number(tx.gasPrice || tx.maxFeePerGas || 0));
 };
 
 // Utility function to calculate gas fee stats
@@ -195,7 +195,7 @@ const calculateGasFeeStats = (gasFees: number[]) => {
     return { avg: '~', high: '~', low: '~' };
   }
 
-  const total = gasFees.reduce((sum, fee) => sum + fee, 0);
+  const total = gasFees?.reduce((sum, fee) => sum + fee, 0);
   const avg = (total / gasFees.length).toFixed(2);
   const high = Math.max(...gasFees).toFixed(2);
   const low = Math.min(...gasFees).toFixed(2);

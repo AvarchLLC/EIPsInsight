@@ -105,8 +105,8 @@ const CustomBox: React.FC<CustomBoxProps> = ({
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const transformedData = data
-    .filter((obj) => obj._id === "Final")
-    .map((obj) => ({
+    ?.filter((obj) => obj._id === "Final")
+    ?.map((obj) => ({
       category: obj.statusChanges[0].category,
       number: obj.count,
     }));
@@ -144,7 +144,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({
             </Tr>
           </Thead>
           <Tbody>
-            {data.sort(sortByCustomOrder).map((entry, index) => (
+            {data.sort(sortByCustomOrder)?.map((entry, index) => (
               <Tr key={index}>
                 <Td minW="100px">
                   <Wrap>

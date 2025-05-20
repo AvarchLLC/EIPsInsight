@@ -84,7 +84,7 @@ const ERCStatusGraph = () => {
 
   const transformedData = graphData
     .flatMap((item) =>
-      item.statusChanges.map((change) => ({
+      item.statusChanges?.map((change) => ({
         status: getStatus(change.lastStatus),
         year: item.year,
         value: 1,
@@ -136,7 +136,7 @@ const ERCStatusGraph = () => {
     const csvContent = [
       ["Year", "EIP", "Last Status", "EIP Title", "EIP Category", "Link"], // Headers
       ...data.flatMap((item) =>
-        item.statusChanges.map((statusChange) => [
+        item.statusChanges?.map((statusChange) => [
           item.year,
           statusChange.eip,
           statusChange.lastStatus,
@@ -145,7 +145,7 @@ const ERCStatusGraph = () => {
           `https://eipsinsight.com/ercs/erc-${statusChange.eip}`,
         ])
       ),
-    ].map((row) => row.join(","))
+    ]?.map((row) => row.join(","))
       .join("\n");
   
     // Create a Blob and trigger download

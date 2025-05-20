@@ -215,7 +215,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
 
 
 
-    const ethBotFiltered = data?.prDetails?.conversations.filter(
+    const ethBotFiltered = data?.prDetails?.conversations?.filter(
         (item) => item.user.login === 'eth-bot'
     );
     const ethBotCount = ethBotFiltered?.length;
@@ -366,7 +366,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
                                                     <Box className="pb-10">
                                                         <Text className="text-lg md:text-2xl font-bold pb-5">Labels:</Text>
                                                         <div className="flex flex-wrap gap-2">
-                                                            {data?.prDetails?.labels.map((item) => (
+                                                            {data?.prDetails?.labels?.map((item) => (
                                                                 <Badge key={item} colorScheme={getLabelColor(item)} px={4} py={2} className="rounded-full">
                                                                     {item}
                                                                 </Badge>
@@ -378,7 +378,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
                                                 <Box>
                                                     <Text className="text-lg md:text-2xl font-bold pb-5">Participants:</Text>
                                                     <div className="flex flex-wrap gap-3">
-                                                        {data?.prDetails?.participants.map((participant) => {
+                                                        {data?.prDetails?.participants?.map((participant) => {
                                                             const matchingConversation = data?.prDetails?.conversations.find(
                                                                 (conversation) => conversation.user.login === participant
                                                             );

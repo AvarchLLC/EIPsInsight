@@ -257,9 +257,9 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
   ];
 
   const formattedData = typeData
-    .reduce((acc: FormattedEIP[], item: EIP) => {
+    ?.reduce((acc: FormattedEIP[], item: EIP) => {
       if (item.status === selectedStatus) {
-        const formattedEIPs: FormattedEIP[] = item.eips.map((eip) => ({
+        const formattedEIPs: FormattedEIP[] = item.eips?.map((eip) => ({
           category: getCat(eip.category),
           date: `${getMonthName(eip.month)} ${eip.year}`,
           value: eip.count,
@@ -278,13 +278,13 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
       return months.indexOf(aMonth) - months.indexOf(bMonth);
     });
 
-  let filteredData = formattedData.filter(
+  let filteredData = formattedData?.filter(
     (item: any) => item.category !== "ERCs"
   );
   if (type === "ERCs") {
     filteredData = formattedData;
   } else if (type === "EIPs") {
-    filteredData = formattedData.filter(
+    filteredData = formattedData?.filter(
       (item: any) => item.category !== "ERCs"
     );
   }
@@ -311,7 +311,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
   const removeDuplicatesFromEips = (eips: EIP2[]) => {
     const seen = new Set();
     
-    return eips.filter((eip) => {
+    return eips?.filter((eip) => {
       if (!seen.has(eip.eip)) {
         seen.add(eip.eip); // Track seen eip numbers
         return true;
@@ -324,7 +324,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
 
   const downloadData = () => {
     // Filter data based on the selected status
-    const filteredData = typeData.filter((item) => item.status === selectedStatus);
+    const filteredData = typeData?.filter((item) => item.status === selectedStatus);
 
     if (!filteredData.length) {
         console.error("No data available for the selected status.");
@@ -339,7 +339,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
             const year = eipGroup.year.toString(); // Convert year to string
             const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Assuming this returns an array of EIPs
 
-            return uniqueEips.map((eip) => ({
+            return uniqueEips?.map((eip) => ({
                 category,
                 year,
                 eip: eip.eip, // EIP number
@@ -369,7 +369,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
         "data:text/csv;charset=utf-8," + 
         header +
         transformedData
-            .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+            ?.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
                 // Generate the correct URL based on the repo type
                 const url =
                     category === "ERC"
@@ -422,7 +422,7 @@ const headingColor = useColorModeValue('black', 'white');
       >
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
           {`Status: ${selectedStatus} - [${
-            data2.filter((item) => item.status === selectedStatus).length
+            data2?.filter((item) => item.status === selectedStatus).length
           }] `}
         </Text>
       </NextLink>

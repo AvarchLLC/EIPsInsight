@@ -89,7 +89,7 @@ const TypeColumnChart : React.FC<AreaCProps> = ({category}) => {
         setIsChartReady(true);
     }, []);
 
-    const filteredData = data.filter((item) => category === (item.status));
+    const filteredData = data?.filter((item) => category === (item.status));
 
     return(
         <>

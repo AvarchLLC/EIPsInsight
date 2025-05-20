@@ -103,7 +103,7 @@ const RecentTransactions = ({ transactions, ethPriceInUSD, timestamp }: { transa
           </Tr>
         </Thead>
         <Tbody>
-          {transactions.map((tx, index) => {
+          {transactions?.map((tx, index) => {
             const valueInWei = hexToDecimal(tx.value); // Convert hex to decimal wei
             const valueInEth = weiToEth(valueInWei); // Convert wei to ETH
             const age = calculateAge(timestamp); // Calculate age using the provided timestamp

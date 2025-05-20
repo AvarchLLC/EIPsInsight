@@ -146,10 +146,10 @@ interface AreaProps {
       setIsChartReady(true);
     }, []);
   
-    const filteredData = data.filter((item) => status === getStatus(item.status));
+    const filteredData = data?.filter((item) => status === getStatus(item.status));
   
     const transformedData = filteredData.flatMap((item) =>
-      item.eips.map((eip) => ({
+      item.eips?.map((eip) => ({
         category: getCat(eip.category),
         year: eip.year.toString(),
         value: eip.count,

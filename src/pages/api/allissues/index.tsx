@@ -41,9 +41,9 @@ export default async (req: Request, res: Response) => {
 
         // Add repository information to each Issue number
         const formattedIssueNumbers = [
-            ...eipIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'EIPs' })),
-            ...ercIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'ERCs' })),
-            ...ripIssueNumbers.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'RIPs' })),
+            ...eipIssueNumbers?.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'EIPs' })),
+            ...ercIssueNumbers?.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'ERCs' })),
+            ...ripIssueNumbers?.map(Issue => ({ issueNumber: Issue.issueNumber, issueTitle:Issue.issueTitle, repo: 'RIPs' })),
         ];
 
         // Send the consolidated list as a JSON response

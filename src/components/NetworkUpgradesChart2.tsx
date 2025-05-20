@@ -95,8 +95,8 @@ const downloadData = () => {
   const header = "Author,Contribution Count,EIP\n";
   const csvContent = "data:text/csv;charset=utf-8," +
     header +
-    transformedData.map(({ name, contributionCount, eips }) =>
-      eips.map((eip, index) => 
+    transformedData?.map(({ name, contributionCount, eips }) =>
+      eips?.map((eip, index) => 
         `${index === 0 ? name : ''},${index === 0 ? contributionCount : ''},https://eipsinsight.com/eips/eip-${eip.replace('EIP-', '')}`
       ).join("\n")
     ).join("\n");
@@ -117,7 +117,7 @@ const generateDistinctColor = (index: number, total: number) => {
   return `hsl(${hue}, 70%, 50%)`;
 };
 
-const colorMap = transformedData.reduce((map, author, index) => {
+const colorMap = transformedData?.reduce((map, author, index) => {
   map[author.name] = generateDistinctColor(index, transformedData.length);
   return map;
 }, {} as Record<string, string>);
@@ -150,7 +150,7 @@ const AuthorContributionsChart = React.memo(() => {
     },
     tooltip: {
       customItems: (items: any[]) =>
-        items.map(item => ({
+        items?.map(item => ({
           ...item,
           name: item.data.name,
           value: `Contributions: ${item.data.contributionCount}`,

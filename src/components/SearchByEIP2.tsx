@@ -68,7 +68,7 @@ const SearchByEip2: React.FC<AuthorProps> = ({ defaultQuery }) => {
           ...getEarliestEntries(jsonData.erc, 'eip'),
           ...getEarliestEntries(jsonData.rip, 'eip'),
         ];
-        filteredData = filteredData.filter(
+        filteredData = filteredData?.filter(
           (entry: EIP, index: number, self: EIP[]) =>
             entry.eip !== '1' || index === self.findIndex((e: EIP) => e.eip === '1')
         );
@@ -90,7 +90,7 @@ const SearchByEip2: React.FC<AuthorProps> = ({ defaultQuery }) => {
     const authorMap: Record<string, number> = {};
   
     data.forEach((eip) => {
-      const authors = eip.author.split(",").map((author) => author.trim());
+      const authors = eip.author.split(",")?.map((author) => author.trim());
       authors.forEach((author) => {
         if (author) {
           // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
@@ -121,7 +121,7 @@ const SearchByEip2: React.FC<AuthorProps> = ({ defaultQuery }) => {
     });
   
     const authorArray = Object.entries(authorMap)
-      .map(([name, count]) => ({ name, count }))
+      ?.map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
   
     setAuthorCounts(authorArray);
@@ -137,12 +137,12 @@ const SearchByEip2: React.FC<AuthorProps> = ({ defaultQuery }) => {
   };
 
   // Filter and paginate data
-  const filteredData = data.filter(item =>
+  const filteredData = data?.filter(item =>
     !selectedAuthor || item.author.toLowerCase().includes(selectedAuthor.toLowerCase())
   );
 //   const totalPages = Math.ceil(filteredData.length / cardsPerPage);
   const filteredData2 = searchTerm
-    ? filteredData.filter((item) =>
+    ? filteredData?.filter((item) =>
         item.eip.toString().includes(searchTerm.trim())
       )
     : filteredData;
@@ -176,7 +176,7 @@ const SearchByEip2: React.FC<AuthorProps> = ({ defaultQuery }) => {
     return csvRows.join('\n');
   };
 
-  const filteredAuthors = authorCounts.filter((author) =>
+  const filteredAuthors = authorCounts?.filter((author) =>
     author.name.toLowerCase().includes(selectedAuthor.toLowerCase())
   );
   
@@ -270,7 +270,7 @@ const findNetworkUpgrade = (eip: number): string | undefined => {
                   
             {/* Display Cards */}
             <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={6}>
-  {paginatedData.map((item) => {
+  {paginatedData?.map((item) => {
     // Find the network upgrade for the current item's EIP
     const networkUpgrade = Object.entries(networkUpgrades).find(([_, eips]) =>
       eips.includes(Number(item.eip))
@@ -361,7 +361,7 @@ const findNetworkUpgrade = (eip: number): string | undefined => {
             maxWidth="100%"
           >
             {(() => {
-              const authors = item.author.split(",").map((author) =>
+              const authors = item.author.split(",")?.map((author) =>
                 author.replace(/<.*?>/g, "").trim()
               );
 

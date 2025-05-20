@@ -234,7 +234,7 @@ const All: React.FC = () => {
               >
                 {/* First Row: 19 Boxes */}
                 <HStack spacing={1} wrap="wrap" justify="center" mb={2}>
-                  {firstRowSlots.map((slot) => {
+                  {firstRowSlots?.map((slot) => {
                     const isProcessed = slot < currentSlot;
                     const isCurrent = slot === currentSlot;
                     const epochOfSlot = Math.floor(slot / 32);
@@ -277,7 +277,7 @@ const All: React.FC = () => {
 
                 {/* Second Row: 13 Boxes + Text + Golden Box */}
                 <HStack spacing={1} wrap="wrap" justify="center">
-                  {secondRowSlots.map((slot) => {
+                  {secondRowSlots?.map((slot) => {
                     const isProcessed = slot < currentSlot;
                     const isCurrent = slot === currentSlot;
                     const epochOfSlot = Math.floor(slot / 32);

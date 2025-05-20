@@ -199,7 +199,7 @@ useEffect(() => {
         const result = await response.json();
         // console.log(result)
 
-        const formattedData = result.reduce((acc: any, item: any) => {
+        const formattedData = result?.reduce((acc: any, item: any) => {
           const { monthYear, value } = item; // Access 'value' directly from the item
           const { created, closed, merged, open, review } = value; // Destructure 'created', 'closed', etc. from 'value'
         
@@ -256,7 +256,7 @@ useEffect(() => {
         // console.log(result);
 
         // Reduce the data by combining entries with the same monthYear
-        const formattedData = result.reduce((acc: any, item: any) => {
+        const formattedData = result?.reduce((acc: any, item: any) => {
           const { monthYear, value } = item; // Access 'value' directly from the item
           const { created = [], closed = [], merged = [], open = [], review = [] } = value; // Destructure with defaults
 
@@ -481,7 +481,7 @@ useEffect(() => {
       ) : (
         <>
           {/* Render Created Items */}
-          {showCategory.created && items.created.map((item: PR | Issue) => (
+          {showCategory.created && items.created?.map((item: PR | Issue) => (
             <Tr key={`created-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
               <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
               <Td p="8px"style={{ wordWrap: 'break-word', maxWidth: '200px' }}>{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
@@ -513,7 +513,7 @@ useEffect(() => {
           ))}
 
           {/* Render Closed Items */}
-          {showCategory.closed && items.closed.map((item: PR | Issue) => (
+          {showCategory.closed && items.closed?.map((item: PR | Issue) => (
             <Tr key={`closed-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
               <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
               <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
@@ -545,7 +545,7 @@ useEffect(() => {
           ))}
 
           {/* Render Merged Items (only for PRs) */}
-          {showCategory.merged && type === 'PRs' && (items as { merged: PR[] }).merged.map((item: PR) => (
+          {showCategory.merged && type === 'PRs' && (items as { merged: PR[] }).merged?.map((item: PR) => (
             <Tr key={`merged-${item.prNumber}`} borderWidth="1px" borderColor="gray.200">
               <Td p="8px" textAlign="center" verticalAlign="middle">{item.prNumber}</Td>
               <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{item.prTitle}</Td>
@@ -575,7 +575,7 @@ useEffect(() => {
           ))}
 
           {/* Render Open Items */}
-          {showCategory.open && items.open.map((item: PR | Issue) => (
+          {showCategory.open && items.open?.map((item: PR | Issue) => (
             <Tr key={`open-${type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}`} borderWidth="1px" borderColor="gray.200">
               <Td p="8px" textAlign="center" verticalAlign="middle">{type === 'PRs' ? (item as PR).prNumber : (item as Issue).IssueNumber}</Td>
               <Td p="8px" textAlign="center" verticalAlign="middle" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis">{type === 'PRs' ? (item as PR).prTitle : (item as Issue).IssueTitle}</Td>
@@ -792,16 +792,16 @@ useEffect(() => {
   
       if (activeTab === 'PRs') {
         // Add each record with 'key' and 'tag' to combinedPRData
-        combinedPRData.created.push(...(currentData as { created: PR[] }).created.map(item => ({ ...item, key, tag: 'created' })));
-        combinedPRData.closed.push(...(currentData as { closed: PR[] }).closed.map(item => ({ ...item, key, tag: 'closed' })));
-        combinedPRData.open.push(...(currentData as { open: PR[] }).open.map(item => ({ ...item, key, tag: 'open' })));
-        combinedPRData.merged.push(...((currentData as { merged: PR[] }).merged || []).map(item => ({ ...item, key, tag: 'merged' })));
-        combinedPRData.reviewed.push(...((currentData as { review: PR[] }).review || []).map(item => ({ ...item, key, tag: 'reviewed' })));
+        combinedPRData.created.push(...(currentData as { created: PR[] }).created?.map(item => ({ ...item, key, tag: 'created' })));
+        combinedPRData.closed.push(...(currentData as { closed: PR[] }).closed?.map(item => ({ ...item, key, tag: 'closed' })));
+        combinedPRData.open.push(...(currentData as { open: PR[] }).open?.map(item => ({ ...item, key, tag: 'open' })));
+        combinedPRData.merged.push(...((currentData as { merged: PR[] }).merged || [])?.map(item => ({ ...item, key, tag: 'merged' })));
+        combinedPRData.reviewed.push(...((currentData as { review: PR[] }).review || [])?.map(item => ({ ...item, key, tag: 'reviewed' })));
       } else {
         // Add each record with 'key' and 'tag' to combinedIssueData
-        combinedIssueData.created.push(...(currentData as { created: Issue[] }).created.map(item => ({ ...item, key, tag: 'created' })));
-        combinedIssueData.closed.push(...(currentData as { closed: Issue[] }).closed.map(item => ({ ...item, key, tag: 'closed' })));
-        combinedIssueData.open.push(...(currentData as { open: Issue[] }).open.map(item => ({ ...item, key, tag: 'open' })));
+        combinedIssueData.created.push(...(currentData as { created: Issue[] }).created?.map(item => ({ ...item, key, tag: 'created' })));
+        combinedIssueData.closed.push(...(currentData as { closed: Issue[] }).closed?.map(item => ({ ...item, key, tag: 'closed' })));
+        combinedIssueData.open.push(...(currentData as { open: Issue[] }).open?.map(item => ({ ...item, key, tag: 'open' })));
       }
     });
   
@@ -866,7 +866,7 @@ useEffect(() => {
 console.log("chart data:",chartdata);
 
 const transformedData = Array.isArray(chartdata) // Check if chartdata is an array
-  ? chartdata.reduce<{
+  ? chartdata?.reduce<{
       [key: string]: { [key: string]: number };
     }>((acc, { monthYear, type, count, eips, ercs, rips }) => {
       if (showCategory[type.toLowerCase()]) { // Ensure the category is selected
@@ -910,22 +910,22 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
     const mergedMax = Math.max(
       0, // Default to 0 if no data is available
       ...finalTransformedData
-          .filter(data => data.type === 'Merged')
-          .map(data => Math.abs(data.count))
+          ?.filter(data => data.type === 'Merged')
+          ?.map(data => Math.abs(data.count))
   );
   
   const closedMax = Math.max(
       0, // Default to 0 if no data is available
       ...finalTransformedData
-          .filter(data => data.type === 'Closed')
-          .map(data => Math.abs(data.count))
+          ?.filter(data => data.type === 'Closed')
+          ?.map(data => Math.abs(data.count))
   );
   
     // Get the minimum of merged and closed counts
     const getmin = Math.max(mergedMax, closedMax) || 0;
 
     const trendData = showCategory.open
-  ? Object.keys(transformedData || {}).map(monthYear => {
+  ? Object.keys(transformedData || {})?.map(monthYear => {
       const entry = transformedData![monthYear]; // Ensure that entry exists and is properly typed
 
       // Calculate the Open value based on transformedData and showCategory
@@ -944,10 +944,10 @@ const finalTransformedData = Object.keys(transformedData || {}).flatMap(monthYea
 
     // Determine y-axis min and max
     const yAxisMin = Math.min(-closedMax, -mergedMax);
-    // const yAxisMax = Math.max(0, Math.max(...trendData.map(data => data.Open)));
+    // const yAxisMax = Math.max(0, Math.max(...trendData?.map(data => data.Open)));
     const yAxisMax = Math.max(
       0, // Default to 0 if no data is available
-      ...trendData.map(data => Math.abs(data.Open)) // Use Open instead of type
+      ...trendData?.map(data => Math.abs(data.Open)) // Use Open instead of type
     );
     
     // console.log(yAxisMax); 
@@ -1418,7 +1418,7 @@ const router = useRouter();
                     {selectedYear ? `Year: ${selectedYear}` : 'Select Year'}
                   </MenuButton>
                   <MenuList>
-                    {getYears().map(year => (
+                    {getYears()?.map(year => (
                       <MenuItem
                         key={year}
                         onClick={() => {
@@ -1442,7 +1442,7 @@ const router = useRouter();
                     {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
                   </MenuButton>
                   <MenuList>
-                    {selectedYear && getMonths().map((month, index) => (
+                    {selectedYear && getMonths()?.map((month, index) => (
                       <MenuItem key={index} onClick={() => setSelectedMonth(month)}>
                         {month}
                       </MenuItem>

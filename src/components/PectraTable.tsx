@@ -118,8 +118,8 @@ import {
   const convertAndDownloadCSV = () => {
     if (PectraData && PectraData.length > 0) {
       const headers = Object.keys(PectraData[0]).join(",") + "\n";
-      const csvRows = PectraData.map((item) => {
-        const values = Object.values(item).map((value) => {
+      const csvRows = PectraData?.map((item) => {
+        const values = Object.values(item)?.map((value) => {
           if (typeof value === "string" && value.includes(",")) {
             return `"${value}"`;
           }
@@ -330,7 +330,7 @@ import {
                   author: (it: any) => (
                     <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
-                        {factorAuthor(it.author).map(
+                        {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
                             let t = item[item.length - 1].substring(
                               1,

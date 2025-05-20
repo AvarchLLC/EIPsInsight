@@ -59,7 +59,7 @@ const Comments: React.FC<CommentsProps> =({page}) => {
 
       // Find the comment by id and update its subComments
       setComments(prevComments => {
-        const updatedComments = prevComments.map(comment => {
+        const updatedComments = prevComments?.map(comment => {
           if (comment._id === commentId) {
             return {
               ...comment,
@@ -81,7 +81,7 @@ const Comments: React.FC<CommentsProps> =({page}) => {
   return (
     <Box mt={8}>
       <VStack spacing={4} align="stretch">
-        {comments.map(comment => (
+        {comments?.map(comment => (
           <Box key={comment._id} p={4} shadow="md" borderWidth="1px" borderRadius="md">
             <Text mb={2}>{comment.content}</Text>
             <HStack>
@@ -93,7 +93,7 @@ const Comments: React.FC<CommentsProps> =({page}) => {
             {/* Replies */}
             {comment.subComments && (
               <VStack spacing={3} align="stretch" pl={6} mt={3}>
-                {comment.subComments.map(reply => (
+                {comment.subComments?.map(reply => (
                   <Box key={reply._id} p={3} shadow="sm" borderWidth="1px" borderRadius="md">
                     <Text>{reply.content}</Text>
                   </Box>

@@ -127,7 +127,7 @@ export default function InsightSummary() {
   const fetchPRData = async () => {
     try {
         const prResults = await Promise.all(
-            PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+            PR_API_ENDPOINTS?.map(endpoint => fetch(endpoint).then(res => res.json()))
           ) as PR[][]; // Define as PR[][] to allow for any number of returned arrays
     
           const [eipsPRs, ercsPRs, ripsPRs] = prResults;
@@ -164,7 +164,7 @@ export default function InsightSummary() {
   const fetchIssueData = async () => {
     try {
         const issueResults = await Promise.all(
-            ISSUE_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+            ISSUE_API_ENDPOINTS?.map(endpoint => fetch(endpoint).then(res => res.json()))
           ) as Issue[][]; // Define as Issue[][] to allow for any number of returned arrays
     
       const [eipsIssues, ercsIssues, ripsIssues] = issueResults;
@@ -413,8 +413,8 @@ export default function InsightSummary() {
         const jsonData: APIData = await response.json();
 
         const removeDuplicatePRs = (statusChangesArray: StatusChange[]): StatusChange[] => {
-          return statusChangesArray.map(item => {
-            const uniquePRs = item.statusChanges.filter(
+          return statusChangesArray?.map(item => {
+            const uniquePRs = item.statusChanges?.filter(
               (value, index, self) =>
                 index === self.findIndex(v => v.eip === value.eip)
             );
@@ -450,14 +450,14 @@ export default function InsightSummary() {
     "Stagnant",
     "Withdrawn",
   ];
-  const tableData = statuses.map((status) => {
+  const tableData = statuses?.map((status) => {
     console.log("table data:", data);
-    const statusData = data.filter((item) => item._id === status);
+    const statusData = data?.filter((item) => item._id === status);
     return {
       _id: status,
-      eipCount: statusData.filter((item) => item.repo === "eip")[0]?.statusChanges.length || 0,
-      ercCount: statusData.filter((item) => item.repo === "erc")[0]?.statusChanges.length || 0,
-      ripCount: statusData.filter((item) => item.repo === "rip")[0]?.statusChanges.length || 0,
+      eipCount: statusData?.filter((item) => item.repo === "eip")[0]?.statusChanges.length || 0,
+      ercCount: statusData?.filter((item) => item.repo === "erc")[0]?.statusChanges.length || 0,
+      ripCount: statusData?.filter((item) => item.repo === "rip")[0]?.statusChanges.length || 0,
     };
   });
 
@@ -465,7 +465,7 @@ export default function InsightSummary() {
     console.log("Input data:", data);
   
     const csvData = data.flatMap((item) =>
-      item.statusChanges.map((statusChange) => ({
+      item.statusChanges?.map((statusChange) => ({
         repo: item.repo,
         eip: statusChange.eip,
         title: statusChange.title,
@@ -533,7 +533,7 @@ export default function InsightSummary() {
         if (Object.keys(summary[repo]).length > 0) {
             hasData = true;
             const text = Object.entries(summary[repo])
-                .map(([status, count]) => `${count} proposals transitioned to ${status}`)
+                ?.map(([status, count]) => `${count} proposals transitioned to ${status}`)
                 .join(", ");
             return `#${label}: ${text}.\n\n`;
         }
@@ -655,7 +655,7 @@ const downloadExcelWithSummary = (csvData: CSVData[], summary: string, year: num
             </Tr>
           </Thead>
           <Tbody>
-            {tableData.map((item) => {
+            {tableData?.map((item) => {
               return (
                 <>
                   <Tr>

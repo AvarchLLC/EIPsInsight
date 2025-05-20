@@ -102,7 +102,7 @@ for (const { date, upgrade, eip } of rawData) {
   }
 }
 
-const transformedData: UpgradeData[] = Object.values(upgradeMap).map(({ date, upgrade, eips }) => ({
+const transformedData: UpgradeData[] = Object.values(upgradeMap)?.map(({ date, upgrade, eips }) => ({
   date,
   upgrade,
   count: eips.length,
@@ -133,8 +133,8 @@ const generateDistinctColor = (index: number, total: number) => {
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-const uniqueUpgrades = [...new Set(transformedData.map((data) => data.upgrade))];
-const colorMap = uniqueUpgrades.reduce((map, upgrade, index) => {
+const uniqueUpgrades = [...new Set(transformedData?.map((data) => data.upgrade))];
+const colorMap = uniqueUpgrades?.reduce((map, upgrade, index) => {
   map[upgrade] = generateDistinctColor(index, uniqueUpgrades.length);
   return map;
 }, {} as Record<string, string>);
@@ -154,7 +154,7 @@ const NetworkUpgradesChart = React.memo(() => {
         header +
         (
           await Promise.all(
-            rawData.map(async ({ date, upgrade, eip }) => {
+            rawData?.map(async ({ date, upgrade, eip }) => {
               const eipNo = eip.replace("EIP-", "");
               const url = `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${eipNo}.md`;
 
@@ -212,7 +212,7 @@ const NetworkUpgradesChart = React.memo(() => {
       content: (origin: UpgradeData) => {
         const eips = origin.label.split(", ");
         return eips
-          .map((eip) => `${eip}`) // Format as EIP-XXXX
+          ?.map((eip) => `${eip}`) // Format as EIP-XXXX
           .join("\n");
       },
       style: (datum: any) => {
@@ -246,7 +246,7 @@ const NetworkUpgradesChart = React.memo(() => {
     legend: { position: "top-right" as const },
     tooltip: {
       customItems: (items: any[]) =>
-        items.map((item) => ({
+        items?.map((item) => ({
           ...item,
           name: item.data.upgrade,
           value: `EIPs: ${item.data.label}`,

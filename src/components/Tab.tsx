@@ -241,7 +241,7 @@ const Table = () => {
     fetchData();
   }, []);
 
-  const sortedData = data.map(({ eip, title, author, status, type, category }) => ({
+  const sortedData = data?.map(({ eip, title, author, status, type, category }) => ({
     eip,
     title,
     author,
@@ -445,7 +445,7 @@ const Table = () => {
               Author: (it : any) => (
                 <td>
                   <div>
-                    {factorAuthor(it.Author).map((item:any, index:any) => {
+                    {factorAuthor(it.Author)?.map((item:any, index:any) => {
                       let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1)
 
                       return (

@@ -523,7 +523,7 @@ const All = () => {
                 },
               }}
             >
-              {PectraPosts.map((pectra, index) => (
+              {PectraPosts?.map((pectra, index) => (
                 <Card
                   key={index}
                   image={pectra.image}
@@ -578,7 +578,7 @@ const All = () => {
     flexWrap="nowrap"
     ml={-2}  // Negative margin to pull content left
   >
-    {PectraPosts.map((pectra, index) => (
+    {PectraPosts?.map((pectra, index) => (
       <Box 
         key={index}
         flex="0 0 auto"
@@ -730,7 +730,7 @@ const All = () => {
               specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
               specText: "Pectra Devnet 0 (Specs)",
             },
-          ].map((item, index) => (
+          ]?.map((item, index) => (
             <Tr style={{ border: "1px solid black" }} key={index}>
               <Td style={{ border: "1px solid black" }}>{item.date}</Td>
               <Td style={{ border: "1px solid black" }}>

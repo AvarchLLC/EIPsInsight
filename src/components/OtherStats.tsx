@@ -124,7 +124,7 @@ const OtherBox: React.FC<Props> = ({ type }) => {
             ? ["ERCs", ERCdata.forksCount, ERCdata.watchlistCount, ERCdata.stars, ERCdata.openIssuesCount]
             : ["RIPs", RIPdata.forksCount, RIPdata.watchlistCount, RIPdata.stars, RIPdata.openIssuesCount],
         ]
-          .map((row) => row.join(","))
+          ?.map((row) => row.join(","))
           .join("\n");
 
         // Create a Blob and trigger download

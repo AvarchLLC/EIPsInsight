@@ -147,7 +147,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     value: number;
   }
   
-  const transformedData = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData = data?.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const category = item.repo === 'rip' ? 'RIPs' : getCat(item.category);
   
@@ -169,7 +169,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     return acc;
   }, []);
 
-  const transformedData2 = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData2 = data?.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const status = getStatus(item.status);
   

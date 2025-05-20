@@ -93,7 +93,7 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
     });
   }, [type]);
 
-  const transformedData = data.reduce(
+  const transformedData = data?.reduce(
     (acc, item) => {
       const year = new Date(item.created).getFullYear();
       const category = item.repo === 'rip' ? 'RIPs' : getCat(item.category);
@@ -104,7 +104,7 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
     {} as Record<string, number>
   );
 
-  const transformedData2 = data.reduce(
+  const transformedData2 = data?.reduce(
     (acc, item) => {
       const year = new Date(item.created).getFullYear();
       const status = getStatus(item.status);
@@ -117,10 +117,10 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
 
   const finalData = chartType === 'status' ? transformedData2 : transformedData;
   const uniqueCategories = new Set(
-    Object.keys(finalData).map((k) => k.split('-')[1])
+    Object.keys(finalData)?.map((k) => k.split('-')[1])
   );
   const years = [
-    ...new Set(Object.keys(finalData).map((k) => k.split('-')[0])),
+    ...new Set(Object.keys(finalData)?.map((k) => k.split('-')[0])),
   ].sort();
 
   const colors = [
@@ -132,7 +132,7 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
     '#FF9F40',
   ];
 
-  const seriesData = Array.from(uniqueCategories).map((category, index) => ({
+  const seriesData = Array.from(uniqueCategories)?.map((category, index) => ({
     name: category,
     type: 'bar',
     stack: 'total',
@@ -145,7 +145,7 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
       borderWidth: 2,
       opacity: 0.6,
     },
-    data: years.map((year) => finalData[`${year}-${category}`] || 0),
+    data: years?.map((year) => finalData[`${year}-${category}`] || 0),
   }));
 
   const option = {

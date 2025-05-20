@@ -67,7 +67,7 @@ export default function InsightStats() {
   const fetchPRData = async () => {
     try {
         const prResults = await Promise.all(
-            PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+            PR_API_ENDPOINTS?.map(endpoint => fetch(endpoint).then(res => res.json()))
           ) as PR[][]; // Define as PR[][] to allow for any number of returned arrays
     
           const [eipsPRs, ercsPRs, ripsPRs] = prResults;
@@ -104,7 +104,7 @@ export default function InsightStats() {
   const fetchIssueData = async () => {
     try {
         const issueResults = await Promise.all(
-            ISSUE_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+            ISSUE_API_ENDPOINTS?.map(endpoint => fetch(endpoint).then(res => res.json()))
           ) as Issue[][]; // Define as Issue[][] to allow for any number of returned arrays
     
       const [eipsIssues, ercsIssues, ripsIssues] = issueResults;

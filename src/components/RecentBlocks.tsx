@@ -50,7 +50,7 @@ const RecentBlocks = ({ blocks, ethPriceInUSD }: { blocks: any[]; ethPriceInUSD:
           </Tr>
         </Thead>
         <Tbody>
-          {blocks.map((block, index) => {
+          {blocks?.map((block, index) => {
             const gasTarget = Number(block.gasLimit);
             const gasUsed = Number(block.gasUsed);
             const reward = block.rewards ? block.rewards : 'N/A'; // Rewards are not directly available in block data

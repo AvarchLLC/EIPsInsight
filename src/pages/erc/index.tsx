@@ -267,14 +267,14 @@ const ERC = () => {
               </Box>
     )}
 
-{["Draft", "Review", "Last Call", "Final"].map((status) => (
+{["Draft", "Review", "Last Call", "Final"]?.map((status) => (
           <Box key={status} className={"group relative flex flex-col gap-3"} paddingBottom={8}>
             {/* Label Section aligned to the left */}
             <Box className={"flex gap-3"}>
               <Text id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/erc/${status}`}>
-                  [{data.filter((item) => item.status === status).length}]
+                  [{data?.filter((item) => item.status === status).length}]
                 </NextLink>
               </Text>
               <p className={"text-red-700"}>*</p>
@@ -313,7 +313,7 @@ const ERC = () => {
           </>
         ) : (
           <>
-{["Meta", "ERC"].map((status) => (
+{["Meta", "ERC"]?.map((status) => (
   <div key={status} id={`${status.toLowerCase()}table`}>
     <CatTable2 dataset={data4} cat="All" status={status} />
   </div>

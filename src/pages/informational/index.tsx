@@ -101,7 +101,7 @@ const Info = () => {
                         {/* Navigation Tabs with Links */}
                         <Tabs isFitted variant="enclosed">
               <TabList>
-                {categories.map((category) => (
+                {categories?.map((category) => (
                   <Link key={category.name} href={category.path} passHref>
                     <Tab as="a">{category.name}</Tab>
                   </Link>
@@ -111,7 +111,7 @@ const Info = () => {
             <FlexBetween>
               <Header
                 title={`Informational [ ${
-                  data.filter((item) => item.type === "Informational").length
+                  data?.filter((item) => item.type === "Informational").length
                 } ]`}
                 subtitle="Informational EIPs describe other changes to the Ethereum ecosystem."
               />

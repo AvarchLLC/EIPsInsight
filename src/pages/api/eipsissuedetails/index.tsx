@@ -37,7 +37,7 @@ export default async (req: Request, res: Response) => {
         const issueDetails = await IssueDetails.find({}).select('issueNumber issueTitle createdAt closedAt state').exec();
         
         // Transform the data to include createdAt, closedAt, and state
-        const transformedDetails = issueDetails.map((issue: any) => {
+        const transformedDetails = issueDetails?.map((issue: any) => {
             const created_at = issue.createdAt;
             const closed_at = issue.closedAt;
             const state = issue.state;

@@ -174,7 +174,7 @@ const DashboardCards = () => {
 
   const statsByType = [
     {
-      title: "Meta", description: "Meta EIPs describe changes to the EIP process, or other non-optional changes.", url: "meta", value: data?.eip.filter(
+      title: "Meta", description: "Meta EIPs describe changes to the EIP process, or other non-optional changes.", url: "meta", value: data?.eip?.filter(
         (item) =>
           item.type === "Standards Track" &&
           item.category === "Core"
@@ -183,31 +183,31 @@ const DashboardCards = () => {
     },
     { title: "Core EIPs", description: "Core EIPs describe changes to the Ethereum protocol.", url: "core", value: 64 },
     {
-      title: "ERCs", description: "ERCs describe application-level standards for the Ethereum ecosystem.", url: "erc", value: data?.erc.filter(
+      title: "ERCs", description: "ERCs describe application-level standards for the Ethereum ecosystem.", url: "erc", value: data?.erc?.filter(
         (item) =>
           item.type === "Standards Track" &&
           item.category === "ERC").length || 0
     },
     {
-      title: "Networking", description: "Networking EIPs describe changes to the Ethereum network protocol.", url: "networking", value: data?.eip.filter(
+      title: "Networking", description: "Networking EIPs describe changes to the Ethereum network protocol.", url: "networking", value: data?.eip?.filter(
         (item) =>
           item.type === "Standards Track" &&
           item.category === "Networking").length || 0
     },
     {
-      title: "Interface EIPs", description: "Interface EIPs describe changes to the Ethereum client API.", url: "interface", value: data?.eip.filter(
+      title: "Interface EIPs", description: "Interface EIPs describe changes to the Ethereum client API.", url: "interface", value: data?.eip?.filter(
         (item) =>
           item.type === "Standards Track" &&
           item.category === "Interface").length || 0
     },
     {
-      title: "Informational EIPs", description: "Informational EIPs describe other changes to the Ethereum ecosystem.", url: "informational", value: data?.eip.filter(
+      title: "Informational EIPs", description: "Informational EIPs describe other changes to the Ethereum ecosystem.", url: "informational", value: data?.eip?.filter(
         (item) =>
           item.type === "Informational" &&
           item.category === "Core").length || 0
     },
     {
-      title: "RIPs", description: "RIPs describe changes to the RIP process, or other non-optional changes.", url: "rip", value: data?.rip.filter(
+      title: "RIPs", description: "RIPs describe changes to the RIP process, or other non-optional changes.", url: "rip", value: data?.rip?.filter(
         (item) =>
           item.type === "Standards Track" &&
           item.category === "RIP").length || 0
@@ -215,13 +215,13 @@ const DashboardCards = () => {
   ];
 
   const statsByStatus = [
-    { title: "Living", description: "Living EIPs are continuously updated and reflect evolving standards or documentation.", url: "alltable", value: allData.filter((item) => item.status === "Living").length },
-    { title: "Final", description: "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.", url: "alltable", value: allData.filter((item) => item.status === "Draft").length },
-    { title: "Draft", description: "Draft EIPs are proposals still under initial consideration and open for feedback.", url: "alltable", value: allData.filter((item) => item.status === "Draft").length },
-    { title: "Review", description: "EIPs in the Review stage are being actively discussed and evaluated by the community.", url: "alltable", value: allData.filter((item) => item.status === "Review").length },
-    { title: "Last Call", description: "Last Call EIPs are nearing finalization, with a short period for final community comments.", url: "alltable", value: allData.filter((item) => item.status === "Last Call").length },
-    { title: "Stagnant", description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.", url: "alltable", value: allData.filter((item) => item.status === "Stagnant").length },
-    { title: "Withdrawn", description: "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.", url: "alltable", value: allData.filter((item) => item.status === "Withdrawn").length },
+    { title: "Living", description: "Living EIPs are continuously updated and reflect evolving standards or documentation.", url: "alltable", value: allData?.filter((item) => item.status === "Living").length },
+    { title: "Final", description: "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.", url: "alltable", value: allData?.filter((item) => item.status === "Draft").length },
+    { title: "Draft", description: "Draft EIPs are proposals still under initial consideration and open for feedback.", url: "alltable", value: allData?.filter((item) => item.status === "Draft").length },
+    { title: "Review", description: "EIPs in the Review stage are being actively discussed and evaluated by the community.", url: "alltable", value: allData?.filter((item) => item.status === "Review").length },
+    { title: "Last Call", description: "Last Call EIPs are nearing finalization, with a short period for final community comments.", url: "alltable", value: allData?.filter((item) => item.status === "Last Call").length },
+    { title: "Stagnant", description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.", url: "alltable", value: allData?.filter((item) => item.status === "Stagnant").length },
+    { title: "Withdrawn", description: "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.", url: "alltable", value: allData?.filter((item) => item.status === "Withdrawn").length },
   ];
   return (
     <div id='dashboard' className={`min-h-screen p-10 ${bgColor} ${textColor}`} >
@@ -243,7 +243,7 @@ const DashboardCards = () => {
 
         {/* Stats Cards */}
         <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap={6} mb={10}>
-          {topStats.map((stat, i) => (
+          {topStats?.map((stat, i) => (
             <Box key={i} bg={cardBg} p={6} borderRadius="xl" boxShadow="md">
               <Stat>
                 <StatLabel color="gray.400">{stat.label}</StatLabel>
@@ -255,7 +255,7 @@ const DashboardCards = () => {
         </Grid>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-          {statsByType.slice(0, 4).map((stat, idx) => (
+          {statsByType.slice(0, 4)?.map((stat, idx) => (
             <StatCard
               key={`type-top-${idx}`}
               title={stat.title}
@@ -270,7 +270,7 @@ const DashboardCards = () => {
 
         {/* Second row - 3 cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-          {statsByType.slice(4).map((stat, idx) => (
+          {statsByType.slice(4)?.map((stat, idx) => (
             <StatCard
               key={`type-bottom-${idx}`}
               title={stat.title}
@@ -302,7 +302,7 @@ const DashboardCards = () => {
               Recent Activity
             </Text>
             <Flex direction="column" gap={4}>
-              {recentActivity.map((item, i) => (
+              {recentActivity?.map((item, i) => (
                 <Box key={i}>
                   <Text fontWeight="medium" fontSize="sm">
                     {item.id}{" "}
@@ -322,7 +322,7 @@ const DashboardCards = () => {
         <div className="pt-10">
           {/* First row - 4 StatCards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            {statsByStatus.slice(0, 4).map((stat, idx) => (
+            {statsByStatus.slice(0, 4)?.map((stat, idx) => (
               <StatCard
                 key={`status-top-${idx}`}
                 title={stat.title}
@@ -337,7 +337,7 @@ const DashboardCards = () => {
 
           {/* Second row - up to 3 StatCards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {statsByStatus.slice(4).map((stat, idx) => (
+            {statsByStatus.slice(4)?.map((stat, idx) => (
               <StatCard
                 key={`status-bottom-${idx}`}
                 title={stat.title}

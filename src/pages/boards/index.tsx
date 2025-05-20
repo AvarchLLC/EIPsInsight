@@ -122,14 +122,14 @@ import {
   
     const handleLabelToggle = (label: string) => {
       setSelectedLabels((prev) =>
-        prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
+        prev.includes(label) ? prev?.filter((l) => l !== label) : [...prev, label]
       );
     };
   
     const filteredData = (data: EIPData[]) => {
       const filterAndSort = (items: EIPData[]) => {
         return items
-          .filter((item) => {
+          ?.filter((item) => {
             // Ignore items with state 'closed'
             if (item.state === "closed") return false;
     
@@ -151,7 +151,7 @@ import {
         return filterAndSort(data);
       }
     
-      return filterAndSort(data).filter((item) =>
+      return filterAndSort(data)?.filter((item) =>
         item.labels.some((label) => selectedLabels.includes(label))
       );
     };
@@ -509,7 +509,7 @@ import {
           </Td>
         </Tr>
       ) : (
-        displayedData.map((item: any, index: number) => (
+        displayedData?.map((item: any, index: number) => (
           <Tr key={item._id} height="40px"> {/* Adjust row height */}
             {/* Index */}
             <Td textAlign="center">
@@ -559,7 +559,7 @@ import {
             {/* Labels */}
             <Td textAlign="center">
               <Box display="flex" flexWrap="wrap" gap="8px" justifyContent="center">
-              {item.labels.map((label: string, idx: number) => {
+              {item.labels?.map((label: string, idx: number) => {
               // Use the mapped color or a fallback color if the label is not in labelColors
               const { color } = labelColors[label.toLowerCase()] || { color: "gray.400" };
 

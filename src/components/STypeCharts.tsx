@@ -143,12 +143,12 @@ interface AreaProps {
 
     
   
-    const filteredData = data.filter((item) =>
+    const filteredData = data?.filter((item) =>
     item.eips.some((eip) => eip.category === status)
 );
   
     const transformedData = filteredData.flatMap((item) =>
-      item.eips.map((eip) => ({
+      item.eips?.map((eip) => ({
         year: eip.year.toString(),
         value: eip.count,
         status: getStatus(item.status)

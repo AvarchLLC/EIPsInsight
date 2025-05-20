@@ -13,7 +13,7 @@ export default async function handler(req: any, res: any) {
 
     // Fetch base fee data
     const baseFeeData = await db.collection('base_fee').find().sort({ timestamp: -1 }).limit(7200).toArray();
-    const fees = baseFeeData.map((data) => ({
+    const fees = baseFeeData?.map((data) => ({
       time: new Date(data.timestamp).toLocaleTimeString(),
       block: Number(data.blockNumber),
       fee: Number(Web3.utils.fromWei(data.baseFeePerGas || '0', 'gwei')), // Convert to Gwei

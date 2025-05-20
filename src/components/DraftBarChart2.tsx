@@ -116,7 +116,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   const removeDuplicatesFromEips = (eips: any[]) => {
     const seen = new Set();
     
-    return eips.filter((eip) => {
+    return eips?.filter((eip) => {
       if (!seen.has(eip.eip)) {
         seen.add(eip.eip); // Track seen eip numbers
         return true;
@@ -130,7 +130,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
 
   const transformedData = filteredData.flatMap((item) => {
     console.log(item); // Log each item
-    return item.eips.map((eip) => ({
+    return item.eips?.map((eip) => ({
       category: getCat(eip.category),
       year: ` ${eip.year.toString()}`,
       value:removeDuplicatesFromEips(eip.eips).length,
@@ -148,7 +148,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     "RIPs",
   ];
   
-  const uniqueYears = [...new Set(transformedData.map((entry) => entry.year))];
+  const uniqueYears = [...new Set(transformedData?.map((entry) => entry.year))];
 
 categories.forEach((category) => {
   uniqueYears.forEach((year) => {
@@ -239,7 +239,7 @@ categories.forEach((category) => {
         const year = eipGroup.date.split("-")[0]; // Extract year from date
         const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Deduplicate EIPs if needed
     
-        return uniqueEips.map((uniqueEip) => ({
+        return uniqueEips?.map((uniqueEip) => ({
           category,
           year,
           eip: uniqueEip.eip, // EIP number
@@ -271,7 +271,7 @@ categories.forEach((category) => {
       "data:text/csv;charset=utf-8," + 
       header +
       transformedData
-          .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+          ?.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
               // Generate the correct URL based on the repo type
               const url = category === "ERCs"
               ? `https://eipsinsight.com/ercs/erc-${eip}`

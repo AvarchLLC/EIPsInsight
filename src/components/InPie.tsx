@@ -77,13 +77,13 @@ function transformAndAddUp(data: DataItem[]): TransformedDataResult {
     sum += value;
   });
 
-  const result: TransformedDataItem[] = Object.entries(transformedData).map(([cat, value]) => ({ cat, value }));
+  const result: TransformedDataItem[] = Object.entries(transformedData)?.map(([cat, value]) => ({ cat, value }));
   return { transformedData: result, sum };
 }
 
 export const PieC: React.FC<CustomBoxProps> = ({ data, status , year, month}) => {
   const objs :any = []
-  const transformedData: { [key: string]: number } = data.reduce((result: { [key: string]: number }, obj) => {
+  const transformedData: { [key: string]: number } = data?.reduce((result: { [key: string]: number }, obj) => {
     
     if (obj._id === status) {
       
@@ -148,7 +148,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status , year, month}) =>
     );
   }
 
-  if (Object.values(transformedData).reduce((total, value) => total + value, 0) === 0) {
+  if (Object.values(transformedData)?.reduce((total, value) => total + value, 0) === 0) {
     return (
         <Box
         bgColor={bg}
@@ -169,7 +169,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status , year, month}) =>
         className="hover: cursor-pointer ease-in duration-200"
       >
         <Text textAlign="left" fontSize="lg" fontWeight="bold" color="#30A0E0" paddingTop="1rem">
-          {status} : {Object.values(transformedData).reduce((total, value) => total + value, 0)}
+          {status} : {Object.values(transformedData)?.reduce((total, value) => total + value, 0)}
         </Text>
         <Divider mt="1rem" mb="1rem" />
       </Box>

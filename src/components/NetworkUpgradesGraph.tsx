@@ -209,7 +209,7 @@ const EIP3DGraph = () => {
   const uniqueGroups = useMemo(() => {
     const groups = new Set<string>();
     graphData.nodes.forEach((node) => groups.add(node.group));
-    return [...groups].filter((g) => g); // remove empty string group
+    return [...groups]?.filter((g) => g); // remove empty string group
   }, [graphData]);
 
   const colorScale = useMemo(() => {
@@ -247,7 +247,7 @@ const EIP3DGraph = () => {
       marginTop: 10,
       color: 'black' // Ensures list items inherit black color
     }}>
-      {uniqueGroups.map((group) => (
+      {uniqueGroups?.map((group) => (
         <li key={group} style={{ 
           marginBottom: 6,
           color: 'black' // Explicit black for list items

@@ -110,7 +110,7 @@ const All = () => {
         setData(jsonData.eip?.concat(jsonData.erc)?.concat(jsonData.rip));
         const alldata=jsonData.eip?.concat(jsonData.erc)?.concat(jsonData.rip);
         let filteredData = alldata
-        .filter((item:any) => item.category === selected);
+        ?.filter((item:any) => item.category === selected);
         if(selected==="All"){
           filteredData=alldata;
         }
@@ -120,7 +120,7 @@ const All = () => {
         console.log("filtered data:", filteredData);
 
         let filteredData2 = alldata
-        .filter((item:any) => item.repo === 'rip');
+        ?.filter((item:any) => item.repo === 'rip');
 
         setData3(filteredData2);
 
@@ -136,7 +136,7 @@ const All = () => {
 
   useEffect(()=>{
         let filteredData = data
-        .filter((item:any) => item.category === selected);
+        ?.filter((item:any) => item.category === selected);
         if(selected==="All"){
           filteredData=data;
         }
@@ -150,16 +150,16 @@ const All = () => {
     let filteredData;
     if(selected!=='RIP'){
     filteredData = data
-        .filter((item) => (selected==="All"||item.category === selected))
-        .map((item) => {
+        ?.filter((item) => (selected==="All"||item.category === selected))
+        ?.map((item) => {
             const { repo, eip, title, author, discussion, status, deadline, type, category,created } = item;
             return { repo, eip, title, author, discussion, status, deadline, type, category,created };
         });
       }
     else{
     filteredData=data
-    .filter((item) => item.repo === 'rip')
-        .map((item) => {
+    ?.filter((item) => item.repo === 'rip')
+        ?.map((item) => {
             const { repo, eip, title, author, discussion, status, deadline, type, category,created } = item;
             return { repo, eip, title, author, discussion, status, deadline, type, category,created };
         });
@@ -177,7 +177,7 @@ const All = () => {
     // Prepare the CSV content
     const csvContent = "data:text/csv;charset=utf-8,"
     + header
-    + filteredData.map(({ repo, eip, title, author, discussion, status, deadline, type, category, created }) => {
+    + filteredData?.map(({ repo, eip, title, author, discussion, status, deadline, type, category, created }) => {
         // Generate the correct URL based on the repo type
         const url = repo === "eip"
             ? `https://eipsinsight.com/eips/eip-${eip}`
@@ -241,7 +241,7 @@ const All = () => {
         On this page
       </Heading>
       <ul style={{ listStyleType: "none", padding: 0 }}>
-        {sections.map(({ id, text }) => (
+        {sections?.map(({ id, text }) => (
           <li key={id} style={{ marginBottom: "8px" }}>
             <Link href={`#${id}`} color="blue.600" style={{ textDecoration: "none" }}>
               {text}
@@ -255,7 +255,7 @@ const All = () => {
             <Box>
               {/* For larger screens, render buttons */}
               <Box display={{ base: "none", md: "flex" }} className="space-x-6">
-              {optionArr.map((item, key) => {
+              {optionArr?.map((item, key) => {
                 if (item === "All") {
                   return (
                     <button
@@ -299,7 +299,7 @@ const All = () => {
                     fontSize: "16px",
                   }}
                 >
-                  {optionArr.map((item, key) => (
+                  {optionArr?.map((item, key) => (
                     <option value={item} key={key}>
                       {item}
                     </option>

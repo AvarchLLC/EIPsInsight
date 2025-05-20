@@ -159,7 +159,7 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
 
 
 
-    const ethBotFiltered = data?.issueDetails?.conversations.filter(
+    const ethBotFiltered = data?.issueDetails?.conversations?.filter(
         (item) => item.user.login === 'eth-bot'
     );
     const ethBotCount = ethBotFiltered?.length;
@@ -253,7 +253,7 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
                 <Box className={'pb-10'}>
                     <Text className={'text-2xl font-bold pb-5'}>Labels: </Text>
                     <div className="flex flex-wrap gap-2">
-                        {data?.issueDetails?.labels.map(item => (
+                        {data?.issueDetails?.labels?.map(item => (
                             <Wrap>
                                 <WrapItem>
                                     <Badge colorScheme={getLabelColor(item)} paddingX={4} paddingY={2} className={'rounded-full'}>
@@ -269,7 +269,7 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
             <Box>
                 <Text className={'text-2xl font-bold pb-5'}>Participants: </Text>
                 <div className={'flex flex-wrap gap-3'}>
-                    {data?.issueDetails?.participants.map(participant => {
+                    {data?.issueDetails?.participants?.map(participant => {
                         const matchingConversation = data?.issueDetails?.conversations.find(conversation => conversation.user.login === participant);
 
                         if (matchingConversation) {

@@ -87,31 +87,31 @@ const EIPStatusDonut = () => {
   const dat = [
     {
       status: "Final",
-      value: data.filter((item) => item.status === "Final").length,
+      value: data?.filter((item) => item.status === "Final").length,
     },
     {
       status: "Draft",
-      value: data.filter((item) => item.status === "Draft").length,
+      value: data?.filter((item) => item.status === "Draft").length,
     },
     {
       status: "Review",
-      value: data.filter((item) => item.status === "Review").length,
+      value: data?.filter((item) => item.status === "Review").length,
     },
     {
       status: "Last Call",
-      value: data.filter((item) => item.status === "Last Call").length,
+      value: data?.filter((item) => item.status === "Last Call").length,
     },
     {
       status: "Living",
-      value: data.filter((item) => item.status === "Living").length,
+      value: data?.filter((item) => item.status === "Living").length,
     },
     {
       status: "Stagnant",
-      value: data.filter((item) => item.status === "Stagnant").length,
+      value: data?.filter((item) => item.status === "Stagnant").length,
     },
     {
       status: "Withdrawn",
-      value: data.filter((item) => item.status === "Withdrawn").length,
+      value: data?.filter((item) => item.status === "Withdrawn").length,
     },
   ];
 
@@ -119,11 +119,11 @@ const EIPStatusDonut = () => {
    
       {
         status: "Meta",
-        value: data.filter((item) => getCat(item.category) === "Meta").length,
+        value: data?.filter((item) => getCat(item.category) === "Meta").length,
       },
       {
         status: "ERC",
-        value: data.filter((item) => getCat(item.category) === "ERCs").length,
+        value: data?.filter((item) => getCat(item.category) === "ERCs").length,
       },
     
   ];
@@ -196,7 +196,7 @@ const EIPStatusDonut = () => {
 
 // Prepare the CSV content
 const csvContent = header
-    + data.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+    + data?.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
         // Generate the correct URL based on the repo type
         const url = repo === "eip"
             ? `https://eipsinsight.com/eips/eip-${eip}`

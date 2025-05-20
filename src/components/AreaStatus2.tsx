@@ -74,7 +74,7 @@ const StackedColumnChart: React.FC = () => {
 
   const removeDuplicatesFromEips = (eips: any[]) => {
     const seen = new Set();
-    return eips.filter((eip) => {
+    return eips?.filter((eip) => {
       if (!seen.has(eip.eip)) {
         seen.add(eip.eip);
         return true;
@@ -110,12 +110,12 @@ const StackedColumnChart: React.FC = () => {
   };
   const status1="Draft";
   const status2="Final";
-  let filteredData = data.filter((item) => item.status === status1);
-  let filteredData2 = data.filter((item) => item.status === status2);
+  let filteredData = data?.filter((item) => item.status === status1);
+  let filteredData2 = data?.filter((item) => item.status === status2);
   const combinedFilteredData = [...filteredData, ...filteredData2];
 
   const transformedData = combinedFilteredData.flatMap((item) => {
-    return item.eips.map((eip) => ({
+    return item.eips?.map((eip) => ({
       status: item.status,
       category: getCat(eip.category),
       year: `${getMonthName(eip.month)} ${eip.year}`,
@@ -138,8 +138,8 @@ const StackedColumnChart: React.FC = () => {
 
   const downloadData = () => {
     // Filter data based on the selected status
-    let filteredData = data.filter((item) => item.status === status1);
-    let filteredData2 = data.filter((item) => item.status === status2);
+    let filteredData = data?.filter((item) => item.status === status1);
+    let filteredData2 = data?.filter((item) => item.status === status2);
     const combinedFilteredData = [...filteredData, ...filteredData2];
     
     // Transform the filtered data to get the necessary details
@@ -150,7 +150,7 @@ const StackedColumnChart: React.FC = () => {
           const year = eip.year.toString(); 
           const month=getMonthName(eip.month);
           const uniqueEips = removeDuplicatesFromEips(eip.eips); 
-          return uniqueEips.map(({ eip }) => ({
+          return uniqueEips?.map(({ eip }) => ({
               status,         
               category,       
               year,           
@@ -167,7 +167,7 @@ const StackedColumnChart: React.FC = () => {
     // Prepare the CSV content
     const csvContent = "data:text/csv;charset=utf-8,"
         + header
-        + transformedData.map(({ status,category, year,month, eip }) => {
+        + transformedData?.map(({ status,category, year,month, eip }) => {
             return `${status},${category},${year},${month},${eip}`; // Each EIP on a separate line
         }).join("\n");
   

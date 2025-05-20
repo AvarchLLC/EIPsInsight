@@ -50,19 +50,19 @@ const TypeGraphs = () => {
         <Grid templateColumns="1fr 1fr 1fr" gap={8}>
           <NextLink href={"/core"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Core - [{data.filter((item) => item.category === "Core").length}]
+              Core - [{data?.filter((item) => item.category === "Core").length}]
             </Text>
           </NextLink>
           <NextLink href={"/networking"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Networking - [
-              {data.filter((item) => item.category === "Networking").length}]
+              {data?.filter((item) => item.category === "Networking").length}]
             </Text>
           </NextLink>
           <NextLink href={"/interface"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Interface - [
-              {data.filter((item) => item.category === "Interface").length}]
+              {data?.filter((item) => item.category === "Interface").length}]
             </Text>
           </NextLink>
         </Grid>
@@ -146,18 +146,18 @@ const TypeGraphs = () => {
         <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
           {/*<NextLink href={'/erc'}>*/}
           {/*    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">*/}
-          {/*        ERC - [{data.filter((item) => item.category === "ERC").length}]*/}
+          {/*        ERC - [{data?.filter((item) => item.category === "ERC").length}]*/}
           {/*    </Text>*/}
           {/*</NextLink>*/}
           <NextLink href={"/meta"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Meta - [{data.filter((item) => item.type === "Meta").length}]
+              Meta - [{data?.filter((item) => item.type === "Meta").length}]
             </Text>
           </NextLink>
           <NextLink href={"/informational"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Informational - [
-              {data.filter((item) => item.type === "Informational").length}]
+              {data?.filter((item) => item.type === "Informational").length}]
             </Text>
           </NextLink>
         </Grid>
@@ -283,7 +283,7 @@ const TypeGraphs = () => {
 
         <NextLink href={"/core"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
-            Core - [{data.filter((item) => item.category === "Core").length}]
+            Core - [{data?.filter((item) => item.category === "Core").length}]
           </Text>
         </NextLink>
 
@@ -316,7 +316,7 @@ const TypeGraphs = () => {
         <NextLink href={"/networking"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
             Networking - [
-            {data.filter((item) => item.category === "Networking").length}]
+            {data?.filter((item) => item.category === "Networking").length}]
           </Text>
         </NextLink>
 
@@ -349,7 +349,7 @@ const TypeGraphs = () => {
         <NextLink href={"/interface"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
             Interface - [
-            {data.filter((item) => item.category === "Interface").length}]
+            {data?.filter((item) => item.category === "Interface").length}]
           </Text>
         </NextLink>
 
@@ -381,7 +381,7 @@ const TypeGraphs = () => {
 
         {/* <NextLink href={"/erc"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
-            ERC - [{data.filter((item) => item.category === "ERC").length}]
+            ERC - [{data?.filter((item) => item.category === "ERC").length}]
           </Text>
         </NextLink>
 
@@ -413,7 +413,7 @@ const TypeGraphs = () => {
 
         <NextLink href={"/meta"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
-            Meta - [{data.filter((item) => item.type === "Meta").length}]
+            Meta - [{data?.filter((item) => item.type === "Meta").length}]
           </Text>
         </NextLink>
 
@@ -446,7 +446,7 @@ const TypeGraphs = () => {
         <NextLink href={"/informational"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
             Informational - [
-            {data.filter((item) => item.type === "Informational").length}]
+            {data?.filter((item) => item.type === "Informational").length}]
           </Text>
         </NextLink>
 

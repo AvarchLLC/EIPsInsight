@@ -375,7 +375,7 @@ const ResourcesPage: React.FC = () => {
           <Icon as={FaQuestionCircle} color={accentColor} /> Frequently Asked Questions
         </Heading>
         <Accordion allowToggle>
-          {FAQs.map((item, index) => (
+          {FAQs?.map((item, index) => (
             <AccordionItem key={index} mb={4} borderWidth="1px" borderRadius="lg" overflow="hidden">
               <AccordionButton
                 bg={cardBg}
@@ -422,7 +422,7 @@ const ResourcesPage: React.FC = () => {
             <Icon as={FaBlog} color={accentColor} /> Latest Blog Posts
           </Heading>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-            {BLOGS.map((item, index) => (
+            {BLOGS?.map((item, index) => (
               <Card key={index} {...item} />
             ))}
           </SimpleGrid>
@@ -444,7 +444,7 @@ const ResourcesPage: React.FC = () => {
             maxW="auto"  // Constrain the maximum width
             mx="auto"   // Center the grid
           >
-            {paginatedVideos.map((url, index) => (
+            {paginatedVideos?.map((url, index) => (
               <VideoCard key={index} url={url} />
             ))}
           </SimpleGrid>
@@ -460,7 +460,7 @@ const ResourcesPage: React.FC = () => {
                 >
                   Previous
                 </Button>
-                {Array.from({ length: totalVideoPages }).map((_, index) => (
+                {Array.from({ length: totalVideoPages })?.map((_, index) => (
                   <Button
                     key={index}
                     onClick={() => setCurrentVideoPage(index)}
@@ -495,7 +495,7 @@ const ResourcesPage: React.FC = () => {
             <Icon as={FaNewspaper} color={accentColor} /> News & Announcements
           </Heading>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-            {NEWS.map((item, index) => (
+            {NEWS?.map((item, index) => (
               <Card key={index} {...item} />
             ))}
           </SimpleGrid>
@@ -510,7 +510,7 @@ const ResourcesPage: React.FC = () => {
         <Icon as={FaTools} color={accentColor} /> Tools
       </Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-        {TOOLS.map((tool, index) => (
+        {TOOLS?.map((tool, index) => (
           <Box
             key={index}
             bg={cardBg}
@@ -566,7 +566,7 @@ const ResourcesPage: React.FC = () => {
               gap={2}
               bg="transparent"
             >
-              {tabContent.map((tab, index) => (
+              {tabContent?.map((tab, index) => (
                 <Tab
                   key={index}
                   onClick={() => handleSelection(tab.label)}
@@ -603,7 +603,7 @@ const ResourcesPage: React.FC = () => {
 
 
             <TabPanels mt={8}>
-              {tabContent.map((tab, index) => (
+              {tabContent?.map((tab, index) => (
                 <TabPanel key={index} px={0}>
                   {tab.content}
                   <ToolsSection />

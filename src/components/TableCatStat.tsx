@@ -106,7 +106,7 @@ const TableCatStat: React.FC<TabProps> = ({ cat, status }) => {
         setIsLoading(false); // Set isLoading to false after data is fetched
 
         // Fetch merged years and months for each item
-        const mergedDataPromises = jsonData.map((item: any) =>
+        const mergedDataPromises = jsonData?.map((item: any) =>
           fetchLastCreatedYearAndMonthFromAPI(item.eip)
         );
 
@@ -130,7 +130,7 @@ const TableCatStat: React.FC<TabProps> = ({ cat, status }) => {
   });
 
   const filteredData = data
-    .map((item: any) => {
+    ?.map((item: any) => {
       const { eip, title, author, status, type, category } = item;
       return {
         eip,
@@ -141,9 +141,9 @@ const TableCatStat: React.FC<TabProps> = ({ cat, status }) => {
         category,
       };
     })
-    .filter((item: any) => item.category === cat && item.status === status);
+    ?.filter((item: any) => item.category === cat && item.status === status);
 
-  const filteredDataWithMergedYearsAndMonths = filteredData.map(
+  const filteredDataWithMergedYearsAndMonths = filteredData?.map(
     (item, index) => ({
       "#": (index + 1).toString(), // Add the sr number
       ...item,
@@ -164,9 +164,9 @@ const TableCatStat: React.FC<TabProps> = ({ cat, status }) => {
         Object.keys(filteredDataWithMergedYearsAndMonths[0]).join(",") + "\n";
 
       // Convert data to CSV rows
-      const csvRows = filteredDataWithMergedYearsAndMonths.map((item) =>
+      const csvRows = filteredDataWithMergedYearsAndMonths?.map((item) =>
         Object.values(item)
-          .map((value) =>
+          ?.map((value) =>
             typeof value === "string" && value.includes(",")
               ? `"${value}"`
               : value
@@ -308,7 +308,7 @@ const TableCatStat: React.FC<TabProps> = ({ cat, status }) => {
               author: (it: any) => (
                 <td key={it.author}>
                   <div>
-                    {factorAuthor(it.author).map((item: any, index: any) => {
+                    {factorAuthor(it.author)?.map((item: any, index: any) => {
                       let t = item[item.length - 1].substring(
                         1,
                         item[item.length - 1].length - 1

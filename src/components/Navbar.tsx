@@ -281,7 +281,7 @@ const Navbar: React.FC = () => {
             <Spacer />
 
             <div className={"flex space-x-2 font-bold"} >
-              {NAV_ITEMS.map((navItem) => (
+              {NAV_ITEMS?.map((navItem) => (
                 <Box key={navItem.label}>
                   <Popover trigger={"hover"} placement={"bottom-start"}>
                     <PopoverTrigger>
@@ -313,7 +313,7 @@ const Navbar: React.FC = () => {
                         maxH={"1500px"}
                       >
                         <Stack direction={"column"} spacing={2}>
-                          {navItem.children.map((child) => (
+                          {navItem.children?.map((child) => (
                             <DesktopSubNav key={child.label} {...child} />
                           ))}
                         </Stack>
@@ -333,7 +333,7 @@ const Navbar: React.FC = () => {
                         maxH={"1500px"}
                       >
                         <Stack direction={"column"} spacing={2}>
-                          {navItem.children.map((child) => (
+                          {navItem.children?.map((child) => (
                             <Box
                               _hover={{
                                 bg: useColorModeValue("pink.50", "gray.900"),
@@ -369,7 +369,7 @@ const Navbar: React.FC = () => {
                         maxH={"1500px"}
                       >
                         <Stack direction={"column"} spacing={2}>
-                          {navItem.children.map((child) => (
+                          {navItem.children?.map((child) => (
                             <Box
                               _hover={{
                                 bg: useColorModeValue("pink.50", "gray.900"),
@@ -406,7 +406,7 @@ const Navbar: React.FC = () => {
                         maxH={"1500px"}
                       >
                         <Stack direction={"column"} spacing={2}>
-                          {navItem.children.map((child) =>
+                          {navItem.children?.map((child) =>
                             child.label === "Search By" ? (
                               <DesktopSubNav2 key={child.label} {...child} />
                             ) : (
@@ -450,7 +450,7 @@ const Navbar: React.FC = () => {
                           maxH={"800px"}
                         >
                           <Stack direction={"row"} spacing={5} ml={6} pl={4}>
-                            {navItem.children.map((child) => (
+                            {navItem.children?.map((child) => (
                               <DesktopSubNav key={child.label} {...child} />
                             ))}
                           </Stack>
@@ -570,7 +570,7 @@ const Navbar: React.FC = () => {
             {isOpen ? (
               <>
                 <div className="flex flex-col relative  border rounded-[0.55rem] my-3 mx-4 space-y-4 py-3 text-lg">
-                  {NAV_ITEMS.map((navItem) => (
+                  {NAV_ITEMS?.map((navItem) => (
                     <Box key={navItem.label} className={"flex flex-col"}>
                       <Popover trigger={"click"} placement={"bottom-start"}>
                         <PopoverTrigger>
@@ -602,7 +602,7 @@ const Navbar: React.FC = () => {
                             maxH={"600px"}
                           >
                             <Stack direction={"column"} spacing={2}>
-                              {navItem.children.map((child) => (
+                              {navItem.children?.map((child) => (
                                 <DesktopSubNav key={child.label} {...child} />
                               ))}
                             </Stack>
@@ -621,7 +621,7 @@ const Navbar: React.FC = () => {
                             maxH={"600px"}
                           >
                             <Stack direction={"column"} spacing={2}>
-                              {navItem.children.map((child) => (
+                              {navItem.children?.map((child) => (
                                 <DesktopSubNav2 key={child.label} {...child} />
                               ))}
                             </Stack>
@@ -640,7 +640,7 @@ const Navbar: React.FC = () => {
                             maxH={"1500px"}
                           >
                             <Stack direction={"column"} spacing={2}>
-                              {navItem.children.map((child) => (
+                              {navItem.children?.map((child) => (
                                 <Box
                                   _hover={{
                                     bg: useColorModeValue(
@@ -679,7 +679,7 @@ const Navbar: React.FC = () => {
                             maxH={"1500px"}
                           >
                             <Stack direction={"column"} spacing={2}>
-                              {navItem.children.map((child) =>
+                              {navItem.children?.map((child) =>
                                 child.label === "Search By" ? (
                                   <DesktopSubNav2 key={child.label} {...child} />
                                 ) : (
@@ -718,7 +718,7 @@ const Navbar: React.FC = () => {
                             maxH={"1500px"}
                           >
                             <Stack direction={"column"} spacing={2}>
-                              {navItem.children.map((child) =>
+                              {navItem.children?.map((child) =>
                                 child.label === "Search By" ? (
                                   <DesktopSubNav key={child.label} {...child} />
                                 ) : (
@@ -766,7 +766,7 @@ const Navbar: React.FC = () => {
                                 ml={6}
                                 pl={4}
                               >
-                                {navItem.children.map((child) => (
+                                {navItem.children?.map((child) => (
                                   <DesktopSubNav key={child.label} {...child} />
                                 ))}
                               </Stack>
@@ -828,7 +828,7 @@ const DesktopSubNav = ({ label, href, subLabel, children }: NavItem) => {
           align={"start"}
         >
           {children &&
-            children.map((subNavItem) => (
+            children?.map((subNavItem) => (
               <Link
                 key={subNavItem.label}
                 py={2}
@@ -907,7 +907,7 @@ const DesktopSubNav2 = ({ label, href, subLabel, children }: NavItem) => {
           <PopoverBody>
             <Stack align="start">
               {children &&
-                children.map((subNavItem) => (
+                children?.map((subNavItem) => (
                   <Link
                     key={subNavItem.label}
                     href={subNavItem.href}

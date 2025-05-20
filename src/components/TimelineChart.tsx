@@ -41,7 +41,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
   const dataToRender = selectedOption === 'pectra' ? data : data2;
 
   const maxItems = Math.max(
-    ...dataToRender.map(
+    ...dataToRender?.map(
       (d) => d.included.length + d.scheduled.length + d.considered.length + d.declined.length
     )
   );
@@ -81,7 +81,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
   };
 
   const downloadReport = () => {
-    const rows = dataToRender.map((d) => ({
+    const rows = dataToRender?.map((d) => ({
       date: d.date,
       included: d.included.length ? d.included.join(', ') : '-',
       considered: d.considered.length ? d.considered.join(', ') : '-',
@@ -93,7 +93,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
   
     const csv = [
       headers,
-      ...rows.map((row) => [
+      ...rows?.map((row) => [
         row.date,
         `"${row.included}"`,
         `"${row.considered}"`,
@@ -101,7 +101,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
         `"${row.scheduled}"`
       ])
     ]
-      .map((r) => r.join(','))
+      ?.map((r) => r.join(','))
       .join('\n');
   
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -226,12 +226,12 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
   
   {/* Main chart content */}
   <Group top={padding} left={padding}>
-    {visibleData.map((item, rowIndex) => {
+    {visibleData?.map((item, rowIndex) => {
       const allEips = [
-        ...item.included.map((eip) => ({ eip, type: 'included' as StatusType })),
-        ...item.scheduled.map((eip) => ({ eip, type: 'scheduled' as StatusType })),
-        ...item.considered.map((eip) => ({ eip, type: 'considered' as StatusType })),
-        ...item.declined.map((eip) => ({ eip, type: 'declined' as StatusType })),
+        ...item.included?.map((eip) => ({ eip, type: 'included' as StatusType })),
+        ...item.scheduled?.map((eip) => ({ eip, type: 'scheduled' as StatusType })),
+        ...item.considered?.map((eip) => ({ eip, type: 'considered' as StatusType })),
+        ...item.declined?.map((eip) => ({ eip, type: 'declined' as StatusType })),
       ];
 
       return (
@@ -256,7 +256,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
           
           {/* EIP Blocks */}
           <Group left={80}>
-            {allEips.map((d, i) => {
+            {allEips?.map((d, i) => {
               const eipNum = d.eip.replace(/EIP-/, '');
               return (
                 <a
@@ -300,7 +300,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
       top={hoveredRow * rowHeight + blockHeight + 10} 
       left={padding + 80} // Match the left padding of the main content
     >
-      {Object.entries(statusCounts).map(([status, count], idx) => (
+      {Object.entries(statusCounts)?.map(([status, count], idx) => (
         <Group key={status} left={idx * 100}>
           <rect 
             width={90} 
@@ -327,7 +327,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
 
   {/* Legend - bottom right */}
   <Group top={chartHeight - padding - Object.entries(COLOR_SCHEME).length * 20} left={chartWidth - 200}>
-    {Object.entries(COLOR_SCHEME).map(([status, color], idx) => (
+    {Object.entries(COLOR_SCHEME)?.map(([status, color], idx) => (
       <Group key={status} top={idx * 20}>
         <rect width={10} height={10} fill={color} rx={2} />
         <text x={16} y={10} fontSize={15} fill="gray">{status}</text>

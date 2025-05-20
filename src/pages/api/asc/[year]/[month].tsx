@@ -24,7 +24,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
         page,
       });
 
-      const prsInDateRange = mergedPRs.filter(
+      const prsInDateRange = mergedPRs?.filter(
         (pr: any) =>
           pr.merged_at &&
           new Date(pr.merged_at) >= startDate &&
@@ -53,7 +53,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
            page: 1,
        });
 
-       const openPRsThisMonth = openPRs.filter(
+       const openPRsThisMonth = openPRs?.filter(
            (pr) => new Date(pr.created_at) >= startDate && new Date(pr.created_at) <= endDate
        );
 
@@ -73,7 +73,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
            page: 1,
        });
 
-       const closedIssuesThisMonth = closedIssues.filter(
+       const closedIssuesThisMonth = closedIssues?.filter(
         (issue) =>
           issue.closed_at &&
           new Date(issue.closed_at) >= startDate &&
@@ -91,7 +91,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
            page: 1,
        });
 
-       const newIssuesThisMonth = newIssues.filter(
+       const newIssuesThisMonth = newIssues?.filter(
            (issue) => new Date(issue.created_at) >= startDate && new Date(issue.created_at) <= endDate
        );
 

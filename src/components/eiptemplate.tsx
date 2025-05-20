@@ -128,7 +128,7 @@ const EipTemplateEditor = () => {
     const hash = window.location.hash;
 
     // Split the hash into parts
-    const parts = hash.split("#").filter(Boolean); // Remove empty strings
+    const parts = hash.split("#")?.filter(Boolean); // Remove empty strings
 
     // Assign values from the URL hash to state variables
     if (parts.length > 0) {
@@ -346,14 +346,14 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     const cleanedTemplate = template.replace(/---\n([\s\S]*?)\n---/, (match, content) => {
       const cleanedContent = content
         .split("\n")
-        .filter((line:any) => line.trim() !== "") // Remove empty lines
+        ?.filter((line:any) => line.trim() !== "") // Remove empty lines
         .join("\n");
       return `---\n${cleanedContent}\n---`;
     });
 
     const cleanedContent2 = cleanedTemplate
     .split("\n")
-    .filter((line, index, array) => {
+    ?.filter((line, index, array) => {
       // Remove empty lines if the previous line is also empty
       if (line.trim() === "" && array[index - 1]?.trim() === "") {
         return false;
@@ -412,13 +412,13 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     const cleanedTemplate = template.replace(/---\n([\s\S]*?)\n---/, (match, content) => {
       const cleanedContent = content
         .split("\n")
-        .filter((line:any) => line.trim() !== "") // Remove empty lines
+        ?.filter((line:any) => line.trim() !== "") // Remove empty lines
         .join("\n");
       return `---\n${cleanedContent}\n---`;
     });
     const cleanedContent2 = cleanedTemplate
     .split("\n")
-    .filter((line, index, array) => {
+    ?.filter((line, index, array) => {
       // Remove empty lines if the previous line is also empty
       if (line.trim() === "" && array[index - 1]?.trim() === "") {
         return false;
@@ -439,8 +439,8 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 
   const tableRows = tableContent
   .split("\n") // Split rows by newline
-  .filter((line) => line.trim()) // Remove empty lines
-  .map((row) => {
+  ?.filter((line) => line.trim()) // Remove empty lines
+  ?.map((row) => {
     // Match key-value pairs with optional URL handling
     const match = row.match(/^([^:]+):\s*(.+)$/);
     if (match) {
@@ -524,14 +524,14 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       const cleanedTemplate = template.replace(/---\n([\s\S]*?)\n---/, (match, content) => {
         const cleanedContent = content
           .split("\n")
-          .filter((line: any) => line.trim() !== "") // Remove empty lines
+          ?.filter((line: any) => line.trim() !== "") // Remove empty lines
           .join("\n");
         return `---\n${cleanedContent}\n---`;
       });
 
       const cleanedContent2 = cleanedTemplate
     .split("\n")
-    .filter((line, index, array) => {
+    ?.filter((line, index, array) => {
       // Remove empty lines if the previous line is also empty
       if (line.trim() === "" && array[index - 1]?.trim() === "") {
         return false;
@@ -598,8 +598,8 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       } else {
         const requiresNumbers = templateData.requires
           .split(",")
-          .map((num) => num.trim())
-          .filter((num) => /^\d+$/.test(num));
+          ?.map((num) => num.trim())
+          ?.filter((num) => /^\d+$/.test(num));
   
         for (const num of requiresNumbers) {
           const links = [
@@ -707,9 +707,9 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     if (missingHeaders.length > 0 || unrecognizedHeaders.length > 0 || errorMessages.length > 0) {
       // Compile error messages
       const numberedErrors = [
-        ...missingHeaders.map((header, index) => `${index + 1}. Missing Header: ${header}`),
-        ...unrecognizedHeaders.map((header, index) => `${missingHeaders.length + index + 1}. Unrecognized Header: ${header}`),
-        ...errorMessages.map((message, index) => `${missingHeaders.length + unrecognizedHeaders.length + index + 1}. ${message}`),
+        ...missingHeaders?.map((header, index) => `${index + 1}. Missing Header: ${header}`),
+        ...unrecognizedHeaders?.map((header, index) => `${missingHeaders.length + index + 1}. Unrecognized Header: ${header}`),
+        ...errorMessages?.map((message, index) => `${missingHeaders.length + unrecognizedHeaders.length + index + 1}. ${message}`),
       ];
   
       // Display errors in a custom toast
@@ -785,14 +785,14 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       const cleanedTemplate = template.replace(/---\n([\s\S]*?)\n---/, (match, content) => {
         const cleanedContent = content
           .split("\n")
-          .filter((line: any) => line.trim() !== "") // Remove empty lines
+          ?.filter((line: any) => line.trim() !== "") // Remove empty lines
           .join("\n");
         return `---\n${cleanedContent}\n---`;
       });
 
       const cleanedContent2 = cleanedTemplate
     .split("\n")
-    .filter((line, index, array) => {
+    ?.filter((line, index, array) => {
       // Remove empty lines if the previous line is also empty
       if (line.trim() === "" && array[index - 1]?.trim() === "") {
         return false;
@@ -1062,7 +1062,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         </Text>
 
 
-          {steps.map((step, index) => (
+          {steps?.map((step, index) => (
             <Box key={index} w="100%">
               <Box mb={4}>
       <Text fontSize="lg" fontWeight="bold" display="inline-block" mr={2}>
@@ -1513,7 +1513,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
                 </Tr>
               </Thead>
               <Tbody>
-                {tableRows.map((row, index) => (
+                {tableRows?.map((row, index) => (
                   <Tr key={index}>
                     <Td color="white">{row[0]}</Td>
                     <Td color="white">{row[1]}</Td>

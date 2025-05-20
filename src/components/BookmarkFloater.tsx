@@ -111,7 +111,7 @@ import {
                 </Text>
               ) : (
                 <List spacing={3} mt={4}>
-                  {bookmarks.map((bookmark, index) => (
+                  {bookmarks?.map((bookmark, index) => (
                     <ListItem 
                       key={index}
                       p={3}

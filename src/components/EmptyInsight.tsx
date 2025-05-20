@@ -73,9 +73,9 @@ const EmptyInsight = () => {
     fetchData();
   }, []);
 
-  let filteredData1 = data.filter((item) => item.status === "Draft");
+  let filteredData1 = data?.filter((item) => item.status === "Draft");
  
-  let filteredData5 = data.filter((item) => item.status === "Final");
+  let filteredData5 = data?.filter((item) => item.status === "Final");
   
 
   const prevMonth = Number(month) - 1;

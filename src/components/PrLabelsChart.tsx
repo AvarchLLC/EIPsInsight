@@ -41,7 +41,7 @@ const EipsLabelChart = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRepo, setSelectedRepo] = useState('eips');
   const [showLabels, setShowLabels] = useState<Record<string, boolean>>(
-    availableLabels.reduce((acc, label) => ({ ...acc, [label]: true }), {})
+    availableLabels?.reduce((acc, label) => ({ ...acc, [label]: true }), {})
   );
   const toast = useToast();
 
@@ -85,7 +85,7 @@ const EipsLabelChart = () => {
 
   const convertToCSV = (data: PRDetails[]) => {
     const headers = ['Repo', 'PR Number', 'PR Title', 'Labels', 'Created At', 'Closed At', 'Merged At'];
-    const rows = data.map(pr => [
+    const rows = data?.map(pr => [
       pr.repo,
       pr.prNumber,
       `"${pr.prTitle.replace(/"/g, '""')}"`, // Escape quotes in title
@@ -95,12 +95,12 @@ const EipsLabelChart = () => {
       pr.merged_at || ''
     ]);
   
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
+    return [headers, ...rows]?.map(row => row.join(',')).join('\n');
   };
 
   const handleDownload = () => {
     // Filter PRs that have at least one of the selected labels
-    const filteredPRs = prDetails.filter(pr => 
+    const filteredPRs = prDetails?.filter(pr => 
       pr.labels.some(label => showLabels[label])
     );
 
@@ -133,7 +133,7 @@ const EipsLabelChart = () => {
       if (!Array.isArray(chartData)) return null;
   
       // Transform data to group by monthYear and count by label
-      // const transformedData = chartData.reduce<{
+      // const transformedData = chartData?.reduce<{
       //   [key: string]: { [key: string]: number };
       // }>((acc, { monthYear, type, count }) => {
       //   if (showLabels[type]) {
@@ -145,7 +145,7 @@ const EipsLabelChart = () => {
       //   return acc;
       // }, {});
 
-      const transformedData = chartData.reduce<{
+      const transformedData = chartData?.reduce<{
         [key: string]: { [key: string]: number };
       }>((acc, { monthYear, type, count }) => {
         // Determine the actual type to use
@@ -173,8 +173,8 @@ const EipsLabelChart = () => {
       const finalData = Object.keys(transformedData).flatMap(monthYear => {
         const monthData = transformedData[monthYear];
         return Object.keys(monthData)
-          .filter(label => showLabels[label])
-          .map(label => ({
+          ?.filter(label => showLabels[label])
+          ?.map(label => ({
             monthYear,
             type: label,
             count: monthData[label]
@@ -423,7 +423,7 @@ const EipsLabelChart = () => {
     </Flex>
     
     {/* Labels List */}
-    {availableLabels.map(label => (
+    {availableLabels?.map(label => (
       <MenuItem key={label} closeOnSelect={false}>
         <Checkbox
           isChecked={showLabels[label]}

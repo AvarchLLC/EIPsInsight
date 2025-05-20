@@ -112,7 +112,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     value: number;
   }
   
-  const transformedData = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData = data?.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const category = getCat(item.category);
   
@@ -181,7 +181,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
 
 // Prepare the CSV content
 const csvContent = header
-    + data.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+    + data?.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
         // Generate the correct URL based on the repo type
         const url = repo === "eip"
             ? `https://eipsinsight.com/eips/eip-${eip}`

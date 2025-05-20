@@ -33,7 +33,7 @@ const EthereumV2 = () => {
   // Function to calculate total gas burnt in the last hour
   const calculateTotalBurntLastHour = (gasBurntData: any[]) => {
     const lastHourData = gasBurntData.slice(0, 7200); // Assuming 5 blocks per minute (300 blocks in 1 hour)
-    const totalBurnt = lastHourData.reduce((sum, data) => sum + data.gasBurnt / 1e18, 0); // Convert wei to ether
+    const totalBurnt = lastHourData?.reduce((sum, data) => sum + data.gasBurnt / 1e18, 0); // Convert wei to ether
     return totalBurnt.toFixed(4); // Format to 4 decimal places
   };
 

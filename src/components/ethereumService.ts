@@ -123,7 +123,7 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
       const end = start + batchSize;
       const batchBlockNumbers = blockNumbers.slice(start, end);
   
-      const batchRequests = batchBlockNumbers.map((blockNumber, index) => ({
+      const batchRequests = batchBlockNumbers?.map((blockNumber, index) => ({
         jsonrpc: '2.0',
         method: 'eth_getBlockByNumber',
         params: [web3.utils.toHex(blockNumber), true],
@@ -133,7 +133,7 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
       try {
         const response = await axios.post(endpoint, batchRequests);
         if (response.data && Array.isArray(response.data)) {
-          allBlocks.push(...response.data.map((res: any) => res.result));
+          allBlocks.push(...response.data?.map((res: any) => res.result));
         } else {
           console.error('Invalid response format:', response.data);
         }

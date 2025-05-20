@@ -323,14 +323,14 @@ const Type = () => {
               </Box>
             )}
 
-            {["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"].map((status) => (
+            {["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"]?.map((status) => (
           <Box key={status} className={"group relative flex flex-col gap-3"} paddingBottom={8}>
             {/* Label Section aligned to the left */}
             <Box className={"flex gap-3"}>
               <Text  id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/eip/${status}`}>
-                  [{data.filter((item) => item.status === status).length}]
+                  [{data?.filter((item) => item.status === status).length}]
                 </NextLink>
               </Text>
               <p className={"text-red-700"}>*</p>
@@ -369,7 +369,7 @@ const Type = () => {
           </>
         ) : (
           <>
-{["Meta", "Informational", "Core", "Networking", "Interface"].map((status) => (
+{["Meta", "Informational", "Core", "Networking", "Interface"]?.map((status) => (
   <div key={status} id={`${status.toLowerCase()}table`}>
     <CatTable2 dataset={data4} cat="All" status={status} />
   </div>

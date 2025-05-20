@@ -113,7 +113,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
         setIsLoading(false); // Set isLoading to false after data is fetched
 
         // Fetch merged years and months for each item
-        const mergedDataPromises = jsonData.map((item: any) =>
+        const mergedDataPromises = jsonData?.map((item: any) =>
           fetchLastCreatedYearAndMonthFromAPI(item.eip)
         );
 
@@ -137,7 +137,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
   });
 
   const filteredData = data
-    .map((item: any) => {
+    ?.map((item: any) => {
       const { eip, title, author, status, type, category,repo,deadline } = item;
       return {
         eip,
@@ -150,9 +150,9 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
         deadline,
       };
     })
-    .filter((item: any) => item.status === cat);
+    ?.filter((item: any) => item.status === cat);
 
-  const filteredDataWithMergedYearsAndMonths = filteredData.map(
+  const filteredDataWithMergedYearsAndMonths = filteredData?.map(
     (item, index) => ({
       "#": (index + 1).toString(), // Add the sr number
       ...item,
@@ -173,9 +173,9 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
         Object.keys(filteredDataWithMergedYearsAndMonths[0]).join(",") + "\n";
 
       // Convert data to CSV rows
-      const csvRows = filteredDataWithMergedYearsAndMonths.map((item) =>
+      const csvRows = filteredDataWithMergedYearsAndMonths?.map((item) =>
         Object.values(item)
-          .map((value) =>
+          ?.map((value) =>
             typeof value === "string" && value.includes(",")
               ? `"${value}"`
               : value
@@ -404,7 +404,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
     author: (it: any) => (
       <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
         <div>
-          {factorAuthor(it.author).map(
+          {factorAuthor(it.author)?.map(
             (item: any, index: any) => {
               let t = item[item.length - 1].substring(
                 1,

@@ -97,25 +97,25 @@ const StatusBox = () => {
   // Add a fallback for empty data to avoid runtime errors
   const safeData = data || [];
 
-  const draftCount = safeData.filter(
+  const draftCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Draft"
   ).length;
-  const reviewCount = safeData.filter(
+  const reviewCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Review"
   ).length;
-  const lastCallCount = safeData.filter(
+  const lastCallCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Last Call"
   ).length;
-  const livingCount = safeData.filter(
+  const livingCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Living"
   ).length;
-  const finalCount = safeData.filter(
+  const finalCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Final"
   ).length;
-  const stagnantCount = safeData.filter(
+  const stagnantCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Stagnant"
   ).length;
-  const withdrawnCount = safeData.filter(
+  const withdrawnCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Withdrawn"
   ).length;
 
@@ -189,7 +189,7 @@ const StatusBox = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {tableItems.map((item, index) => (
+            {tableItems?.map((item, index) => (
               <Tr key={index}>
                 <Td>
                   <NextLink href={`/tableStatus/${item.status}`}>

@@ -59,7 +59,7 @@ interface TabProps {
  
   const data = cat;
   const filteredData = data
-  .map((item: any) => {
+  ?.map((item: any) => {
     const { eip, title, author, status, type, category, deadline } = item;
     return {
       eip,
@@ -138,7 +138,7 @@ interface TabProps {
               author: (it: any) => (
                   <td key={it.author}>
                     <div>
-                      {factorAuthor(it.author).map((item: any, index: any) => {
+                      {factorAuthor(it.author)?.map((item: any, index: any) => {
                         let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1);
                         return (
                             <Wrap key={index}>

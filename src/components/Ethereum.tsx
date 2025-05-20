@@ -75,7 +75,7 @@ export const fetchLast7200Blocks = async (isSepolia: boolean = false) => {
   const latestBlock = await provider.eth.getBlockNumber();
   const blockNumbers = Array.from({ length: 7200 }, (_, i) => Number(latestBlock) - i);
 
-  const batchRequests = blockNumbers.map((blockNumber, index) => ({
+  const batchRequests = blockNumbers?.map((blockNumber, index) => ({
     jsonrpc: '2.0',
     method: 'eth_getBlockByNumber',
     params: [web3.utils.toHex(blockNumber), true],

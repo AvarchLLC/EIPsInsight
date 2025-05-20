@@ -613,15 +613,15 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
     const mergedMax = Math.max(
       0, // Default to 0 if no data is available
       ...transformedData
-          .filter(data => data.type === 'Merged')
-          .map(data => Math.abs(data.count))
+          ?.filter(data => data.type === 'Merged')
+          ?.map(data => Math.abs(data.count))
   );
   
   const closedMax = Math.max(
       0, // Default to 0 if no data is available
       ...transformedData
-          .filter(data => data.type === 'Closed')
-          .map(data => Math.abs(data.count))
+          ?.filter(data => data.type === 'Closed')
+          ?.map(data => Math.abs(data.count))
   );
   
     // Get the minimum of merged and closed counts
@@ -630,15 +630,15 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
     const mergedMax2 = Math.max(
         0, // Default to 0 if no data is available
         ...transformedData2
-            .filter(data => data.type === 'Merged')
-            .map(data => Math.abs(data.count))
+            ?.filter(data => data.type === 'Merged')
+            ?.map(data => Math.abs(data.count))
     );
     
     const closedMax2 = Math.max(
         0, // Default to 0 if no data is available
         ...transformedData2
-            .filter(data => data.type === 'Closed')
-            .map(data => Math.abs(data.count))
+            ?.filter(data => data.type === 'Closed')
+            ?.map(data => Math.abs(data.count))
     );
     
       // Get the minimum of merged and closed counts
@@ -648,15 +648,15 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
     const mergedMax3 = Math.max(
       0, // Default to 0 if no data is available
       ...transformedData3
-          .filter(data => data.type === 'Merged')
-          .map(data => Math.abs(data.count))
+          ?.filter(data => data.type === 'Merged')
+          ?.map(data => Math.abs(data.count))
   );
   
   const closedMax3 = Math.max(
       0, // Default to 0 if no data is available
       ...transformedData3
-          .filter(data => data.type === 'Closed')
-          .map(data => Math.abs(data.count))
+          ?.filter(data => data.type === 'Closed')
+          ?.map(data => Math.abs(data.count))
   );
   
     // Get the minimum of merged and closed counts
@@ -665,15 +665,15 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
     const mergedMax4 = Math.max(
         0, // Default to 0 if no data is available
         ...transformedData4
-            .filter(data => data.type === 'Merged')
-            .map(data => Math.abs(data.count))
+            ?.filter(data => data.type === 'Merged')
+            ?.map(data => Math.abs(data.count))
     );
     
     const closedMax4 = Math.max(
         0, // Default to 0 if no data is available
         ...transformedData4
-            .filter(data => data.type === 'Closed')
-            .map(data => Math.abs(data.count))
+            ?.filter(data => data.type === 'Closed')
+            ?.map(data => Math.abs(data.count))
     );
     
       // Get the minimum of merged and closed counts
@@ -683,15 +683,15 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
     const mergedMax5 = Math.max(
       0, // Default to 0 if no data is available
       ...transformedData5
-          .filter(data => data.type === 'Merged')
-          .map(data => Math.abs(data.count))
+          ?.filter(data => data.type === 'Merged')
+          ?.map(data => Math.abs(data.count))
   );
   
   const closedMax5 = Math.max(
       0, // Default to 0 if no data is available
       ...transformedData5
-          .filter(data => data.type === 'Closed')
-          .map(data => Math.abs(data.count))
+          ?.filter(data => data.type === 'Closed')
+          ?.map(data => Math.abs(data.count))
   );
   
     // Get the minimum of merged and closed counts
@@ -700,15 +700,15 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
     const mergedMax6 = Math.max(
         0, // Default to 0 if no data is available
         ...transformedData6
-            .filter(data => data.type === 'Merged')
-            .map(data => Math.abs(data.count))
+            ?.filter(data => data.type === 'Merged')
+            ?.map(data => Math.abs(data.count))
     );
     
     const closedMax6 = Math.max(
         0, // Default to 0 if no data is available
         ...transformedData6
-            .filter(data => data.type === 'Closed')
-            .map(data => Math.abs(data.count))
+            ?.filter(data => data.type === 'Closed')
+            ?.map(data => Math.abs(data.count))
     );
     
       // Get the minimum of merged and closed counts
@@ -716,7 +716,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
 
     // Prepare trend data for created category
     const trendData = showCategory.open
-  ? Object.keys(dataToUse).map(monthYear => {
+  ? Object.keys(dataToUse)?.map(monthYear => {
       const items = dataToUse[monthYear] || {}; // Ensure items is defined
       const items2 = dataToUse2[monthYear] || {}; // Ensure items2 is defined
 
@@ -729,7 +729,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
   : [];
 
   const trendData2 = showCategory.open
-  ? Object.keys(dataToUse).map(monthYear => {
+  ? Object.keys(dataToUse)?.map(monthYear => {
       const items = dataToUse3[monthYear] || {}; // Ensure items is defined
       const items2 = dataToUse4[monthYear] || {}; // Ensure items2 is defined
 
@@ -742,7 +742,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
   : [];
 
   const trendData3 = showCategory.open
-  ? Object.keys(dataToUse).map(monthYear => {
+  ? Object.keys(dataToUse)?.map(monthYear => {
       const items = dataToUse5[monthYear] || {}; // Ensure items is defined
       const items2 = dataToUse6[monthYear] || {}; // Ensure items2 is defined
 
@@ -758,7 +758,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
 
     // Determine y-axis min and max
     const yAxisMin = Math.min(-closedMax, -mergedMax);
-    const yAxisMax = Math.max(0, Math.max(...trendData.map(data => data.Open)));
+    const yAxisMax = Math.max(0, Math.max(...trendData?.map(data => data.Open)));
 
     // Sort data by monthYear in ascending order
     const sortedData = transformedData.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
@@ -766,7 +766,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
 
     // Determine y-axis min and max
     const yAxisMin2 = Math.min(-closedMax2, -mergedMax2);
-    const yAxisMax2 = Math.max(0, Math.max(...trendData2.map(data => data.Open)));
+    const yAxisMax2 = Math.max(0, Math.max(...trendData2?.map(data => data.Open)));
 
     // Sort data by monthYear in ascending order
     const sortedData2 = transformedData2.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
@@ -774,16 +774,16 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
 
     // Determine y-axis min and max
     const yAxisMin3 = Math.min(-closedMax3, -mergedMax3);
-    const yAxisMax3 = Math.max(0, Math.max(...trendData3.map(data => data.Open)));
+    const yAxisMax3 = Math.max(0, Math.max(...trendData3?.map(data => data.Open)));
 
     // Sort data by monthYear in ascending order
     const sortedData3 = transformedData3.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
     const sortedTrendData3 = trendData3.sort((a, b) => a.monthYear.localeCompare(b.monthYear));
 // Assuming sortedTrendData, sortedTrendData2, sortedTrendData3 are your datasets
 const combinedData = [
-  ...sortedTrendData.map(item => ({ ...item, category: 'EIPs' })),
-  ...sortedTrendData2.map(item => ({ ...item, category: 'ERCs' })),
-  ...sortedTrendData3.map(item => ({ ...item, category: 'RIPs' })),
+  ...sortedTrendData?.map(item => ({ ...item, category: 'EIPs' })),
+  ...sortedTrendData2?.map(item => ({ ...item, category: 'ERCs' })),
+  ...sortedTrendData3?.map(item => ({ ...item, category: 'RIPs' })),
 ];
 
 
@@ -889,13 +889,13 @@ keys.forEach((key) => {
     ...(data.PRs[key]?.open || []),
     ...(data2.PRs[key]?.open || []),
     ...(data3.PRs[key]?.open || [])
-  ].map((item) => ({ ...item, key }));
+  ]?.map((item) => ({ ...item, key }));
 
   const issueData = [
     ...(data.Issues[key]?.open || []),
     ...(data2.Issues[key]?.open || []),
     ...(data3.Issues[key]?.open || [])
-  ].map((item) => ({ ...item, key }));
+  ]?.map((item) => ({ ...item, key }));
 
   combinedPRs.push(...prData);
   combinedIssues.push(...issueData);
@@ -905,7 +905,7 @@ keys.forEach((key) => {
 const allData = [...combinedPRs, ...combinedIssues];
 
 // Format data into CSV-friendly structure
-const csv = allData.map((item) => {
+const csv = allData?.map((item) => {
   if ('prNumber' in item) {
     const createdDate = item.created_at ? new Date(item.created_at) : null;
     const createdMonth = createdDate ? createdDate.toLocaleString('default', { month: 'long' }) : '-';

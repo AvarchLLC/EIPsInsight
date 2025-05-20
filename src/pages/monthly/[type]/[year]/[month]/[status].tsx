@@ -88,8 +88,8 @@ const Insi = () => {
         const response = await fetch(`/api/new/statusChanges/${year}/${month}`);
 
         const removeDuplicatePRs = (statusChangesArray: StatusChange[]): StatusChange[] => {
-          return statusChangesArray.map(item => {
-            const uniquePRs = item.statusChanges.filter(
+          return statusChangesArray?.map(item => {
+            const uniquePRs = item.statusChanges?.filter(
               (value, index, self) =>
                 index === self.findIndex(v => v.eip === value.eip)
             );

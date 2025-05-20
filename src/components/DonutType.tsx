@@ -50,13 +50,13 @@ const DonutType: React.FC<DonutTypeProps> = ({ type }) => {
   }, []);
   
 
-  const LivingCount = data.filter(item => item.type === type && item.status === "Living").length;
-  const FinalCount = data.filter(item => item.type === type && item.status === "Final").length;
-  const LastCount = data.filter(item => item.type === type && item.status === "Last Call").length;
-  const ReviewCount = data.filter(item => item.type === type && item.status === "Review").length;
-  const DraftCount = data.filter(item => item.type === type && item.status === "Draft").length;
-  const StagnantCount = data.filter(item => item.type === type && item.status === "Stagnant").length;
-  const WithdrawnCount = data.filter(item => item.type === type && item.status === "Withdrawn").length;
+  const LivingCount = data?.filter(item => item.type === type && item.status === "Living").length;
+  const FinalCount = data?.filter(item => item.type === type && item.status === "Final").length;
+  const LastCount = data?.filter(item => item.type === type && item.status === "Last Call").length;
+  const ReviewCount = data?.filter(item => item.type === type && item.status === "Review").length;
+  const DraftCount = data?.filter(item => item.type === type && item.status === "Draft").length;
+  const StagnantCount = data?.filter(item => item.type === type && item.status === "Stagnant").length;
+  const WithdrawnCount = data?.filter(item => item.type === type && item.status === "Withdrawn").length;
 
   const total = LivingCount+FinalCount+LastCount+ReviewCount+DraftCount+StagnantCount+WithdrawnCount;
   const pieChartData: PieChartData[] = [

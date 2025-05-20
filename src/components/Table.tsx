@@ -313,10 +313,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
           //   ...getallEntries(jsonData5.rip, 'eip'),
           // ];
           
-          filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
+          filteredData = filteredData?.filter((entry: EIPData, index: number, self: EIPData[]) =>
             entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
           ); 
-          // filteredData2 = filteredData2.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
+          // filteredData2 = filteredData2?.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
           //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
           // );          
         }
@@ -348,10 +348,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
             ...getallEntries(jsonData5.rip, 'eip'),
           ];
           
-          filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
+          filteredData = filteredData?.filter((entry: EIPData, index: number, self: EIPData[]) =>
             entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
           ); 
-          // filteredData2 = filteredData2.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
+          // filteredData2 = filteredData2?.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
           //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
           // );          
         }
@@ -379,7 +379,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
     }
   });
 
-  const filteredData = data2.map((item: any) => {
+  const filteredData = data2?.map((item: any) => {
     const { eip, title, author, status, type, category, repo, changedMonth, changedYear } = item;
     return {
       eip,
@@ -397,7 +397,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
 
   console.log("filtered data:", filteredDataWithMergedYearsAndMonths)
 
-  const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
+  const DataForFilter = filteredDataWithMergedYearsAndMonths?.filter((item) => {
     const isYearInRange =
       (!selectedYearRange.start ||
         item.changedYear >= selectedYearRange.start) &&
@@ -427,7 +427,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
     
     if (DataForFilter && DataForFilter.length > 0) {
       // Create CSV headers
-      const mergedData = DataForFilter.map((item) => {
+      const mergedData = DataForFilter?.map((item) => {
         const matchingEntry = data3.find((entry) => entry.eip === item.eip);
         return {
           ...item,
@@ -441,8 +441,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
       const headers = Object.keys(mergedData[0]).join(",") + "\n";
   
       // Convert data to CSV rows
-      const csvRows = mergedData.map((item) => {
-        const values = Object.values(item).map((value) => {
+      const csvRows = mergedData?.map((item) => {
+        const values = Object.values(item)?.map((value) => {
           // Ensure values with commas are enclosed in double quotes
           if (typeof value === "string" && value.includes(",")) {
             return `"${value}"`;
@@ -591,7 +591,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       onChange={(e) => setSelectedStatus(e.target.value)}
                     >
                       <option value="">Select Status</option>
-                      {statusArr.map((status) => (
+                      {statusArr?.map((status) => (
                         <option key={status} value={status}>
                           {status}
                         </option>
@@ -603,7 +603,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                       <option value="">Select Category</option>
-                      {catArr.map((item) => (
+                      {catArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -620,7 +620,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       }
                     >
                       <option value="">Start Year</option>
-                      {yearsArr.map((item) => (
+                      {yearsArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -637,7 +637,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       }
                     >
                       <option value="">End Year</option>
-                      {yearsArr.map((item) => (
+                      {yearsArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -654,7 +654,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       }
                     >
                       <option value="">Start Month</option>
-                      {monthArr.map((item) => (
+                      {monthArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -671,7 +671,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       }
                     >
                       <option value="">End Month</option>
-                      {monthArr.map((item) => (
+                      {monthArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -803,7 +803,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   author: (it: any) => (
                     <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
-                        {factorAuthor(it.author).map(
+                        {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
                             let t = item[item.length - 1].substring(
                               1,

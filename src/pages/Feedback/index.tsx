@@ -101,7 +101,7 @@ const Feedback: React.FC = () => {
                 No feedback yet!
               </Text>
             ) : (
-              comments.map((comment, index) => (
+              comments?.map((comment, index) => (
                 <Flex
                   key={comment.id}
                   flexDirection={index % 2 === 0 ? 'row' : 'row-reverse'}

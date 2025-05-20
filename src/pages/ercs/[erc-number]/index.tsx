@@ -241,7 +241,7 @@ const TestComponent = () => {
                           <Th>Requires</Th>
                           <Td>
                             <HStack>
-                              {metadataJson.requires.map((req, i) => (
+                              {metadataJson.requires?.map((req, i) => (
                                 <NLink key={i} href={`/eips/eip-${req}`}>
                                   <Text
                                     color="blue.400"
@@ -340,9 +340,9 @@ const TestComponent = () => {
                             >
                               <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
                                 {data
-                                  .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
+                                  ?.filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
                                   .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
-                                  .map((item, index, sortedData) => {
+                                  ?.map((item, index, sortedData) => {
                                     const currentDate = new Date(item.date);
                                     const nextItem = sortedData[index + 1];
                                     const nextDate = nextItem ? new Date(nextItem.date) : null;
@@ -455,7 +455,7 @@ const TestComponent = () => {
                                   <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
                                     {data2
                                       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
-                                      .map((item, index, sortedData) => {
+                                      ?.map((item, index, sortedData) => {
                                         const currentDate = new Date(item.date);
                                         const nextItem = sortedData[index + 1];
                                         const nextDate = nextItem ? new Date(nextItem.date) : null;
@@ -567,7 +567,7 @@ const extractLastStatusDates = (data: any) => {
     }
   });
 
-  return Object.keys(statusDates).map((status) => ({
+  return Object.keys(statusDates)?.map((status) => ({
     status,
     date: statusDates[status],
   }));
@@ -583,7 +583,7 @@ const extractLastTypesDates = (data: any) => {
 ];
   let lasttype = "";
   const sortedData = Object.keys(data)
-    .filter((key) => key !== "repo") 
+    ?.filter((key) => key !== "repo") 
     .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
 
   sortedData.forEach((key) => {
@@ -634,11 +634,11 @@ export const convertMetadataToJson = (metadataText: string): EipMetadataJson => 
       if (key.trim() === "erc") {
         jsonObject[key.trim()] = parseInt(value.trim());
       } else if (key.trim() === "requires") {
-        jsonObject[key.trim()] = value.split(",").map((v) => parseInt(v));
+        jsonObject[key.trim()] = value.split(",")?.map((v) => parseInt(v));
       } else if (key.trim() === "author") {
         jsonObject[key.trim()] = value
           .split(",")
-          .map((author: string) => author.trim());
+          ?.map((author: string) => author.trim());
       } else {
         jsonObject[key.trim()] = value.trim();
       }

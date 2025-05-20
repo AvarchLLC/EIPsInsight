@@ -78,8 +78,8 @@ const parseStatusChanges = (entry: EIPEntry): StatusChangeNode[] => {
   });
 
   return nodes.sort((a, b) => {
-    const [aDay, aMonth, aYear] = a.date.split('-').map(Number);
-    const [bDay, bMonth, bYear] = b.date.split('-').map(Number);
+    const [aDay, aMonth, aYear] = a.date.split('-')?.map(Number);
+    const [bDay, bMonth, bYear] = b.date.split('-')?.map(Number);
     if (aYear !== bYear) return aYear - bYear;
     if (aMonth !== bMonth) return aMonth - bMonth;
     return aDay - bDay;
@@ -324,12 +324,12 @@ const StatusGraph = () => {
             });
 
             const filteredEIPs = searchEIP 
-              ? Object.keys(groupedByEIP).filter(eip => eip.startsWith(searchEIP))
+              ? Object.keys(groupedByEIP)?.filter(eip => eip.startsWith(searchEIP))
               : Object.keys(groupedByEIP);
 
             return filteredEIPs.reverse().flatMap((eip, groupIndex) => {
               const nodes = groupedByEIP[eip] || [];
-              return nodes.map((node, index) => {
+              return nodes?.map((node, index) => {
                 const x = index * 10;
                 const y = groupIndex * -5;
                 const z = 0;

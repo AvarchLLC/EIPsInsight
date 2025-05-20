@@ -129,7 +129,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 // Process PR details
 const processPRDetails = async (prData:any,Type:string) => {
     try {
-        const labels = prData.labels.map((label: { name: any; }) => label.name);
+        const labels = prData.labels?.map((label: { name: any; }) => label.name);
         const conversations = await fetchConversations(Type,prData.number);
         const commits = await fetchCommits(Type,prData.number);
         const participants = getParticipants(conversations, commits);
@@ -222,11 +222,11 @@ const fetchConversations = async (Type:string,number:number) => {
 // Get participants from conversations
 const getParticipants = (conversations: any[], commits: any[]) => {
     const commentParticipants = conversations
-        .filter((conversation) => conversation.user.login !== 'github-actions[bot]')
-        .map((conversation) => conversation.user.login);
+        ?.filter((conversation) => conversation.user.login !== 'github-actions[bot]')
+        ?.map((conversation) => conversation.user.login);
 
     const commitParticipants = commits
-        .map((commit) => commit.committer.login);
+        ?.map((commit) => commit.committer.login);
 
     // Combine the arrays and use a Set to ensure uniqueness
     const uniqueParticipants = new Set([...commentParticipants, ...commitParticipants]);
@@ -239,8 +239,8 @@ const getParticipants2 = (conversations: any[]) => {
     if (conversations.length === 0) return [];
 
     const commentParticipants = conversations
-        .filter((conversation) => conversation.user && conversation.user.login && conversation.user.login !== 'github-actions[bot]')
-        .map((conversation) => conversation.user.login);
+        ?.filter((conversation) => conversation.user && conversation.user.login && conversation.user.login !== 'github-actions[bot]')
+        ?.map((conversation) => conversation.user.login);
 
     // Use a Set to ensure uniqueness and convert it back to an array
     const uniqueParticipants = new Set(commentParticipants);
@@ -278,7 +278,7 @@ const fetchFilesChanged = async (Type:string,number: number) => {
             },
         });
 
-        const files = filesResponse.data.map((file: { filename: any; }) => file.filename);
+        const files = filesResponse.data?.map((file: { filename: any; }) => file.filename);
         return files;
     } catch (error:any) {
         console.log('Error fetching files changed:', error.message);

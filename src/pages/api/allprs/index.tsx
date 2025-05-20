@@ -42,9 +42,9 @@ export default async (req: Request, res: Response) => {
 
         // Add repository information to each PR number
         const formattedPrNumbers = [
-            ...eipPrNumbers.map(pr => ({ prNumber: pr.prNumber, prTitle:pr.prTitle, repo: 'EIPs' })),
-            ...ercPrNumbers.map(pr => ({ prNumber: pr.prNumber, prTitle:pr.prTitle, repo: 'ERCs' })),
-            ...ripPrNumbers.map(pr => ({ prNumber: pr.prNumber, prTitle:pr.prTitle, repo: 'RIPs' })),
+            ...eipPrNumbers?.map(pr => ({ prNumber: pr.prNumber, prTitle:pr.prTitle, repo: 'EIPs' })),
+            ...ercPrNumbers?.map(pr => ({ prNumber: pr.prNumber, prTitle:pr.prTitle, repo: 'ERCs' })),
+            ...ripPrNumbers?.map(pr => ({ prNumber: pr.prNumber, prTitle:pr.prTitle, repo: 'RIPs' })),
         ];
 
         // Send the consolidated list as a JSON response

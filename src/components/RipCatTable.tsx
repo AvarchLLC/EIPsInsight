@@ -113,8 +113,8 @@ import {
     });
   
     const filteredData = dataset
-      .filter((item) => item.repo === "rip" && item.status === status)
-      .map((item) => {
+      ?.filter((item) => item.repo === "rip" && item.status === status)
+      ?.map((item) => {
         const { eip, title, author } = item;
         return {
           eip,
@@ -257,7 +257,7 @@ import {
                   author: (it: any) => (
                     <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
-                        {factorAuthor(it.author).map(
+                        {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
                             let t = item[item.length - 1].substring(
                               1,

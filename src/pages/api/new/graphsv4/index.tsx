@@ -64,17 +64,17 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
-        const eipResults = (await EipStatusChange.find({})).map((result:any) => ({
+        const eipResults = (await EipStatusChange.find({}))?.map((result:any) => ({
             ...result.toObject(),
             repo: "eip",
           }));
     
-          const ercResults = (await ErcStatusChange.find({})).map((result:any) => ({
+          const ercResults = (await ErcStatusChange.find({}))?.map((result:any) => ({
             ...result.toObject(),
             repo: "erc",
           }));
     
-          const ripResults = (await RipStatusChange.find({})).map((result:any) => ({
+          const ripResults = (await RipStatusChange.find({}))?.map((result:any) => ({
             ...result.toObject(),
             repo: "rip",
           }));
