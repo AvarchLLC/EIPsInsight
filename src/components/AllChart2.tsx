@@ -8,20 +8,21 @@ import Dashboard from "./Dashboard";
 import NextLink from "next/link";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 
+
 const getCat = (cat: string) => {
   switch (cat) {
-    case "Standards Track" ||
-      "Standard Track" ||
-      "Standards Track (Core, Networking, Interface, ERC)" ||
-      "Standard" ||
-      "Process" ||
-      "Core" ||
-      "core":
+    case "Standards Track":
+    case "Standard Track":
+    case "Standards Track (Core, Networking, Interface, ERC)":
+    case "Standard":
+    case "Process":
+    case "Core":
+    case "core":
       return "Core";
-    case "ERC":
-      return "ERCs";
     case "RIP":
       return "RIPs";
+    case "ERC":
+      return "ERCs";
     case "Networking":
       return "Networking";
     case "Interface":
@@ -75,7 +76,7 @@ interface EIP {
   discussion: string;
   deadline: string;
   requires: string;
-  repo:string;
+  repo: string;
   unique_ID: number;
   __v: number;
 }
@@ -106,11 +107,11 @@ interface ChartProps {
   dataset: APIResponse;
 }
 
-const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
+const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
   const [data, setData] = useState<EIP[]>([]);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [isLoading, setIsLoading] = useState(true);
-  const [chart,setchart]=useState("category");
+  const [chart, setchart] = useState("category");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -146,14 +147,14 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     year: number;
     value: number;
   }
-  
+
   const transformedData = data.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const category = item.repo === 'rip' ? 'RIPs' : getCat(item.category);
-  
+
     // Check if a record for the same category and year already exists
     const existingEntry = acc.find((entry) => entry.year === year && entry.category === category);
-  
+
     if (existingEntry) {
       // If it exists, increment the value
       existingEntry.value += 1;
@@ -165,17 +166,17 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
         value: 1,
       });
     }
-  
+
     return acc;
   }, []);
 
   const transformedData2 = data.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const status = getStatus(item.status);
-  
+
     // Check if a record for the same category and year already exists
     const existingEntry = acc.find((entry) => entry.year === year && entry.category === status);
-  
+
     if (existingEntry) {
       // If it exists, increment the value
       existingEntry.value += 1;
@@ -187,12 +188,12 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
         value: 1,
       });
     }
-  
+
     return acc;
   }, []);
-  
-  
-  
+
+
+
 
 
   const Area = dynamic(
@@ -224,7 +225,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     slider: {
       start: 0,
       end: 1,
-  },
+    },
     color: categoryColors,
     seriesField: "category",
     isStack: true,
@@ -238,11 +239,11 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     //     opacity: 0.6,
     //   },
     // } as any,
-    
+
   };
-  
-  
-  
+
+
+
 
   return (
     <>
@@ -266,38 +267,38 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
               borderColor: "#30A0E0",
             }}
           >
-            
-            <Box
-            width={"100%"}       // Make the container full width
-            minWidth={"100px"}  // Set a minimum width
-            height={400}
-            overflowX="auto"     // Enable horizontal scrolling if necessary
-            overflowY="hidden"
-            as={motion.div}
-            padding={"2 rem"}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            // transition={{ duration: 0.5 }}
-          >
-             <Flex justify="space-between" align="center">
-      {/* Label and Dropdown in the same row */}
-      <Box>
-      <Link href="/alltable">
-        <Text 
-          fontSize="2xl" 
-          fontWeight="bold" 
-          color="#30A0E0" 
-          cursor="pointer" // Optional: To indicate it's clickable
-          _hover={{ textDecoration: 'underline' }} // Optional: Adds hover effect
-        >
-          {type === 'Total' ? `All EIPs [${data.length}]` : `${type} - [${data.length}]`}
-        </Text>
-      </Link>
-    </Box>
 
-      {/* Dropdown aligned to the right */}
-      <Box>
-      {/* <Select
+            <Box
+              width={"100%"}       // Make the container full width
+              minWidth={"100px"}  // Set a minimum width
+              height={400}
+              overflowX="auto"     // Enable horizontal scrolling if necessary
+              overflowY="hidden"
+              as={motion.div}
+              padding={"2 rem"}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+            // transition={{ duration: 0.5 }}
+            >
+              <Flex justify="space-between" align="center">
+                {/* Label and Dropdown in the same row */}
+                <Box>
+                  <Link href="/alltable">
+                    <Text
+                      fontSize="2xl"
+                      fontWeight="bold"
+                      color="#30A0E0"
+                      cursor="pointer" // Optional: To indicate it's clickable
+                      _hover={{ textDecoration: 'underline' }} // Optional: Adds hover effect
+                    >
+                      {type === 'Total' ? `All EIPs [${data.length}]` : `${type} - [${data.length}]`}
+                    </Text>
+                  </Link>
+                </Box>
+
+                {/* Dropdown aligned to the right */}
+                <Box>
+                  {/* <Select
   value={chart}
   onChange={(e) => setchart(e.target.value)}
   mt={1}
@@ -316,28 +317,28 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
   // }}
 > */}
 
-<Select
-              variant="outline"
-              // placeholder="Select Year"
-              value={chart}
-              mt={1}
-              // mb={2}
-              backgroundColor="#30A0E0"
-              color="black"
-              onChange={(e) => setchart(e.target.value)}
-              className="border border-gray-300 rounded px-7 py-2 focus:outline-none focus:border-blue-500"
-              size="md"
-            >
-  <option value="category">Category</option>
-  <option value="status">Status</option>
-</Select>
-      </Box>
-    </Flex>
-            <Area {...config} />
-            <Box className={"w-full"}>
-              <DateTime />
+                  <Select
+                    variant="outline"
+                    // placeholder="Select Year"
+                    value={chart}
+                    mt={1}
+                    // mb={2}
+                    backgroundColor="#30A0E0"
+                    color="black"
+                    onChange={(e) => setchart(e.target.value)}
+                    className="border border-gray-300 rounded px-7 py-2 focus:outline-none focus:border-blue-500"
+                    size="md"
+                  >
+                    <option value="category">Category</option>
+                    <option value="status">Status</option>
+                  </Select>
+                </Box>
+              </Flex>
+              <Area {...config} />
+              <Box className={"w-full"}>
+                <DateTime />
+              </Box>
             </Box>
-          </Box>
 
           </Box>
         </>
