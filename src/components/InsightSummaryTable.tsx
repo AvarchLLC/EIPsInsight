@@ -225,7 +225,7 @@ export default function InsightSummary() {
 
   
 
-    data.forEach(pr => {
+    data?.forEach(pr => {
       if (!processedPRs.has(pr.prNumber)) {
       const createdDate = pr.created_at ? new Date(pr.created_at) : null;
       const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
@@ -331,7 +331,7 @@ export default function InsightSummary() {
     };
     const processedIssues = new Set();
 
-    data.forEach(issue => {
+    data?.forEach(issue => {
       if (!processedIssues.has(issue.IssueNumber)) {
         
         processedIssues.add(issue.IssueNumber);
@@ -514,7 +514,7 @@ export default function InsightSummary() {
     };
 
     // Count transitions for each repo
-    csvData.forEach((item) => {
+    csvData?.forEach((item) => {
         const { repo, toStatus } = item;
 
         if (repo in summary) {

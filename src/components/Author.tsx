@@ -54,7 +54,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
         const getEarliestEntries = (data: any[], key: string) => {
           const uniqueEntries: Record<string, any> = {};
-          data.forEach(entry => {
+          data?.forEach(entry => {
             const entryKey = entry[key];
             if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
               uniqueEntries[entryKey] = entry;
@@ -89,9 +89,9 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   useEffect(() => {
     const authorMap: Record<string, number> = {};
   
-    data.forEach((eip) => {
+    data?.forEach((eip) => {
       const authors = eip.author.split(",")?.map((author) => author.trim());
-      authors.forEach((author) => {
+      authors?.forEach((author) => {
         if (author) {
           // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
           const handleMatch = author.match(/(.+?)\s\(@([a-zA-Z0-9-_]+)\)$/);
@@ -157,7 +157,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
     csvRows.push(headers.join(','));
   
     // Add data rows
-    data.forEach((item: EIP) => {
+    data?.forEach((item: EIP) => {
       const row = [
         `EIP-${item.eip}`, // EIP ID
         `"${item.title}"`, // Title (quoted to handle commas)

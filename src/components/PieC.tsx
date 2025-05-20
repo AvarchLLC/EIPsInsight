@@ -62,7 +62,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
   const transformedData: { [key: string]: number } = data?.reduce(
     (result: { [key: string]: number }, obj) => {
       if (obj._id === status) {
-        obj.statusChanges.forEach((statusChange) => {
+        obj.statusChanges?.forEach((statusChange) => {
           result[statusChange.category] = obj.count;
           if (statusChange.status === "Draft") {
             console.log(statusChange);

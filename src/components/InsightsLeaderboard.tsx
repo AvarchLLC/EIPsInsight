@@ -350,7 +350,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         const reviewers = Array.from(new Set(monthlyChartData?.map(item => item.reviewer)));
         const totalReviewers = reviewers?.length;
 
-        monthlyChartData.forEach((item: MonthlyChartData, index: number) => {
+        monthlyChartData?.forEach((item: MonthlyChartData, index: number) => {
             if (!reviewerColorsMap[item.reviewer]) {
                 // Assign a new color only if the reviewer doesn't already have one
                 reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);

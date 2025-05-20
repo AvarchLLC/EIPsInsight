@@ -73,7 +73,7 @@ const SearchBox: React.FC = () => {
 
         const getEarliestEntries = (data: any[], key: string) => {
           const uniqueEntries: Record<string, any> = {};
-          data.forEach((entry) => {
+          data?.forEach((entry) => {
             const entryKey = entry[key];
             if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
               uniqueEntries[entryKey] = entry;
@@ -107,9 +107,9 @@ const SearchBox: React.FC = () => {
   useEffect(() => {
     const authorMap: Record<string, number> = {};
 
-    authordata.forEach((eip) => {
+    authordata?.forEach((eip) => {
       const authors = eip.author.split(",")?.map((author) => author.trim());
-      authors.forEach((author) => {
+      authors?.forEach((author) => {
         if (author) {
           // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
           const handleMatch = author.match(/(.+?)\s\(@([a-zA-Z0-9-_]+)\)$/);

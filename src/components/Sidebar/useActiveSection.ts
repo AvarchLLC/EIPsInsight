@@ -22,13 +22,13 @@ export function useActiveSection(sectionIds: string[]) {
       }
     );
 
-    sectionIds.forEach((id) => {
+    sectionIds?.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
 
     return () => {
-      sectionIds.forEach((id) => {
+      sectionIds?.forEach((id) => {
         const el = document.getElementById(id);
         if (el) observer.unobserve(el);
       });

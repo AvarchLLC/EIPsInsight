@@ -47,7 +47,7 @@ const EIPStatusDonut = () => {
       try {
         const response = await fetch(`/api/new/all`);
         let jsonData = await response.json();
-        jsonData.rip.forEach((item: EIP) => {
+        jsonData.rip?.forEach((item: EIP) => {
           if (item.eip === "7859") {
               item.status = "Draft"; 
           }

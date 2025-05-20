@@ -125,8 +125,8 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   
   const allRows=["CORE", "META", "Informational","Networking","Interface","ERCs","RIPs"]
 
-  allRows.forEach(category => {
-    transformedData.forEach(data => {
+  allRows?.forEach(category => {
+    transformedData?.forEach(data => {
       const existing = rows.find((row) => row.category.toLowerCase() === category.toLowerCase() && row.year === data.year);
       if (!existing) {
         rows.push({ category, year: data.year, value: 0 });
@@ -161,7 +161,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     );
   
     // Add EIPs data to csvRows
-    yearEIPs.forEach((eip) => {
+    yearEIPs?.forEach((eip) => {
       csvRows.push([
         eip.eip,
         escapeCSV(eip.title),  // Escape title field

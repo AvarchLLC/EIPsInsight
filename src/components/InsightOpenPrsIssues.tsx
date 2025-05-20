@@ -129,7 +129,7 @@ const fetchPRData = async (year: string) => {
     const eipsTransformed = transformPRData(eipsData, eipsReviewData, year);
     let transformedData: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open: PR[], review: PR[] } } = {};
     const combineData = (source: any, target: any, ) => {
-                Object.keys(source).forEach(key => {
+                Object.keys(source)?.forEach(key => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
@@ -167,7 +167,7 @@ const fetchPRData2 = async (year: string) => {
     const ercsTransformed = transformPRData(ercsData, ercsReviewData, year);
     let transformedData: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open: PR[], review: PR[] } } = {};
     const combineData = (source: any, target: any, ) => {
-                Object.keys(source).forEach(key => {
+                Object.keys(source)?.forEach(key => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
@@ -209,7 +209,7 @@ const fetchPRData3 = async (year: string) => {
     const ripsTransformed = transformPRData(ripsData, ripsReviewData, year);
     let transformedData: { [key: string]: { created: PR[], closed: PR[], merged: PR[], open: PR[], review: PR[] } } = {};
     const combineData = (source: any, target: any, ) => {
-                Object.keys(source).forEach(key => {
+                Object.keys(source)?.forEach(key => {
                   // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                   const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                   
@@ -250,7 +250,7 @@ const fetchPRData3 = async (year: string) => {
       let transformedData: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } } = {};
       // Combine the transformed data for each month/year key
         const combineIssueData = (source: any, target: any) => {
-            Object.keys(source).forEach(key => {
+            Object.keys(source)?.forEach(key => {
                 // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                 const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                 
@@ -292,7 +292,7 @@ const fetchPRData3 = async (year: string) => {
       let transformedData: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } } = {};
       // Combine the transformed data for each month/year key
         const combineIssueData = (source: any, target: any) => {
-            Object.keys(source).forEach(key => {
+            Object.keys(source)?.forEach(key => {
                 // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                 const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                 
@@ -332,7 +332,7 @@ const fetchPRData3 = async (year: string) => {
      let transformedData: { [key: string]: { created: Issue[], closed: Issue[], open: Issue[] } } = {};
      // Combine the transformed data for each month/year key
        const combineIssueData = (source: any, target: any) => {
-           Object.keys(source).forEach(key => {
+           Object.keys(source)?.forEach(key => {
                // Check if the key contains the required year (assuming key format is "YYYY-someOtherData")
                const yearString = key.split('-')[0]; // Assuming the key format is "YYYY-someOtherData"
                
@@ -395,7 +395,7 @@ const fetchPRData3 = async (year: string) => {
   
     const processedPRs = new Set();
   
-    data.forEach(pr => {
+    data?.forEach(pr => {
       if (!processedPRs.has(pr.prNumber)) {
         const createdDate = pr.created_at ? new Date(pr.created_at) : null;
         const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
@@ -484,7 +484,7 @@ const fetchPRData3 = async (year: string) => {
     };
     const processedIssues = new Set();
 
-    data.forEach(issue => {
+    data?.forEach(issue => {
       if (!processedIssues.has(issue.IssueNumber)) {
         
         processedIssues.add(issue.IssueNumber);
@@ -883,7 +883,7 @@ const combinedPRs: any[] = [];
 const combinedIssues: any[] = [];
 
 // Iterate through the generated month keys and accumulate data
-keys.forEach((key) => {
+keys?.forEach((key) => {
   // Add the key as a field for each PR and Issue
   const prData = [
     ...(data.PRs[key]?.open || []),

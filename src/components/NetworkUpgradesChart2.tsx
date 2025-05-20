@@ -79,8 +79,8 @@ const rawData = [
 
 const authorContributions: Record<string, AuthorData> = {};
 
-rawData.forEach(({ eip, authors }) => {
-  authors.forEach(author => {
+rawData?.forEach(({ eip, authors }) => {
+  authors?.forEach(author => {
     if (!authorContributions[author]) {
       authorContributions[author] = { name: author, contributionCount: 0, eips: [] };
     }

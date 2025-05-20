@@ -57,7 +57,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         } else if (type === "ERC") {
           setData(jsonData.erc);
         } else if (type === "RIP") {
-          jsonData.rip.forEach((item: EIP) => {
+          jsonData.rip?.forEach((item: EIP) => {
             if (item.eip === "7859") {
                 item.status = "Draft"; // Update the status
             }

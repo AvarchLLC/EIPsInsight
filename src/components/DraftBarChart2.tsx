@@ -150,8 +150,8 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   
   const uniqueYears = [...new Set(transformedData?.map((entry) => entry.year))];
 
-categories.forEach((category) => {
-  uniqueYears.forEach((year) => {
+categories?.forEach((category) => {
+  uniqueYears?.forEach((year) => {
     const hasCategoryForYear = transformedData.some(
       (entry) => entry.category === category && entry.year === year
     );

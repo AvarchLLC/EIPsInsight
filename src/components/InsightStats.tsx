@@ -137,7 +137,7 @@ export default function InsightStats() {
   // const transformPRData = (data: PR[], key: string) => {
   //   const monthYearData = { PRs: { created: [] as PR[], closed: [] as PR[], merged: [] as PR[], open: [] as PR[] } };
 
-  //   data.forEach(pr => {
+  //   data?.forEach(pr => {
   //     const createdDate = pr.created_at ? new Date(pr.created_at) : null;
   //     const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
   //     const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
@@ -156,7 +156,7 @@ export default function InsightStats() {
   // const transformIssueData = (data: Issue[], key: string) => {
   //   const monthYearData = { Issues: { created: [] as Issue[], closed: [] as Issue[], open: [] as Issue[] } };
 
-  //   data.forEach(issue => {
+  //   data?.forEach(issue => {
   //     const createdDate = new Date(issue.created_at);
   //     const closedDate = issue.closed_at ? new Date(issue.closed_at) : null;
   //     const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
@@ -201,7 +201,7 @@ export default function InsightStats() {
 
   
 
-    data.forEach(pr => {
+    data?.forEach(pr => {
       const createdDate = pr.created_at ? new Date(pr.created_at) : null;
       const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
       const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
@@ -313,7 +313,7 @@ while (openDate < endDate) {
   //       }
   //   };
 
-  //   data.forEach(issue => {
+  //   data?.forEach(issue => {
   //     const createdDate = new Date(issue.created_at);
   //     const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
       
@@ -397,7 +397,7 @@ while (openDate < endDate) {
     };
     const processedIssues = new Set();
 
-    data.forEach(issue => {
+    data?.forEach(issue => {
       if (!processedIssues.has(issue.IssueNumber)) {
         
         processedIssues.add(issue.IssueNumber);

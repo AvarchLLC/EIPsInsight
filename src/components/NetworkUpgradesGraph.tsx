@@ -218,7 +218,7 @@ const EIP3DGraph = () => {
       '#FF6B6B', '#4ECDC4', '#FFD93D', '#6A0572', '#1B9CFC',
       '#FF9F1C', '#2EC4B6', '#E71D36', '#A8DADC', '#457B9D',
     ];
-    uniqueGroups.forEach((group, index) => {
+    uniqueGroups?.forEach((group, index) => {
       scale.set(group, palette[index % palette?.length]);
     });
     return scale;

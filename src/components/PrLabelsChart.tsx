@@ -397,7 +397,7 @@ const EipsLabelChart = () => {
         colorScheme="blue"
         onClick={() => {
           const allSelected: Record<string, boolean> = {};
-          availableLabels.forEach(label => {
+          availableLabels?.forEach(label => {
             allSelected[label] = true;
           });
           setShowLabels(allSelected);
@@ -412,7 +412,7 @@ const EipsLabelChart = () => {
         colorScheme="red"
         onClick={() => {
           const noneSelected: Record<string, boolean> = {};
-          availableLabels.forEach(label => {
+          availableLabels?.forEach(label => {
             noneSelected[label] = false;
           });
           setShowLabels(noneSelected);

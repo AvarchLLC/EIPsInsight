@@ -49,7 +49,7 @@ const parseStatusChanges = (entry: EIPEntry): StatusChangeNode[] => {
   const nodes: StatusChangeNode[] = [];
   const seenChanges = new Set<string>();
 
-  statusChanges.forEach((change, index) => {
+  statusChanges?.forEach((change, index) => {
     const match = change.match(/(.*?) -> (.*?)\((\d+)-(\d+)-(\d+)\)/) ||
       change.match(/(.*?)\((\d+)-(\d+)-(\d+)\)/);
 
@@ -143,7 +143,7 @@ const StatusGraph = () => {
           const eipCategoryChangesMap: { [eip: string]: string[] } = {};
 
           if (data.eip && Array.isArray(data.eip)) {
-            data.eip.forEach((entry: any) => {
+            data.eip?.forEach((entry: any) => {
               const { eip, type, category, status, fromStatus, toStatus, changedDay, changedMonth, changedYear } = entry;
               const statusChangeString = fromStatus && fromStatus !== "unknown" ?
                 `${fromStatus} -> ${toStatus}(${changedDay}-${changedMonth}-${changedYear})` :
@@ -165,7 +165,7 @@ const StatusGraph = () => {
 
           if (data.eip && Array.isArray(data.eip)) {
             const seenEIPs = new Set();
-            data.eip.forEach((entry: any) => {
+            data.eip?.forEach((entry: any) => {
               const { eip, title, author, status, type, category, repo } = entry;
               
               if (!seenEIPs.has(eip)) {
@@ -316,7 +316,7 @@ const StatusGraph = () => {
           {(() => {
             const groupedByEIP: { [eip: string]: StatusChangeNode[] } = {};
 
-            data.forEach((node) => {
+            data?.forEach((node) => {
               if (!groupedByEIP[node.eip]) {
                 groupedByEIP[node.eip] = [];
               }

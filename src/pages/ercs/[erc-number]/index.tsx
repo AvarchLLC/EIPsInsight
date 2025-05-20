@@ -553,7 +553,7 @@ const extractercNo = (data: any) => {
 const extractLastStatusDates = (data: any) => {
   const statusDates: Record<string, string> = {};
 
-  Object.keys(data).forEach((key) => {
+  Object.keys(data)?.forEach((key) => {
     let laststatus = "";
     if (key !== "repo") {
       const { status, mergedDate } = data[key];
@@ -586,7 +586,7 @@ const extractLastTypesDates = (data: any) => {
     ?.filter((key) => key !== "repo") 
     .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
 
-  sortedData.forEach((key) => {
+  sortedData?.forEach((key) => {
     let { type, mergedDate } = data[key];
 
     if (type === "unknown") {
@@ -628,7 +628,7 @@ export const convertMetadataToJson = (metadataText: string): EipMetadataJson => 
   const lines = metadataText.split("\n");
   const jsonObject: any = {};
 
-  lines.forEach((line) => {
+  lines?.forEach((line) => {
     const [key, value] = line.split(/: (.+)/);
     if (key && value) {
       if (key.trim() === "erc") {

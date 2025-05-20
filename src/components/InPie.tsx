@@ -67,7 +67,7 @@ function transformAndAddUp(data: DataItem[]): TransformedDataResult {
   const transformedData: { [key: string]: number } = {};
   let sum = 0;
 
-  data.forEach(item => {
+  data?.forEach(item => {
     const { cat, value } = item;
     if (transformedData[cat]) {
       transformedData[cat] += value;
@@ -88,7 +88,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status , year, month}) =>
     if (obj._id === status) {
       
     
-      obj.statusChanges.forEach((statusChange) => {
+      obj.statusChanges?.forEach((statusChange) => {
         objs.push({ cat : statusChange.category, value:1})
         result[statusChange.category] = obj.count;
       });

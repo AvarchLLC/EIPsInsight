@@ -197,7 +197,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     "RIPs",
   ];
   
-  categories.forEach((category) => {
+  categories?.forEach((category) => {
     const hasCategory = transformedData.some((entry) => entry.category === category);
   
     if (!hasCategory) {

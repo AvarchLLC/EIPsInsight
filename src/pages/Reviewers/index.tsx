@@ -960,7 +960,7 @@ const renderChart = () => {
   // Assign colors if not already assigned
   const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
   const totalReviewers = reviewers?.length;
-  filteredData.forEach((item, index) => {
+  filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       // Assign a new color only if the reviewer doesn't already have one
       reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
@@ -1029,7 +1029,7 @@ const renderChart4 = () => {
   // Assign colors if not already assigned
   const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
   const totalReviewers = reviewers?.length;
-  filteredData.forEach((item, index) => {
+  filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       // Assign a new color only if the reviewer doesn't already have one
       reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
@@ -1119,7 +1119,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
   // Assign colors to reviewers
   const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
   const totalReviewers = reviewers?.length;
-  filteredData.forEach((item, index) => {
+  filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       reviewerColorsMap[item.reviewer] = `hsl(${(index * (360 / totalReviewers)) % 360}, 85%, 50%)`;
     }
@@ -1693,7 +1693,7 @@ const handleFilterData2 = () => {
   const filteredData:any = [];
   for (const reviewerName in activeData) {
     const reviews = activeData[reviewerName];
-    reviews.forEach((pr: PRInfo) => {
+    reviews?.forEach((pr: PRInfo) => {
       const reviewDate = new Date(pr.reviewDate);
       const reviewMonthYear = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, "0")}`;
 
@@ -1736,7 +1736,7 @@ const editorsActivity = () => {
 
   const reviewers = [...new Set(processedData?.map((item: any) => item.reviewer))];
   const reviewerColors: { [key: string]: string } = {};
-  reviewers.forEach((reviewer, index) => {
+  reviewers?.forEach((reviewer, index) => {
     reviewerColors[reviewer as string] = generateDistinctColor(index, reviewers?.length);
   });
 

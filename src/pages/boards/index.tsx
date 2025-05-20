@@ -223,7 +223,7 @@ import {
       csvRows.push(headers.join(','));
     
       // Iterate over the filtered data and extract necessary fields
-      filteredData.forEach((item: any, index: number) => {
+      filteredData?.forEach((item: any, index: number) => {
         const row = [
           index + 1,                              // Serial Number
           item.prNumber,                          // PR Number

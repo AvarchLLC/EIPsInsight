@@ -98,7 +98,7 @@ const StackedColumnChart: React.FC = () => {
 
   const consolidateData = (data: DataItem[]): TransformedItem[] => {
     const result: { [key: string]: TransformedItem } = {};
-    data.forEach((item) => {
+    data?.forEach((item) => {
       const key = `${item.status}-${item.year}`;
       if (result[key]) {
         result[key].value += item.value;

@@ -181,7 +181,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
         function getEarliestEntries(data:any, key:any) {
           const uniqueEntries:any = {};
 
-          data.forEach((entry:any) => {
+          data?.forEach((entry:any) => {
             const entryKey = entry[key];
             
             // If this is the first time we see this `key` or if the current entry's date is earlier, store it
@@ -207,7 +207,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
             "Standard"
           ];
         
-          data.forEach((entry: any) => {
+          data?.forEach((entry: any) => {
             const { eip, type,category,fromStatus, toStatus, changedDay, changedMonth, changedYear } = entry;
 
             if(eip=='615'){
@@ -263,7 +263,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
           });
         
           // Now, build the final entries with status changes concatenated into one string for each EIP
-          data.forEach((entry: any) => {
+          data?.forEach((entry: any) => {
             const { eip, title, author, status, type, category, repo } = entry;
             
             // Join the status changes into a single string

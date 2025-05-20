@@ -467,7 +467,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     setIsLoading(true); // Show spinner
   
     // Check if any required header is missing
-    requiredHeaders.forEach((header) => {
+    requiredHeaders?.forEach((header) => {
       if (!templateData[header] || templateData[header].trim() === "") {
         missingHeaders.push(header);
       }

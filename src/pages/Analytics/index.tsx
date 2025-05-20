@@ -648,7 +648,7 @@ useEffect(() => {
 
   
     // Add data to CSV rows
-    items.forEach((item: PR | Issue) => {
+    items?.forEach((item: PR | Issue) => {
       const row = type === 'PRs'
         ? [
             (item as PR).prNumber,
@@ -704,7 +704,7 @@ useEffect(() => {
     // console.log(items);
   
     // Add data to CSV rows
-    items.forEach((item: PR | Issue & { key: string; tag: string }) => {
+    items?.forEach((item: PR | Issue & { key: string; tag: string }) => {
       const row = type === 'PRs'
         ? [
             item.key, // Add `key`
@@ -787,7 +787,7 @@ useEffect(() => {
     const allData = activeTab === 'PRs' ? downloaddata.PRs : downloaddata.Issues;
   
     // Iterate over all keys in the selected dataset (PRs or Issues)
-    Object.keys(allData).forEach((key) => {
+    Object.keys(allData)?.forEach((key) => {
       const currentData = allData[key];
   
       if (activeTab === 'PRs') {

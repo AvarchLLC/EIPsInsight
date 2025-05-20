@@ -677,7 +677,7 @@ const extractLastStatusDates = (data: any) => {
     ?.filter((key) => key !== "repo")
     .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
 
-  sortedData.forEach((key) => {
+  sortedData?.forEach((key) => {
     const { status, mergedDate } = data[key];
     if (status === "unknown") {
       return;
@@ -706,7 +706,7 @@ const extractLastTypesDates = (data: any) => {
     ?.filter((key) => key !== "repo")
     .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
 
-  sortedData.forEach((key) => {
+  sortedData?.forEach((key) => {
     let { type, mergedDate } = data[key];
 
     if (type === "unknown") {
@@ -788,7 +788,7 @@ export const convertMetadataToJson = (metadataText: string): EipMetadataJson => 
   const lines = metadataText.split("\n");
   const jsonObject: any = {};
 
-  lines.forEach((line) => {
+  lines?.forEach((line) => {
     const [key, value] = line.split(/: (.+)/);
     if (key && value) {
       if (key.trim() === "eip") {

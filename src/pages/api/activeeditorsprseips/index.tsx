@@ -111,7 +111,7 @@ export default async (req: Request, res: Response) => {
         const resultByReviewer: { [key: string]: any[] } = {};
 
         // Initialize the result object with empty arrays for each reviewer
-        githubHandles.forEach((handle) => {
+        githubHandles?.forEach((handle) => {
             resultByReviewer[handle] = [];
         });
 
@@ -134,7 +134,7 @@ export default async (req: Request, res: Response) => {
         ]);
 
         // Group PR details by reviewer
-        eipReviews.forEach((review: any) => {
+        eipReviews?.forEach((review: any) => {
             const { reviewerName, prNumber, prTitle, created_at, closed_at, merged_at, reviewDate, reviewComment } = review;
 
             // Add review details to the respective reviewer

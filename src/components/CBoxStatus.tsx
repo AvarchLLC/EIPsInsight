@@ -174,7 +174,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
   yearData
     ?.filter((item) => item.category !== "ERC")
     ?.forEach((item) => {
-      item.eips.forEach((item) => {
+      item.eips?.forEach((item) => {
         if (
           (item.type === "Standards Track" ||
             item.type === "Standard Track" ||

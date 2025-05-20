@@ -67,7 +67,7 @@ export default async (req: Request, res: Response) => {
 
         // Create an object to store combined results
         const resultByReviewer: { [key: string]: any[] } = {};
-        githubHandles.forEach((handle) => {
+        githubHandles?.forEach((handle) => {
             resultByReviewer[handle] = [];
         });
 
@@ -104,7 +104,7 @@ export default async (req: Request, res: Response) => {
         const allReviews = [...eipReviews, ...ercReviews, ...ripReviews];
 
         // Group reviews by reviewer
-        allReviews.forEach((review: any) => {
+        allReviews?.forEach((review: any) => {
             const { reviewerName, repo, prNumber, prTitle, created_at, closed_at, merged_at, reviewDate, reviewComment } = review;
             resultByReviewer[reviewerName].push({
                 repo,

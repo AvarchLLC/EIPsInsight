@@ -98,7 +98,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
     csvRows.push(headers.join(','));
   
   
-    data.forEach((item: CombinedItem) => {
+    data?.forEach((item: CombinedItem) => {
       const row = [
         `${item.Repo}`, 
         `"${item.Number}"`,
