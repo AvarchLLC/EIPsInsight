@@ -55,9 +55,9 @@ const parseStatusChanges = (entry: EIPEntry): StatusChangeNode[] => {
 
     if (match) {
       let from, to, day, month, year;
-      if (match.length === 6) {
+      if (match?.length === 6) {
         [, from, to, day, month, year] = match;
-      } else if (match.length === 5) {
+      } else if (match?.length === 5) {
         [, to, day, month, year] = match;
         from = "unknown";
       }
@@ -211,7 +211,7 @@ const StatusGraph = () => {
     const found = data.find((n) => n.eip.startsWith(searchEIP));
     if (found) {
       const index = data.indexOf(found);
-      const angle = (index / data.length) * Math.PI * 2;
+      const angle = (index / data?.length) * Math.PI * 2;
       const radius = 15;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;

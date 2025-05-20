@@ -64,12 +64,12 @@ export default async function handler(
       const chunks: Uint8Array[] = [];
       req.on('data', (chunk: Uint8Array) => chunks.push(chunk));
       req.on('end', () => {
-        const totalLength = chunks?.reduce((sum, chunk) => sum + chunk.length, 0);
+        const totalLength = chunks?.reduce((sum, chunk) => sum + chunk?.length, 0);
         const combined = Buffer.alloc(totalLength);
         let offset = 0;
         for (const chunk of chunks) {
           combined.set(chunk, offset);
-          offset += chunk.length;
+          offset += chunk?.length;
         }
         resolve(combined);
       });

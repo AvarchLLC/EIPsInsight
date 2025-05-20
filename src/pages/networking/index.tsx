@@ -114,7 +114,7 @@ const Networking = () => {
                     (item) =>
                       item.type === "Standards Track" &&
                       item.category === "Networking"
-                  ).length
+                  )?.length
                 } ]`}
                 subtitle="Networking EIPs describe changes to the Ethereum network protocol."
               />

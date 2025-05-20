@@ -166,7 +166,7 @@ const All = () => {
     }
 
     // Check if there's any data to download
-    if (filteredData.length === 0) {
+    if (filteredData?.length === 0) {
         console.log("No data available for download.");
         return; // Exit if no data is present
     }

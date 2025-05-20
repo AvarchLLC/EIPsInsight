@@ -104,7 +104,7 @@ const EipsLabelChart = () => {
       pr.labels.some(label => showLabels[label])
     );
 
-    if (filteredPRs.length === 0) {
+    if (filteredPRs?.length === 0) {
       toast({
         title: 'No data to download',
         description: 'No PRs match the currently selected labels',
@@ -123,14 +123,14 @@ const EipsLabelChart = () => {
     const link = document.createElement('a');
     link.href = url;
     link.download = `${selectedRepo}-pr-details-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(link);
+    document.body?.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
   const renderChart = () => {
-      if (!Array.isArray(chartData)) return null;
+      if (!Array?.isArray(chartData)) return null;
   
       // Transform data to group by monthYear and count by label
       // const transformedData = chartData?.reduce<{
@@ -170,9 +170,9 @@ const EipsLabelChart = () => {
       console.log("transformed data:",transformedData);
   
       // Convert to array format for the chart
-      const finalData = Object.keys(transformedData).flatMap(monthYear => {
+      const finalData = Object?.keys(transformedData).flatMap(monthYear => {
         const monthData = transformedData[monthYear];
-        return Object.keys(monthData)
+        return Object?.keys(monthData)
           ?.filter(label => showLabels[label])
           ?.map(label => ({
             monthYear,
@@ -277,7 +277,7 @@ const EipsLabelChart = () => {
           position: 'top-right',
           itemName: {
             formatter: (text: string) => {
-              if (text.length > 15) return text.substring(0, 12) + '...';
+              if (text?.length > 15) return text?.substring(0, 12) + '...';
               return text;
             }
           }
@@ -287,7 +287,7 @@ const EipsLabelChart = () => {
             autoRotate: false,
             formatter: (text: string) => {
               const [year, month] = text.split('-');
-              return `${new Date(Number(year), Number(month) - 1).toLocaleString('default', { month: 'short' })} ${year.slice(-2)}`;
+              return `${new Date(Number(year), Number(month) - 1)?.toLocaleString('default', { month: 'short' })} ${year.slice(-2)}`;
             }
           }
         },
@@ -306,7 +306,7 @@ const EipsLabelChart = () => {
                 <ul>
                   {items?.map((item, index) => (
                     <li key={index}>
-                      {item.name}: {item.value}
+                      {item.name}: {item?.value}
                     </li>
                   ))}
                 </ul>

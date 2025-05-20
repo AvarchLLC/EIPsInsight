@@ -290,7 +290,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
           cursor="pointer" // Optional: To indicate it's clickable
           _hover={{ textDecoration: 'underline' }} // Optional: Adds hover effect
         >
-          {type === 'Total' ? `All EIPs [${data.length}]` : `${type} - [${data.length}]`}
+          {type === 'Total' ? `All EIPs [${data?.length}]` : `${type} - [${data?.length}]`}
         </Text>
       </Link>
     </Box>

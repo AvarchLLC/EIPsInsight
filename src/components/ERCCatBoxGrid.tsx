@@ -39,26 +39,26 @@ const ERCCatBoxGrid = () => {
 
   const draftCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Draft"
-  ).length;
+  )?.length;
   const reviewCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Review"
-  ).length;
+  )?.length;
   const lastCallCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Last Call"
-  ).length;
+  )?.length;
   const livingCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Living"
-  ).length;
+  )?.length;
   const finalCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Final"
-  ).length;
+  )?.length;
   const stagnantCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Stagnant"
-  ).length;
+  )?.length;
   const withdrawnCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Withdrawn"
-  ).length;
-  const totalCount = data?.filter((item) => item.category === "ERC").length;
+  )?.length;
+  const totalCount = data?.filter((item) => item.category === "ERC")?.length;
   return (
     <Box
       display={"grid"}

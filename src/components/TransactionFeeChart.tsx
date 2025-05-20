@@ -12,7 +12,7 @@ const Line = dynamic(() => import("@ant-design/plots").then((mod) => mod.Line), 
 type DataType = "fee" | "priorityFee" | "gasUsed" | "gasBurnt";
 
 const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { data: any[], data1: any[], data2: any[], data3: any[], ethPriceInUSD: number }) => {
-  if (!data || data.length === 0) return null;
+  if (!data || data?.length === 0) return null;
 
   const textColor = useColorModeValue("white", "white");
   const buttonBg = useColorModeValue("rgba(159, 122, 234, 0.2)", "rgba(159, 122, 234, 0.1)");
@@ -101,8 +101,8 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
 
         // Calculate the average for the selected dataType
         const avgValue =
-            hourData.length > 0
-                ? hourData?.reduce((acc, curr) => acc + curr[dataType], 0) / hourData.length
+            hourData?.length > 0
+                ? hourData?.reduce((acc, curr) => acc + curr[dataType], 0) / hourData?.length
                 : 0; // Default to 0 if no data for the hour
 
         heatmapData.push({

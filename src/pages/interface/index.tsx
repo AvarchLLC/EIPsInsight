@@ -114,7 +114,7 @@ const Interface = () => {
                     (item) =>
                       item.type === "Standards Track" &&
                       item.category === "Interface"
-                  ).length
+                  )?.length
                 } ]`}
                 subtitle="Interface EIPs describe changes to the Ethereum client API."
               />

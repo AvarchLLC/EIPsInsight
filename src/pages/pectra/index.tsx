@@ -84,10 +84,10 @@ const All = () => {
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;

@@ -248,7 +248,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
         });
     });
 
-    if (!transformedData.length) {
+    if (!transformedData?.length) {
         console.error("No data to transform.");
         alert("No data available for download.");
         return;

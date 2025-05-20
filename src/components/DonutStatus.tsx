@@ -53,12 +53,12 @@ const DonutStatus: React.FC<DonutTypeProps>= ({ status }) => {
     fetchData();
   }, []);
 
-  const coreCount = data?.filter(item => item.status === status && item.category === 'Core').length;
-  const ercCount = data?.filter(item => item.status === status && item.category === 'ERC').length;
-  const networkingCount = data?.filter(item => item.status === status && item.category === 'Networking').length;
-  const interfaceCount = data?.filter(item => item.status === status && item.category === 'Interface').length;
-  const metaCount = data?.filter(item => item.status === status && item.type === 'Meta').length;
-  const informationalCount = data?.filter(item => item.status === status && item.type === 'Informational').length;
+  const coreCount = data?.filter(item => item.status === status && item.category === 'Core')?.length;
+  const ercCount = data?.filter(item => item.status === status && item.category === 'ERC')?.length;
+  const networkingCount = data?.filter(item => item.status === status && item.category === 'Networking')?.length;
+  const interfaceCount = data?.filter(item => item.status === status && item.category === 'Interface')?.length;
+  const metaCount = data?.filter(item => item.status === status && item.type === 'Meta')?.length;
+  const informationalCount = data?.filter(item => item.status === status && item.type === 'Informational')?.length;
   const total = coreCount+ercCount+networkingCount+ interfaceCount+metaCount+informationalCount;
   const pieChartData: PieChartData[] = [
     {

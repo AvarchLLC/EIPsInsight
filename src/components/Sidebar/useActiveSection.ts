@@ -12,7 +12,7 @@ export function useActiveSection(sectionIds: string[]) {
           ?.filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
 
-        if (visible.length > 0) {
+        if (visible?.length > 0) {
           setActiveId(visible[0].target.id);
         }
       },

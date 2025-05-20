@@ -147,7 +147,7 @@ import {
           });
       };
     
-      if (selectedLabels.length === 0) {
+      if (selectedLabels?.length === 0) {
         return filterAndSort(data);
       }
     
@@ -186,7 +186,7 @@ import {
       // Check the active tab and fetch the appropriate data
       const filteredData = displayedData;
     
-      if (!filteredData || filteredData.length === 0) {
+      if (!filteredData || filteredData?.length === 0) {
         alert(`No data available for the selected month in ${activeTab}.`);
         return;
       }
@@ -438,7 +438,7 @@ import {
         > */}
            <Flex justify="space-between" align="center" p={4}>
         <Heading as="h2" size="lg" color={useColorModeValue("#3182CE", "blue.300")}>
-          {activeTab} BOARD ({displayedData.length})
+          {activeTab} BOARD ({displayedData?.length})
         </Heading>
         <Button
           colorScheme="blue"
@@ -502,7 +502,7 @@ import {
     </Thead>
 
     <Tbody>
-      {displayedData.length === 0 ? (
+      {displayedData?.length === 0 ? (
         <Tr>
           <Td colSpan={3} textAlign="center" color="white">
             No Data Available

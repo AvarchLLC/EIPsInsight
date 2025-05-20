@@ -131,16 +131,16 @@ const EipTemplateEditor = () => {
     const parts = hash.split("#")?.filter(Boolean); // Remove empty strings
 
     // Assign values from the URL hash to state variables
-    if (parts.length > 0) {
+    if (parts?.length > 0) {
       setViewMode(parts[0] as "edit" | "output" | "split");
     }
-    if (parts.length > 1) {
+    if (parts?.length > 1) {
       setActiveTab(parts[1] as "eip" | "erc" | "rip");
     }
-    if (parts.length > 2) {
+    if (parts?.length > 2) {
       setActiveTab2(parts[2] as "new" | "import");
     }
-    if (parts.length > 3) {
+    if (parts?.length > 3) {
       setSearchNumber(parts[3]);
     }
   }, []);
@@ -435,7 +435,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
   // Split the content
   const splitContent = markdownContent.split(/---\n/); // Split by "---"
   const tableContent = splitContent[1]?.trim() || ""; // Extract the content between "---"
-  const markdownValue = splitContent.length > 2 ? splitContent.slice(2).join("---\n").trim() : ""; // Rest of the markdown
+  const markdownValue = splitContent?.length > 2 ? splitContent.slice(2).join("---\n").trim() : ""; // Rest of the markdown
 
   const tableRows = tableContent
   .split("\n") // Split rows by newline
@@ -704,12 +704,12 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       unrecognizedHeaders.push("category");
     }
   
-    if (missingHeaders.length > 0 || unrecognizedHeaders.length > 0 || errorMessages.length > 0) {
+    if (missingHeaders?.length > 0 || unrecognizedHeaders?.length > 0 || errorMessages?.length > 0) {
       // Compile error messages
       const numberedErrors = [
         ...missingHeaders?.map((header, index) => `${index + 1}. Missing Header: ${header}`),
-        ...unrecognizedHeaders?.map((header, index) => `${missingHeaders.length + index + 1}. Unrecognized Header: ${header}`),
-        ...errorMessages?.map((message, index) => `${missingHeaders.length + unrecognizedHeaders.length + index + 1}. ${message}`),
+        ...unrecognizedHeaders?.map((header, index) => `${missingHeaders?.length + index + 1}. Unrecognized Header: ${header}`),
+        ...errorMessages?.map((message, index) => `${missingHeaders?.length + unrecognizedHeaders?.length + index + 1}. ${message}`),
       ];
   
       // Display errors in a custom toast
@@ -1503,7 +1503,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
             _dark={{ bg: "gray.900", color: preview ? "white" : "gray.300" }}
             overflow="auto"
           >
-            {tableRows.length > 0 && (
+            {tableRows?.length > 0 && (
             <TableContainer mt={4}>
             <Table variant="striped" colorScheme="blue">
               <Thead>

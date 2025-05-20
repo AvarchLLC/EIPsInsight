@@ -79,9 +79,9 @@ const processIssueDetails = async (issueData: any) => {
       issueDescription: issueData.body,
       labels,
       conversations,
-      numConversations: conversations.length,
+      numConversations: conversations?.length,
       participants,
-      numParticipants: participants.length,
+      numParticipants: participants?.length,
       state: issueData.state,
       createdAt: new Date(issueData.created_at),
       updatedAt: new Date(issueData.updated_at),
@@ -118,7 +118,7 @@ const fetchIssueConversations = async (issueNumber: number) => {
       const conversations = conversationResponse.data;
       allConversations = allConversations?.concat(conversations);
 
-      if (conversations.length < 100) {
+      if (conversations?.length < 100) {
         break;
       }
 

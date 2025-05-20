@@ -61,19 +61,19 @@ export const getBlockDetails = async (blockNumber: string | number, isSepolia: b
     slotInEpoch,
     validator: beaconData?.data?.header?.message?.proposer_index || block.miner,
     blockNumber: block.number,
-    transactions: block.transactions.length,
-    size: `${(Number(block.size) / 1024).toFixed(2)} KB`,
-    gasUsed: `${(Number(block.gasUsed) / 1e6).toFixed(1)}M`,
-    gasLimit: `${(Number(block.gasLimit) / 1e6).toFixed(1)}M`,
-    baseFee: `${Number(web3.utils.fromWei(block.baseFeePerGas || '0', 'gwei')).toFixed(2)} Gwei`,
-    gasBurnt: `${web3.utils.fromWei(gasBurnt.toString(), 'ether')} ETH`,
+    transactions: block.transactions?.length,
+    size: `${(Number(block.size) / 1024)?.toFixed(2)} KB`,
+    gasUsed: `${(Number(block.gasUsed) / 1e6)?.toFixed(1)}M`,
+    gasLimit: `${(Number(block.gasLimit) / 1e6)?.toFixed(1)}M`,
+    baseFee: `${Number(web3.utils?.fromWei(block.baseFeePerGas || '0', 'gwei')).toFixed(2)} Gwei`,
+    gasBurnt: `${web3.utils?.fromWei(gasBurnt.toString(), 'ether')} ETH`,
   };
 };
 
 export const fetchLast7200Blocks = async (isSepolia: boolean = false) => {
   const provider = isSepolia ? sepoliaWeb3 : web3;
   const latestBlock = await provider.eth.getBlockNumber();
-  const blockNumbers = Array.from({ length: 7200 }, (_, i) => Number(latestBlock) - i);
+  const blockNumbers = Array?.from({ length: 7200 }, (_, i) => Number(latestBlock) - i);
 
   const batchRequests = blockNumbers?.map((blockNumber, index) => ({
     jsonrpc: '2.0',
@@ -84,5 +84,5 @@ export const fetchLast7200Blocks = async (isSepolia: boolean = false) => {
 
   const endpoint = isSepolia ? 'https://ethereum-sepolia-rpc.publicnode.com' : 'https://ethereum-rpc.publicnode.com';
   const response = await axios.post(endpoint, batchRequests);
-  return response.data;
+  return response?.data;
 };

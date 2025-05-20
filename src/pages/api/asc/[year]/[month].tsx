@@ -33,7 +33,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
 
       mergedPRsThisMonth = mergedPRsThisMonth?.concat(prsInDateRange);
 
-      if (prsInDateRange.length < 100) {
+      if (prsInDateRange?.length < 100) {
         break;
       }
 
@@ -142,7 +142,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
           commitDetails.stats.additions &&
           commitDetails.stats.deletions
         ) {
-          filesChanged += commitDetails.files.length;
+          filesChanged += commitDetails.files?.length;
           insertions += commitDetails.stats.additions;
           deletions += commitDetails.stats.deletions;
         }
@@ -151,13 +151,13 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
 
        // Return the insights as an object
        const insights = {
-           mergedPRs: mergedPRsThisMonth.length,
-           openPRs: openPRsThisMonth.length,
-           closedIssues: closedIssuesThisMonth.length,
-           newIssues: newIssuesThisMonth.length,
-           commitsToMaster: commitsToMaster.length,
-           commitsToAllBranches: commitsToAllBranches.length,
-           contributors: contributors.length,
+           mergedPRs: mergedPRsThisMonth?.length,
+           openPRs: openPRsThisMonth?.length,
+           closedIssues: closedIssuesThisMonth?.length,
+           newIssues: newIssuesThisMonth?.length,
+           commitsToMaster: commitsToMaster?.length,
+           commitsToAllBranches: commitsToAllBranches?.length,
+           contributors: contributors?.length,
            filesChanged,
            insertions,
            deletions,

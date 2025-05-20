@@ -109,7 +109,7 @@ const Meta = () => {
             <FlexBetween>
               <Header
                 title={`Meta - [ ${
-                  data?.filter((item) => item.type === "Meta").length
+                  data?.filter((item) => item.type === "Meta")?.length
                 } ]`}
                 subtitle="Meta EIPs describe changes to the EIP process, or other non optional changes."
               />

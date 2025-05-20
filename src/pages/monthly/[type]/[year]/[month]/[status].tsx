@@ -120,7 +120,7 @@ const Insi = () => {
   }, [year, month]);
 
   useEffect(() => {
-    if (data.length === 0) {
+    if (data?.length === 0) {
       setIsResEmpty(true);
     } else {
       setIsResEmpty(false);

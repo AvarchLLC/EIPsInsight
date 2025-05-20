@@ -42,7 +42,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
 
   const maxItems = Math.max(
     ...dataToRender?.map(
-      (d) => d.included.length + d.scheduled.length + d.considered.length + d.declined.length
+      (d) => d.included?.length + d.scheduled?.length + d.considered?.length + d.declined?.length
     )
   );
 
@@ -55,7 +55,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
     range: [0, maxItems * (blockWidth + blockSpacing)],
   });
   const chartWidth = xScale(maxItems) + 200;
-  const chartHeight = visibleData.length * rowHeight + 80;
+  const chartHeight = visibleData?.length * rowHeight + 80;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -83,10 +83,10 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
   const downloadReport = () => {
     const rows = dataToRender?.map((d) => ({
       date: d.date,
-      included: d.included.length ? d.included.join(', ') : '-',
-      considered: d.considered.length ? d.considered.join(', ') : '-',
-      declined: d.declined.length ? d.declined.join(', ') : '-',
-      scheduled: d.scheduled.length ? d.scheduled.join(', ') : '-',
+      included: d.included?.length ? d.included.join(', ') : '-',
+      considered: d.considered?.length ? d.considered.join(', ') : '-',
+      declined: d.declined?.length ? d.declined.join(', ') : '-',
+      scheduled: d.scheduled?.length ? d.scheduled.join(', ') : '-',
     }));
   
     const headers = ['ChangeDate', 'Included', 'Considered', 'Declined', 'Scheduled'];
@@ -241,10 +241,10 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
           onMouseEnter={() => {
             setHoveredRow(rowIndex);
             setStatusCounts({
-              included: item.included.length,
-              scheduled: item.scheduled.length,
-              considered: item.considered.length,
-              declined: item.declined.length
+              included: item.included?.length,
+              scheduled: item.scheduled?.length,
+              considered: item.considered?.length,
+              declined: item.declined?.length
             });
           }}
           onMouseLeave={() => setHoveredRow(null)}
@@ -326,7 +326,7 @@ const TimelineVisxChart: React.FC<{ data: EIPData[]; data2: EIPData[] }> = ({ da
   )}
 
   {/* Legend - bottom right */}
-  <Group top={chartHeight - padding - Object.entries(COLOR_SCHEME).length * 20} left={chartWidth - 200}>
+  <Group top={chartHeight - padding - Object.entries(COLOR_SCHEME)?.length * 20} left={chartWidth - 200}>
     {Object.entries(COLOR_SCHEME)?.map(([status, color], idx) => (
       <Group key={status} top={idx * 20}>
         <rect width={10} height={10} fill={color} rx={2} />

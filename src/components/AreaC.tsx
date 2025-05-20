@@ -326,7 +326,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     // Filter data based on the selected status
     const filteredData = typeData?.filter((item) => item.status === selectedStatus);
 
-    if (!filteredData.length) {
+    if (!filteredData?.length) {
         console.error("No data available for the selected status.");
         alert("No data available for download.");
         return;
@@ -355,7 +355,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
         });
     });
 
-    if (!transformedData.length) {
+    if (!transformedData?.length) {
         console.error("Transformed data is empty.");
         alert("No transformed data available for download.");
         return;
@@ -422,7 +422,7 @@ const headingColor = useColorModeValue('black', 'white');
       >
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
           {`Status: ${selectedStatus} - [${
-            data2?.filter((item) => item.status === selectedStatus).length
+            data2?.filter((item) => item.status === selectedStatus)?.length
           }] `}
         </Text>
       </NextLink>

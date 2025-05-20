@@ -129,7 +129,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   
 
   const handleExpand = () => {
-    setVisibleCount((prev) => Math.min(prev + 5, authorCounts.length));
+    setVisibleCount((prev) => Math?.min(prev + 5, authorCounts?.length));
   };
 
   const handleCollapse = () => {
@@ -140,13 +140,13 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   const filteredData = data?.filter(item =>
     !selectedAuthor || item.author.toLowerCase().includes(selectedAuthor.toLowerCase())
   );
-  // const totalPages = Math.ceil(filteredData.length / cardsPerPage);
+  // const totalPages = Math.ceil(filteredData?.length / cardsPerPage);
   const filteredData2 = searchTerm
     ? filteredData?.filter((item) =>
         item.eip.toString().includes(searchTerm.trim())
       )
     : filteredData;
-    const totalPages = Math.ceil(filteredData2.length / cardsPerPage);
+    const totalPages = Math.ceil(filteredData2?.length / cardsPerPage);
   
 
   const jsonToCsv = (data: EIP[]): string => { 
@@ -183,7 +183,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   console.log("paginated data:", paginatedData);
   
   const handleDownload = () => {
-    if (!paginatedData.length) {
+    if (!paginatedData?.length) {
       alert('No data to download.');
       return;
     }
@@ -307,7 +307,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
 
 
-      {visibleCount < authorCounts.length && (
+      {visibleCount < authorCounts?.length && (
         <Tooltip label="Expand" fontSize="md">
           <IconButton
           icon={<ChevronDownIcon fontWeight="bold" />}
@@ -516,7 +516,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
     // Show only the first author with ...more if applicable
     const firstAuthor = sortedAuthors[0];
-    const hasMoreAuthors = sortedAuthors.length > 1;
+    const hasMoreAuthors = sortedAuthors?.length > 1;
 
     return (
       <Box

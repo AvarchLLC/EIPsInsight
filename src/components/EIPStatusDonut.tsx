@@ -60,31 +60,31 @@ const EIPStatusDonut = () => {
   const dat = [
     {
       status: "Final",
-      value: data?.filter((item) => item.status === "Final").length,
+      value: data?.filter((item) => item.status === "Final")?.length,
     },
     {
       status: "Draft",
-      value: data?.filter((item) => item.status === "Draft").length,
+      value: data?.filter((item) => item.status === "Draft")?.length,
     },
     {
       status: "Review",
-      value: data?.filter((item) => item.status === "Review").length,
+      value: data?.filter((item) => item.status === "Review")?.length,
     },
     {
       status: "Last Call",
-      value: data?.filter((item) => item.status === "Last Call").length,
+      value: data?.filter((item) => item.status === "Last Call")?.length,
     },
     {
       status: "Living",
-      value: data?.filter((item) => item.status === "Living").length,
+      value: data?.filter((item) => item.status === "Living")?.length,
     },
     {
       status: "Stagnant",
-      value: data?.filter((item) => item.status === "Stagnant").length,
+      value: data?.filter((item) => item.status === "Stagnant")?.length,
     },
     {
       status: "Withdrawn",
-      value: data?.filter((item) => item.status === "Withdrawn").length,
+      value: data?.filter((item) => item.status === "Withdrawn")?.length,
     },
   ];
   const Area = dynamic(
@@ -217,7 +217,7 @@ const csvContent = header
         display="flex"
         flexDirection="column"
       >
-        {`EIP - [${data.length}]`}
+        {`EIP - [${data?.length}]`}
       </Text>
     </NextLink>
           </Heading>

@@ -90,10 +90,10 @@ const All = () => {
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;
@@ -585,7 +585,7 @@ const All = () => {
         width={{ base: "280px", md: "320px" }}
         // Adjusted margins for arrow clearance
         ml={index === 0 ? 4 : 0}  // Increased from 2 to 4 to compensate for negative margin
-        mr={index === PectraPosts.length - 1 ? 2 : 0}
+        mr={index === PectraPosts?.length - 1 ? 2 : 0}
       >
         <Card
           image={pectra.image}

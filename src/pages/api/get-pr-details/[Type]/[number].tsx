@@ -93,7 +93,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 const uniqueParticipantsArray = Array.from(mergedParticipants);
 
                 issueDetails.participants=uniqueParticipantsArray;
-                issueDetails.numParticipants=uniqueParticipantsArray.length;
+                issueDetails.numParticipants=uniqueParticipantsArray?.length;
 
                 prDetails = {
                     type: 'Pull Request',
@@ -143,13 +143,13 @@ const processPRDetails = async (prData:any,Type:string) => {
             prDescription: prData.body,
             labels,
             conversations,
-            numConversations: conversations.length,
+            numConversations: conversations?.length,
             participants,
-            numParticipants: participants.length,
+            numParticipants: participants?.length,
             commits,
-            numCommits: commits.length,
+            numCommits: commits?.length,
             filesChanged: files,
-            numFilesChanged: files.length,
+            numFilesChanged: files?.length,
             mergeDate,
         });
 
@@ -184,7 +184,7 @@ const fetchConversations = async (Type:string,number:number) => {
             const conversations = conversationResponse.data;
             allConversations = allConversations?.concat(conversations);
 
-            if (conversations.length < 100) {
+            if (conversations?.length < 100) {
                 break;
             }
 
@@ -204,7 +204,7 @@ const fetchConversations = async (Type:string,number:number) => {
             const conversations = conversationResponse.data;
             allConversations = allConversations?.concat(conversations);
 
-            if (conversations.length < 100) {
+            if (conversations?.length < 100) {
                 break;
             }
 
@@ -236,7 +236,7 @@ const getParticipants = (conversations: any[], commits: any[]) => {
 };
 
 const getParticipants2 = (conversations: any[]) => {
-    if (conversations.length === 0) return [];
+    if (conversations?.length === 0) return [];
 
     const commentParticipants = conversations
         ?.filter((conversation) => conversation.user && conversation.user.login && conversation.user.login !== 'github-actions[bot]')

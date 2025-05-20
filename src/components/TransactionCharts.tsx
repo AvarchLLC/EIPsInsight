@@ -33,7 +33,7 @@ export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactio
     ?.filter(([type]) => type !== '4' && type !== 'all')
     ?.map(([type, txs]) => ({
       name: `Type ${type}`,
-      value: txs.length,
+      value: txs?.length,
       type,
     }));
 
@@ -74,12 +74,12 @@ export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactio
                 animationBegin={0}
               >
                 {data?.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS?.length]} />
                 ))}
               </Pie>
               <Tooltip
                 content={({ payload }) => {
-                  if (payload && payload.length > 0) {
+                  if (payload && payload?.length > 0) {
                     const { name, value, type } = payload[0].payload;
                     const percentage = ((value / data?.reduce((sum, d) => sum + d.value, 0)) * 100).toFixed(2);
                     return (
@@ -143,7 +143,7 @@ export const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactio
                 ?.map(([type, stats], index) => (
                     <Box
                     key={type}
-                    bg={COLORS[index % COLORS.length]}
+                    bg={COLORS[index % COLORS?.length]}
                     p={4}
                     borderRadius="20px"
                     boxShadow="0 4px 12px rgba(0, 119, 255, 0.3)"
@@ -191,12 +191,12 @@ const extractGasFees = (transactions: any[]) => {
 
 // Utility function to calculate gas fee stats
 const calculateGasFeeStats = (gasFees: number[]) => {
-  if (!gasFees || gasFees.length === 0) {
+  if (!gasFees || gasFees?.length === 0) {
     return { avg: '~', high: '~', low: '~' };
   }
 
   const total = gasFees?.reduce((sum, fee) => sum + fee, 0);
-  const avg = (total / gasFees.length).toFixed(2);
+  const avg = (total / gasFees?.length).toFixed(2);
   const high = Math.max(...gasFees).toFixed(2);
   const low = Math.min(...gasFees).toFixed(2);
 

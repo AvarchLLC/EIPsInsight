@@ -65,12 +65,12 @@ const LineChart: React.FC = () => {
     const InterEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'Interface');
     const MetaEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'Meta');
     const InfoEips = eips?.filter((eip) => eip.status === 'Final' && eip.category === 'Informational');
-    LivingCounts[key] = livingEips.length;
-    ERCCounts[key] = ercEips.length;
-    NetCounts[key] = NetEips.length;
-    InterCounts[key] = InterEips.length;
-    MetaCounts[key] = MetaEips.length;
-    InfoCounts[key] = InfoEips.length;
+    LivingCounts[key] = livingEips?.length;
+    ERCCounts[key] = ercEips?.length;
+    NetCounts[key] = NetEips?.length;
+    InterCounts[key] = InterEips?.length;
+    MetaCounts[key] = MetaEips?.length;
+    InfoCounts[key] = InfoEips?.length;
   }
 
   const data = {

@@ -151,17 +151,17 @@ const EIP3DGraph = () => {
   const [showResetZoom, setShowResetZoom] = useState(true);
 
   const handleZoomIn = () => {
-    if (fgRef.current) {
-      const distance = fgRef.current.camera().position.length();
-      fgRef.current.camera().position.setLength(distance * 0.8); // zoom in
+    if (fgRef?.current) {
+      const distance = fgRef.current?.camera()?.position?.length();
+      fgRef?.current?.camera()?.position?.setLength(distance * 0.8); // zoom in
       setShowResetZoom(true);
     }
   };
   
   const handleZoomOut = () => {
-    if (fgRef.current) {
-      const distance = fgRef.current.camera().position.length();
-      fgRef.current.camera().position.setLength(distance * 1.2); // zoom out
+    if (fgRef?.current) {
+      const distance = fgRef.current?.camera().position?.length();
+      fgRef?.current?.camera().position?.setLength(distance * 1.2); // zoom out
       setShowResetZoom(true);
     }
   };
@@ -173,7 +173,7 @@ const EIP3DGraph = () => {
     const seen = new Set<number>();
 
     for (const upgrade of networkUpgradesData.networkUpgrades) {
-      for (const { eip } of upgrade.eips) {
+      for (const { eip } of upgrade?.eips) {
         if (!seen.has(eip)) {
           nodes.push({
             id: eip,
@@ -208,7 +208,7 @@ const EIP3DGraph = () => {
 
   const uniqueGroups = useMemo(() => {
     const groups = new Set<string>();
-    graphData.nodes.forEach((node) => groups.add(node.group));
+    graphData.nodes?.forEach((node) => groups.add(node.group));
     return [...groups]?.filter((g) => g); // remove empty string group
   }, [graphData]);
 
@@ -219,7 +219,7 @@ const EIP3DGraph = () => {
       '#FF9F1C', '#2EC4B6', '#E71D36', '#A8DADC', '#457B9D',
     ];
     uniqueGroups.forEach((group, index) => {
-      scale.set(group, palette[index % palette.length]);
+      scale.set(group, palette[index % palette?.length]);
     });
     return scale;
   }, [uniqueGroups]);

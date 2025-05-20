@@ -773,7 +773,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
               <CopyLink link={`https://eipsinsight.com/Editors#Leaderboard`} />
             </Heading>
             <CSVLink
-              data={csvData.length ? csvData : []} 
+              data={csvData?.length ? csvData : []} 
               filename={`editors_yearly_data.csv`}
               onClick={async () => {
                 try {
@@ -803,7 +803,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
               <CopyLink link={`https://eipsinsight.com/Reviewers#Leaderboard`} />
             </Heading>
             <CSVLink
-              data={csvData.length ? csvData : []} 
+              data={csvData?.length ? csvData : []} 
               filename={`reviewers_yearly_data.csv`}
               onClick={async () => {
                 try {
@@ -860,7 +860,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
                 {`Editors Leaderboard (Monthly)`}
               </Heading>
               <CSVLink
-                data={csvData.length ? csvData : []}
+                data={csvData?.length ? csvData : []}
                 filename={`editors_${selectedYear}_${selectedMonth}.csv`}
                 onClick={async () => {
                   try {
@@ -886,7 +886,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
                 {`Reviewers Leaderboard (Monthly)`}
               </Heading>
               <CSVLink
-                data={csvData.length ? csvData : []} 
+                data={csvData?.length ? csvData : []} 
                 filename={`reviewers_${selectedYear}_${selectedMonth}.csv`}
                 onClick={async () => {
                   try {
@@ -959,11 +959,11 @@ const renderChart = () => {
 
   // Assign colors if not already assigned
   const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
-  const totalReviewers = reviewers.length;
+  const totalReviewers = reviewers?.length;
   filteredData.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       // Assign a new color only if the reviewer doesn't already have one
-      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
+      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
     }
   });
   // console.log("filtered data:", filteredData);
@@ -1028,11 +1028,11 @@ const renderChart4 = () => {
 
   // Assign colors if not already assigned
   const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
-  const totalReviewers = reviewers.length;
+  const totalReviewers = reviewers?.length;
   filteredData.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       // Assign a new color only if the reviewer doesn't already have one
-      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
+      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
     }
   });
 
@@ -1118,7 +1118,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
 
   // Assign colors to reviewers
   const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
-  const totalReviewers = reviewers.length;
+  const totalReviewers = reviewers?.length;
   filteredData.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       reviewerColorsMap[item.reviewer] = `hsl(${(index * (360 / totalReviewers)) % 360}, 85%, 50%)`;
@@ -1238,7 +1238,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
             </a>
           </Flex>
           <CSVLink
-            data={csvData.length ? csvData : []}
+            data={csvData?.length ? csvData : []}
             filename={`${reviewer}_reviews_data.csv`}
             onClick={async () => {
               try {
@@ -1618,7 +1618,7 @@ const fetchData4 = async () => {
         return reviewDate >= startDate && (!endDate || reviewDate <= endDate); // Check if within timeline
       });
 
-      if (reviews.length > 0) {
+      if (reviews?.length > 0) {
         filtered[reviewerName] = reviews; // Include only reviewers with valid reviews
       }
 
@@ -1737,7 +1737,7 @@ const editorsActivity = () => {
   const reviewers = [...new Set(processedData?.map((item: any) => item.reviewer))];
   const reviewerColors: { [key: string]: string } = {};
   reviewers.forEach((reviewer, index) => {
-    reviewerColors[reviewer as string] = generateDistinctColor(index, reviewers.length);
+    reviewerColors[reviewer as string] = generateDistinctColor(index, reviewers?.length);
   });
 
   const scatterConfig = {
@@ -2489,7 +2489,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       </section>
       <Flex alignItems="center">
         <CSVLink
-          data={csvData.length ? csvData : []}
+          data={csvData?.length ? csvData : []}
           filename={`reviews_data_since_2015.csv`}
           
           onClick={async () => {
@@ -2531,7 +2531,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
     <Flex alignItems="center">
 
       <CSVLink
-          data={csvData.length ? csvData : []}
+          data={csvData?.length ? csvData : []}
           filename={`reviews_data_since_2015.csv`}
           
           onClick={async () => {
@@ -2974,7 +2974,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
             {selectedYear && selectedMonth && (
                 <Box mt={4} display="flex" justifyContent="flex-end">
                 <CSVLink
-                  data={csvData.length ? csvData : []}
+                  data={csvData?.length ? csvData : []}
                   filename={`reviews_${selectedYear}_${selectedMonth}.csv`}
                   onClick={async () => {
                     try {

@@ -113,7 +113,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({
 
   console.log(data);
 
-  // const numRows = data.length + 5;
+  // const numRows = data?.length + 5;
   // const rowHeight = 40; // Assuming each row has a height of 40px
   // const maxHeight = `${numRows * rowHeight}px`;
 

@@ -138,22 +138,22 @@ export default function InsightSummary() {
 
       setPrData({
         EIPs: {
-          open: transformedEipsData[key].open.length,
-          created: transformedEipsData[key].created.length,
-          closed: transformedEipsData[key].closed.length,
-          merged: transformedEipsData[key].merged.length,
+          open: transformedEipsData[key].open?.length,
+          created: transformedEipsData[key].created?.length,
+          closed: transformedEipsData[key].closed?.length,
+          merged: transformedEipsData[key].merged?.length,
         },
         ERCs: {
-          open: transformedErcsData[key].open.length,
-          created: transformedErcsData[key].created.length,
-          closed: transformedErcsData[key].closed.length,
-          merged: transformedErcsData[key].merged.length,
+          open: transformedErcsData[key].open?.length,
+          created: transformedErcsData[key].created?.length,
+          closed: transformedErcsData[key].closed?.length,
+          merged: transformedErcsData[key].merged?.length,
         },
         RIPs: {
-          open: transformedRipsData[key].open.length,
-          created: transformedRipsData[key].created.length,
-          closed: transformedRipsData[key].closed.length,
-          merged: transformedRipsData[key].merged.length,
+          open: transformedRipsData[key].open?.length,
+          created: transformedRipsData[key].created?.length,
+          closed: transformedRipsData[key].closed?.length,
+          merged: transformedRipsData[key].merged?.length,
         },
       });
     } catch (error) {
@@ -174,19 +174,19 @@ export default function InsightSummary() {
 
       setIssueData({
         EIPs: {
-          open: transformedEipsIssue[key].open.length,
-          created: transformedEipsIssue[key].created.length,
-          closed: transformedEipsIssue[key].closed.length,
+          open: transformedEipsIssue[key].open?.length,
+          created: transformedEipsIssue[key].created?.length,
+          closed: transformedEipsIssue[key].closed?.length,
         },
         ERCs: {
-          open: transformedErcsIssue[key].open.length,
-          created: transformedErcsIssue[key].created.length,
-          closed: transformedErcsIssue[key].closed.length,
+          open: transformedErcsIssue[key].open?.length,
+          created: transformedErcsIssue[key].created?.length,
+          closed: transformedErcsIssue[key].closed?.length,
         },
         RIPs: {
-          open: transformedRipsIssue[key].open.length,
-          created: transformedRipsIssue[key].created.length,
-          closed: transformedRipsIssue[key].closed.length,
+          open: transformedRipsIssue[key].open?.length,
+          created: transformedRipsIssue[key].created?.length,
+          closed: transformedRipsIssue[key].closed?.length,
         },
       });
     } catch (error) {
@@ -455,9 +455,9 @@ export default function InsightSummary() {
     const statusData = data?.filter((item) => item._id === status);
     return {
       _id: status,
-      eipCount: statusData?.filter((item) => item.repo === "eip")[0]?.statusChanges.length || 0,
-      ercCount: statusData?.filter((item) => item.repo === "erc")[0]?.statusChanges.length || 0,
-      ripCount: statusData?.filter((item) => item.repo === "rip")[0]?.statusChanges.length || 0,
+      eipCount: statusData?.filter((item) => item.repo === "eip")[0]?.statusChanges?.length || 0,
+      ercCount: statusData?.filter((item) => item.repo === "erc")[0]?.statusChanges?.length || 0,
+      ripCount: statusData?.filter((item) => item.repo === "rip")[0]?.statusChanges?.length || 0,
     };
   });
 
@@ -488,7 +488,7 @@ export default function InsightSummary() {
       const csvData = generateCSVData(data);
   
       // Check if CSV data is empty
-      if (csvData.length === 0) {
+      if (csvData?.length === 0) {
         console.error("CSV data is empty or not generated correctly.");
         return;
       }
@@ -530,7 +530,7 @@ export default function InsightSummary() {
     let hasData = false;
 
     const formatSummary = (repo: string, label: string) => {
-        if (Object.keys(summary[repo]).length > 0) {
+        if (Object.keys(summary[repo])?.length > 0) {
             hasData = true;
             const text = Object.entries(summary[repo])
                 ?.map(([status, count]) => `${count} proposals transitioned to ${status}`)
@@ -556,7 +556,7 @@ const downloadExcelWithSummary = (csvData: CSVData[], summary: string, year: num
   const worksheet = XLSX.utils.json_to_sheet(csvData);
 
   // Determine the row index where the summary should be placed (below data)
-  const lastRowIndex = csvData.length + 2;
+  const lastRowIndex = csvData?.length + 2;
 
   // Add summary text to the merged cell
   XLSX.utils.sheet_add_aoa(worksheet, [[summary]], { origin: `A${lastRowIndex}` });
@@ -610,7 +610,7 @@ const downloadExcelWithSummary = (csvData: CSVData[], summary: string, year: num
 
   {/* Download button next to the text */}
   {/* <CSVLink 
-    data={csvData.length ? csvData : []} 
+    data={csvData?.length ? csvData : []} 
     filename={`StatusChanges-${year}-${month}.csv`} 
     onClick={async (e: any) => {
       try {
@@ -618,7 +618,7 @@ const downloadExcelWithSummary = (csvData: CSVData[], summary: string, year: num
         generateCSVData();
   
         
-        if (csvData.length === 0) {
+        if (csvData?.length === 0) {
           e.preventDefault();
           console.error("CSV data is empty or not generated correctly.");
           return;

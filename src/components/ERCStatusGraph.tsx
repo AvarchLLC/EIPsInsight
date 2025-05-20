@@ -165,7 +165,7 @@ const ERCStatusGraph = () => {
       <Flex justifyContent="space-between" alignItems="center" marginBottom="1rem">
         <NextLink href={"/riptable"}>
           <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-            ERC (Progress Over the Years) - [{data.length}]
+            ERC (Progress Over the Years) - [{data?.length}]
           </Text>
         </NextLink>
         <Button

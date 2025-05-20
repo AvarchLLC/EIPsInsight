@@ -173,7 +173,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
       status: item.status,
       category: getCat(eip.category),
       year: `${getMonthName(eip.month)} ${eip.year}`,
-      value: removeDuplicatesFromEips(eip.eips).length,
+      value: removeDuplicatesFromEips(eip.eips)?.length,
     }));
   });
 

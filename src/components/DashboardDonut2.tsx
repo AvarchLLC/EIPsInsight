@@ -90,32 +90,32 @@ const DashboardDonut2: React.FC<AreaCProps> = ({ dataset }) => {
     },
     {
       status: "ERCs",
-      value: allData?.filter((item) => getCat(item.category) === "ERCs").length,
+      value: allData?.filter((item) => getCat(item.category) === "ERCs")?.length,
     },
     {
       status: "RIPs",
-      value: allData?.filter((item) => item.repo === "rip").length,
+      value: allData?.filter((item) => item.repo === "rip")?.length,
     },
     {
       status: "Networking",
-      value: allData?.filter((item) => getCat(item.category) === "Networking").length,
+      value: allData?.filter((item) => getCat(item.category) === "Networking")?.length,
     },
     {
       status: "Interface",
-      value: allData?.filter((item) => getCat(item.category) === "Interface").length,
+      value: allData?.filter((item) => getCat(item.category) === "Interface")?.length,
     },
     {
       status: "Informational",
-      value: allData?.filter((item) => getCat(item.category) === "Informational").length,
+      value: allData?.filter((item) => getCat(item.category) === "Informational")?.length,
     },
     {
       status: "Meta",
-      value: allData?.filter((item) => getCat(item.category) === "Meta").length - 1,
+      value: allData?.filter((item) => getCat(item.category) === "Meta")?.length - 1,
     },
 
   ];
 
-  const Area = dynamic(() => import("@ant-design/plots").then((item) => item.Pie), {
+  const Area = dynamic(() => import("@ant-design/plots")?.then((item) => item.Pie), {
     ssr: false,
   });
 

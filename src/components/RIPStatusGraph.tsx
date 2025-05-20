@@ -183,7 +183,7 @@ const RIPStatusGraph = () => {
       <Flex justifyContent="space-between" alignItems="center" marginBottom="1rem">
         <NextLink href={"/riptable"}>
           <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-            RIP (Progress Over the Years) - [{data.length}]
+            RIP (Progress Over the Years) - [{data?.length}]
           </Text>
         </NextLink>
         <Button

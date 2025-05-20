@@ -61,7 +61,7 @@ const EIPCatBoxGrid = () => {
     allData?.filter(
       (item) =>
         item.type === "Standards Track" && item.category === "Core"
-    ).length || 0;
+    )?.length || 0;
 
   const NetworkingCount = new Set(
     allData?.filter((item) => item.category === "Networking")?.map((item) => item.eip)
@@ -106,7 +106,7 @@ const EIPCatBoxGrid = () => {
         {
           allData?.filter(
             (item) => item.type === "Standards Track" && item.category !== "ERC"
-          ).length
+          )?.length
         }
       </Text>
 

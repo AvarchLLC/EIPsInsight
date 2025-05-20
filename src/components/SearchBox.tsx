@@ -241,8 +241,8 @@ const SearchBox: React.FC = () => {
       const newFilteredResults = [
         ...exactMatches,
         ...partialMatches.sort((a, b) => {
-          const aLength = a.prNumber.toString().length;
-          const bLength = b.prNumber.toString().length;
+          const aLength = a.prNumber.toString()?.length;
+          const bLength = b.prNumber.toString()?.length;
           return bLength - aLength; // Sort by the length of the prNumber in descending order
         }),
       ];
@@ -272,8 +272,8 @@ const SearchBox: React.FC = () => {
       const newFilteredIssueResults = [
         ...exactIssueMatches,
         ...partialIssueMatches.sort((a, b) => {
-          const aLength = a.issueNumber.toString().length;
-          const bLength = b.issueNumber.toString().length;
+          const aLength = a.issueNumber.toString()?.length;
+          const bLength = b.issueNumber.toString()?.length;
           return bLength - aLength; // Sort by the length of the prNumber in descending order
         }),
       ];
@@ -309,8 +309,8 @@ const SearchBox: React.FC = () => {
       const newFilteredEIPResults = [
         ...exactEIPMatches,
         ...partialEIPMatches.sort((a, b) => {
-          const aLength = a.eip.length;
-          const bLength = b.eip.length;
+          const aLength = a.eip?.length;
+          const bLength = b.eip?.length;
           return bLength - aLength; // Sort by the length of the eip in descending order
         }),
       ];
@@ -393,7 +393,7 @@ const SearchBox: React.FC = () => {
     const prNumberStr = result.prNumber.toString().trim();
 
     // Ensure the PR number length is greater than or equal to the query string length
-    const isLengthValid = prNumberStr.length >= queryStr.length;
+    const isLengthValid = prNumberStr?.length >= queryStr?.length;
 
     // Ensure the PR is unique based on both repo and PR number
     const isUnique = index === self.findIndex((r) => r.prNumber === result.prNumber && r.repo === result.repo);
@@ -419,7 +419,7 @@ const SearchBox: React.FC = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowDown") {
         setSelectedIndex((prevIndex) => {
-          const newIndex = prevIndex < filteredAuthors.length + filteredResults.length + filteredIssueResults.length + filteredEIPResults.length - 1
+          const newIndex = prevIndex < filteredAuthors?.length + filteredResults?.length + filteredIssueResults?.length + filteredEIPResults?.length - 1
             ? prevIndex + 1
             : prevIndex;
           if (dropdownRef.current) {
@@ -489,10 +489,10 @@ const SearchBox: React.FC = () => {
           ref={dropdownRef}
           className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto"
         >
-          {filteredResults.length === 0 &&
-          filteredEIPResults.length === 0 &&
-          filteredIssueResults.length === 0 &&
-          filteredAuthors.length === 0 ? (
+          {filteredResults?.length === 0 &&
+          filteredEIPResults?.length === 0 &&
+          filteredIssueResults?.length === 0 &&
+          filteredAuthors?.length === 0 ? (
             <p className="p-2 text-red-500 text-center font-bold">
               Invalid EIP/ERC/RIP/PR/Issue/Author
             </p>
@@ -522,7 +522,7 @@ const SearchBox: React.FC = () => {
                   key={result.prNumber}
                   value={result.prNumber}
                   onClick={() => handleSearchResultClick(result.prNumber, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + index ? "bg-blue-100" : ""}`}
+                  className={`text-lg py-3 ${selectedIndex === filteredAuthors?.length + index ? "bg-blue-100" : ""}`}
                 >
                   {result.repo} PR: {result.prNumber}
                 </option>
@@ -532,7 +532,7 @@ const SearchBox: React.FC = () => {
                   key={result.issueNumber}
                   value={result.issueNumber}
                   onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + index ? "bg-blue-100" : ""}`}
+                  className={`text-lg py-3 ${selectedIndex === filteredAuthors?.length + uniqueResults?.length + index ? "bg-blue-100" : ""}`}
                 >
                   {result.repo} ISSUE: {result.issueNumber}
                 </option>
@@ -542,7 +542,7 @@ const SearchBox: React.FC = () => {
                   key={result.eip}
                   value={result.eip}
                   onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + filteredIssueResults.length + index ? "bg-blue-100" : ""}`}
+                  className={`text-lg py-3 ${selectedIndex === filteredAuthors?.length + uniqueResults?.length + filteredIssueResults?.length + index ? "bg-blue-100" : ""}`}
                 >
                   {result.repo.toUpperCase()} Number: {result.eip}
                 </option>

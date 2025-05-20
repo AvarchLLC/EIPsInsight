@@ -99,25 +99,25 @@ const StatusBox = () => {
 
   const draftCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Draft"
-  ).length;
+  )?.length;
   const reviewCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Review"
-  ).length;
+  )?.length;
   const lastCallCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Last Call"
-  ).length;
+  )?.length;
   const livingCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Living"
-  ).length;
+  )?.length;
   const finalCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Final"
-  ).length;
+  )?.length;
   const stagnantCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Stagnant"
-  ).length;
+  )?.length;
   const withdrawnCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Withdrawn"
-  ).length;
+  )?.length;
 
   const totalCount =
     draftCount +

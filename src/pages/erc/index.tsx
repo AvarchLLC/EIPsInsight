@@ -201,7 +201,7 @@ const ERC = () => {
             >
               {/* Header Section */}
               <Header
-        title={`Ethereum Request for Comment -      [ ${data.length} ]`}
+        title={`Ethereum Request for Comment -      [ ${data?.length} ]`}
         subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
       />
 
@@ -274,7 +274,7 @@ const ERC = () => {
               <Text id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/erc/${status}`}>
-                  [{data?.filter((item) => item.status === status).length}]
+                  [{data?.filter((item) => item.status === status)?.length}]
                 </NextLink>
               </Text>
               <p className={"text-red-700"}>*</p>

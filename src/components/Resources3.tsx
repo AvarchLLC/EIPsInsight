@@ -327,7 +327,7 @@ const ResourcesPage: React.FC = () => {
     (currentVideoPage + 1) * videosPerPage
   );
 
-  const totalVideoPages = Math.ceil(VIDEOS.length / videosPerPage);
+  const totalVideoPages = Math?.ceil(VIDEOS?.length / videosPerPage);
 
   const FAQContent = () => (
     <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
@@ -383,12 +383,12 @@ const ResourcesPage: React.FC = () => {
                 p={4}
               >
                 <Box flex="1" textAlign="left">
-                  <Heading size="md">{item.title}</Heading>
+                  <Heading size="md">{item?.title}</Heading>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
               <AccordionPanel pb={4} bg={useColorModeValue("gray.50", "gray.700")}>
-                <Text mb={3}>{item.content}</Text>
+                <Text mb={3}>{item?.content}</Text>
                 <NextLink href={item.link} passHref legacyBehavior>
                   <Link
                     color={accentColor}

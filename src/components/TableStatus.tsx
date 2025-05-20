@@ -86,7 +86,7 @@ async function fetchLastCreatedYearAndMonthFromAPI(
 
     const data = await response.json();
 
-    if (Array.isArray(data) && data.length > 0) {
+    if (Array.isArray(data) && data?.length > 0) {
       const lastElement = data[0];
       const lastElementCreatedYear = lastElement.mergedYear;
       const lastElementCreatedMonth = lastElement.mergedMonth;
@@ -124,10 +124,10 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;
@@ -225,7 +225,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
   });
 
   const convertAndDownloadCSV = () => {
-    if (DataForFilter && DataForFilter.length > 0) {
+    if (DataForFilter && DataForFilter?.length > 0) {
       // Create CSV headers
       const headers =
         Object.keys(filteredDataWithMergedYearsAndMonths[0]).join(",") + "\n";
@@ -577,17 +577,17 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       <div>
                         {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
-                            let t = item[item.length - 1].substring(
+                            let t = item[item?.length - 1].substring(
                               1,
-                              item[item.length - 1].length - 1
+                              item[item?.length - 1]?.length - 1
                             );
                             return (
                               <Wrap key={index}>
                                 <WrapItem>
                                   <Link
                                     href={`${
-                                      item[item.length - 1].substring(
-                                        item[item.length - 1].length - 1
+                                      item[item?.length - 1].substring(
+                                        item[item?.length - 1]?.length - 1
                                       ) === ">"
                                         ? "mailto:" + t
                                         : "https://github.com/" + t.substring(1)

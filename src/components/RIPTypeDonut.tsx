@@ -91,31 +91,31 @@ const EIPStatusDonut = () => {
   const dat2 = [
     {
       status: "Core",
-      value: data?.filter((item) => item.type === "Standards Track" && item.category === "Core" && item.repo==="rip").length,
+      value: data?.filter((item) => item.type === "Standards Track" && item.category === "Core" && item.repo==="rip")?.length,
     },
       {
         status: "Networking",
-        value: data?.filter((item) => getCat(item.category) === "Networking").length,
+        value: data?.filter((item) => getCat(item.category) === "Networking")?.length,
       },
       {
         status: "Interface",
-        value: data?.filter((item) => getCat(item.category) === "Interface").length,
+        value: data?.filter((item) => getCat(item.category) === "Interface")?.length,
       },
       {
         status: "Informational",
-        value: data?.filter((item) => getCat(item.category) === "Informational").length,
+        value: data?.filter((item) => getCat(item.category) === "Informational")?.length,
       },
       {
         status: "Meta",
-        value: data?.filter((item) => getCat(item.category) === "Meta").length,
+        value: data?.filter((item) => getCat(item.category) === "Meta")?.length,
       },
       {
         status: "RIPs",
-        value: data?.filter((item) => getCat(item.category) === "RIPs").length,
+        value: data?.filter((item) => getCat(item.category) === "RIPs")?.length,
       },
       {
         status: "RRCs",
-        value: data?.filter((item) => getCat(item.category) === "RRCs").length,
+        value: data?.filter((item) => getCat(item.category) === "RRCs")?.length,
       },
     
   ]?.filter((item) => item.value > 0);
@@ -253,7 +253,7 @@ const csvContent = header
         display="flex"
         flexDirection="column"
       >
-        {`RIP - [${data.length}]`}
+        {`RIP - [${data?.length}]`}
       </Text>
     </NextLink>
           </Heading>

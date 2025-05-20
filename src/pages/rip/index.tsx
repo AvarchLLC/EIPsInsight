@@ -214,7 +214,7 @@ const RIP = () => {
             >
               {/* Header Section */}
               <Header
-        title={`Rollup Improvement Proposal - [ ${data.length} ]`}
+        title={`Rollup Improvement Proposal - [ ${data?.length} ]`}
         subtitle="RIPs describe changes to the RIP process, or other non-optional changes."
       />
 
@@ -392,7 +392,7 @@ const RIP = () => {
               <Text id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/rip/${status}`}>
-                  [{data?.filter((item) => item.status === status).length}]
+                  [{data?.filter((item) => item.status === status)?.length}]
                 </NextLink>
               </Text>
               <p className={"text-red-700"}>*</p>

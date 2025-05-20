@@ -150,10 +150,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;
@@ -230,7 +230,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
             }
 
             if (eipTypeChangesMap[eip]) {
-              let previousType = eipTypeChangesMap[eip][eipTypeChangesMap[eip].length - 1];
+              let previousType = eipTypeChangesMap[eip][eipTypeChangesMap[eip]?.length - 1];
               
               if(standardTrackTypes.includes(eipType)){
                 eipType="Standards Track"
@@ -425,7 +425,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
   const convertAndDownloadCSV = () => {
     // console.log(DataForFilter);
     
-    if (DataForFilter && DataForFilter.length > 0) {
+    if (DataForFilter && DataForFilter?.length > 0) {
       // Create CSV headers
       const mergedData = DataForFilter?.map((item) => {
         const matchingEntry = data3.find((entry) => entry.eip === item.eip);
@@ -805,17 +805,17 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       <div>
                         {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
-                            let t = item[item.length - 1].substring(
+                            let t = item[item?.length - 1].substring(
                               1,
-                              item[item.length - 1].length - 1
+                              item[item?.length - 1]?.length - 1
                             );
                             return (
                               <Wrap key={index}>
                                 <WrapItem>
                                   <Link
                                     href={`${
-                                      item[item.length - 1].substring(
-                                        item[item.length - 1].length - 1
+                                      item[item?.length - 1].substring(
+                                        item[item?.length - 1]?.length - 1
                                       ) === ">"
                                         ? "mailto:" + t
                                         : "https://github.com/" + t.substring(1)

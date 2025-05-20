@@ -111,7 +111,7 @@ const Info = () => {
             <FlexBetween>
               <Header
                 title={`Informational [ ${
-                  data?.filter((item) => item.type === "Informational").length
+                  data?.filter((item) => item.type === "Informational")?.length
                 } ]`}
                 subtitle="Informational EIPs describe other changes to the Ethereum ecosystem."
               />

@@ -183,7 +183,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     return item.eips?.map((eip) => ({
       category: getCat(eip.category),
       year: `${getMonthName(eip.month)} ${eip.year.toString()}`,
-      value:removeDuplicatesFromEips(eip.eips).length
+      value:removeDuplicatesFromEips(eip.eips)?.length
     }));
   });
   
@@ -311,7 +311,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     
 
 
-  if (!transformedData.length) {
+  if (!transformedData?.length) {
       console.error("Transformed data is empty.");
       alert("No transformed data available for download.");
       return;

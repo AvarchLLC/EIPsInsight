@@ -233,8 +233,8 @@ const csvContent = header
         flexDirection="column"
       >
         {type === 'Total'
-          ? `Total Ethereum Proposals - [${data.length}]`
-          : `${type} - [${data.length}]`}
+          ? `Total Ethereum Proposals - [${data?.length}]`
+          : `${type} - [${data?.length}]`}
       </Text>
     </NextLink>
       <Button colorScheme="blue"  fontSize={{ base: "0.6rem", md: "md" }} onClick={async () => {

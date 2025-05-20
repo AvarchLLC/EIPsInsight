@@ -101,7 +101,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
     ],
   };
 
-  if (data.length === 0) {
+  if (data?.length === 0) {
     return (
       <Box
         bgColor={bg}

@@ -88,7 +88,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
         item.Number.toString().includes(searchTerm.trim())
       )
     : combinedData;
-    const totalPages = Math.ceil(combinedData.length / cardsPerPage);
+    const totalPages = Math.ceil(combinedData?.length / cardsPerPage);
  
 
   const jsonToCsv = (data: CombinedItem[]): string => { 
@@ -119,7 +119,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
   console.log("paginated data:", paginatedData);
   
   const handleDownload = () => {
-    if (!paginatedData.length) {
+    if (!paginatedData?.length) {
       alert('No data to download.');
       return;
     }

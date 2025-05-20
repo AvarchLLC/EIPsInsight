@@ -222,7 +222,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
     });
 
   const convertAndDownloadCSV = () => {
-    if (yearData && yearData.length > 0) {
+    if (yearData && yearData?.length > 0) {
       // Define the columns you want to drop
       const columnsToDrop = [
         "_id",
@@ -287,7 +287,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
     }
   };
 
-  const numRows = typeData.length + 4;
+  const numRows = typeData?.length + 4;
 const rowHeight = 40; // Assuming each row has a height of 40px
 const maxHeight = `${numRows * rowHeight}px`;
 const rows = [];

@@ -108,7 +108,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
       ?.map((eip) => ({
         category: getCat(eip.category),
         year: eip.year,
-        value: eip.eips.length,  // Keep all duplicates (counting each EIP entry as-is)
+        value: eip.eips?.length,  // Keep all duplicates (counting each EIP entry as-is)
       }));
   });
   
@@ -135,7 +135,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   });
 
   const total = rows?.reduce((sum, row) => sum + row.value, 0);
-  const numRows = rows.length + 15;
+  const numRows = rows?.length + 15;
   const rowHeight = 40; // Assuming each row has a height of 40px
   const maxHeight = `${numRows * rowHeight}px`;
 

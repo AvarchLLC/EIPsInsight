@@ -555,56 +555,56 @@ const fetchPRData3 = async (year: string) => {
     const transformedData = Object.keys(dataToUse).flatMap(monthYear => {
         const items = dataToUse[monthYear];
         return [
-            ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
-            ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
-            ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
-            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
+            ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
+            ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged??.length || 0) : 0 }] : []), // Negative count
+            ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
+            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
         ];
     });
     const transformedData2 = Object.keys(dataToUse2).flatMap(monthYear => {
         const items = dataToUse[monthYear];
         return [
-            ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
-            ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
-            ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
-            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
+            ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
+            ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged??.length || 0) : 0 }] : []), // Negative count
+            ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
+            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
         ];
     });
     const transformedData3 = Object.keys(dataToUse3).flatMap(monthYear => {
       const items = dataToUse[monthYear];
       return [
-          ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
-          ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
-          ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
-          // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
+          ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
+          ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged??.length || 0) : 0 }] : []), // Negative count
+          ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
+          // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
       ];
   });
   const transformedData4 = Object.keys(dataToUse4).flatMap(monthYear => {
       const items = dataToUse[monthYear];
       return [
-          ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
-          ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
-          ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
-          // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
+          ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
+          ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged??.length || 0) : 0 }] : []), // Negative count
+          ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
+          // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
       ];
   });
 
   const transformedData5 = Object.keys(dataToUse5).flatMap(monthYear => {
     const items = dataToUse[monthYear];
     return [
-        ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
-        ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
-        ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
-        // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
+        ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
+        ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged??.length || 0) : 0 }] : []), // Negative count
+        ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
+        // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
     ];
 });
 const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
     const items = dataToUse[monthYear];
     return [
-        ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created.length }] : []),
-        ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
-        ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed.length) }] : []), // Negative count
-        // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
+        ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
+        ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged??.length || 0) : 0 }] : []), // Negative count
+        ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
+        // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
     ];
 });
 
@@ -722,7 +722,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
 
       return {
         monthYear,
-        Open: (items.open ? items.open.length : 0) + (items2.open ? items2.open.length : 0) + 
+        Open: (items.open ? items.open?.length : 0) + (items2.open ? items2.open?.length : 0) + 
               Math.abs(getmin) + Math.abs(closedMax2),
       };
     })
@@ -735,7 +735,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
 
       return {
         monthYear,
-        Open: (items.open ? items.open.length : 0) + (items2.open ? items2.open.length : 0) + 
+        Open: (items.open ? items.open?.length : 0) + (items2.open ? items2.open?.length : 0) + 
               Math.abs(getmin) + Math.abs(closedMax2),
       };
     })
@@ -748,7 +748,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
 
       return {
         monthYear,
-        Open: (items.open ? items.open.length : 0) + (items2.open ? items2.open.length : 0) + 
+        Open: (items.open ? items.open?.length : 0) + (items2.open ? items2.open?.length : 0) + 
               Math.abs(getmin) + Math.abs(closedMax2),
       };
     })
@@ -993,7 +993,7 @@ const csv = allData?.map((item) => {
 
   {/* Download button next to the text */}
   <CSVLink 
-    data={csvData.length ? csvData : []} 
+    data={csvData?.length ? csvData : []} 
     filename={`OpenPRSAndIssues-${selectedYear}-${selectedMonth}.csv`} 
     onClick={async (e: any) => {
       try {
@@ -1001,7 +1001,7 @@ const csv = allData?.map((item) => {
         generateCSVData();
   
         // Check if CSV data is empty and prevent default behavior
-        if (csvData.length === 0) {
+        if (csvData?.length === 0) {
           e.preventDefault();
           console.error("CSV data is empty or not generated correctly.");
           return;

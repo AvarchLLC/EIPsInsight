@@ -92,12 +92,12 @@ export const getBlockDetails = async (blockNumber: string | number, isSepolia: b
     slotInEpoch,
     validator: beaconData?.data?.header?.message?.proposer_index || block.miner,
     blockNumber: block.number,
-    transactions: block.transactions.length,
+    transactions: block.transactions?.length,
     size: `${(Number(block.size) / 1024).toFixed(2)} KB`,
     gasUsed: `${(Number(block.gasUsed) / 1e6).toFixed(1)}M`,
     gasLimit: `${(Number(block.gasLimit) / 1e6).toFixed(1)}M`,
     baseFee: `${Number(web3.utils.fromWei(block.baseFeePerGas || '0', 'gwei')).toFixed(2)} Gwei`,
-    gasBurnt: `${web3.utils.fromWei(gasBurnt.toString(), 'ether')} ETH`,
+    gasBurnt: `${web3.utils?.fromWei(gasBurnt.toString(), 'ether')} ETH`,
   };
 };
 
@@ -112,7 +112,7 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
     const blockNumbers = Array.from({ length: 10 }, (_, i) => Number(latestBlock) - i);
   
     const batchSize = 100; // Number of blocks per batch
-    const totalBatches = Math.ceil(blockNumbers.length / batchSize); // Total batches (72)
+    const totalBatches = Math?.ceil(blockNumbers?.length / batchSize); // Total batches (72)
   
     const endpoint = isSepolia ? 'https://ethereum-sepolia-rpc.publicnode.com' : 'https://ethereum-hoodi-rpc.publicnode.com';
   

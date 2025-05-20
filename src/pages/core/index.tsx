@@ -81,7 +81,7 @@ const Core = () => {
             <FlexBetween>
               <Header
                 title={`Standard Tracks - Core [ ${
-                  data?.filter((item) => item.category === "Core").length
+                  data?.filter((item) => item.category === "Core")?.length
                 } ]`}
                 subtitle="Core EIPs describe changes to the Ethereum protocol."
               />

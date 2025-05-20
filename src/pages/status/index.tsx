@@ -89,31 +89,31 @@ const Status = () => {
   const dat = [
     {
       status: "Draft",
-      value: allData?.filter((item) => item.status === "Draft").length,
+      value: allData?.filter((item) => item.status === "Draft")?.length,
     },
     {
       status: "Review",
-      value: allData?.filter((item) => item.status === "Review").length,
+      value: allData?.filter((item) => item.status === "Review")?.length,
     },
     {
       status: "Last Call",
-      value: allData?.filter((item) => item.status === "Last Call").length,
+      value: allData?.filter((item) => item.status === "Last Call")?.length,
     },
     {
       status: "Living",
-      value: allData?.filter((item) => item.status === "Living").length,
+      value: allData?.filter((item) => item.status === "Living")?.length,
     },
     {
       status: "Stagnant",
-      value: allData?.filter((item) => item.status === "Stagnant").length,
+      value: allData?.filter((item) => item.status === "Stagnant")?.length,
     },
     {
       status: "Withdrawn",
-      value: allData?.filter((item) => item.status === "Withdrawn").length,
+      value: allData?.filter((item) => item.status === "Withdrawn")?.length,
     },
     {
       status: "Final",
-      value: allData?.filter((item) => item.status === "Final").length,
+      value: allData?.filter((item) => item.status === "Final")?.length,
     },
   ];
 
@@ -213,7 +213,7 @@ const Status = () => {
               <div id="draft">Draft -{" "}
               <NextLink href={`/tableStatus/Draft`}>
                 {" "}
-                [ {allData?.filter((item) => item.status === "Draft").length} ]
+                [ {allData?.filter((item) => item.status === "Draft")?.length} ]
               </NextLink>
 </div>
             </Text>
@@ -235,7 +235,7 @@ const Status = () => {
               <div id="review">Review -{" "}
               <NextLink href={`/tableStatus/Review`}>
                 {" "}
-                [ {allData?.filter((item) => item.status === "Review").length} ]
+                [ {allData?.filter((item) => item.status === "Review")?.length} ]
               </NextLink>
 </div>
             </Text>
@@ -256,7 +256,7 @@ const Status = () => {
               <div id="lastcall">Last Call -
               <NextLink href={`/tableStatus/LastCall`}>
                 {" "}
-                [ {allData?.filter((item) => item.status ===  "Last Call").length
+                [ {allData?.filter((item) => item.status ===  "Last Call")?.length
                 } ]{" "}
               </NextLink>
               </div>
@@ -279,7 +279,7 @@ const Status = () => {
               <div id="final">Final -
               <NextLink href={`/tableStatus/Final`}>
                 {" "}
-                [ {allData?.filter((item) => item.status === "Final").length
+                [ {allData?.filter((item) => item.status === "Final")?.length
                 } ]{" "}
               </NextLink>
               </div>
@@ -302,7 +302,7 @@ const Status = () => {
               <div id="stagnant">Stagnant -
               <NextLink href={`/tableStatus/Stagnant`}>
                 {" "}
-                [ {allData?.filter((item) => item.status === "Stagnant").length
+                [ {allData?.filter((item) => item.status === "Stagnant")?.length
                 } ]{" "}
               </NextLink>
               </div>
@@ -324,7 +324,7 @@ const Status = () => {
               <div id="withdrawn">Withdrawn -
               <NextLink href={`/tableStatus/Withdrawn`}>
                 {" "}
-                [ {allData?.filter((item) => item.status ===  "Withdrawn").length
+                [ {allData?.filter((item) => item.status ===  "Withdrawn")?.length
                 } ]{" "}
               </NextLink>
               </div>
@@ -346,7 +346,7 @@ const Status = () => {
               <div id="living">Living -
               <NextLink href={`/tableStatus/Living`}>
                 {" "}
-                [ {allData?.filter((item) => item.status === "Living").length} ]
+                [ {allData?.filter((item) => item.status === "Living")?.length} ]
               </NextLink>
               </div>
             </Text>

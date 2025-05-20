@@ -47,7 +47,7 @@ const InsightsLeaderboard = () => {
   
       setLoading2(true);
   
-      const formattedMonth = selectedMonth.length === 1 ? `0${selectedMonth}` : selectedMonth;
+      const formattedMonth = selectedMonth?.length === 1 ? `0${selectedMonth}` : selectedMonth;
       const key = `${selectedYear}-${formattedMonth}`;
       console.log("key1: ", key);
   
@@ -348,12 +348,12 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
     if (monthlyChartData) {
         // Assign colors if not already assigned
         const reviewers = Array.from(new Set(monthlyChartData?.map(item => item.reviewer)));
-        const totalReviewers = reviewers.length;
+        const totalReviewers = reviewers?.length;
 
         monthlyChartData.forEach((item: MonthlyChartData, index: number) => {
             if (!reviewerColorsMap[item.reviewer]) {
                 // Assign a new color only if the reviewer doesn't already have one
-                reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
+                reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
             }
         });
     }
@@ -382,7 +382,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 
   {/* Download button next to the text */}
   <CSVLink 
-    data={csvData.length ? csvData : []} 
+    data={csvData?.length ? csvData : []} 
     filename={`reviews_data.csv`} 
     onClick={async (e: any) => {
       try {
@@ -390,7 +390,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         generateCSVData();
   
         // Check if CSV data is empty and prevent default behavior
-        if (csvData.length === 0) {
+        if (csvData?.length === 0) {
           e.preventDefault();
           console.error("CSV data is empty or not generated correctly.");
           return;

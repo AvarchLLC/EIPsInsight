@@ -105,12 +105,12 @@ for (const { date, upgrade, eip } of rawData) {
 const transformedData: UpgradeData[] = Object.values(upgradeMap)?.map(({ date, upgrade, eips }) => ({
   date,
   upgrade,
-  count: eips.length,
-  label: eips.join(", "),
+  count: eips?.length,
+  label: eips?.join(", "),
 })).sort((a, b) => {
   if (a.date === "TBD") return 1;
   if (b.date === "TBD") return -1;
-  return new Date(a.date).getTime() - new Date(b.date).getTime();
+  return new Date(a.date)?.getTime() - new Date(b.date)?.getTime();
 });
 
 function getContrastColor(hexColor: string) {
@@ -135,7 +135,7 @@ const generateDistinctColor = (index: number, total: number) => {
 
 const uniqueUpgrades = [...new Set(transformedData?.map((data) => data.upgrade))];
 const colorMap = uniqueUpgrades?.reduce((map, upgrade, index) => {
-  map[upgrade] = generateDistinctColor(index, uniqueUpgrades.length);
+  map[upgrade] = generateDistinctColor(index, uniqueUpgrades?.length);
   return map;
 }, {} as Record<string, string>);
 
@@ -153,7 +153,7 @@ const NetworkUpgradesChart = React.memo(() => {
         "data:text/csv;charset=utf-8," +
         header +
         (
-          await Promise.all(
+          await Promise?.all(
             rawData?.map(async ({ date, upgrade, eip }) => {
               const eipNo = eip.replace("EIP-", "");
               const url = `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${eipNo}.md`;

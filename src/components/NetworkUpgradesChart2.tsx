@@ -118,7 +118,7 @@ const generateDistinctColor = (index: number, total: number) => {
 };
 
 const colorMap = transformedData?.reduce((map, author, index) => {
-  map[author.name] = generateDistinctColor(index, transformedData.length);
+  map[author?.name] = generateDistinctColor(index, transformedData?.length);
   return map;
 }, {} as Record<string, string>);
 
@@ -131,7 +131,7 @@ const AuthorContributionsChart = React.memo(() => {
     xField: "name",
     yField: "contributionCount",
     seriesField: "name",
-    color: (datum: { name?: string }) => colorMap[datum.name as string] || "#ccc",   
+    color: (datum: { name?: string }) => colorMap[datum?.name as string] || "#ccc",   
     columnStyle: {
       radius: [10, 10, 0, 0],
     },

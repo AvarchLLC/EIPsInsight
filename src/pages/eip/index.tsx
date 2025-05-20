@@ -224,7 +224,7 @@ const Type = () => {
             >
               {/* Header Section */}
               <Header
-              title={`Ethereum Improvement Proposal - [${data.length}]`}
+              title={`Ethereum Improvement Proposal - [${data?.length}]`}
               subtitle="Meta, Informational, Standard Track - Core, Interface, Networking."
               />
 
@@ -330,7 +330,7 @@ const Type = () => {
               <Text  id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/eip/${status}`}>
-                  [{data?.filter((item) => item.status === status).length}]
+                  [{data?.filter((item) => item.status === status)?.length}]
                 </NextLink>
               </Text>
               <p className={"text-red-700"}>*</p>

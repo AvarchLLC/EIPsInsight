@@ -89,7 +89,7 @@ export default function EIPMD() {
   const handleScroll = (event: WheelEvent<HTMLDivElement>) => {
     const delta = Math.sign(event.deltaY);
     setCurrentIndex(
-      (prevIndex) => (prevIndex + delta + authors.length) % authors.length
+      (prevIndex) => (prevIndex + delta + authors?.length) % authors?.length
     );
   };
 

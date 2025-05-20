@@ -178,7 +178,7 @@ const DashboardCards = () => {
         (item) =>
           item.type === "Standards Track" &&
           item.category === "Core"
-      ).length || 0,
+      )?.length || 0,
 
     },
     { title: "Core EIPs", description: "Core EIPs describe changes to the Ethereum protocol.", url: "core", value: 64 },
@@ -186,42 +186,42 @@ const DashboardCards = () => {
       title: "ERCs", description: "ERCs describe application-level standards for the Ethereum ecosystem.", url: "erc", value: data?.erc?.filter(
         (item) =>
           item.type === "Standards Track" &&
-          item.category === "ERC").length || 0
+          item.category === "ERC")?.length || 0
     },
     {
       title: "Networking", description: "Networking EIPs describe changes to the Ethereum network protocol.", url: "networking", value: data?.eip?.filter(
         (item) =>
           item.type === "Standards Track" &&
-          item.category === "Networking").length || 0
+          item.category === "Networking")?.length || 0
     },
     {
       title: "Interface EIPs", description: "Interface EIPs describe changes to the Ethereum client API.", url: "interface", value: data?.eip?.filter(
         (item) =>
           item.type === "Standards Track" &&
-          item.category === "Interface").length || 0
+          item.category === "Interface")?.length || 0
     },
     {
       title: "Informational EIPs", description: "Informational EIPs describe other changes to the Ethereum ecosystem.", url: "informational", value: data?.eip?.filter(
         (item) =>
           item.type === "Informational" &&
-          item.category === "Core").length || 0
+          item.category === "Core")?.length || 0
     },
     {
       title: "RIPs", description: "RIPs describe changes to the RIP process, or other non-optional changes.", url: "rip", value: data?.rip?.filter(
         (item) =>
           item.type === "Standards Track" &&
-          item.category === "RIP").length || 0
+          item.category === "RIP")?.length || 0
     },
   ];
 
   const statsByStatus = [
-    { title: "Living", description: "Living EIPs are continuously updated and reflect evolving standards or documentation.", url: "alltable", value: allData?.filter((item) => item.status === "Living").length },
-    { title: "Final", description: "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.", url: "alltable", value: allData?.filter((item) => item.status === "Draft").length },
-    { title: "Draft", description: "Draft EIPs are proposals still under initial consideration and open for feedback.", url: "alltable", value: allData?.filter((item) => item.status === "Draft").length },
-    { title: "Review", description: "EIPs in the Review stage are being actively discussed and evaluated by the community.", url: "alltable", value: allData?.filter((item) => item.status === "Review").length },
-    { title: "Last Call", description: "Last Call EIPs are nearing finalization, with a short period for final community comments.", url: "alltable", value: allData?.filter((item) => item.status === "Last Call").length },
-    { title: "Stagnant", description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.", url: "alltable", value: allData?.filter((item) => item.status === "Stagnant").length },
-    { title: "Withdrawn", description: "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.", url: "alltable", value: allData?.filter((item) => item.status === "Withdrawn").length },
+    { title: "Living", description: "Living EIPs are continuously updated and reflect evolving standards or documentation.", url: "alltable", value: allData?.filter((item) => item.status === "Living")?.length },
+    { title: "Final", description: "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.", url: "alltable", value: allData?.filter((item) => item.status === "Draft")?.length },
+    { title: "Draft", description: "Draft EIPs are proposals still under initial consideration and open for feedback.", url: "alltable", value: allData?.filter((item) => item.status === "Draft")?.length },
+    { title: "Review", description: "EIPs in the Review stage are being actively discussed and evaluated by the community.", url: "alltable", value: allData?.filter((item) => item.status === "Review")?.length },
+    { title: "Last Call", description: "Last Call EIPs are nearing finalization, with a short period for final community comments.", url: "alltable", value: allData?.filter((item) => item.status === "Last Call")?.length },
+    { title: "Stagnant", description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.", url: "alltable", value: allData?.filter((item) => item.status === "Stagnant")?.length },
+    { title: "Withdrawn", description: "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.", url: "alltable", value: allData?.filter((item) => item.status === "Withdrawn")?.length },
   ];
   return (
     <div id='dashboard' className={`min-h-screen p-10 ${bgColor} ${textColor}`} >
@@ -263,7 +263,7 @@ const DashboardCards = () => {
               description={stat.description}
               url={stat.url}
               icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][idx % 4]}
-              color={colors[idx % colors.length]}
+              color={colors[idx % colors?.length]}
             />
           ))}
         </div>
@@ -278,7 +278,7 @@ const DashboardCards = () => {
               description={stat.description}
               url={stat.url}
               icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][(idx + 4) % 4]}
-              color={colors[(idx + 4) % colors.length]}
+              color={colors[(idx + 4) % colors?.length]}
             />
           ))}
         </div>
@@ -330,7 +330,7 @@ const DashboardCards = () => {
                 description={stat.description}
                 url={stat.url}
                 icon={FaChartBar}
-                color={colors[(idx + 3) % colors.length]}
+                color={colors[(idx + 3) % colors?.length]}
               />
             ))}
           </div>
@@ -345,7 +345,7 @@ const DashboardCards = () => {
                 description={stat.description}
                 url={stat.url}
                 icon={FaChartBar}
-                color={colors[(idx + 7) % colors.length]}
+                color={colors[(idx + 7) % colors?.length]}
               />
             ))}
           </div>

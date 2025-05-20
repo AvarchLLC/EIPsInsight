@@ -309,12 +309,12 @@ useEffect(() => {
       : { created: [] as Issue[], closed: [] as Issue[], open:[] as Issue[] });
   
 
-      const createdCount = items.created.length;
-      const closedCount = items.closed.length;
-      const openCount = items.open.length;
+      const createdCount = items.created?.length;
+      const closedCount = items.closed?.length;
+      const openCount = items.open?.length;
 
       // Conditionally calculate for PR-specific categories
-      const mergedCount = type === 'PRs' ? (items as { merged: PR[] }).merged.length : 0;
+      const mergedCount = type === 'PRs' ? (items as { merged: PR[] }).merged?.length : 0;
       
 
 
@@ -474,7 +474,7 @@ useEffect(() => {
 
   
     <Tbody>
-      {items.created.length === 0 && items.closed.length === 0 && items.open.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged.length === 0) : true) ? (
+      {items.created?.length === 0 && items.closed?.length === 0 && items.open?.length === 0 && (type === 'PRs' ? ('merged' in items && items.merged?.length === 0) : true) ? (
         <Tr>
           <Td colSpan={type === 'PRs' ? 8 : 6} textAlign="center">No Data Available</Td>
         </Tr>
@@ -742,7 +742,7 @@ useEffect(() => {
     const key = `${selectedYear}-${String(getMonths().indexOf(selectedMonth) + 1).padStart(2, '0')}`;
     const filteredData = activeTab === 'PRs' ? data.PRs[key] : data.Issues[key];
   
-    if (!filteredData || (filteredData.created.length === 0 && filteredData.closed.length === 0)) {
+    if (!filteredData || (filteredData.created?.length === 0 && filteredData.closed?.length === 0)) {
       alert('No data available for the selected month.');
       return;
     }
@@ -808,14 +808,14 @@ useEffect(() => {
     // Check if there's data to download
     const noData =
       activeTab === 'PRs'
-        ? combinedPRData.created.length === 0 &&
-          combinedPRData.closed.length === 0 &&
-          combinedPRData.open.length === 0 &&
-          combinedPRData.merged.length === 0 &&
-          combinedPRData.reviewed.length === 0
-        : combinedIssueData.created.length === 0 &&
-          combinedIssueData.closed.length === 0 &&
-          combinedIssueData.open.length === 0;
+        ? combinedPRData.created?.length === 0 &&
+          combinedPRData.closed?.length === 0 &&
+          combinedPRData.open?.length === 0 &&
+          combinedPRData.merged?.length === 0 &&
+          combinedPRData.reviewed?.length === 0
+        : combinedIssueData.created?.length === 0 &&
+          combinedIssueData.closed?.length === 0 &&
+          combinedIssueData.open?.length === 0;
   
     if (noData) {
       alert('No data available.');

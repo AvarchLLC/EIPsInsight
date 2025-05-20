@@ -140,8 +140,8 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
       focus: 'series',
     },
     itemStyle: {
-      color: colors[index % colors.length],
-      borderColor: colors[index % colors.length],
+      color: colors[index % colors?.length],
+      borderColor: colors[index % colors?.length],
       borderWidth: 2,
       opacity: 0.6,
     },

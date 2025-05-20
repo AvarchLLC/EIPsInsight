@@ -249,7 +249,7 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
     >
         {/* Labels and Participants */}
         <Box className="border-0 lg:border-r lg:border-blue-400" paddingRight={4}>
-            {data?.issueDetails?.labels.length !== 0 && (
+            {data?.issueDetails?.labels?.length !== 0 && (
                 <Box className={'pb-10'}>
                     <Text className={'text-2xl font-bold pb-5'}>Labels: </Text>
                     <div className="flex flex-wrap gap-2">

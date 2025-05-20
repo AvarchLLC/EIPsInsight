@@ -96,7 +96,7 @@ const Feedback: React.FC = () => {
           </Box>
         ) : (
           <Box maxW="6xl" mx="auto">
-            {comments.length === 0 ? (
+            {comments?.length === 0 ? (
               <Text textAlign="center" fontSize="xl" color={textColor} mt={8}>
                 No feedback yet!
               </Text>

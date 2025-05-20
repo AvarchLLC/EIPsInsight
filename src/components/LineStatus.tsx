@@ -69,13 +69,13 @@ const LineStatus: React.FC<TabProps> = ({cat }) => {
     const withdrawnEips = eips?.filter((eip) => eip.status  && eip.category===cat );
     const livingEips = eips?.filter((eip) => eip.status  && eip.category===cat );
     const draftEips = eips?.filter((eip) => eip.status && eip.category===cat );
-    LivingCounts[key] = livingEips.length;
-    Final[key] = finalEips.length;
-    Review[key] = reviewEips.length;
-    LastCall[key] = lastCallEips.length;
-    Stagnant[key] = stagnantEips.length;
-    Withdrawn[key] = withdrawnEips.length;
-    Draft[key] = draftEips.length;
+    LivingCounts[key] = livingEips?.length;
+    Final[key] = finalEips?.length;
+    Review[key] = reviewEips?.length;
+    LastCall[key] = lastCallEips?.length;
+    Stagnant[key] = stagnantEips?.length;
+    Withdrawn[key] = withdrawnEips?.length;
+    Draft[key] = draftEips?.length;
   }
 
   const data = {

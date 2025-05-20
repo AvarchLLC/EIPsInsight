@@ -236,7 +236,7 @@ const TestComponent = () => {
                     )}
 
                     {metadataJson?.requires &&
-                      metadataJson.requires.length > 0 && (
+                      metadataJson.requires?.length > 0 && (
                         <Tr>
                           <Th>Requires</Th>
                           <Td>
@@ -412,7 +412,7 @@ const TestComponent = () => {
                       </motion.div>
                     )}
                   </Box>
-                  {data2.length > 1 && (
+                  {data2?.length > 1 && (
                           <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}

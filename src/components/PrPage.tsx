@@ -220,7 +220,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
     );
     const ethBotCount = ethBotFiltered?.length;
     const gitActionsBotFiltered = data?.prDetails?.conversations?.filter(
-        (item) => item.user.login === 'github-actions[bot]'
+        (item) => item?.user?.login === 'github-actions[bot]'
     );
     const gitActionsBotCount = gitActionsBotFiltered?.length;
 
@@ -336,7 +336,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
                                                                     <Wrap>
                                                                         <WrapItem>
                                                                             <Badge colorScheme="gray" className="rounded-full" fontSize={{ base: 'lg', md: '2xl' }} px={4} py={1}>
-                                                                                {data?.prDetails?.commits.length}
+                                                                                {data?.prDetails?.commits?.length}
                                                                             </Badge>
                                                                         </WrapItem>
                                                                     </Wrap>
@@ -362,7 +362,7 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
                                                     </tbody>
                                                 </table>
 
-                                                {data?.prDetails?.labels.length !== 0  && (
+                                                {data?.prDetails?.labels?.length !== 0  && (
                                                     <Box className="pb-10">
                                                         <Text className="text-lg md:text-2xl font-bold pb-5">Labels:</Text>
                                                         <div className="flex flex-wrap gap-2">
