@@ -62,7 +62,7 @@ export const TransactionTabs: React.FC<TransactionTabsProps> = ({ transactions }
         {[0, 1, 2, 3, 4]?.map((type) => (
           <TabPanel key={type}>
             <Box borderRadius="lg" borderWidth="1px" borderColor={borderColor} bg={panelBg} p={4}>
-              {transactions[type]??.length > 0 ? (
+              {transactions[type]?.length > 0 ? (
                 transactions[type]?.map((tx, index) => (
                   <Box
                     key={index}

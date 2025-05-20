@@ -558,7 +558,7 @@ const fetchPRData3 = async (year: string) => {
             ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
             ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
             ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
-            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
+            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
         ];
     });
     const transformedData2 = Object.keys(dataToUse2).flatMap(monthYear => {
@@ -567,7 +567,7 @@ const fetchPRData3 = async (year: string) => {
             ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
             ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
             ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
-            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
+            // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
         ];
     });
     const transformedData3 = Object.keys(dataToUse3).flatMap(monthYear => {
@@ -576,7 +576,7 @@ const fetchPRData3 = async (year: string) => {
           ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
           ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
           ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
-          // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
+          // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
       ];
   });
   const transformedData4 = Object.keys(dataToUse4).flatMap(monthYear => {
@@ -585,7 +585,7 @@ const fetchPRData3 = async (year: string) => {
           ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
           ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
           ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
-          // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
+          // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
       ];
   });
 
@@ -595,7 +595,7 @@ const fetchPRData3 = async (year: string) => {
         ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
         ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
         ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
-        // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
+        // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
     ];
 });
 const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
@@ -604,7 +604,7 @@ const transformedData6 = Object.keys(dataToUse6).flatMap(monthYear => {
         ...(showCategory.created ? [{ monthYear, type: 'Created', count: items.created?.length }] : []),
         ...(activeTab === 'PRs' && showCategory.merged ? [{ monthYear, type: 'Merged', count: 'merged' in items ? -(items.merged?.length || 0) : 0 }] : []), // Negative count
         ...(showCategory.closed ? [{ monthYear, type: 'Closed', count: -(items.closed?.length) }] : []), // Negative count
-        // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review??.length || 0 : 0 }] : []),
+        // ...(activeTab === 'PRs' && showCategory.review ? [{ monthYear, type: 'Review', count: 'review' in items ? items.review?.length || 0 : 0 }] : []),
     ];
 });
 
