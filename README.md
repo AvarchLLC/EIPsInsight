@@ -61,6 +61,7 @@ The Ethereum Insight Proposals Insights is deployed using Vercel for seamless ho
 - Nandan R Pai [(@nandanpi)](https://github.com/nandanpi)
 - Viwin [(@viwinkumarpadala)](https://github.com/viwinkumarpadala)
 - Arjun [(@Arjundotadex)](https://github.com/Arjundotadex)
+- Priti Tiwari [(@prititi)](https://github.com/prititi)
 
 ---
 
