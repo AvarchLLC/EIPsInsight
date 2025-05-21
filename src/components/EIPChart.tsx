@@ -123,14 +123,7 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
     ...new Set(Object.keys(finalData)?.map((k) => k.split('-')[0])),
   ].sort();
 
-  const colors = [
-    '#FF6384',
-    '#36A2EB',
-    '#FFCE56',
-    '#4BC0C0',
-    '#9966FF',
-    '#FF9F40',
-  ];
+  const colorsByType = ["#f579ba", "#9164f7", "#3ed59e", "#68aafa", "#fbc22f", "#ac91fa", "#f97878"];
 
   const seriesData = Array.from(uniqueCategories)?.map((category, index) => ({
     name: category,
@@ -140,8 +133,8 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
       focus: 'series',
     },
     itemStyle: {
-      color: colors[index % colors?.length],
-      borderColor: colors[index % colors?.length],
+      color: colorsByType[index % colorsByType?.length],
+      borderColor: colorsByType[index % colorsByType?.length],
       borderWidth: 2,
       opacity: 0.6,
     },

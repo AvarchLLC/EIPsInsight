@@ -1,6 +1,5 @@
 "use client";
 
-
 import {
   Box,
   Grid,
@@ -20,7 +19,7 @@ import Link from "next/link";
 import { FaBolt, FaChartBar, FaCodeBranch, FaNetworkWired } from "react-icons/fa";
 import CopyLink from "./CopyLink";
 
-// mock.ts
+// Mock top stats
 const topStats = [
   {
     label: "Active Proposals",
@@ -106,11 +105,19 @@ interface APIResponse {
   rip: EIP[];
 }
 
-// Color variants
-const colors = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#6366f1", "#0ea5e9", "#7c3aed"];
+interface StatCardProps {
+  title: string;
+  value: number;
+  icon: any;
+  color: string;
+  description: string;
+  url: string;
+}
 
-// Card component
-const StatCard = ({ title, value, icon, color, description, url }: any) => {
+const colorsByType = ["#f579ba", "#9164f7", "#3ed59e", "#68aafa", "#fbc22f", "#ac91fa", "#f97878"];
+const colorsByStatus = ["#38a169", "#2996ff", "#ffd800", "#d69e2e", "#38a169", "#ff2f0d", "#ff0d0d"];
+
+const StatCard = ({ title, value, icon, color, description, url }: StatCardProps) => {
   return (
     <Box
       bg={useColorModeValue("white", "gray.800")}
@@ -122,7 +129,7 @@ const StatCard = ({ title, value, icon, color, description, url }: any) => {
       transition="all 0.3s"
       _hover={{ transform: "scale(1.02)", shadow: "2xl" }}
     >
-      <Link href={`/${url}`} >
+      <Link href={`/${url}`}>
         <Flex align="center" gap={3}>
           {icon && <Icon as={icon} boxSize={5} color={color} />}
           <Text fontSize="sm" color="gray.500">
@@ -132,14 +139,13 @@ const StatCard = ({ title, value, icon, color, description, url }: any) => {
         <Text fontSize="2xl" fontWeight="bold" mt={2}>
           {value}
         </Text>
-        {/* Render description here */}
         {description && (
           <Text fontSize="sm" mt={1} color="gray.500">
             {description}
           </Text>
         )}
       </Link>
-    </Box >
+    </Box>
   );
 };
 
@@ -147,7 +153,6 @@ const DashboardCards = () => {
   const cardBg = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("text-gray-700", "text-gray-200");
   const bgColor = useColorModeValue("bg-gray-100", "bg-gray-900");
-  const subtitleColor = useColorModeValue("text-gray-600", "text-gray-400");
 
   const [data, setData] = useState<APIResponse>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
@@ -167,67 +172,107 @@ const DashboardCards = () => {
     fetchData();
   }, []);
 
-  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
-  const secondaryTextColor = useColorModeValue("gray.500", "gray.400");
-
-
-
+  const allData: EIP[] = [...data.eip, ...data.erc, ...data.rip];
   const statsByType = [
     {
-      title: "Meta", description: "Meta EIPs describe changes to the EIP process, or other non-optional changes.", url: "meta", value: data?.eip?.filter(
-        (item) =>
-          item.type === "Standards Track" &&
-          item.category === "Core"
-      )?.length || 0,
-
-    },
-    { title: "Core EIPs", description: "Core EIPs describe changes to the Ethereum protocol.", url: "core", value: 64 },
-    {
-      title: "ERCs", description: "ERCs describe application-level standards for the Ethereum ecosystem.", url: "erc", value: data?.erc?.filter(
-        (item) =>
-          item.type === "Standards Track" &&
-          item.category === "ERC")?.length || 0
+      title: "Meta",
+      description: "Meta EIPs describe changes to the EIP process, or other non-optional changes.",
+      url: "meta",
+      value: new Set(allData.filter(item => item.type === "Meta").map(item => item.eip)).size,
     },
     {
-      title: "Networking", description: "Networking EIPs describe changes to the Ethereum network protocol.", url: "networking", value: data?.eip?.filter(
-        (item) =>
-          item.type === "Standards Track" &&
-          item.category === "Networking")?.length || 0
+      title: "Core EIPs",
+      description: "Core EIPs describe changes to the Ethereum protocol.",
+      url: "core",
+      value:
+        data.eip.filter(item => item.type === "Standards Track" && item.category === "Core").length ||
+        0,
     },
     {
-      title: "Interface EIPs", description: "Interface EIPs describe changes to the Ethereum client API.", url: "interface", value: data?.eip?.filter(
-        (item) =>
-          item.type === "Standards Track" &&
-          item.category === "Interface")?.length || 0
+      title: "ERCs",
+      description: "ERCs describe application-level standards for the Ethereum ecosystem.",
+      url: "erc",
+      value: new Set(allData.filter(item => item.category === "ERC").map(item => item.eip)).size,
     },
     {
-      title: "Informational EIPs", description: "Informational EIPs describe other changes to the Ethereum ecosystem.", url: "informational", value: data?.eip?.filter(
-        (item) =>
-          item.type === "Informational" &&
-          item.category === "Core")?.length || 0
+      title: "Networking",
+      description: "Networking EIPs describe changes to the Ethereum network protocol.",
+      url: "networking",
+      value: new Set(
+        allData.filter(item => item.category === "Networking").map(item => item.eip)
+      ).size,
     },
     {
-      title: "RIPs", description: "RIPs describe changes to the RIP process, or other non-optional changes.", url: "rip", value: data?.rip?.filter(
-        (item) =>
-          item.type === "Standards Track" &&
-          item.category === "RIP")?.length || 0
+      title: "Interface EIPs",
+      description: "Interface EIPs describe changes to the Ethereum client API.",
+      url: "interface",
+      value: new Set(allData.filter(item => item.category === "Interface").map(item => item.eip)).size,
+    },
+    {
+      title: "Informational EIPs",
+      description: "Informational EIPs describe other changes to the Ethereum ecosystem.",
+      url: "informational",
+      value: new Set(
+        allData.filter(item => item.category === "Informational").map(item => item.eip)
+      ).size,
+    },
+    {
+      title: "RIPs",
+      description: "RIPs describe changes to the RIP process, or other non-optional changes.",
+      url: "rip",
+      value: new Set(allData.filter(item => item.repo === "rip").map(item => item.eip)).size,
     },
   ];
 
   const statsByStatus = [
-    { title: "Living", description: "Living EIPs are continuously updated and reflect evolving standards or documentation.", url: "alltable", value: allData?.filter((item) => item.status === "Living")?.length },
-    { title: "Final", description: "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.", url: "alltable", value: allData?.filter((item) => item.status === "Draft")?.length },
-    { title: "Draft", description: "Draft EIPs are proposals still under initial consideration and open for feedback.", url: "alltable", value: allData?.filter((item) => item.status === "Draft")?.length },
-    { title: "Review", description: "EIPs in the Review stage are being actively discussed and evaluated by the community.", url: "alltable", value: allData?.filter((item) => item.status === "Review")?.length },
-    { title: "Last Call", description: "Last Call EIPs are nearing finalization, with a short period for final community comments.", url: "alltable", value: allData?.filter((item) => item.status === "Last Call")?.length },
-    { title: "Stagnant", description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.", url: "alltable", value: allData?.filter((item) => item.status === "Stagnant")?.length },
-    { title: "Withdrawn", description: "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.", url: "alltable", value: allData?.filter((item) => item.status === "Withdrawn")?.length },
+    {
+      title: "Living",
+      description: "Living EIPs are continuously updated and reflect evolving standards or documentation.",
+      url: "alltable",
+      value: allData?.filter((item) => item.status === "Living")?.length
+    },
+    {
+      title: "Final",
+      description: "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.",
+      url: "alltable",
+      value: allData?.filter((item) => item.status === "Final")?.length
+    },
+    {
+      title: "Draft",
+      description: "Draft EIPs are proposals still under initial consideration and open for feedback.",
+      url: "alltable",
+      value: allData?.filter((item) => item.status === "Draft")?.length
+    },
+    {
+      title: "Review",
+      description: "EIPs in the Review stage are being actively discussed and evaluated by the community.",
+      url: "alltable",
+      value: allData?.filter((item) => item.status === "Review")?.length
+    },
+    {
+      title: "Last Call",
+      description: "Last Call EIPs are nearing finalization, with a short period for final community comments.",
+      url: "alltable",
+      value: allData?.filter((item) => item.status === "Last Call")?.length
+    },
+    {
+      title: "Stagnant",
+      description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.",
+      url: "alltable",
+      value: allData?.filter((item) => item.status === "Stagnant")?.length
+    },
+    {
+      title: "Withdrawn",
+      description: "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.",
+      url: "alltable",
+      value: allData?.filter((item) => item.status === "Withdrawn")?.length
+    }
   ];
-  return (
-    <div id='dashboard' className={`min-h-screen p-10 ${bgColor} ${textColor}`} >
 
+
+  return (
+    <div id="dashboard" className={`min-h-screen p-10 ${bgColor} ${textColor}`}>
       <Box px={{ base: 4, md: 8 }} py={6}>
-        {/* Page Heading */}
         <Box mb={6}>
           <Text fontSize="4xl" fontWeight="extrabold">
             Dashboard
@@ -241,9 +286,9 @@ const DashboardCards = () => {
           </Text>
         </Box>
 
-        {/* Stats Cards */}
+        {/* Top Stats Cards */}
         <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap={6} mb={10}>
-          {topStats?.map((stat, i) => (
+          {topStats.map((stat, i) => (
             <Box key={i} bg={cardBg} p={6} borderRadius="xl" boxShadow="md">
               <Stat>
                 <StatLabel color="gray.400">{stat.label}</StatLabel>
@@ -254,39 +299,31 @@ const DashboardCards = () => {
           ))}
         </Grid>
 
+        {/* Type-based Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-          {statsByType.slice(0, 4)?.map((stat, idx) => (
+          {statsByType.slice(0, 4).map((stat, idx) => (
             <StatCard
               key={`type-top-${idx}`}
-              title={stat.title}
-              value={stat.value}
-              description={stat.description}
-              url={stat.url}
+              {...stat}
               icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][idx % 4]}
-              color={colors[idx % colors?.length]}
+              color={colorsByType[idx % colorsByType.length]}
             />
           ))}
         </div>
 
-        {/* Second row - 3 cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-          {statsByType.slice(4)?.map((stat, idx) => (
+          {statsByType.slice(4).map((stat, idx) => (
             <StatCard
               key={`type-bottom-${idx}`}
-              title={stat.title}
-              value={stat.value}
-              description={stat.description}
-              url={stat.url}
+              {...stat}
               icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][(idx + 4) % 4]}
-              color={colors[(idx + 4) % colors?.length]}
+              color={colorsByType[(idx + 4) % colorsByType.length]}
             />
           ))}
         </div>
 
-
-        {/* Proposal Activity & Recent Activity */}
+        {/* Proposal Chart and Activity */}
         <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={6}>
-          {/* Proposal Activity */}
           <Box bg={cardBg} p={6} borderRadius="2xl" boxShadow="xl">
             <Text fontSize="lg" fontWeight="semibold" mb={4}>
               Proposal Activity
@@ -296,13 +333,12 @@ const DashboardCards = () => {
             </Box>
           </Box>
 
-          {/* Recent Activity */}
           <Box bg={cardBg} p={6} borderRadius="2xl" boxShadow="xl">
             <Text fontSize="lg" fontWeight="semibold" mb={4}>
               Recent Activity
             </Text>
             <Flex direction="column" gap={4}>
-              {recentActivity?.map((item, i) => (
+              {recentActivity.map((item, i) => (
                 <Box key={i}>
                   <Text fontWeight="medium" fontSize="sm">
                     {item.id}{" "}
@@ -319,38 +355,30 @@ const DashboardCards = () => {
             </Flex>
           </Box>
         </Grid>
+
+        {/* Status Stat Cards */}
         <div className="pt-10">
-          {/* First row - 4 StatCards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            {statsByStatus.slice(0, 4)?.map((stat, idx) => (
+            {statsByStatus.slice(0, 4).map((stat, idx) => (
               <StatCard
                 key={`status-top-${idx}`}
-                title={stat.title}
-                value={stat.value}
-                description={stat.description}
-                url={stat.url}
-                icon={FaChartBar}
-                color={colors[(idx + 3) % colors?.length]}
+                {...stat}
+                icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][idx % 4]}
+                color={colorsByStatus[idx % colorsByStatus.length]}
               />
             ))}
           </div>
-
-          {/* Second row - up to 3 StatCards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {statsByStatus.slice(4)?.map((stat, idx) => (
+            {statsByStatus.slice(4).map((stat, idx) => (
               <StatCard
                 key={`status-bottom-${idx}`}
-                title={stat.title}
-                value={stat.value}
-                description={stat.description}
-                url={stat.url}
-                icon={FaChartBar}
-                color={colors[(idx + 7) % colors?.length]}
+                {...stat}
+                icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][(idx + 4) % 4]}
+                color={colorsByStatus[(idx + 4) % colorsByStatus.length]}
               />
             ))}
           </div>
         </div>
-
       </Box>
     </div>
   );
