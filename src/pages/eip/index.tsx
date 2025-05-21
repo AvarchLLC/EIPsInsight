@@ -259,58 +259,34 @@ const Type = () => {
 
             {/* Donut and AllChart side by side */}
             <Box className="w-full grid grid-cols-1 lg:grid-cols-2 gap-5 pt-8" id="graphs">
-              <Box className="h-fit">
-                {selected === "status" ? (
-                  <EIPStatusDonut />
-                ) : (
-                  <EIPTypeDonut />
-                )}
+              <Box className="w-full min-h-[400px] overflow-hidden">
+                <Box className="w-full h-full">
+                  {selected === "status" ? (
+                    <EIPStatusDonut />
+                  ) : (
+                    <EIPTypeDonut />
+                  )}
+                </Box>
               </Box>
-              <Box className="h-fit">
-                {selected === "status" ? (
-                  <AllChart3 type="EIP" />
-                ) : (
-                  <AllChart type="EIP" />
-                )}
+              <Box className="w-full min-h-[400px] overflow-hidden">
+                <Box className="w-full h-full">
+                  {selected === "status" ? (
+                    <AllChart3 type="EIP" />
+                  ) : (
+                    <AllChart type="EIP" />
+                  )}
+                </Box>
               </Box>
             </Box>
 
 
 
-            <Box paddingTop={8}>
+            <Box pt={12}>
               {selected === "status" ? (
                 <></>
               ) : (
                 <TypeGraphs />
               )}
-            </Box>
-
-            <Box
-              id="StatusTimeline"
-              mt={2}
-              mb={2}
-              px={{ base: 2, md: 4, lg: 6 }}
-              width="100%"
-              maxWidth="100vw"
-              overflowX="auto"
-            >
-              <Text
-                fontSize={{ base: '2xl', md: '3xl', lg: '3xl' }}
-                fontWeight="bold"
-                color="#30A0E0"
-                mt={2}
-                textAlign="center"
-
-              >
-                EIPs Status Timelines
-              </Text>
-              <br />
-              <Flex justifyContent="center" alignItems="center" width="100%">
-                <Box width="100%" maxWidth="100%" overflow="hidden">
-                  <StatusGraph />
-                </Box>
-              </Flex>
-              <br />
             </Box>
 
             <Box paddingBottom={{ lg: "5", md: "5", sm: "5", base: "5" }}>
@@ -342,11 +318,19 @@ const Type = () => {
 
                   {/* Scrollable Charts Grid */}
                   <Box overflowX="auto">
-                    <Grid templateColumns={{ base: "1fr", sm: "1fr", lg: "repeat(2, 1fr)" }} gap={6}>
-                      <StackedColumnChart type={"EIPs"} status={status} dataset={data2} />
-                      <CBoxStatus status={status} type={"EIPs"} dataset={data3} />
+                    <Grid
+                      templateColumns="repeat(2, 1fr)" 
+                      gap={6}
+                      minW="600px">
+                      <Box minW="0" w="100%" overflow="hidden">
+                        <StackedColumnChart type={"EIPs"} status={status} dataset={data2} />
+                      </Box>
+                      <Box minW="0" w="100%">
+                        <CBoxStatus status={status} type={"EIPs"} dataset={data3} />
+                      </Box>
                     </Grid>
                   </Box>
+
                 </Box>
               ))}
 

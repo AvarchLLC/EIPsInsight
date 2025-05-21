@@ -459,6 +459,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
       borderRadius="lg"
       shadow="md"
       width="100%"
+      height="full"
       overflowX="auto"
       _hover={{ borderColor: "#30A0E0", borderWidth: "1px" }}
     >

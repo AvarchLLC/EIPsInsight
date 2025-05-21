@@ -429,6 +429,7 @@ const EIPStatusDonut = () => {
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const headingColor = useColorModeValue("black", "white");
+  
 return (
   <Box
     bg={bg}

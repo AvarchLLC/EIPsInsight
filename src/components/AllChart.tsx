@@ -478,6 +478,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
           boxShadow="lg"
           p={4}
           mb={6}
+          h="full"
           _hover={{ border: "1px solid", borderColor: "blue.400" }}
         >
           <Flex justify="space-between" align="center" mb={4}>

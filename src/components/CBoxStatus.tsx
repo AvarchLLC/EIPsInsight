@@ -549,11 +549,13 @@ import {
   Button,
   Stack,
   Spinner,
+  useToast
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
 import { DownloadIcon } from "@chakra-ui/icons";
 import axios from "axios";
+
 
 interface EIP {
   _id: string;
@@ -694,7 +696,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset, status, type }) => {
       setTypeData(data?.erc || []);
     }
   }, [data, type]);
-
+  
   const statusData = typeData.filter(
     (item) => item.status === getStatus(status)
   );
@@ -934,11 +936,11 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset, status, type }) => {
               </Select>
 
               <Button
-                size="md"
+                size="lg"
                 colorScheme="blue"
-                leftIcon={<DownloadIcon />}
                 onClick={convertAndDownloadCSV}
                 aria-label="Download CSV"
+                fontSize="2xs"
               >
                 Download CSV
               </Button>
