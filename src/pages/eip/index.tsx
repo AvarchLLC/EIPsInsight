@@ -283,7 +283,7 @@ const Type = () => {
           )}
           </Box>
 
-          <Box
+          {/* <Box
             id="StatusTimeline"
             mt={2}
             mb={2}
@@ -298,7 +298,6 @@ const Type = () => {
               color="#30A0E0"
               mt={2}
               textAlign="center"
-              
             >
               EIPs Status Timelines
             </Text>
@@ -309,7 +308,7 @@ const Type = () => {
               </Box>
             </Flex>
             <br />
-          </Box>
+          </Box> */}
 
           <Box paddingBottom={{ lg: "5", md: "5", sm: "5", base: "5" }}>
             {/* <AreaC type={"EIPs"} /> */}
