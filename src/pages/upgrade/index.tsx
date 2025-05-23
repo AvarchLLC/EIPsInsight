@@ -240,7 +240,15 @@ const All = () => {
         category:"Core",
         discussion:"https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
       },
-      
+      {
+        eip: "7642",
+        title: "eth/69 - history expiry and simpler receipts",
+        author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
+        link: "https://eipsinsight.com/eips/eip-7642",
+        type:"Standards Track",
+        category:"Networking",
+        discussion:"https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+      },
       {
         eip: "7685",
         title: "General purpose execution layer requests",
