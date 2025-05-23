@@ -108,14 +108,14 @@
 //     year: number;
 //     value: number;
 //   }
-  
+
 //   const transformedData = data.reduce<TransformedData[]>((acc, item) => {
 //     const year = new Date(item.created).getFullYear();
 //     const category = getCat(item.category);
-  
+
 //     // Check if a record for the same category and year already exists
 //     const existingEntry = acc.find((entry) => entry.year === year && entry.category === category);
-  
+
 //     if (existingEntry) {
 //       // If it exists, increment the value
 //       existingEntry.value += 1;
@@ -127,12 +127,12 @@
 //         value: 1,
 //       });
 //     }
-  
+
 //     return acc;
 //   }, []);
-  
-  
-  
+
+
+
 
 
 //   const Area = dynamic(
@@ -169,9 +169,9 @@
 //     areaStyle: { fillOpacity: 0.6 },
 //     legend: { position: "top-right" as const },
 //     smooth: true,
-    
+
 //   };
-  
+
 //   const downloadData = () => {
 //     // Convert the data to CSV format
 //     const header = "Repo, EIP, Title, Author, Status, Type, Category, Discussion, Created at, Deadline, Link\n";
@@ -192,23 +192,23 @@
 //         // Wrap title, author, discussion, and status in double quotes to handle commas
 //         return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
 //     }).join("\n");
-  
+
 //     // Create a Blob with the CSV content
 //     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    
+
 //     // Create a URL for the Blob
 //     const url = URL.createObjectURL(blob);
-    
+
 //     // Create an anchor tag to trigger the download
 //     const a = document.createElement("a");
 //     a.href = url;
 //     a.download = "data.csv";  // File name
 //     a.click();
-    
+
 //     // Clean up the URL object
 //     URL.revokeObjectURL(url);
 //   };
-  
+
 
 //   return (
 //     <>
@@ -233,7 +233,7 @@
 //       borderColor: "#30A0E0",
 //     }}
 //   >
-    
+
 
 //     {/* Flex container to place the Text and Button on opposite ends */}
 //     <Flex justifyContent="space-between" alignItems="center" paddingX="1rem" marginBottom="1rem">
@@ -364,16 +364,11 @@ interface EIP {
 }
 
 const categoryColors: string[] = [
-  "#3B82F6", // blue
-  "#EF4444", // red
-  "#10B981", // green
-  "#F59E0B", // yellow
-  "#8B5CF6", // violet
-  "#EC4899", // pink
-  "#6366F1", // indigo
-  "#22D3EE", // cyan
-  "#14B8A6", // teal
-  "#F97316", // orange
+  "#fbc22f", // Meta
+  "#f579ba", // Core
+  "#68aafa", // Interface
+  "#3ed59e", // Networking
+  "#ac91fa", // Informational
 ];
 
 interface ChartProps {
@@ -437,7 +432,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     isStack: true,
     color: categoryColors,
     smooth: true,
-    legend: { position: "top-right" as const },
+    legend: { position: "bottom-right" as const },
     interactions: [{ type: "element-active" }],
     slider: { start: 0, end: 1 },
     areaStyle: { fillOpacity: 0.7 },
@@ -451,8 +446,8 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
           repo === "eip"
             ? `https://eipsinsight.com/eips/eip-${eip}`
             : repo === "erc"
-            ? `https://eipsinsight.com/ercs/erc-${eip}`
-            : `https://eipsinsight.com/rips/rip-${eip}`;
+              ? `https://eipsinsight.com/ercs/erc-${eip}`
+              : `https://eipsinsight.com/rips/rip-${eip}`;
         return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status}","${type}","${category}","${discussion}","${created}","${deadline || ""}","${url}"`;
       })
       .join("\n");
@@ -487,10 +482,10 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
                 type === "ERC"
                   ? "/erctable"
                   : type === "EIP"
-                  ? "/eiptable"
-                  : type === "RIP"
-                  ? "/riptable"
-                  : "/alltable"
+                    ? "/eiptable"
+                    : type === "RIP"
+                      ? "/riptable"
+                      : "/alltable"
               }
               passHref
             >
@@ -524,9 +519,6 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
           <Box as={motion.div} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
             <Box w="100%" overflowX="auto">
               <Area {...config} />
-            </Box>
-            <Box mt={4}>
-              <DateTime />
             </Box>
           </Box>
         </Box>

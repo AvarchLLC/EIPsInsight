@@ -1244,8 +1244,9 @@ const CatTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
   const toast = useToast();
 
   const filteredData = dataset
-    .filter((item) => (cat === "All" || item.category === cat) && item.status === status)
-    .sort((a, b) => parseInt(a.eip) - parseInt(b.eip));
+    .filter((item) => (cat === "All" || item.category === cat) && (status === "All" || item.status === status))
+    .sort((a, b) => parseInt(b.eip) - parseInt(a.eip));
+
 
   const getColorByType = (type: string): string => {
     const key = type.toLowerCase();

@@ -3,7 +3,7 @@ import React from "react";
 import LargeWithAppLinksAndSocial from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Box, ColorModeScript, Text, Link } from "@chakra-ui/react";
-import { Inter } from "next/font/google";
+import { Rajdhani } from 'next/font/google';
 import "../app/globals.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -14,8 +14,10 @@ import { SessionProvider } from "next-auth/react";
 import SessionWrapper from '@/components/SessionWrapper';
 import { AuthLocalStorageInitializer } from "./AuthLocalStorageInitializer";
 
-const mont = Inter({ subsets: ["latin"] });
-const AllLayout = ({ children }: { children: React.ReactNode }) => {
+const mont = Rajdhani({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const router = usePathname();
   return (
     <SessionWrapper> 

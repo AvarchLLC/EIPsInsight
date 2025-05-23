@@ -598,7 +598,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
 
   const filteredData = dataset
     .filter((item) => (cat === "All" || item.category === cat) && item.category === status)
-    .sort((a, b) => parseInt(a.eip) - parseInt(b.eip));
+    .sort((a, b) => parseInt(b.eip) - parseInt(a.eip));
 
   const getColorByType = (type: string): string => {
     const key = type.toLowerCase();
@@ -725,6 +725,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
       <Box
         maxHeight="500px"
         overflowY="auto"
+        overflowX="hidden"
         pr={2}
         css={{
           scrollbarWidth: "thin",
@@ -735,8 +736,11 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
             width: "6px",
           },
           "&::-webkit-scrollbar-thumb": {
-            background: useColorModeValue("#CBD5E0", "#4A5568"),
-            borderRadius: "8px",
+            background: useColorModeValue("#cbd5e0", "#4A5568"),
+            borderRadius: "12px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
           },
         }}
       >

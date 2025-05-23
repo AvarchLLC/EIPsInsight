@@ -14,6 +14,8 @@ import {
   useColorModeValue,
   Link as LI,
   SimpleGrid,
+  Select,
+  GridItem,
 } from "@chakra-ui/react";
 import CBoxStatus from "@/components/CBoxStatus";
 import StackedColumnChart from "@/components/StackedBarChart";
@@ -26,7 +28,7 @@ import AllChart3 from "@/components/AllChart3";
 import { Button, Heading, ButtonGroup, Flex } from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
-import StatusGraph from "@/components/Statuschangesgraph";
+import StatusGraph from "@/components/StatusGraph";
 
 interface EIP {
   _id: string;
@@ -110,7 +112,11 @@ interface Data {
 }
 
 import OtherBox from "@/components/OtherStats";
+import EipTable from "@/components/EipTable";
+import StatusGraphs from "@/components/StatusGraph";
 
+const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
+const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
 
 
 const Type = () => {
@@ -120,6 +126,9 @@ const Type = () => {
   const [data3, setData3] = useState<Data>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [selected, setSelected] = useState<"status" | "type">("type");
+  const [selectedInner, setSelectedInner] = useState(ALL_OPTIONS[0]);
+  const [selectedStatusInner, setSelectedStatusInner] = useState(Status_OPTIONS[0]);
+
 
   const [isVisible, setIsVisible] = useState(false);
   let timeout: string | number | NodeJS.Timeout | undefined;
@@ -137,6 +146,10 @@ const Type = () => {
       clearTimeout(timeout);
     };
   }, []);
+  useEffect(() => {
+    setSelectedInner(ALL_OPTIONS[0]);
+  }, [selected]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -257,18 +270,10 @@ const Type = () => {
             </Box>
 
 
-            {/* Donut and AllChart side by side */}
-            <Box className="w-full grid grid-cols-1 lg:grid-cols-2 gap-5 pt-8" id="graphs">
-              <Box className="w-full min-h-[400px] overflow-hidden">
-                <Box className="w-full h-full">
-                  {selected === "status" ? (
-                    <EIPStatusDonut />
-                  ) : (
-                    <EIPTypeDonut />
-                  )}
-                </Box>
-              </Box>
-              <Box className="w-full min-h-[400px] overflow-hidden">
+            <Box className="w-full flex flex-col gap-5 pt-8" id="graphs">
+
+              {/* AllChart - Full Width Below Donut */}
+              <Box className="w-full overflow-hidden">
                 <Box className="w-full h-full">
                   {selected === "status" ? (
                     <AllChart3 type="EIP" />
@@ -277,64 +282,185 @@ const Type = () => {
                   )}
                 </Box>
               </Box>
+
+              {/* Donut Chart - Full Width on Top */}
+              <Box className="w-full  overflow-hidden">
+                <Box className="w-full h-full">
+                  {selected === "status" ? (
+                    <EIPStatusDonut />
+                  ) : (
+                    <EIPTypeDonut />
+                  )}
+                </Box>
+              </Box>
             </Box>
 
 
 
-            <Box pt={12}>
-              {selected === "status" ? (
-                <></>
-              ) : (
-                <TypeGraphs />
+            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto">
+
+              {/* Show heading AND dropdown ONLY when selected === 'type' */}
+              {selected === "type" && (
+                <>
+                  <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="blue.500">
+                    Select Category or Type to View EIP Stats
+                  </Text>
+
+                  <Box display="flex" justifyContent="center" my={4}>
+                    <Select
+                      maxW="320px"
+                      value={selectedInner}
+                      onChange={(e) => setSelectedInner(e.target.value)}
+                      borderColor="blue.400"
+                      _hover={{ borderColor: "blue.500" }}
+                      focusBorderColor="blue.500"
+                    >
+                      {ALL_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </Select>
+                  </Box>
+                </>
               )}
+
+              <Box pt={12}>
+                {selected !== "status" && (
+                  <SimpleGrid
+                    columns={{ base: 1, md: 3 }}
+                    spacing={6}
+                    pt={12}
+                    alignItems="stretch"
+                  >
+                    <GridItem colSpan={{ base: 1, md: 2 }}>
+                      <Box
+                        minH="100%"
+                        h="full"
+                        display="flex"
+                        flexDirection="column"
+                        borderRadius="xl"
+                        bg="gray.50"
+                        p={4}
+                      >
+                        <TypeGraphs selected={selectedInner} />
+                      </Box>
+                    </GridItem>
+                    <GridItem colSpan={{ base: 1, md: 1 }}>
+                      <Box
+                        minH="100%"
+                        h="full"
+                        display="flex"
+                        flexDirection="column"
+                        borderRadius="xl"
+                        bg="gray.50"
+                        p={4}
+                      >
+                        <CatTable2 dataset={data4} cat="All" status={selectedInner} />
+                      </Box>
+                    </GridItem>
+                  </SimpleGrid>
+                )}
+              </Box>
             </Box>
+
+
+
 
             <Box paddingBottom={{ lg: "5", md: "5", sm: "5", base: "5" }}>
-              {/* <AreaC type={"EIPs"} /> */}
-
               {selected === "status" && (
-                <Box paddingY="8">
-                  <Text id="draftvsfinal" fontSize="3xl" fontWeight="bold" color="#A020F0">
-                    Draft vs Final (Over the Years)
-                  </Text>
-                  <AreaStatus type="EIPs" />
-                </Box>
-              )}
-
-              {["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"].map((status) => (
-                <Box key={status} className={"group relative flex flex-col gap-3"} paddingBottom={8}>
-                  {/* Label Section aligned to the left */}
-                  <Box className={"flex gap-3"}>
-                    <Text id={`${status.toLowerCase().replace(/\s+/g, '')}`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
-                      {status} -{" "}
-                      <NextLink href={`/tableStatus/eip/${status}`}>
-                        [{data.filter((item) => item.status === status).length}]
-                      </NextLink>
+                <>
+                  {/* AreaStatus Section */}
+                  <Box paddingY="8">
+                    <Text id="draftvsfinal" fontSize="3xl" fontWeight="bold" color="#A020F0">
+                      Draft vs Final (Over the Years)
                     </Text>
-                    <p className={"text-red-700"}>*</p>
-                    <p className={"hidden group-hover:block text-lg"}>Count as on date</p>
+                    <AreaStatus type="EIPs" />
+                  </Box>
+
+                  {/* Status-specific charts only shown when `selected === "status"` */}
+                  <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto">
+                    {selected === "status" && (
+                      <>
+                        <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="blue.500">
+                          EIP Status Dashboard
+                        </Text>
+
+                        <Box display="flex" justifyContent="center" my={4}>
+                          <Select
+                            maxW="320px"
+                            value={selectedStatusInner}
+                            onChange={(e) => setSelectedStatusInner(e.target.value)}
+                            borderColor="blue.400"
+                            _hover={{ borderColor: "blue.500" }}
+                            focusBorderColor="blue.500"
+                          >
+                            {["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"].map((status) => (
+                              <option key={status} value={status}>
+                                {status} ({data.filter((item) => item.status === status).length})
+                              </option>
+                            ))}
+                          </Select>
+                        </Box>
+
+                        <Box pt={8}>
+                          <SimpleGrid
+                            columns={{ base: 1, md: 3 }}
+                            spacing={6}
+                            alignItems="stretch"
+                            width="100%"
+                          >
+                            {/* Chart takes 2/3 width on md+ screens */}
+                            <GridItem colSpan={{ base: 1, md: 2 }}>
+                              <Box
+                                w="100%"
+                                h="full"
+                                display="flex"
+                                flexDirection="column"
+                                borderRadius="xl"
+                                bg="gray.50"
+                                p={4}
+                              >
+                                <StackedColumnChart
+                                  status={selectedStatusInner}
+                                  type="EIPs"
+                                  dataset={data2}
+                                  showDownloadButton={false}
+                                />
+                              </Box>
+                            </GridItem>
+
+                            {/* Table takes 1/3 width on md+ screens */}
+                            <GridItem colSpan={{ base: 1, md: 1 }}>
+                              <Box
+                                h="full"
+                                display="flex"
+                                flexDirection="column"
+                                borderRadius="xl"
+                                bg="gray.50"
+                                p={4}
+                                width="100%"
+                              >
+                                <CatTable
+                                  dataset={data4}
+                                  cat="All"
+                                  status={selectedStatusInner}
+                                />
+                              </Box>
+                            </GridItem>
+                          </SimpleGrid>
+                        </Box>
+
+                      </>
+                    )}
                   </Box>
 
 
-                  {/* Scrollable Charts Grid */}
-                  <Box overflowX="auto">
-                    <Grid
-                      templateColumns="repeat(2, 1fr)" 
-                      gap={6}
-                      minW="600px">
-                      <Box minW="0" w="100%" overflow="hidden">
-                        <StackedColumnChart type={"EIPs"} status={status} dataset={data2} />
-                      </Box>
-                      <Box minW="0" w="100%">
-                        <CBoxStatus status={status} type={"EIPs"} dataset={data3} />
-                      </Box>
-                    </Grid>
-                  </Box>
 
-                </Box>
-              ))}
-
+                </>
+              )}
             </Box>
+
           </Box>
 
           <Box
@@ -344,25 +470,15 @@ const Type = () => {
           // marginTop={{ lg: "2", md: "2", sm: "", base: "2" }}
           >
             {selected === "status" ? (
-              <><SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-                <CatTable dataset={data4} cat="All" status="Draft" />
-                <CatTable dataset={data4} cat="All" status="Final" />
-                <CatTable dataset={data4} cat="All" status="Review" />
-                <CatTable dataset={data4} cat="All" status="Last Call" />
-                <CatTable dataset={data4} cat="All" status="Living" />
-                <CatTable dataset={data4} cat="All" status="Withdrawn" />
-                <CatTable dataset={data4} cat="All" status="Stagnant" />
-              </SimpleGrid>
-
+              <>
+                <Box className="w-full mt-6">
+                  <EipTable dataset={data4} cat="All" status="All" />
+                </Box>
               </>
             ) : (
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-                {["Meta", "Informational", "Core", "Networking", "Interface"].map((status) => (
-                  <div key={status} id={`${status.toLowerCase()}table`}>
-                    <CatTable2 dataset={data4} cat="All" status={status} />
-                  </div>
-                ))}
-              </SimpleGrid>
+              <Box className="w-full mt-6">
+                <EipTable dataset={data4} cat="All" status="All" />
+              </Box>
             )}
             <Box
               bg={useColorModeValue("blue.50", "gray.700")} // Background color for the box
@@ -387,8 +503,9 @@ const Type = () => {
 
 
         </motion.div>
-      )}
-    </AllLayout>
+      )
+      }
+    </AllLayout >
   );
 };
 

@@ -416,6 +416,8 @@ interface AreaCProps {
   dataset: APIResponse;
   status: string;
   type: string;
+  showDownloadButton?: boolean;
+
 }
 
 interface APIResponse {
@@ -440,6 +442,7 @@ interface EIP2 {
   __v: number;
   repo: string;
 }
+
 
 interface EIP {
   status: string;
@@ -467,7 +470,7 @@ const categoryColors: string[] = [
   "rgb(0, 128, 0)",
 ];
 
-const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => {
+const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showDownloadButton = true, }) => {
   const [data, setData] = useState<APIResponse>();
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -507,7 +510,9 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     setIsChartReady(true);
   }, []);
 
-  const filteredData = typeData.filter((item) => item.status === status);
+  const filteredData = typeData.filter((item) =>
+    status === "All" ? true : item.status === status
+  );
 
   const transformedData = filteredData
     .flatMap((item) =>
@@ -523,10 +528,11 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     ssr: false,
   });
 
-  // Responsive chart sizing with max limits
+  // Responsive chart sizing with smaller max limits
   const chartWidth = windowSize.width
-    ? Math.min(windowSize.width * 0.9, 720)
-    : 600;
+    ? Math.min(windowSize.width * 0.5, 600) // target ~50% screen width, max 600px
+    : 500;
+
   const chartHeight = windowSize.height
     ? Math.min(windowSize.height * 0.55, 400)
     : 350;
@@ -539,14 +545,18 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     seriesField: "category",
     isStack: true,
     areaStyle: { fillOpacity: 0.6 },
-    legend: { position: "top-right" as const },
+    legend: { position: "bottom-right" as const },
     smooth: true,
     label: {
       position: "middle",
+      content: (originData: any) => {
+        return originData.value >= 3 ? `${originData.value}` : '';
+      },
       style: {
         fill: "#FFFFFF",
-        opacity: 0.7,
+        opacity: 0.9,
         fontWeight: "600",
+        fontSize: 12,
       },
     } as any,
     width: chartWidth,
@@ -604,8 +614,8 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
               repo === "eip"
                 ? `https://eipsinsight.com/eips/eip-${eip}`
                 : repo === "erc"
-                ? `https://eipsinsight.com/ercs/erc-${eip}`
-                : `https://eipsinsight.com/rips/rip-${eip}`;
+                  ? `https://eipsinsight.com/ercs/erc-${eip}`
+                  : `https://eipsinsight.com/rips/rip-${eip}`;
 
             return `${month},${year},"${category.replace(
               /"/g,
@@ -666,26 +676,30 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
             >
               {`${status}`}
             </Heading>
-            <Button
-              colorScheme="blue"
-              onClick={async () => {
-                try {
-                  downloadData();
-                  await axios.post("/api/DownloadCounter");
-                } catch (error) {
-                  console.error("Error triggering download counter:", error);
-                }
-              }}
-              size={{ base: "sm", md: "md" }}
-              whiteSpace="nowrap"
-            >
-              Download CSV
-            </Button>
+            {showDownloadButton && (
+              <Button
+                colorScheme="blue"
+                onClick={async () => {
+                  try {
+                    downloadData();
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
+                size={{ base: "sm", md: "md" }}
+                whiteSpace="nowrap"
+              >
+                Download CSV
+              </Button>
+            )}
+
           </Flex>
 
           <Box
             overflowX={{ base: "auto", md: "visible" }}
             paddingBottom={{ base: 4, md: 0 }}
+            w="100%"
           >
             <Area {...config} />
           </Box>

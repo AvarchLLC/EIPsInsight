@@ -34,16 +34,16 @@ interface Props {
   type: 'EIPs' | 'ERCs' | 'RIPs';
 }
 
-const getChange = (current: number = 0, previous: number = 0) => {
-  if (previous === 0) {
-    return { text: '+0.0%', direction: 'increase' };
-  }
-  const change = ((current - previous) / previous) * 100;
-  return {
-    text: `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`,
-    direction: change >= 0 ? 'increase' : 'decrease',
-  };
-};
+// const getChange = (current: number = 0, previous: number = 0) => {
+//   if (previous === 0) {
+//     return { text: '+0.0%', direction: 'increase' };
+//   }
+//   const change = ((current - previous) / previous) * 100;
+//   return {
+//     text: `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`,
+//     direction: change >= 0 ? 'increase' : 'decrease',
+//   };
+// };
 
 const ChakraGithubStats: React.FC<Props> = ({ type }) => {
   const [EIPdata, setEIPData] = useState<EIP | null>(null);
@@ -70,30 +70,30 @@ const ChakraGithubStats: React.FC<Props> = ({ type }) => {
 
   const data = type === 'EIPs' ? EIPdata : type === 'ERCs' ? ERCdata : RIPdata;
 
-  const downloadData = async () => {
-    if (!data) return;
-    const csvContent = [
-      ['Type', 'Forks Count', 'Watchlist Count', 'Stars', 'Open Issues Count'],
-      [type, data.forksCount, data.watchlistCount, data.stars, data.openIssuesCount],
-    ]
-      .map((row) => row.join(','))
-      .join('\n');
+  // const downloadData = async () => {
+  //   if (!data) return;
+  //   const csvContent = [
+  //     ['Type', 'Forks Count', 'Watchlist Count', 'Stars', 'Open Issues Count'],
+  //     [type, data.forksCount, data.watchlistCount, data.stars, data.openIssuesCount],
+  //   ]
+  //     .map((row) => row.join(','))
+  //     .join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${type}_stats_report.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  //   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement('a');
+  //   link.href = url;
+  //   link.setAttribute('download', `${type}_stats_report.csv`);
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
 
-    try {
-      await axios.post('/api/DownloadCounter');
-    } catch (err) {
-      console.error('Failed to update download counter:', err);
-    }
-  };
+  //   try {
+  //     await axios.post('/api/DownloadCounter');
+  //   } catch (err) {
+  //     console.error('Failed to update download counter:', err);
+  //   }
+  // };
 
   if (!data) return null;
 
@@ -102,25 +102,25 @@ const ChakraGithubStats: React.FC<Props> = ({ type }) => {
       title: 'Forks',
       icon: GitBranch,
       value: data.forksCount,
-      change: getChange(data.forksCount, data.forksPrev),
+      // change: getChange(data.forksCount, data.forksPrev),
     },
     {
       title: 'Watchlist',
       icon: Eye,
       value: data.watchlistCount,
-      change: getChange(data.watchlistCount, data.watchlistPrev),
+      // change: getChange(data.watchlistCount, data.watchlistPrev),
     },
     {
       title: 'Stars',
       icon: Star,
       value: data.stars,
-      change: getChange(data.stars, data.starsPrev),
+      // change: getChange(data.stars, data.starsPrev),
     },
     {
-      title: 'Open Issues',
+      title: 'Open Issues & PR',
       icon: AlertCircle,
       value: data.openIssuesCount,
-      change: getChange(data.openIssuesCount, data.openIssuesPrev),
+      // change: getChange(data.openIssuesCount, data.openIssuesPrev),
     },
   ];
 
@@ -134,15 +134,15 @@ const ChakraGithubStats: React.FC<Props> = ({ type }) => {
         gap={{ base: 2, sm: 0 }}
       >
         <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="semibold" color="purple.500">
-          GitHub Insights – {type}
+          GitHub Stats – {type}
         </Text>
-        <Button onClick={downloadData} colorScheme="purple" size="sm" alignSelf={{ base: 'flex-start', sm: 'auto' }}>
+        {/* <Button onClick={downloadData} colorScheme="purple" size="sm" alignSelf={{ base: 'flex-start', sm: 'auto' }}>
           Download CSV
-        </Button>
+        </Button> */}
       </Flex>
 
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>
-        {statCards.map(({ title, icon, value, change }) => (
+        {statCards.map(({ title, icon, value }) => (
           <Box
             key={title}
             bg={useColorModeValue('gray.100', 'gray.800')}
@@ -164,7 +164,7 @@ const ChakraGithubStats: React.FC<Props> = ({ type }) => {
               <Icon as={icon} boxSize={{ base: 5, md: 6 }} color="gray.600" />
             </Flex>
 
-            <Flex mt={2} align="center" flexWrap="wrap" gap={1}>
+            {/* <Flex mt={2} align="center" flexWrap="wrap" gap={1}>
               <Icon
                 as={change.direction === 'increase' ? ArrowUpRight : ArrowDownRight}
                 color={change.direction === 'increase' ? 'green.400' : 'red.400'}
@@ -177,7 +177,7 @@ const ChakraGithubStats: React.FC<Props> = ({ type }) => {
               >
                 {change.text}
               </Badge>
-            </Flex>
+            </Flex> */}
           </Box>
         ))}
       </SimpleGrid>

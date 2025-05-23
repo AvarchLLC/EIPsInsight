@@ -157,13 +157,18 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     seriesField: "status",
     isStack: true,
     areaStyle: { fillOpacity: 0.6 },
-    legend: { position: "top-right" as const },
+    legend: { position: "bottom-right" as const },
     smooth: true,
     label: {
       position: "middle",
+      content: (originData: any) => {
+        return originData.value >= 3 ? `${originData.value}` : '';
+      },
       style: {
         fill: "#FFFFFF",
-        opacity: 0.6,
+        opacity: 0.9,
+        fontWeight: "600",
+        fontSize: 12,
       },
     } as any,
   };
@@ -174,15 +179,15 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
 
     // Transform the typeData to get the necessary details
     const transformedData = typeData.flatMap(({ statusChanges, year }) => {
-        return statusChanges
-            .filter(({ eipCategory }) => eipCategory === targetCategory) // Filter by eipCategory
-            .map(({ eip, lastStatus, eipTitle, eipCategory }) => ({
-                eip,
-                lastStatus,
-                eipTitle,
-                eipCategory,
-                year: year.toString(), // Convert year to string
-            }));
+      return statusChanges
+        .filter(({ eipCategory }) => eipCategory === targetCategory) // Filter by eipCategory
+        .map(({ eip, lastStatus, eipTitle, eipCategory }) => ({
+          eip,
+          lastStatus,
+          eipTitle,
+          eipCategory,
+          year: year.toString(), // Convert year to string
+        }));
     });
 
     // Define the CSV header
@@ -190,16 +195,15 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
 
     // Prepare the CSV content
     const csvContent =
-        "data:text/csv;charset=utf-8," +
-        header +
-        transformedData
+      "data:text/csv;charset=utf-8," +
+      header +
+      transformedData
         .map(({ eip, lastStatus, eipTitle, eipCategory, year }) => {
-            return `${eip},${lastStatus},${eipTitle},${eipCategory},${year},${
-              eipCategory === "ERC"
-                    ? `https://eipsinsight.com/ercs/erc-${eip}`
-                    : type === "EIPs"
-                    ? `https://eipsinsight.com/eips/eip-${eip}`
-                    : `https://eipsinsight.com/rips/rip-${eip}`
+          return `${eip},${lastStatus},${eipTitle},${eipCategory},${year},${eipCategory === "ERC"
+            ? `https://eipsinsight.com/ercs/erc-${eip}`
+            : type === "EIPs"
+              ? `https://eipsinsight.com/eips/eip-${eip}`
+              : `https://eipsinsight.com/rips/rip-${eip}`
             }`;
         }).join("\n");
 
@@ -214,37 +218,40 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     document.body.appendChild(link); // Required for Firefox
     link.click();
     document.body.removeChild(link);
-};
+  };
 
-const headingColor = useColorModeValue('black', 'white');
+  const headingColor = useColorModeValue('black', 'white');
+  const chartHeight = Math.min(400, windowSize.height * 0.6);
 
-return (
-  <>
+
+  return (
+    <>
       <Flex justifyContent="space-between" alignItems="center" mb="0.5rem" width="100%">
-          <Heading size="md" color={headingColor}>
-              {category}
-          </Heading>
-          <Button colorScheme="blue" 
+        <Heading size="md" color={headingColor}>
+          {category}
+        </Heading>
+        <Button colorScheme="blue"
           onClick={async () => {
             try {
               // Trigger the CSV conversion and download
               downloadData();
-        
+
               // Trigger the API call
               await axios.post("/api/DownloadCounter");
             } catch (error) {
               console.error("Error triggering download counter:", error);
             }
           }}
-          >
-              Download CSV
-          </Button>
+        >
+          Download CSV
+        </Button>
       </Flex>
-      <Box boxSize="100%" overflowX="auto">
-          <Area {...config} />
+      <Box width="100%" height={`${chartHeight}px`}>
+        <Area {...config} height={chartHeight} />
       </Box>
-  </>
-);
+
+    </>
+  );
 
 
 };

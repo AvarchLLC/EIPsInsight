@@ -307,16 +307,14 @@ interface EIP {
   __v: number;
 }
 const categoryColors: string[] = [
-  "#3B82F6", // blue
-  "#EF4444", // red
-  "#10B981", // green
-  "#F59E0B", // yellow
-  "#8B5CF6", // violet
-  "#EC4899", // pink
-  "#6366F1", // indigo
-  "#22D3EE", // cyan
-  "#14B8A6", // teal
-  "#F97316", // orange
+  "#00BFA6", // Living - teal
+  "#2F80ED", // Final - blue
+  "#F2994A", // Stagnant - orange
+  "#EB5757", // Withdrawn - red
+  "#F2C94C", // Review - yellow
+  "#9B51E0", // Last Call - purple
+  "#27AE60", // Draft - green
+
 ];
 
 interface ChartProps {
@@ -406,7 +404,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     seriesField: "status",
     isStack: true,
     areaStyle: { fillOpacity: 0.6 },
-    legend: { position: "top-right" as const },
+    legend: { position: "bottom-right" as const },
     smooth: true,
   };
 
@@ -460,7 +458,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
       shadow="md"
       width="100%"
       height="full"
-      overflowX="auto"
+      overflowX="hidden"
       _hover={{ borderColor: "#30A0E0", borderWidth: "1px" }}
     >
       <Flex
@@ -518,9 +516,6 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
       >
         <Box minW="320px" maxW="100%">
           <Area {...config} />
-        </Box>
-        <Box mt={4}>
-          <DateTime />
         </Box>
       </Box>
     </Box>
