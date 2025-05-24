@@ -21,13 +21,13 @@ const Dasboard = () => {
   
   return (
     <AllLayout>
-                  <Head>
-                <title>
-                    Home
-                </title>
-            </Head>
-      <Dashboard/>
-      <ViewsShare path={'/home'}/>
+      <Head>
+        <title>
+          Home
+        </title>
+      </Head>
+      <Dashboard />
+      <ViewsShare path={'/home'} />
     </AllLayout>
   );
 };

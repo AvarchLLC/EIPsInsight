@@ -20,7 +20,8 @@ const theme = extendTheme({
       // Determine the background based on pathname and color mode
       const background = isHomePage
         ? (props.colorMode === 'light'
-          ? 'linear-gradient(90deg, #2bc0e4, #eaecc6, #89fffd)' // Sky blue to violet gradient
+          // ? 'linear-gradient(90deg, #2bc0e4, #eaecc6, #89fffd)' // Sky blue to violet gradient
+          ? 'linear-gradient(90deg, gray.50, gray.900)' // Sky blue to violet gradient
             : 'linear-gradient(90deg,rgba(10, 25, 47, 1),rgba(128, 128, 128, 1), rgba(0, 0, 0, 1))') // Dark gradient
         : undefined;
 
