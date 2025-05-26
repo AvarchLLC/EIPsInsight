@@ -7,15 +7,14 @@ import {
     Badge,
     Link,
 } from "@chakra-ui/react";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
 
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 
 interface ERC {
     _id: string;
-    eip: string;
+    eip: string;          // Changed from eip to erc
     title: string;
     author: string;
     status: string;
@@ -38,19 +37,17 @@ interface AreaCProps {
 
 import "@coreui/coreui/dist/css/coreui.min.css";
 
-
 const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
     const [data, setData] = useState<ERC[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(false);
+
+
     useEffect(() => {
         setInterval(() => {
             setIsLoading(false);
         }, 2000);
-    });
-    console.log(dataset);
-    console.log(status);
-    console.log(cat);
+    }, []);
 
     const factorAuthor = (data: any) => {
         let list = data.split(",");
@@ -66,17 +63,15 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // const response = await fetch(`/api/new/all`);
-                // const jsonData = await response.json();
                 setData(dataset);
-                setIsLoading(false); // Set isLoading to false after data is fetched
+                setIsLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
-                setIsLoading(false); // Set isLoading to false if there's an error
+                setIsLoading(false);
             }
         };
         fetchData();
-    }, []);
+    }, [dataset]);
 
     useEffect(() => {
         if (bg === "#f6f6f7") {
@@ -84,22 +79,21 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
         } else {
             setIsDarkMode(true);
         }
+    }, []);
+
+    // Map dataset to filtered data (keeping same keys but replacing eip with erc)
+    const filteredData = dataset.map((item) => {
+        const { eip, title, author, repo, type, category, status } = item;
+        return {
+            eip,
+            title,
+            author,
+            repo,
+            type,
+            category,
+            status,
+        };
     });
-
-   const filteredData = dataset
-  .filter(item => item.repo === 'erc')
-  .map(({ eip, title, author, repo, type, category, status }) => ({
-    eip,
-    title,
-    author,
-    repo,
-    type,
-    category,
-    status,
-  }));
-
-    console.log("All EIP data:", filteredData);
-
 
     const bg = useColorModeValue("#f6f6f7", "#171923");
 
@@ -119,10 +113,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                 >
                     <CCardBody>
                         <>
-                            <h2 className="text-blue-400 font-semibold text-4xl">
-                                {" "}
-                                {status}
-                            </h2>
+                            <h2 className="text-blue-400 font-semibold text-4xl">{status}</h2>
                             <Box maxH="400px" overflowY="auto" w="full">
                                 <CSmartTable
                                     items={filteredData.sort(
@@ -132,93 +123,82 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                     columnFilter
                                     columnSorter
                                     pagination={false}
-                                    itemsPerPage={filteredData.length || 1000} 
+                                    itemsPerPage={filteredData.length || 1000}
                                     tableProps={{
                                         hover: true,
                                         responsive: true,
                                         style: {
                                             borderRadius: "0.55rem",
-                                            minWidth: "100%", // ensure responsiveness
+                                            minWidth: "100%",
                                         },
                                     }}
                                     columns={[
-
                                         {
-                                            key: 'eip',
-                                            label: 'ERC',
+                                            key: "eip",
+                                            label: "ERC",
                                             _style: {
-                                                backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                                                color: isDarkMode ? 'white' : 'black',
-                                                fontWeight: 'bold',
-                                            }
+                                                backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                                                color: isDarkMode ? "white" : "black",
+                                                fontWeight: "bold",
+                                            },
                                         },
                                         {
-                                            key: 'title',
-                                            label: 'Title',
+                                            key: "title",
+                                            label: "Title",
                                             _style: {
-                                                backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                                                color: isDarkMode ? 'white' : 'black',
-                                                fontWeight: 'bold',
-                                            }
+                                                backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                                                color: isDarkMode ? "white" : "black",
+                                                fontWeight: "bold",
+                                            },
                                         },
                                         {
-                                            key: 'author',
-                                            label: 'Author',
+                                            key: "author",
+                                            label: "Author",
                                             _style: {
-                                                backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                                                color: isDarkMode ? 'white' : 'black',
-                                                fontWeight: 'bold',
-                                            }
+                                                backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                                                color: isDarkMode ? "white" : "black",
+                                                fontWeight: "bold",
+                                            },
                                         },
                                         {
-                                            key: 'type',
-                                            label: 'Type',
+                                            key: "type",
+                                            label: "Type",
                                             _style: {
-                                                backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                                                color: isDarkMode ? 'white' : 'black',
-                                                fontWeight: 'bold',
-                                            }
+                                                backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                                                color: isDarkMode ? "white" : "black",
+                                                fontWeight: "bold",
+                                            },
                                         },
                                         {
-                                            key: 'category',
-                                            label: 'category',
+                                            key: "category",
+                                            label: "Category",
                                             _style: {
-                                                backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                                                color: isDarkMode ? 'white' : 'black',
-                                                fontWeight: 'bold',
-                                            }
+                                                backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                                                color: isDarkMode ? "white" : "black",
+                                                fontWeight: "bold",
+                                            },
                                         },
                                         {
-                                            key: 'status',
-                                            label: 'status',
+                                            key: "status",
+                                            label: "Status",
                                             _style: {
-                                                backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC',
-                                                color: isDarkMode ? 'white' : 'black',
-                                                fontWeight: 'bold',
-                                            }
+                                                backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                                                color: isDarkMode ? "white" : "black",
+                                                fontWeight: "bold",
+                                            },
                                         },
                                     ]}
                                     scopedColumns={{
-                                        "#": (item: any) => (
-                                            <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                                                <Link href={`/${item.repo === 'erc' ? "ercs/erc" : item.repo === 'rip' ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                                        erc: (item: any) => (
+                                            <td
+                                                key={item.erc}
+                                                style={{ backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC" }}
+                                            >
+                                                <Link href={`/ercs/erc-${item.erc}`}>
                                                     <Wrap>
                                                         <WrapItem>
                                                             <Badge colorScheme={getStatusColor(item.status)}>
-                                                                {item["#"]}
-                                                            </Badge>
-                                                        </WrapItem>
-                                                    </Wrap>
-                                                </Link>
-                                            </td>
-                                        ),
-                                        eip: (item: any) => (
-                                            <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
-                                                <Link href={`/${item.repo === 'erc' ? "ercs/erc" : item.repo === 'rip' ? "rips/rip" : "eips/eip"}-${item.eip}`}>
-                                                    <Wrap>
-                                                        <WrapItem>
-                                                            <Badge colorScheme={getStatusColor(item.status)}>
-                                                                {item.eip}
+                                                                {item.erc}
                                                             </Badge>
                                                         </WrapItem>
                                                     </Wrap>
@@ -227,12 +207,16 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                         ),
                                         title: (item: any) => (
                                             <td
-                                                key={item.eip}
-                                                style={{ fontWeight: "bold", height: "100%", backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
+                                                key={item.erc}
+                                                style={{
+                                                    fontWeight: "bold",
+                                                    height: "100%",
+                                                    backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                                                }}
                                                 className="hover:text-[#1c7ed6]"
                                             >
                                                 <Link
-                                                    href={`/${cat === "ERC" || item.repo === 'erc' ? "ercs/erc" : item.repo === 'rip' ? "rips/rip" : "eips/eip"}-${item.eip}`}
+                                                    href={`/ercs/erc-${item.erc}`}
                                                     className={
                                                         isDarkMode
                                                             ? "hover:text-[#1c7ed6] text-[13px] text-white"
@@ -244,61 +228,65 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                             </td>
                                         ),
                                         author: (it: any) => (
-                                            <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                                            <td
+                                                key={it.author}
+                                                style={{ backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC" }}
+                                            >
                                                 <div>
-                                                    {factorAuthor(it.author).map(
-                                                        (item: any, index: any) => {
-                                                            let t = item[item.length - 1].substring(
-                                                                1,
-                                                                item[item.length - 1].length - 1
-                                                            );
-                                                            return (
-                                                                <Wrap key={index}>
-                                                                    <WrapItem>
-                                                                        <Link
-                                                                            href={`${item[item.length - 1].substring(
-                                                                                item[item.length - 1].length - 1
-                                                                            ) === ">"
+                                                    {factorAuthor(it.author).map((item: any, index: any) => {
+                                                        let t = item[item.length - 1].substring(
+                                                            1,
+                                                            item[item.length - 1].length - 1
+                                                        );
+                                                        return (
+                                                            <Wrap key={index}>
+                                                                <WrapItem>
+                                                                    <Link
+                                                                        href={`${item[item.length - 1].substring(
+                                                                            item[item.length - 1].length - 1
+                                                                        ) === ">"
                                                                                 ? "mailto:" + t
                                                                                 : "https://github.com/" + t.substring(1)
-                                                                                }`}
-                                                                            target="_blank"
-                                                                            className={
-                                                                                isDarkMode
-                                                                                    ? "hover:text-[#1c7ed6] text-[13px] text-white"
-                                                                                    : "hover:text-[#1c7ed6] text-[13px] text-black"
-                                                                            }
-                                                                        >
-                                                                            {item}
-                                                                        </Link>
-                                                                    </WrapItem>
-                                                                </Wrap>
-                                                            );
-                                                        }
-                                                    )}
+                                                                            }`}
+                                                                        target="_blank"
+                                                                        className={
+                                                                            isDarkMode
+                                                                                ? "hover:text-[#1c7ed6] text-[13px] text-white"
+                                                                                : "hover:text-[#1c7ed6] text-[13px] text-black"
+                                                                        }
+                                                                    >
+                                                                        {item}
+                                                                    </Link>
+                                                                </WrapItem>
+                                                            </Wrap>
+                                                        );
+                                                    })}
                                                 </div>
                                             </td>
                                         ),
                                         type: (item: any) => (
                                             <td
-                                                key={item.eip}
+                                                key={item.erc}
                                                 className={isDarkMode ? "text-white" : "text-black"}
-                                                style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
+                                                style={{ backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC" }}
                                             >
                                                 {item.type}
                                             </td>
                                         ),
                                         category: (item: any) => (
                                             <td
-                                                key={item.eip}
+                                                key={item.erc}
                                                 className={isDarkMode ? "text-white" : "text-black"}
-                                                style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}
+                                                style={{ backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC" }}
                                             >
                                                 {item.category}
                                             </td>
                                         ),
                                         status: (item: any) => (
-                                            <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                                            <td
+                                                key={item.erc}
+                                                style={{ backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC" }}
+                                            >
                                                 <Wrap>
                                                     <WrapItem>
                                                         <Badge colorScheme={getStatusColor(item.status)}>
@@ -309,12 +297,11 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                             </td>
                                         ),
                                     }}
-
                                 />
                             </Box>
                         </>
-                    </CCardBody >
-                </Box >
+                    </CCardBody>
+                </Box>
             ) : (
                 <></>
             )}

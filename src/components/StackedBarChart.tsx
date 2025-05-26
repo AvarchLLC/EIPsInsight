@@ -380,6 +380,12 @@ import {
   Flex,
   Heading,
   Button,
+  Select,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import DateTime from "@/components/DateTime";
@@ -478,6 +484,10 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showD
   const [isLoading, setIsLoading] = useState(true);
   const [typeData, setTypeData] = useState<EIP[]>([]);
   const [isChartReady, setIsChartReady] = useState(false);
+  const [yearFilter, setYearFilter] = useState<string>("All");
+  const [yearFrom, setYearFrom] = useState<number | null>(null);
+  const [yearTo, setYearTo] = useState<number | null>(null);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -513,6 +523,11 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showD
   const filteredData = typeData.filter((item) =>
     status === "All" ? true : item.status === status
   );
+  const allYears = Array.from(
+    new Set(
+      typeData.flatMap((item) => item.eips.map((eip) => eip.year))
+    )
+  ).sort((a, b) => a - b);
 
   const transformedData = filteredData
     .flatMap((item) =>
@@ -566,6 +581,14 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showD
   const downloadData = () => {
     const transformedData = filteredData.flatMap((item) => {
       return item.eips.flatMap((eipGroup) => {
+        if (
+          (yearFilter !== "All" && eipGroup.year.toString() !== yearFilter) ||
+          (yearFrom && eipGroup.year < yearFrom) ||
+          (yearTo && eipGroup.year > yearTo)
+        ) {
+          return [];
+        }
+
         return eipGroup.eips.map((eip) => ({
           month: eipGroup.month,
           year: eipGroup.year,
@@ -582,6 +605,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showD
         }));
       });
     });
+
 
     if (!transformedData.length) {
       alert("No data available for download.");
@@ -661,40 +685,65 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showD
           mx="auto"
           maxWidth="900px"
         >
-          <Flex
-            justifyContent="space-between"
-            alignItems="center"
-            mb={{ base: 4, md: 6 }}
-            flexWrap="wrap"
-            gap={{ base: 2, md: 0 }}
-          >
-            <Heading
-              size={{ base: "md", md: "lg" }}
-              color={headingColor}
-              flex="1"
-              minW="150px"
+          <Heading size="md" mb={4} color={headingColor}>
+            {type} {status === "All" ? "" : `- ${status}`} Over Time
+          </Heading>
+
+          <Flex gap={4} direction={{ base: "column", md: "row" }} mb={4} align="center" wrap="wrap">
+            <Select
+              placeholder="Select Year"
+              onChange={(e) => {
+                setYearFilter(e.target.value);
+                setYearFrom(null);
+                setYearTo(null);
+              }}
+              value={yearFilter}
+              width="150px"
             >
-              {`${status}`}
-            </Heading>
-            {showDownloadButton && (
-              <Button
-                colorScheme="blue"
-                onClick={async () => {
-                  try {
-                    downloadData();
-                    await axios.post("/api/DownloadCounter");
-                  } catch (error) {
-                    console.error("Error triggering download counter:", error);
-                  }
+              <option value="All">All Years</option>
+              {allYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </Select>
+
+            <Flex align="center" gap={2}>
+              <input
+                type="number"
+                placeholder="From"
+                min={2000}
+                max={3000}
+                value={yearFrom ?? ""}
+                onChange={(e) => {
+                  setYearFilter("All");
+                  setYearFrom(e.target.value ? parseInt(e.target.value) : null);
                 }}
-                size={{ base: "sm", md: "md" }}
-                whiteSpace="nowrap"
-              >
+                style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '100px' }}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                placeholder="To"
+                min={2000}
+                max={3000}
+                value={yearTo ?? ""}
+                onChange={(e) => {
+                  setYearFilter("All");
+                  setYearTo(e.target.value ? parseInt(e.target.value) : null);
+                }}
+                style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '100px' }}
+              />
+            </Flex>
+
+
+            {showDownloadButton && (
+              <Button onClick={downloadData} colorScheme="blue">
                 Download CSV
               </Button>
             )}
-
           </Flex>
+
 
           <Box
             overflowX={{ base: "auto", md: "visible" }}

@@ -7,6 +7,8 @@ import LoaderComponent from "@/components/Loader";
 import TypeGraphs from "@/components/TypeGraphs";
 import TypeGraphs3 from "@/components/TypeGraphs3";
 import SearchBox from "@/components/SearchBox";
+import { useRouter } from "next/router";
+import { CopyIcon } from "@chakra-ui/icons"; // or any icon
 import {
   Box,
   Grid,
@@ -16,6 +18,8 @@ import {
   SimpleGrid,
   Select,
   GridItem,
+  Link,
+  useToast,
 } from "@chakra-ui/react";
 import CBoxStatus from "@/components/CBoxStatus";
 import StackedColumnChart from "@/components/StackedBarChart";
@@ -28,7 +32,6 @@ import AllChart3 from "@/components/AllChart3";
 import { Button, Heading, ButtonGroup, Flex } from "@chakra-ui/react";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
-import StatusGraph from "@/components/StatusGraph";
 
 interface EIP {
   _id: string;
@@ -113,7 +116,6 @@ interface Data {
 
 import OtherBox from "@/components/OtherStats";
 import EipTable from "@/components/EipTable";
-import StatusGraphs from "@/components/StatusGraph";
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
@@ -128,6 +130,55 @@ const Type = () => {
   const [selected, setSelected] = useState<"status" | "type">("type");
   const [selectedInner, setSelectedInner] = useState(ALL_OPTIONS[0]);
   const [selectedStatusInner, setSelectedStatusInner] = useState(Status_OPTIONS[0]);
+  const router = useRouter();
+  const basePath = typeof window !== "undefined" ? window.location.origin : "";
+  const toast = useToast();
+
+  const handleCopyOverviewChart = () => {
+    const url = `${window.location.origin}/eip/type?view=${selected}#charts`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: `Shared view for ${selected === "status" ? "Status Chart" : "Type Chart"}`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+  const handleCopyTypeDetail = () => {
+    const url = `${window.location.origin}/eip/type?view=type&filter=${encodeURIComponent(selectedInner)}#type-graphs`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: `Shared view for Type: ${selectedInner}`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+  const handleCopyStatusDetail = () => {
+    const url = `${window.location.origin}/eip/type?view=status&status=${encodeURIComponent(selectedStatusInner)}#status-graphs`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: `Shared view for Status: ${selectedStatusInner}`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+  const handleCopyAreaChart = () => {
+    const url = `${window.location.origin}/eip/type?view=status#draftvsfinal`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: "Shared Draft vs Final view",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
 
 
   const [isVisible, setIsVisible] = useState(false);
@@ -169,6 +220,15 @@ const Type = () => {
   }, []);
 
   useEffect(() => {
+    if (router.query.view === "status") {
+      setSelected("status");
+    } else {
+      // default or if view === "type"
+      setSelected("type");
+    }
+  }, [router.query.view]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
@@ -187,6 +247,7 @@ const Type = () => {
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
+
   useEffect(() => {
     // Simulating a loading delay
     const timeout = setTimeout(() => {
@@ -197,145 +258,271 @@ const Type = () => {
     return () => clearTimeout(timeout);
   }, []);
   return (
-    <AllLayout>
-      {isLoading ? ( // Check if the data is still loading
-        // Show loader if data is loading
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Your loader component */}
-            <LoaderComponent />
-          </motion.div>
-        </Box>
-      ) : (
+  <AllLayout>
+    {isLoading ? (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-
-          <Box
-            paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}
-            marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-            paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-            marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          <LoaderComponent />
+        </motion.div>
+      </Box>
+    ) : (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Box
+          paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}
+          marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
+          paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+          marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+        >
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            justify="space-between"
+            align="center"
+            wrap="wrap"
+            gap={4}
           >
-            {/* Header and Toggle Buttons */}
-            <Flex
-              direction={{ base: "column", md: "row" }}
-              justify="space-between"
-              align="center"
-              wrap="wrap"
-              gap={4}
-            >
-              <Header
-                title={`Ethereum Improvement Proposal - [${data.length}]`}
-                subtitle="Meta, Informational, Standard Track - Core, Interface, Networking."
-              />
+            <Header
+              title={`Ethereum Improvement Proposal - [${data.length}]`}
+              subtitle={
+                <Flex align="center" gap={2} flexWrap="wrap">
+                  <Text>
+                    EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature
+                  </Text>
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    variant="link"
+                    as={Link}
+                    href="/FAQs/EIP"
+                  >
+                    Learn More
+                  </Button>
+                </Flex>
+              }
+            />
 
-              {/* OtherBox Full Width */}
-              <Box className="w-full mt-6">
-                <OtherBox type="EIPs" />
+            <Box className="w-full mt-6">
+              <OtherBox type="EIPs" />
+            </Box>
+            <ButtonGroup size="md" isAttached>
+              <Button
+                colorScheme="blue"
+                variant={selected === "type" ? "solid" : "outline"}
+                onClick={() => {
+                  setSelected("type");
+                  router.push("?view=type", undefined, { shallow: true });
+                }}
+              >
+                Type
+              </Button>
+              <Button
+                colorScheme="blue"
+                variant={selected === "status" ? "solid" : "outline"}
+                onClick={() => {
+                  setSelected("status");
+                  router.push("?view=status", undefined, { shallow: true });
+                }}
+              >
+                Status
+              </Button>
+            </ButtonGroup>
+          </Flex>
+          <Box display={{ base: "block", md: "block", lg: "none" }} className={"w-full pt-10"}>
+            <SearchBox />
+          </Box>
+
+          <Box className="w-full flex flex-col gap-5 pt-8" id="graphs">
+            <Box id="charts" className="w-full overflow-hidden">
+              <Box display="flex" justifyContent="space-between" alignItems="center" px={4} pb={2}>
+                <Text fontSize="xl" fontWeight="bold">
+                  {selected === "status" ? "Status Chart" : "Type Chart"}
+                </Text>
+                <Button
+                  onClick={handleCopyOverviewChart}
+                  size="sm"
+                  leftIcon={<CopyIcon />}
+                  colorScheme="blue"
+                  variant="ghost"
+                >
+                  Copy Link
+                </Button>
               </Box>
-              <ButtonGroup size="md" isAttached>
-                <Button
-                  colorScheme="blue"
-                  variant={selected === "type" ? "solid" : "outline"}
-                  onClick={() => setSelected("type")}
-                  flex="1"
-                >
-                  Type
-                </Button>
-                <Button
-                  colorScheme="blue"
-                  variant={selected === "status" ? "solid" : "outline"}
-                  onClick={() => setSelected("status")}
-                  flex="1"
-                >
-                  Status
-                </Button>
-              </ButtonGroup>
-            </Flex>
-            <Box display={{ base: "block", md: "block", lg: "none" }} className={"w-full pt-10"}>
-              <SearchBox />
+              <Box className="w-full h-full">
+                {selected === "status" ? (
+                  <AllChart3 type="EIP" />
+                ) : (
+                  <AllChart type="EIP" />
+                )}
+              </Box>
             </Box>
 
-
-            <Box className="w-full flex flex-col gap-5 pt-8" id="graphs">
-
-              {/* AllChart - Full Width Below Donut */}
-              <Box className="w-full overflow-hidden">
-                <Box className="w-full h-full">
-                  {selected === "status" ? (
-                    <AllChart3 type="EIP" />
-                  ) : (
-                    <AllChart type="EIP" />
-                  )}
-                </Box>
-              </Box>
-
-              {/* Donut Chart - Full Width on Top */}
-              <Box className="w-full  overflow-hidden">
-                <Box className="w-full h-full">
-                  {selected === "status" ? (
-                    <EIPStatusDonut />
-                  ) : (
-                    <EIPTypeDonut />
-                  )}
-                </Box>
+            <Box className="w-full overflow-hidden">
+              <Box className="w-full h-full">
+                {selected === "status" ? (
+                  <EIPStatusDonut />
+                ) : (
+                  <EIPTypeDonut />
+                )}
               </Box>
             </Box>
+          </Box>
 
+          <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto">
+            {selected === "type" && (
+              <>
+                <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="blue.500">
+                  Select Category or Type to View EIP Stats
+                </Text>
+                <Box display="flex" justifyContent="center" my={4}>
+                  <Select
+                    maxW="320px"
+                    value={selectedInner}
+                    onChange={(e) => setSelectedInner(e.target.value)}
+                    borderColor="blue.400"
+                    _hover={{ borderColor: "blue.500" }}
+                    focusBorderColor="blue.500"
+                  >
+                    {ALL_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </Select>
+                </Box>
 
+                {/* Copy button for TypeGraphs + CatTable2 section */}
+                <Box display="flex" justifyContent="center" mb={4}>
+                  <Button
+                    onClick={handleCopyTypeDetail}
+                    size="sm"
+                    leftIcon={<CopyIcon />}
+                    colorScheme="blue"
+                    variant="ghost"
+                  >
+                    Copy Link
+                  </Button>
+                </Box>
+              </>
+            )}
 
-            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto">
+            <Box pt={12}>
+              {selected !== "status" && (
+                <SimpleGrid
+                  columns={{ base: 1, md: 3 }}
+                  spacing={6}
+                  pt={12}
+                  alignItems="stretch"
+                  id="type-graphs"
+                >
+                  <GridItem colSpan={{ base: 1, md: 2 }}>
+                    <Box
+                      minH="100%"
+                      h="full"
+                      display="flex"
+                      flexDirection="column"
+                      borderRadius="xl"
+                      bg="gray.50"
+                      p={4}
+                    >
+                      <TypeGraphs selected={selectedInner} />
+                    </Box>
+                  </GridItem>
+                  <GridItem colSpan={{ base: 1, md: 1 }}>
+                    <Box
+                      minH="100%"
+                      h="full"
+                      display="flex"
+                      flexDirection="column"
+                      borderRadius="xl"
+                      bg="gray.50"
+                      p={4}
+                    >
+                      <CatTable2 dataset={data4} cat="All" status={selectedInner} />
+                    </Box>
+                  </GridItem>
+                </SimpleGrid>
+              )}
+            </Box>
+          </Box>
 
-              {/* Show heading AND dropdown ONLY when selected === 'type' */}
-              {selected === "type" && (
-                <>
+          <Box paddingBottom={{ lg: "5", md: "5", sm: "5", base: "5" }}>
+            {selected === "status" && (
+              <>
+                <Box paddingY="8">
+                  <Flex justify="space-between" align="center" mb={4} id="draftvsfinal">
+                    <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
+                      Draft vs Final (Over the Years)
+                    </Text>
+                    <Button
+                      onClick={handleCopyAreaChart}
+                      size="sm"
+                      leftIcon={<CopyIcon />}
+                      colorScheme="blue"
+                      variant="ghost"
+                    >
+                      Copy Link
+                    </Button>
+                  </Flex>
+                  <AreaStatus type="EIPs" />
+                </Box>
+
+                <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="status-graphs">
                   <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="blue.500">
-                    Select Category or Type to View EIP Stats
+                    EIP Status Dashboard
                   </Text>
 
                   <Box display="flex" justifyContent="center" my={4}>
                     <Select
                       maxW="320px"
-                      value={selectedInner}
-                      onChange={(e) => setSelectedInner(e.target.value)}
+                      value={selectedStatusInner}
+                      onChange={(e) => setSelectedStatusInner(e.target.value)}
                       borderColor="blue.400"
                       _hover={{ borderColor: "blue.500" }}
                       focusBorderColor="blue.500"
                     >
-                      {ALL_OPTIONS.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
+                      {["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"].map((status) => (
+                        <option key={status} value={status}>
+                          {status} ({data.filter((item) => item.status === status).length})
                         </option>
                       ))}
                     </Select>
                   </Box>
-                </>
-              )}
 
-              <Box pt={12}>
-                {selected !== "status" && (
+                  {/* Copy button for StackedColumnChart + CatTable section */}
+                  <Box display="flex" justifyContent="center" mb={4}>
+                    <Button
+                      onClick={handleCopyStatusDetail}
+                      size="sm"
+                      leftIcon={<CopyIcon />}
+                      colorScheme="blue"
+                      variant="ghost"
+                    >
+                      Copy Link
+                    </Button>
+                  </Box>
+
                   <SimpleGrid
                     columns={{ base: 1, md: 3 }}
                     spacing={6}
-                    pt={12}
                     alignItems="stretch"
+                    width="100%"
                   >
                     <GridItem colSpan={{ base: 1, md: 2 }}>
                       <Box
-                        minH="100%"
+                        w="100%"
                         h="full"
                         display="flex"
                         flexDirection="column"
@@ -343,170 +530,72 @@ const Type = () => {
                         bg="gray.50"
                         p={4}
                       >
-                        <TypeGraphs selected={selectedInner} />
+                        <StackedColumnChart
+                          status={selectedStatusInner}
+                          type="EIPs"
+                          dataset={data2}
+                        />
                       </Box>
                     </GridItem>
+
                     <GridItem colSpan={{ base: 1, md: 1 }}>
                       <Box
-                        minH="100%"
                         h="full"
                         display="flex"
                         flexDirection="column"
                         borderRadius="xl"
                         bg="gray.50"
                         p={4}
+                        width="100%"
                       >
-                        <CatTable2 dataset={data4} cat="All" status={selectedInner} />
+                        <CatTable
+                          dataset={data4}
+                          cat="All"
+                          status={selectedStatusInner}
+                        />
                       </Box>
                     </GridItem>
                   </SimpleGrid>
-                )}
-              </Box>
-            </Box>
+                </Box>
+              </>
+            )}
+          </Box>
 
+        </Box>
 
-
-
-            <Box paddingBottom={{ lg: "5", md: "5", sm: "5", base: "5" }}>
-              {selected === "status" && (
-                <>
-                  {/* AreaStatus Section */}
-                  <Box paddingY="8">
-                    <Text id="draftvsfinal" fontSize="3xl" fontWeight="bold" color="#A020F0">
-                      Draft vs Final (Over the Years)
-                    </Text>
-                    <AreaStatus type="EIPs" />
-                  </Box>
-
-                  {/* Status-specific charts only shown when `selected === "status"` */}
-                  <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto">
-                    {selected === "status" && (
-                      <>
-                        <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="blue.500">
-                          EIP Status Dashboard
-                        </Text>
-
-                        <Box display="flex" justifyContent="center" my={4}>
-                          <Select
-                            maxW="320px"
-                            value={selectedStatusInner}
-                            onChange={(e) => setSelectedStatusInner(e.target.value)}
-                            borderColor="blue.400"
-                            _hover={{ borderColor: "blue.500" }}
-                            focusBorderColor="blue.500"
-                          >
-                            {["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"].map((status) => (
-                              <option key={status} value={status}>
-                                {status} ({data.filter((item) => item.status === status).length})
-                              </option>
-                            ))}
-                          </Select>
-                        </Box>
-
-                        <Box pt={8}>
-                          <SimpleGrid
-                            columns={{ base: 1, md: 3 }}
-                            spacing={6}
-                            alignItems="stretch"
-                            width="100%"
-                          >
-                            {/* Chart takes 2/3 width on md+ screens */}
-                            <GridItem colSpan={{ base: 1, md: 2 }}>
-                              <Box
-                                w="100%"
-                                h="full"
-                                display="flex"
-                                flexDirection="column"
-                                borderRadius="xl"
-                                bg="gray.50"
-                                p={4}
-                              >
-                                <StackedColumnChart
-                                  status={selectedStatusInner}
-                                  type="EIPs"
-                                  dataset={data2}
-                                  showDownloadButton={false}
-                                />
-                              </Box>
-                            </GridItem>
-
-                            {/* Table takes 1/3 width on md+ screens */}
-                            <GridItem colSpan={{ base: 1, md: 1 }}>
-                              <Box
-                                h="full"
-                                display="flex"
-                                flexDirection="column"
-                                borderRadius="xl"
-                                bg="gray.50"
-                                p={4}
-                                width="100%"
-                              >
-                                <CatTable
-                                  dataset={data4}
-                                  cat="All"
-                                  status={selectedStatusInner}
-                                />
-                              </Box>
-                            </GridItem>
-                          </SimpleGrid>
-                        </Box>
-
-                      </>
-                    )}
-                  </Box>
-
-
-
-                </>
-              )}
-            </Box>
-
+        <Box
+          paddingBottom={{ lg: "10", sm: "10", base: "10" }}
+          marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
+          paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+        >
+          <Box className="w-full mt-6">
+            <EipTable dataset={data4} cat="All" status="All" />
           </Box>
 
           <Box
-            paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-            marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-            paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-          // marginTop={{ lg: "2", md: "2", sm: "", base: "2" }}
+            bg={useColorModeValue("blue.50", "gray.700")}
+            color="black"
+            borderRadius="md"
+            padding={4}
+            marginTop={4}
           >
-            {selected === "status" ? (
-              <>
-                <Box className="w-full mt-6">
-                  <EipTable dataset={data4} cat="All" status="All" />
-                </Box>
-              </>
-            ) : (
-              <Box className="w-full mt-6">
-                <EipTable dataset={data4} cat="All" status="All" />
-              </Box>
-            )}
-            <Box
-              bg={useColorModeValue("blue.50", "gray.700")} // Background color for the box
-              color="black" // Text color
-              borderRadius="md" // Rounded corners
-              padding={4} // Padding inside the box
-              marginTop={4} // Margin above the box
-            >
-              <Text>
-                Also checkout{' '}
-                <LI href="/erc" color="blue" isExternal>
-                  ERCs
-                </LI>{' '}
-                and{' '}
-                <LI href="/rip" color="blue" isExternal>
-                  RIPs
-                </LI>.
-              </Text>
-            </Box>
+            <Text>
+              Also checkout{' '}
+              <LI href="/erc" color="blue" isExternal>
+                ERCs
+              </LI>{' '}
+              and{' '}
+              <LI href="/rip" color="blue" isExternal>
+                RIPs
+              </LI>.
+            </Text>
           </Box>
+        </Box>
+      </motion.div>
+    )}
+  </AllLayout>
+);
 
-
-
-        </motion.div>
-      )
-      }
-    </AllLayout >
-  );
 };
 
 export default Type;

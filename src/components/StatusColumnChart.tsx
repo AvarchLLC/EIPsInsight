@@ -105,6 +105,9 @@ const getCat = (cat: string) => {
 const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
   const [data, setData] = useState<APIResponse>();
   const [typeData, setTypeData] = useState<StatusChart[]>([]);
+  const [fromYear, setFromYear] = useState<number | undefined>();
+  const [toYear, setToYear] = useState<number | undefined>();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,6 +125,9 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     fetchData();
   }, []);
 
+  const availableYears = Array.from(
+    new Set(typeData.map((item) => item.year))
+  ).sort((a, b) => a - b);
 
 
   const windowSize = useWindowSize();
@@ -174,26 +180,28 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
   };
 
   const downloadData = () => {
-    // Define the eipCategory you want to filter by
-    const targetCategory = category; // Replace with the desired category value
+    const targetCategory = category;
 
-    // Transform the typeData to get the necessary details
     const transformedData = typeData.flatMap(({ statusChanges, year }) => {
+      if (
+        (fromYear !== undefined && year < fromYear) ||
+        (toYear !== undefined && year > toYear)
+      ) {
+        return [];
+      }
+
       return statusChanges
-        .filter(({ eipCategory }) => eipCategory === targetCategory) // Filter by eipCategory
+        .filter(({ eipCategory }) => getCat(eipCategory) === targetCategory)
         .map(({ eip, lastStatus, eipTitle, eipCategory }) => ({
           eip,
           lastStatus,
           eipTitle,
           eipCategory,
-          year: year.toString(), // Convert year to string
+          year: year.toString(),
         }));
     });
 
-    // Define the CSV header
     const header = "EIP,Last Status,EIP Title,EIP Category,Year,Link\n";
-
-    // Prepare the CSV content
     const csvContent =
       "data:text/csv;charset=utf-8," +
       header +
@@ -207,18 +215,15 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
             }`;
         }).join("\n");
 
-    // Check the generated CSV content before download
-    console.log("CSV Content:", csvContent);
-
-    // Encode the CSV content for downloading
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "StatusChart.csv"); // Set the filename here
-    document.body.appendChild(link); // Required for Firefox
+    link.setAttribute("download", `StatusChart_${fromYear ?? "start"}-${toYear ?? "end"}.csv`);
+    document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+
 
   const headingColor = useColorModeValue('black', 'white');
   const chartHeight = Math.min(400, windowSize.height * 0.6);
@@ -226,26 +231,53 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
 
   return (
     <>
-      <Flex justifyContent="space-between" alignItems="center" mb="0.5rem" width="100%">
+      <Flex justifyContent="space-between" alignItems="center" mb="0.5rem" width="100%" flexWrap="wrap" gap={2}>
         <Heading size="md" color={headingColor}>
           {category}
         </Heading>
-        <Button colorScheme="blue"
-          onClick={async () => {
-            try {
-              // Trigger the CSV conversion and download
-              downloadData();
 
-              // Trigger the API call
-              await axios.post("/api/DownloadCounter");
-            } catch (error) {
-              console.error("Error triggering download counter:", error);
-            }
-          }}
-        >
-          Download CSV
-        </Button>
+        <Flex gap={2} alignItems="center" flexWrap="wrap">
+          <Box>
+            <select
+              onChange={(e) => setFromYear(parseInt(e.target.value))}
+              value={fromYear}
+              style={{ padding: "4px", borderRadius: "4px" }}
+            >
+              <option value="">From</option>
+              {availableYears.map((year) => (
+                <option key={`from-${year}`} value={year}>{year}</option>
+              ))}
+            </select>
+          </Box>
+
+          <Box>
+            <select
+              onChange={(e) => setToYear(parseInt(e.target.value))}
+              value={toYear}
+              style={{ padding: "4px", borderRadius: "4px" }}
+            >
+              <option value="">To</option>
+              {availableYears.map((year) => (
+                <option key={`to-${year}`} value={year}>{year}</option>
+              ))}
+            </select>
+          </Box>
+
+          <Button colorScheme="blue"
+            onClick={async () => {
+              try {
+                downloadData();
+                await axios.post("/api/DownloadCounter");
+              } catch (error) {
+                console.error("Error triggering download counter:", error);
+              }
+            }}
+          >
+            Download CSV
+          </Button>
+        </Flex>
       </Flex>
+
       <Box width="100%" height={`${chartHeight}px`}>
         <Area {...config} height={chartHeight} />
       </Box>

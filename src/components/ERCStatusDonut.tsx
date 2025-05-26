@@ -364,23 +364,12 @@ const ERCStatusDonut = () => {
 
   return (
     <Box
-      bg={bg}
       borderRadius="2xl"
       p={{ base: 4, md: 6 }}
       minH="600px"
       boxShadow="md"
       _hover={{ border: "1px solid", borderColor: "#30A0E0" }}
     >
-      <Flex justify="space-between" align="center" mb={6}>
-        <NextLink href="/erctable">
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
-            ERC - [{data.length}]
-          </Text>
-        </NextLink>
-        <Button colorScheme="blue" size="sm" onClick={handleDownload}>
-          Download CSV
-        </Button>
-      </Flex>
 
       {isLoading ? (
         <Flex justify="center" align="center" minH="300px">
