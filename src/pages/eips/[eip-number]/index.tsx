@@ -367,11 +367,11 @@ const getInclusionStage = (eipIdentifier: string): string => {
   const statusOrder = [
     "Draft",
     "Review",
-    "Living",
-    "Stagnant",
     "Last Call",
-    "Withdrawn",
     "Final",
+    "Stagnant",
+    "Withdrawn",
+     "Living",
   ];
 
   const boxBg = useColorModeValue("gray.100", "gray.700");
