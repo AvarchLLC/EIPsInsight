@@ -24,7 +24,7 @@ import SearchBox from "@/components/SearchBox";
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import { motion } from "framer-motion";
 import PectraTable from "@/components/PectraTable";
-import { Table, Thead, Tbody, Tr, Th, Td, Link,TableContainer } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, Link, TableContainer } from "@chakra-ui/react";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 // import Image from "next/image";
@@ -38,7 +38,7 @@ import { IconButton } from '@chakra-ui/react';
 import { useRef } from 'react';
 
 
-const sepolia_key=process.env.NEXT_PUBLIC_SEPOLIA_API as string;
+const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
 
 
@@ -47,6 +47,7 @@ const All = () => {
   const [selected, setSelected] = useState("Meta");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka'>('pectra');
   const optionArr = [
     "Meta",
     "Informational",
@@ -108,7 +109,8 @@ const All = () => {
   }) => {
     const bg = useColorModeValue("gray.50", "gray.700"); // Light mode: gray.50, Dark mode: gray.700
     const textColor = useColorModeValue("black", "white"); // Light mode: black, Dark mode: white
-  
+
+
     return (
       <Flex
         direction="row"
@@ -149,14 +151,14 @@ const All = () => {
       </Flex>
     );
   };
-  
-  
-  
-  
-  
-  
 
-  const PectraPosts= [
+
+
+
+
+
+
+  const PectraPosts = [
     {
       image: "pectraimg1.jpg",
       title: "Holesky Testnet Support Ends in September",
@@ -193,321 +195,322 @@ const All = () => {
       content: "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
       link: "At 7:29 UTC today, on epoch 222464, the Pectra network upgrade went live on the Sepolia testnet. Unfortunately, an issue with Sepolia's permissioned deposit contract prevented many execution layer clients from including transactions in blocks."
     },
-]
+  ]
 
   const pectraData = [
 
     {
-        eip: "2537",
-        title: "Precompile for BLS12-381 curve operations",
-        author: "Alex Vlasov (@shamatar), Kelly Olson (@ineffectualproperty), Alex Stokes (@ralexstokes), Antonio Sanso (@asanso)",
-        link: "https://eipsinsight.com/eips/eip-2537",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip2537-bls12-precompile-discussion-thread/4187"
-      },
-      {
-        eip: "2935",
-        title: "Serve historical block hashes from state",
-        author: "Vitalik Buterin (@vbuterin), Tomasz Stanczak (@tkstanczak), Guillaume Ballet (@gballet), Gajinder Singh (@g11tech), Tanishq Jasoria (@tanishqjasoria), Ignacio Hagopian (@jsign), Jochem Brouwer (@jochem-brouwer)",
-        link: "https://eipsinsight.com/eips/eip-2935",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-2935-save-historical-block-hashes-in-state/4565"
-      },
-      {
-        eip: "6110",
-        title: "Supply validator deposits on chain",
-        author: "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo), Peter Davies (@petertdavies)",
-        link: "https://eipsinsight.com/eips/eip-6110",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-6110-supply-validator-deposits-on-chain/12072"
-      },
-      {
-        eip: "7002",
-        title: "Execution layer triggerable withdrawals",
-        author: "Danny Ryan (@djrtwo), Mikhail Kalinin (@mkalinin), Ansgar Dietrichs (@adietrichs), Hsiao-Wei Wang (@hwwhww), lightclient (@lightclient)",
-        link: "https://eipsinsight.com/eips/eip-7002",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7002-execution-layer-triggerable-exits/14195"
-      },
-      {
-        eip: "7251",
-        title: "Increase the MAX_EFFECTIVE_BALANCE",
-        author: "mike (@michaelneuder), Francesco (@fradamt), dapplion (@dapplion), Mikhail (@mkalinin), Aditya (@adiasg), Justin (@justindrake), lightclient (@lightclient)",
-        link: "https://eipsinsight.com/eips/eip-2251",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982"
-      },
-      {
-        eip: "7549",
-        title: "Move committee index outside Attestation",
-        author: "dapplion (@dapplion)",
-        link: "https://eipsinsight.com/eips/eip-7549",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
-      },
-      
-      {
-        eip: "7685",
-        title: "General purpose execution layer requests",
-        author: "lightclient (@lightclient)",
-        link: "https://eipsinsight.com/eips/eip-7685",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7685-general-purpose-execution-layer-requests/19668"
-      },
-      {
-        eip: "7702",
-        title: "Set EOA account code",
-        author: "Vitalik Buterin (@vbuterin), Sam Wilson (@SamWilsn), Ansgar Dietrichs (@adietrichs), Matt Garnett (@lightclient)",
-        link: "https://eipsinsight.com/eips/eip-7702",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-set-eoa-account-code-for-one-transaction/19923"
-      },
-      {
-        eip: "7691",
-        title: "Blob throughput increase",
-        author: "Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation), Sam Calder-Mason (@samcm), Andrew Davis (@savid), Ansgar Dietrichs (@adietrichs)",
-        link: "https://eipsinsight.com/eips/eip-7691",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7691-blob-throughput-increase/19694"
-      },
-      {
-        eip: "7623",
-        title: "Increase calldata cost",
-        author: "Toni Wahrstätter (@nerolation), Vitalik Buterin (@vbuterin)",
-        link: "https://eipsinsight.com/eips/eip-7623",
-        type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/eip-7623-increase-calldata-cost/18647"
-      },
-      {
-          eip: "7840",
-          title: "Add blob schedule to EL config files",
-          author: "lightclient (@lightclient)",
-          link: "https://eipsinsight.com/eips/eip-7840",
-          type:"Standards Track",
-        category:"Core",
-        discussion:"https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182"
-      },
-        {
-          eip: "7642",
-          title: "eth/69 - history expiry and simpler receipts",
-          author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
-          link: "https://eipsinsight.com/eips/eip-7642",
-          type:"Standards Track",
-        category:"Networking",
-        discussion:"https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
-      },
-      //   {
-      //     eip: "4200",
-      //     title: "EOF - Static relative jumps",
-      //     author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-      //     link: "https://eipsinsight.com/eips/eip-4200",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-3920-static-relative-jumps/7108"
-      // },
-      //   {
-      //     eip: "4750",
-      //     title: "EOF - Functions",
-      //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
-      //     link: "https://eipsinsight.com/eips/eip-4750",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
-      // },
-      //   {
-      //     eip: "5450",
-      //     title: "EOF - Stack Validation",
-      //     author: "Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic), Danno Ferrin (@shemnon)",
-      //     link: "https://eipsinsight.com/eips/eip-5450",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-5450-eof-stack-validation/10410"
-      // },
-      //   {
-      //     eip: "6206",
-      //     title: "EOF - JUMPF and non-returning functions",
-      //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Matt Garnett (@lightclient)",
-      //     link: "https://eipsinsight.com/eips/eip-6206",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
-      // },
-      //   {
-      //     eip: "7069",
-      //     title: "Revamped CALL instructions",
-      //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Danno Ferrin (@shemnon), Andrei Maiboroda (@gumb0), Charles Cooper (@charles-cooper)",
-      //     link: "https://eipsinsight.com/eips/eip-7069",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-revamped-call-instructions/14432"
-      // },
-      //   {
-      //     eip: "7480",
-      //     title: "EOF - Data section access instructions",
-      //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
-      //     link: "https://eipsinsight.com/eips/eip-7480",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-7480-eof-data-instructions/15414"
-      // },
-      //   {
-      //     eip: "7620",
-      //     title: "EOF Contract Creation",
-      //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz)",
-      //     link: "https://eipsinsight.com/eips/eip-7620",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-7620-eof-contract-creation-instructions/18625"
-      // },
-      //   {
-      //     eip: "7698",
-      //     title: "EOF - Creation transaction",
-      //     author: "Piotr Dobaczewski (@pdobacz), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic)",
-      //     link: "https://eipsinsight.com/eips/eip-7698",
-      //     type:"Standards Track",
-      //   category:"Core",
-      //   discussion:"https://ethereum-magicians.org/t/eip-7698-eof-creation-transaction/19784"
-      // },
+      eip: "2537",
+      title: "Precompile for BLS12-381 curve operations",
+      author: "Alex Vlasov (@shamatar), Kelly Olson (@ineffectualproperty), Alex Stokes (@ralexstokes), Antonio Sanso (@asanso)",
+      link: "https://eipsinsight.com/eips/eip-2537",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip2537-bls12-precompile-discussion-thread/4187"
+    },
+    {
+      eip: "2935",
+      title: "Serve historical block hashes from state",
+      author: "Vitalik Buterin (@vbuterin), Tomasz Stanczak (@tkstanczak), Guillaume Ballet (@gballet), Gajinder Singh (@g11tech), Tanishq Jasoria (@tanishqjasoria), Ignacio Hagopian (@jsign), Jochem Brouwer (@jochem-brouwer)",
+      link: "https://eipsinsight.com/eips/eip-2935",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-2935-save-historical-block-hashes-in-state/4565"
+    },
+    {
+      eip: "6110",
+      title: "Supply validator deposits on chain",
+      author: "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo), Peter Davies (@petertdavies)",
+      link: "https://eipsinsight.com/eips/eip-6110",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-6110-supply-validator-deposits-on-chain/12072"
+    },
+    {
+      eip: "7002",
+      title: "Execution layer triggerable withdrawals",
+      author: "Danny Ryan (@djrtwo), Mikhail Kalinin (@mkalinin), Ansgar Dietrichs (@adietrichs), Hsiao-Wei Wang (@hwwhww), lightclient (@lightclient)",
+      link: "https://eipsinsight.com/eips/eip-7002",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7002-execution-layer-triggerable-exits/14195"
+    },
+    {
+      eip: "7251",
+      title: "Increase the MAX_EFFECTIVE_BALANCE",
+      author: "mike (@michaelneuder), Francesco (@fradamt), dapplion (@dapplion), Mikhail (@mkalinin), Aditya (@adiasg), Justin (@justindrake), lightclient (@lightclient)",
+      link: "https://eipsinsight.com/eips/eip-2251",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982"
+    },
+    {
+      eip: "7549",
+      title: "Move committee index outside Attestation",
+      author: "dapplion (@dapplion)",
+      link: "https://eipsinsight.com/eips/eip-7549",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
+    },
+
+    {
+      eip: "7685",
+      title: "General purpose execution layer requests",
+      author: "lightclient (@lightclient)",
+      link: "https://eipsinsight.com/eips/eip-7685",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7685-general-purpose-execution-layer-requests/19668"
+    },
+    {
+      eip: "7702",
+      title: "Set EOA account code",
+      author: "Vitalik Buterin (@vbuterin), Sam Wilson (@SamWilsn), Ansgar Dietrichs (@adietrichs), Matt Garnett (@lightclient)",
+      link: "https://eipsinsight.com/eips/eip-7702",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-set-eoa-account-code-for-one-transaction/19923"
+    },
+    {
+      eip: "7691",
+      title: "Blob throughput increase",
+      author: "Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation), Sam Calder-Mason (@samcm), Andrew Davis (@savid), Ansgar Dietrichs (@adietrichs)",
+      link: "https://eipsinsight.com/eips/eip-7691",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7691-blob-throughput-increase/19694"
+    },
+    {
+      eip: "7623",
+      title: "Increase calldata cost",
+      author: "Toni Wahrstätter (@nerolation), Vitalik Buterin (@vbuterin)",
+      link: "https://eipsinsight.com/eips/eip-7623",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7623-increase-calldata-cost/18647"
+    },
+    {
+      eip: "7840",
+      title: "Add blob schedule to EL config files",
+      author: "lightclient (@lightclient)",
+      link: "https://eipsinsight.com/eips/eip-7840",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182"
+    },
+    {
+      eip: "7642",
+      title: "eth/69 - history expiry and simpler receipts",
+      author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
+      link: "https://eipsinsight.com/eips/eip-7642",
+      type: "Standards Track",
+      category: "Networking",
+      discussion: "https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+    },
+    //   {
+    //     eip: "4200",
+    //     title: "EOF - Static relative jumps",
+    //     author: "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
+    //     link: "https://eipsinsight.com/eips/eip-4200",
+    //     type:"Standards Track",
+    //   category:"Core",
+    //   discussion:"https://ethereum-magicians.org/t/eip-3920-static-relative-jumps/7108"
+    // },
+    //   {
+    //     eip: "4750",
+    //     title: "EOF - Functions",
+    //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
+    //     link: "https://eipsinsight.com/eips/eip-4750",
+    //     type:"Standards Track",
+    //   category:"Core",
+    //   discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
+    // },
+    //   {
+    //     eip: "5450",
+    //     title: "EOF - Stack Validation",
+    //     author: "Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic), Danno Ferrin (@shemnon)",
+    //     link: "https://eipsinsight.com/eips/eip-5450",
+    //     type:"Standards Track",
+    //   category:"Core",
+    //   discussion:"https://ethereum-magicians.org/t/eip-5450-eof-stack-validation/10410"
+    // },
+    //   {
+    //     eip: "6206",
+    //     title: "EOF - JUMPF and non-returning functions",
+    //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Matt Garnett (@lightclient)",
+    //     link: "https://eipsinsight.com/eips/eip-6206",
+    //     type:"Standards Track",
+    //   category:"Core",
+    //   discussion:"https://ethereum-magicians.org/t/eip-4750-eof-functions/8195"
+    // },
+    //   {
+    //     eip: "7069",
+    //     title: "Revamped CALL instructions",
+    //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Danno Ferrin (@shemnon), Andrei Maiboroda (@gumb0), Charles Cooper (@charles-cooper)",
+    //     link: "https://eipsinsight.com/eips/eip-7069",
+    //     type:"Standards Track",
+    //   category:"Core",
+    //   discussion:"https://ethereum-magicians.org/t/eip-revamped-call-instructions/14432"
+    // },
+    //   {
+    //     eip: "7480",
+    //     title: "EOF - Data section access instructions",
+    //     author: "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
+    //     link: "https://eipsinsight.com/eips/eip-7480",
+    //     type:"Standards Track",
+    //   category:"Core",
+    //   discussion:"https://ethereum-magicians.org/t/eip-7480-eof-data-instructions/15414"
+    // },
+    //   {
+    //     eip: "7620",
+    //     title: "EOF Contract Creation",
+    //     author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz)",
+    //     link: "https://eipsinsight.com/eips/eip-7620",
+    //     type:"Standards Track",
+    //   category:"Core",
+    //   discussion:"https://ethereum-magicians.org/t/eip-7620-eof-contract-creation-instructions/18625"
+    // },
+    //   {
+    //     eip: "7698",
+    //     title: "EOF - Creation transaction",
+    //     author: "Piotr Dobaczewski (@pdobacz), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast), Alex Beregszaszi (@axic)",
+    //     link: "https://eipsinsight.com/eips/eip-7698",
+    //     type:"Standards Track",
+    //   category:"Core",
+    //   discussion:"https://ethereum-magicians.org/t/eip-7698-eof-creation-transaction/19784"
+    // },
   ];
 
- 
+
 
   const router = useRouter();
-  
-    const scrollToHash = () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const element = document.getElementById(hash.slice(1));
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
-        }
-      }
-    };
-  
-    useEffect(() => {
-      if (!isLoading) {
-        scrollToHash();
-      }
-    }, [isLoading]);
-  
-    useLayoutEffect(() => {
-      router.events.on("routeChangeComplete", scrollToHash);
-      return () => {
-        router.events.off("routeChangeComplete", scrollToHash);
-      };
-    }, [router]);
 
+  const scrollToHash = () => {
+    const hash = window.location.hash;
+    if (hash) {
+      const element = document.getElementById(hash.slice(1));
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      scrollToHash();
+    }
+  }, [isLoading]);
+
+  useLayoutEffect(() => {
+    router.events.on("routeChangeComplete", scrollToHash);
+    return () => {
+      router.events.off("routeChangeComplete", scrollToHash);
+    };
+  }, [router]);
+
+  const upgradeName = selectedOption === 'pectra' ? 'Pectra' : 'Fusaka';
 
 
   return (
     <>
       <AllLayout>
-      <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-        <Box
-          paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-          marginX={{ lg: "10", md: "2", sm: "2", base: "2" }}
-          paddingX={{ lg: "5", md: "5", sm: "5", base: "5" }}
-          marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
-        >
-       <Box>
-       <Text
-           as={motion.div}
-           initial={{ opacity: 0, y: -20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.5 } as any}
-           fontSize={{base: "2xl",md:"4xl", lg: "6xl"}}
-           fontWeight={{ base: "extrabold", md: "bold", lg: "bold" }}
-           color="#30A0E0"
-          >
-            Ethereum Network Upgrades
-          </Text>
-
-        <br/>
-        {/* <br/> */}
-        <SlotCountdown/>
-        <br/>
-        <Text
-          as={motion.div}
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          fontSize={{base: "2xl",md:"2xl", lg: "2xl"}}
-          fontWeight="bold"
-          color="#30A0E0"
-          mt={2}
+          transition={{ duration: 0.8 }}
         >
-          PECTRA
-        </Text>
-
-        <Flex
-           direction={{ base: "column", md: "row" }}
-           align="flex-start"
-           gap={{ base: 4, md: 6 }}
-           width="100%"
-           justify="space-between"
-           wrap="wrap" 
-        >
-          {/* Text Section */}
-          <Text
-            flex={{ base: "1 1 auto", md: "3" }} // Text takes 3/5 width on larger screens
-            fontSize={{ base: "md", md: "lg", lg: "2xl" }}
-            textAlign="justify"
-            lineHeight="1.6"
-            maxWidth="1200px" // Limit text width for better readability
+          <Box
+            paddingBottom={{ lg: "10", sm: "10", base: "10" }}
+            marginX={{ lg: "10", md: "2", sm: "2", base: "2" }}
+            paddingX={{ lg: "5", md: "5", sm: "5", base: "5" }}
+            marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
           >
-            Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
-            collectively known as{" "}
-            <NLink href="https://eipsinsight.com/eips/eip-7600">
-              <Text as="span" color="blue.500" textDecor="underline">
-                Pectra
+            <Box>
+              <Text
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                fontSize={{ base: "2xl", md: "4xl", lg: "6xl" }}
+                fontWeight={{ base: "extrabold", md: "bold", lg: "bold" }}
+                color="#30A0E0"
+              >
+                Ethereum Network Upgrades
               </Text>
-            </NLink>. This upgrade will involve significant changes to both the{" "}
-            <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
-              <Text as="span" color="blue.500" textDecor="underline">
-                Execution and Consensus layers
-              </Text>
-            </NLink>{" "} 
-            on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
-            <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
-              <Text as="span" color="blue.500" textDecor="underline">
-                Ethereum Improvement Proposals (EIPs)
-              </Text>
-            </NLink>, 
-            the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have 
-            now been shifted to the upcoming{" "}
-            <NLink href="https://eipsinsight.com/eips/eip-7600">
-              <Text as="span" color="blue.500" textDecor="underline">
-                Fusaka
-              </Text>
-            </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
-            <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
-              <Text as="span" color="blue.500" textDecor="underline">
-                Devnet 6
-              </Text>
-            </NLink>.Specs and other details can be followed below.{" "}
-            <NLink href="#carousel-section">
-              <Text as="span" color="blue.500" textDecor="underline">
-                View more
-              </Text>
-            </NLink>.
-          </Text>
 
-          {/* Cards Section */}
-          {/* <Flex
+              <br />
+              {/* <br/> */}
+              <SlotCountdown />
+              <br />
+              <Text
+                as={motion.div}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 } as any}
+                fontSize={{ base: "2xl", md: "2xl", lg: "2xl" }}
+                fontWeight="bold"
+                color="#30A0E0"
+                mt={2}
+              >
+                PECTRA
+              </Text>
+
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                align="flex-start"
+                gap={{ base: 4, md: 6 }}
+                width="100%"
+                justify="space-between"
+                wrap="wrap"
+              >
+                {/* Text Section */}
+                <Text
+                  flex={{ base: "1 1 auto", md: "3" }} // Text takes 3/5 width on larger screens
+                  fontSize={{ base: "md", md: "lg", lg: "2xl" }}
+                  textAlign="justify"
+                  lineHeight="1.6"
+                  maxWidth="1200px" // Limit text width for better readability
+                >
+                  Ethereum developers are moving toward the next major network upgrade, Prague and Electra,
+                  collectively known as{" "}
+                  <NLink href="https://eipsinsight.com/eips/eip-7600">
+                    <Text as="span" color="blue.500" textDecor="underline">
+                      Pectra
+                    </Text>
+                  </NLink>. This upgrade will involve significant changes to both the{" "}
+                  <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+                    <Text as="span" color="blue.500" textDecor="underline">
+                      Execution and Consensus layers
+                    </Text>
+                  </NLink>{" "}
+                  on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
+                  <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
+                    <Text as="span" color="blue.500" textDecor="underline">
+                      Ethereum Improvement Proposals (EIPs)
+                    </Text>
+                  </NLink>,
+                  the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have
+                  now been shifted to the upcoming{" "}
+                  <NLink href="https://eipsinsight.com/eips/eip-7600">
+                    <Text as="span" color="blue.500" textDecor="underline">
+                      Fusaka
+                    </Text>
+                  </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
+                  <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
+                    <Text as="span" color="blue.500" textDecor="underline">
+                      Devnet 6
+                    </Text>
+                  </NLink>.Specs and other details can be followed below.{" "}
+                  <NLink href="#carousel-section">
+                    <Text as="span" color="blue.500" textDecor="underline">
+                      View more
+                    </Text>
+                  </NLink>.
+                </Text>
+
+                {/* Cards Section */}
+                {/* <Flex
               flex={{ base: "1 1 auto", md: "1" }} // Cards take 2/5 width on larger screens
               wrap="wrap" // Ensure cards can wrap onto new rows if needed
               justify="flex-start" // Align cards to the left
@@ -546,87 +549,87 @@ const All = () => {
 
 
 
-          </Flex>
+              </Flex>
 
-          <Flex
-      position="relative"
-      width="100%"
-      align="center"
-    >
-      {/* Left arrow */}
-      <IconButton
-        aria-label="Scroll left"
-        icon={<ChevronLeftIcon />}
-        position="absolute"
-        left={0}
-        zIndex={1}
-        onClick={scrollLeft}
-        bg="white"
-        boxShadow="md"
-        _hover={{ bg: "gray.100" }}
-      />
+              <Flex
+                position="relative"
+                width="100%"
+                align="center"
+              >
+                {/* Left arrow */}
+                <IconButton
+                  aria-label="Scroll left"
+                  icon={<ChevronLeftIcon />}
+                  position="absolute"
+                  left={0}
+                  zIndex={1}
+                  onClick={scrollLeft}
+                  bg="white"
+                  boxShadow="md"
+                  _hover={{ bg: "gray.100" }}
+                />
 
-      {/* Cards container */}
-      <Flex
-        ref={containerRef}
-        flex="1"
-        overflowX="auto"
-        overflowY="hidden"
-        py={4}
-        px={8}
-        scrollBehavior="smooth"
-        sx={{
-          "&::-webkit-scrollbar": {
-            height: "8px",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: "#3182ce",
-            borderRadius: "4px",
-          },
-          "&::-webkit-scrollbar-thumb:hover": {
-            background: "#2b6cb0",
-          },
-          "&::-webkit-scrollbar-track": {
-            background: "#edf2f7",
-          },
-        }}
-      >
-        <Flex gap={4} flexWrap="nowrap">
-          {PectraPosts.map((pectra, index) => (
-            <Card
-              key={index}
-              image={pectra.image}
-              title={pectra.title}
-              content={pectra.content}
-              link={pectra.link}
-              // minWidth="300px"
-              // flex="0 0 auto"
-            />
-          ))}
-        </Flex>
-      </Flex>
+                {/* Cards container */}
+                <Flex
+                  ref={containerRef}
+                  flex="1"
+                  overflowX="auto"
+                  overflowY="hidden"
+                  py={4}
+                  px={8}
+                  scrollBehavior="smooth"
+                  sx={{
+                    "&::-webkit-scrollbar": {
+                      height: "8px",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                      background: "#3182ce",
+                      borderRadius: "4px",
+                    },
+                    "&::-webkit-scrollbar-thumb:hover": {
+                      background: "#2b6cb0",
+                    },
+                    "&::-webkit-scrollbar-track": {
+                      background: "#edf2f7",
+                    },
+                  }}
+                >
+                  <Flex gap={4} flexWrap="nowrap">
+                    {PectraPosts.map((pectra, index) => (
+                      <Card
+                        key={index}
+                        image={pectra.image}
+                        title={pectra.title}
+                        content={pectra.content}
+                        link={pectra.link}
+                      // minWidth="300px"
+                      // flex="0 0 auto"
+                      />
+                    ))}
+                  </Flex>
+                </Flex>
 
-      {/* Right arrow */}
-      <IconButton
-        aria-label="Scroll right"
-        icon={<ChevronRightIcon />}
-        position="absolute"
-        right={0}
-        zIndex={1}
-        onClick={scrollRight}
-        bg="white"
-        boxShadow="md"
-        _hover={{ bg: "gray.100" }}
-      />
-    </Flex>
-        
-
+                {/* Right arrow */}
+                <IconButton
+                  aria-label="Scroll right"
+                  icon={<ChevronRightIcon />}
+                  position="absolute"
+                  right={0}
+                  zIndex={1}
+                  onClick={scrollRight}
+                  bg="white"
+                  boxShadow="md"
+                  _hover={{ bg: "gray.100" }}
+                />
+              </Flex>
 
 
 
 
-        <Box id="NetworkUpgradesChart" mt={2} mb={2}>
-          <Text
+
+
+              <Box id="NetworkUpgradesChart" mt={2} mb={2}>
+                <Text
                   fontSize={{ base: '2xl', md: '3xl', lg: '3xl' }}
                   fontWeight="bold"
                   color="#30A0E0"
@@ -634,32 +637,32 @@ const All = () => {
                 >
                   Network Upgrades and EIPs Relationship Graph
                 </Text>
-                <br/>
-          <Flex justifyContent="center" alignItems="center">
-            <Image
-              src="/Pectra_Relations2.jpg"
-              alt="Image 1"
-              borderRadius="md"
-              width={{ base: "250px", md: "350px", lg: "500px" }}
-              height="auto"
-              objectFit="contain"
-            />
-          </Flex>
-          <br/>
-        </Box>
+                <br />
+                <Flex justifyContent="center" alignItems="center">
+                  <Image
+                    src="/Pectra_Relations2.jpg"
+                    alt="Image 1"
+                    borderRadius="md"
+                    width={{ base: "250px", md: "350px", lg: "500px" }}
+                    height="auto"
+                    objectFit="contain"
+                  />
+                </Flex>
+                <br />
+              </Box>
 
 
 
-        <Box id="NetworkUpgrades" mt={2}>
-          <NetworkUpgradesChart/>
-        </Box>
-        <br/>
-        <Box id="AuthorContributions">
-          <NetworkUpgradesChart2/>
-        </Box>
+              <Box id="NetworkUpgrades" mt={2}>
+                <NetworkUpgradesChart />
+              </Box>
+              <br />
+              <Box id="AuthorContributions">
+                <NetworkUpgradesChart2 />
+              </Box>
 
 
-      {/* <Grid
+              {/* <Grid
       templateColumns={{ base: "1fr", md: "1fr 1fr" }} // Stack vertically on small screens
       gap={6}
       p={6}
@@ -790,14 +793,14 @@ const All = () => {
 </Grid> */}
 
 
-        </Box>
+            </Box>
 
 
-          {
-            <Box display={{ base: "none", md: "block" }}>
-              <PectraTable PectraData={pectraData}/>
-              <br/>
-              {/* <Text
+            {
+              <Box display={{ base: "none", md: "block" }}>
+                <PectraTable title={upgradeName} PectraData={pectraData} />
+                <br />
+                {/* <Text
            as={motion.div}
            initial={{ opacity: 0, y: -20 }}
            animate={{ opacity: 1, y: 0 }}
@@ -808,11 +811,11 @@ const All = () => {
           >
             Related Videos
           </Text> */}
-            </Box>
-          }
-        </Box>
-       
-        {/* <Box display={{ base: "none", md: "block" }} className="w-3/4 mx-auto" id="carousel-section"> 
+              </Box>
+            }
+          </Box>
+
+          {/* <Box display={{ base: "none", md: "block" }} className="w-3/4 mx-auto" id="carousel-section"> 
         
         <Carousel 
   showThumbs={false} 
