@@ -1241,6 +1241,7 @@ const All = () => {
       discussion: "https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
     },
 
+
     {
       eip: "7685",
       title: "General purpose execution layer requests",

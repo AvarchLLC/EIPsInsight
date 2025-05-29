@@ -572,6 +572,7 @@ const Type = () => {
               <EipTable dataset={data4} cat="All" status="All" />
             </Box>
 
+
             <Box
               bg={useColorModeValue("blue.50", "gray.700")}
               color="black"
