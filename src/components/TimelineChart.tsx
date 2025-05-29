@@ -35,7 +35,7 @@ const padding = 10;
 const rowHeight = cubeSize + 12;
 const blockHeight = cubeSize;
 
-const TimelineVisxChart: React.FC<Props> = ({ data, data2, selectedOption, setSelectedOption,}) => {
+const TimelineVisxChart: React.FC<Props> = ({ data, data2, selectedOption, setSelectedOption, }) => {
   // Use data according to selected option (optional)
   const [scrollIndex, setScrollIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -43,13 +43,22 @@ const TimelineVisxChart: React.FC<Props> = ({ data, data2, selectedOption, setSe
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
 
-  const dataToRender = selectedOption === 'pectra' ? data : data2;
+  const selectedData = selectedOption === 'pectra' ? data : data2;
+  const dataToRender = Array.isArray(selectedData) ? selectedData : [];
 
-  const maxItems = Math.max(
-    ...dataToRender?.map(
-      (d) => d.included?.length + d.scheduled?.length + d.considered?.length + d.declined?.length
-    )
-  );
+
+  const maxItems = dataToRender.length === 0
+    ? 0
+    : Math.max(
+      ...dataToRender.map(
+        (d) =>
+          (d.included?.length || 0) +
+          (d.scheduled?.length || 0) +
+          (d.considered?.length || 0) +
+          (d.declined?.length || 0)
+      )
+    );
+
 
   const maxVisibleRows = 15;
   const visibleData = dataToRender.slice(scrollIndex, scrollIndex + maxVisibleRows);
@@ -233,10 +242,10 @@ const TimelineVisxChart: React.FC<Props> = ({ data, data2, selectedOption, setSe
           <Group top={padding} left={padding}>
             {visibleData?.map((item, rowIndex) => {
               const allEips = [
-                ...item.included?.map((eip) => ({ eip, type: 'included' as StatusType })),
-                ...item.scheduled?.map((eip) => ({ eip, type: 'scheduled' as StatusType })),
-                ...item.considered?.map((eip) => ({ eip, type: 'considered' as StatusType })),
-                ...item.declined?.map((eip) => ({ eip, type: 'declined' as StatusType })),
+                ...(Array.isArray(item.included) ? item.included : []).map((eip) => ({ eip, type: 'included' as StatusType })),
+                ...(Array.isArray(item.scheduled) ? item.scheduled : []).map((eip) => ({ eip, type: 'scheduled' as StatusType })),
+                ...(Array.isArray(item.considered) ? item.considered : []).map((eip) => ({ eip, type: 'considered' as StatusType })),
+                ...(Array.isArray(item.declined) ? item.declined : []).map((eip) => ({ eip, type: 'declined' as StatusType })),
               ];
 
               return (

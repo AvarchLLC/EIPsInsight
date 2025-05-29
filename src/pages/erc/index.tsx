@@ -128,7 +128,7 @@ const ERC = () => {
   const toast = useToast();
 
   const handleCopyOverviewChart = () => {
-    const url = `${window.location.origin}/erc/type?view=${selected}#charts`;
+    const url = `${window.location.origin}/erc?view=${selected}#charts`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
@@ -138,8 +138,9 @@ const ERC = () => {
       isClosable: true,
     });
   };
+
   const handleCopyERCStatusGraph = () => {
-    const url = `${window.location.origin}/erc/type?view=type#erc-status-graph`;
+    const url = `${window.location.origin}/erc?view=type#erc-status-graph`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
@@ -151,7 +152,7 @@ const ERC = () => {
   };
 
   const handleCopyStatusDetail = () => {
-    const url = `${window.location.origin}/erc/type?view=status&status=${encodeURIComponent(selectedStatusInner)}#status-graphs`;
+    const url = `${window.location.origin}/erc?view=status&status=${encodeURIComponent(selectedStatusInner)}#status-graphs`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
@@ -161,8 +162,9 @@ const ERC = () => {
       isClosable: true,
     });
   };
+
   const handleCopyAreaChart = () => {
-    const url = `${window.location.origin}/erc/type?view=status#draftvsfinal`;
+    const url = `${window.location.origin}/erc?view=status#draftvsfinal`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",

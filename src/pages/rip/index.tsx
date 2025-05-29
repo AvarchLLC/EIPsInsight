@@ -119,9 +119,8 @@ const RIP = () => {
   const router = useRouter();
   const basePath = typeof window !== "undefined" ? window.location.origin : "";
   const toast = useToast();
-
   const handleCopyOverviewChart = () => {
-    const url = `${window.location.origin}/rip/type?view=${selected}#charts`;
+    const url = `${window.location.origin}/rip?view=${selected}#charts`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
@@ -132,9 +131,8 @@ const RIP = () => {
     });
   };
 
-
   const handleCopyStatusDetail = () => {
-    const url = `${window.location.origin}/rip/type?view=status&status=${encodeURIComponent(selectedStatusInner)}#status-graphs`;
+    const url = `${window.location.origin}/rip?view=status&status=${encodeURIComponent(selectedStatusInner)}#status-graphs`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
@@ -146,7 +144,7 @@ const RIP = () => {
   };
 
   const handleCopyAreaChart = () => {
-    const url = `${window.location.origin}/rip/type?view=status#draftvsfinal`;
+    const url = `${window.location.origin}/rip?view=status#draftvsfinal`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
@@ -156,8 +154,6 @@ const RIP = () => {
       isClosable: true,
     });
   };
-
-
 
   useEffect(() => {
     const fetchData = async () => {

@@ -145,11 +145,11 @@
 //   //       </Link>
 //   //     </Box>
 //   //   );
-  
-  
-  
-  
-  
+
+
+
+
+
 
 //   const PectraPosts= [
 //     {
@@ -240,7 +240,7 @@
 //         category:"Core",
 //         discussion:"https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
 //       },
-      
+
 //       {
 //         eip: "7685",
 //         title: "General purpose execution layer requests",
@@ -369,10 +369,10 @@
 //       // },
 //   ];
 
- 
+
 
 //   const router = useRouter();
-  
+
 //     const scrollToHash = () => {
 //       const hash = window.location.hash;
 //       if (hash) {
@@ -382,13 +382,13 @@
 //         }
 //       }
 //     };
-  
+
 //     useEffect(() => {
 //       if (!isLoading) {
 //         scrollToHash();
 //       }
 //     }, [isLoading]);
-  
+
 //     useLayoutEffect(() => {
 //       router.events.on("routeChangeComplete", scrollToHash);
 //       return () => {
@@ -462,7 +462,7 @@
 //             fontSize={{ base: "md", md: "lg", lg: "2xl" }}
 //             textAlign="justify"
 //             lineHeight="1.6"
-            
+
 //           >
 //             Ethereum developers are moving toward the next major network upgrade, Prague and Electra, 
 //             collectively known as{" "}
@@ -611,7 +611,7 @@
 //     _hover={{ bg: "gray.100" }}
 //   />
 // </Flex>
-        
+
 
 
 
@@ -632,7 +632,7 @@
 //     color="#30A0E0"
 //     mt={2}
 //     textAlign="center"
-    
+
 //   >
 //     Network Upgrades and EIPs Relationship Graph
 //   </Text>
@@ -660,7 +660,7 @@
 //       gap={6}
 //       p={6}
 //     >
-     
+
 //       <Box>
 //         <Text
 //           as={motion.div}
@@ -737,7 +737,7 @@
 //                 <Link href={item.specLink} color="blue.500" textDecor="underline" isExternal>
 //                   {item.specText}
 //                 </Link>
-              
+
 //               </Td>
 //             </Tr>
 //           ))}
@@ -807,9 +807,9 @@
 //             </Box>
 //           }
 //         </Box>
-       
+
 //         {/* <Box display={{ base: "none", md: "block" }} className="w-3/4 mx-auto" id="carousel-section"> 
-        
+
 //         <Carousel 
 //   showThumbs={false} 
 //   autoPlay 
@@ -822,7 +822,7 @@
 //     hasPrev && (
 //       <button
 //         type="button"
-        
+
 //         onClick={onClickHandler}
 //         title={label}
 //         style={{
@@ -1080,7 +1080,7 @@ const All = () => {
     "RIP",
   ];
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     if (bg === "#f6f6f7") {
       setIsDarkMode(false);
@@ -1370,133 +1370,133 @@ const All = () => {
   ];
 
   const fusakaData = [
-  {
-    eip: "7723",
-    title: "Network Upgrade Inclusion Stages",
-    author: "Tim Beiko (@timbeiko)",
-    link: "https://eipsinsight.com/eips/eip-7723",
-    type: "Meta",
-    category: "",
-    discussion: "https://ethereum-magicians.org/t/eip-7723-network-upgrade-inclusion-stages/20281"
-  },
-  {
-    eip: "7594",
-    title: "PeerDAS - Peer Data Availability Sampling",
-    author: "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
-    link: "https://eipsinsight.com/eips/eip-7594",
-    type: "Standards Track",
-    category: "Networking",
-    discussion: "https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
-  },
-  {
-    eip: "7823",
-    title: "Set upper bounds for MODEXP",
-    author: "Alex Beregszaszi (@axic), Radoslaw Zagorowicz (@rodiazet)",
-    link: "https://eipsinsight.com/eips/eip-7823",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7823-set-upper-bounds-for-modexp/21798"
-  },
-  {
-    eip: "7825",
-    title: "Transaction Gas Limit Cap",
-    author: "Giulio Rebuffo (@Giulio2002)",
-    link: "https://eipsinsight.com/eips/eip-7825",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7825-transaction-gas-limit-cap/21848"
-  },
-  {
-    eip: "7883",
-    title: "ModExp Gas Cost Increase",
-    author: "Marcin Sobczak (@marcindsobczak), Marek Moraczyński (@MarekM25), Marcos Maceo (@stdevMac)",
-    link: "https://eipsinsight.com/eips/eip-7883",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7883-modexp-gas-cost-increase/22841"
-  },
-  {
-    eip: "7892",
-    title: "Blob Parameter Only Hardforks",
-    author: "Mark Mackey (@ethDreamer)",
-    link: "https://eipsinsight.com/eips/eip-7892",
-    type: "Informational",
-    category: "",
-    discussion: "https://ethereum-magicians.org/t/eip-7892-blob-parameter-only-hardforks/23018"
-  },
-  {
-    eip: "7918",
-    title: "Blob base fee bounded by execution cost",
-    author: "Anders Elowsson (@anderselowsson), Ben Adams (@benaadams), Francesco D'Amato (@fradamt)",
-    link: "https://eipsinsight.com/eips/eip-7918",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-blob-base-fee-bounded-by-price-of-blob-carrying-transaction/23271"
-  },
-  {
-    eip: "7935",
-    title: "Set default gas limit to XX0M",
-    author: "Sophia Gold (@sophia-gold), Parithosh Jayanthi (@parithoshj), Toni Wahrstätter (@nerolation), Carl Beekhuizen (@CarlBeek), Ansgar Dietrichs (@adietrichs), Dankrad Feist (@dankrad), Alex Stokes (@ralexstokes), Josh Rudolph (@jrudolph), Giulio Rebuffo (@Giulio2002), Storm Slivkoff (@sslivkoff)",
-    link: "https://eipsinsight.com/eips/eip-7935",
-    type: "Informational",
-    category: "",
-    discussion: "https://ethereum-magicians.org/t/eip-7935-set-default-gas-limit-to-xx0m/23789"
-  },
-  {
-    eip: "7642",
-    title: "eth/69 - history expiry and simpler receipts",
-    author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
-    link: "https://eipsinsight.com/eips/eip-7642",
-    type: "Standards Track",
-    category: "Networking",
-    discussion: "https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
-  },
-  {
-    eip: "7212",
-    title: "Precompile for secp256r1 Curve Support",
-    author: "Ulaş Erdoğan (@ulerdogan), Doğan Alpaslan (@doganalpaslan)",
-    link: "https://eipsinsight.com/eips/eip-7212",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7212-precompiled-for-secp256r1-curve-support/14789"
-  },
-  {
-    eip: "5920",
-    title: "PAY opcode",
-    author: "Gavin John (@Pandapip1), Zainan Victor Zhou (@xinbenlv), Sam Wilson (@SamWilsn), Jochem Brouwer (@jochem-brouwer), Charles Cooper (@charles-cooper)",
-    link: "https://eipsinsight.com/eips/eip-5920",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-5920-pay-opcode/11717"
-  },
-  {
-    eip: "7907",
-    title: "Meter Contract Code Size And Increase Limit",
-    author: "Charles Cooper (@charles-cooper), Qi Zhou (@qizhou)",
-    link: "https://eipsinsight.com/eips/eip-7907",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156"
-  },
-  {
-    eip: "7917",
-    title: "Deterministic proposer lookahead",
-    author: "Lin Oshitani (@linoscope) <lin@nethermind.io>, Justin Drake (@JustinDrake) <justin@ethereum.org>",
-    link: "https://eipsinsight.com/eips/eip-7917",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7917-deterministic-proposer-lookahead/23259"
-  },
-  {
-    eip: "7934",
-    title: "RLP Execution Block Size Limit",
-    author: "Giulio Rebuffo (@Giulio2002), Ben Adams (@benaadams), Storm Slivkoff (@sslivkoff)",
-    link: "https://eipsinsight.com/eips/eip-7934",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7934-add-bytesize-limit-to-blocks/23589"
-  }
-];
+    {
+      eip: "7723",
+      title: "Network Upgrade Inclusion Stages",
+      author: "Tim Beiko (@timbeiko)",
+      link: "https://eipsinsight.com/eips/eip-7723",
+      type: "Meta",
+      category: "",
+      discussion: "https://ethereum-magicians.org/t/eip-7723-network-upgrade-inclusion-stages/20281"
+    },
+    {
+      eip: "7594",
+      title: "PeerDAS - Peer Data Availability Sampling",
+      author: "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
+      link: "https://eipsinsight.com/eips/eip-7594",
+      type: "Standards Track",
+      category: "Networking",
+      discussion: "https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
+    },
+    {
+      eip: "7823",
+      title: "Set upper bounds for MODEXP",
+      author: "Alex Beregszaszi (@axic), Radoslaw Zagorowicz (@rodiazet)",
+      link: "https://eipsinsight.com/eips/eip-7823",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7823-set-upper-bounds-for-modexp/21798"
+    },
+    {
+      eip: "7825",
+      title: "Transaction Gas Limit Cap",
+      author: "Giulio Rebuffo (@Giulio2002)",
+      link: "https://eipsinsight.com/eips/eip-7825",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7825-transaction-gas-limit-cap/21848"
+    },
+    {
+      eip: "7883",
+      title: "ModExp Gas Cost Increase",
+      author: "Marcin Sobczak (@marcindsobczak), Marek Moraczyński (@MarekM25), Marcos Maceo (@stdevMac)",
+      link: "https://eipsinsight.com/eips/eip-7883",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7883-modexp-gas-cost-increase/22841"
+    },
+    {
+      eip: "7892",
+      title: "Blob Parameter Only Hardforks",
+      author: "Mark Mackey (@ethDreamer)",
+      link: "https://eipsinsight.com/eips/eip-7892",
+      type: "Informational",
+      category: "",
+      discussion: "https://ethereum-magicians.org/t/eip-7892-blob-parameter-only-hardforks/23018"
+    },
+    {
+      eip: "7918",
+      title: "Blob base fee bounded by execution cost",
+      author: "Anders Elowsson (@anderselowsson), Ben Adams (@benaadams), Francesco D'Amato (@fradamt)",
+      link: "https://eipsinsight.com/eips/eip-7918",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-blob-base-fee-bounded-by-price-of-blob-carrying-transaction/23271"
+    },
+    {
+      eip: "7935",
+      title: "Set default gas limit to XX0M",
+      author: "Sophia Gold (@sophia-gold), Parithosh Jayanthi (@parithoshj), Toni Wahrstätter (@nerolation), Carl Beekhuizen (@CarlBeek), Ansgar Dietrichs (@adietrichs), Dankrad Feist (@dankrad), Alex Stokes (@ralexstokes), Josh Rudolph (@jrudolph), Giulio Rebuffo (@Giulio2002), Storm Slivkoff (@sslivkoff)",
+      link: "https://eipsinsight.com/eips/eip-7935",
+      type: "Informational",
+      category: "",
+      discussion: "https://ethereum-magicians.org/t/eip-7935-set-default-gas-limit-to-xx0m/23789"
+    },
+    {
+      eip: "7642",
+      title: "eth/69 - history expiry and simpler receipts",
+      author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
+      link: "https://eipsinsight.com/eips/eip-7642",
+      type: "Standards Track",
+      category: "Networking",
+      discussion: "https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+    },
+    {
+      eip: "7212",
+      title: "Precompile for secp256r1 Curve Support",
+      author: "Ulaş Erdoğan (@ulerdogan), Doğan Alpaslan (@doganalpaslan)",
+      link: "https://eipsinsight.com/eips/eip-7212",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7212-precompiled-for-secp256r1-curve-support/14789"
+    },
+    {
+      eip: "5920",
+      title: "PAY opcode",
+      author: "Gavin John (@Pandapip1), Zainan Victor Zhou (@xinbenlv), Sam Wilson (@SamWilsn), Jochem Brouwer (@jochem-brouwer), Charles Cooper (@charles-cooper)",
+      link: "https://eipsinsight.com/eips/eip-5920",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-5920-pay-opcode/11717"
+    },
+    {
+      eip: "7907",
+      title: "Meter Contract Code Size And Increase Limit",
+      author: "Charles Cooper (@charles-cooper), Qi Zhou (@qizhou)",
+      link: "https://eipsinsight.com/eips/eip-7907",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156"
+    },
+    {
+      eip: "7917",
+      title: "Deterministic proposer lookahead",
+      author: "Lin Oshitani (@linoscope) <lin@nethermind.io>, Justin Drake (@JustinDrake) <justin@ethereum.org>",
+      link: "https://eipsinsight.com/eips/eip-7917",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7917-deterministic-proposer-lookahead/23259"
+    },
+    {
+      eip: "7934",
+      title: "RLP Execution Block Size Limit",
+      author: "Giulio Rebuffo (@Giulio2002), Ben Adams (@benaadams), Storm Slivkoff (@sslivkoff)",
+      link: "https://eipsinsight.com/eips/eip-7934",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7934-add-bytesize-limit-to-blocks/23589"
+    }
+  ];
   const router = useRouter();
 
   const scrollToHash = () => {
@@ -1605,28 +1605,53 @@ const All = () => {
                           Execution and Consensus layers
                         </Text>
                       </NLink>{" "}
-                      on the mainnet.
-                    </>
-                  ) : (
-                    <>
-                      Following the Pectra upgrade, Ethereum developers are already planning the next major update called{" "}
+                      on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
+                      <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Ethereum Improvement Proposals (EIPs)
+                        </Text>
+                      </NLink>,
+                      the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have
+                      now been shifted to the upcoming{" "}
                       <NLink href="https://eipsinsight.com/eips/eip-7607">
                         <Text as="span" color="blue.500" textDecor="underline">
                           Fusaka
                         </Text>
-                      </NLink>, which combines Fulu and Osaka upgrades. This upgrade will focus on{" "}
-                      <NLink href="#">
+                      </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
+                      <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
                         <Text as="span" color="blue.500" textDecor="underline">
-                          improving scalability
+                          Devnet 6
                         </Text>
-                      </NLink>{" "}
-                      and{" "}
-                      <NLink href="#">
-                        <Text as="span" color="blue.500" textDecor="underline">
-                          validator efficiency
-                        </Text>
-                      </NLink>.
+                      </NLink>
                     </>
+                  ) : (
+                    <>
+                      <NLink href="https://eipsinsight.com/eips/eip-7607">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Fusaka
+                        </Text>
+                      </NLink> upgrade is Ethereum's next major network enhancement expected in late 2025, aiming to improve scalability, efficiency, and cryptographic performance. Key features include <NLink href="https://eipsinsight.com/eips/eip-7594">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          PeerDAS
+                        </Text>
+                      </NLink> (Peer Data Availability Sampling) to reduce bandwidth and enhance Layer 2 support, Blob Parameter Override (BPO) for dynamic data load testing, and ModExp precompiles (<NLink href="https://eipsinsight.com/eips/eip-7823">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          EIP-7823
+                        </Text>
+                      </NLink> & <NLink href="https://eipsinsight.com/eips/eip-7883">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          EIP-7883
+                        </Text>
+                      </NLink>) to speed up cryptographic operations like RSA & zk-SNARKs. Currently, testing is underway via 
+                      <NLink href="https://notes.ethereum.org/@ethpandaops/fusaka-devnet-0">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Devnet 0
+                        </Text>
+                      </NLink>, validating these core components ahead of June's in-person dev meeting. Despite tight timelines and coordination challenges across teams, Fusaka is seen as essential for Ethereum's roadmap, setting the stage for the upcoming <NLink href="https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Glamsterdam
+                        </Text>
+                      </NLink> upgrade.</>
                   )}
                 </Text>
               </Flex>
@@ -1739,17 +1764,14 @@ const All = () => {
               </Box>
 
               {/* Table Section */}
-              {selectedOption === 'pectra' ? (
-                <Box id="pectra-table" display={{ base: "none", md: "block" }}>
-                  <PectraTable PectraData={currentData} />
-                  <br />
-                </Box>
-              ) : (
-                <Box id="fusaka-table" display={{ base: "none", md: "block" }}>
-                  <PectraTable PectraData={currentData} />
-                  <br />
-                </Box>
-              )}
+              <Box
+                id={selectedOption === 'pectra' ? 'pectra-table' : 'fusaka-table'}
+                display={{ base: "none", md: "block" }}
+              >
+                <PectraTable PectraData={currentData} title={upgradeName} />
+                <br />
+              </Box>
+
             </Box>
           </Box>
         </motion.div>
