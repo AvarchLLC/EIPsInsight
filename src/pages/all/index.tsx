@@ -619,15 +619,15 @@ const All = () => {
     document.body.removeChild(link);
   };
   const factorAuthor = (data: string): string[][] => {
-  const authors = data.split(",").map((a) => a.trim().split(" "));
-  if (
-    authors.length &&
-    authors[authors.length - 1][authors[authors.length - 1].length - 1] === "al."
-  ) {
-    authors.pop(); // Remove "et al." if present
-  }
-  return authors;
-};
+    const authors = data.split(",").map((a) => a.trim().split(" "));
+    if (
+      authors.length &&
+      authors[authors.length - 1][authors[authors.length - 1].length - 1] === "al."
+    ) {
+      authors.pop(); // Remove "et al." if present
+    }
+    return authors;
+  };
 
 
   const getStatusColor = (status: any) => {
@@ -729,7 +729,7 @@ const All = () => {
             </Text>
           </MotionBox>
         ) : (
-          <Box bg={bg} borderRadius="md" p={4}>
+          <Box bg={bg} borderRadius="md" p={4} overflowX="auto">
             <CCardBody>
               <CSmartTable
                 items={filteredData}
@@ -752,10 +752,15 @@ const All = () => {
                   { key: "status", label: "Status" },
                 ]}
                 scopedColumns={{
-                  eip: (item: { repo: string; eip: any; status: any; }) => (
-                    <td>
+                  eip: (item: { repo: string; eip: any; status: any }) => (
+                    <td className={isDarkMode ? "text-white" : "text-black"}>
                       <ChakraLink
-                        href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}
+                        href={`/${item.repo === "erc"
+                            ? "ercs/erc"
+                            : item.repo === "rip"
+                              ? "rips/rip"
+                              : "eips/eip"
+                          }-${item.eip}`}
                         target="_blank"
                       >
                         <Badge colorScheme={getStatusColor(item.status)}>
@@ -763,14 +768,18 @@ const All = () => {
                         </Badge>
                       </ChakraLink>
                     </td>
-
                   ),
-                  title: (item: { repo: string; eip: any; title: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }) => (
+                  title: (item: { repo: string; eip: any; title: string }) => (
                     <td>
                       <ChakraLink
-                        href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}
+                        href={`/${item.repo === "erc"
+                          ? "ercs/erc"
+                          : item.repo === "rip"
+                            ? "rips/rip"
+                            : "eips/eip"
+                          }-${item.eip}`}
                         target="_blank"
-                        className={isDarkMode ? "text-white" : "text-black"}
+                        className={isDarkMode ? "text-white" : "text-black"} // Adjust text color based on theme
                       >
                         {item.title}
                       </ChakraLink>
@@ -778,8 +787,10 @@ const All = () => {
                   ),
                   author: (item: { author: string }) => (
                     <td
-                      style={{ backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC" }}
-                      className={isDarkMode ? "text-white" : "text-black"}
+                      style={{
+                        backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC", // Adjust background color based on theme
+                      }}
+                      className={isDarkMode ? "text-white" : "text-black"} // Adjust text color based on theme
                     >
                       <div>
                         {factorAuthor(item.author).map((authorPart, index) => {
@@ -787,10 +798,9 @@ const All = () => {
                           const isEmail = lastToken.endsWith(">");
                           const clean = lastToken.substring(1, lastToken.length - 1);
 
-                          const link =
-                            isEmail && clean.includes("@")
-                              ? `mailto:${clean}`
-                              : `https://github.com/${clean.replace(/^@/, "")}`;
+                          const link = isEmail && clean.includes("@")
+                            ? `mailto:${clean}`
+                            : `https://github.com/${clean.replace(/^@/, "")}`;
 
                           return (
                             <Wrap key={index}>
@@ -802,7 +812,7 @@ const All = () => {
                                     isDarkMode
                                       ? "hover:text-[#1c7ed6] text-[13px] text-white"
                                       : "hover:text-[#1c7ed6] text-[13px] text-black"
-                                  }
+                                  } // Adjust text color based on theme
                                 >
                                   {authorPart.join(" ")}
                                 </ChakraLink>
@@ -813,30 +823,30 @@ const All = () => {
                       </div>
                     </td>
                   ),
-
-                  type: (item: { type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }) => (
-                    <td className={isDarkMode ? "text-white" : "text-black"}>
+                  type: (item: { type: string }) => (
+                    <td className={isDarkMode ? "text-white" : "text-black"}> // Adjust text color based on theme
                       {item.type}
                     </td>
                   ),
-                  category: (item: { category: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }) => (
-                    <td className={isDarkMode ? "text-white" : "text-black"}>
+                  category: (item: { category: string }) => (
+                    <td className={isDarkMode ? "text-white" : "text-black"}> // Adjust text color based on theme
                       {item.category}
                     </td>
                   ),
-                  status: (item: { status: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }) => (
+                  status: (item: { status: string }) => (
                     <td>
                       <Badge colorScheme={getStatusColor(item.status)}>
                         {item.status}
                       </Badge>
                     </td>
                   ),
-                  repo: (item: { repo: string; }) => (
+                  repo: (item: { repo: string }) => (
                     <td>
                       <Badge colorScheme="cyan">{item.repo.toUpperCase()}</Badge>
                     </td>
                   ),
                 }}
+
               />
             </CCardBody>
           </Box>

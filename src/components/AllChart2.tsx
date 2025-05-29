@@ -83,13 +83,13 @@ interface EIP {
 
 
 const categoryColors: string[] = [
-  "rgb(255, 99, 132)",
-  "rgb(255, 159, 64)",
-  "rgb(255, 205, 86)",
-  "rgb(75, 192, 192)",
-  "rgb(54, 162, 235)",
-  "rgb(153, 102, 255)",
-  "rgb(255, 99, 255)",
+  "rgb(255, 99, 132)", //meta
+  "rgb(255, 159, 64)", //core
+  "rgb(255, 205, 86)", //interface
+  "rgb(75, 192, 192)", //networking
+  "rgb(54, 162, 235)", //informational
+  "rgb(153, 102, 255)", //ercs
+  "rgb(255, 99, 255)", //rips
   "rgb(50, 205, 50)",
   "rgb(255, 0, 0)",
   "rgb(0, 128, 0)",

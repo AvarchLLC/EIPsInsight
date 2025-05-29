@@ -594,11 +594,11 @@ interface EIP {
 }
 
 const colorsByType = [
-  "#f579ba", // Core
-  "#3ed59e", // Networking
-  "#68aafa", // Interface
-  "#fbc22f", // Meta
-  "#ac91fa", // Informational
+  "rgb(255, 159, 64)", // Core
+  "rgb(75, 192, 192)", // Networking
+  "rgb(255, 205, 86)", // Interface
+  "rgb(255, 99, 132)", // Meta
+  "rgb(54, 162, 235)",  // Informational
 ];
 
 const EIPTypeDonut = () => {
