@@ -1,5 +1,6 @@
 import TimelineChart from '@/components/TimelineChart';
 import { Heading, Box } from '@chakra-ui/react';
+import { SetStateAction } from 'react';
 
 const EIPTimelinePage = () => {
   const originalData = [
@@ -70,7 +71,9 @@ const EIPTimelinePage = () => {
   return (
     <Box p={4}>
       <Heading mb={4}>EIP Timeline</Heading>
-      <TimelineChart data={processedData} data2={data2}/>
+      <TimelineChart data={processedData} data2={data2} selectedOption={'pectra'} setSelectedOption={function (value: SetStateAction<'pectra' | 'fusaka'>): void {
+        throw new Error('Function not implemented.');
+      } }/>
     </Box>
   );
 };

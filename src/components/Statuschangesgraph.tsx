@@ -5,6 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Text } from "@react-three/drei";
 import * as THREE from "three";
 
+
 interface EIPEntry {
   eip: string;
   title: string;
@@ -90,7 +91,7 @@ const StatusNode = ({ node, position }: { node: StatusChangeNode; position: [num
   const color = statusColors[node.to] || "#ffffff";
 
   return (
-    <group position={position}>
+    <group  position={position}>
       <mesh>
         <sphereGeometry args={[1.2, 32, 32]} />
         <meshStandardMaterial color={color} />

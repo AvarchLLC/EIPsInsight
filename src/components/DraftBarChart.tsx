@@ -8,13 +8,13 @@ import axios from "axios";
 
 const getCat = (cat: string) => {
   switch (cat) {
-    case "Standards Track" ||
-      "Standard Track" ||
-      "Standards Track (Core, Networking, Interface, ERC)" ||
-      "Standard" ||
-      "Process" ||
-      "Core" ||
-      "core":
+    case "Standards Track":
+    case "Standard Track":
+    case "Standards Track (Core, Networking, Interface, ERC)":
+    case "Standard":
+    case "Process":
+    case "Core":
+    case "core":
       return "Core";
     case "RIP":
       return "RIPs";
