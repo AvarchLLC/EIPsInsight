@@ -256,7 +256,7 @@ export const sidebarConfig: Record<string, SidebarItem[]> = {
   ],
   '/upgrade': [
     {
-      label: 'Pectra/Fusaka',
+      label: 'Upgrade',
       icon: LuTrendingUp,
       id: 'pectrafusaka',
       children: [

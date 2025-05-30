@@ -1572,6 +1572,7 @@ const All = () => {
                 fontSize={{ base: "2xl", md: "4xl", lg: "6xl" }}
                 fontWeight={{ base: "extrabold", md: "bold", lg: "bold" }}
                 color="#30A0E0"
+                id="pectrafusaka"
               >
                 Ethereum Network Upgrades
               </Text>
