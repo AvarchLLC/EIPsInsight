@@ -157,7 +157,7 @@ const EIP3DGraph = () => {
       setShowResetZoom(true);
     }
   };
-  
+
   const handleZoomOut = () => {
     if (fgRef.current) {
       const distance = fgRef.current.camera().position.length();
@@ -165,7 +165,7 @@ const EIP3DGraph = () => {
       setShowResetZoom(true);
     }
   };
-  
+
 
   const graphData = useMemo(() => {
     const nodes: any[] = [];
@@ -226,45 +226,45 @@ const EIP3DGraph = () => {
 
   return (
     <div style={{ height: '100vh', position: 'relative' }}>
-  {/* Legend */}
-  <div style={{
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    background: 'rgba(255, 255, 255, 0.9)',
-    padding: '12px',
-    borderRadius: '10px',
-    fontSize: '0.9rem',
-    boxShadow: '0 0 10px rgba(0,0,0,0.3)',
-    zIndex: 10,
-    maxWidth: '200px',
-    color: 'black' // Added this line to set all text to black
-  }}>
-    <strong style={{ color: 'black' }}>Network Upgrades</strong>
-    <ul style={{ 
-      listStyle: 'none', 
-      padding: 0, 
-      marginTop: 10,
-      color: 'black' // Ensures list items inherit black color
-    }}>
-      {uniqueGroups.map((group) => (
-        <li key={group} style={{ 
-          marginBottom: 6,
-          color: 'black' // Explicit black for list items
+      {/* Legend */}
+      <div style={{
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        background: 'rgba(255, 255, 255, 0.9)',
+        padding: '12px',
+        borderRadius: '10px',
+        fontSize: '0.9rem',
+        boxShadow: '0 0 10px rgba(0,0,0,0.3)',
+        zIndex: 10,
+        maxWidth: '200px',
+        color: 'black' // Added this line to set all text to black
+      }}>
+        <strong style={{ color: 'black' }}>Network Upgrades</strong>
+        <ul style={{
+          listStyle: 'none',
+          padding: 0,
+          marginTop: 10,
+          color: 'black' // Ensures list items inherit black color
         }}>
-          <span style={{
-            display: 'inline-block',
-            width: 12,
-            height: 12,
-            borderRadius: '50%',
-            backgroundColor: colorScale.get(group),
-            marginRight: 8,
-          }} />
-          {group}
-        </li>
-      ))}
-    </ul>
-  </div>
+          {uniqueGroups.map((group) => (
+            <li key={group} style={{
+              marginBottom: 6,
+              color: 'black' // Explicit black for list items
+            }}>
+              <span style={{
+                display: 'inline-block',
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                backgroundColor: colorScale.get(group),
+                marginRight: 8,
+              }} />
+              {group}
+            </li>
+          ))}
+        </ul>
+      </div>
 
 
       {/* Zoom Controls */}
@@ -299,48 +299,62 @@ const EIP3DGraph = () => {
         }
       </VStack>
 
-      <ForceGraph3D
-        ref={fgRef}
-        graphData={graphData}
-        nodeThreeObject={(node: any) => {
-          const color = colorScale.get(node.group) || '#999';
-        
-          // Create sphere mesh
-          const geometry = new THREE.SphereGeometry(6, 16, 16);
-          const material = new THREE.MeshBasicMaterial({ color });
-          const sphere = new THREE.Mesh(geometry, material);
-        
-          // Create sprite label
-          const sprite = new SpriteText(node.label);
-          sprite.color = '#ffffff';
-          sprite.backgroundColor = 'transparent';
-          sprite.textHeight = 4;
-          sprite.position.set(0, 10, 0);
-        
-          // Combine into a group
-          const group = new THREE.Group();
-          group.add(sphere);
-          group.add(sprite);
-        
-          return group;
+
+      <div
+        style={{
+          margin: '0 auto',
+          width: '90%',
+          maxWidth: '900px',
+          height: '450px', // 2:1 ratio (width:height)
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
-        
-        nodeLabel={(node) => `${node.label} (Upgrade: ${node.upgradeName || 'N/A'})`}
-        linkColor={() => '#999'}
-        linkWidth={2}
-        linkDirectionalParticles={2}
-        linkDirectionalParticleWidth={2}
-        linkOpacity={0.6}
-        linkDirectionalArrowLength={3}
-        linkDirectionalArrowRelPos={0.9}
-        forceEngine="d3"
-        d3VelocityDecay={0.3}
-        d3AlphaDecay={0.02}
-        nodeResolution={32}
-        warmupTicks={100}
-        cooldownTicks={1000}
+      >
+        <ForceGraph3D
+          ref={fgRef}
+          graphData={graphData}
+          nodeThreeObject={(node: any) => {
+            const color = colorScale.get(node.group) || '#999';
+
+            // Create sphere mesh
+            const geometry = new THREE.SphereGeometry(6, 16, 16);
+            const material = new THREE.MeshBasicMaterial({ color });
+            const sphere = new THREE.Mesh(geometry, material);
+
+            // Create sprite label
+            const sprite = new SpriteText(node.label);
+            sprite.color = '#ffffff';
+            sprite.backgroundColor = 'transparent';
+            sprite.textHeight = 4;
+            sprite.position.set(0, 10, 0);
+
+            // Combine into a group
+            const group = new THREE.Group();
+            group.add(sphere);
+            group.add(sprite);
+
+            return group;
+          }}
+
+          nodeLabel={(node) => `${node.label} (Upgrade: ${node.upgradeName || 'N/A'})`}
+          linkColor={() => '#999'}
+          linkWidth={2}
+          linkDirectionalParticles={2}
+          linkDirectionalParticleWidth={2}
+          linkOpacity={0.6}
+          linkDirectionalArrowLength={3}
+          linkDirectionalArrowRelPos={0.9}
+          forceEngine="d3"
+          d3VelocityDecay={0.3}
+          d3AlphaDecay={0.02}
+          nodeResolution={32}
+          warmupTicks={100}
+          cooldownTicks={1000}
         // onZoom={() => setShowResetZoom(true)}
-      />
+        />
+      </div>
+
     </div>
   );
 };

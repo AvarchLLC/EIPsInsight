@@ -32,16 +32,23 @@ import {
   LuTrophy,
   LuBarChart2
 } from 'react-icons/lu';
+export interface SidebarItem {
+  label: string;
+  icon: React.ElementType;
+  id: string;
+  children?: SidebarItem[];
+  condition?: (context: any) => boolean; // optional to show/hide dynamically if needed
+}
 
-export const sidebarConfig: Record<string, { label: string; icon: React.ElementType; id: string }[]> = {
-    '/': [
+export const sidebarConfig: Record<string, SidebarItem[]> = {
+  '/': [
     { label: 'All EIPs', icon: LuHome, id: 'all' },
     { label: 'Our Tools', icon: LuWrench, id: 'ourtools' },
     { label: 'What is EIPs Insights?', icon: LuInfo, id: 'what' },
     { label: 'EIP Status Changes by Year', icon: LuBarChartBig, id: 'statuschanges' },
     { label: 'Dashboard', icon: LuDatabase, id: 'dashboard' },
   ],
-      '/home': [
+  '/home': [
     { label: 'All EIPs', icon: LuHome, id: 'all' },
     { label: 'Our Tools', icon: LuWrench, id: 'ourtools' },
     { label: 'What is EIPs Insights?', icon: LuInfo, id: 'what' },
@@ -52,14 +59,21 @@ export const sidebarConfig: Record<string, { label: string; icon: React.ElementT
     { label: 'What is EIPs Insights', icon: LuInfo, id: 'what' }
   ],
   '/all': [
-    { label: 'Search EIP', icon: LuSearch, id: 'searchEIP' },
-    { label: 'Living', icon: LuCheckCircle2, id: 'living' },
-    { label: 'Final', icon: LuArchive, id: 'final' },
-    { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
-    { label: 'Review', icon: LuEye, id: 'review' },
-    { label: 'Draft', icon: LuFileText, id: 'draft' },
-    { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' },
-    { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
+    {
+      label: 'Categories',
+      icon: LuListChecks,
+      id: 'categories',
+      children: [
+        { label: 'Search EIP', icon: LuSearch, id: 'searchEIP' },
+        { label: 'Living', icon: LuCheckCircle2, id: 'living' },
+        { label: 'Final', icon: LuArchive, id: 'final' },
+        { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
+        { label: 'Review', icon: LuEye, id: 'review' },
+        { label: 'Draft', icon: LuFileText, id: 'draft' },
+        { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' },
+        { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
+      ],
+    },
   ],
   '/milestones2024': [
     { label: 'Analytics Scheduler', icon: LuClipboardList, id: 'analytics-scheduler' },
@@ -145,57 +159,116 @@ export const sidebarConfig: Record<string, { label: string; icon: React.ElementT
   // ],
   '/rip': [
     { label: 'Graphs', icon: LuBarChartBig, id: 'graphs' },
-        { label: 'Draft vs Final', icon: LuBarChart2, id: 'draftvsfinal' },
-    { label: 'Draft', icon: LuFileText, id: 'draft' },
-    { label: 'Final', icon: LuArchive, id: 'final' },
-    { label: 'Living', icon: LuCheckCircle2, id: 'living' },
-    { label: 'Meta', icon: LuListChecks, id: 'meta' },
-     { label: 'Informational', icon: LuListChecks, id: 'informational' },
-    { label: 'Core', icon: LuHome, id: 'core' },
-     { label: 'Networking', icon: LuListChecks, id: 'networking' },
-      { label: 'Interface', icon: LuListChecks, id: 'interface' },
+    { label: 'Draft vs Final', icon: LuBarChart2, id: 'draftvsfinal' },
+    {
+      label: 'Statuses',
+      icon: LuListChecks,
+      id: 'statuses',
+      children: [
+        { label: 'Draft', icon: LuFileText, id: 'draft' },
+        { label: 'Final', icon: LuArchive, id: 'final' },
+        { label: 'Living', icon: LuCheckCircle2, id: 'living' },
+      ],
+    },
+    {
+      label: 'Categories',
+      icon: LuListChecks,
+      id: 'categories',
+      children: [
+        { label: 'Meta', icon: LuListChecks, id: 'meta' },
+        { label: 'Informational', icon: LuListChecks, id: 'informational' },
+        { label: 'Core', icon: LuHome, id: 'core' },
+        { label: 'Networking', icon: LuListChecks, id: 'networking' },
+        { label: 'Interface', icon: LuListChecks, id: 'interface' },
+      ],
+    },
     { label: 'RIP', icon: LuInfo, id: 'rip' },
-    { label: 'RRC', icon: LuFileSignature, id: 'rrc' }
+    { label: 'RRC', icon: LuFileSignature, id: 'rrc' },
   ],
   '/eip': [
     { label: 'Graphs', icon: LuBarChartBig, id: 'graphs' },
     { label: 'Draft vs Final', icon: LuBarChart2, id: 'draftvsfinal' },
-    { label: 'Core', icon: LuHome, id: 'core' },
-    { label: 'Networking', icon: LuNetwork, id: 'networking' },
-    { label: 'Interface', icon: LuWrench, id: 'interface' },
-    { label: 'Meta', icon: LuListChecks, id: 'meta' },
-    { label: 'Informational', icon: LuInfo, id: 'informational' },
-    { label: 'Draft', icon: LuFileText, id: 'draft' },
-    { label: 'Review', icon: LuEye, id: 'review' },
-    { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
-    { label: 'Final', icon: LuArchive, id: 'final' },
-    { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
-    { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' },
-    { label: 'Living', icon: LuCheckCircle2, id: 'living' },
-    { label: 'Meta Table', icon: LuTable, id: 'metatable' },
-    { label: 'Informational Table', icon: LuTable, id: 'informationaltable' },
-    { label: 'Core Table', icon: LuTable, id: 'coretable' },
-    { label: 'Networking Table', icon: LuTable, id: 'networkingtable' },
-    { label: 'Interface Table', icon: LuTable, id: 'interfacetable' }
+    {
+      label: 'Categories',
+      icon: LuListChecks,
+      id: 'categories',
+      children: [
+        { label: 'Core', icon: LuHome, id: 'core' },
+        { label: 'Networking', icon: LuNetwork, id: 'networking' },
+        { label: 'Interface', icon: LuWrench, id: 'interface' },
+        { label: 'Meta', icon: LuListChecks, id: 'meta' },
+        { label: 'Informational', icon: LuInfo, id: 'informational' },
+      ],
+    },
+    {
+      label: 'Statuses',
+      icon: LuListChecks,
+      id: 'statuses',
+      children: [
+        { label: 'Draft', icon: LuFileText, id: 'draft' },
+        { label: 'Review', icon: LuEye, id: 'review' },
+        { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
+        { label: 'Final', icon: LuArchive, id: 'final' },
+        { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
+        { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' },
+        { label: 'Living', icon: LuCheckCircle2, id: 'living' },
+      ],
+    },
+    {
+      label: 'Tables',
+      icon: LuTable,
+      id: 'tables',
+      children: [
+        { label: 'Meta Table', icon: LuTable, id: 'metatable' },
+        { label: 'Informational Table', icon: LuTable, id: 'informationaltable' },
+        { label: 'Core Table', icon: LuTable, id: 'coretable' },
+        { label: 'Networking Table', icon: LuTable, id: 'networkingtable' },
+        { label: 'Interface Table', icon: LuTable, id: 'interfacetable' },
+      ],
+    },
   ],
   '/erc': [
     { label: 'Graphs', icon: LuBarChartBig, id: 'graphs' },
     { label: 'ERC (Progress Over the Years)', icon: LuTrendingUp, id: 'ercprogress' },
-    { label: 'Draft', icon: LuFileText, id: 'draft' },
-    { label: 'Review', icon: LuEye, id: 'review' },
-    { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
-    { label: 'Final', icon: LuArchive, id: 'final' },
-    { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
-    { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' },
-    { label: 'Living', icon: LuCheckCircle2, id: 'living' },
-    { label: 'Meta Table', icon: LuTable, id: 'metatable' },
-    { label: 'ERC Table', icon: LuTable, id: 'erctable' }
+    {
+      label: 'Statuses',
+      icon: LuListChecks,
+      id: 'statuses',
+      children: [
+        { label: 'Draft', icon: LuFileText, id: 'draft' },
+        { label: 'Review', icon: LuEye, id: 'review' },
+        { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
+        { label: 'Final', icon: LuArchive, id: 'final' },
+        { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
+        { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' },
+        { label: 'Living', icon: LuCheckCircle2, id: 'living' },
+      ],
+    },
+    {
+      label: 'Tables',
+      icon: LuTable,
+      id: 'tables',
+      children: [
+        { label: 'Meta Table', icon: LuTable, id: 'metatable' },
+        { label: 'ERC Table', icon: LuTable, id: 'erctable' },
+      ],
+    },
   ],
   '/upgrade': [
-    { label: 'PECTRA', icon: LuTrendingUp, id: 'pectra' },
-    { label: 'Network Upgrades and EIPs Relationship Graph', icon: LuGitBranch, id: 'NetworkUpgradesChartp' },
+    {
+      label: 'Pectra/Fusaka',
+      icon: LuTrendingUp,
+      id: 'pectrafusaka',
+      children: [
+        { label: 'PECTRA', icon: LuTrendingUp, id: 'pectra' },
+        { label: 'FUSAKA', icon: LuTrendingUp, id: 'fusaka' },
+      ],
+    },
     { label: 'Network Upgrades Graph', icon: LuBarChartBig, id: 'NetworkUpgrades' },
+    {label: 'Upgrade Table',icon: LuTable,id: 'upgrade-table' },
+    { label: 'Network Upgrades and EIPs Relationship Graph', icon: LuGitBranch, id: 'NetworkUpgradesChartp' },
+    { label: 'Network Upgrades chart', icon: LuBarChartBig, id: 'NetworkUpgradeschart' },
     { label: 'Author Contributions', icon: LuUsers, id: 'AuthorContributions' },
-    { label: 'Pectra Table', icon: LuTable, id: 'pectra-table' }
+
   ]
 };

@@ -1020,6 +1020,7 @@
 
 // export default All;
 
+'use client';
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
 import {
@@ -1038,7 +1039,8 @@ import {
   SimpleGrid,
   Badge,
   AspectRatio,
-  Grid
+  Grid,
+  GridItem
 } from "@chakra-ui/react";
 import SlotCountdown from "@/components/SlotCountdown";
 import NLink from "next/link";
@@ -1062,6 +1064,7 @@ import { useRef } from 'react';
 import UpgradesTimeline from "@/components/UpgradesTimeline";
 import { Card } from "@/components/pectraCards";
 import StatusGraph from "@/components/Statuschangesgraph";
+import { useSidebar } from '@/components/Sidebar/SideBarContext';
 
 const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
@@ -1070,6 +1073,9 @@ const All = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka'>('pectra');
+  const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
+  // const selectedOption = selectedUpgrade;       // just alias so rest of code works
+  // const setSelectedOption = setSelectedUpgrade;
   const optionArr = [
     "Meta",
     "Informational",
@@ -1080,6 +1086,22 @@ const All = () => {
     "RIP",
   ];
   const [isLoading, setIsLoading] = useState(true);
+  const [isMediumOrLarger, setIsMediumOrLarger] = useState(false);
+
+
+  useEffect(() => {
+    const checkWidth = () => {
+      setIsMediumOrLarger(window.innerWidth >= 768);
+    };
+
+    checkWidth(); // initial check
+    window.addEventListener('resize', checkWidth);
+
+    return () => {
+      window.removeEventListener('resize', checkWidth);
+    };
+  }, []);
+
 
   useEffect(() => {
     if (bg === "#f6f6f7") {
@@ -1555,6 +1577,22 @@ const All = () => {
               </Text>
 
               <br />
+              <Box mt={4} mb={4}>
+                <select
+                  value={selectedOption}
+                  onChange={(e) => setSelectedOption(e.target.value as 'pectra' | 'fusaka')}
+                  style={{
+                    padding: '8px',
+                    fontSize: '16px',
+                    borderRadius: '6px',
+                    border: '1px solid gray',
+                  }}
+                >
+                  <option value="pectra">Pectra</option>
+                  <option value="fusaka">Fusaka</option>
+                </select>
+              </Box>
+
               <Text
                 as={motion.div}
                 initial={{ opacity: 0, y: -20 }}
@@ -1643,7 +1681,7 @@ const All = () => {
                         <Text as="span" color="blue.500" textDecor="underline">
                           EIP-7883
                         </Text>
-                      </NLink>) to speed up cryptographic operations like RSA & zk-SNARKs. Currently, testing is underway via 
+                      </NLink>) to speed up cryptographic operations like RSA & zk-SNARKs. Currently, testing is underway via
                       <NLink href="https://notes.ethereum.org/@ethpandaops/fusaka-devnet-0">
                         <Text as="span" color="blue.500" textDecor="underline">
                           Devnet 0
@@ -1657,80 +1695,72 @@ const All = () => {
                 </Text>
               </Flex>
 
-              {/* Blog Cards Section */}
-              <Flex position="relative" width="100%" align="center">
-                <IconButton
-                  aria-label="Scroll left"
-                  icon={<ChevronLeftIcon />}
-                  position="absolute"
-                  left={0}
-                  zIndex={2}
-                  onClick={scrollLeft}
-                  bg="#30A0E0"
-                  boxShadow="md"
-                  _hover={{ bg: "gray.100" }}
-                />
+              {/* Blog Cards Section - Vertical Scroll with same width and responsive */}
 
-                <Flex
-                  ref={containerRef}
-                  flex="1"
-                  overflow="hidden"
-                  py={4}
-                  pl={6}
-                  pr={10}
-                  _hover={{
-                    overflowX: "auto",
-                  }}
-                  sx={{
-                    scrollbarWidth: "none",
-                    "&::-webkit-scrollbar": {
-                      display: "none",
-                    },
-                    "& > div": {
-                      paddingRight: "40px",
-                    },
-                  }}
+              <Box
+                maxHeight="450px"
+                overflowY="auto"
+                width="100%"
+                padding="4"
+              >
+                <Grid
+                  // Responsive: 1 column on small screens, 3 columns on medium and up
+                  templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
+                  gap={6}
                 >
-                  <Flex
-                    gap={6}
-                    flexWrap="nowrap"
-                    ml={-2}
-                  >
-                    {currentPosts?.map((post, index) => (
-                      <Box
-                        key={index}
-                        flex="0 0 auto"
-                        width={{ base: "280px", md: "320px" }}
-                        ml={index === 0 ? 4 : 0}
-                        mr={index === currentPosts?.length - 1 ? 2 : 0}
-                      >
-                        <Card
-                          image={post.image}
-                          title={post.title}
-                          content={post.content}
-                          link={post.link}
-                        />
-                      </Box>
-                    ))}
-                  </Flex>
-                </Flex>
+                  {currentPosts?.map((post, index) => {
+                    const isLastRow =
+                      index >= currentPosts.length - (currentPosts.length % 3 || 3);
 
-                <IconButton
-                  aria-label="Scroll right"
-                  icon={<ChevronRightIcon />}
-                  position="absolute"
-                  right={0}
-                  zIndex={2}
-                  onClick={scrollRight}
-                  bg="#30A0E0"
-                  boxShadow="md"
-                  _hover={{ bg: "gray.100" }}
+                    const lastRowCount = currentPosts.length % 3;
+                    // Only apply colSpan logic on md and up, else always 1 on small screens
+                    const colSpan =
+                      lastRowCount === 2 && isLastRow && isMediumOrLarger ? 1.5 : 1;
+
+
+                    return (
+                      <GridItem
+                        key={index}
+                        colSpan={colSpan}
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="stretch"
+                      >
+                        <Box
+                          width="100%"
+                          height="100%"
+                          borderWidth="1px"
+                          borderRadius="md"
+                          overflow="hidden"
+                        >
+                          <Card
+                            image={post.image}
+                            title={post.title}
+                            content={post.content}
+                            link={post.link}
+                          />
+                        </Box>
+                      </GridItem>
+                    );
+                  })}
+                </Grid>
+              </Box>
+              <Box
+                id="upgrade-table"  // Consistent ID
+                display={{ base: "none", md: "block" }}
+              >
+                {/* Content changes based on selection */}
+                <PectraTable
+                  PectraData={selectedOption === 'pectra' ? pectraData : fusakaData}
+                  title={selectedOption === 'pectra' ? 'Pectra' : 'Fusaka'}
                 />
-              </Flex>
+                <br />
+              </Box>
+
 
               {/* Network Upgrades Chart - Remains the same for both */}
               <Box
-                id="NetworkUpgradesChart"
+                id="NetworkUpgradesChartp"
                 mt={2}
                 mb={2}
                 px={{ base: 2, md: 4, lg: 6 }}
@@ -1756,7 +1786,7 @@ const All = () => {
                 <br />
               </Box>
 
-              <Box id="NetworkUpgrades" mt={2}>
+              <Box id="NetworkUpgradeschart" mt={2}>
                 <NetworkUpgradesChart />
               </Box>
               <br />
@@ -1765,13 +1795,7 @@ const All = () => {
               </Box>
 
               {/* Table Section */}
-              <Box
-                id={selectedOption === 'pectra' ? 'pectra-table' : 'fusaka-table'}
-                display={{ base: "none", md: "block" }}
-              >
-                <PectraTable PectraData={currentData} title={upgradeName} />
-                <br />
-              </Box>
+
 
             </Box>
           </Box>
