@@ -1,30 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useWindowSize } from "react-use";
-import { Box, useColorModeValue, Button, Flex, Heading } from "@chakra-ui/react";
+import {
+  Box,
+  useColorModeValue,
+  Button,
+  Flex,
+  Heading,
+} from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import axios from "axios";
 
 interface StatusChart {
-    statusChanges: {
-      eip: string;
-      lastStatus: string;
-      eipTitle: string;
-      eipCategory: string;
-    }[];
-    year: number;
-  }
-  
-  interface APIResponse {
-    eip: StatusChart[];
-    erc: StatusChart[];
-    rip: StatusChart[];
-  }
-  
-  interface AreaCProps {
-    category: string;
-    type: string;
-  }
-  
+  statusChanges: {
+    eip: string;
+    lastStatus: string;
+    eipTitle: string;
+    eipCategory: string;
+  }[];
+  year: number;
+}
+
+interface APIResponse {
+  eip: StatusChart[];
+  erc: StatusChart[];
+  rip: StatusChart[];
+}
+
+interface AreaCProps {
+  category: string;
+  type: string;
+}
 
 const getStatus = (status: string) => {
   switch (status) {
@@ -113,26 +118,30 @@ const StatusChart2: React.FC<AreaCProps> = ({ category, type }) => {
         const jsonData = await response.json();
         setData(jsonData);
 
-        const combinedData = [...jsonData.eip, ...jsonData.erc, ...jsonData.rip]?.reduce(
-            (acc: StatusChart[], curr: StatusChart) => {
-              const existingYear = acc.find((item) => item.year === curr.year);
-              if (existingYear) {
-                // Merge status changes if year already exists
-                existingYear.statusChanges.push(...curr.statusChanges);
-              } else {
-                // Add a new entry for the year
-                acc.push({ year: curr.year, statusChanges: [...curr.statusChanges] });
-              }
-              return acc;
-            },
-            [] as StatusChart[]
-          );
-        
-        if(category==="ERC"){
+        const combinedData = [
+          ...jsonData?.eip,
+          ...jsonData?.erc,
+          ...jsonData.rip,
+        ]?.reduce((acc: StatusChart[], curr: StatusChart) => {
+          const existingYear = acc?.find((item) => item.year === curr.year);
+          if (existingYear) {
+            // Merge status changes if year already exists
+            existingYear.statusChanges.push(...curr.statusChanges);
+          } else {
+            // Add a new entry for the year
+            acc.push({
+              year: curr.year,
+              statusChanges: [...curr.statusChanges],
+            });
+          }
+          return acc;
+        }, [] as StatusChart[]);
+
+        if (category === "ERC") {
           console.log("chart data", jsonData.erc);
           console.log("Combined Chart Data", combinedData);
         }
-        
+
         setTypeData(combinedData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -168,9 +177,9 @@ const StatusChart2: React.FC<AreaCProps> = ({ category, type }) => {
     }))
   );
 
-  if(category==="Meta"){
+  if (category === "Meta") {
     console.log("filteredData", filteredData);
-    console.log("transformed data:",transformedData);
+    console.log("transformed data:", transformedData);
   }
 
   const Area = dynamic(
@@ -205,15 +214,15 @@ const StatusChart2: React.FC<AreaCProps> = ({ category, type }) => {
 
     // Transform the typeData to get the necessary details
     const transformedData = typeData.flatMap(({ statusChanges, year }) => {
-        return statusChanges
-            ?.filter(({ eipCategory }) => eipCategory === targetCategory) // Filter by eipCategory
-            ?.map(({ eip, lastStatus, eipTitle, eipCategory }) => ({
-                eip,
-                lastStatus,
-                eipTitle,
-                eipCategory,
-                year: year.toString(), // Convert year to string
-            }));
+      return statusChanges
+        ?.filter(({ eipCategory }) => eipCategory === targetCategory) // Filter by eipCategory
+        ?.map(({ eip, lastStatus, eipTitle, eipCategory }) => ({
+          eip,
+          lastStatus,
+          eipTitle,
+          eipCategory,
+          year: year.toString(), // Convert year to string
+        }));
     });
 
     // Define the CSV header
@@ -221,18 +230,19 @@ const StatusChart2: React.FC<AreaCProps> = ({ category, type }) => {
 
     // Prepare the CSV content
     const csvContent =
-        "data:text/csv;charset=utf-8," +
-        header +
-        transformedData
+      "data:text/csv;charset=utf-8," +
+      header +
+      transformedData
         ?.map(({ eip, lastStatus, eipTitle, eipCategory, year }) => {
-            return `${eip},${lastStatus},${eipTitle},${eipCategory},${year},${
-              eipCategory === "ERC"
-                    ? `https://eipsinsight.com/ercs/erc-${eip}`
-                    : type === "EIPs"
-                    ? `https://eipsinsight.com/eips/eip-${eip}`
-                    : `https://eipsinsight.com/rips/rip-${eip}`
-            }`;
-        }).join("\n");
+          return `${eip},${lastStatus},${eipTitle},${eipCategory},${year},${
+            eipCategory === "ERC"
+              ? `https://eipsinsight.com/ercs/erc-${eip}`
+              : type === "EIPs"
+              ? `https://eipsinsight.com/eips/eip-${eip}`
+              : `https://eipsinsight.com/rips/rip-${eip}`
+          }`;
+        })
+        .join("\n");
 
     // Check the generated CSV content before download
     console.log("CSV Content:", csvContent);
@@ -245,39 +255,43 @@ const StatusChart2: React.FC<AreaCProps> = ({ category, type }) => {
     document.body.appendChild(link); // Required for Firefox
     link.click();
     document.body.removeChild(link);
-};
+  };
 
-const headingColor = useColorModeValue('black', 'white');
+  const headingColor = useColorModeValue("black", "white");
 
-return (
-  <>
-      <Flex justifyContent="space-between" alignItems="center" mb="0.5rem" width="100%">
-          <Heading size="md" color={headingColor}>
-              {category}
-          </Heading>
-          <Button colorScheme="blue" 
+  return (
+    <>
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        mb="0.5rem"
+        width="100%"
+      >
+        <Heading size="md" color={headingColor}>
+          {category}
+        </Heading>
+        <Button
+          colorScheme="blue"
           onClick={async () => {
             try {
               // Trigger the CSV conversion and download
               downloadData();
-        
+
               // Trigger the API call
               await axios.post("/api/DownloadCounter");
             } catch (error) {
               console.error("Error triggering download counter:", error);
             }
           }}
-          >
-              Download CSV
-          </Button>
+        >
+          Download CSV
+        </Button>
       </Flex>
       <Box boxSize="100%" overflowX="auto">
-          <Area {...config} />
+        <Area {...config} />
       </Box>
-  </>
-);
-
-
+    </>
+  );
 };
 
 export default StatusChart2;

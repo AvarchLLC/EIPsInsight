@@ -10,23 +10,23 @@ import { usePathname } from "next/navigation";
 import Head from "next/head";
 import Script from "next/script";
 import FloatingContributionIcon from "./FloatingContributionIcon";
-import BookmarkFloater from './BookmarkFloater';
+import BookmarkFloater from "./BookmarkFloater";
 import { SessionProvider } from "next-auth/react";
-import SessionWrapper from '@/components/SessionWrapper';
+import SessionWrapper from "@/components/SessionWrapper";
 import { AuthLocalStorageInitializer } from "./AuthLocalStorageInitializer";
-import { BookmarkProvider } from './BookmarkContext';
+import { BookmarkProvider } from "./BookmarkContext";
 import { Portal } from "@chakra-ui/react";
-import Sidebar from "@/components/Sidebar/SideBar";
 import { SidebarProvider, useSidebar } from "./Sidebar/SideBarContext";
 import SidebarConfigLoader from "./Sidebar/SideBarConfigLoader";
 import { sidebarConfig } from "./Sidebar/slidebarConfig";
-
+import AppSidebar from "./Sidebar/AppSidebar";
 
 const mont = Inter({ subsets: ["latin"] });
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const { isCollapsed } = useSidebar();
   const pathname = usePathname();
-  const topLevelRoute = pathname === "/" ? "/" : `/${pathname?.split("/")?.[1]}`;
+  const topLevelRoute =
+    pathname === "/" ? "/" : `/${pathname?.split("/")?.[1]}`;
   const shouldShowSidebar = !!sidebarConfig[topLevelRoute];
   const router = usePathname();
   return (
@@ -53,7 +53,6 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
           },
         }}
         className={`${mont.className} base-page-size`}
-
       >
         <Head>
           <title>EIPs Insights</title>
@@ -61,7 +60,10 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
         </Head>
 
         {/* Google Analytics */}
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></Script>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"
+        ></Script>
         <Script id="google-analytics" strategy="afterInteractive">
           {`
           window.dataLayer = window.dataLayer || [];
@@ -79,7 +81,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
               {shouldShowSidebar && (
                 <Portal>
                   <Box position="fixed" top="0" left="0" zIndex={100000}>
-                    <Sidebar />
+                    <AppSidebar />
                   </Box>
                 </Portal>
               )}
@@ -110,10 +112,14 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
                 <FloatingContributionIcon />
               </Box>
 
-              <Box position="fixed" bottom={{ base: 20, md: 4 }} right={{ base: 4, md: 20 }} zIndex={1000}>
+              <Box
+                position="fixed"
+                bottom={{ base: 20, md: 4 }}
+                right={{ base: 4, md: 20 }}
+                zIndex={1000}
+              >
                 <BookmarkFloater />
               </Box>
-
 
               <LargeWithAppLinksAndSocial />
             </BookmarkProvider>

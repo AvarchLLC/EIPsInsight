@@ -1,17 +1,19 @@
-'use client';
-import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { sidebarConfig } from './slidebarConfig';
-import { useSidebar } from './SideBarContext';
+"use client";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { useSidebar } from "./SideBarContext";
+import { sidebarConfig } from "./slidebarConfig";
 
 export default function SidebarConfigLoader() {
   const pathname = usePathname();
-  const { setSections } = useSidebar();
+  const { setActivePath } = useSidebar();
 
   useEffect(() => {
-    const firstSegment = '/' + pathname?.split('/')[1]; // Extracts '/issue' from '/issue/EIPs/70'
-    setSections(firstSegment ? sidebarConfig[firstSegment] || [] : []);
-  }, [pathname, setSections]);
+    const firstSegment = "/" + pathname?.split("/")[1];
+    if (firstSegment in sidebarConfig) {
+      setActivePath(firstSegment);
+    }
+  }, [pathname, setActivePath]);
 
   return null;
 }

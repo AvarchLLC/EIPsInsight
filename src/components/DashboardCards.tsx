@@ -16,7 +16,12 @@ import {
 import EIPChartWrapper from "./EIPChart";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaBolt, FaChartBar, FaCodeBranch, FaNetworkWired } from "react-icons/fa";
+import {
+  FaBolt,
+  FaChartBar,
+  FaCodeBranch,
+  FaNetworkWired,
+} from "react-icons/fa";
 import CopyLink from "./CopyLink";
 
 // Mock top stats
@@ -114,10 +119,33 @@ interface StatCardProps {
   url: string;
 }
 
-const colorsByType = ["#f579ba", "#9164f7", "#3ed59e", "#68aafa", "#fbc22f", "#ac91fa", "#f97878"];
-const colorsByStatus = ["#38a169", "#2996ff", "#ffd800", "#d69e2e", "#38a169", "#ff2f0d", "#ff0d0d"];
+const colorsByType = [
+  "#f579ba",
+  "#9164f7",
+  "#3ed59e",
+  "#68aafa",
+  "#fbc22f",
+  "#ac91fa",
+  "#f97878",
+];
+const colorsByStatus = [
+  "#38a169",
+  "#2996ff",
+  "#ffd800",
+  "#d69e2e",
+  "#38a169",
+  "#ff2f0d",
+  "#ff0d0d",
+];
 
-const StatCard = ({ title, value, icon, color, description, url }: StatCardProps) => {
+const StatCard = ({
+  title,
+  value,
+  icon,
+  color,
+  description,
+  url,
+}: StatCardProps) => {
   return (
     <Box
       bg={useColorModeValue("white", "gray.800")}
@@ -176,99 +204,128 @@ const DashboardCards = () => {
   const statsByType = [
     {
       title: "Meta",
-      description: "Meta EIPs describe changes to the EIP process, or other non-optional changes.",
+      description:
+        "Meta EIPs describe changes to the EIP process, or other non-optional changes.",
       url: "meta",
-      value: new Set(allData.filter(item => item.type === "Meta").map(item => item.eip)).size,
+      value: new Set(
+        allData.filter((item) => item.type === "Meta").map((item) => item.eip)
+      ).size,
     },
     {
       title: "Core EIPs",
       description: "Core EIPs describe changes to the Ethereum protocol.",
       url: "core",
       value:
-        data.eip.filter(item => item.type === "Standards Track" && item.category === "Core").length ||
-        0,
+        data.eip.filter(
+          (item) => item.type === "Standards Track" && item.category === "Core"
+        ).length || 0,
     },
     {
       title: "ERCs",
-      description: "ERCs describe application-level standards for the Ethereum ecosystem.",
+      description:
+        "ERCs describe application-level standards for the Ethereum ecosystem.",
       url: "erc",
-      value: new Set(allData.filter(item => item.category === "ERC").map(item => item.eip)).size,
+      value: new Set(
+        allData
+          .filter((item) => item.category === "ERC")
+          .map((item) => item.eip)
+      ).size,
     },
     {
       title: "Networking",
-      description: "Networking EIPs describe changes to the Ethereum network protocol.",
+      description:
+        "Networking EIPs describe changes to the Ethereum network protocol.",
       url: "networking",
       value: new Set(
-        allData.filter(item => item.category === "Networking").map(item => item.eip)
+        allData
+          .filter((item) => item.category === "Networking")
+          .map((item) => item.eip)
       ).size,
     },
     {
       title: "Interface EIPs",
-      description: "Interface EIPs describe changes to the Ethereum client API.",
+      description:
+        "Interface EIPs describe changes to the Ethereum client API.",
       url: "interface",
-      value: new Set(allData.filter(item => item.category === "Interface").map(item => item.eip)).size,
+      value: new Set(
+        allData
+          .filter((item) => item.category === "Interface")
+          .map((item) => item.eip)
+      ).size,
     },
     {
       title: "Informational EIPs",
-      description: "Informational EIPs describe other changes to the Ethereum ecosystem.",
+      description:
+        "Informational EIPs describe other changes to the Ethereum ecosystem.",
       url: "informational",
       value: new Set(
-        allData.filter(item => item.category === "Informational").map(item => item.eip)
+        allData
+          .filter((item) => item.category === "Informational")
+          .map((item) => item.eip)
       ).size,
     },
     {
       title: "RIPs",
-      description: "RIPs describe changes to the RIP process, or other non-optional changes.",
+      description:
+        "RIPs describe changes to the RIP process, or other non-optional changes.",
       url: "rip",
-      value: new Set(allData.filter(item => item.repo === "rip").map(item => item.eip)).size,
+      value: new Set(
+        allData.filter((item) => item.repo === "rip").map((item) => item.eip)
+      ).size,
     },
   ];
 
   const statsByStatus = [
     {
       title: "Living",
-      description: "Living EIPs are continuously updated and reflect evolving standards or documentation.",
+      description:
+        "Living EIPs are continuously updated and reflect evolving standards or documentation.",
       url: "alltable",
-      value: allData?.filter((item) => item.status === "Living")?.length
+      value: allData?.filter((item) => item.status === "Living")?.length,
     },
     {
       title: "Final",
-      description: "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.",
+      description:
+        "Final EIPs have been formally accepted and implemented as part of the Ethereum protocol.",
       url: "alltable",
-      value: allData?.filter((item) => item.status === "Final")?.length
+      value: allData?.filter((item) => item.status === "Final")?.length,
     },
     {
       title: "Draft",
-      description: "Draft EIPs are proposals still under initial consideration and open for feedback.",
+      description:
+        "Draft EIPs are proposals still under initial consideration and open for feedback.",
       url: "alltable",
-      value: allData?.filter((item) => item.status === "Draft")?.length
+      value: allData?.filter((item) => item.status === "Draft")?.length,
     },
     {
       title: "Review",
-      description: "EIPs in the Review stage are being actively discussed and evaluated by the community.",
+      description:
+        "EIPs in the Review stage are being actively discussed and evaluated by the community.",
       url: "alltable",
-      value: allData?.filter((item) => item.status === "Review")?.length
+      value: allData?.filter((item) => item.status === "Review")?.length,
     },
     {
       title: "Last Call",
-      description: "Last Call EIPs are nearing finalization, with a short period for final community comments.",
+      description:
+        "Last Call EIPs are nearing finalization, with a short period for final community comments.",
       url: "alltable",
-      value: allData?.filter((item) => item.status === "Last Call")?.length
+      value: allData?.filter((item) => item.status === "Last Call")?.length,
     },
     {
       title: "Stagnant",
-      description: "Stagnant EIPs are inactive and have not progressed for a prolonged period.",
+      description:
+        "Stagnant EIPs are inactive and have not progressed for a prolonged period.",
       url: "alltable",
-      value: allData?.filter((item) => item.status === "Stagnant")?.length
+      value: allData?.filter((item) => item.status === "Stagnant")?.length,
     },
     {
       title: "Withdrawn",
-      description: "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.",
+      description:
+        "Withdrawn EIPs have been removed from consideration by the author or due to lack of support.",
       url: "alltable",
-      value: allData?.filter((item) => item.status === "Withdrawn")?.length
-    }
+      value: allData?.filter((item) => item.status === "Withdrawn")?.length,
+    },
   ];
-
 
   return (
     <div id="dashboard" className={`min-h-screen p-10 ${bgColor} ${textColor}`}>
@@ -286,8 +343,8 @@ const DashboardCards = () => {
           </Text>
         </Box>
 
-        {/* Top Stats Cards */}
-        <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap={6} mb={10}>
+        {/* Top Stats Cards when api then uncomment it */}
+        {/* <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap={6} mb={10}>
           {topStats.map((stat, i) => (
             <Box key={i} bg={cardBg} p={6} borderRadius="xl" boxShadow="md">
               <Stat>
@@ -297,7 +354,7 @@ const DashboardCards = () => {
               </Stat>
             </Box>
           ))}
-        </Grid>
+        </Grid> */}
 
         {/* Type-based Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
@@ -316,7 +373,11 @@ const DashboardCards = () => {
             <StatCard
               key={`type-bottom-${idx}`}
               {...stat}
-              icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][(idx + 4) % 4]}
+              icon={
+                [FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][
+                  (idx + 4) % 4
+                ]
+              }
               color={colorsByType[(idx + 4) % colorsByType.length]}
             />
           ))}
@@ -363,7 +424,9 @@ const DashboardCards = () => {
               <StatCard
                 key={`status-top-${idx}`}
                 {...stat}
-                icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][idx % 4]}
+                icon={
+                  [FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][idx % 4]
+                }
                 color={colorsByStatus[idx % colorsByStatus.length]}
               />
             ))}
@@ -373,7 +436,11 @@ const DashboardCards = () => {
               <StatCard
                 key={`status-bottom-${idx}`}
                 {...stat}
-                icon={[FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][(idx + 4) % 4]}
+                icon={
+                  [FaCodeBranch, FaChartBar, FaBolt, FaNetworkWired][
+                    (idx + 4) % 4
+                  ]
+                }
                 color={colorsByStatus[(idx + 4) % colorsByStatus.length]}
               />
             ))}
