@@ -77,7 +77,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 let allConversations2 = commentsResponse.data;
                 console.log(commentsResponse.data);
 
-                allConversations2 = allConversations2.concat(commentsResponse);
+                allConversations2 = allConversations2?.concat(commentsResponse);
 
                 const participants2 = getParticipants2(allConversations2);
 
@@ -93,7 +93,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 const uniqueParticipantsArray = Array.from(mergedParticipants);
 
                 issueDetails.participants=uniqueParticipantsArray;
-                issueDetails.numParticipants=uniqueParticipantsArray.length;
+                issueDetails.numParticipants=uniqueParticipantsArray?.length;
 
                 prDetails = {
                     type: 'Pull Request',
@@ -129,7 +129,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 // Process PR details
 const processPRDetails = async (prData:any,Type:string) => {
     try {
-        const labels = prData.labels.map((label: { name: any; }) => label.name);
+        const labels = prData.labels?.map((label: { name: any; }) => label.name);
         const conversations = await fetchConversations(Type,prData.number);
         const commits = await fetchCommits(Type,prData.number);
         const participants = getParticipants(conversations, commits);
@@ -143,13 +143,13 @@ const processPRDetails = async (prData:any,Type:string) => {
             prDescription: prData.body,
             labels,
             conversations,
-            numConversations: conversations.length,
+            numConversations: conversations?.length,
             participants,
-            numParticipants: participants.length,
+            numParticipants: participants?.length,
             commits,
-            numCommits: commits.length,
+            numCommits: commits?.length,
             filesChanged: files,
-            numFilesChanged: files.length,
+            numFilesChanged: files?.length,
             mergeDate,
         });
 
@@ -182,9 +182,9 @@ const fetchConversations = async (Type:string,number:number) => {
             });
 
             const conversations = conversationResponse.data;
-            allConversations = allConversations.concat(conversations);
+            allConversations = allConversations?.concat(conversations);
 
-            if (conversations.length < 100) {
+            if (conversations?.length < 100) {
                 break;
             }
 
@@ -202,9 +202,9 @@ const fetchConversations = async (Type:string,number:number) => {
             });
 
             const conversations = conversationResponse.data;
-            allConversations = allConversations.concat(conversations);
+            allConversations = allConversations?.concat(conversations);
 
-            if (conversations.length < 100) {
+            if (conversations?.length < 100) {
                 break;
             }
 
@@ -222,11 +222,11 @@ const fetchConversations = async (Type:string,number:number) => {
 // Get participants from conversations
 const getParticipants = (conversations: any[], commits: any[]) => {
     const commentParticipants = conversations
-        .filter((conversation) => conversation.user.login !== 'github-actions[bot]')
-        .map((conversation) => conversation.user.login);
+        ?.filter((conversation) => conversation.user.login !== 'github-actions[bot]')
+        ?.map((conversation) => conversation.user.login);
 
     const commitParticipants = commits
-        .map((commit) => commit.committer.login);
+        ?.map((commit) => commit.committer.login);
 
     // Combine the arrays and use a Set to ensure uniqueness
     const uniqueParticipants = new Set([...commentParticipants, ...commitParticipants]);
@@ -236,11 +236,11 @@ const getParticipants = (conversations: any[], commits: any[]) => {
 };
 
 const getParticipants2 = (conversations: any[]) => {
-    if (conversations.length === 0) return [];
+    if (conversations?.length === 0) return [];
 
     const commentParticipants = conversations
-        .filter((conversation) => conversation.user && conversation.user.login && conversation.user.login !== 'github-actions[bot]')
-        .map((conversation) => conversation.user.login);
+        ?.filter((conversation) => conversation.user && conversation.user.login && conversation.user.login !== 'github-actions[bot]')
+        ?.map((conversation) => conversation.user.login);
 
     // Use a Set to ensure uniqueness and convert it back to an array
     const uniqueParticipants = new Set(commentParticipants);
@@ -278,7 +278,7 @@ const fetchFilesChanged = async (Type:string,number: number) => {
             },
         });
 
-        const files = filesResponse.data.map((file: { filename: any; }) => file.filename);
+        const files = filesResponse.data?.map((file: { filename: any; }) => file.filename);
         return files;
     } catch (error:any) {
         console.log('Error fetching files changed:', error.message);

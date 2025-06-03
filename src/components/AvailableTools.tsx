@@ -77,7 +77,7 @@ const ToolsSection: FC = () => {
         alignItems="center"
         width="100%"
       >
-        <ToolCard imageSrc="/DashboardCard1.png" label="Analytics" link="/analytics" />
+        <ToolCard imageSrc="/DashboardCard1.png" label="Analytics" link="/Analytics" />
         <ToolCard imageSrc="/DashboardCard2.png" label="Editors Leaderboard" link="/Reviewers" />
         <ToolCard imageSrc="/DashboardCard3.png" label="Boards" link="/boards" />
         <ToolCard imageSrc="/DashboardCard7.png" label="Search by Author" link="/authors" />

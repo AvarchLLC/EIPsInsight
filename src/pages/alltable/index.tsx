@@ -35,7 +35,7 @@ const AllTable = () => {
         const response = await fetch(`/api/new/all`);
         console.log(response);
         const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -88,10 +88,13 @@ const AllTable = () => {
             marginTop={{ md: "10", base: "5" }}
           >
             <FlexBetween>
+              <div id="table">
               <Header
-                title={`All EIPs,ERCs & RIPs - [ ${data.length} ]`}
+                title={`All EIPs,ERCs & RIPs - [ ${data?.length} ]`}
                 subtitle=""
+                
               />
+              </div>
             </FlexBetween>
             <Table type="Total" />
             {/* <AreaC type={"EIPs"} /> */}

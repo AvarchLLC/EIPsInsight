@@ -26,7 +26,15 @@ import {
   Heading,
   Button,
   useColorModeValue,
+  Popover,
+  PopoverTrigger,
+  PopoverArrow,
+  PopoverContent,
+  PopoverHeader,
+  PopoverCloseButton,
+  PopoverBody
 } from "@chakra-ui/react";
+import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { Markdown } from "@/components/MarkdownEIP";
 import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
@@ -228,12 +236,12 @@ const TestComponent = () => {
                     )}
 
                     {metadataJson?.requires &&
-                      metadataJson.requires.length > 0 && (
+                      metadataJson.requires?.length > 0 && (
                         <Tr>
                           <Th>Requires</Th>
                           <Td>
                             <HStack>
-                              {metadataJson.requires.map((req, i) => (
+                              {metadataJson.requires?.map((req, i) => (
                                 <NLink key={i} href={`/eips/eip-${req}`}>
                                   <Text
                                     color="blue.400"
@@ -281,6 +289,26 @@ const TestComponent = () => {
                             {/* Heading on the Left */}
                             <Heading size="md" color={"#30A0E0"}>
                               Status Timeline
+
+                              <Popover>
+                                                  <PopoverTrigger>
+                                                  <IconButton
+                                                          aria-label="More info"
+                                                          icon={<InfoOutlineIcon />}
+                                                          size="md"
+                                                          colorScheme="blue"
+                                                          variant="ghost"
+                                                        />
+                                                  </PopoverTrigger>
+                                                  <PopoverContent>
+                                                    <PopoverArrow />
+                                                    <PopoverCloseButton />
+                                                    <PopoverHeader>Instructions</PopoverHeader>
+                                                    <PopoverBody>
+                                                    The timeline tracks status changes using the merged date as the reference point.
+                                                    </PopoverBody>
+                                                  </PopoverContent>
+                                                </Popover>
                             </Heading>
               
                             {/* Dropdown Button on the Right */}
@@ -312,9 +340,9 @@ const TestComponent = () => {
                             >
                               <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
                                 {data
-                                  .filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
+                                  ?.filter((item) => statusOrder.includes(item.status)) // Filter out any unexpected statuses
                                   .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
-                                  .map((item, index, sortedData) => {
+                                  ?.map((item, index, sortedData) => {
                                     const currentDate = new Date(item.date);
                                     const nextItem = sortedData[index + 1];
                                     const nextDate = nextItem ? new Date(nextItem.date) : null;
@@ -384,7 +412,7 @@ const TestComponent = () => {
                       </motion.div>
                     )}
                   </Box>
-                  {data2.length > 1 && (
+                  {data2?.length > 1 && (
                           <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -393,7 +421,7 @@ const TestComponent = () => {
                             <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="1">
                               {/* Heading on the Left */}
                               <Flex justify="space-between" align="center">
-                                <Heading size="md" color={"#30A0E0"}>
+                                <Heading id="timeline" size="md" color={"#30A0E0"}>
                                   Type Timeline
                                 </Heading>
                   
@@ -427,7 +455,7 @@ const TestComponent = () => {
                                   <Flex w="100%" gap={6} align="center" flexWrap="wrap" mt="4">
                                     {data2
                                       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // Sort by date
-                                      .map((item, index, sortedData) => {
+                                      ?.map((item, index, sortedData) => {
                                         const currentDate = new Date(item.date);
                                         const nextItem = sortedData[index + 1];
                                         const nextDate = nextItem ? new Date(nextItem.date) : null;
@@ -525,7 +553,7 @@ const extractercNo = (data: any) => {
 const extractLastStatusDates = (data: any) => {
   const statusDates: Record<string, string> = {};
 
-  Object.keys(data).forEach((key) => {
+  Object.keys(data)?.forEach((key) => {
     let laststatus = "";
     if (key !== "repo") {
       const { status, mergedDate } = data[key];
@@ -539,7 +567,7 @@ const extractLastStatusDates = (data: any) => {
     }
   });
 
-  return Object.keys(statusDates).map((status) => ({
+  return Object.keys(statusDates)?.map((status) => ({
     status,
     date: statusDates[status],
   }));
@@ -555,10 +583,10 @@ const extractLastTypesDates = (data: any) => {
 ];
   let lasttype = "";
   const sortedData = Object.keys(data)
-    .filter((key) => key !== "repo") 
+    ?.filter((key) => key !== "repo") 
     .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
 
-  sortedData.forEach((key) => {
+  sortedData?.forEach((key) => {
     let { type, mergedDate } = data[key];
 
     if (type === "unknown") {
@@ -600,17 +628,17 @@ export const convertMetadataToJson = (metadataText: string): EipMetadataJson => 
   const lines = metadataText.split("\n");
   const jsonObject: any = {};
 
-  lines.forEach((line) => {
+  lines?.forEach((line) => {
     const [key, value] = line.split(/: (.+)/);
     if (key && value) {
       if (key.trim() === "erc") {
         jsonObject[key.trim()] = parseInt(value.trim());
       } else if (key.trim() === "requires") {
-        jsonObject[key.trim()] = value.split(",").map((v) => parseInt(v));
+        jsonObject[key.trim()] = value.split(",")?.map((v) => parseInt(v));
       } else if (key.trim() === "author") {
         jsonObject[key.trim()] = value
           .split(",")
-          .map((author: string) => author.trim());
+          ?.map((author: string) => author.trim());
       } else {
         jsonObject[key.trim()] = value.trim();
       }

@@ -167,7 +167,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   const removeDuplicatesFromEips = (eips: any[]) => {
     const seen = new Set();
     
-    return eips.filter((eip) => {
+    return eips?.filter((eip) => {
       if (!seen.has(eip.eip)) {
         seen.add(eip.eip); // Track seen eip numbers
         return true;
@@ -180,10 +180,10 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
 
   const transformedData = filteredData.flatMap((item) => {
     console.log(item); // Log each item
-    return item.eips.map((eip) => ({
+    return item.eips?.map((eip) => ({
       category: getCat(eip.category),
       year: `${getMonthName(eip.month)} ${eip.year.toString()}`,
-      value:removeDuplicatesFromEips(eip.eips).length
+      value:removeDuplicatesFromEips(eip.eips)?.length
     }));
   });
   
@@ -197,7 +197,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     "RIPs",
   ];
   
-  categories.forEach((category) => {
+  categories?.forEach((category) => {
     const hasCategory = transformedData.some((entry) => entry.category === category);
   
     if (!hasCategory) {
@@ -277,7 +277,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
 
   const downloadData = () => {
     // Filter data based on the selected status
-    let filteredData = dataset.slice(1).concat(dataset[0]);
+    let filteredData = dataset.slice(1)?.concat(dataset[0]);
 
     console.log("new filtered data:",filteredData)
 
@@ -292,7 +292,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
         const month = eipGroup.month;
 
     
-        return uniqueEips.map((uniqueEip) => ({
+        return uniqueEips?.map((uniqueEip) => ({
           category,
           year,
           month,
@@ -311,7 +311,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     
 
 
-  if (!transformedData.length) {
+  if (!transformedData?.length) {
       console.error("Transformed data is empty.");
       alert("No transformed data available for download.");
       return;
@@ -325,7 +325,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
       "data:text/csv;charset=utf-8," + 
       header +
       transformedData
-          .map(({ year, month, repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+          ?.map(({ year, month, repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
               // Generate the correct URL based on the repo type
               const url = repo === "erc"
               ? `https://eipsinsight.com/ercs/erc-${eip}`
@@ -358,7 +358,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
             }
 
             // Wrap fields in double quotes and join with commas
-            return baseFields.map(field => `"${field}"`).join(",");
+            return baseFields?.map(field => `"${field}"`).join(",");
           })
           .join("\n");
   

@@ -17,7 +17,7 @@ export const TransactionTabs: React.FC<TransactionTabsProps> = ({ transactions }
   return (
     <Tabs variant="unstyled">
       <TabList>
-        {['All', '0', '1', '2', '3', '4'].map((tab, index) => (
+        {['All', '0', '1', '2', '3', '4']?.map((tab, index) => (
           <Tab
             key={index}
             px={6}
@@ -45,7 +45,7 @@ export const TransactionTabs: React.FC<TransactionTabsProps> = ({ transactions }
       <TabPanels mt={4}>
         <TabPanel>
           <Box borderRadius="lg" borderWidth="1px" borderColor={borderColor} bg={panelBg} p={4}>
-            {transactions.all.map((tx, index) => (
+            {transactions.all?.map((tx, index) => (
               <Box
                 key={index}
                 p={3}
@@ -59,11 +59,11 @@ export const TransactionTabs: React.FC<TransactionTabsProps> = ({ transactions }
             ))}
           </Box>
         </TabPanel>
-        {[0, 1, 2, 3, 4].map((type) => (
+        {[0, 1, 2, 3, 4]?.map((type) => (
           <TabPanel key={type}>
             <Box borderRadius="lg" borderWidth="1px" borderColor={borderColor} bg={panelBg} p={4}>
               {transactions[type]?.length > 0 ? (
-                transactions[type].map((tx, index) => (
+                transactions[type]?.map((tx, index) => (
                   <Box
                     key={index}
                     p={3}

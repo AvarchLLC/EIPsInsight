@@ -122,9 +122,9 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
         } else if (type === "RIP") {
           setData(dataset.rip);
         } else if (type === "Total") {
-          setData(dataset.eip.concat(dataset.erc.concat(dataset.rip)));
+          setData(dataset.eip?.concat(dataset.erc?.concat(dataset.rip)));
         } else {
-          setData(dataset.eip.concat(dataset.erc.concat(dataset.rip)));
+          setData(dataset.eip?.concat(dataset.erc?.concat(dataset.rip)));
         }
         setIsLoading(false);
       } catch (error) {
@@ -147,7 +147,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     value: number;
   }
   
-  const transformedData = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData = data?.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const category = item.repo === 'rip' ? 'RIPs' : getCat(item.category);
   
@@ -169,7 +169,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
     return acc;
   }, []);
 
-  const transformedData2 = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData2 = data?.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const status = getStatus(item.status);
   
@@ -290,7 +290,7 @@ const AllChart: React.FC<ChartProps> = ({ type,dataset }) => {
           cursor="pointer" // Optional: To indicate it's clickable
           _hover={{ textDecoration: 'underline' }} // Optional: Adds hover effect
         >
-          {type === 'Total' ? `All EIPs [${data.length}]` : `${type} - [${data.length}]`}
+          {type === 'Total' ? `All EIPs [${data?.length}]` : `${type} - [${data?.length}]`}
         </Text>
       </Link>
     </Box>

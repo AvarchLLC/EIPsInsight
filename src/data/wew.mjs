@@ -142,7 +142,7 @@ const AreaC = () => {
     category: string;
     date: string;
     value: number;
-  }[] = data ? data.flatMap(eip => eip.eips.map(({ category, month, year, count }) => ({
+  }[] = data ? data.flatMap(eip => eip.eips?.map(({ category, month, year, count }) => ({
     category,
     date: `${getMonthName(month)} ${year}`,
     value: count
@@ -151,7 +151,7 @@ const AreaC = () => {
 
   const filteredData = formattedEIPs;
 
-  // const mappedData= filteredData.reduce(
+  // const mappedData= filteredData?.reduce(
   //   (acc: MappedData, item) => {
   //     const createdDate = new Date(item.date);
   //     const monthYear = `${createdDate.toLocaleString('en-US', { month: 'long' })} ${createdDate.getFullYear()}`;

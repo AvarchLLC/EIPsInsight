@@ -36,10 +36,10 @@ const DoughnutChart = () => {
     fetchData();
   }, []);
 
-  const coreCount = data.filter(item => item.category === 'Core').length;
-  const ercCount = data.filter(item => item.category === 'ERC').length;
-  const networkingCount = data.filter(item => item.category === 'Networking').length;
-  const interfaceCount = data.filter(item => item.category === 'Interface').length;
+  const coreCount = data?.filter(item => item.category === 'Core')?.length;
+  const ercCount = data?.filter(item => item.category === 'ERC')?.length;
+  const networkingCount = data?.filter(item => item.category === 'Networking')?.length;
+  const interfaceCount = data?.filter(item => item.category === 'Interface')?.length;
 
   const chartData = {
     labels: ['Core', 'ERC', 'Networking', 'Interface'],

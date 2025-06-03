@@ -108,7 +108,7 @@ export default function LargeWithAppLinksAndSocial() {
                 {/* <NextLink href={'https://www.instagram.com/etherworld.co/?hl=en'} target={'_blank'}><BsInstagram size={25} className={'hover:scale-125 duration-200'}/></NextLink> */}
                 <NextLink href={'https://www.youtube.com/channel/UCnceAY-vAQsO8TgGAj5SGFA'} target={'_blank'}><BsYoutube size={25} className={'hover:scale-125 duration-200'}/></NextLink>
                 <NextLink href={'https://www.linkedin.com/company/avarch-llc/'} target={'_blank'}><BsLinkedin size={25} className={'hover:scale-125 duration-200'}/></NextLink>
-                <NextLink href={'https://etherworld.co'} target={'_blank'}><BsNewspaper size={25} className={'hover:scale-125 duration-200'}/></NextLink>
+                <NextLink href={'https://etherworld.co/tag/eipsinsight/'} target={'_blank'}><BsNewspaper size={25} className={'hover:scale-125 duration-200'}/></NextLink>
               </div>
 
               <NextLink href={'https://builder.gitcoin.co/#/chains/1/registry/0x03506eD3f57892C85DB20C36846e9c808aFe9ef4/projects/738'} target={'_blank'}>

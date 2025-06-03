@@ -4,7 +4,7 @@ import { FaCube } from 'react-icons/fa';
 import Web3 from 'web3';
 
 const RecentBlocks = ({ blocks, ethPriceInUSD }: { blocks: any[]; ethPriceInUSD: number }) => {
-  if (!blocks || blocks.length === 0) return null;
+  if (!blocks || blocks?.length === 0) return null;
 
   // Colors and shadows
   const textColor = useColorModeValue('white', 'white');
@@ -50,14 +50,14 @@ const RecentBlocks = ({ blocks, ethPriceInUSD }: { blocks: any[]; ethPriceInUSD:
           </Tr>
         </Thead>
         <Tbody>
-          {blocks.map((block, index) => {
-            const gasTarget = Number(block.gasLimit);
-            const gasUsed = Number(block.gasUsed);
-            const reward = block.rewards ? block.rewards : 'N/A'; // Rewards are not directly available in block data
-            const txs = block.transactions.length;
-            const age = new Date(Number(block.timestamp) * 1000).toLocaleTimeString();
-            const baseFee = block.baseFeePerGas ? `${Number(Web3.utils.fromWei(block.baseFeePerGas, 'gwei')).toFixed(2)} Gwei` : 'N/A';
-            const burnedETH = block.baseFeePerGas ? `${Web3.utils.fromWei((BigInt(block.gasUsed) * BigInt(block.baseFeePerGas)).toString(), 'ether')} ETH` : 'N/A';
+          {blocks?.map((block, index) => {
+            const gasTarget = Number(block?.gasLimit);
+            const gasUsed = Number(block?.gasUsed);
+            const reward = block?.rewards ? block?.rewards : 'N/A'; // Rewards are not directly available in block data
+            const txs = block.transactions?.length;
+            const age = new Date(Number(block?.timestamp) * 1000).toLocaleTimeString();
+            const baseFee = block?.baseFeePerGas ? `${Number(Web3.utils?.fromWei(block.baseFeePerGas, 'gwei')).toFixed(2)} Gwei` : 'N/A';
+            const burnedETH = block?.baseFeePerGas ? `${Web3.utils?.fromWei((BigInt(block.gasUsed) * BigInt(block.baseFeePerGas))?.toString(), 'ether')} ETH` : 'N/A';
 
             return (
               <Tr key={index} bg={tableRowBg} _hover={{ bg: 'rgba(255, 255, 255, 0.1)' }}>

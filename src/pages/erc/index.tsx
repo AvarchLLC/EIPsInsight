@@ -201,7 +201,7 @@ const ERC = () => {
             >
               {/* Header Section */}
               <Header
-        title={`Ethereum Request for Comment -      [ ${data.length} ]`}
+        title={`Ethereum Request for Comment -      [ ${data?.length} ]`}
         subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
       />
 
@@ -231,7 +231,7 @@ const ERC = () => {
       <SearchBox />
     </Box>
 
-    <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-8 gap-5">
+    <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-8 gap-5" id="graphs">
       <Box>
       {selected === "status" ? (
             <ERCStatusDonut />
@@ -260,21 +260,21 @@ const ERC = () => {
     </Box>
     {selected === "status" && (
               <Box paddingY="8">
-                <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
+                <Text id="ercprogress" fontSize="3xl" fontWeight="bold" color="#A020F0">
                   Draft vs Final (Over the Years)
                 </Text>
                 <AreaStatus type="ERCs" />
               </Box>
     )}
 
-{["Draft", "Review", "Last Call", "Final"].map((status) => (
+{["Draft", "Review", "Last Call", "Final"]?.map((status) => (
           <Box key={status} className={"group relative flex flex-col gap-3"} paddingBottom={8}>
             {/* Label Section aligned to the left */}
             <Box className={"flex gap-3"}>
-              <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+              <Text id={`${status.toLowerCase().replace(/\s+/g, '') }`} fontSize="3xl" fontWeight="bold" color="#30A0E0">
                 {status} -{" "}
                 <NextLink href={`/tableStatus/erc/${status}`}>
-                  [{data.filter((item) => item.status === status).length}]
+                  [{data?.filter((item) => item.status === status)?.length}]
                 </NextLink>
               </Text>
               <p className={"text-red-700"}>*</p>
@@ -313,8 +313,11 @@ const ERC = () => {
           </>
         ) : (
           <>
-            <CatTable2 dataset={data4} cat="All" status="Meta" />
-            <CatTable2 dataset={data4} cat="All" status="ERC" />
+{["Meta", "ERC"]?.map((status) => (
+  <div key={status} id={`${status.toLowerCase()}table`}>
+    <CatTable2 dataset={data4} cat="All" status={status} />
+  </div>
+))}
           </>
         )}
         <Box

@@ -20,6 +20,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CodeBlock } from "@/components/Codehelper";
+import { useState, useEffect } from "react";
 
 export const extractEipNumber = (eipOrNo: string, prefix: string): string => {
   const match = eipOrNo.match(
@@ -49,6 +50,36 @@ const resolveURL = (markdownFileURL: string, url: string) => {
   return url;
 };
 
+const getValidLink = async (num: string): Promise<string> => {
+  const links = [
+    {
+      url: `https://raw.githubusercontent.com/ethereum/RIPs/master/RIPS/rip-${num}.md`,
+      path: `/rips/rip-${num}`
+    },
+    {
+      url: `https://raw.githubusercontent.com/ethereum/ERCs/master/ERCS/erc-${num}.md`,
+      path: `/ercs/erc-${num}`
+    },
+    {
+      url: `https://raw.githubusercontent.com/ethereum/EIPs/master/EIPS/eip-${num}.md`,
+      path: `/eips/eip-${num}`
+    },
+  ];
+
+  for (const link of links) {
+    try {
+      const response = await fetch(link.url);
+      if (response.ok) {
+        
+        return link.path;
+      }
+    } catch (error) {
+      console.error(`Error checking link ${link.url}:`, error);
+    }
+  }
+  return `/eips/eip-${num}`;
+};
+
 type GetCoreProps = {
   children?: React.ReactNode;
   "data-sourcepos"?: any;
@@ -59,6 +90,40 @@ function getCoreProps(props: GetCoreProps): any {
     ? { "data-sourcepos": props["data-sourcepos"] }
     : {};
 }
+
+interface EIPLinkProps {
+  eipNumber: string;
+  children: React.ReactNode;
+}
+
+const EIPLink: React.FC<EIPLinkProps> = ({ eipNumber, children }) => {
+  const [linkPath, setLinkPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLink = async () => {
+      const path = await getValidLink(eipNumber);
+      console.log("path:",path);
+      setLinkPath(path);
+    };
+    fetchLink();
+  }, [eipNumber]);
+
+  if (linkPath === null) {
+    return (
+      <Text as="span" color="blue.500" textDecor="underline">
+        {children}
+      </Text>
+    );
+  }
+  console.log("link path:", linkPath);
+  return (
+    <NLink href={linkPath} passHref>
+      <Text as="span" color="blue.500" textDecor="underline">
+        {children}
+      </Text>
+    </NLink>
+  );
+};
 
 export const Markdown = ({
   md,
@@ -103,14 +168,14 @@ export const Markdown = ({
           const language = match ? match[1] : "javascript";
           return (
             <Box
-            position="relative"
-            w={{ base: "100%", sm: "600px", md: "800px", lg: "1000px", xl: "1200px" }}  // Responsive width
-            maxW="1200px"          // Maximum width to prevent exceeding this value
-            overflowX="auto"       // Allow horizontal scroll if needed
-            borderRadius="lg"
-            p={5}
-            mx="auto"              // Center horizontally
-            textAlign="center"
+              position="relative"
+              w={{ base: "100%", sm: "600px", md: "800px", lg: "1000px", xl: "1200px" }}
+              maxW="1200px"
+              overflowX="auto"
+              borderRadius="lg"
+              p={5}
+              mx="auto"
+              textAlign="center"
             >
               <CodeBlock language={language}>{children as string}</CodeBlock>
             </Box>
@@ -124,43 +189,37 @@ export const Markdown = ({
           return <Divider />;
         },
         a: (props) => {
-            const url = props.href ?? "";
-          
-            let isEIPLink = false;
-            let eipNumber = "";
-          
-            try {
-              const eipPattern = /eip-(\d+)/;
-              const match = url.match(eipPattern);
-              if (match) {
-                isEIPLink = true;
-                eipNumber = match[1];  // Extract the EIP number
-              }
-            } catch {}
-          
-            if (isEIPLink) {
-              return (
-                <NLink href={`/eips/eip-${eipNumber}`}>
-                  <Text as={"span"} color="blue.500" textDecor={"underline"}>
-                    {props.children}
-                  </Text>
-                </NLink>
-              );
-            } else {
-              return (
-                <Link
-                  {...props}
-                  href={resolveURL(markdownFileURL, url)}
-                  color="blue.500"
-                  isExternal
-                />
-              );
+          const { href = "", children } = props;
+          let isEIPLink = false;
+          let eipNumber = "";
+
+          try {
+            const eipPattern = /eip-(\d+)/;
+            const match = href.match(eipPattern);
+            if (match) {
+              isEIPLink = true;
+              eipNumber = match[1];
             }
-          },          
+          } catch {}
+
+          if (isEIPLink) {
+            return <EIPLink eipNumber={eipNumber}>{children}</EIPLink>;
+          } else {
+            return (
+              <Link
+                href={resolveURL(markdownFileURL, href)}
+                color="blue.500"
+                isExternal
+              >
+                {children}
+              </Link>
+            );
+          }
+        },
         img: (props) => (
           <Image
             {...props}
-            src={resolveURL(markdownFileURL, props.src as string)}
+            src={resolveURL(markdownFileURL, props.src || "")}
           />
         ),
         text: (props) => {
@@ -268,11 +327,41 @@ export const Markdown = ({
             {props.children}
           </Td>
         ),
-        th: (props) => (
-          <Th border="1px solid" borderColor="gray.300" p={3}>
-            {props.children}
-          </Th>
-        ),
+th: (props) => {
+  const headingToIdMap: Record<string, string> = {
+    'Status Timeline': 'timeline',
+    'Simple Summary': 'summary',
+    'Abstract': 'abstract',
+    'Motivation': 'motivation',
+    'Specification': 'specification',
+    'Rationale': 'rationale',
+    'Backwards Compatibility': 'compatibility',
+    'Copyright': 'copyright',
+  };
+
+  const label = String(props.children).trim();
+  const id = headingToIdMap[label];
+
+  return (
+    <Th
+      id={id || undefined}
+      border="1px solid"
+      borderColor="gray.300"
+      p={3}
+    >
+      {id ? (
+        <NLink href={`#${id}`} passHref>
+          <Text as="span" color="blue.500" _hover={{ textDecoration: "underline" }}>
+            {label}
+          </Text>
+        </NLink>
+      ) : (
+        label
+      )}
+    </Th>
+  );
+},
+
       }}
     >
       {md}

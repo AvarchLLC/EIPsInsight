@@ -58,13 +58,13 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
         // Combine PR and Issue data
         const combined = [
-          ...prData.map((pr) => ({
+          ...prData?.map((pr) => ({
             Number: pr.prNumber,
             Title: pr.prTitle,
             Type: "PR" as const,
             Repo: pr.repo,
           })),
-          ...issueData.map((issue) => ({
+          ...issueData?.map((issue) => ({
             Number: issue.issueNumber,
             Title: issue.issueTitle,
             Type: "issue" as const,
@@ -84,11 +84,11 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
 
   const filteredData2 = searchTerm
-    ? combinedData.filter((item) =>
+    ? combinedData?.filter((item) =>
         item.Number.toString().includes(searchTerm.trim())
       )
     : combinedData;
-    const totalPages = Math.ceil(combinedData.length / cardsPerPage);
+    const totalPages = Math.ceil(combinedData?.length / cardsPerPage);
  
 
   const jsonToCsv = (data: CombinedItem[]): string => { 
@@ -98,7 +98,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
     csvRows.push(headers.join(','));
   
   
-    data.forEach((item: CombinedItem) => {
+    data?.forEach((item: CombinedItem) => {
       const row = [
         `${item.Repo}`, 
         `"${item.Number}"`,
@@ -119,7 +119,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
   console.log("paginated data:", paginatedData);
   
   const handleDownload = () => {
-    if (!paginatedData.length) {
+    if (!paginatedData?.length) {
       alert('No data to download.');
       return;
     }
@@ -218,7 +218,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
                   
             {/* Display Cards */}
             <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={6}>
-              {paginatedData.map((item) => (
+              {paginatedData?.map((item) => (
                 <NextLink
                   href={`/${item.Type === "PR" ? `/PR/${item.Repo}/${item.Number}` :`/issue/${item.Repo}/${item.Number}`}`}
                   target="_blank"

@@ -54,7 +54,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
         const getEarliestEntries = (data: any[], key: string) => {
           const uniqueEntries: Record<string, any> = {};
-          data.forEach(entry => {
+          data?.forEach(entry => {
             const entryKey = entry[key];
             if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
               uniqueEntries[entryKey] = entry;
@@ -68,7 +68,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
           ...getEarliestEntries(jsonData.erc, 'eip'),
           ...getEarliestEntries(jsonData.rip, 'eip'),
         ];
-        filteredData = filteredData.filter(
+        filteredData = filteredData?.filter(
           (entry: EIP, index: number, self: EIP[]) =>
             entry.eip !== '1' || index === self.findIndex((e: EIP) => e.eip === '1')
         );
@@ -89,9 +89,9 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   useEffect(() => {
     const authorMap: Record<string, number> = {};
   
-    data.forEach((eip) => {
-      const authors = eip.author.split(",").map((author) => author.trim());
-      authors.forEach((author) => {
+    data?.forEach((eip) => {
+      const authors = eip.author.split(",")?.map((author) => author.trim());
+      authors?.forEach((author) => {
         if (author) {
           // Match GitHub handle in the format: Vitalik Buterin (@vbuterin)
           const handleMatch = author.match(/(.+?)\s\(@([a-zA-Z0-9-_]+)\)$/);
@@ -121,7 +121,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
     });
   
     const authorArray = Object.entries(authorMap)
-      .map(([name, count]) => ({ name, count }))
+      ?.map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
   
     setAuthorCounts(authorArray);
@@ -129,7 +129,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   
 
   const handleExpand = () => {
-    setVisibleCount((prev) => Math.min(prev + 5, authorCounts.length));
+    setVisibleCount((prev) => Math?.min(prev + 5, authorCounts?.length));
   };
 
   const handleCollapse = () => {
@@ -137,16 +137,16 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   };
 
   // Filter and paginate data
-  const filteredData = data.filter(item =>
+  const filteredData = data?.filter(item =>
     !selectedAuthor || item.author.toLowerCase().includes(selectedAuthor.toLowerCase())
   );
-  // const totalPages = Math.ceil(filteredData.length / cardsPerPage);
+  // const totalPages = Math.ceil(filteredData?.length / cardsPerPage);
   const filteredData2 = searchTerm
-    ? filteredData.filter((item) =>
+    ? filteredData?.filter((item) =>
         item.eip.toString().includes(searchTerm.trim())
       )
     : filteredData;
-    const totalPages = Math.ceil(filteredData2.length / cardsPerPage);
+    const totalPages = Math.ceil(filteredData2?.length / cardsPerPage);
   
 
   const jsonToCsv = (data: EIP[]): string => { 
@@ -157,7 +157,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
     csvRows.push(headers.join(','));
   
     // Add data rows
-    data.forEach((item: EIP) => {
+    data?.forEach((item: EIP) => {
       const row = [
         `EIP-${item.eip}`, // EIP ID
         `"${item.title}"`, // Title (quoted to handle commas)
@@ -172,7 +172,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
     return csvRows.join('\n');
   };
 
-  const filteredAuthors = authorCounts.filter((author) =>
+  const filteredAuthors = authorCounts?.filter((author) =>
     author.name.toLowerCase().includes(selectedAuthor.toLowerCase())
   );
   
@@ -183,7 +183,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   console.log("paginated data:", paginatedData);
   
   const handleDownload = () => {
-    if (!paginatedData.length) {
+    if (!paginatedData?.length) {
       alert('No data to download.');
       return;
     }
@@ -269,7 +269,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
       borderRadius="lg"
       overflowX="auto"
     >
-      {filteredAuthors.slice(0, visibleCount).map((author) => (
+      {filteredAuthors.slice(0, visibleCount)?.map((author) => (
   <Box
   key={author.name}
   bg={selectedAuthor === author.name ? "blue.600" : "blue.500"}
@@ -307,7 +307,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
 
 
-      {visibleCount < authorCounts.length && (
+      {visibleCount < authorCounts?.length && (
         <Tooltip label="Expand" fontSize="md">
           <IconButton
           icon={<ChevronDownIcon fontWeight="bold" />}
@@ -419,7 +419,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
                   
             {/* Display Cards */}
             <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={6}>
-              {paginatedData.map((item) => (
+              {paginatedData?.map((item) => (
                 <NextLink
                   key={item._id}
                   href={`/${item.repo === "erc" ? "ercs/erc" : item.repo === "rip" ? "rips/rip" : "eips/eip"}-${item.eip}`}
@@ -498,7 +498,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
   maxWidth="100%"
 >
   {(() => {
-    const authors = item.author.split(",").map((author) =>
+    const authors = item.author.split(",")?.map((author) =>
       author.replace(/<.*?>/g, "").trim()
     );
 
@@ -516,7 +516,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
     // Show only the first author with ...more if applicable
     const firstAuthor = sortedAuthors[0];
-    const hasMoreAuthors = sortedAuthors.length > 1;
+    const hasMoreAuthors = sortedAuthors?.length > 1;
 
     return (
       <Box

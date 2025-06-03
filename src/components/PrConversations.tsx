@@ -130,7 +130,7 @@ const PrConversations: React.FC<PrConversationsProps> = ({dataset}) => {
                     ):(
                         <>
                             {
-                                data?.prDetails?.conversations.map(comment => (
+                                data?.prDetails?.conversations?.map(comment => (
                                     <Box
                                         className={'mx-8 mb-8 rounded-lg'}
                                         paddingY={4}

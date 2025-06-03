@@ -1,559 +1,618 @@
 import React, { useState, useEffect } from "react";
-import {useColorModeValue, Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Image, Link, Flex, Grid } from "@chakra-ui/react";
 import Header from "./Header";
-import { SimpleGrid } from "@chakra-ui/react";
-
+import {
+  useColorModeValue,
+  Box,
+  Button,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+  Image,
+  Link,
+  Flex,
+  SimpleGrid,
+  Heading,
+  Icon,
+  Badge,
+  useBreakpointValue,
+  AspectRatio,
+  Stack,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  Grid,
+  Center,
+} from "@chakra-ui/react";
+import { FaYoutube, FaNewspaper, FaBlog, FaQuestionCircle, FaTools } from "react-icons/fa";
+import NextLink from 'next/link';
 
 const ResourcesPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  const bg = useColorModeValue("#f6f6f7", "#171923");
-  const bg2 = useColorModeValue("gray.50", "gray.700"); // Light mode: gray.50, Dark mode: gray.700
-  const textColor2 = useColorModeValue("black", "white"); // Light mode: black, Dark mode: white
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.700", "gray.200");
+  const accentColor = useColorModeValue("blue.500", "blue.300");
+  const tabBg = useColorModeValue("white", "gray.700");
+  const tabBorderColor = useColorModeValue("gray.200", "gray.600");
 
-  const handleSelection = (hash:any) => {
-    if (hash === "FAQ") {
-      setTabIndex(0);
-    } else if (hash === "Blogs") {
-      setTabIndex(1);
-    } else if (hash === "Videos") {
-      setTabIndex(2);
-    } else if (hash === "News") {
-      setTabIndex(3);
+  const tabSize = useBreakpointValue({ base: "sm", md: "md" });
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
+  const handleSelection = (hash: any) => {
+    const upperHash = hash.toUpperCase();
+    const tabs = ["FAQ", "BLOGS", "VIDEOS", "NEWS"];
+    const index = tabs.indexOf(upperHash);
+    if (index !== -1) {
+      setTabIndex(index);
+      window.location.hash = hash;
     }
-    window.location.hash = hash; // Update the hash in the URL
   };
 
   useEffect(() => {
-    const hash = window.location.hash.slice(1); // Get the hash from the URL
-    console.log("Current hash:", hash);
-
-    // Match the hash to the corresponding tab index
-    if (hash === "FAQ") {
-      setTabIndex(0);
-    } else if (hash.toUpperCase() === "BLOGS") {
-      setTabIndex(1);
-    } else if (hash.toUpperCase() === "VIDEOS") {
-      setTabIndex(2);
-    } else if (hash.toUpperCase() === "NEWS") {
-      setTabIndex(3);
-    }
+    const hash = window.location.hash.slice(1).toUpperCase();
+    const tabs = ["FAQ", "BLOGS", "VIDEOS", "NEWS"];
+    const index = tabs.indexOf(hash);
+    if (index !== -1) setTabIndex(index);
   }, []);
 
 
-  
 
-  const Card = ({ image, title, content, link }: { image: string; title: string; content: string; link: string }) => {
-    return (
-      <Flex
-        direction={{ base: "column", md: "row" }}
-        bg={bg2}
-        p={5}
-        borderRadius="lg"
-        boxShadow="lg"
-        mb={5}
-        height={{ base: "300px", sm: "350px", md: "200px" }}
-        align="center"
+  const Card = ({ image, title, content, link, tag }: { image?: string; title: string; content: string; link: string; tag?: string }) => (
+    <Box
+      bg={cardBg}
+      p={5}
+      borderRadius="xl"
+      boxShadow="md"
+      height="100%"
+      transition="all 0.2s ease"
+      _hover={{
+        transform: "translateY(-5px)",
+        boxShadow: "lg",
+      }}
+    >
+      {image && (
+        <AspectRatio ratio={16 / 9} mb={4} borderRadius="lg" overflow="hidden">
+          <Image src={image} alt={title} objectFit="cover" />
+        </AspectRatio>
+      )}
+      {tag && (
+        <Badge colorScheme="blue" mb={2}>
+          {tag}
+        </Badge>
+      )}
+      <Heading fontSize={{ base: "lg", md: "xl" }} mb={2} noOfLines={2}>
+        {title}
+      </Heading>
+      <Text fontSize="md" color={textColor} noOfLines={3} mb={4}>
+        {content}
+      </Text>
+      <Link
+        href={link}
+        color={accentColor}
+        fontWeight="semibold"
+        isExternal={!link.startsWith('/')}
+        display="inline-flex"
+        alignItems="center"
       >
-        <Image
-          src={image}
-          alt={title}
-          boxSize={{ base: "150px", md: "150px" }}
-          objectFit="cover"
-          borderRadius="lg"
-          mr={{ md: 5 }}
-        />
-        <Box flex="1" overflow="hidden">
-          <Text
-            fontSize={{ base: "sm", md: "lg", lg: "xl" }}
-            fontWeight="bold"
-            color={textColor2}
-            noOfLines={1}
-            mb={1}
+        Read more →
+      </Link>
+    </Box>
+  );
+
+  const VideoCard = ({ url }: { url: string }) => {
+    const embedUrl = url
+      .replace("watch?v=", "embed/")
+      .replace("youtu.be/", "youtube.com/embed/");
+
+    return (
+      <Box
+        bg={cardBg}
+        p={0}
+        borderRadius="xl"
+        boxShadow="md"
+        overflow="hidden"
+        transition="all 0.2s ease"
+        _hover={{
+          transform: "translateY(-3px)",
+          boxShadow: "lg",
+        }}
+        width="100%"
+      >
+        <AspectRatio ratio={16 / 9}>
+          <iframe
+            width="100%"
+            height="100%"
+            src={embedUrl}
+            title="EIPsInsight Video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </AspectRatio>
+        <Box p={3}>
+          <Link
+            href={url.replace("embed/", "watch?v=").replace("youtube.com/embed/", "youtu.be/")}
+            color={accentColor}
+            fontSize="sm"
+            fontWeight="semibold"
+            isExternal
+            display="inline-flex"
+            alignItems="center"
           >
-            {title}
-          </Text>
-          <Text
-            mt={2}
-            fontSize={{ base: "sm", md: "md", lg: "lg" }}
-            noOfLines={3} // Limit to 3 lines on all screen sizes
-            textAlign="justify"
-            color={textColor2}
-            overflow="hidden" // Ensures text doesn't overflow
-          >
-            {content}
-          </Text>
-          <Link href={link} color="blue.400" isExternal>
-            Read More
+            Watch on YouTube →
           </Link>
         </Box>
-      </Flex>
+      </Box>
     );
   };
 
-  const Card2 = ({ image, title,link }: { image: string; title: string; link: string }) => {
-    return (
-      <Link href={link}>
-      <Flex
-  direction="row" // Default: column on small screens, row on larger
-  wrap="nowrap" // Prevent wrapping of content within the Flex container
-  bg={bg2}
-  p={5}
-  borderRadius="lg"
-  boxShadow="lg"
-  height="auto" // Allow height to adjust dynamically
-  align="center"
-  justify="space-between"
-  minWidth="200px" // Minimum width for the entire box
-  minHeight="100px" 
-  w="100%" // Full width of the parent container
->
-  
-  <Box
-    flex="1"
-    overflow="hidden"
-    flexShrink={0} // Prevent shrinking below the minimum width
-  >
-    <Text
-      fontSize={{ base: "md", sm: "lg", md: "xl" }} // Adjust font size for responsiveness
-      fontWeight="bold"
-      color={textColor2}
-      mb={1}
-      whiteSpace="normal" // Allow multi-line wrapping
-      wordBreak="break-word" // Handle long words
-      overflow="hidden" // Prevent content overflow
-      textOverflow="ellipsis" // Add ellipsis for truncated text
-    >
-      {title}
-    </Text>
-  </Box>
-</Flex>
-</Link>
-
-
-
-
-
-    );
-  };
-  
-  // export default Card;
-  
-  const FAQs= [
+  const TOOLS = [
     {
-        image: "faq_resources1.png",
-        title: "What is an Ethereum Improvement Proposal (EIP)?",
-        content: "An overview of account abstraction, EOA, Contract, EIP-86, EIP-2938, EIP-4337, sponsored transaction and more.",
-        link: "/FAQs/EIP"
+      title: "Analytics",
+      description: "Track and visualize EIP activity and trends",
+      link: "/Analytics",
+      icon: "📊"
     },
     {
-        image: "faq_resources2.png",
-        title: "What is an Ethereum Request for Change (ERC)?",
-        content: "Need, Proposal, Churn Limit, Managing Validator Exits & Activations",
-        link: "/FAQs/ERC"
+      title: "Boards",
+      description: "Manage and organize EIP proposals",
+      link: "/boards",
+      icon: "📋"
     },
     {
-        image: "faq_resources3.png",
-        title: "What is an Rollup Improvement Proposal (RIP)?",
-        content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
-        link: "/FAQs/RIP"
+      title: "Editors & Reviewers Leaderboard",
+      description: "See top contributors in the EIP ecosystem",
+      link: "/Reviewers",
+      icon: "🏆"
     },
     {
-        image: "Blockchain_Future.png",
-        title: "What is EIPsInsight?",
-        content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
-        link: "/about"
-    },
-]
-  
-
-
-
-
-const NEWS= [
-  {
-    image: "EIP_blog1.png",
-    title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
-    content: "Bringing You the Latest in Ethereum Improvement Proposals",
-    link: "/Blogs/blog1"
-},
-    {
-        image: "news1.jpg",
-        title: "The EIP Proposal Builder: Simplify, Streamline, Succeed",
-        content: "Introducing the EIP Proposal Builder: Simplify the creation of Ethereum Improvement Proposals with ease. Enjoy real-time editing, intuitive features, and streamlined workflows—empowering everyone to contribute effortlessly to Ethereum.",
-        link: "https://etherworld.co/2025/01/20/the-eip-proposal-builder-simplify-streamline-succeed/"
+      title: "EIP Proposal Builder",
+      description: "Create and format new EIP proposals easily",
+      link: "/proposalbuilder",
+      icon: "🛠️"
     },
     {
-        image: "news2.jpg",
-        title: "Unveiling the Analytics Tool on EIPsInsight",
-        content: "Discover EIPsInsight Analytics – a tool designed to streamline project management with visualized GitHub data. Track trends, customize charts, and download reports effortlessly for precise insights into PRs and issues.",
-        link: "https://etherworld.co/2025/01/07/unveiling-the-analytics-tool-on-eipsinsight/"
+      title: "Search by Author",
+      description: "Find EIPs by their authors",
+      link: "/authors",
+      icon: "🔍"
     },
     {
-        image: "news3.png",
-        title: "Boosting EIP Contributions: Unleashing the Power of Editors Leaderboard and EIP Board",
-        content: "The Editors Leaderboard and EIP Board streamline EIP reviews by tracking individual contributions and prioritizing open pull requests, fostering collaboration, efficiency, and recognition within the Ethereum Improvement Proposal process.",
-        link: "https://etherworld.co/2024/12/26/boosting-eip-contributions-unleashing-the-power-of-editors-leaderboard-and-eip-board/"
+      title: "Search by EIP",
+      description: "Quickly find specific EIPs",
+      link: "/SearchEip",
+      icon: "🔎"
+    }
+  ];
+
+  const FAQs = [
+    {
+      title: "What is an Ethereum Improvement Proposal (EIP)?",
+      content: "EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community,",
+      link: "/FAQs/EIP",
+      tag: "Beginner"
     },
     {
-        image: "news4.jpg",
-        title: "Introducing EIP-Board: Simplifying Pull Request Management for EIP Editors",
-        content: "EIP-Board simplifies Ethereum Improvement Proposal management by prioritizing pull requests based on editor responses and author interactions. Discover how this innovative tool supports EIP editors and enhances collaboration within the Ethereum ecosystem.",
-        link: "https://etherworld.co/2024/12/04/introducing-eip-board-simplifying-pull-request-management-for-eip-editors/"
+      title: "What is an Ethereum Request for Change (ERC)?",
+      content: "The goal of Ethereum Request for Change (ERCs) is to standardize and provide high-quality documentation for the Ethereum application layer.",
+      link: "/FAQs/ERC",
+      tag: "Intermediate"
     },
     {
-      image: "news5.jpg",
-      title: "Introducing ‘Search by Author’ Feature on EIPsInsight",
-      content: "Tracking and exploring Ethereum proposals just got a whole lot easier. EtherWorld is thrilled to announce the latest update to EIPsInsight: the Search by Author feature.",
-      link: "https://etherworld.co/2024/11/26/search-by-author-eipsinsight/"
-  },
-  {
-      image: "news6.jpg",
-      title: "Introducing EIPsInsight: Your Go-To Tool for Navigating Ethereum Proposals",
-      content: "EIPsInsight simplifies tracking Ethereum proposals with visual dashboards, real-time PR updates, and trend insights, empowering developers and editors to navigate EIP progress efficiently and collaboratively.",
-      link: "https://etherworld.co/2024/11/07/eipsinsight/"
-  },
-  
-]
-const INSIGHT= [
-  {
-    image: "EipsInsightRecap.jpg",
-    title: "Eipsinsight milestones 2024",
-    content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities, which together streamline workflows, promote accountability, and optimize the management of proposals.",
-    link: "/milestones2024"
-},
-{
-  image: "blog1.jpg",
-  title: "ERC-7779: Understanding & Redefining Wallet Interoperability",
-  content: "ERC-7779 revolutionizes Ethereum by enhancing wallet interoperability, simplifying user transitions, and enabling advanced features like gas sponsorship and batch execution. It empowers users and developers with seamless, secure, and flexible account management.",
-  link: "https://etherworld.co/2025/01/24/erc-7779-understanding-redefining-wallet-interoperability/"
-},
-  {
-    image: "resources3.jpg",
-    title: "Ethereum's Dencun upgrade moving towards Devnet 8",
-    content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
-    link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/"
-},
-{
-    image: "resources7.png",
-    title: "Eip - 7516 : BLOBBASEFEE opcode",
-    content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently. It enables trustless accounting and blob gas futures with a gas cost of 2, aligning with conventions, ensuring seamless integration and minimal impact on backward compatibility.",
-    link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/"
-},
-{
-    image: "resources9.jpg",
-    title: "EIP - 7045 Increase Max Attestation Inclusion Slot",
-    content: "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security and efficiency. The article delves into its motivation, technical changes, implications, and impact on consensus and security.",
-    link: "https://etherworld.co/2024/01/09/eip-7045/"
-},
-{
-    image: "resources10.png",
-    title: "EIP-1153 and Transient storage",
-    content: "EIP-1153 introduces transient storage, revolutionizing Ethereum's data handling. It addresses gas inefficiencies, enhancing smart contract performance. Explore its impact on inter-frame communication and gas cost efficiency.",
-    link: "https://etherworld.co/2024/01/08/eip-1153-and-transient-storage/"
-},
-{
-    image: "resources12.png",
-    title: "EIP-5656: MCOPY - An efficient EVM instruction",
-    content: "EIP-5656 introduces MCOPY. Addressing gas cost challenges, MCOPY benefits, use cases, and impact, presenting a promising upgrade for Ethereum's ecosystem.",
-    link: "https://etherworld.co/2023/11/15/eip-5656-mcopy-an-efficient-evm-instruction/"
-},
-{
-    image: "resources15.jpg",
-    title: "Transient Storage for Beginners",
-    content: "EIP-1153: Need, Effects, Pros & Cons, Future Plans",
-    link: "https://etherworld.co/2022/12/13/transient-storage-for-beginners/"
-}
-  // {
-  //     image: "Blockchain_Future.png",
-  //     title: "What is EIPsInsight?",
-  //     content: "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs),  Ethereum Request for Comments (ERCs), Rollup Improvement Proposals (RIPs) over a specified period.",
-  //     link: "/About"
-  // },
-]
+      title: "What is an Rollup Improvement Proposal (RIP)?",
+      content: "A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions",
+      link: "/FAQs/RIP",
+      tag: "Advanced"
+    },
+    {
+      title: "What is EIPsInsight?",
+      content: "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period.",
+      link: "/About",
+      tag: "About"
+    },
+  ];
 
-const Links = [
-  "https://www.youtube.com/embed/AyidVR6X6J8?start=8",
-  "https://youtu.be/sIr6XX8yR8o?si=csIwXAls_fm7Hfcx",
-  "https://youtu.be/dEgBVAzY6Eg?si=1CVqeBFXepeji-Ik",
-  "https://www.youtube.com/watch?v=nJ57mkttCH0",
-  "https://youtu.be/V75TPvK-K_s?si=KDQI5kP4y-2-9bka",
-  "https://youtu.be/fwxkbUaa92w?si=uHze3y_--2JfYMjD",
-  "https://www.youtube.com/embed/YuEA-jE2Z8c",
-  "https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpnKFDl1KzGOKqwux5JaLlv",
-  "https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpok0smGmq-dFGVHQzW84a2",
- 
-];
+  const NEWS = [
+    {
+      image: "/EIP_blog1.png",
+      title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
+      content: "Bringing You the Latest in Ethereum Improvement Proposals",
+      link: "/Blogs/blog1"
+    },
+    {
+      image: "/news1.jpg",
+      title: "The EIP Proposal Builder: Simplify, Streamline, Succeed",
+      content: "Introducing the EIP Proposal Builder: Simplify the creation of Ethereum Improvement Proposals with ease.",
+      link: "https://etherworld.co/2025/01/20/the-eip-proposal-builder-simplify-streamline-succeed/",
+      tag: "New Feature"
+    },
+    {
+      image: "/news2.jpg",
+      title: "Unveiling the Analytics Tool on EIPsInsight",
+      content: "Discover EIPsInsight Analytics – a tool designed to streamline project management with visualized GitHub data.",
+      link: "https://etherworld.co/2025/01/07/unveiling-the-analytics-tool-on-eipsinsight/",
+      tag: "Tool"
+    },
+    {
+      image: "/news3.png",
+      title: "Boosting EIP Contributions: Unleashing the Power of Editors Leaderboard",
+      content: "The Editors Leaderboard and EIP Board streamline EIP reviews by tracking individual contributions.",
+      link: "https://etherworld.co/2024/12/26/boosting-eip-contributions-unleashing-the-power-of-editors-leaderboard-and-eip-board/",
+      tag: "Community"
+    },
+    {
+      image: "/news4.jpg",
+      title: "Introducing EIP-Board: Simplifying Pull Request Management",
+      content: "EIP-Board simplifies Ethereum Improvement Proposal management by prioritizing pull requests.",
+      link: "https://etherworld.co/2024/12/04/introducing-eip-board-simplifying-pull-request-management-for-eip-editors/",
+      tag: "New Feature"
+    },
+    {
+      image: "/news5.jpg",
+      title: "Introducing 'Search by Author' Feature on EIPsInsight",
+      content: "Tracking and exploring Ethereum proposals just got a whole lot easier.",
+      link: "https://etherworld.co/2024/11/26/search-by-author-eipsinsight/",
+      tag: "Feature"
+    },
+  ];
 
-// Convert URLs to the embed format
-const embedLinks = Links.map((link) => {
-  if (link.includes("youtube.com/watch?v=")) {
-    return link.replace("watch?v=", "embed/");
-  } else if (link.includes("youtu.be")) {
-    return link.replace("youtu.be/", "www.youtube.com/embed/");
-  }
-  return link;
-});
+  const BLOGS = [
+    {
+      image: "/blog3.jpg",
+      title: "ICYMI: New Features on EIPsInsight",
+      content: "EIPsInsight introduces new features, including filters, reviewer tracking, Pectra countdown, and improved analytics.",
+      link: "https://etherworld.co/2025/04/01/icymi-new-features-on-eipsinsight/",
+      tag: "Update"
+    },
+    {
+      image: "/EipsInsightRecap.jpg",
+      title: "Eipsinsight milestones 2024",
+      content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities.",
+      link: "/milestones2024",
+      tag: "Year in Review"
+    },
+    {
+      image: "/blog1.jpg",
+      title: "ERC-7779: Understanding & Redefining Wallet Interoperability",
+      content: "ERC-7779 revolutionizes Ethereum by enhancing wallet interoperability, simplifying user transitions.",
+      link: "https://etherworld.co/2025/01/24/erc-7779-understanding-redefining-wallet-interoperability/",
+      tag: "Technical"
+    },
+    {
+      image: "/resources3.jpg",
+      title: "Ethereum's Dencun upgrade moving towards Devnet 8",
+      content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
+      link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/",
+      tag: "Upgrade"
+    },
+    {
+      image: "/resources7.png",
+      title: "Eip - 7516 : BLOBBASEFEE opcode",
+      content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently.",
+      link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/",
+      tag: "Technical"
+    },
+    {
+      image: "/resources9.jpg",
+      title: "EIP - 7045 Increase Max Attestation Inclusion Slot",
+      content: "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security.",
+      link: "https://etherworld.co/2024/01/09/eip-7045/",
+      tag: "Technical"
+    },
+  ];
 
+  const VIDEOS = [
+    "https://www.youtube.com/embed/AyidVR6X6J8?start=8",
+    "https://youtu.be/sIr6XX8yR8o?si=csIwXAls_fm7Hfcx",
+    "https://youtu.be/dEgBVAzY6Eg?si=1CVqeBFXepeji-Ik",
+    "https://www.youtube.com/watch?v=nJ57mkttCH0",
+    "https://youtu.be/V75TPvK-K_s?si=KDQI5kP4y-2-9bka",
+    "https://youtu.be/fwxkbUaa92w?si=uHze3y_--2JfYMjD",
+    "https://www.youtube.com/embed/YuEA-jE2Z8c",
+    "https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpnKFDl1KzGOKqwux5JaLlv",
+    "https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpok0smGmq-dFGVHQzW84a2",
+  ];
+
+
+  const [currentVideoPage, setCurrentVideoPage] = useState(0);
+  const videosPerPage = 4;
+
+  const paginatedVideos = VIDEOS.slice(
+    currentVideoPage * videosPerPage,
+    (currentVideoPage + 1) * videosPerPage
+  );
+
+  const totalVideoPages = Math?.ceil(VIDEOS?.length / videosPerPage);
+
+  const FAQContent = () => (
+    <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
+      <Box width="100%"
+        position="relative"
+        overflow="hidden"
+        borderRadius="xl"
+        boxShadow="md" >
+        <AspectRatio ratio={9 / 10} maxH="600px">
+          <video autoPlay
+            loop
+            muted
+            playsInline
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              position: 'absolute',
+              top: 0,
+              left: 0
+            }}
+          >
+            <source src="/single.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </AspectRatio>
+
+      </Box>
+
+      <Box>
+        <Image
+          src="/faq_resources4.png"
+          alt="FAQ Illustration"
+          borderRadius="xl"
+          boxShadow="md"
+          mb={6}
+        />
+        <Heading size="xl" // Increased from lg to xl
+          mb={8}
+          display="flex"
+          alignItems="center"
+          gap={3}
+          fontSize={{ base: "2xl", md: "3xl" }}
+        >
+          <Icon as={FaQuestionCircle} color={accentColor} /> Frequently Asked Questions
+        </Heading>
+        <Accordion allowToggle>
+          {FAQs?.map((item, index) => (
+            <AccordionItem key={index} mb={4} borderWidth="1px" borderRadius="lg" overflow="hidden">
+              <AccordionButton
+                bg={cardBg}
+                _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                p={4}
+              >
+                <Box flex="1" textAlign="left">
+                  <Heading size="md">{item?.title}</Heading>
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+              <AccordionPanel pb={4} bg={useColorModeValue("gray.50", "gray.700")}>
+                <Text mb={3}>{item?.content}</Text>
+                <NextLink href={item.link} passHref legacyBehavior>
+                  <Link
+                    color={accentColor}
+                    fontWeight="semibold"
+                    display="inline-flex"
+                    alignItems="center"
+                  >
+                    Learn more →
+                  </Link>
+                </NextLink>
+              </AccordionPanel>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </Box>
+    </Grid>
+  );
 
   const tabContent = [
     {
       label: "FAQ",
-      content: (
-        <>
-           <Flex 
-      direction={{ base: "column", md: "row" }} 
-      align="center" 
-      gap={4} 
-      p={4}
-    >
-      {/* Left Half: Image */}
-      <Box 
-        flex={{ base: "none", md: "1" }} 
-        display={{ base: "block", md: "flex" }} 
-        justifyContent="center" 
-        alignItems="center"
-      >
-        <Image 
-            src="/EIPsInsightFAQ.png" 
-            alt="FAQs Illustration" 
-            maxW="100%" 
-            minH="100%"
-            borderRadius="md" 
-            shadow="md" 
-        />
-
-      </Box>
-
-      {/* Right Half: FAQ Cards */}
-      <Box 
-        flex={{ base: "none", md: "2" }} 
-        mt={{ base: 4, md: 0 }}
-        w="100%"
-  maxW={{ lg: "50%" }} 
-      >
-        <SimpleGrid 
-    columns={{ base: 1, md: 1, lg: 1 }} // Stacks based on screen size
-    spacing={4}
-  >
-    {FAQs.map((eip, index) => (
-      <Box key={index}>
-        {Card2({ 
-          image: eip.image, 
-          title: eip.title, 
-          link: eip.link 
-        })}
-      </Box>
-    ))}
-  </SimpleGrid>
-      </Box>
-    </Flex>
-          </>
-      ),
+      icon: FaQuestionCircle,
+      content: <FAQContent />
     },
     {
-        label: "Blogs",
-        content: (
-            <>
-            <SimpleGrid 
-                columns={{ base: 1, md: 2 }} 
-                spacing={4} 
-            >
-                {INSIGHT.map((eip, index) => (
-                <div key={index}>
-                    {Card({ 
-                    image: eip.image, 
-                    title: eip.title, 
-                    content: eip.content, 
-                    link: eip.link 
-                    })}
-                </div>
-                ))}
-            </SimpleGrid>
-          </>
-        ),
-      },
-      {
-        label: "Videos",
-        content: (
-          <>
-            <Grid 
-              templateColumns={{ base: "1fr", lg: "2fr 3fr" }} // Single column for small screens, 2:3 split for large screens
-              gap={4}
-            >
-              {/* Left Section: Small Videos */}
-              <SimpleGrid 
-                columns={{ base: 1, lg: 2 }} 
-                spacing={4} 
-                display={{ base: "none", md:"none", lg: "grid" }} // Visible only on large screens
-              >
-                {embedLinks.slice(1, 5).map((link, index) => (
-                  <iframe
+      label: "Blogs",
+      icon: FaBlog,
+      content: (
+        <Box>
+          <Heading size="lg" mb={6} display="flex" alignItems="center" gap={2}>
+            <Icon as={FaBlog} color={accentColor} /> Latest Blog Posts
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+            {BLOGS?.map((item, index) => (
+              <Card key={index} {...item} />
+            ))}
+          </SimpleGrid>
+        </Box>
+      )
+    },
+    {
+      label: "Videos",
+      icon: FaYoutube,
+      content: (
+        <Box>
+          <Heading size="lg" mb={6} display="flex" alignItems="center" gap={2}>
+            <Icon as={FaYoutube} color={accentColor} /> Video Tutorials & Guides
+          </Heading>
+
+          <SimpleGrid
+            columns={{ base: 1, sm: 2 }}
+            spacing={4}
+            maxW="auto"  // Constrain the maximum width
+            mx="auto"   // Center the grid
+          >
+            {paginatedVideos?.map((url, index) => (
+              <VideoCard key={index} url={url} />
+            ))}
+          </SimpleGrid>
+          {totalVideoPages > 1 && (
+            <Flex justify="center" mt={6}>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  onClick={() => setCurrentVideoPage(prev => Math.max(prev - 1, 0))}
+                  disabled={currentVideoPage === 0}
+                  size="sm"
+                  colorScheme="blue"
+                  variant="outline"
+                >
+                  Previous
+                </Button>
+                {Array.from({ length: totalVideoPages })?.map((_, index) => (
+                  <Button
                     key={index}
-                    src={link}
-                    title={`Video ${index + 2}`}
-                    style={{ borderRadius: "8px" }}
-                    width="100%"
-                    height="200px"
-                    allowFullScreen
-                  />
+                    onClick={() => setCurrentVideoPage(index)}
+                    colorScheme={currentVideoPage === index ? 'blue' : 'gray'}
+                    size="sm"
+                    variant={currentVideoPage === index ? 'solid' : 'outline'}
+                  >
+                    {index + 1}
+                  </Button>
                 ))}
-              </SimpleGrid>
-      
-              {/* Right Section: Featured Video */}
-              <Box 
-                bg="gray.900" 
-                borderRadius="lg" 
-                overflow="hidden"
-              >
-                <iframe
-                  src={Links[0]}
-                  title="Featured Video"
-                  style={{ borderRadius: "8px" }}
-                  width="100%"
-                  height="400px"
-                  allowFullScreen
-                />
-              </Box>
-            </Grid>
-      
-            {/* Second Row: Remaining Videos */}
-            <SimpleGrid 
-              columns={{ base: 1, sm: 2, lg: 4 }} 
-              spacing={4} 
-              mt={{ base: 4, lg: 8 }}
-            >
-              {embedLinks.slice(5).map((link, index) => (
-                <iframe
-                  key={index}
-                  src={link}
-                  title={`Video ${index + 6}`}
-                  style={{ borderRadius: "8px" }}
-                  width="100%"
-                  height="200px"
-                  allowFullScreen
-                />
-              ))}
-            </SimpleGrid>
-      
-            {/* Responsive Stacked View for Small Screens */}
-            <SimpleGrid 
-              columns={1} 
-              spacing={4} 
-              display={{ base: "grid", lg: "none" }} // Visible only on small/medium screens
-              mt={4}
-            >
-              {embedLinks.map((link, index) => (
-                <iframe
-                  key={index}
-                  src={link}
-                  title={`Video ${index + 1}`}
-                  style={{ borderRadius: "8px" }}
-                  width="100%"
-                  height="200px"
-                  allowFullScreen
-                />
-              ))}
-            </SimpleGrid>
-          </>
-        ),
-      },
-      
-      
+                <Button
+                  onClick={() => setCurrentVideoPage(prev => Math.min(prev + 1, totalVideoPages - 1))}
+                  disabled={currentVideoPage === totalVideoPages - 1}
+                  size="sm"
+                  colorScheme="blue"
+                  variant="outline"
+                >
+                  Next
+                </Button>
+              </Stack>
+            </Flex>
+          )}
+        </Box>
+      )
+    },
     {
       label: "News",
+      icon: FaNewspaper,
       content: (
-        <>
-            <SimpleGrid 
-                columns={{ base: 1, md: 2 }} 
-                spacing={4} 
-            >
-                {NEWS.map((eip, index) => (
-                <div key={index}>
-                    {Card({ 
-                    image: eip.image, 
-                    title: eip.title, 
-                    content: eip.content, 
-                    link: eip.link 
-                    })}
-                </div>
-                ))}
-            </SimpleGrid>
-          </>
-      ),
-    },
+        <Box>
+          <Heading size="lg" mb={6} display="flex" alignItems="center" gap={2}>
+            <Icon as={FaNewspaper} color={accentColor} /> News & Announcements
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+            {NEWS?.map((item, index) => (
+              <Card key={index} {...item} />
+            ))}
+          </SimpleGrid>
+        </Box>
+      )
+    }
   ];
 
-  return (
-    <Box
-      paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-      paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-      marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
-      className="flex flex-col space-x-6"
-    >  <Box ml={5}>
-      <Header title="Resources" subtitle="" />
-      </Box>
-      <Tabs isFitted variant="soft-rounded" index={tabIndex} // Control the active tab
-      onChange={(key) => {
-        // Update the tab index and hash when the tab is changed
-        if (key === 0) handleSelection("FAQ");
-        if (key === 1) handleSelection("Blogs");
-        if (key === 2) handleSelection("Videos");
-        if (key === 3) handleSelection("News");
-      }}>
-     <Box mt={2} borderRadius="10px 10px 0 0">
-     <Flex
-    justify="space-between"
-    // bg="gray.700"
-    p={1}
-    mb={1}
-    borderRadius="md"
-  >
-    <TabList
-      mb={1}
-      display="flex"
-      flexWrap="wrap" // Enable wrapping for tabs
-      width="100%"
-      gap={2} // Add spacing between tabs
-    >
-      {tabContent.map((tab, index) => (
-        <Tab
-          key={index}
-          _selected={{
-            bg: "blue.300",
-            color: "white",
-            borderColor: "lightblue", // Border color for selected state
-            paddingY: 3, // Increased padding for height
-          }}
-          _hover={{
-            bg: "blue.100",
-          }}
-          p={3} // Increased padding for height
-          flex={{ base: "1 1 calc(50% - 1rem)", md: "1 1 calc(25% - 1rem)" }} // Responsive flex basis
-          textAlign="center"
-          borderRadius="md"
-          boxShadow="sm"
-          cursor="pointer"
-          color={textColor2} // Use textColor2 for text color
-          whiteSpace="normal" // Allow text wrapping
-          wordBreak="break-word" // Handle long words
-          fontSize="lg" // Increased font size
-          border="2px solid" // Thicker border
-          borderColor={textColor2} // Use textColor2 for border color
-        >
-          {tab.label}
-        </Tab>
-      ))}
-    </TabList>
-  </Flex>
-</Box>
-
-
-      <TabPanels>
-        {tabContent.map((tab, index) => (
-          <TabPanel key={index}>{tab.content}</TabPanel>
+  const ToolsSection = () => (
+    <Box mt={8}>
+      <Heading size="lg" mb={6} display="flex" alignItems="center" gap={2}>
+        <Icon as={FaTools} color={accentColor} /> Tools
+      </Heading>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+        {TOOLS?.map((tool, index) => (
+          <Box
+            key={index}
+            bg={cardBg}
+            p={6}
+            borderRadius="xl"
+            boxShadow="md"
+            transition="all 0.2s ease"
+            _hover={{
+              transform: "translateY(-5px)",
+              boxShadow: "lg",
+            }}
+          >
+            <Flex align="center" mb={3}>
+              <Text fontSize="2xl" mr={3}>{tool.icon}</Text>
+              <Heading size="md">{tool.title}</Heading>
+            </Flex>
+            <Text mb={4} color={textColor}>{tool.description}</Text>
+            <NextLink href={tool.link} passHref legacyBehavior>
+              <Link
+                color={accentColor}
+                fontWeight="semibold"
+                display="inline-flex"
+                alignItems="center"
+              >
+                Open Tool →
+              </Link>
+            </NextLink>
+          </Box>
         ))}
-      </TabPanels>
-    </Tabs>
+      </SimpleGrid>
+    </Box>
+  );
+  return (
+    <Box minH="100vh">
+      <Box maxW="7xl" mx="auto" px={8}> {/* This centers content with padding */}
+        <Header
+          title="Resources"
+          subtitle="Learn, explore, and stay updated with Ethereum improvements"
+        />
+      </Box>
+      <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} py={8}>
+        <Center mb={8}>
+          <Tabs
+            index={tabIndex}
+            onChange={setTabIndex}
+            variant="unstyled"
+            isFitted={isMobile}
+          >
+            <TabList
+              display="flex"
+              flexWrap="wrap"
+              justifyContent="center"
+              gap={2}
+              bg="transparent"
+            >
+              {tabContent?.map((tab, index) => (
+                <Tab
+                  key={index}
+                  onClick={() => handleSelection(tab.label)}
+                  fontSize={tabSize}
+                  fontWeight="semibold"
+                  bg={tabBg}
+                  borderWidth="1px"
+                  borderColor={tabIndex === index ? accentColor : tabBorderColor}
+                  borderRadius="lg"
+                  py={3}
+                  px={2}
+                  flex={1}
+                  mx={0.5}
+                  _selected={{
+                    color: "black",
+                    bg: accentColor,
+                    boxShadow: "md",
+                  }}
+                  _hover={{
+                    bg: useColorModeValue("gray.100", "gray.600"),
+                  }}
+                  transition="all 0.2s ease"
+                  minW={{ base: "auto", md: "200px" }}
+                  maxW={{ md: "250px" }}
+                  color={tabIndex === index ? "white" : textColor}
+                >
+                  <Stack direction="row" align="center" justify="center" spacing={2}>
+                    <Icon as={tab.icon} />
+                    {!isMobile && <Text>{tab.label}</Text>}
+                  </Stack>
+                </Tab>
+              ))}
+            </TabList>
+
+
+            <TabPanels mt={8}>
+              {tabContent?.map((tab, index) => (
+                <TabPanel key={index} px={0}>
+                  {tab.content}
+                  <ToolsSection />
+                </TabPanel>
+              ))}
+            </TabPanels>
+          </Tabs>
+        </Center>
+      </Box>
     </Box>
   );
 };

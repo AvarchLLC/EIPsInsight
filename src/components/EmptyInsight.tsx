@@ -63,7 +63,7 @@ const EmptyInsight = () => {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
         console.log("rip data:",jsonData.rip);
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         // setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -73,9 +73,9 @@ const EmptyInsight = () => {
     fetchData();
   }, []);
 
-  let filteredData1 = data.filter((item) => item.status === "Draft");
+  let filteredData1 = data?.filter((item) => item.status === "Draft");
  
-  let filteredData5 = data.filter((item) => item.status === "Final");
+  let filteredData5 = data?.filter((item) => item.status === "Final");
   
 
   const prevMonth = Number(month) - 1;

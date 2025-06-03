@@ -47,28 +47,28 @@ const EIPCatBoxGrid = () => {
     fetchData();
   }, []);
   const bg = useColorModeValue("#f6f6f7", "#171923");
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
 
   const MetaCount = new Set(
-    allData.filter((item) => item.type === "Meta").map((item) => item.eip)
+    allData?.filter((item) => item.type === "Meta")?.map((item) => item.eip)
   ).size;
 
   const InformationalCount = new Set(
-    allData.filter((item) => item.type === "Informational").map((item) => item.eip)
+    allData?.filter((item) => item.type === "Informational")?.map((item) => item.eip)
   ).size;
 
   const CoreCount =
-    allData.filter(
+    allData?.filter(
       (item) =>
         item.type === "Standards Track" && item.category === "Core"
-    ).length || 0;
+    )?.length || 0;
 
   const NetworkingCount = new Set(
-    allData.filter((item) => item.category === "Networking").map((item) => item.eip)
+    allData?.filter((item) => item.category === "Networking")?.map((item) => item.eip)
   ).size;
 
   const InterfaceCount = new Set(
-    allData.filter((item) => item.category === "Interface").map((item) => item.eip)
+    allData?.filter((item) => item.category === "Interface")?.map((item) => item.eip)
   ).size;
 
   const totalCount =
@@ -104,9 +104,9 @@ const EIPCatBoxGrid = () => {
       <Text fontSize="3xl" fontWeight="bold" color="#30A0E0" paddingY={8}>
         Standards Track -{" "}
         {
-          allData.filter(
+          allData?.filter(
             (item) => item.type === "Standards Track" && item.category !== "ERC"
-          ).length
+          )?.length
         }
       </Text>
 

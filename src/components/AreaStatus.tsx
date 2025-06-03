@@ -15,7 +15,7 @@
 //         setData(jsonData);
 //         if (type === "EIPs" && jsonData.eip) {
 //           setTypeData(
-//             jsonData.eip.filter((item: any) => item.category !== "ERCs")
+//             jsonData.eip?.filter((item: any) => item.category !== "ERCs")
 //           );
 //         } else if (type === "ERCs" && jsonData.erc) {
 //           setTypeData(jsonData.erc);
@@ -107,10 +107,10 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         if (type === "EIPs" && jsonData.eip) {
           setData(
-          jsonData.eip.filter((item: any) => item.category !== "ERCs")
+          jsonData.eip?.filter((item: any) => item.category !== "ERCs")
         );
         } else if (type === "ERCs" && jsonData.erc) {
           setData(jsonData.erc);
@@ -128,7 +128,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
 
   const removeDuplicatesFromEips = (eips: any[]) => {
     const seen = new Set();
-    return eips.filter((eip) => {
+    return eips?.filter((eip) => {
       if (!seen.has(eip.eip)) {
         seen.add(eip.eip);
         return true;
@@ -152,7 +152,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
 
   const consolidateData = (data: DataItem[]): TransformedItem[] => {
     const result: { [key: string]: TransformedItem } = {};
-    data.forEach((item) => {
+    data?.forEach((item) => {
       const key = `${item.status}-${item.year}`;
       if (result[key]) {
         result[key].value += item.value;
@@ -164,16 +164,16 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
   };
   const status1="Draft";
   const status2="Final";
-  let filteredData = data.filter((item) => item.status === status1);
-  let filteredData2 = data.filter((item) => item.status === status2);
+  let filteredData = data?.filter((item) => item.status === status1);
+  let filteredData2 = data?.filter((item) => item.status === status2);
   const combinedFilteredData = [...filteredData, ...filteredData2];
 
   const transformedData = combinedFilteredData.flatMap((item) => {
-    return item.eips.map((eip) => ({
+    return item.eips?.map((eip) => ({
       status: item.status,
       category: getCat(eip.category),
       year: `${getMonthName(eip.month)} ${eip.year}`,
-      value: removeDuplicatesFromEips(eip.eips).length,
+      value: removeDuplicatesFromEips(eip.eips)?.length,
     }));
   });
 
@@ -192,8 +192,8 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
 
   const downloadData = () => {
     // Filter data based on the selected status
-    let filteredData = data.filter((item) => item.status === status1);
-    let filteredData2 = data.filter((item) => item.status === status2);
+    let filteredData = data?.filter((item) => item.status === status1);
+    let filteredData2 = data?.filter((item) => item.status === status2);
     const combinedFilteredData = [...filteredData, ...filteredData2];
     
     // Transform the filtered data to get the necessary details
@@ -204,7 +204,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
           const year = eip.year.toString(); 
           const month=getMonthName(eip.month);
           const uniqueEips = removeDuplicatesFromEips(eip.eips); 
-          return uniqueEips.map(({ eip }) => ({
+          return uniqueEips?.map(({ eip }) => ({
               status,         
               category,       
               year,           
@@ -221,7 +221,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
     // Prepare the CSV content
     const csvContent = "data:text/csv;charset=utf-8,"
         + header
-        + transformedData.map(({ status,category, year,month, eip }) => {
+        + transformedData?.map(({ status,category, year,month, eip }) => {
             return `${status},${category},${year},${month},${eip}`; // Each EIP on a separate line
         }).join("\n");
   

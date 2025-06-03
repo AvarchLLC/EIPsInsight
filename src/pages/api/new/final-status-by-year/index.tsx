@@ -226,19 +226,19 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const eipFinal = EipfinalStatusByYear.map((item: any) => {
+    const eipFinal = EipfinalStatusByYear?.map((item: any) => {
       return { ...item, repo: "eip" };
     });
 
-    const ercFinal = ErcfinalStatusByYear.map((item: any) => {
+    const ercFinal = ErcfinalStatusByYear?.map((item: any) => {
       return { ...item, repo: "erc" };
     });
 
-    const ercFrozenFinal = FrozenErcData.map((item: any) => {
+    const ercFrozenFinal = FrozenErcData?.map((item: any) => {
       return { ...item, repo: "erc" };
     });
 
-    const ripFinal = RipfinalStatusByYear.map((item: any) => {
+    const ripFinal = RipfinalStatusByYear?.map((item: any) => {
       return { ...item, repo: "rip" };
     });
 

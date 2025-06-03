@@ -38,34 +38,10 @@ const nextConfig = withMDX(
       return [
         // Redirect lowercase 'reviewers' to properly cased 'Reviewers', only if the pathname is not already correct
         {
-          source: '/reviewers',
-          destination: '/Reviewers',
+          source: '/pectra',
+          destination: '/upgrade',
           permanent: true,
-          has: [{ type: 'header', key: 'x-original-path', value: '/reviewers' }]
-        },
-        {
-          source: '/REVIEWERS',
-          destination: '/Reviewers',
-          permanent: true,
-          has: [{ type: 'header', key: 'x-original-path', value: '/REVIEWERS' }]
-        },
-        {
-          source: '/analytics',
-          destination: '/anlytics',
-          permanent: true,
-          has: [{ type: 'header', key: 'x-original-path', value: '/analytics' }]
-        },
-        {
-          source: '/ANALYTICS',
-          destination: '/analytics',
-          permanent: true,
-          has: [{ type: 'header', key: 'x-original-path', value: '/ANALYTICS' }]
-        },
-        {
-          source: '/BOARDS',
-          destination: '/boards',
-          permanent: true,
-          has: [{ type: 'header', key: 'x-original-path', value: '/BOARDS' }]
+          has: [{ type: 'header', key: 'x-original-path', value: '/pectra' }]
         },
       ];
     }

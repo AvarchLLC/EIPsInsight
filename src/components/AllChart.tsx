@@ -86,16 +86,16 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         } else if (type === "ERC") {
           setData(jsonData.erc);
         } else if (type === "RIP") {
-          jsonData.rip.forEach((item: EIP) => {
+          jsonData.rip?.forEach((item: EIP) => {
             if (item.eip === "7859") {
                 item.status = "Draft"; // Update the status
             }
         });        
           setData(jsonData.rip);
         } else if (type === "Total") {
-          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+          setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         } else {
-          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+          setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         }
         setIsLoading(false);
       } catch (error) {
@@ -112,7 +112,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     value: number;
   }
   
-  const transformedData = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData = data?.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const category = getCat(item.category);
   
@@ -181,7 +181,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
 
 // Prepare the CSV content
 const csvContent = header
-    + data.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+    + data?.map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
         // Generate the correct URL based on the repo type
         const url = repo === "eip"
             ? `https://eipsinsight.com/eips/eip-${eip}`
@@ -262,8 +262,8 @@ const csvContent = header
         flexDirection="column"
       >
         {type === 'Total'
-          ? `Total Ethereum Proposals - [${data.length}]`
-          : `${type} - [${data.length}]`}
+          ? `Total Ethereum Proposals - [${data?.length}]`
+          : `${type} - [${data?.length}]`}
       </Text>
     </NextLink>
       <Button colorScheme="blue"  fontSize={{ base: "0.6rem", md: "md" }} onClick={async () => {

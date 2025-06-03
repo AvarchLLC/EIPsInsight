@@ -54,10 +54,10 @@ import {
   
     const factorAuthor = (data: any) => {
       let list = data.split(",");
-      for (let i = 0; i < list.length; i++) {
+      for (let i = 0; i < list?.length; i++) {
         list[i] = list[i].split(" ");
       }
-      if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+      if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
         list.pop();
       }
       return list;
@@ -87,8 +87,8 @@ import {
     });
   
     const filteredData = dataset
-      .filter((item) => (cat === "All" || item.category === cat) && item.category === status)
-      .map((item) => {
+      ?.filter((item) => (cat === "All" || item.category === cat) && item.category === status)
+      ?.map((item) => {
         const { eip, title, author, repo, type, category, status } = item;
       return {
         eip,
@@ -107,7 +107,7 @@ import {
   
     return (
       <>
-        {filteredData.length > 0 ? (
+        {filteredData?.length > 0 ? (
           <Box
             bgColor={bg}
             marginTop={"2"}
@@ -140,7 +140,7 @@ import {
                   itemsPerPage={5}
                   pagination
                   paginationProps={{
-                    pages: Math.ceil(filteredData.length / 5), // Calculate the number of pages based on the items and items per page
+                    pages: Math.ceil(filteredData?.length / 5), // Calculate the number of pages based on the items and items per page
                     style: {
                       display: 'flex',
                       flexWrap: 'wrap', // Allow pagination to wrap in smaller screens
@@ -262,19 +262,19 @@ import {
                     author: (it: any) => (
                       <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                         <div>
-                          {factorAuthor(it.author).map(
+                          {factorAuthor(it.author)?.map(
                             (item: any, index: any) => {
-                              let t = item[item.length - 1].substring(
+                              let t = item[item?.length - 1].substring(
                                 1,
-                                item[item.length - 1].length - 1
+                                item[item?.length - 1]?.length - 1
                               );
                               return (
                                 <Wrap key={index}>
                                   <WrapItem>
                                     <Link
                                       href={`${
-                                        item[item.length - 1].substring(
-                                          item[item.length - 1].length - 1
+                                        item[item?.length - 1].substring(
+                                          item[item?.length - 1]?.length - 1
                                         ) === ">"
                                           ? "mailto:" + t
                                           : "https://github.com/" + t.substring(1)

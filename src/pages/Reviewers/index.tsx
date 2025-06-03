@@ -17,7 +17,10 @@ import dayjs from "dayjs";
 import CopyLink from "@/components/CopyLink";
 import { useRouter } from "next/router";
 import { DownloadIcon } from "@chakra-ui/icons";
+import TableOfContents from '@/components/TableOfContents';
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import FeedbackButton from "@/components/FeedbackButton";
+import { Tooltip } from "@chakra-ui/react";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -109,7 +112,7 @@ const ReviewTracker = () => {
 
     // Filter only if start or end date is provided
     if (startDate && endDate) {
-        const filteredData = chart1data.filter((item) => {
+        const filteredData = chart1data?.filter((item) => {
             const itemDate = item.monthYear; // Assuming monthYear is in "YYYY-MM" format
             return itemDate >= startDate && itemDate <= endDate;
         });
@@ -125,6 +128,8 @@ const ReviewTracker = () => {
 
   const toggleCollapse = () => setShow(!show);
 
+  const [showThumbs, setShowThumbs] = useState(false);
+
   const fetchReviewers = async (): Promise<string[]> => {
     try {
       const response = await fetch(
@@ -134,7 +139,7 @@ const ReviewTracker = () => {
   
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
-      const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
+      const reviewers = matches ? Array.from(new Set(matches?.map((m) => m.slice(2)))) : [];
       const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
       // Merge the two arrays and ensure uniqueness
@@ -154,7 +159,7 @@ const ReviewTracker = () => {
   useEffect(() => {
     fetchReviewers().then((uniqueReviewers) => {
       setReviewers(uniqueReviewers);
-      const initialShowReviewer = uniqueReviewers.reduce(
+      const initialShowReviewer = uniqueReviewers?.reduce(
         (acc, reviewer) => ({ ...acc, [reviewer]: false }),
         {} as ShowReviewerType
       );
@@ -163,7 +168,7 @@ const ReviewTracker = () => {
   }, []);
 
   const selectAllReviewers = () => {
-    const updatedReviewers = Object.keys(showReviewer).reduce(
+    const updatedReviewers = Object.keys(showReviewer)?.reduce(
       (acc, reviewer) => ({ ...acc, [reviewer]: true }),
       {} as ShowReviewerType
     );
@@ -172,7 +177,7 @@ const ReviewTracker = () => {
 
   // Function to deselect all reviewers
   const deselectAllReviewers = () => {
-    const updatedReviewers = Object.keys(showReviewer).reduce(
+    const updatedReviewers = Object.keys(showReviewer)?.reduce(
       (acc, reviewer) => ({ ...acc, [reviewer]: false }),
       {} as ShowReviewerType
     );
@@ -182,7 +187,7 @@ const ReviewTracker = () => {
   // Function to select only the active reviewers from the list selectEmeritusReviewers
   const selectActiveReviewers = () => {
     const reviewers3=[ "lightclient", "SamWilsn", "xinbenlv", "g11tech","CarlBeek","nconsigny","yoavw", "adietrichs"];
-    const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
+    const updatedReviewers = Object.keys(showReviewer)?.reduce((acc, reviewer) => {
       acc[reviewer] = reviewers3.includes(reviewer);
       return acc;
     }, {} as ShowReviewerType);
@@ -192,7 +197,7 @@ const ReviewTracker = () => {
 
   const selectEmeritusReviewers = () => {
     const reviewers3=["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu"];
-    const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
+    const updatedReviewers = Object.keys(showReviewer)?.reduce((acc, reviewer) => {
       acc[reviewer] = reviewers3.includes(reviewer);
       return acc;
     }, {} as ShowReviewerType);
@@ -202,7 +207,7 @@ const ReviewTracker = () => {
 
   const selectReviewers = () => {
     const reviewers2= ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner"]
-    const updatedReviewers = Object.keys(showReviewer).reduce((acc, reviewer) => {
+    const updatedReviewers = Object.keys(showReviewer)?.reduce((acc, reviewer) => {
       acc[reviewer] = reviewers2.includes(reviewer);
       return acc;
     }, {} as ShowReviewerType);
@@ -258,7 +263,8 @@ const ReviewTracker = () => {
   
     const filteredData = data
   
-    const csv = data.map((pr: PR) => ({
+    const csv = data?.map((pr: PR) => ({
+        Repo: pr.repo,
         PR_Number: pr.prNumber,
         Title: pr.prTitle,
         Reviewer: pr.reviewer,
@@ -284,9 +290,10 @@ const ReviewTracker = () => {
 
     // console.log(data)
   
-    const filteredData = data.filter((pr: PR) => reviewersList.includes(pr.reviewer));
+    const filteredData = data?.filter((pr: PR) => reviewersList.includes(pr.reviewer));
   
-    const csv = filteredData.map((pr: PR) => ({
+    const csv = filteredData?.map((pr: PR) => ({
+        Repo: pr.repo,
         PR_Number: pr.prNumber,
         Title: pr.prTitle,
         Reviewer: pr.reviewer,
@@ -310,9 +317,10 @@ const ReviewTracker = () => {
 
     // console.log(data)
   
-    const filteredData = data.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
+    const filteredData = data?.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
   
-    const csv = filteredData.map((pr: PR) => ({
+    const csv = filteredData?.map((pr: PR) => ({
+        Repo: pr.repo,
         PR_Number: pr.prNumber,
         Title: pr.prTitle,
         Reviewer: pr.reviewer,
@@ -333,9 +341,10 @@ const ReviewTracker = () => {
 
 const generateCSVData9 = () => {
   // Filter data for reviewers only
-  const filteredData = downloaddata.filter((pr: PR) => reviewersList.includes(pr.reviewer));
+  const filteredData = downloaddata?.filter((pr: PR) => reviewersList.includes(pr.reviewer));
 
-  const csv = filteredData.map((pr: PR) => ({
+  const csv = filteredData?.map((pr: PR) => ({
+    Repo: pr.repo,
     PR_Number: pr.prNumber,
     Title: pr.prTitle,
     Reviewer: pr.reviewer,
@@ -352,9 +361,10 @@ const generateCSVData9 = () => {
 
 const generateCSVData10 = () => {
   // Filter data for editors only (exclude reviewers)
-  const filteredData = downloaddata.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
+  const filteredData = downloaddata?.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
 
-  const csv = filteredData.map((pr: PR) => ({
+  const csv = filteredData?.map((pr: PR) => ({
+    Repo: pr.repo,
     PR_Number: pr.prNumber,
     Title: pr.prTitle,
     Reviewer: pr.reviewer,
@@ -396,7 +406,7 @@ const generateCSVData5 = () => {
 
     // console.log("download data 5:", downloaddata)
 
-    const filteredData = downloaddata.filter((pr) => {
+    const filteredData = downloaddata?.filter((pr) => {
       const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
       const shouldIncludeReviewer = pr.reviewer && showReviewer[pr.reviewer];
       return (
@@ -408,7 +418,8 @@ const generateCSVData5 = () => {
     });
     // console.log("Filtered Data 5:", filteredData);
 
-    const csv = filteredData.map((pr: PR) => ({
+    const csv = filteredData?.map((pr: PR) => ({
+      Repo: pr.repo,
       PR_Number: pr.prNumber,
       Title: pr.prTitle,
       Reviewer: pr.reviewer,
@@ -427,7 +438,7 @@ const generateCSVData5 = () => {
 else{
   const filteredData =downloaddata
 
-  const csv = filteredData.map((pr: PR) => ({
+  const csv = filteredData?.map((pr: PR) => ({
     PR_Number: pr.prNumber,
     Title: pr.prTitle,
     Reviewer: pr.reviewer,
@@ -457,7 +468,7 @@ const generateCSVData3 = (reviewer: string) => {
     endDate.setDate(0); // Last day of the month
 
     // Filter the data based on review date and reviewer
-    const filteredData = downloaddata.filter((pr) => {
+    const filteredData = downloaddata?.filter((pr) => {
       const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
       return (
         reviewDate &&
@@ -468,7 +479,8 @@ const generateCSVData3 = (reviewer: string) => {
     });
 
     // Map the filtered data to CSV format
-    const csv = filteredData.map((pr: PR) => ({
+    const csv = filteredData?.map((pr: PR) => ({
+      Repo: pr.repo,
       PR_Number: pr.prNumber,
       Title: pr.prTitle,
       Reviewer: pr.reviewer,
@@ -483,11 +495,11 @@ const generateCSVData3 = (reviewer: string) => {
     setCsvData(csv);
   } else {
     // If no date range is selected, use all data and filter by reviewer if provided
-    const filteredData = downloaddata.filter((pr) => 
+    const filteredData = downloaddata?.filter((pr) => 
       reviewer ? pr.reviewer === reviewer : true // Filter by reviewer if provided
     );
 
-    const csv = filteredData.map((pr: PR) => ({
+    const csv = filteredData?.map((pr: PR) => ({
       PR_Number: pr.prNumber,
       Title: pr.prTitle,
       Reviewer: pr.reviewer,
@@ -517,7 +529,7 @@ const generateCSVData3 = (reviewer: string) => {
   
   const flattenResponse = (response: Record<string, any[]>) => {
     return Object.entries(response).flatMap(([reviewer, reviews]) =>
-      reviews.map(review => ({ ...review, reviewer }))
+      reviews?.map(review => ({ ...review, reviewer }))
     );
   };
   
@@ -538,7 +550,7 @@ const generateCSVData3 = (reviewer: string) => {
       // console.log(formattedData);
     
       // Extract unique reviewers from the formattedData
-      // const reviewers = Array.from(new Set(formattedData.map(review => review.reviewer)));
+      // const reviewers = Array.from(new Set(formattedData?.map(review => review.reviewer)));
 
       // console.log("reviewers:",reviewers);
       // const githubHandles = await fetchReviewers();
@@ -547,11 +559,11 @@ const generateCSVData3 = (reviewer: string) => {
       // console.log("active:",activereviewers);
       
       // // Create the initial state for showing reviewers (set all to true by default)
-      const initialShowReviewer = githubHandles.reduce(
+      const initialShowReviewer = githubHandles?.reduce(
         (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
         {}
       );
-      const updatedReviewers = Object.keys(initialShowReviewer).reduce((acc, reviewer) => {
+      const updatedReviewers = Object.keys(initialShowReviewer)?.reduce((acc, reviewer) => {
         acc[reviewer] = githubHandles2.includes(reviewer);
         return acc;
       }, {} as ShowReviewerType);
@@ -609,12 +621,12 @@ interface PRData {
 const getYearlyData = (data: PRData[]) => {
   // Initialize an accumulator to hold yearly data
   const yearlyData: Record<string, number> = data
-    .filter(item => {
+    ?.filter(item => {
       // Extract the year from 'monthYear' and check if it falls between 2015 and 2025
       const itemYear = parseInt(item.monthYear.split('-')[0], 10);
       return itemYear >= 2015 && itemYear <= 2025;
     })
-    .reduce((acc, item) => {
+    ?.reduce((acc, item) => {
       // Only count if the reviewer is shown
       if (showReviewer[item.reviewer]) {
         acc[item.reviewer] = (acc[item.reviewer] || 0) + item.count;  // Accumulate the count for each reviewer
@@ -625,7 +637,7 @@ const getYearlyData = (data: PRData[]) => {
   // Sort the data by reviewer count in decreasing order
   const sortedYearlyData = Object.entries(yearlyData)
     .sort(([, a], [, b]) => b - a)  // Sort by count in decreasing order
-    .reduce((acc, [reviewer, count]) => {
+    ?.reduce((acc, [reviewer, count]) => {
       acc[reviewer] = count;
       return acc;
     }, {} as Record<string, number>);
@@ -638,8 +650,8 @@ const getYearlyData = (data: PRData[]) => {
 // Function to filter PR data for the selected month and year
 const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
   const monthlyData: Record<string, number> = data
-    .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)  // Filter by year and month
-    .reduce((acc, item) => {
+    ?.filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)  // Filter by year and month
+    ?.reduce((acc, item) => {
       // Only count if the reviewer is shown
       if (showReviewer[item.reviewer]) {
         acc[item.reviewer] = (acc[item.reviewer] || 0) + item.count;  // Accumulate the count
@@ -650,7 +662,7 @@ const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
   // Sort reviewers by count in decreasing order
   const sortedMonthlyData = Object.entries(monthlyData)
     .sort(([, a], [, b]) => b - a)  // Sort by count in decreasing order
-    .reduce((acc, [reviewer, count]) => {
+    ?.reduce((acc, [reviewer, count]) => {
       acc[reviewer] = count;
       return acc;
     }, {} as Record<string, number>);
@@ -661,7 +673,7 @@ const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
 
 // Function to format data into chart-friendly format
 const formatChartData = (rawData: Record<string, number>) => {
-  return Object.entries(rawData).map(([reviewer, count]) => ({
+  return Object.entries(rawData)?.map(([reviewer, count]) => ({
     reviewer,
     count,
   }));
@@ -687,7 +699,7 @@ const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => 
         formatter: (reviewer: string) => reviewer, // Display reviewer names on Y-axis
       },
     },
-    annotations: chartData.map((datum) => ({
+    annotations: chartData?.map((datum) => ({
       type: 'html',
       position: { count: datum.count, reviewer: datum.reviewer }, // Correcting position
       html: `
@@ -721,7 +733,7 @@ const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) =>
         formatter: (reviewer: string) => reviewer, // Display reviewer names on Y-axis
       },
     },
-    annotations: chartData.map((datum) => ({
+    annotations: chartData?.map((datum) => ({
       type: 'html',
       position: { count: datum.count, reviewer: datum.reviewer }, // Correcting position
       html: `
@@ -761,7 +773,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
               <CopyLink link={`https://eipsinsight.com/Editors#Leaderboard`} />
             </Heading>
             <CSVLink
-              data={csvData.length ? csvData : []} 
+              data={csvData?.length ? csvData : []} 
               filename={`editors_yearly_data.csv`}
               onClick={async () => {
                 try {
@@ -791,7 +803,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
               <CopyLink link={`https://eipsinsight.com/Reviewers#Leaderboard`} />
             </Heading>
             <CSVLink
-              data={csvData.length ? csvData : []} 
+              data={csvData?.length ? csvData : []} 
               filename={`reviewers_yearly_data.csv`}
               onClick={async () => {
                 try {
@@ -843,11 +855,12 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
           {/* Editors Chart */}
           <Box width={{ base: "100%", md: "45%" }} padding="1rem">
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+              
               <Heading size="md" color="black">
                 {`Editors Leaderboard (Monthly)`}
               </Heading>
               <CSVLink
-                data={csvData.length ? csvData : []}
+                data={csvData?.length ? csvData : []}
                 filename={`editors_${selectedYear}_${selectedMonth}.csv`}
                 onClick={async () => {
                   try {
@@ -873,7 +886,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
                 {`Reviewers Leaderboard (Monthly)`}
               </Heading>
               <CSVLink
-                data={csvData.length ? csvData : []} 
+                data={csvData?.length ? csvData : []} 
                 filename={`reviewers_${selectedYear}_${selectedMonth}.csv`}
                 onClick={async () => {
                   try {
@@ -902,7 +915,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
 
 
 const transformAndGroupData = (data: any[]): ReviewData[] => {
-  const groupedData: GroupedData = data.reduce((acc, item) => {
+  const groupedData: GroupedData = data?.reduce((acc, item) => {
     const { monthYear, reviewer, count } = item;
     
     if (!acc[monthYear]) {
@@ -933,9 +946,9 @@ type ReviewDatum = {
 const renderChart = () => {
   const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
   // console.log("data to use:",dataToUse)
-  const filteredData = dataToUse.filter(item =>
+  const filteredData = dataToUse?.filter(item =>
     Object.keys(showReviewer) // Get the list of reviewers from showReviewer
-      .filter(reviewer => showReviewer[reviewer]) // Only include checked reviewers
+      ?.filter(reviewer => showReviewer[reviewer]) // Only include checked reviewers
       .includes(item.reviewer) // Check if the item reviewer is in the list of checked reviewers
   );
 
@@ -945,12 +958,12 @@ const renderChart = () => {
   };
 
   // Assign colors if not already assigned
-  const reviewers = Array.from(new Set(filteredData.map(item => item.reviewer)));
-  const totalReviewers = reviewers.length;
-  filteredData.forEach((item, index) => {
+  const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
+  const totalReviewers = reviewers?.length;
+  filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       // Assign a new color only if the reviewer doesn't already have one
-      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
+      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
     }
   });
   // console.log("filtered data:", filteredData);
@@ -1002,9 +1015,9 @@ const renderChart4 = () => {
   const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
   // console.log("data to use:", dataToUse);
 
-  const filteredData = dataToUse.filter(item =>
+  const filteredData = dataToUse?.filter(item =>
     Object.keys(showReviewer) // Get the list of reviewers from showReviewer
-      .filter(reviewer => showReviewer[reviewer]) // Only include checked reviewers
+      ?.filter(reviewer => showReviewer[reviewer]) // Only include checked reviewers
       .includes(item.reviewer) // Check if the item reviewer is in the list of checked reviewers
   );
 
@@ -1014,12 +1027,12 @@ const renderChart4 = () => {
   };
 
   // Assign colors if not already assigned
-  const reviewers = Array.from(new Set(filteredData.map(item => item.reviewer)));
-  const totalReviewers = reviewers.length;
-  filteredData.forEach((item, index) => {
+  const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
+  const totalReviewers = reviewers?.length;
+  filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       // Assign a new color only if the reviewer doesn't already have one
-      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
+      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
     }
   });
 
@@ -1067,9 +1080,9 @@ const renderChart4 = () => {
 
 const renderCharts3 = (reviewsdata: PRData[]) => {
   const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
-  const filteredData = dataToUse.filter(item =>
+  const filteredData = dataToUse?.filter(item =>
     Object.keys(showReviewer)
-      .filter(reviewer => showReviewer[reviewer])
+      ?.filter(reviewer => showReviewer[reviewer])
       .includes(item.reviewer)
   );
 
@@ -1104,19 +1117,19 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
   const completeXAxisRange = generateMonthYearRange("2019-05", dayjs().format("YYYY-MM"));
 
   // Assign colors to reviewers
-  const reviewers = Array.from(new Set(filteredData.map(item => item.reviewer)));
-  const totalReviewers = reviewers.length;
-  filteredData.forEach((item, index) => {
+  const reviewers = Array.from(new Set(filteredData?.map(item => item.reviewer)));
+  const totalReviewers = reviewers?.length;
+  filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
       reviewerColorsMap[item.reviewer] = `hsl(${(index * (360 / totalReviewers)) % 360}, 85%, 50%)`;
     }
   });
 
   const filledData = reviewers.flatMap((reviewer) => {
-    const reviewerData = filteredData.filter((item) => item.reviewer === reviewer);
-    const dataMap = new Map(reviewerData.map((item) => [item.monthYear, item]));
+    const reviewerData = filteredData?.filter((item) => item.reviewer === reviewer);
+    const dataMap = new Map(reviewerData?.map((item) => [item.monthYear, item]));
 
-    return completeXAxisRange.map((monthYear) => ({
+    return completeXAxisRange?.map((monthYear) => ({
       monthYear,
       reviewer,
       count: dataMap.get(monthYear)?.count || 0, // Default to 0 if missing
@@ -1125,8 +1138,8 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
 
   // Separate reviewers and editors
   // const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
-  const editorsData = filledData.filter(item => !reviewersList.includes(item.reviewer));
-  const reviewersData = filledData.filter(item => reviewersList.includes(item.reviewer));
+  const editorsData = filledData?.filter(item => !reviewersList.includes(item.reviewer));
+  const reviewersData = filledData?.filter(item => reviewersList.includes(item.reviewer));
 
   const getReviewerCount = (name: string) => {
     console.log("name:",name);
@@ -1225,7 +1238,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
             </a>
           </Flex>
           <CSVLink
-            data={csvData.length ? csvData : []}
+            data={csvData?.length ? csvData : []}
             filename={`${reviewer}_reviews_data.csv`}
             onClick={async () => {
               try {
@@ -1249,16 +1262,17 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
     );
   };
 
-  const editorCharts = Array.from(new Set(editorsData.map(item => item.reviewer))).map(reviewer => 
-    generateChart(reviewer, editorsData.filter(item => item.reviewer === reviewer)))
+  const editorCharts = Array.from(new Set(editorsData?.map(item => item.reviewer)))?.map(reviewer => 
+    generateChart(reviewer, editorsData?.filter(item => item.reviewer === reviewer)))
   ;
 
-  const reviewerCharts = Array.from(new Set(reviewersData.map(item => item.reviewer))).map(reviewer => 
-    generateChart(reviewer, reviewersData.filter(item => item.reviewer === reviewer))
+  const reviewerCharts = Array.from(new Set(reviewersData?.map(item => item.reviewer)))?.map(reviewer => 
+    generateChart(reviewer, reviewersData?.filter(item => item.reviewer === reviewer))
   );
 
   return (
     <div>
+      <section id = "editors">
        <Heading
               as="h3"
               size="lg"
@@ -1269,7 +1283,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
         >
           Editors
         </Heading>
-      
+        </section>
       <div
         style={{
           display: "flex",
@@ -1280,6 +1294,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
       >
         {editorCharts}
       </div>
+      <section id = "Reviewers">
       <Heading
               as="h3"
               size="lg"
@@ -1290,6 +1305,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
         >
         Reviewers
       </Heading>
+      </section>
       <div
         style={{
           display: "flex",
@@ -1394,7 +1410,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
 
   const renderTable = (year: string, month: string, reviewerFilter: any) => {
     // console.log(data);
-    const filteredData = data.filter(item => showReviewer[item.reviewer]);;
+    const filteredData = data?.filter(item => showReviewer[item.reviewer]);;
 
         console.log("filtered data:",filteredData);
         console.log("show reviewers:", showReviewer);
@@ -1491,7 +1507,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
                 </Table>
                 <Table variant="striped" colorScheme="gray" >
                 <Tbody>
-                    {filteredData.map((pr, index) => {
+                    {filteredData?.map((pr, index) => {
                         const status = pr.merged_at
                             ? 'Merged'
                             : pr.closed_at
@@ -1581,7 +1597,7 @@ const fetchData4 = async () => {
     const allTimelines = timelines;
 
     // Format the timeline data for easy access
-    const timelineMap = allTimelines.reduce((map: any, reviewer: any) => {
+    const timelineMap = allTimelines?.reduce((map: any, reviewer: any) => {
       map[reviewer.reviewer] = {
         startDate: new Date(reviewer.startDate),
         endDate: reviewer.endDate ? new Date(reviewer.endDate) : null, // null means no end date
@@ -1593,16 +1609,16 @@ const fetchData4 = async () => {
     console.log("data before:", data);
 
     // Step 3: Filter reviews based on timeline
-    const filteredData = Object.keys(data).reduce((filtered: ReviewerData, reviewerName: string) => {
+    const filteredData = Object.keys(data)?.reduce((filtered: ReviewerData, reviewerName: string) => {
       if (!timelineMap[reviewerName]) return filtered; // Skip if no timeline info available
 
       const { startDate, endDate } = timelineMap[reviewerName];
-      const reviews = data[reviewerName].filter((review: PRInfo) => {
+      const reviews = data[reviewerName]?.filter((review: PRInfo) => {
         const reviewDate = new Date(review.reviewDate);
         return reviewDate >= startDate && (!endDate || reviewDate <= endDate); // Check if within timeline
       });
 
-      if (reviews.length > 0) {
+      if (reviews?.length > 0) {
         filtered[reviewerName] = reviews; // Include only reviewers with valid reviews
       }
 
@@ -1677,7 +1693,7 @@ const handleFilterData2 = () => {
   const filteredData:any = [];
   for (const reviewerName in activeData) {
     const reviews = activeData[reviewerName];
-    reviews.forEach((pr: PRInfo) => {
+    reviews?.forEach((pr: PRInfo) => {
       const reviewDate = new Date(pr.reviewDate);
       const reviewMonthYear = `${reviewDate.getFullYear()}-${String(reviewDate.getMonth() + 1).padStart(2, "0")}`;
 
@@ -1709,7 +1725,7 @@ const editorsActivity = () => {
     return `${hh.toString().padStart(2, "0")}:${minutes}`;
   };
 
-  const processedData = activityData.map((item: any) => ({
+  const processedData = activityData?.map((item: any) => ({
     ...item,
     timeIn24Hour: convertTo24Hour(item.formattedTime),
   }));
@@ -1718,10 +1734,10 @@ const editorsActivity = () => {
     a.timeIn24Hour.localeCompare(b.timeIn24Hour)
   );
 
-  const reviewers = [...new Set(processedData.map((item: any) => item.reviewer))];
+  const reviewers = [...new Set(processedData?.map((item: any) => item.reviewer))];
   const reviewerColors: { [key: string]: string } = {};
-  reviewers.forEach((reviewer, index) => {
-    reviewerColors[reviewer as string] = generateDistinctColor(index, reviewers.length);
+  reviewers?.forEach((reviewer, index) => {
+    reviewerColors[reviewer as string] = generateDistinctColor(index, reviewers?.length);
   });
 
   const scatterConfig = {
@@ -1800,13 +1816,13 @@ const editorsSpecialityChart = () => {
   const targetReviewers = ["lightclient", "SamWilsn", "xinbenlv", "g11tech","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
   // Step 1: Filter the data to include only target reviewers
-  const filteredEIPData = yearlyChartData1.filter((item) =>
+  const filteredEIPData = yearlyChartData1?.filter((item) =>
     targetReviewers.includes(item.reviewer)
   );
-  const filteredERCData = yearlyChartData2.filter((item) =>
+  const filteredERCData = yearlyChartData2?.filter((item) =>
     targetReviewers.includes(item.reviewer)
   );
-  const filteredRIPData = yearlyChartData3.filter((item) =>
+  const filteredRIPData = yearlyChartData3?.filter((item) =>
     targetReviewers.includes(item.reviewer)
   );
   // console.log("filtered data spec:", filteredEIPData)
@@ -1814,17 +1830,17 @@ const editorsSpecialityChart = () => {
 
   // Step 2: Combine and format the data for the chart
   const chartData = [
-    ...filteredEIPData.map((item) => ({
+    ...filteredEIPData?.map((item) => ({
       reviewer: item.reviewer,
       repo: "EIPs",
       value: item.count,
     })),
-    ...filteredERCData.map((item) => ({
+    ...filteredERCData?.map((item) => ({
       reviewer: item.reviewer,
       repo: "ERCs",
       value: item.count,
     })),
-    ...filteredRIPData.map((item) => ({
+    ...filteredRIPData?.map((item) => ({
       reviewer: item.reviewer,
       repo: "RIPs",
       value: item.count,
@@ -1908,21 +1924,181 @@ const router = useRouter();
     };
   }, [router]);
 
+  // Scroll to the feedback section at the bottom of the page
+  const scrollToFeedbackSection = () => {
+    const feedbackSection = document.getElementById("comments"); // Ensure the case matches the HTML
+    if (feedbackSection) {
+      feedbackSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+// Handle thumbs up/down feedback
+const handleFeedbackClick = (type: 'positive' | 'negative') => {
+  const message =
+    type === 'positive'
+      ? 'Thank you for your positive feedback!'
+      : 'Thank you for your feedback!';
+  alert(message);
+};
+
 
   return (
+   
     loading ? (
       <LoaderComponent />
     ) : (
+      
       <AllLayout>
-        
-        <Box 
-        padding={{ base: 1, md: 4 }}
-        margin={{ base: 2, md: 4 }}
+   <Box
+  position="fixed"
+  right="0"
+  top="50%"
+  transform="translateY(-50%)"
+  zIndex="1000"
+  display="flex"
+  flexDirection="column" // Stack items vertically
+  alignItems="center" // Center-align items
+  gap="10px" // Space between elements
+  onMouseEnter={() => setShowThumbs(true)} // Show thumbs on hover
+  onMouseLeave={() => setShowThumbs(false)} // Hide thumbs when not hovering
+>
+  {/* Feedback Button */}
+  <Tooltip label="Give Feedback" aria-label="Feedback Tooltip">
+    <Box
+      bg="#48BB78" // Replace with your floating icons' color
+      color="white"
+      p="9px"
+      position="fixed" // Make the button fixed on the screen
+      right="-60px"
+      borderRadius="8px 8px 0px 0px"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      fontSize="12px"
+      cursor="pointer"
+      lineHeight="0.5"
+      minWidth="140px" 
+      transition="translateY(-55%), transform 0.3s ease, box-shadow 0.3s ease"
+      boxShadow="lg"
+      style={{
+        transform: "rotate(-90deg)", // Rotate text vertically
+        transformOrigin: "center center", // Rotate around the center
+      }}
+      _hover={{
+        transform: "scale(1.05) rotate(-90deg)", // Keep rotation on hover with scaling
+        bg: "#2B6CB0", // Slightly darker on hover
+        boxShadow: "xl",
+      }}
+      onClick={scrollToFeedbackSection} // Scroll to comments when the feedback button is clicked
+    >
+      Is this page helpful?
+    </Box>
+  </Tooltip>
+
+  {/* Thumbs-up and Thumbs-down Buttons */}
+  {showThumbs && (
+    <Box
+      bg="white"
+      color="#3182CE"
+      p="10px"
+      borderRadius="15px"
+      position= "fixed"
+      right = "25px"
+      top = "-70px"
+      display="flex"
+      flexDirection="column" // Stack thumbs vertically
+      alignItems="center"
+      justifyContent="center"
+      gap="12px" // Space between thumbs-up and thumbs-down
+      mt="10px"
+      boxShadow="lg"
+      border="1px solid #E2E8F0"
+      transition="transform 0.3s ease, box-shadow 0.3s ease"
+      _hover={{
+        transform: "scale(1.05)",
+      }}
+    >
+      {/* Thumbs-Up Button */}
+      <Tooltip label="I like this!" aria-label="Thumbs-Up Tooltip">
+        <Box
+          as="button"
+          bg="#E6FFFA" // Light green background
+          color="#2C7A7B"
+          borderRadius="50%" // Circular button
+          p="12px"
+          fontSize="20px"
+          boxShadow="md"
+          transition="background 0.3s ease, transform 0.3s ease"
+          _hover={{
+            bg: "#B2F5EA", // Slightly darker green on hover
+            transform: "scale(1.1)",
+          }}
+          onClick={scrollToFeedbackSection} // Scroll to comments when Thumbs-Up is clicked
+          aria-label="Thumbs up"
         >
-          <Heading
-            size="xl"
-            marginBottom={10}
-            textAlign="center" style={{ color: '#42a5f5', fontSize: '2.5rem', fontWeight: 'bold', }} > Editors & Reviewers Leaderboard</Heading>
+          👍
+        </Box>
+      </Tooltip>
+
+      {/* Thumbs-Down Button */}
+      <Tooltip label="Needs Improvement" aria-label="Thumbs-Down Tooltip">
+        <Box
+          as="button"
+          bg="#FED7D7" // Light red background
+          color="#C53030"
+          borderRadius="50%" // Circular button
+          p="12px"
+          fontSize="20px"
+          boxShadow="md"
+          transition="background 0.3s ease, transform 0.3s ease"
+          _hover={{
+            bg: "#FEB2B2", // Slightly darker red on hover
+            transform: "scale(1.1)",
+          }}
+          onClick={scrollToFeedbackSection} // Scroll to comments when Thumbs-Down is clicked
+          aria-label="Thumbs down"
+        >
+          👎
+        </Box>
+      </Tooltip>
+    </Box>
+  )}
+</Box>
+
+
+
+      {/* Rest of the component */}
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        gap={{ base: 4, md: 8 }}
+        p={{ base: 4, md: 8 }}
+      >
+        {/* Sidebar and other content */}
+        {/* ... */}
+      </Flex>
+         <Flex
+    direction={{ base: 'column', md: 'row' }}
+    gap={{ base: 4, md: 8 }}
+    p={{ base: 4, md: 8 }}
+  >
+    {/* Sidebar for Table of Contents */}
+    <Box flex="0 0 250px" display={{ base: 'none', md: 'block' }}>
+      <TableOfContents />
+      </Box>
+      
+      <Box flex="1" p={4}>
+        <section id = "LeaderBoard">
+          
+      <Heading
+        size="xl"
+        marginBottom={10}
+        textAlign="center"
+        color={useColorModeValue('blue.600', 'blue.300')}
+        fontWeight="bold"
+      >
+        Editors & Reviewers Leaderboard
+      </Heading>
+      </section>
 
 
 <Box
@@ -1933,6 +2109,7 @@ const router = useRouter();
       marginBottom={2}
     >
       <Flex justify="space-between" align="center">
+        <section id = "Leaderboard FAQ">
         <Heading
           as="h3"
           size="lg"
@@ -1940,6 +2117,7 @@ const router = useRouter();
           color={useColorModeValue("#3182CE", "blue.300")}
         > Editors & Reviewers Leaderboard FAQ
         </Heading>
+        </section>
         <Box
   bg="blue" // Gray background
   borderRadius="md" // Rounded corners
@@ -2136,6 +2314,7 @@ const router = useRouter();
             <Box id="ActivityTimeline" className="w-full">
 
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+            <section id="ActivityTimeline">
             <Heading
               as="h3"
               size="lg"
@@ -2144,7 +2323,9 @@ const router = useRouter();
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
             > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
+
             </Heading> 
+            </section>
               <Flex alignItems="center">
                 <Button
                   colorScheme="blue"
@@ -2176,7 +2357,7 @@ const router = useRouter();
                 {selectedStartYear2 ? `${selectedStartYear2}` : 'Select Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString())?.map((year) => (
                   <MenuItem key={year} onClick={() => setSelectedStartYear2(year)} bg="white" color="black">
                     {year}
                   </MenuItem>
@@ -2202,7 +2383,7 @@ const router = useRouter();
                 { name: 'Oct', value: '10' },
                 { name: 'Nov', value: '11' },
                 { name: 'Dec', value: '12' },
-              ].map((month) => (
+              ]?.map((month) => (
                 <MenuItem
                   key={month.value}
                   onClick={() => setSelectedStartMonth2(month.value)}
@@ -2229,7 +2410,7 @@ const router = useRouter();
                   {selectedEndYear2 ? `${selectedEndYear2}` : 'Select Year'}
                 </MenuButton>
                 <MenuList bg="white" color="black" borderColor="blue.500">
-                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
+                  {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString())?.map((year) => (
                     <MenuItem
                       key={year}
                       onClick={() => setSelectedEndYear2(year)}
@@ -2261,7 +2442,7 @@ const router = useRouter();
                     { name: 'Oct', value: '10' },
                     { name: 'Nov', value: '11' },
                     { name: 'Dec', value: '12' },
-                  ].map((month) => (
+                  ]?.map((month) => (
                     <MenuItem
                       key={month.value}
                       onClick={() => setSelectedEndMonth2(month.value)}
@@ -2301,12 +2482,14 @@ const router = useRouter();
   {/* The part that is breaking start */}
   <Box id="Monthly" className={"w-full"}>
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+      <section id = "PRs Reviewed" >
       <Heading size="md" color="black">
         {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com/Reviewers#Monthly`} />
       </Heading>
+      </section>
       <Flex alignItems="center">
         <CSVLink
-          data={csvData.length ? csvData : []}
+          data={csvData?.length ? csvData : []}
           filename={`reviews_data_since_2015.csv`}
           
           onClick={async () => {
@@ -2348,7 +2531,7 @@ const router = useRouter();
     <Flex alignItems="center">
 
       <CSVLink
-          data={csvData.length ? csvData : []}
+          data={csvData?.length ? csvData : []}
           filename={`reviews_data_since_2015.csv`}
           
           onClick={async () => {
@@ -2405,7 +2588,7 @@ const router = useRouter();
                 {selectedStartYear ? `${selectedStartYear}` : 'Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString())?.map((year) => (
                   <MenuItem
                     key={year}
                     onClick={() => setSelectedStartYear(year)}
@@ -2437,7 +2620,7 @@ const router = useRouter();
                   { name: 'Oct', value: '10' },
                   { name: 'Nov', value: '11' },
                   { name: 'Dec', value: '12' },
-                ].map((month) => (
+                ]?.map((month) => (
                   <MenuItem
                     key={month.value}
                     onClick={() => setSelectedStartMonth(month.value)}
@@ -2463,7 +2646,7 @@ const router = useRouter();
                 {selectedEndYear ? `${selectedEndYear}` : 'Year'}
               </MenuButton>
               <MenuList bg="white" color="black" borderColor="blue.500">
-                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString()).map((year) => (
+                {Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString())?.map((year) => (
                   <MenuItem
                     key={year}
                     onClick={() => setSelectedEndYear(year)}
@@ -2495,7 +2678,7 @@ const router = useRouter();
                   { name: 'Oct', value: '10' },
                   { name: 'Nov', value: '11' },
                   { name: 'Dec', value: '12' },
-                ].map((month) => (
+                ]?.map((month) => (
                   <MenuItem
                     key={month.value}
                     onClick={() => setSelectedEndMonth(month.value)}
@@ -2558,7 +2741,7 @@ const router = useRouter();
               </MenuItem>
 
               
-              {Object.keys(showReviewer).map((reviewer) => (
+              {Object.keys(showReviewer)?.map((reviewer) => (
                 <MenuItem key={reviewer}>
                   <Checkbox
                     isChecked={showReviewer[reviewer]}
@@ -2638,7 +2821,7 @@ const router = useRouter();
         </MenuItem>
 
         
-        {Object.keys(showReviewer).map((reviewer) => (
+        {Object.keys(showReviewer)?.map((reviewer) => (
           <MenuItem key={reviewer}>
             <Checkbox
               isChecked={showReviewer[reviewer]}
@@ -2672,7 +2855,7 @@ const router = useRouter();
                 {selectedYear ? `Year: ${selectedYear}` : 'Select Year'}
               </MenuButton>
               <MenuList>
-                {getYears().map((year) => (
+                {getYears()?.map((year) => (
                   <MenuItem
                     key={year}
                     onClick={() => {
@@ -2697,7 +2880,7 @@ const router = useRouter();
                 {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
               </MenuButton>
               <MenuList>
-                {selectedYear && getMonths().map((month, index) => (
+                {selectedYear && getMonths()?.map((month, index) => (
                   <MenuItem key={index} onClick={() => setSelectedMonth(month)}>
                     {month}
                   </MenuItem>
@@ -2727,7 +2910,7 @@ const router = useRouter();
                 {selectedYear ? `Year: ${selectedYear}` : 'Select Year'}
               </MenuButton>
               <MenuList>
-                {getYears().map((year) => (
+                {getYears()?.map((year) => (
                   <MenuItem
                     key={year}
                     onClick={() => {
@@ -2752,7 +2935,7 @@ const router = useRouter();
                 {selectedMonth ? `Month: ${selectedMonth}` : 'Select Month'}
               </MenuButton>
               <MenuList>
-                {selectedYear && getMonths().map((month, index) => (
+                {selectedYear && getMonths()?.map((month, index) => (
                   <MenuItem key={index} onClick={() => setSelectedMonth(month)}>
                     {month}
                   </MenuItem>
@@ -2791,7 +2974,7 @@ const router = useRouter();
             {selectedYear && selectedMonth && (
                 <Box mt={4} display="flex" justifyContent="flex-end">
                 <CSVLink
-                  data={csvData.length ? csvData : []}
+                  data={csvData?.length ? csvData : []}
                   filename={`reviews_${selectedYear}_${selectedMonth}.csv`}
                   onClick={async () => {
                     try {
@@ -2842,6 +3025,7 @@ const router = useRouter();
               // }}
             >
             <Box id="Speciality" className="w-full">
+              <section id = "active editors">
             <Heading
               as="h3"
               size="lg"
@@ -2851,21 +3035,24 @@ const router = useRouter();
               color={useColorModeValue("#3182CE", "blue.300")}
             > Active Editors PR reviews in each Repository <CopyLink link={`https://eipsinsight.com/Reviewers#Speciality`} />
             </Heading>
+            </section>
               {editorsSpecialityChart()}
             </Box>
           </Box>
           <br/>
         <hr></hr>
         <br/>
-        <Text fontSize="3xl" fontWeight="bold">Comments</Text>
+        <section id="comments">
+        <Text fontSize="3xl" fontWeight="bold">Comments</Text></section>
           <Comments page={"Reviewers"}/>
+          
         </Box>
 
 
         
-    </Box>
-    {/* </motion.div> */}
-  </AllLayout>
+        </Box>
+  </Flex>
+</AllLayout>
 )
 ); };
 

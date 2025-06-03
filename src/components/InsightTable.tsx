@@ -100,10 +100,10 @@ const InsightTable: React.FC<TabProps> = ({
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;
@@ -115,8 +115,8 @@ const InsightTable: React.FC<TabProps> = ({
         const response = await fetch(`/api/new/statusChanges/${year}/${month}`);
 
         const removeDuplicatePRs = (statusChangesArray: DataObject[]): DataObject[] => {
-          return statusChangesArray.map(item => {
-            const uniquePRs = item.statusChanges.filter(
+          return statusChangesArray?.map(item => {
+            const uniquePRs = item.statusChanges?.filter(
               (value, index, self) =>
                 index === self.findIndex(v => v.eip === value.eip)
             );
@@ -135,7 +135,7 @@ const InsightTable: React.FC<TabProps> = ({
         } else if (Tabletype === "rip") {
           setData(removeDuplicatePRs(jsonData.rip));
         } else if (Tabletype === "all") {
-          setData(removeDuplicatePRs(jsonData.eip.concat(jsonData.erc).concat(jsonData.rip)));
+          setData(removeDuplicatePRs(jsonData.eip?.concat(jsonData.erc)?.concat(jsonData.rip)));
         }
         setIsLoading(false);
       } catch (error) {
@@ -167,7 +167,7 @@ const InsightTable: React.FC<TabProps> = ({
     if (status === "LastCall") {
       let srNo = 1; // Initialize the serial number
 
-      newData = finalStatusChanges.map((item: StatusChange) => {
+      newData = finalStatusChanges?.map((item: StatusChange) => {
         const { eip, title, author, status, type, category, deadline } = item;
         const commitLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
@@ -190,7 +190,7 @@ const InsightTable: React.FC<TabProps> = ({
     } else if (status === "Draft") {
       let srNo = 1; // Initialize the serial number
 
-      newData = finalStatusChanges.map((item: StatusChange) => {
+      newData = finalStatusChanges?.map((item: StatusChange) => {
         const { eip, title, author, status, type, category, created } = item;
         const commitLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
@@ -213,7 +213,7 @@ const InsightTable: React.FC<TabProps> = ({
     } else if (status === "Final") {
       let srNo = 1; // Initialize the serial number
 
-      newData = finalStatusChanges.map((item: StatusChange) => {
+      newData = finalStatusChanges?.map((item: StatusChange) => {
         const {
           eip,
           title,
@@ -246,7 +246,7 @@ const InsightTable: React.FC<TabProps> = ({
     } else {
       let srNo = 1; // Initialize the serial number
 
-      newData = finalStatusChanges.map((item: StatusChange) => {
+      newData = finalStatusChanges?.map((item: StatusChange) => {
         const { eip, title, author, status, type, category, deadline } = item;
         const commitLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
@@ -275,11 +275,11 @@ const InsightTable: React.FC<TabProps> = ({
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const convertAndDownloadCSV = () => {
-    if (filteredData && filteredData.length > 0) {
+    if (filteredData && filteredData?.length > 0) {
       const headers = Object.keys(filteredData[0]);
       // headers.push("Commit Link");
       headers.push(`${Tabletype.toUpperCase()} Link`);
-      const csvRows = filteredData.map((item) => {
+      const csvRows = filteredData?.map((item) => {
         const values = Object.values(item);
         const eipLink = `https://github.com/ethereum/${
           Tabletype === "eip" ? "EIPs" : Tabletype === "erc" ? "ERCs" : "RIPs"
@@ -289,7 +289,7 @@ const InsightTable: React.FC<TabProps> = ({
         // values.push(commitLink);
         values.push(eipLink);
         return values
-          .map((value) =>
+          ?.map((value) =>
             typeof value === "string" && value.includes(",")
               ? `"${value}"`
               : value
@@ -505,18 +505,18 @@ const InsightTable: React.FC<TabProps> = ({
                 author: (it: any) => (
                   <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                     <div>
-                      {factorAuthor(it.author).map((item: any, index: any) => {
-                        let t = item[item.length - 1].substring(
+                      {factorAuthor(it.author)?.map((item: any, index: any) => {
+                        let t = item[item?.length - 1].substring(
                           1,
-                          item[item.length - 1].length - 1
+                          item[item?.length - 1]?.length - 1
                         );
                         return (
                           <Wrap key={index}>
                             <WrapItem>
                               <Link
                                 href={`${
-                                  item[item.length - 1].substring(
-                                    item[item.length - 1].length - 1
+                                  item[item?.length - 1].substring(
+                                    item[item?.length - 1]?.length - 1
                                   ) === ">"
                                     ? "mailto:" + t
                                     : "https://github.com/" + t.substring(1)

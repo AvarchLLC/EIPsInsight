@@ -147,9 +147,9 @@ export default async (req: Request, res: Response) => {
     console.log("Processed RIP Data:", RipfinalCategoryByYear);
 
     // Combine and send the response
-    const eipFinal = EipfinalCategoryByYear.map((item: any) => ({ ...item, repo: "eip" }));
-    const ercFinal = ErcfinalCategoryByYear.map((item: any) => ({ ...item, repo: "erc" }));
-    const ripFinal = RipfinalCategoryByYear.map((item: any) => ({ ...item, repo: "rip" }));
+    const eipFinal = EipfinalCategoryByYear?.map((item: any) => ({ ...item, repo: "eip" }));
+    const ercFinal = ErcfinalCategoryByYear?.map((item: any) => ({ ...item, repo: "erc" }));
+    const ripFinal = RipfinalCategoryByYear?.map((item: any) => ({ ...item, repo: "rip" }));
 
     res.json({
       eip: eipFinal,

@@ -100,7 +100,7 @@ const Networking = () => {
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
           <Tabs isFitted variant="enclosed">
               <TabList>
-                {categories.map((category) => (
+                {categories?.map((category) => (
                   <Link key={category.name} href={category.path} passHref>
                     <Tab as="a">{category.name}</Tab>
                   </Link>
@@ -110,11 +110,11 @@ const Networking = () => {
             <FlexBetween>
               <Header
                 title={`Standard Tracks - Networking [ ${
-                  data.filter(
+                  data?.filter(
                     (item) =>
                       item.type === "Standards Track" &&
                       item.category === "Networking"
-                  ).length
+                  )?.length
                 } ]`}
                 subtitle="Networking EIPs describe changes to the Ethereum network protocol."
               />

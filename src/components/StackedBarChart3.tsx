@@ -148,9 +148,9 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
         setData(jsonData);
         if (type === "EIPs" && jsonData.eip) {
           setTypeData(
-            jsonData.eip.filter((item: any) => item.category !== "ERCs")
+            jsonData.eip?.filter((item: any) => item.category !== "ERCs")
           );
-          console.log(jsonData.eip.filter((item: any) => item.category !== "ERCs"));
+          console.log(jsonData.eip?.filter((item: any) => item.category !== "ERCs"));
         } else if (type === "ERCs" && jsonData.erc) {
           setTypeData(jsonData.erc);
         }
@@ -186,20 +186,20 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     setIsChartReady(true);
   }, []);
 
-  const filteredData = typeData.filter((item) => item.status === status);
+  const filteredData = typeData?.filter((item) => item.status === status);
   console.log(data);
   console.log(typeData)
   console.log(filteredData)
 
   const transformedData = filteredData
     .flatMap((item) =>
-      item.eips.map((eip) => ({
+      item.eips?.map((eip) => ({
         category: getCat(eip.category),
         year: eip.year.toString(),
         value: eip.count,
       }))
     )
-    // .filter((item) => item.category !== "ERCs");
+    // ?.filter((item) => item.category !== "ERCs");
     console.log(transformedData);
   
   const Area = dynamic(
@@ -241,7 +241,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     // Transform the `typeData` to extract the required details
     const transformedData = filteredData.flatMap((item) => {
         return item.eips.flatMap((eipGroup) => {
-            return eipGroup.eips.map((eip) => ({
+            return eipGroup.eips?.map((eip) => ({
                 month: eipGroup.month, // Assuming eipGroup includes 'month'
                 year: eipGroup.year,  // Assuming eipGroup includes 'year'
                 category: eipGroup.category, // Category from the group
@@ -258,7 +258,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
         });
     });
 
-    if (!transformedData.length) {
+    if (!transformedData?.length) {
         console.error("No data to transform.");
         alert("No data available for download.");
         return;
@@ -273,7 +273,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
         "data:text/csv;charset=utf-8," +
         header +
         transformedData
-            .map(
+            ?.map(
                 ({
                     month,
                     year,

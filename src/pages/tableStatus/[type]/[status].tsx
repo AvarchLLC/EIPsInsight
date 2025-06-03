@@ -49,7 +49,7 @@ const StatTab2 = () => {
             <LoaderComponent />
           </motion.div>
         </Box>
-      ) : pathname && pathname.length >= 3 ? (
+      ) : pathname && pathname?.length >= 3 ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

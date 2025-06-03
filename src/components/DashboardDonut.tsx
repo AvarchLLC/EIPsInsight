@@ -56,36 +56,36 @@ const DashboardDonut: React.FC<AreaCProps> =({dataset}) => {
     // fetchData();
   }, []);
 
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
 
   const dat = [
     {
       status: "Draft",
-      value: allData.filter((item) => item.status === "Draft").length,
+      value: allData?.filter((item) => item.status === "Draft")?.length,
     },
     {
       status: "Review",
-      value: allData.filter((item) => item.status === "Review").length,
+      value: allData?.filter((item) => item.status === "Review")?.length,
     },
     {
       status: "Last Call",
-      value: allData.filter((item) => item.status === "Last Call").length,
+      value: allData?.filter((item) => item.status === "Last Call")?.length,
     },
     {
       status: "Living",
-      value: allData.filter((item) => item.status === "Living").length,
+      value: allData?.filter((item) => item.status === "Living")?.length,
     },
     {
       status: "Stagnant",
-      value: allData.filter((item) => item.status === "Stagnant").length,
+      value: allData?.filter((item) => item.status === "Stagnant")?.length,
     },
     {
       status: "Withdrawn",
-      value: allData.filter((item) => item.status === "Withdrawn").length,
+      value: allData?.filter((item) => item.status === "Withdrawn")?.length,
     },
     {
       status: "Final",
-      value: allData.filter((item) => item.status === "Final").length,
+      value: allData?.filter((item) => item.status === "Final")?.length,
     },
   ];
 

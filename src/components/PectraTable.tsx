@@ -105,22 +105,22 @@ import {
     });
   
     const factorAuthor = (data: any) => {
-      let list = data.split(",");
-      for (let i = 0; i < list.length; i++) {
-        list[i] = list[i].split(" ");
+      let list = data?.split(",");
+      for (let i = 0; i < list?.length; i++) {
+        list[i] = list[i]?.split(" ");
       }
-      if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+      if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
         list.pop();
       }
       return list;
     };
 
   const convertAndDownloadCSV = () => {
-    if (PectraData && PectraData.length > 0) {
-      const headers = Object.keys(PectraData[0]).join(",") + "\n";
-      const csvRows = PectraData.map((item) => {
-        const values = Object.values(item).map((value) => {
-          if (typeof value === "string" && value.includes(",")) {
+    if (PectraData && PectraData?.length > 0) {
+      const headers = Object?.keys(PectraData[0])?.join(",") + "\n";
+      const csvRows = PectraData?.map((item) => {
+        const values = Object?.values(item)?.map((value) => {
+          if (typeof value === "string" && value?.includes(",")) {
             return `"${value}"`;
           }
           return value;
@@ -132,7 +132,7 @@ import {
 
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document?.createElement("a");
       a.style.display = "none";
       a.href = url;
       a.download = `Pectra.csv`;
@@ -147,7 +147,7 @@ import {
         try {
           const response = await fetch(`/api/new/all`);
           const jsonData = await response.json();
-          setData(jsonData.eip.concat(jsonData.erc));
+          setData(jsonData.eip?.concat(jsonData.erc));
           setIsLoading(false); // Set isLoading to false after data is fetched
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -172,7 +172,7 @@ import {
   
     return (
       <>
-        {filteredData.length > 0 ? (
+        {filteredData?.length > 0 ? (
           <Box
             bgColor={bg}
             marginTop={"12"}
@@ -193,7 +193,7 @@ import {
               <div className="flex justify-between items-center">
                 <h2 className="text-blue-400 font-semibold text-4xl">
                   {" "}
-                  {`Pectra - [${filteredData.length}]`}
+                  {`Pectra - [${filteredData?.length}]`}
                 </h2>
                 <Button
                   colorScheme="blue"
@@ -301,8 +301,8 @@ import {
                       <Link href={`eips/eip-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
-                            <Badge colorScheme={getStatusColor(item.status)}>
-                              {item.eip}
+                            <Badge colorScheme={getStatusColor(item?.status)}>
+                              {item?.eip}
                             </Badge>
                           </WrapItem>
                         </Wrap>
@@ -330,22 +330,22 @@ import {
                   author: (it: any) => (
                     <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
-                        {factorAuthor(it.author).map(
+                        {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
-                            let t = item[item.length - 1].substring(
+                            let t = item[item?.length - 1]?.substring(
                               1,
-                              item[item.length - 1].length - 1
+                              item[item?.length - 1]?.length - 1
                             );
                             return (
                               <Wrap key={index}>
                                 <WrapItem>
                                   <Link
                                     href={`${
-                                      item[item.length - 1].substring(
-                                        item[item.length - 1].length - 1
+                                      item[item?.length - 1]?.substring(
+                                        item[item?.length - 1]?.length - 1
                                       ) === ">"
                                         ? "mailto:" + t
-                                        : "https://github.com/" + t.substring(1)
+                                        : "https://github.com/" + t?.substring(1)
                                     }`}
                                     target="_blank"
                                     className={

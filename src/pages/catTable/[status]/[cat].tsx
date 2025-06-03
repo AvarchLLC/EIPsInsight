@@ -33,7 +33,7 @@ const StatTab = () => {
             <LoaderComponent />
           </motion.div>
         </Box>
-      ) : pathname && pathname.length >= 4 ? (
+      ) : pathname && pathname?.length >= 4 ? (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
             <FlexBetween>

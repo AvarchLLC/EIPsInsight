@@ -40,76 +40,82 @@ interface AreaCProps {
 }
 
 const getCat = (cat: string) => {
-    switch (cat) {
-      case "Standards Track" ||
-        "Standard Track" ||
-        "Standards Track (Core, Networking, Interface, ERC)" ||
-        "Standard" ||
-        "Process" ||
-        "Core" ||
-        "core":
-        return "Core";
-      case "ERC":
-        return "ERCs";
-      case "RIP":
-        return "RIPs";
-      case "Networking":
-        return "Networking";
-      case "Interface":
-        return "Interface";
-      case "Meta":
-        return "Meta";
-      case "Informational":
-        return "Informational";
-      default:
-        return "Core";
-    }
-  };
+  switch (cat) {
+    case "Standards Track":
+    case "Standard Track":
+    case "Standards Track (Core, Networking, Interface, ERC)":
+    case "Standard":
+    case "Process":
+    case "Core":
+    case "core":
+      return "Core";
+    case "ERC":
+      return "ERCs";
+    case "RIP":
+      return "RIPs";
+    case "Networking":
+      return "Networking";
+    case "Interface":
+      return "Interface";
+    case "Meta":
+      return "Meta";
+    case "Informational":
+      return "Informational";
+    default:
+      return "Core";
+  }
+};
 
-const DashboardDonut2: React.FC<AreaCProps> =({dataset}) => {
+
+const DashboardDonut2: React.FC<AreaCProps> = ({ dataset }) => {
   const [data, setData] = useState<APIResponse>();
 
   useEffect(() => {
-    
-        setData(dataset);
-   
+
+    setData(dataset);
+
   }, []);
 
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
 
   const dat = [
     {
       status: "Core",
-      value: allData.filter((item) => item.type === "Standards Track" && item.category === "Core" && item.repo==="eip").length,
+      value: allData?.filter?.((item) =>
+        item.type === "Standards Track" &&
+        item.category === "Core" &&
+        item.repo === "eip"
+      )?.length ?? 0,
+
     },
     {
-        status: "ERCs",
-        value: allData.filter((item) => getCat(item.category) === "ERCs").length,
-      },
-      {
-        status: "RIPs",
-        value: allData.filter((item) => item.repo === "rip").length,
-      },
-      {
-        status: "Networking",
-        value: allData.filter((item) => getCat(item.category) === "Networking").length,
-      },
-      {
-        status: "Interface",
-        value: allData.filter((item) => getCat(item.category) === "Interface").length,
-      },
-      {
-        status: "Informational",
-        value: allData.filter((item) => getCat(item.category) === "Informational").length,
-      },
-      {
-        status: "Meta",
-        value: allData.filter((item) => getCat(item.category) === "Meta").length-1,
-      },
-    
+      status: "ERCs",
+      value: allData?.filter((item) => getCat(item.category) === "ERCs")?.length,
+    },
+    {
+      status: "RIPs",
+      value: allData?.filter((item) => item.repo === "rip")?.length,
+    },
+    {
+      status: "Networking",
+      value: allData?.filter((item) => getCat(item.category) === "Networking")?.length,
+    },
+    {
+      status: "Interface",
+      value: allData?.filter((item) => getCat(item.category) === "Interface")?.length,
+    },
+    {
+      status: "Informational",
+      value: allData?.filter((item) => getCat(item.category) === "Informational")?.length,
+    },
+    {
+      status: "Meta",
+      value: allData?.filter((item) => getCat(item.category) === "Meta")?.length - 1,
+    },
+
   ];
 
-  const Area = dynamic(() => import("@ant-design/plots").then((item) => item.Pie), {
+  const Area = dynamic(() => import("@ant-design/plots")?.then((item) => item.Pie), {
     ssr: false,
   });
 
@@ -159,8 +165,8 @@ const DashboardDonut2: React.FC<AreaCProps> =({dataset}) => {
       return '#000'; // Fallback color if status is not present
     },
   };
-  
-  
+
+
 
   return (
     <>

@@ -38,7 +38,7 @@ const Navbar = () => {
             color="white"
             textShadow="0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8)" // Enhanced purple shadow
           >
-            Ethereum Mainnet
+            Ethereum Hoodie Testnet
           </Text>
         </Flex>
 

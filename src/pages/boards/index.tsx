@@ -26,6 +26,7 @@ import {
   import Comments from "@/components/comments";
   import LabelFilter from "@/components/LabelFilter";
   import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+  import EipsLabelChart from "@/components/PrLabelsChart";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {
@@ -121,14 +122,14 @@ import {
   
     const handleLabelToggle = (label: string) => {
       setSelectedLabels((prev) =>
-        prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
+        prev.includes(label) ? prev?.filter((l) => l !== label) : [...prev, label]
       );
     };
   
     const filteredData = (data: EIPData[]) => {
       const filterAndSort = (items: EIPData[]) => {
         return items
-          .filter((item) => {
+          ?.filter((item) => {
             // Ignore items with state 'closed'
             if (item.state === "closed") return false;
     
@@ -146,11 +147,11 @@ import {
           });
       };
     
-      if (selectedLabels.length === 0) {
+      if (selectedLabels?.length === 0) {
         return filterAndSort(data);
       }
     
-      return filterAndSort(data).filter((item) =>
+      return filterAndSort(data)?.filter((item) =>
         item.labels.some((label) => selectedLabels.includes(label))
       );
     };
@@ -185,7 +186,7 @@ import {
       // Check the active tab and fetch the appropriate data
       const filteredData = displayedData;
     
-      if (!filteredData || filteredData.length === 0) {
+      if (!filteredData || filteredData?.length === 0) {
         alert(`No data available for the selected month in ${activeTab}.`);
         return;
       }
@@ -222,7 +223,7 @@ import {
       csvRows.push(headers.join(','));
     
       // Iterate over the filtered data and extract necessary fields
-      filteredData.forEach((item: any, index: number) => {
+      filteredData?.forEach((item: any, index: number) => {
         const row = [
           index + 1,                              // Serial Number
           item.prNumber,                          // PR Number
@@ -437,7 +438,7 @@ import {
         > */}
            <Flex justify="space-between" align="center" p={4}>
         <Heading as="h2" size="lg" color={useColorModeValue("#3182CE", "blue.300")}>
-          {activeTab} BOARD ({displayedData.length})
+          {activeTab} BOARD ({displayedData?.length})
         </Heading>
         <Button
           colorScheme="blue"
@@ -501,14 +502,14 @@ import {
     </Thead>
 
     <Tbody>
-      {displayedData.length === 0 ? (
+      {displayedData?.length === 0 ? (
         <Tr>
           <Td colSpan={3} textAlign="center" color="white">
             No Data Available
           </Td>
         </Tr>
       ) : (
-        displayedData.map((item: any, index: number) => (
+        displayedData?.map((item: any, index: number) => (
           <Tr key={item._id} height="40px"> {/* Adjust row height */}
             {/* Index */}
             <Td textAlign="center">
@@ -558,7 +559,7 @@ import {
             {/* Labels */}
             <Td textAlign="center">
               <Box display="flex" flexWrap="wrap" gap="8px" justifyContent="center">
-              {item.labels.map((label: string, idx: number) => {
+              {item.labels?.map((label: string, idx: number) => {
               // Use the mapped color or a fallback color if the label is not in labelColors
               const { color } = labelColors[label.toLowerCase()] || { color: "gray.400" };
 
@@ -632,7 +633,7 @@ import {
         >
           <Text>
             For other details, check{' '}
-            <LI href="/analytics" color="blue" isExternal>
+            <LI href="/Analytics" color="blue" isExternal>
               PRs Analytics
             </LI>{' '}
             and{' '}

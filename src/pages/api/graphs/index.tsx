@@ -83,9 +83,9 @@ export default async (req: Request, res: Response) => {
         }
     ])
         .then((result:any) => {
-            const formattedResult = result.map((group:any) => ({
+            const formattedResult = result?.map((group:any) => ({
                 status: group._id,
-                eips: group.eips.reduce((acc:any, eipGroup:any) => {
+                eips: group.eips?.reduce((acc:any, eipGroup:any) => {
                     const { category, changedYear, changedMonth, count, eips } = eipGroup;
                     acc.push({
                         category,

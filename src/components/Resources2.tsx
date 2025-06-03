@@ -183,7 +183,7 @@ const INSIGHT= [
       image: "Blockchain_Future.png",
       title: "What is EIPsInsight?",
       content: "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs),  Ethereum Request for Comments (ERCs), Rollup Improvement Proposals (RIPs) over a specified period.",
-      link: "/about"
+      link: "/About"
   },
  
 ]
@@ -198,7 +198,7 @@ const INSIGHT= [
                 columns={{ base: 1, md: 2 }}  // 1 column on small screens, 2 columns on medium and larger screens
                 spacing={4}  // Adjust the space between cards
             >
-                {INSIGHT.map((eip, index) => (
+                {INSIGHT?.map((eip, index) => (
                 <div key={index}>
                     {Card({ 
                     image: eip.image, 
@@ -220,7 +220,7 @@ const INSIGHT= [
                 columns={{ base: 1, md: 2 }}  // 1 column on small screens, 2 columns on medium and larger screens
                 spacing={4}  // Adjust the space between cards
             >
-                {EIPS.map((eip, index) => (
+                {EIPS?.map((eip, index) => (
                 <div key={index}>
                     {Card({ 
                     image: eip.image, 
@@ -242,7 +242,7 @@ const INSIGHT= [
                 columns={{ base: 1, md: 2 }}  // 1 column on small screens, 2 columns on medium and larger screens
                 spacing={4}  // Adjust the space between cards
             >
-                {PECTRA.map((pectra: { image: string; title: string; content: string; link: string }, index: number) => (
+                {PECTRA?.map((pectra: { image: string; title: string; content: string; link: string }, index: number) => (
                 <div key={index}>
                     {Card({ 
                     image: pectra.image, 
@@ -505,7 +505,7 @@ const INSIGHT= [
       width="100%"
       gap={2} // Add spacing between tabs
     >
-      {tabContent.map((tab, index) => (
+      {tabContent?.map((tab, index) => (
         <Tab
           key={index}
           _selected={{
@@ -536,7 +536,7 @@ const INSIGHT= [
 
 
       <TabPanels>
-        {tabContent.map((tab, index) => (
+        {tabContent?.map((tab, index) => (
           <TabPanel key={index}>{tab.content}</TabPanel>
         ))}
       </TabPanels>
