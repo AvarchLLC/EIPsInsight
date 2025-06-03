@@ -281,14 +281,17 @@ const ERC = () => {
               />
 
               {/* OtherBox Full Width */}
-              <Box className="w-full mt-6">
+              <Box className="w-full mt-6" id="githubstats">
                 <OtherBox type="ERCs" />
               </Box>
 
               {/* Toggle Buttons */}
               <ButtonGroup size="md" isAttached>
                 <Button
-                  colorScheme="blue"
+                  bg="#40E0D0"
+                  color="white"
+                  _hover={{ bg: "#30c9c9" }}
+                  _active={{ bg: "#1fb8b8" }}
                   variant={selected === "type" ? "solid" : "outline"}
                   onClick={() => setSelected("type")}
                   flex="1"
@@ -296,7 +299,10 @@ const ERC = () => {
                   Type
                 </Button>
                 <Button
-                  colorScheme="blue"
+                  bg="#40E0D0"
+                  color="white"
+                  _hover={{ bg: "#30c9c9" }}
+                  _active={{ bg: "#1fb8b8" }}
                   variant={selected === "status" ? "solid" : "outline"}
                   onClick={() => setSelected("status")}
                   flex="1"
@@ -325,7 +331,7 @@ const ERC = () => {
               </Flex>
 
               {/* AllChart - Full Width Below Donut */}
-              <Box className="w-full overflow-hidden">
+              <Box className="w-full overflow-hidden" >
                 <Box className="w-full h-full">
                   {selected === "status" ? (
                     <AllChart3 type="ERC" />
@@ -374,7 +380,7 @@ const ERC = () => {
                     id="ercprogress"
                     fontSize="3xl"
                     fontWeight="bold"
-                    color="#A020F0"
+                    color="#40E0D0"
                   >
                     Draft vs Final (Over the Years)
                   </Text>
@@ -395,14 +401,14 @@ const ERC = () => {
               </Box>
             )}
 
-            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto">
+            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="statuses">
               {selected === "status" && (
                 <>
                   <Text
                     fontSize="2xl"
                     fontWeight="bold"
                     textAlign="center"
-                    color="blue.500"
+                    color="#40E0D0"
                     mb={4}
                   >
                     Select ERC Status to View Stats
@@ -486,7 +492,7 @@ const ERC = () => {
             marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
             paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
           >
-            <Box className="w-full mt-6">
+            <Box className="w-full mt-6" id="tables">
               <ErcTable dataset={data4} cat="All" status="All" />
             </Box>
 

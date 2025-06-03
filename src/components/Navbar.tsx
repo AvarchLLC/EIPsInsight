@@ -49,15 +49,15 @@ const Navbar: React.FC = () => {
         },
         {
           label: "EIP",
-          href: `/eip`,
+          href: `/eip?view=type`,
         },
         {
           label: "ERC",
-          href: `/erc`,
+          href: `/erc?view=type`,
         },
         {
           label: "RIP",
-          href: `/rip`,
+          href: `/rip?view=type`,
         },
       ],
     },

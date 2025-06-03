@@ -483,7 +483,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
           <Text
             fontSize={{ base: "md", md: "xl" }}
             fontWeight="bold"
-            color="#30A0E0"
+            color="#40E0D0"
             cursor="pointer"
           >
             {type === "Total"
@@ -493,7 +493,10 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         </NextLink>
 
         <Button
-          colorScheme="blue"
+          bg="#40E0D0"
+          color="white"
+          _hover={{ bg: "#30c9c9" }}
+          _active={{ bg: "#1fb8b8" }}
           fontSize={{ base: "xs", md: "sm" }}
           onClick={async () => {
             try {

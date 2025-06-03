@@ -1361,7 +1361,11 @@ const CatTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
             <Text fontSize="2xl" fontWeight="bold" color="blue.400">
               {status}
             </Text>
-            <Button size="sm" colorScheme="blue" onClick={downloadCSV} cursor="pointer">
+            <Button size="sm" bg="#40E0D0"
+              color="white"
+              _hover={{ bg: "#30c9c9" }}
+              _active={{ bg: "#1fb8b8" }}
+              onClick={downloadCSV} cursor="pointer">
               Download CSV
             </Button>
           </Stack>

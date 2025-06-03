@@ -390,7 +390,10 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
               </select>
 
               <Button
-                colorScheme="blue"
+                bg="#40E0D0"
+                color="white"
+                _hover={{ bg: "#30c9c9" }}
+                _active={{ bg: "#1fb8b8" }}
                 onClick={async () => {
                   try {
                     downloadData();

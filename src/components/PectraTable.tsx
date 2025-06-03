@@ -197,7 +197,10 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
                 </h2>
 
                 <Button
-                  colorScheme="blue"
+                  bg="#48D1CC"
+                  color="white"
+                  _hover={{ bg: "#30c9c9" }}
+                  _active={{ bg: "#1fb8b8" }}
                   variant="outline"
                   fontSize={"14px"}
                   fontWeight={"bold"}
@@ -394,7 +397,10 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
                         as="a"
                         href={item.discussion}
                         target="_blank"
-                        colorScheme="blue"
+                        bg="#40E0D0"
+                        color="white"
+                        _hover={{ bg: "#30c9c9" }}
+                        _active={{ bg: "#1fb8b8" }}
                         size="md"
                         padding="1.2rem"
                       >

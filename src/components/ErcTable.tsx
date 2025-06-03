@@ -189,6 +189,19 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                         },
                                     ]}
                                     scopedColumns={{
+                                        "#": (item: any) => (
+                                            <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                                                <Link href={`/${item.repo === 'erc' ? "ercs/erc" : item.repo === 'rip' ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                                                    <Wrap>
+                                                        <WrapItem>
+                                                            <Badge colorScheme={getStatusColor(item.status)}>
+                                                                {item["#"]}
+                                                            </Badge>
+                                                        </WrapItem>
+                                                    </Wrap>
+                                                </Link>
+                                            </td>
+                                        ),
                                         erc: (item: any) => (
                                             <td
                                                 key={item.erc}
@@ -245,8 +258,8 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                                                         href={`${item[item.length - 1].substring(
                                                                             item[item.length - 1].length - 1
                                                                         ) === ">"
-                                                                                ? "mailto:" + t
-                                                                                : "https://github.com/" + t.substring(1)
+                                                                            ? "mailto:" + t
+                                                                            : "https://github.com/" + t.substring(1)
                                                                             }`}
                                                                         target="_blank"
                                                                         className={

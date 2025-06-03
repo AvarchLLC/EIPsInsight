@@ -743,23 +743,65 @@ const All = () => {
                 }}
 
                 columns={[
-                  { key: "repo", label: "Repo" },
-                  { key: "eip", label: "EIP" },
-                  { key: "title", label: "Title" },
-                  { key: "author", label: "Author" },
-                  { key: "type", label: "Type" },
-                  { key: "category", label: "Category" },
-                  { key: "status", label: "Status" },
+                  {
+                    key: "repo", label: "Repo", _style: {
+                      backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                      color: isDarkMode ? "white" : "black",
+                      fontWeight: "bold",
+                    },
+                  },
+                  {
+                    key: "eip", label: "EIP", _style: {
+                      backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                      color: isDarkMode ? "white" : "black",
+                      fontWeight: "bold",
+                    },
+                  },
+                  {
+                    key: "title", label: "Title", _style: {
+                      backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                      color: isDarkMode ? "white" : "black",
+                      fontWeight: "bold",
+                    },
+                  },
+                  {
+                    key: "author", label: "Author", _style: {
+                      backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                      color: isDarkMode ? "white" : "black",
+                      fontWeight: "bold",
+                    },
+                  },
+                  {
+                    key: "type", label: "Type", _style: {
+                      backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                      color: isDarkMode ? "white" : "black",
+                      fontWeight: "bold",
+                    },
+                  },
+                  {
+                    key: "category", label: "Category", _style: {
+                      backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                      color: isDarkMode ? "white" : "black",
+                      fontWeight: "bold",
+                    },
+                  },
+                  {
+                    key: "status", label: "Status", _style: {
+                      backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
+                      color: isDarkMode ? "white" : "black",
+                      fontWeight: "bold",
+                    },
+                  },
                 ]}
                 scopedColumns={{
                   eip: (item: { repo: string; eip: any; status: any }) => (
                     <td className={isDarkMode ? "text-white" : "text-black"}>
                       <ChakraLink
                         href={`/${item.repo === "erc"
-                            ? "ercs/erc"
-                            : item.repo === "rip"
-                              ? "rips/rip"
-                              : "eips/eip"
+                          ? "ercs/erc"
+                          : item.repo === "rip"
+                            ? "rips/rip"
+                            : "eips/eip"
                           }-${item.eip}`}
                         target="_blank"
                       >
