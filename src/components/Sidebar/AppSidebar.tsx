@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { IconButton, Tooltip } from "@chakra-ui/react";
-
+import { Variants } from "framer-motion";
 import {
   Box,
   VStack,
@@ -26,6 +26,8 @@ import {
   Divider,
   Flex,
 } from "@chakra-ui/react";
+
+
 
 import { useState } from "react";
 import Link from "next/link";
@@ -40,7 +42,17 @@ import {
   FiTool,
 } from "react-icons/fi";
 
-const MotionVStack = motion(VStack);
+import { chakra, shouldForwardProp } from "@chakra-ui/react";
+import { isValidMotionProp } from "framer-motion";
+
+// Extend chakra with motion.div
+const MotionDiv = chakra(motion.div, {
+  // allow motion props to be forwarded
+  shouldForwardProp: (prop) =>
+    isValidMotionProp(prop) || shouldForwardProp(prop),
+});
+
+
 
 function generateYearlyInsights() {
   const currentDate = new Date();
@@ -330,20 +342,21 @@ function SidebarItem({
   const iconColor = useColorModeValue("gray.600", "gray.300");
   const hoverBg = useColorModeValue("gray.200", "gray.700");
 
-  const variants = {
-    open: {
-      opacity: 1,
-      height: "auto",
-      transition: { duration: 0.3 },
-      pointerEvents: "auto",
-    },
-    isCollapsed: {
-      opacity: 0,
-      height: 0,
-      transition: { duration: 0.3 },
-      pointerEvents: "none",
-    },
-  };
+const variants: Variants = {
+  open: {
+    opacity: 1,
+    height: "auto",
+    transition: { duration: 0.3 },
+    pointerEvents: "auto",
+  },
+  isCollapsed: {
+    opacity: 0,
+    height: 0,
+    transition: { duration: 0.3 },
+    pointerEvents: "none",
+  },
+};
+
 
   return (
     <Box>
@@ -406,18 +419,20 @@ function SidebarItem({
       {hasChildren && (
         <AnimatePresence initial={false}>
           {expanded && isExpanded && (
-            <MotionVStack
-              pl={6 + depth * 12}
-              align="stretch"
-              spacing={1}
-              mt={1}
-              initial="isCollapsed"
-              animate="open"
-              exit="isCollapsed"
-              variants={variants}
-              overflow="hidden"
-              position="relative"
-            >
+<MotionDiv
+  display="flex"
+  flexDirection="column"
+  pl={6 + depth * 12}
+  alignItems="stretch"
+  gap={1} // replaces `spacing`
+  mt={1}
+  initial="isCollapsed"
+  animate="open"
+  exit="isCollapsed"
+  variants={variants}
+  overflow="hidden"
+  position="relative"
+>
               <Box
                 position="absolute"
                 left="12px"
@@ -440,7 +455,7 @@ function SidebarItem({
                   isCollapsed={isCollapsed}
                 />
               ))}
-            </MotionVStack>
+            </MotionDiv>
           )}
         </AnimatePresence>
       )}
