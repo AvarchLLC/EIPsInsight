@@ -26,7 +26,7 @@ import NextLink from "next/link";
 import { GitHub } from "react-feather";
 import Logo from "@/components/Logo";
 import SearchBox from "./SearchBox";
-import { useSidebarStore } from "@/pages/stores/useSidebarStore";
+import { useSidebarStore } from "@/stores/useSidebarStore";
 interface NavItem {
   label: string;
   subLabel?: string;

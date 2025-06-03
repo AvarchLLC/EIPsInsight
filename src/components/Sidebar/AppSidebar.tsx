@@ -32,7 +32,7 @@ import {
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSidebarStore } from "@/pages/stores/useSidebarStore";
+import { useSidebarStore } from "@/stores/useSidebarStore";
 import { children } from "cheerio/dist/commonjs/api/traversing";
 import {
   FiBarChart2,
