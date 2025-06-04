@@ -8,6 +8,7 @@ import {
   useTheme,
   Stack,
   Tooltip,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import { DownloadIcon } from "@chakra-ui/icons";
@@ -70,7 +71,7 @@ const Dashboard = () => {
   const textColorDark = "#F5F5F5";
   const bgGradientLight = "linear(to-r, #2980B9, #3498DB)";
   const bgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)";
-
+const toast = useToast();
   // useEffect(() => {
   //   setSections([
   //     { label: 'All EIPs', icon: FiHome, id: 'all' },
@@ -154,7 +155,42 @@ const Dashboard = () => {
       router.events.off("routeChangeComplete", scrollToHash);
     };
   }, [router]);
+  //  const [showThumbs, setShowThumbs] = useState(false);
+  
+ const submitFeedback = async (type: "like" | "dislike") => {
+    try {
+      const res = await fetch("/api/Feedback/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
 
+      if (!res.headers.get("content-type")?.includes("application/json")) {
+        throw new Error("Unexpected response format");
+      }
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast({
+          title: "Thanks for your feedback!",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error(data.message || "Something went wrong");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Error submitting feedback",
+        description: err?.message || "Unknown error",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
   return (
     <>
       <Box
@@ -196,7 +232,7 @@ const Dashboard = () => {
               bg: "#2B6CB0",
               boxShadow: "xl",
             }}
-            onClick={scrollToFeedbackSection}
+            onClick={() => setShowThumbs((prev) => !prev)}
           >
             Is this page helpful?
           </Box>
@@ -238,7 +274,7 @@ const Dashboard = () => {
                   bg: "#B2F5EA",
                   transform: "scale(1.1)",
                 }}
-                onClick={scrollToFeedbackSection}
+                onClick={() => submitFeedback("like")}
                 aria-label="Thumbs up"
               >
                 👍
@@ -259,7 +295,7 @@ const Dashboard = () => {
                   bg: "#FEB2B2",
                   transform: "scale(1.1)",
                 }}
-                onClick={scrollToFeedbackSection}
+                onClick={() => submitFeedback("dislike")}
                 aria-label="Thumbs down"
               >
                 👎
