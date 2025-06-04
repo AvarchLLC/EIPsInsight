@@ -37,7 +37,7 @@ export const BookmarkProvider = ({ children }: { children: React.ReactNode }) =>
     setBookmarks(prev => {
       const existingIndex = prev.findIndex(b => b.url === url);
       if (existingIndex >= 0) {
-        return prev.filter(b => b.url !== url);
+        return prev?.filter(b => b.url !== url);
       } else {
         return [...prev, { url, title }];
       }

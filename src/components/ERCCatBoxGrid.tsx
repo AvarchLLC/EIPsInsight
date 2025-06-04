@@ -37,28 +37,28 @@ const ERCCatBoxGrid = () => {
   }, []);
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  const draftCount = data.filter(
+  const draftCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Draft"
-  ).length;
-  const reviewCount = data.filter(
+  )?.length;
+  const reviewCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Review"
-  ).length;
-  const lastCallCount = data.filter(
+  )?.length;
+  const lastCallCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Last Call"
-  ).length;
-  const livingCount = data.filter(
+  )?.length;
+  const livingCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Living"
-  ).length;
-  const finalCount = data.filter(
+  )?.length;
+  const finalCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Final"
-  ).length;
-  const stagnantCount = data.filter(
+  )?.length;
+  const stagnantCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Stagnant"
-  ).length;
-  const withdrawnCount = data.filter(
+  )?.length;
+  const withdrawnCount = data?.filter(
     (item) => item.category === "ERC" && item.status === "Withdrawn"
-  ).length;
-  const totalCount = data.filter((item) => item.category === "ERC").length;
+  )?.length;
+  const totalCount = data?.filter((item) => item.category === "ERC")?.length;
   return (
     <Box
       display={"grid"}

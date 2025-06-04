@@ -69,7 +69,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 // Process issue details
 const processIssueDetails = async (issueData: any) => {
   try {
-    const labels = issueData.labels.map((label: { name: any }) => label.name);
+    const labels = issueData.labels?.map((label: { name: any }) => label.name);
     const conversations = await fetchIssueConversations(issueData.number);
     const participants = getParticipants(conversations);
 
@@ -79,9 +79,9 @@ const processIssueDetails = async (issueData: any) => {
       issueDescription: issueData.body,
       labels,
       conversations,
-      numConversations: conversations.length,
+      numConversations: conversations?.length,
       participants,
-      numParticipants: participants.length,
+      numParticipants: participants?.length,
       state: issueData.state,
       createdAt: new Date(issueData.created_at),
       updatedAt: new Date(issueData.updated_at),
@@ -116,9 +116,9 @@ const fetchIssueConversations = async (issueNumber: number) => {
       );
 
       const conversations = conversationResponse.data;
-      allConversations = allConversations.concat(conversations);
+      allConversations = allConversations?.concat(conversations);
 
-      if (conversations.length < 100) {
+      if (conversations?.length < 100) {
         break;
       }
 
@@ -135,8 +135,8 @@ const fetchIssueConversations = async (issueNumber: number) => {
 // Extract unique participants
 const getParticipants = (conversations: any[]) => {
   const commentParticipants = conversations
-    .filter((conversation) => conversation.user?.login !== 'github-actions[bot]')
-    .map((conversation) => conversation.user?.login);
+    ?.filter((conversation) => conversation.user?.login !== 'github-actions[bot]')
+    ?.map((conversation) => conversation.user?.login);
 
   const uniqueParticipants = new Set([...commentParticipants]);
 

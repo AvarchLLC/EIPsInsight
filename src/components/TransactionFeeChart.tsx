@@ -12,7 +12,7 @@ const Line = dynamic(() => import("@ant-design/plots").then((mod) => mod.Line), 
 type DataType = "fee" | "priorityFee" | "gasUsed" | "gasBurnt";
 
 const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { data: any[], data1: any[], data2: any[], data3: any[], ethPriceInUSD: number }) => {
-  if (!data || data.length === 0) return null;
+  if (!data || data?.length === 0) return null;
 
   const textColor = useColorModeValue("white", "white");
   const buttonBg = useColorModeValue("rgba(159, 122, 234, 0.2)", "rgba(159, 122, 234, 0.1)");
@@ -70,7 +70,7 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
     // Function to convert 12-hour format to 24-hour format
     const convertTo24Hour = (timeStr: string) => {
         const [time, modifier] = timeStr.split(" ");
-        let [hours, minutes, seconds] = time.split(":").map(Number);
+        let [hours, minutes, seconds] = time.split(":")?.map(Number);
 
         if (modifier.toLowerCase() === "pm" && hours !== 12) {
             hours += 12;
@@ -82,7 +82,7 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
     };
 
     // Normalize sortedData timestamps to Date objects
-    const normalizedData = sortedData.map((d) => {
+    const normalizedData = sortedData?.map((d) => {
         const formattedTime = convertTo24Hour(d.time); // Convert 12-hour to 24-hour
         const dateObj = new Date(`${now.toISOString().split("T")[0]}T${formattedTime}`); // Parse correctly
         return {
@@ -97,12 +97,12 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
         const hourEnd = hourStart + 60 * 60 * 1000; // End of the hour
 
         // Filter data for the current hour
-        const hourData = normalizedData.filter((d) => d.time >= hourStart && d.time < hourEnd);
+        const hourData = normalizedData?.filter((d) => d.time >= hourStart && d.time < hourEnd);
 
         // Calculate the average for the selected dataType
         const avgValue =
-            hourData.length > 0
-                ? hourData.reduce((acc, curr) => acc + curr[dataType], 0) / hourData.length
+            hourData?.length > 0
+                ? hourData?.reduce((acc, curr) => acc + curr[dataType], 0) / hourData?.length
                 : 0; // Default to 0 if no data for the hour
 
         heatmapData.push({
@@ -274,7 +274,7 @@ const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { dat
       {/* Tabs for selecting data type */}
       <Flex mb={4} gap={2} wrap="wrap">
         <Flex mb={4} gap={4} wrap="wrap">
-          {(["fee", "priorityFee", "gasUsed", "gasBurnt"] as DataType[]).map((type) => (
+          {(["fee", "priorityFee", "gasUsed", "gasBurnt"] as DataType[])?.map((type) => (
             <Button
               key={type}
               onClick={() => setDataType(type)}

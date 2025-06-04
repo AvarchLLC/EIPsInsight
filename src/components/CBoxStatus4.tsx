@@ -139,7 +139,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
         setData(jsonData);
         if (type === "EIPs" && jsonData.eip) {
           setTypeData(
-            jsonData.eip.filter(
+            jsonData.eip?.filter(
               (item: any) =>
                 item.category !== getCat("ERC") && item.category !== "ERCs"
             )
@@ -174,17 +174,17 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
       }
   });
 
-  const statusData = typeData.filter(
+  const statusData = typeData?.filter(
     (item) => item.status === getStatus(status)
   );
   const yearData = statusData
-    .flatMap((item) => item.eips)
-    .filter((item) => item.year === selectedYear);
+    ?.flatMap((item) => item.eips)
+    ?.filter((item) => item.year === selectedYear);
 
   const result: { [key: string]: number } = {};
 
-  yearData.forEach((item) => {
-      item.eips.forEach((item) => {
+  yearData?.forEach((item) => {
+      item.eips?.forEach((item) => {
         if (
           (item.type === "Standards Track" ||
             item.type === "Standard Track" ||
@@ -222,7 +222,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
     });
 
   const convertAndDownloadCSV = () => {
-    if (yearData && yearData.length > 0) {
+    if (yearData && yearData?.length > 0) {
       // Define the columns you want to drop
       const columnsToDrop = [
         "_id",
@@ -244,18 +244,18 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
       // Create CSV headers
       const headers =
         Object.keys(yearData[0].eips[0])
-          .filter((column) => !columnsToDrop.includes(column))
-          .join(",") + "\n";
+          ?.filter((column) => !columnsToDrop.includes(column))
+          ?.join(",") + "\n";
 
       // Convert data to CSV rows
-      const csvRows = yearData.map((item) => {
-        const values = item.eips.map((eip) => {
+      const csvRows = yearData?.map((item) => {
+        const values = item.eips?.map((eip) => {
           // Filter out the columns you want to drop
           const filteredValues = Object.values(eip)
-            .filter(
+            ?.filter(
               (value, index) => !columnsToDrop.includes(Object.keys(eip)[index])
             )
-            .map((value) => {
+            ?.map((value) => {
               // Ensure values with commas are enclosed in double quotes
               if (typeof value === "string" && value.includes(",")) {
                 return `"${value}"`;
@@ -287,7 +287,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset,status, type }) => {
     }
   };
 
-  const numRows = typeData.length + 4;
+  const numRows = typeData?.length + 4;
 const rowHeight = 40; // Assuming each row has a height of 40px
 const maxHeight = `${numRows * rowHeight}px`;
 const rows = [];
@@ -441,7 +441,7 @@ for (const key of standardTrackKeys) {
               className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
               size="md"
             >
-              {years.map((item) => (
+              {years?.map((item) => (
                 <option value={`${item}`} key={item}>
                   {item}
                 </option>

@@ -23,7 +23,7 @@ function getMonthName(month) {
       const formattedData = [];
       console.log(jsonData)
 
-      const formattedEIPs = jsonData.flatMap(eip => eip["eips"].map(({ category, month, year, count }) => ({
+      const formattedEIPs = jsonData.flatMap(eip => eip["eips"]?.map(({ category, month, year, count }) => ({
         category,
         date: `${getMonthName(month)} ${year}`,
         value: count

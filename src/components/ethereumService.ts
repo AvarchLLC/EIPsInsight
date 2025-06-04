@@ -92,12 +92,12 @@ export const getBlockDetails = async (blockNumber: string | number, isSepolia: b
     slotInEpoch,
     validator: beaconData?.data?.header?.message?.proposer_index || block.miner,
     blockNumber: block.number,
-    transactions: block.transactions.length,
+    transactions: block.transactions?.length,
     size: `${(Number(block.size) / 1024).toFixed(2)} KB`,
     gasUsed: `${(Number(block.gasUsed) / 1e6).toFixed(1)}M`,
     gasLimit: `${(Number(block.gasLimit) / 1e6).toFixed(1)}M`,
     baseFee: `${Number(web3.utils.fromWei(block.baseFeePerGas || '0', 'gwei')).toFixed(2)} Gwei`,
-    gasBurnt: `${web3.utils.fromWei(gasBurnt.toString(), 'ether')} ETH`,
+    gasBurnt: `${web3.utils?.fromWei(gasBurnt.toString(), 'ether')} ETH`,
   };
 };
 
@@ -112,7 +112,7 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
     const blockNumbers = Array.from({ length: 10 }, (_, i) => Number(latestBlock) - i);
   
     const batchSize = 100; // Number of blocks per batch
-    const totalBatches = Math.ceil(blockNumbers.length / batchSize); // Total batches (72)
+    const totalBatches = Math?.ceil(blockNumbers?.length / batchSize); // Total batches (72)
   
     const endpoint = isSepolia ? 'https://ethereum-sepolia-rpc.publicnode.com' : 'https://ethereum-hoodi-rpc.publicnode.com';
   
@@ -123,7 +123,7 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
       const end = start + batchSize;
       const batchBlockNumbers = blockNumbers.slice(start, end);
   
-      const batchRequests = batchBlockNumbers.map((blockNumber, index) => ({
+      const batchRequests = batchBlockNumbers?.map((blockNumber, index) => ({
         jsonrpc: '2.0',
         method: 'eth_getBlockByNumber',
         params: [web3.utils.toHex(blockNumber), true],
@@ -133,7 +133,7 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
       try {
         const response = await axios.post(endpoint, batchRequests);
         if (response.data && Array.isArray(response.data)) {
-          allBlocks.push(...response.data.map((res: any) => res.result));
+          allBlocks.push(...response.data?.map((res: any) => res.result));
         } else {
           console.error('Invalid response format:', response.data);
         }

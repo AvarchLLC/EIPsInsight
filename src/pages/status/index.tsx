@@ -84,36 +84,36 @@ const Status = () => {
     fetchData();
   }, []);
 
-  const allData: EIP[] = data2?.eip.concat(data2?.erc.concat(data2?.rip)) || [];
+  const allData: EIP[] = data2?.eip?.concat(data2?.erc?.concat(data2?.rip)) || [];
 
   const dat = [
     {
       status: "Draft",
-      value: allData.filter((item) => item.status === "Draft").length,
+      value: allData?.filter((item) => item.status === "Draft")?.length,
     },
     {
       status: "Review",
-      value: allData.filter((item) => item.status === "Review").length,
+      value: allData?.filter((item) => item.status === "Review")?.length,
     },
     {
       status: "Last Call",
-      value: allData.filter((item) => item.status === "Last Call").length,
+      value: allData?.filter((item) => item.status === "Last Call")?.length,
     },
     {
       status: "Living",
-      value: allData.filter((item) => item.status === "Living").length,
+      value: allData?.filter((item) => item.status === "Living")?.length,
     },
     {
       status: "Stagnant",
-      value: allData.filter((item) => item.status === "Stagnant").length,
+      value: allData?.filter((item) => item.status === "Stagnant")?.length,
     },
     {
       status: "Withdrawn",
-      value: allData.filter((item) => item.status === "Withdrawn").length,
+      value: allData?.filter((item) => item.status === "Withdrawn")?.length,
     },
     {
       status: "Final",
-      value: allData.filter((item) => item.status === "Final").length,
+      value: allData?.filter((item) => item.status === "Final")?.length,
     },
   ];
 
@@ -137,7 +137,7 @@ const Status = () => {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
         console.log("rip data:",jsonData.rip);
-        setData3(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData3(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -147,13 +147,13 @@ const Status = () => {
     fetchData();
   }, []);
 
-  let filteredData1 = data3.filter((item) => item.status === "Draft");
-  let filteredData2 = data3.filter((item) => item.status === "Review");
-  let filteredData3 = data3.filter((item) => item.status === "Last Call");
-  let filteredData4 = data3.filter((item) => item.status === "Living");
-  let filteredData5 = data3.filter((item) => item.status === "Final");
-  let filteredData6 = data3.filter((item) => item.status === "Stagnant");
-  let filteredData7 = data3.filter((item) => item.status === "Withdrawn");
+  let filteredData1 = data3?.filter((item) => item.status === "Draft");
+  let filteredData2 = data3?.filter((item) => item.status === "Review");
+  let filteredData3 = data3?.filter((item) => item.status === "Last Call");
+  let filteredData4 = data3?.filter((item) => item.status === "Living");
+  let filteredData5 = data3?.filter((item) => item.status === "Final");
+  let filteredData6 = data3?.filter((item) => item.status === "Stagnant");
+  let filteredData7 = data3?.filter((item) => item.status === "Withdrawn");
 
   useEffect(() => {
     // Simulating a loading delay
@@ -213,7 +213,7 @@ const Status = () => {
               <div id="draft">Draft -{" "}
               <NextLink href={`/tableStatus/Draft`}>
                 {" "}
-                [ {allData.filter((item) => item.status === "Draft").length} ]
+                [ {allData?.filter((item) => item.status === "Draft")?.length} ]
               </NextLink>
 </div>
             </Text>
@@ -235,7 +235,7 @@ const Status = () => {
               <div id="review">Review -{" "}
               <NextLink href={`/tableStatus/Review`}>
                 {" "}
-                [ {allData.filter((item) => item.status === "Review").length} ]
+                [ {allData?.filter((item) => item.status === "Review")?.length} ]
               </NextLink>
 </div>
             </Text>
@@ -256,7 +256,7 @@ const Status = () => {
               <div id="lastcall">Last Call -
               <NextLink href={`/tableStatus/LastCall`}>
                 {" "}
-                [ {allData.filter((item) => item.status ===  "Last Call").length
+                [ {allData?.filter((item) => item.status ===  "Last Call")?.length
                 } ]{" "}
               </NextLink>
               </div>
@@ -279,7 +279,7 @@ const Status = () => {
               <div id="final">Final -
               <NextLink href={`/tableStatus/Final`}>
                 {" "}
-                [ {allData.filter((item) => item.status === "Final").length
+                [ {allData?.filter((item) => item.status === "Final")?.length
                 } ]{" "}
               </NextLink>
               </div>
@@ -302,7 +302,7 @@ const Status = () => {
               <div id="stagnant">Stagnant -
               <NextLink href={`/tableStatus/Stagnant`}>
                 {" "}
-                [ {allData.filter((item) => item.status === "Stagnant").length
+                [ {allData?.filter((item) => item.status === "Stagnant")?.length
                 } ]{" "}
               </NextLink>
               </div>
@@ -324,7 +324,7 @@ const Status = () => {
               <div id="withdrawn">Withdrawn -
               <NextLink href={`/tableStatus/Withdrawn`}>
                 {" "}
-                [ {allData.filter((item) => item.status ===  "Withdrawn").length
+                [ {allData?.filter((item) => item.status ===  "Withdrawn")?.length
                 } ]{" "}
               </NextLink>
               </div>
@@ -346,7 +346,7 @@ const Status = () => {
               <div id="living">Living -
               <NextLink href={`/tableStatus/Living`}>
                 {" "}
-                [ {allData.filter((item) => item.status === "Living").length} ]
+                [ {allData?.filter((item) => item.status === "Living")?.length} ]
               </NextLink>
               </div>
             </Text>

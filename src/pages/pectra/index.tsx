@@ -85,10 +85,10 @@ const All = () => {
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;
@@ -536,7 +536,7 @@ const All = () => {
                 },
               }}
             >
-              {PectraPosts.map((pectra, index) => (
+              {PectraPosts?.map((pectra, index) => (
                 <Card
                   key={index}
                   image={pectra.image}
@@ -737,7 +737,7 @@ const All = () => {
               specLink: "https://notes.ethereum.org/@ethpandaops/pectra-devnet-0",
               specText: "Pectra Devnet 0 (Specs)",
             },
-          ].map((item, index) => (
+          ]?.map((item, index) => (
             <Tr style={{ border: "1px solid black" }} key={index}>
               <Td style={{ border: "1px solid black" }}>{item.date}</Td>
               <Td style={{ border: "1px solid black" }}>

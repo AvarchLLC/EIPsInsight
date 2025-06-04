@@ -133,15 +133,15 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  const filteredData = typeData.map((item) => ({
+  const filteredData = typeData?.map((item) => ({
     year: item.year,
-    statusChanges: item.statusChanges.filter(
+    statusChanges: item.statusChanges?.filter(
       (x) => getCat(x.eipCategory) === category
     ),
   }));
 
   const transformedData = filteredData.flatMap((item) =>
-    item.statusChanges.map((change) => ({
+    item.statusChanges?.map((change) => ({
       status: getStatus(change.lastStatus),
       year: item.year,
       value: 1,

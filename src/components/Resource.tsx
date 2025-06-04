@@ -351,7 +351,7 @@ const Resource = () => {
     bg={bg}
     borderRadius={"0.55rem"}
   >
-    {cards.map((item, index) => (
+    {cards?.map((item, index) => (
       <a
         href={item.href}
         target="_blank"

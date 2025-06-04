@@ -115,15 +115,15 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
-  const filteredData = typeData.map((item) => ({
+  const filteredData = typeData?.map((item) => ({
     year: item.year,
-    categoryChanges: item.categoryChanges.filter(
+    categoryChanges: item.categoryChanges?.filter(
       (x) => getStatus(x.eipStatus) === category
     ),
   }));
 
   const transformedData = filteredData.flatMap((item) =>
-    item.categoryChanges.map((change) => ({
+    item.categoryChanges?.map((change) => ({
       category: getCat(change.lastCategory),
       year: item.year,
       value: 1,
@@ -163,8 +163,8 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     // Transform the typeData to get the necessary details
     const transformedData = typeData.flatMap(({ categoryChanges, year }) => {
         return categoryChanges
-            .filter(({ eipStatus }) => eipStatus === targetCategory) // Filter by eipStatus
-            .map(({ eip, lastCategory, eipTitle, eipStatus }) => ({
+            ?.filter(({ eipStatus }) => eipStatus === targetCategory) // Filter by eipStatus
+            ?.map(({ eip, lastCategory, eipTitle, eipStatus }) => ({
                 eip,
                 lastCategory,
                 eipTitle,
@@ -181,7 +181,7 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
         "data:text/csv;charset=utf-8," +
         header +
         transformedData
-        .map(({ eip, lastCategory, eipTitle, eipStatus, year }) => {
+        ?.map(({ eip, lastCategory, eipTitle, eipStatus, year }) => {
             return `${eip},${lastCategory},${eipTitle},${eipStatus},${year},${
               eipStatus === "ERC"
                     ? `https://eipsinsight.com/ercs/erc-${eip}`

@@ -161,7 +161,7 @@ const RIP = () => {
         const response = await fetch(`/api/new/all`);
         console.log(response);
         let jsonData = await response.json();
-        jsonData.rip.forEach((item: EIP) => {
+        jsonData.rip?.forEach((item: EIP) => {
           if (item.eip === "7859") {
             item.status = "Draft"; // Update the status
           }

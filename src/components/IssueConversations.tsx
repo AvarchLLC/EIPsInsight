@@ -78,7 +78,7 @@ const IssueConversations: React.FC<IssueConversationsProps> = ({dataset}) => {
                     ):(
                         <>
                             {
-                                data?.issueDetails?.conversations.map(comment => (
+                                data?.issueDetails?.conversations?.map(comment => (
                                     <Box
                                         className={'mx-8 mb-8 rounded-lg'}
                                         paddingY={4}

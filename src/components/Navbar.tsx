@@ -26,7 +26,7 @@ import NextLink from "next/link";
 import { GitHub } from "react-feather";
 import Logo from "@/components/Logo";
 import SearchBox from "./SearchBox";
-
+import { useSidebarStore } from "@/stores/useSidebarStore";
 interface NavItem {
   label: string;
   subLabel?: string;
@@ -41,8 +41,8 @@ const Navbar: React.FC = () => {
       href:`/upgrade`
     },
     {
-      label:"All-EIPS",
-      children:[
+      label: "All-EIPS",
+      children: [
         {
           label: "All",
           href: `/all`,
@@ -79,7 +79,7 @@ const Navbar: React.FC = () => {
         {
           label: "EIP Proposal Builder",
           href: `/proposalbuilder`,
-    },
+        },
         // {
         //   label: "Search by author",
         //   href: `/authors`,
@@ -87,7 +87,7 @@ const Navbar: React.FC = () => {
         {
           label: "Search By",
           // href:`/authors`,
-          children:[
+          children: [
             {
               label: "Author",
               href: `/authors`,
@@ -107,7 +107,7 @@ const Navbar: React.FC = () => {
           ],
         },
       ],
-    },    
+    },
     {
       label: "Insight",
       children: [
@@ -159,12 +159,6 @@ const Navbar: React.FC = () => {
     },
     {
       label: "Resources",
-      // children: [
-      //   {
-      //     label: "Resources",
-      //     href: `/resources`,
-      //   },
-      // ],
       href: `/resources`,
     },
   ];
@@ -240,6 +234,7 @@ const Navbar: React.FC = () => {
   const linkColor = useColorModeValue("gray.600", "gray.200");
   const linkHoverColor = useColorModeValue("gray.800", "white");
   const popoverContentBgColor = useColorModeValue("white", "gray.800");
+  const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
   return (
     <>
@@ -265,7 +260,7 @@ const Navbar: React.FC = () => {
           >
             <Box className={"flex"} flexShrink={0}>
               <Logo />
-              <NextLink href={`/home`} passHref>
+              <NextLink href={`/`} passHref>
                 <Text
                   textAlign={useBreakpointValue({ base: "center", md: "left" })}
                   color={useColorModeValue("gray.800", "white")}
@@ -280,7 +275,13 @@ const Navbar: React.FC = () => {
 
             <Spacer />
 
-            <div className={"flex space-x-2 font-bold"} >
+            <div
+              className={`flex space-x-2 font-bold ${
+                isCollapsed
+                  ? "opacity-100"
+                  : "opacity-0 pointer-events-none hidden"
+              }`}
+            >
               {NAV_ITEMS.map((navItem) => (
                 <Box key={navItem.label}>
                   <Popover trigger={"hover"} placement={"bottom-start"}>
@@ -320,7 +321,6 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
-
                     {navItem.children && navItem.label === "Resources" && (
                       <PopoverContent
                         border={0}
@@ -357,7 +357,7 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
-                  {navItem.children && navItem.label === "All-EIPS" && (
+                    {navItem.children && navItem.label === "All-EIPS" && (
                       <PopoverContent
                         border={0}
                         boxShadow={"xl"}
@@ -393,7 +393,6 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
-
                     {navItem.children && navItem.label === "Tools" && (
                       <PopoverContent
                         border={0}
@@ -424,7 +423,9 @@ const Navbar: React.FC = () => {
                                   _groupHover={{ color: "pink.400" }}
                                   fontWeight={500}
                                 >
-                                  <NextLink href={`${child.href}`}>{child.label}</NextLink>
+                                  <NextLink href={`${child.href}`}>
+                                    {child.label}
+                                  </NextLink>
                                 </Text>
                               </Box>
                             )
@@ -433,12 +434,11 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
-
                     {navItem.children &&
                       navItem.label !== "Insight" &&
-                      navItem.label !== "Resources" && 
-                      navItem.label !=="All-EIPS" &&
-                      navItem.label !=="Tools" &&(
+                      navItem.label !== "Resources" &&
+                      navItem.label !== "All-EIPS" &&
+                      navItem.label !== "Tools" && (
                         <PopoverContent
                           border={0}
                           boxShadow={"xl"}
@@ -460,8 +460,12 @@ const Navbar: React.FC = () => {
                 </Box>
               ))}
             </div>
-            <Box ml={5} display={{ base: "none", md: "block" }}  minWidth="302px">
-            <SearchBox/>
+            <Box
+              ml={5}
+              display={{ base: "none", md: "block" }}
+              minWidth="302px"
+            >
+              <SearchBox />
             </Box>
 
             <Flex ml={10}>
@@ -474,20 +478,12 @@ const Navbar: React.FC = () => {
                 pr={4}
               >
                 {/* <SearchBox/> */}
-                <NextLink href="https://github.com/Avarch-org/EIPUI" passHref>
-                  <IconButton
-                    aria-label="github"
-                    variant={"outline"}
-                    colorScheme="blue"
-                    size="lg"
-                    icon={<GitHub />}
-                  />
-                </NextLink>
                 <IconButton
                   aria-label="Mode Change"
                   variant="outline"
                   colorScheme="blue"
                   size="lg"
+                  rounded="full"
                   icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
                   onClick={toggleColorMode}
                 />
@@ -609,7 +605,7 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                       {navItem.children && navItem.label === "Search By" && (
+                        {navItem.children && navItem.label === "Search By" && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -628,7 +624,7 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                        {navItem.children && (navItem.label === "Resources") && (
+                        {navItem.children && navItem.label === "Resources" && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -667,7 +663,7 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                       {navItem.children && (navItem.label === "Tools") && (
+                        {navItem.children && navItem.label === "Tools" && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -679,34 +675,42 @@ const Navbar: React.FC = () => {
                             maxH={"1500px"}
                           >
                             <Stack direction={"column"} spacing={2}>
-                            {navItem.children.map((child) =>
-                            child.label === "Search By" ? (
-                              <DesktopSubNav2 key={child.label} {...child} />
-                            ) : (
-                              <Box
-                                key={child.label} // Unique key for React rendering
-                                _hover={{
-                                  bg: useColorModeValue("pink.50", "gray.900"),
-                                }}
-                                p={2}
-                                rounded={"md"}
-                                role={"group"}
-                              >
-                                <Text
-                                  transition={"all .3s ease"}
-                                  _groupHover={{ color: "pink.400" }}
-                                  fontWeight={500}
-                                >
-                                  <NextLink href={`${child.href}`}>{child.label}</NextLink>
-                                </Text>
-                              </Box>
-                            )
-                          )}
+                              {navItem.children.map((child) =>
+                                child.label === "Search By" ? (
+                                  <DesktopSubNav2
+                                    key={child.label}
+                                    {...child}
+                                  />
+                                ) : (
+                                  <Box
+                                    key={child.label} // Unique key for React rendering
+                                    _hover={{
+                                      bg: useColorModeValue(
+                                        "pink.50",
+                                        "gray.900"
+                                      ),
+                                    }}
+                                    p={2}
+                                    rounded={"md"}
+                                    role={"group"}
+                                  >
+                                    <Text
+                                      transition={"all .3s ease"}
+                                      _groupHover={{ color: "pink.400" }}
+                                      fontWeight={500}
+                                    >
+                                      <NextLink href={`${child.href}`}>
+                                        {child.label}
+                                      </NextLink>
+                                    </Text>
+                                  </Box>
+                                )
+                              )}
                             </Stack>
                           </PopoverContent>
                         )}
 
-                  {navItem.children && (navItem.label === "All-EIPS") && (
+                        {navItem.children && navItem.label === "All-EIPS" && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -718,29 +722,34 @@ const Navbar: React.FC = () => {
                             maxH={"1500px"}
                           >
                             <Stack direction={"column"} spacing={2}>
-                            {navItem.children.map((child) =>
-                            child.label === "Search By" ? (
-                              <DesktopSubNav key={child.label} {...child} />
-                            ) : (
-                              <Box
-                                key={child.label} // Unique key for React rendering
-                                _hover={{
-                                  bg: useColorModeValue("pink.50", "gray.900"),
-                                }}
-                                p={2}
-                                rounded={"md"}
-                                role={"group"}
-                              >
-                                <Text
-                                  transition={"all .3s ease"}
-                                  _groupHover={{ color: "pink.400" }}
-                                  fontWeight={500}
-                                >
-                                  <NextLink href={`${child.href}`}>{child.label}</NextLink>
-                                </Text>
-                              </Box>
-                            )
-                          )}
+                              {navItem.children.map((child) =>
+                                child.label === "Search By" ? (
+                                  <DesktopSubNav key={child.label} {...child} />
+                                ) : (
+                                  <Box
+                                    key={child.label} // Unique key for React rendering
+                                    _hover={{
+                                      bg: useColorModeValue(
+                                        "pink.50",
+                                        "gray.900"
+                                      ),
+                                    }}
+                                    p={2}
+                                    rounded={"md"}
+                                    role={"group"}
+                                  >
+                                    <Text
+                                      transition={"all .3s ease"}
+                                      _groupHover={{ color: "pink.400" }}
+                                      fontWeight={500}
+                                    >
+                                      <NextLink href={`${child.href}`}>
+                                        {child.label}
+                                      </NextLink>
+                                    </Text>
+                                  </Box>
+                                )
+                              )}
                             </Stack>
                           </PopoverContent>
                         )}
@@ -748,8 +757,8 @@ const Navbar: React.FC = () => {
                         {navItem.children &&
                           navItem.label !== "Insight" &&
                           navItem.label !== "Resources" &&
-                          navItem.label !== "Tools" && 
-                          navItem.label !== "All-EIPS" &&(
+                          navItem.label !== "Tools" &&
+                          navItem.label !== "All-EIPS" && (
                             <PopoverContent
                               border={0}
                               boxShadow={"xl"}
@@ -772,14 +781,12 @@ const Navbar: React.FC = () => {
                               </Stack>
                             </PopoverContent>
                           )}
-                          
                       </Popover>
                     </Box>
                   ))}
                   <Box m={4}>
-                  <SearchBox/>
+                    <SearchBox />
                   </Box>
-                  
                 </div>
               </>
             ) : (
@@ -846,7 +853,6 @@ const DesktopSubNav = ({ label, href, subLabel, children }: NavItem) => {
     </Box>
   );
 };
-
 
 const DesktopSubNav2 = ({ label, href, subLabel, children }: NavItem) => {
   return (
@@ -915,18 +921,16 @@ const DesktopSubNav2 = ({ label, href, subLabel, children }: NavItem) => {
                       textDecoration: "none",
                       color: "pink.400",
                     }}
-                    style={{ textDecoration: "none" }} 
+                    style={{ textDecoration: "none" }}
                   >
                     <Box
                       py={2}
-                      
                       fontWeight={500}
-                      transition="background-color 0.3s ease" 
+                      transition="background-color 0.3s ease"
                     >
                       {subNavItem.label}
                     </Box>
                   </Link>
-                  
                 ))}
             </Stack>
           </PopoverBody>
@@ -935,9 +939,5 @@ const DesktopSubNav2 = ({ label, href, subLabel, children }: NavItem) => {
     </Popover>
   );
 };
-
-
-
-
 
 export default Navbar;

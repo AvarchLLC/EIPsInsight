@@ -109,7 +109,7 @@ import {
                 </Tr>
               </Thead>
               <Tbody>
-                {eipData.map((item: any, index: number) => (
+                {eipData?.map((item: any, index: number) => (
                   <Tr
                     key={item._id}
                     style={{

@@ -97,27 +97,27 @@ const StatusBox = () => {
   // Add a fallback for empty data to avoid runtime errors
   const safeData = data || [];
 
-  const draftCount = safeData.filter(
+  const draftCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Draft"
-  ).length;
-  const reviewCount = safeData.filter(
+  )?.length;
+  const reviewCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Review"
-  ).length;
-  const lastCallCount = safeData.filter(
+  )?.length;
+  const lastCallCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Last Call"
-  ).length;
-  const livingCount = safeData.filter(
+  )?.length;
+  const livingCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Living"
-  ).length;
-  const finalCount = safeData.filter(
+  )?.length;
+  const finalCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Final"
-  ).length;
-  const stagnantCount = safeData.filter(
+  )?.length;
+  const stagnantCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Stagnant"
-  ).length;
-  const withdrawnCount = safeData.filter(
+  )?.length;
+  const withdrawnCount = safeData?.filter(
     (item) => item.category !== "ERC" && item.status === "Withdrawn"
-  ).length;
+  )?.length;
 
   const totalCount =
     draftCount +
@@ -189,7 +189,7 @@ const StatusBox = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {tableItems.map((item, index) => (
+            {tableItems?.map((item, index) => (
               <Tr key={index}>
                 <Td>
                   <NextLink href={`/tableStatus/${item.status}`}>

@@ -62,20 +62,20 @@ const LineStatus: React.FC<TabProps> = ({cat }) => {
 
   for (const key in groupedEips) {
     const eips = groupedEips[key];
-    const finalEips = eips.filter((eip) => eip.status && eip.category===cat );
-    const reviewEips = eips.filter((eip) => eip.status  && eip.category===cat );
-    const lastCallEips = eips.filter((eip) => eip.status && eip.category===cat );
-    const stagnantEips = eips.filter((eip) => eip.status  && eip.category===cat );
-    const withdrawnEips = eips.filter((eip) => eip.status  && eip.category===cat );
-    const livingEips = eips.filter((eip) => eip.status  && eip.category===cat );
-    const draftEips = eips.filter((eip) => eip.status && eip.category===cat );
-    LivingCounts[key] = livingEips.length;
-    Final[key] = finalEips.length;
-    Review[key] = reviewEips.length;
-    LastCall[key] = lastCallEips.length;
-    Stagnant[key] = stagnantEips.length;
-    Withdrawn[key] = withdrawnEips.length;
-    Draft[key] = draftEips.length;
+    const finalEips = eips?.filter((eip) => eip.status && eip.category===cat );
+    const reviewEips = eips?.filter((eip) => eip.status  && eip.category===cat );
+    const lastCallEips = eips?.filter((eip) => eip.status && eip.category===cat );
+    const stagnantEips = eips?.filter((eip) => eip.status  && eip.category===cat );
+    const withdrawnEips = eips?.filter((eip) => eip.status  && eip.category===cat );
+    const livingEips = eips?.filter((eip) => eip.status  && eip.category===cat );
+    const draftEips = eips?.filter((eip) => eip.status && eip.category===cat );
+    LivingCounts[key] = livingEips?.length;
+    Final[key] = finalEips?.length;
+    Review[key] = reviewEips?.length;
+    LastCall[key] = lastCallEips?.length;
+    Stagnant[key] = stagnantEips?.length;
+    Withdrawn[key] = withdrawnEips?.length;
+    Draft[key] = draftEips?.length;
   }
 
   const data = {

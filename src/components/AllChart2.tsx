@@ -123,9 +123,9 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
         } else if (type === "RIP") {
           setData(dataset.rip);
         } else if (type === "Total") {
-          setData(dataset.eip.concat(dataset.erc.concat(dataset.rip)));
+          setData(dataset.eip?.concat(dataset.erc?.concat(dataset.rip)));
         } else {
-          setData(dataset.eip.concat(dataset.erc.concat(dataset.rip)));
+          setData(dataset.eip?.concat(dataset.erc?.concat(dataset.rip)));
         }
         setIsLoading(false);
       } catch (error) {
@@ -170,7 +170,7 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     return acc;
   }, []);
 
-  const transformedData2 = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData2 = data?.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const status = getStatus(item.status);
 

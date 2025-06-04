@@ -242,8 +242,8 @@ const getInclusionStage = (eipIdentifier: string): string => {
     console.log("eip:", eipNo);
 
     const matchedUpgrades = Object.entries(networkUpgrades)
-      .filter(([_, eipNos]) => eipNos.map(Number).includes(Number(eipNo)))
-      .map(([upgradeName]) => upgradeName);
+      ?.filter(([_, eipNos]) => eipNos?.map(Number).includes(Number(eipNo)))
+      ?.map(([upgradeName]) => upgradeName);
 
     const formattedUpgrades = matchedUpgrades.join(", ");
     console.log("Matched Network Upgrade Labels:", formattedUpgrades);
@@ -510,12 +510,12 @@ const CustomTooltip = ({
                     )}
 
                     {metadataJson?.requires &&
-                      metadataJson.requires.length > 0 && (
+                      metadataJson.requires?.length > 0 && (
                         <Tr>
                           <Th>Requires</Th>
                           <Td>
                             <HStack>
-                              {metadataJson.requires.map((req, i) => (
+                              {metadataJson.requires?.map((req, i) => (
                                 <NLink key={i} href={`/eips/eip-${req}`}>
                                   <Text
                                     color="blue.400"
@@ -768,10 +768,10 @@ const extractLastStatusDates = (data: any) => {
   const statusDates: { status: string; date: string }[] = [];
   let laststatus = "";
   const sortedData = Object.keys(data)
-    .filter((key) => key !== "repo")
+    ?.filter((key) => key !== "repo")
     .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
 
-  sortedData.forEach((key) => {
+  sortedData?.forEach((key) => {
     const { status, mergedDate } = data[key];
     if (status === "unknown") {
       return;
@@ -797,10 +797,10 @@ const extractLastTypesDates = (data: any) => {
   ];
   let lasttype = "";
   const sortedData = Object.keys(data)
-    .filter((key) => key !== "repo")
+    ?.filter((key) => key !== "repo")
     .sort((a, b) => new Date(data[a].mergedDate).getTime() - new Date(data[b].mergedDate).getTime());
 
-  sortedData.forEach((key) => {
+  sortedData?.forEach((key) => {
     let { type, mergedDate } = data[key];
 
     if (type === "unknown") {
@@ -882,17 +882,17 @@ export const convertMetadataToJson = (metadataText: string): EipMetadataJson => 
   const lines = metadataText.split("\n");
   const jsonObject: any = {};
 
-  lines.forEach((line) => {
+  lines?.forEach((line) => {
     const [key, value] = line.split(/: (.+)/);
     if (key && value) {
       if (key.trim() === "eip") {
         jsonObject[key.trim()] = parseInt(value.trim());
       } else if (key.trim() === "requires") {
-        jsonObject[key.trim()] = value.split(",").map((v) => parseInt(v));
+        jsonObject[key.trim()] = value.split(",")?.map((v) => parseInt(v));
       } else if (key.trim() === "author") {
         jsonObject[key.trim()] = value
           .split(",")
-          .map((author: string) => author.trim());
+          ?.map((author: string) => author.trim());
       } else {
         jsonObject[key.trim()] = value.trim();
       }

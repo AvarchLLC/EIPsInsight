@@ -47,7 +47,7 @@ import {
           maxH="300px"
           overflowY="auto"
         >
-          {labels.map((label) => (
+          {labels?.map((label) => (
             <MenuItem key={label} bg={menuBg} color={menuColor}>
               <Checkbox
                 isChecked={selectedLabels.includes(label)}

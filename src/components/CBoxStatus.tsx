@@ -671,7 +671,7 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset, status, type }) => {
         setData(jsonData);
         if (type === "EIPs" && jsonData.eip) {
           setTypeData(
-            jsonData.eip.filter(
+            jsonData.eip?.filter(
               (item: any) =>
                 item.category !== getCat("ERC") && item.category !== "ERCs"
             )
@@ -702,15 +702,15 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset, status, type }) => {
   );
 
   const yearData = statusData
-    .flatMap((item) => item.eips)
-    .filter((item) => item.year === selectedYear);
+    ?.flatMap((item) => item.eips)
+    ?.filter((item) => item.year === selectedYear);
 
   const result: { [key: string]: number } = {};
 
   yearData
-    .filter((item) => item.category !== "ERC")
-    .forEach((item) => {
-      item.eips.forEach((item) => {
+    ?.filter((item) => item.category !== "ERC")
+    ?.forEach((item) => {
+      item.eips?.forEach((item) => {
         if (
           (item.type === "Standards Track" ||
             item.type === "Standard Track" ||
@@ -761,8 +761,8 @@ const CBoxStatus: React.FC<CBoxProps> = ({ dataset, status, type }) => {
 
       const headers =
         Object.keys(yearData[0].eips[0])
-          .filter((column) => !columnsToDrop.includes(column))
-          .join(",") + "\n";
+          ?.filter((column) => !columnsToDrop.includes(column))
+          ?.join(",") + "\n";
 
       const csvRows = yearData.map((item) => {
         const values = item.eips.map((eip) => {

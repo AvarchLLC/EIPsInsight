@@ -93,7 +93,7 @@ const FactsSection: FC = () => {
       </Heading>
 
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mb={10}>
-        {facts.map((fact, index) => (
+        {facts?.map((fact, index) => (
           <FactCard key={index} title={fact.title} content={fact.content} />
         ))}
       </Grid>
@@ -108,7 +108,7 @@ const FactsSection: FC = () => {
       </Heading>
 
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
-        {funFacts.map((fact, index) => (
+        {funFacts?.map((fact, index) => (
           <FactCard key={index} title={fact.title} content={fact.content} />
         ))}
       </Grid>

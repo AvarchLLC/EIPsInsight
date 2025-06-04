@@ -10,6 +10,7 @@ const theme = extendTheme({
     useSystemColorMode: false,
   },
   styles: {
+
     global: (props: StyleFunctionProps) => ({
       body: {
         bg: props.colorMode === 'light' ? '#ffffff' : '#000000',

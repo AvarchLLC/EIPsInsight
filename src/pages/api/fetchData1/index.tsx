@@ -13,7 +13,7 @@ export default async function handler(req: any, res: any) {
 
     // Fetch gas burnt data
     const gasBurntData = await db.collection('gas_burnt').find().sort({ timestamp: -1 }).limit(7200).toArray();
-    const gasBurnt = gasBurntData.map((data) => ({
+    const gasBurnt = gasBurntData?.map((data) => ({
       time: new Date(data.timestamp).toLocaleTimeString(),
       block: Number(data.blockNumber),
       gasBurnt: Number(Web3.utils.fromWei(data.gasBurnt || '0', 'gwei')), // Convert to Gwei

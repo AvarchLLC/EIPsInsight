@@ -390,12 +390,16 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         } else if (type === "ERC") {
           setData(jsonData.erc);
         } else if (type === "RIP") {
-          jsonData.rip.forEach((item: EIP) => {
-            if (item.eip === "7859") item.status = "Draft";
-          });
+          jsonData.rip?.forEach((item: EIP) => {
+            if (item.eip === "7859") {
+                item.status = "Draft"; // Update the status
+            }
+        });        
           setData(jsonData.rip);
+        } else if (type === "Total") {
+          setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         } else {
-          setData([...jsonData.eip, ...jsonData.erc, ...jsonData.rip]);
+          setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         }
         setIsLoading(false);
       } catch (err) {

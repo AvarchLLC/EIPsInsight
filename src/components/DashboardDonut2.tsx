@@ -75,7 +75,7 @@ const DashboardDonut2: React.FC<AreaCProps> = ({ dataset }) => {
 
   }, []);
 
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
 
   const dat = [
     {
@@ -109,7 +109,7 @@ const DashboardDonut2: React.FC<AreaCProps> = ({ dataset }) => {
 
   ];
 
-  const Area = dynamic(() => import("@ant-design/plots").then((item) => item.Pie), {
+  const Area = dynamic(() => import("@ant-design/plots")?.then((item) => item.Pie), {
     ssr: false,
   });
 

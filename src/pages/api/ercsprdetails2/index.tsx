@@ -39,7 +39,7 @@ export default async (req: Request, res: Response) => {
         const prDetails = await PrDetails.find({}).select('prNumber prTitle labels createdAt closedAt mergedAt').exec();
 
         // Transform the data to include createdAt, closedAt, and mergedAt
-        const transformedDetails = prDetails.map((pr: any) => {
+        const transformedDetails = prDetails?.map((pr: any) => {
             const { prNumber, prTitle, labels, createdAt: created_at, closedAt: closed_at, mergedAt: merged_at } = pr;
 
             return {

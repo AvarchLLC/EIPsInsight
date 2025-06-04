@@ -531,7 +531,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showD
 
   const transformedData = filteredData
     .flatMap((item) =>
-      item.eips.map((eip) => ({
+      item.eips?.map((eip) => ({
         category: getCat(eip.category),
         year: eip.year.toString(),
         value: eip.count,

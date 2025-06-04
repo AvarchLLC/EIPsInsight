@@ -25,7 +25,7 @@
           Table of Contents
         </Heading>
         <List spacing={4}>
-          {toc.map((item) => (
+          {toc?.map((item) => (
             <ListItem key={item.id}>
               <Link
                 href={`#${item.id}`}

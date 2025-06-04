@@ -85,7 +85,7 @@ const SearchBox: React.FC = () => {
           ...getEarliestEntries(jsonData.erc, 'eip'),
           ...getEarliestEntries(jsonData.rip, 'eip'),
         ];
-        filteredData = filteredData.filter(
+        filteredData = filteredData?.filter(
           (entry: EIP, index: number, self: EIP2[]) =>
             entry.eip !== '1' || index === self.findIndex((e: EIP2) => e.eip === '1')
         );
@@ -137,19 +137,19 @@ const SearchBox: React.FC = () => {
     });
   
     const authorArray = Object.entries(authorMap)
-      .map(([name, count]) => ({ name, count }))
+      ?.map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
   
     setAuthorCounts(authorArray);
   }, [authordata]);
 
   // const filteredAuthorData = query
-  // ? authordata.filter(item =>
+  // ? authordata?.filter(item =>
   //     item.author.toLowerCase().includes(query.toLowerCase())
   //   )
   // : [];
 
-  const filteredAuthors = authorCounts.filter((author) =>
+  const filteredAuthors = authorCounts?.filter((author) =>
     author.name.toLowerCase().includes(query.toLowerCase())
   );
 
@@ -192,7 +192,7 @@ const SearchBox: React.FC = () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setEipData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setEipData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -221,7 +221,7 @@ const SearchBox: React.FC = () => {
       const seenPRs = new Set<string>();
 
       // Filter PR results based on exact match first
-      const exactMatches = data.filter((item) => {
+      const exactMatches = data?.filter((item) => {
         const key = `${item.prNumber}-${item.repo}`;
         if (seenPRs.has(key)) return false; // Skip if already seen
         seenPRs.add(key); // Mark as seen
@@ -230,9 +230,9 @@ const SearchBox: React.FC = () => {
 
       // Filter PR results for partial matches (those that start with the query)
       const partialMatches = data
-        .filter((item) => item.prNumber.toString().startsWith(queryStr))
-        .filter((item) => item.prNumber.toString() !== queryStr) // Exclude exact matches
-        .filter((item) => {
+        ?.filter((item) => item.prNumber.toString().startsWith(queryStr))
+        ?.filter((item) => item.prNumber.toString() !== queryStr) // Exclude exact matches
+        ?.filter((item) => {
           const key = `${item.prNumber}-${item.repo}`;
           if (seenPRs.has(key)) return false; // Skip if already seen
           seenPRs.add(key); // Mark as seen
@@ -243,8 +243,8 @@ const SearchBox: React.FC = () => {
       const newFilteredResults = [
         ...exactMatches,
         ...partialMatches.sort((a, b) => {
-          const aLength = a.prNumber.toString().length;
-          const bLength = b.prNumber.toString().length;
+          const aLength = a.prNumber.toString()?.length;
+          const bLength = b.prNumber.toString()?.length;
           return bLength - aLength; // Sort by the length of the prNumber in descending order
         }),
       ];
@@ -253,7 +253,7 @@ const SearchBox: React.FC = () => {
       const seenIssues = new Set<string>();
 
       // Filter PR results based on exact match first
-      const exactIssueMatches = IssueData.filter((item) => {
+      const exactIssueMatches = IssueData?.filter((item) => {
         const key = `${item.issueNumber}-${item.repo}`;
         if (seenIssues.has(key)) return false; // Skip if already seen
         seenIssues.add(key); // Mark as seen
@@ -275,8 +275,8 @@ const SearchBox: React.FC = () => {
       const newFilteredIssueResults = [
         ...exactIssueMatches,
         ...partialIssueMatches.sort((a, b) => {
-          const aLength = a.issueNumber.toString().length;
-          const bLength = b.issueNumber.toString().length;
+          const aLength = a.issueNumber.toString()?.length;
+          const bLength = b.issueNumber.toString()?.length;
           return bLength - aLength; // Sort by the length of the prNumber in descending order
         }),
       ];
@@ -342,8 +342,8 @@ const partialEIPMatches = queryStr
       const newFilteredEIPResults = [
         ...exactEIPMatches,
         ...partialEIPMatches.sort((a, b) => {
-          const aLength = a.eip.length;
-          const bLength = b.eip.length;
+          const aLength = a.eip?.length;
+          const bLength = b.eip?.length;
           return bLength - aLength; // Sort by the length of the eip in descending order
         }),
       ];

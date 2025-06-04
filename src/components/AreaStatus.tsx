@@ -383,7 +383,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         if (type === "EIPs" && jsonData.eip) {
           setData(jsonData.eip.filter((item: any) => item.category !== "ERCs"));
         } else if (type === "ERCs" && jsonData.erc) {
@@ -401,7 +401,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
 
   const removeDuplicatesFromEips = (eips: any[]) => {
     const seen = new Set();
-    return eips.filter((eip) => {
+    return eips?.filter((eip) => {
       if (!seen.has(eip.eip)) {
         seen.add(eip.eip);
         return true;
@@ -425,7 +425,7 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
 
   const consolidateData = (data: DataItem[]): TransformedItem[] => {
     const result: { [key: string]: TransformedItem } = {};
-    data.forEach((item) => {
+    data?.forEach((item) => {
       const key = `${item.status}-${item.year}`;
       if (result[key]) {
         result[key].value += item.value;
@@ -443,11 +443,11 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
   const combinedFilteredData = [...filteredData, ...filteredData2];
 
   const transformedData = combinedFilteredData.flatMap((item) => {
-    return item.eips.map((eip) => ({
+    return item.eips?.map((eip) => ({
       status: item.status,
       category: getCat(eip.category),
       year: `${getMonthName(eip.month)} ${eip.year}`,
-      value: removeDuplicatesFromEips(eip.eips).length,
+      value: removeDuplicatesFromEips(eip.eips)?.length,
     }));
   });
 

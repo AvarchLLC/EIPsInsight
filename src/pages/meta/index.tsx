@@ -50,7 +50,7 @@ const Meta = () => {
       try {
         const response = await fetch(`/api/new/all`);
         const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc));
+        setData(jsonData.eip?.concat(jsonData.erc));
         setIsLoading(false); // Set loader state to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -99,7 +99,7 @@ const Meta = () => {
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
           <Tabs isFitted variant="enclosed">
               <TabList>
-                {categories.map((category) => (
+                {categories?.map((category) => (
                   <Link key={category.name} href={category.path} passHref>
                     <Tabs as="a">{category.name}</Tabs>
                   </Link>
@@ -109,7 +109,7 @@ const Meta = () => {
             <FlexBetween>
               <Header
                 title={`Meta - [ ${
-                  data.filter((item) => item.type === "Meta").length
+                  data?.filter((item) => item.type === "Meta")?.length
                 } ]`}
                 subtitle="Meta EIPs describe changes to the EIP process, or other non optional changes."
               />

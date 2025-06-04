@@ -89,7 +89,7 @@ export default function EIPMD() {
   const handleScroll = (event: WheelEvent<HTMLDivElement>) => {
     const delta = Math.sign(event.deltaY);
     setCurrentIndex(
-      (prevIndex) => (prevIndex + delta + authors.length) % authors.length
+      (prevIndex) => (prevIndex + delta + authors?.length) % authors?.length
     );
   };
 
@@ -196,7 +196,7 @@ export default function EIPMD() {
                 ref={authorRef}
                 className="w-full h-80 overflow-y-auto border p-2 rounded-lg shadow-md"
               >
-                {authors.map((author, index) => (
+                {authors?.map((author, index) => (
                   <div
                     key={index}
                     className="py-2 transform transition-transform"

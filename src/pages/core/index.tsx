@@ -69,7 +69,7 @@ const Core = () => {
             {/* Navigation Tabs with Links */}
             <Tabs isFitted variant="enclosed">
               <TabList>
-                {categories.map((category) => (
+                {categories?.map((category) => (
                   <Link key={category.name} href={category.path} passHref>
                     <Tab as="a">{category.name}</Tab>
                   </Link>
@@ -81,7 +81,7 @@ const Core = () => {
             <FlexBetween>
               <Header
                 title={`Standard Tracks - Core [ ${
-                  data.filter((item) => item.category === "Core").length
+                  data?.filter((item) => item.category === "Core")?.length
                 } ]`}
                 subtitle="Core EIPs describe changes to the Ethereum protocol."
               />

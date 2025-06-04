@@ -105,15 +105,15 @@ const CustomBox: React.FC<CustomBoxProps> = ({
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const transformedData = data
-    .filter((obj) => obj._id === "Final")
-    .map((obj) => ({
+    ?.filter((obj) => obj._id === "Final")
+    ?.map((obj) => ({
       category: obj.statusChanges[0].category,
       number: obj.count,
     }));
 
   console.log(data);
 
-  // const numRows = data.length + 5;
+  // const numRows = data?.length + 5;
   // const rowHeight = 40; // Assuming each row has a height of 40px
   // const maxHeight = `${numRows * rowHeight}px`;
 
@@ -144,7 +144,7 @@ const CustomBox: React.FC<CustomBoxProps> = ({
             </Tr>
           </Thead>
           <Tbody>
-            {data.sort(sortByCustomOrder).map((entry, index) => (
+            {data.sort(sortByCustomOrder)?.map((entry, index) => (
               <Tr key={index}>
                 <Td minW="100px">
                   <Wrap>

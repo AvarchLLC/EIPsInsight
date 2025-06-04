@@ -117,11 +117,11 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
   };
 
   const convertAndDownloadCSV = () => {
-    if (PectraData && PectraData.length > 0) {
-      const headers = Object.keys(PectraData[0]).join(",") + "\n";
-      const csvRows = PectraData.map((item) => {
-        const values = Object.values(item).map((value) => {
-          if (typeof value === "string" && value.includes(",")) {
+    if (PectraData && PectraData?.length > 0) {
+      const headers = Object?.keys(PectraData[0])?.join(",") + "\n";
+      const csvRows = PectraData?.map((item) => {
+        const values = Object?.values(item)?.map((value) => {
+          if (typeof value === "string" && value?.includes(",")) {
             return `"${value}"`;
           }
           return value;
@@ -133,7 +133,7 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
 
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document?.createElement("a");
       a.style.display = "none";
       a.href = url;
       a.download = `Pectra.csv`;
@@ -302,8 +302,8 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
                       <Link href={`eips/eip-${item.eip}`}>
                         <Wrap>
                           <WrapItem>
-                            <Badge colorScheme={getStatusColor(item.status)}>
-                              {item.eip}
+                            <Badge colorScheme={getStatusColor(item?.status)}>
+                              {item?.eip}
                             </Badge>
                           </WrapItem>
                         </Wrap>
@@ -331,11 +331,11 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
                   author: (it: any) => (
                     <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
-                        {factorAuthor(it.author).map(
+                        {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
-                            let t = item[item.length - 1].substring(
+                            let t = item[item?.length - 1]?.substring(
                               1,
-                              item[item.length - 1].length - 1
+                              item[item?.length - 1]?.length - 1
                             );
                             return (
                               <Wrap key={index}>
@@ -391,7 +391,7 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
                       }}
                     >
                       <Button
-                        as="a"
+                        as={Link}
                         href={item.discussion}
                         target="_blank"
                         colorScheme="blue"

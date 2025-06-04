@@ -28,11 +28,11 @@ const EIPTimelinePage = () => {
   ];
 
   // Preprocess to add "declined" field based on removed EIPs
-  const processedData = originalData.map((entry, index, arr) => {
+  const processedData = originalData?.map((entry, index, arr) => {
     const allPrevEIPs = new Set<string>();
     for (let i = 0; i < index; i++) {
-      arr[i].scheduled.forEach((eip) => allPrevEIPs.add(eip));
-      arr[i].considered.forEach((eip) => allPrevEIPs.add(eip));
+      arr[i].scheduled?.forEach((eip) => allPrevEIPs.add(eip));
+      arr[i].considered?.forEach((eip) => allPrevEIPs.add(eip));
     }
 
     const currentEIPs = new Set([
@@ -40,7 +40,7 @@ const EIPTimelinePage = () => {
       ...entry.considered,
     ]);
 
-    const declined = [...allPrevEIPs].filter((eip) => !currentEIPs.has(eip));
+    const declined = [...allPrevEIPs]?.filter((eip) => !currentEIPs.has(eip));
 
     return {
       ...entry,
@@ -48,11 +48,11 @@ const EIPTimelinePage = () => {
     };
   });
 
-  const processedData2 = data2.map((entry, index, arr) => {
+  const processedData2 = data2?.map((entry, index, arr) => {
     const allPrevEIPs = new Set<string>();
     for (let i = 0; i < index; i++) {
-      arr[i].scheduled.forEach((eip) => allPrevEIPs.add(eip));
-      arr[i].considered.forEach((eip) => allPrevEIPs.add(eip));
+      arr[i].scheduled?.forEach((eip) => allPrevEIPs.add(eip));
+      arr[i].considered?.forEach((eip) => allPrevEIPs.add(eip));
     }
 
     const currentEIPs = new Set([
@@ -60,7 +60,7 @@ const EIPTimelinePage = () => {
       ...entry.considered,
     ]);
 
-    const declined = [...allPrevEIPs].filter((eip) => !currentEIPs.has(eip));
+    const declined = [...allPrevEIPs]?.filter((eip) => !currentEIPs.has(eip));
 
     return {
       ...entry,

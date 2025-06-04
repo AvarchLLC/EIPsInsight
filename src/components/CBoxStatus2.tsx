@@ -92,7 +92,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
 
   const removeDuplicatesFromEips = (eips: any[]) => {
     const seen = new Set();
-    return eips.filter((eip) => {
+    return eips?.filter((eip) => {
       const uniqueKey = `${eip.eip}-${eip.status}`; // Combine EIP number and status
       if (!seen.has(uniqueKey)) {
         seen.add(uniqueKey);
@@ -104,16 +104,16 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   
   const transformedData = filteredData.flatMap((item) => {
     return item.eips
-      .filter((eip) => eip.year === selectedYear)
-      .map((eip) => ({
+      ?.filter((eip) => eip.year === selectedYear)
+      ?.map((eip) => ({
         category: getCat(eip.category),
         year: eip.year,
-        value: eip.eips.length,  // Keep all duplicates (counting each EIP entry as-is)
+        value: eip.eips?.length,  // Keep all duplicates (counting each EIP entry as-is)
       }));
   });
   
 
-  const rows = transformedData.reduce((acc, curr) => {
+  const rows = transformedData?.reduce((acc, curr) => {
     const existing = acc.find((item) => item.category === curr.category && item.year === curr.year);
     if (existing) {
       existing.value += curr.value;
@@ -125,8 +125,8 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
   
   const allRows=["CORE", "META", "Informational","Networking","Interface","ERCs","RIPs"]
 
-  allRows.forEach(category => {
-    transformedData.forEach(data => {
+  allRows?.forEach(category => {
+    transformedData?.forEach(data => {
       const existing = rows.find((row) => row.category.toLowerCase() === category.toLowerCase() && row.year === data.year);
       if (!existing) {
         rows.push({ category, year: data.year, value: 0 });
@@ -134,8 +134,8 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     });
   });
 
-  const total = rows.reduce((sum, row) => sum + row.value, 0);
-  const numRows = rows.length + 15;
+  const total = rows?.reduce((sum, row) => sum + row.value, 0);
+  const numRows = rows?.length + 15;
   const rowHeight = 40; // Assuming each row has a height of 40px
   const maxHeight = `${numRows * rowHeight}px`;
 
@@ -156,12 +156,12 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     // Gather EIPs data for the selected year
     const yearEIPs = filteredData.flatMap((item) =>
       item.eips
-        .filter((eip) => eip.year === selectedYear)
-        .flatMap((eip) => eip.eips) // Assuming this contains the actual EIP objects
+        ?.filter((eip) => eip.year === selectedYear)
+        ?.flatMap((eip) => eip.eips) // Assuming this contains the actual EIP objects
     );
   
     // Add EIPs data to csvRows
-    yearEIPs.forEach((eip) => {
+    yearEIPs?.forEach((eip) => {
       csvRows.push([
         eip.eip,
         escapeCSV(eip.title),  // Escape title field
@@ -176,7 +176,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     });
   
     // Create CSV content
-    const csvString = csvRows.map((row) => row.join(",")).join("\n");
+    const csvString = csvRows?.map((row) => row.join(",")).join("\n");
     const blob = new Blob([csvString], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
   
@@ -227,7 +227,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
               className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
               size="md"
             >
-              {years.map((item) => (
+              {years?.map((item) => (
                 <option value={`${item}`} key={item}>
                   {item}
                 </option>
@@ -268,7 +268,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
       </Tr>
     </Thead>
     <Tbody>
-      {rows.map((row) => (
+      {rows?.map((row) => (
         <Tr key={`${row.category}-${row.year}`}>
           <Td style={{ wordWrap: 'break-word' }}>{`${row.category}`}</Td>
           <Td style={{ wordWrap: 'break-word' }}>{row.value}</Td>

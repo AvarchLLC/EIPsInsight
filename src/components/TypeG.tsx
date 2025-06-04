@@ -204,7 +204,7 @@ const TypeG: React.FC = () => {
         marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
       >
         <Text fontSize="xl" fontWeight="bold" color="#4267B2">
-          Draft - [ {data.filter((item) => item.status === "Draft").length} ]
+          Draft - [ {data?.filter((item) => item.status === "Draft")?.length} ]
         </Text>
 
         <Box
@@ -239,7 +239,7 @@ const TypeG: React.FC = () => {
         <AreaC type={"EIPs"} />
 
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"8"}>
-          Review - [ {data.filter((item) => item.status === "Review").length} ]
+          Review - [ {data?.filter((item) => item.status === "Review")?.length} ]
         </Text>
 
         <Box
@@ -268,7 +268,7 @@ const TypeG: React.FC = () => {
 
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"8"}>
           Stagnant - [{" "}
-          {data.filter((item) => item.status === "Stagnant").length} ]
+          {data?.filter((item) => item.status === "Stagnant")?.length} ]
         </Text>
 
         <Box
@@ -296,7 +296,7 @@ const TypeG: React.FC = () => {
         </Box>
 
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"8"}>
-          Living - [ {data.filter((item) => item.status === "Living").length} ]
+          Living - [ {data?.filter((item) => item.status === "Living")?.length} ]
         </Text>
 
         <Box
@@ -325,7 +325,7 @@ const TypeG: React.FC = () => {
 
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"8"}>
           Last Call - [{" "}
-          {data.filter((item) => item.status === "Last Call").length} ]
+          {data?.filter((item) => item.status === "Last Call")?.length} ]
         </Text>
 
         <Box
@@ -354,7 +354,7 @@ const TypeG: React.FC = () => {
 
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"8"}>
           Withdrawn - [{" "}
-          {data.filter((item) => item.status === "Withdrawn").length} ]
+          {data?.filter((item) => item.status === "Withdrawn")?.length} ]
         </Text>
 
         <Box
@@ -382,7 +382,7 @@ const TypeG: React.FC = () => {
         </Box>
 
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"8"}>
-          Final - [ {data.filter((item) => item.status === "Final").length} ]
+          Final - [ {data?.filter((item) => item.status === "Final")?.length} ]
         </Text>
 
         <Box

@@ -3,7 +3,7 @@ import { convertEthToUSD, convertGweiToUSD } from "./ethereumService";
 import { FaList, FaCopy } from 'react-icons/fa';
 
 const RecentTransactions = ({ transactions, ethPriceInUSD, timestamp }: { transactions: any[]; ethPriceInUSD: number; timestamp: number }) => {
-  if (!transactions || transactions.length === 0) return null;
+  if (!transactions || transactions?.length === 0) return null;
 
   const toast = useToast(); // For showing toast notifications
 
@@ -26,7 +26,7 @@ const RecentTransactions = ({ transactions, ethPriceInUSD, timestamp }: { transa
   // };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
+    navigator.clipboard.writeText(text)?.then(() => {
       toast({
         title: "copied!",
         description: "The hash has been copied to your clipboard.",
@@ -103,7 +103,7 @@ const RecentTransactions = ({ transactions, ethPriceInUSD, timestamp }: { transa
           </Tr>
         </Thead>
         <Tbody>
-          {transactions.map((tx, index) => {
+          {transactions?.map((tx, index) => {
             const valueInWei = hexToDecimal(tx.value); // Convert hex to decimal wei
             const valueInEth = weiToEth(valueInWei); // Convert wei to ETH
             const age = calculateAge(timestamp); // Calculate age using the provided timestamp

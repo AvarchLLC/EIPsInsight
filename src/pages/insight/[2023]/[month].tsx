@@ -118,7 +118,7 @@ const Month = () => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+        setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -128,13 +128,13 @@ const Month = () => {
     fetchData();
   }, []);
 
-  let filteredData1 = data.filter((item) => item.status === "Draft");
-  let filteredData2 = data.filter((item) => item.status === "Review");
-  let filteredData3 = data.filter((item) => item.status === "Last Call");
-  let filteredData4 = data.filter((item) => item.status === "Living");
-  let filteredData5 = data.filter((item) => item.status === "Final");
-  let filteredData6 = data.filter((item) => item.status === "Stagnant");
-  let filteredData7 = data.filter((item) => item.status === "Withdrawn");
+  let filteredData1 = data?.filter((item) => item.status === "Draft");
+  let filteredData2 = data?.filter((item) => item.status === "Review");
+  let filteredData3 = data?.filter((item) => item.status === "Last Call");
+  let filteredData4 = data?.filter((item) => item.status === "Living");
+  let filteredData5 = data?.filter((item) => item.status === "Final");
+  let filteredData6 = data?.filter((item) => item.status === "Stagnant");
+  let filteredData7 = data?.filter((item) => item.status === "Withdrawn");
   
   console.log("meta data:",filteredData3)
 

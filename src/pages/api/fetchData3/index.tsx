@@ -13,7 +13,7 @@ export default async function handler(req: any, res: any) {
 
     // Fetch priority fee data
     const priorityFeeData = await db.collection('priority_fee').find().sort({ timestamp: -1 }).limit(7200).toArray();
-    const priorityFee = priorityFeeData.map((data) => ({
+    const priorityFee = priorityFeeData?.map((data) => ({
       time: new Date(data.timestamp).toLocaleTimeString(),
       block: Number(data.blockNumber),
       priorityFee: Number(Web3.utils.fromWei(data.priorityFeePerGas || '0', 'gwei')), // Convert to Gwei
