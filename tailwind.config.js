@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+
+const { fontFamily } = require('tailwindcss/defaultTheme');
 module.exports = {
   darkMode: ["class"],
   content: [
@@ -6,9 +8,14 @@ module.exports = {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   theme: {
     container: {
+      extend: {
+        fontFamily: {
+          rajdhani: ['var(--font-rajdhani)', 'sans-serif'],
+        },
+      },
       center: true,
       padding: "2rem",
       screens: {

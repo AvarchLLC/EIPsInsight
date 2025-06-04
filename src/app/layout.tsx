@@ -1,6 +1,6 @@
 "use client";
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Rajdhani } from 'next/font/google';
 import { Providers } from "./providers";
 import { Box, ColorModeScript, Flex } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
@@ -14,30 +14,24 @@ import SessionWrapper from "@/components/SessionWrapper";
 import { useSidebar } from "@/components/Sidebar/SideBarContext";
 import AppSidebar from "@/components/Sidebar/AppSidebar";
 
+
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
 const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
 
-const mont = Inter({ subsets: ["latin"] });
 
 export default function AllLayout({ children }: { children: React.ReactNode }) {
+
+const mont = Rajdhani({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
+
   const pathname = usePathname();
   const { isCollapsed } = useSidebar();
 
   return (
     <SessionWrapper>
       <html lang="en">
-        {/* <head>
-      
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></script>
-        <script>
-          {`window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'G-R36R5NJFTW');
-          `}
-        </script>
-      </head> */}
         <body className={`${mont.className}`}>
           <ColorModeScript initialColorMode="dark" />
           <AnimatePresence>

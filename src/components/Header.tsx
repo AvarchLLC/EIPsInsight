@@ -6,7 +6,7 @@ import CopyLink from './CopyLink';
 
 interface HeaderProps {
   title: string;
-  subtitle: string;
+  subtitle: React.ReactNode;
 }
 
 const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {

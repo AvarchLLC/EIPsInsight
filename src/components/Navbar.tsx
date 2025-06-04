@@ -37,8 +37,8 @@ interface NavItem {
 const Navbar: React.FC = () => {
   const NAV_ITEMS: Array<NavItem> = [
     {
-      label: "Pectra",
-      href: `/upgrade`,
+      label:"Upgrade",
+      href:`/upgrade`
     },
     {
       label: "All-EIPS",
