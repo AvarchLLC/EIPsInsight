@@ -138,7 +138,7 @@ const SearchByEip: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
   return (
     <>
-      <Box p={5} maxW="1200px" mx="auto">
+      <Box p={5} maxW="1200px" mx="auto" id='Search PR/ISSUE'>
         
         <Flex justifyContent="center" mt={3} alignItems="center" gap={4}>
           <Input
