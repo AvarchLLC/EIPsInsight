@@ -130,7 +130,7 @@ const sidebarStructure = [
   },
   {
     icon: LayoutDashboard,
-    label: "Pectra",
+    label: "Upgrade",
     href: "/upgrade",
     children: [
       { label: "PECTRA", href: "/upgrade#pectra" },
@@ -213,17 +213,78 @@ const sidebarStructure = [
     icon: Wrench,
     label: "Tools",
     children: [
-      { label: "Analytics", href: "/Analytics" },
-      { label: "Boards", href: "/boards" },
-      { label: "Editors & Reviewers Leaderboard", href: "/Reviewers" },
-      { label: "EIP Proposal Builder", href: "/proposalbuilder#split#eip#new" },
+      {
+        label: "Analytics",
+        href: "/Analytics",
+        children: [
+          { label: "Github PR Analytics", href: "/Analytics#GithubAnalytics" },
+          { label: "EIPs Label Chart", href: "/Analytics#EIPsLabelChart" },
+        ],
+      },
+      {
+        label: "Boards",
+        href: "/boards",
+        children: [{ label: "EIPs BOARD", href: "/boards#EIPsBOARD" }],
+      },
+      {
+        label: "Editors & Reviewers Leaderboard",
+        href: "/Reviewers",
+        children: [
+          { label: "editors", href: "/Reviewers#editors" },
+          { label: "Reviewers", href: "/Reviewers#Reviewers" },
+          { label: "LeaderBoard", href: "/Reviewers#LeaderBoard" },
+          { label: "Leaderboard FAQ", href: "/Reviewers#Leaderboard FAQ" },
+          { label: "ActivityTimeline", href: "/Reviewers#ActivityTimeline" },
+          { label: "PRs Reviewed", href: "/Reviewers#PRs Reviewed" },
+          { label: "active editors", href: "/Reviewers#active editors" },
+          { label: "comments", href: "/Reviewers#comments" },
+        ],
+      },
+      {
+        label: "EIP Proposal Builder",
+        href: "/proposalbuilder",
+        children: [
+          {
+            label: "EIP Builder",
+            href: "/proposalbuilder#split#eip#new#EipTemplateEditor",
+          },
+        ],
+      },
       {
         label: "Search By",
         children: [
-          { label: "Author", href: "/authors" },
-          { label: "EIP", href: "/SearchEip" },
-          { label: "EIP Title", href: "/SearchEipTitle" },
-          { label: "PR/ISSUE", href: "/SearchPRSandISSUES" },
+          {
+            label: "Author",
+            href: "/authors",
+            children: [
+              { label: "Search Author", href: "/authors#Search Author" },
+            ],
+          },
+          {
+            label: "EIP",
+            href: "/SearchEip",
+            children: [{ label: "Search EIP", href: "/SearchEip#Search EIP" }],
+          },
+          {
+            label: "EIP Title",
+            href: "/SearchEipTitle",
+            children: [
+              {
+                label: "Search EIP Title",
+                href: "/SearchEipTitle#Search EIP Title",
+              },
+            ],
+          },
+          {
+            label: "PR/ISSUE",
+            href: "/SearchPRSandISSUES",
+            children: [
+              {
+                label: "Search PR/ISSUE",
+                href: "/SearchPRSandISSUES#Search PR/ISSUE",
+              },
+            ],
+          },
         ],
       },
     ],

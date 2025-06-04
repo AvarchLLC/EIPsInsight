@@ -255,4 +255,47 @@ export const sidebarConfig: Record<
     { label: "Author Contributions", icon: LuUsers, id: "AuthorContributions" },
     { label: "Pectra Table", icon: LuTable, id: "pectra-table" },
   ],
+  "/Analytics": [
+    { label: "Github PR Analytics", icon: LuUsers, id: "GithubAnalytics" },
+    { label: "EIPs Label Chart", icon: LuUsers, id: "EIPsLabelChart" },
+  ],
+  "/boards": [{ label: "EIPs BOARD", icon: LuUsers, id: "EIPsBOARD" }],
+
+  "/Reviewers": [
+    { label: "editors", icon: LuUsers, id: "/Reviewers#editors" },
+    { label: "Reviewers", icon: LuUsers, id: "/Reviewers#Reviewers" },
+    { label: "LeaderBoard", icon: LuUsers, id: "/Reviewers#LeaderBoard" },
+    {
+      label: "Leaderboard FAQ",
+      icon: LuUsers,
+      id: "/Reviewers#Leaderboard FAQ",
+    },
+    {
+      label: "ActivityTimeline",
+      icon: LuUsers,
+      id: "/Reviewers#ActivityTimeline",
+    },
+    { label: "PRs Reviewed", icon: LuUsers, id: "/Reviewers#PRs Reviewed" },
+    { label: "active editors", icon: LuUsers, id: "/Reviewers#active editors" },
+    { label: "comments", icon: LuUsers, id: "/Reviewers#comments" },
+  ],
+  "/proposalbuilder": [
+    { label: "EIP Builder", icon: LuUsers, id: "#split#eip#new#EipTemplateEditor" },
+  ],
+  "/authors": [{ label: "Search Author", icon: LuUsers, id: "Search Author" }],
+  "/SearchEip": [{ label: "Search EIP", icon: LuUsers, id: "/Search EIP" }],
+  "/SearchEipTitle": [
+    {
+      label: "Search EIP Title",
+      icon: LuUsers,
+      id: "Search EIP Title",
+    },
+  ],
+  "/SearchPRSandISSUES": [
+    {
+      label: "Search PR/ISSUE",
+      icon: LuSearch,
+      id: "Search PR/ISSUE",
+    },
+  ],
 };
