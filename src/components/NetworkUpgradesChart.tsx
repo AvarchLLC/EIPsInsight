@@ -1297,6 +1297,17 @@ const rawData = [
   { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "" },
   { date: "2015-07-30", upgrade: "Frontier", eip: "" },
   { date: "2021-10-21", upgrade: "Altair", eip: "" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "2537" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "2935" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "6110" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "7002" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "7251" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "7549" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "7685" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "7702" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "7691" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "7623" },
+  { date: "2025-07-05", upgrade: "Pectra", eip: "7840" },
 ];
 // Group data by date-upgrade combination// Group data by date-upgrade combination (keeping duplicates)
 const upgradeMap: Record<string, UpgradeData> = {};

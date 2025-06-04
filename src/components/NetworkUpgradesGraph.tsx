@@ -143,6 +143,23 @@ const networkUpgradesData = {
         { eip: 6049, requires: [] },
       ],
     },
+    {
+      name: 'Fusaka',
+      eips: [
+        { eip: 7594, requires: [4844] },
+        { eip: 7642, requires: [5793] },
+        { eip: 7823, requires: [198] },
+        { eip: 7825, requires: [] },
+        { eip: 7883, requires: [] },
+        { eip: 7892, requires: [] },
+        { eip: 7918, requires: [4844, 7840] },
+        { eip: 7935, requires: [] },
+        { eip: 5920, requires: [] },
+        { eip: 7901, requires: [] },
+        { eip: 7917, requires: [] },
+        { eip: 7934, requires: [] }
+      ]
+    },
   ],
 };
 

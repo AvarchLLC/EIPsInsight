@@ -287,11 +287,10 @@ const RIP = () => {
               {/* Toggle Buttons */}
               <ButtonGroup size="md" isAttached>
                 <Button
-                  bg="#40E0D0"
-                  color="white"
-                  _hover={{ bg: "#30c9c9" }}
-                  _active={{ bg: "#1fb8b8" }}
-                  variant={selected === "type" ? "solid" : "outline"}
+                  bg={selected === "type" ? "#40E0D0" : "white"}
+                  color={selected === "type" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
                   onClick={() => {
                     setSelected("type");
                     router.push("?view=type", undefined, { shallow: true });
@@ -300,11 +299,10 @@ const RIP = () => {
                   Type
                 </Button>
                 <Button
-                  bg="#40E0D0"
-                  color="white"
-                  _hover={{ bg: "#30c9c9" }}
-                  _active={{ bg: "#1fb8b8" }}
-                  variant={selected === "status" ? "solid" : "outline"}
+                  bg={selected === "status" ? "#40E0D0" : "white"}
+                  color={selected === "status" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
                   onClick={() => {
                     setSelected("status");
                     router.push("?view=status", undefined, { shallow: true });
@@ -313,6 +311,7 @@ const RIP = () => {
                   Status
                 </Button>
               </ButtonGroup>
+
             </Flex>
             <br />
             <Box
@@ -497,7 +496,7 @@ const RIP = () => {
                 <>
                   {/* Header and Dropdown to select status */}
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                    <Text fontSize="2xl" fontWeight="bold" textAlign="center"   color="#40E0D0">
+                    <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="#40E0D0">
                       Select RIP Status to View Stats
                     </Text>
                     <Button

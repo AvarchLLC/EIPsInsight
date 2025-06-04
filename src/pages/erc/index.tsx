@@ -288,24 +288,26 @@ const ERC = () => {
               {/* Toggle Buttons */}
               <ButtonGroup size="md" isAttached>
                 <Button
-                  bg="#40E0D0"
-                  color="white"
-                  _hover={{ bg: "#30c9c9" }}
-                  _active={{ bg: "#1fb8b8" }}
-                  variant={selected === "type" ? "solid" : "outline"}
-                  onClick={() => setSelected("type")}
-                  flex="1"
+                  bg={selected === "type" ? "#40E0D0" : "white"}
+                  color={selected === "type" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
+                  onClick={() => {
+                    setSelected("type");
+                    router.push("?view=type", undefined, { shallow: true });
+                  }}
                 >
                   Type
                 </Button>
                 <Button
-                  bg="#40E0D0"
-                  color="white"
-                  _hover={{ bg: "#30c9c9" }}
-                  _active={{ bg: "#1fb8b8" }}
-                  variant={selected === "status" ? "solid" : "outline"}
-                  onClick={() => setSelected("status")}
-                  flex="1"
+                  bg={selected === "status" ? "#40E0D0" : "white"}
+                  color={selected === "status" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
+                  onClick={() => {
+                    setSelected("status");
+                    router.push("?view=status", undefined, { shallow: true });
+                  }}
                 >
                   Status
                 </Button>

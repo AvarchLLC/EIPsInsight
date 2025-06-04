@@ -313,7 +313,7 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
 
   const removeDuplicatesFromEips = (eips: EIP2[]) => {
     const seen = new Set();
-    
+
     return eips.filter((eip) => {
       if (!seen.has(eip.eip)) {
         seen.add(eip.eip); // Track seen eip numbers
@@ -330,38 +330,38 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     const filteredData = typeData.filter((item) => item.status === selectedStatus);
 
     if (!filteredData.length) {
-        console.error("No data available for the selected status.");
-        alert("No data available for download.");
-        return;
+      console.error("No data available for the selected status.");
+      alert("No data available for download.");
+      return;
     }
 
     // Transform the filtered data to get the necessary details
     const transformedData = filteredData.flatMap((item) => {
-        return item.eips.flatMap((eipGroup) => {
-            const category = getCat(eipGroup.category); // Assuming this function returns a string
-            const year = eipGroup.year.toString(); // Convert year to string
-            const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Assuming this returns an array of EIPs
+      return item.eips.flatMap((eipGroup) => {
+        const category = getCat(eipGroup.category); // Assuming this function returns a string
+        const year = eipGroup.year.toString(); // Convert year to string
+        const uniqueEips = removeDuplicatesFromEips(eipGroup.eips); // Assuming this returns an array of EIPs
 
-            return uniqueEips.map((eip) => ({
-                category,
-                year,
-                eip: eip.eip, // EIP number
-                author: eip.author, // Author of the EIP
-                repo: eip.repo, // Repo type (e.g., "eip", "erc", "rip")
-                discussion: eip.discussion, // Discussion link
-                status: eip.status, // Status of the EIP
-                created: eip.created, // Creation date
-                deadline: eip.deadline || "", // Deadline if exists, else empty
-                type: eip.type, // Type of the EIP
-                title: eip.title, // Title of the EIP
-            }));
-        });
+        return uniqueEips.map((eip) => ({
+          category,
+          year,
+          eip: eip.eip, // EIP number
+          author: eip.author, // Author of the EIP
+          repo: eip.repo, // Repo type (e.g., "eip", "erc", "rip")
+          discussion: eip.discussion, // Discussion link
+          status: eip.status, // Status of the EIP
+          created: eip.created, // Creation date
+          deadline: eip.deadline || "", // Deadline if exists, else empty
+          type: eip.type, // Type of the EIP
+          title: eip.title, // Title of the EIP
+        }));
+      });
     });
 
     if (!transformedData.length) {
-        console.error("Transformed data is empty.");
-        alert("No transformed data available for download.");
-        return;
+      console.error("Transformed data is empty.");
+      alert("No transformed data available for download.");
+      return;
     }
 
     // Define the CSV header
@@ -369,24 +369,24 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
 
     // Prepare the CSV content
     const csvContent =
-        "data:text/csv;charset=utf-8," + 
-        header +
-        transformedData
-            .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
-                // Generate the correct URL based on the repo type
-                const url =
-                    category === "ERC"
-                        ? `https://eipsinsight.com/ercs/erc-${eip}`
-                        : `https://eipsinsight.com/eips/eip-${eip}`;
-                        
+      "data:text/csv;charset=utf-8," +
+      header +
+      transformedData
+        .map(({ repo, eip, title, author, discussion, status, type, category, created, deadline }) => {
+          // Generate the correct URL based on the repo type
+          const url =
+            category === "ERC"
+              ? `https://eipsinsight.com/ercs/erc-${eip}`
+              : `https://eipsinsight.com/eips/eip-${eip}`;
 
-                // Handle the 'deadline' field, use empty string if not available
-                const deadlineValue = deadline || "";
 
-                // Wrap fields in double quotes to handle commas
-                return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
-            })
-            .join("\n");
+          // Handle the 'deadline' field, use empty string if not available
+          const deadlineValue = deadline || "";
+
+          // Wrap fields in double quotes to handle commas
+          return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
+        })
+        .join("\n");
 
     // Check the generated CSV content before download
     console.log("CSV Content Preview:", csvContent);
@@ -399,10 +399,10 @@ const AreaC: React.FC<AreaCProps> = ({ type }) => {
     document.body.appendChild(link); // Required for Firefox
     link.click();
     document.body.removeChild(link);
-};
+  };
 
 
-const headingColor = useColorModeValue('black', 'white');
+  const headingColor = useColorModeValue('black', 'white');
 
   return (
     <Box
@@ -419,14 +419,12 @@ const headingColor = useColorModeValue('black', 'white');
       className=" ease-in duration-200"
     >
       <NextLink
-        href={`/tableStatus/${
-          type === "EIPs" ? "eip" : type === "ERCs" ? "erc" : "rip"
-        }/${selectedStatus}`}
+        href={`/tableStatus/${type === "EIPs" ? "eip" : type === "ERCs" ? "erc" : "rip"
+          }/${selectedStatus}`}
       >
         <Text fontSize="xl" fontWeight="bold" color="#30A0E0" marginRight="6">
-          {`Status: ${selectedStatus} - [${
-            data2.filter((item) => item.status === selectedStatus).length
-          }] `}
+          {`Status: ${selectedStatus} - [${data2.filter((item) => item.status === selectedStatus).length
+            }] `}
         </Text>
       </NextLink>
       <Select
@@ -458,24 +456,27 @@ const headingColor = useColorModeValue('black', 'white');
         ) : (
           // Show chart when it's ready
           <>
-          <br/>
-          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-          <Heading size="md" color={headingColor}>
-            {`${selectedStatus}`}
-          </Heading>
-          {/* Assuming a download option exists for the yearly data as well */}
-          <Button colorScheme="blue" onClick={async () => {
-    try {
-      // Trigger the CSV conversion and download
-      downloadData();
+            <br />
+            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+              <Heading size="md" color={headingColor}>
+                {`${selectedStatus}`}
+              </Heading>
+              {/* Assuming a download option exists for the yearly data as well */}
+              <Button bg="#40E0D0"
+                color="white"
+                _hover={{ bg: "#30c9c9" }}
+                _active={{ bg: "#1fb8b8" }} onClick={async () => {
+                  try {
+                    // Trigger the CSV conversion and download
+                    downloadData();
 
-      // Trigger the API call
-      await axios.post("/api/DownloadCounter");
-    } catch (error) {
-      console.error("Error triggering download counter:", error);
-    }
-  }}>Download CSV</Button>
-        </Flex>
+                    // Trigger the API call
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}>Download CSV</Button>
+            </Flex>
             <Area {...config} />
           </>
         )}

@@ -195,7 +195,7 @@
 //     let filteredData = data.filter((item) => item.status === status1);
 //     let filteredData2 = data.filter((item) => item.status === status2);
 //     const combinedFilteredData = [...filteredData, ...filteredData2];
-    
+
 //     // Transform the filtered data to get the necessary details
 //     const transformedData = combinedFilteredData.flatMap((item) => {
 //       const status = item.status;
@@ -213,21 +213,21 @@
 //           }));
 //       });
 //   });
-  
+
 
 //     // Define the CSV header
 //     const header = "Status,Category,Year,Month,EIP\n";
-  
+
 //     // Prepare the CSV content
 //     const csvContent = "data:text/csv;charset=utf-8,"
 //         + header
 //         + transformedData.map(({ status,category, year,month, eip }) => {
 //             return `${status},${category},${year},${month},${eip}`; // Each EIP on a separate line
 //         }).join("\n");
-  
+
 //     // Check the generated CSV content before download
 //     console.log("CSV Content:", csvContent);
-  
+
 //     // Encode the CSV content for downloading
 //     const encodedUri = encodeURI(csvContent);
 //     const link = document.createElement("a");
@@ -570,9 +570,9 @@ const AreaStatus: React.FC<AreaCProps> = ({ type }) => {
               Draft vs Final
             </Heading>
             <Button
-              bg={buttonBg}
+              bg="#40E0D0"
               color="white"
-              _hover={{ bg: buttonHoverBg }}
+              _hover={{ bg: "#30c9c9" }}
               size={{ base: "md", md: "lg" }}
               onClick={async () => {
                 try {

@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 } as any}
         fontSize={{ base: "lg", md: 'lg', lg: "2xl" }}
-        color={useColorModeValue(headingColorLight, headingColorDark)}
+        color={useColorModeValue("black", "white")}
       >
         {subtitle}
       </Text>
