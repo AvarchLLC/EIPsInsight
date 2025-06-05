@@ -1250,20 +1250,14 @@ const CatTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
 
   const getColorByType = (type: string): string => {
     const key = type.toLowerCase();
-    if (key.includes("erc")) return "blue";
-    if (key.includes("meta")) return "teal";
-    if (key.includes("core")) return "purple";
-    if (key.includes("interface")) return "orange";
-    if (key.includes("networking")) return "yellow";
-    if (key.includes("informational")) return "cyan";
+    if (key.includes("meta") || key.includes("living")) return "rgb(255, 99, 132)";        // meta - living
+    if (key.includes("core") || key.includes("final")) return "rgb(255, 159, 64)";         // core - final
+    if (key.includes("interface") || key.includes("stagnant")) return "rgb(255, 205, 86)"; // interface - stagnant
+    if (key.includes("networking") || key.includes("withdrawn")) return "rgb(75, 192, 192)"; // networking - withdrawn
+    if (key.includes("informational") || key.includes("review")) return "rgb(54, 162, 235)"; // informational - review
+    if (key.includes("erc") || key.toLowerCase().includes("lastcall") || key.toLowerCase().includes("last call")) return "rgb(153, 102, 255)"; // ercs - lastcall
+    if (key.includes("rip") || key.includes("draft")) return "rgb(255, 99, 255)"; // rips - draft
     if (key.includes("standards") || key.includes("standards track")) return "green";
-    if (key.includes("living")) return "pink";
-    if (key.includes("withdrawn")) return "red";
-    if (key.includes("stagnant")) return "gray";
-    if (key.includes("lastcall") || key.includes("last call")) return "red";
-    if (key.includes("review")) return "orange";
-    if (key.includes("final")) return "green";
-    if (key.includes("draft")) return "purple";
     return "gray";
   };
 
@@ -1367,7 +1361,12 @@ const CatTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
             <Text fontSize="2xl" fontWeight="bold" color="blue.400">
               {status}
             </Text>
-            <Button size="sm" colorScheme="blue" onClick={downloadCSV} cursor="pointer">
+            <Button size="sm"
+              bg="#40E0D0"
+              color="white"
+              _hover={{ bg: "#30c9c9" }}
+              _active={{ bg: "#1fb8b8" }}
+              onClick={downloadCSV} cursor="pointer">
               Download CSV
             </Button>
           </Stack>

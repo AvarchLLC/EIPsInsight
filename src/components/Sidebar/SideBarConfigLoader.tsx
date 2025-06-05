@@ -1,19 +1,16 @@
-"use client";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-import { useSidebar } from "./SideBarContext";
-import { sidebarConfig } from "./slidebarConfig";
+'use client';
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { useSidebar } from './SideBarContext';
 
 export default function SidebarConfigLoader() {
   const pathname = usePathname();
-  const { setActivePath } = useSidebar();
+  const { setRouteRoot } = useSidebar();
 
   useEffect(() => {
-    const firstSegment = "/" + pathname?.split("/")[1];
-    if (firstSegment in sidebarConfig) {
-      setActivePath(firstSegment);
-    }
-  }, [pathname, setActivePath]);
+    const root = '/' + (pathname?.split('/')[1] || '');
+    setRouteRoot(root.toLowerCase());
+  }, [pathname, setRouteRoot]);
 
   return null;
 }

@@ -300,8 +300,13 @@ const ERCStatusDonut = () => {
   }, []);
 
   const colorsByStatus = [
-    "#2F80ED", "#27AE60", "#F2C94C",
-    "#9B51E0", "#00BFA6", "#F2994A", "#EB5757"
+    "rgb(255, 159, 64)", // Final
+    "rgb(255, 99, 255)", // Draft
+    "rgb(54, 162, 235)", // Review
+    "rgb(153, 102, 255)", // Last Call
+    "rgb(255, 99, 132)", // Living
+    "rgb(255, 205, 86)", // Stagnant
+    "rgb(75, 192, 192)", // Withdrawn
   ];
 
   const descriptionsByStatus: Record<string, string> = {

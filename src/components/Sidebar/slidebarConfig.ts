@@ -31,153 +31,134 @@ import {
   LuListTree,
   LuTrophy,
   LuBarChart2,
-  LuRocket,
-} from "react-icons/lu";
+  LuGithub
+} from 'react-icons/lu';
 
-export const sidebarGroupIcons: Record<string, React.ElementType> = {
-  "/": LuHome,
-  "/home": LuHome,
-  "/About": LuInfo,
-  "/all": LuSearch,
-  "/milestones2024": LuClipboardList,
-  "/trivia": LuSparkles,
-  "/status": LuPieChart,
-  "/issue": LuGitBranch,
-  "/PR": LuGitPullRequest,
-  "/eips": LuFileText,
-  "/ercs": LuFileText,
-  "/rips": LuFileText,
-  "/insight": LuEye,
-  "/rip": LuGitCommit,
-  "/eip": LuBarChart2,
-  "/erc": LuTrendingUp,
-  "/upgrade": LuRocket,
-  "/resources": LuRocket,
-};
 
-export const sidebarConfig: Record<
-  string,
-  { label: string; icon: React.ElementType; id: string }[]
-> = {
-  "/": [
-    { label: "All EIPs", icon: LuHome, id: "all" },
-    { label: "Our Tools", icon: LuWrench, id: "ourtools" },
-    { label: "What is EIPs Insights?", icon: LuInfo, id: "what" },
+interface SidebarItem {
+  label: string;
+  icon: React.ElementType;
+  id: string;
+  children?: SidebarItem[];
+  condition?: (context: any) => boolean;
+}
+
+// Define a type for the view-based configuration
+interface ViewBasedConfig {
+  type: SidebarItem[];
+  status: SidebarItem[];
+}
+
+// Create a union type for sidebar configuration
+type SidebarConfig = Record<string, SidebarItem[] | ViewBasedConfig>;
+
+export const sidebarConfig: SidebarConfig = {
+  '/': [
+    { label: 'All EIPs', icon: LuHome, id: 'all' },
+    { label: 'Our Tools', icon: LuWrench, id: 'ourtools' },
+    { label: 'What is EIPs Insights?', icon: LuInfo, id: 'what' },
+    { label: 'EIP Status Changes by Year', icon: LuBarChartBig, id: 'statuschanges' },
+    { label: 'Dashboard', icon: LuDatabase, id: 'dashboard' },
+  ],
+  '/home': [
+    { label: 'All EIPs', icon: LuHome, id: 'all' },
+    { label: 'Our Tools', icon: LuWrench, id: 'ourtools' },
+    { label: 'What is EIPs Insights?', icon: LuInfo, id: 'what' },
+    { label: 'EIP Status Changes by Year', icon: LuBarChartBig, id: 'statuschanges' },
+    { label: 'Dashboard', icon: LuDatabase, id: 'dashboard' },
+  ],
+  '/About': [
+    { label: 'What is EIPs Insights', icon: LuInfo, id: 'what' }
+  ],
+  '/all': [
     {
-      label: "EIP Status Changes by Year",
-      icon: LuBarChartBig,
-      id: "statuschanges",
+      label: 'Categories',
+      icon: LuListChecks,
+      id: 'categories',
+      children: [
+        { label: 'Search EIP', icon: LuSearch, id: 'searchEIP' },
+        { label: 'Living', icon: LuCheckCircle2, id: 'living' },
+        { label: 'Final', icon: LuArchive, id: 'final' },
+        { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
+        { label: 'Review', icon: LuEye, id: 'review' },
+        { label: 'Draft', icon: LuFileText, id: 'draft' },
+        { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' },
+        { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
+      ],
     },
-    { label: "Dashboard", icon: LuDatabase, id: "dashboard" },
   ],
-  "/About": [{ label: "What is EIPs Insights", icon: LuInfo, id: "what" }],
-  "/resources": [{ label: "What is EIPs Insights", icon: LuInfo, id: "what" }],
-  "/all": [
-    { label: "Search EIP", icon: LuSearch, id: "searchEIP" },
-    { label: "Living", icon: LuCheckCircle2, id: "living" },
-    { label: "Final", icon: LuArchive, id: "final" },
-    { label: "Last Call", icon: LuClock4, id: "lastcall" },
-    { label: "Review", icon: LuEye, id: "review" },
-    { label: "Draft", icon: LuFileText, id: "draft" },
-    { label: "Withdrawn", icon: LuBan, id: "withdrawn" },
-    { label: "Stagnant", icon: LuPauseCircle, id: "stagnant" },
+  '/milestones2024': [
+    { label: 'Analytics Scheduler', icon: LuClipboardList, id: 'analytics-scheduler' },
+    { label: 'Reviewers Tracker', icon: LuUsers, id: 'reviewers-tracker' },
+    { label: 'EIP Board', icon: LuListTree, id: 'eip-board' },
+    { label: 'Search Tool', icon: LuSearch, id: 'search-tool' },
+    { label: 'Pectra Network Upgrade', icon: LuTrendingUp, id: 'pectra-upgrade' },
+    { label: 'Detailed Network Upgrade Information', icon: LuBookOpen, id: 'network-info' },
+    { label: 'Gratitude', icon: LuSmile, id: 'gratitude' },
+    { label: 'Conclusion', icon: LuQuote, id: 'conclusion' }
   ],
-  "/milestones2024": [
-    {
-      label: "Analytics Scheduler",
-      icon: LuClipboardList,
-      id: "analytics-scheduler",
-    },
-    { label: "Reviewers Tracker", icon: LuUsers, id: "reviewers-tracker" },
-    { label: "EIP Board", icon: LuListTree, id: "eip-board" },
-    { label: "Search Tool", icon: LuSearch, id: "search-tool" },
-    {
-      label: "Pectra Network Upgrade",
-      icon: LuTrendingUp,
-      id: "pectra-upgrade",
-    },
-    {
-      label: "Detailed Network Upgrade Information",
-      icon: LuBookOpen,
-      id: "network-info",
-    },
-    { label: "Gratitude", icon: LuSmile, id: "gratitude" },
-    { label: "Conclusion", icon: LuQuote, id: "conclusion" },
+  '/trivia': [
+    { label: 'Cool EIP Facts', icon: LuSparkles, id: 'cool-facts' },
+    { label: 'Fun EIP Facts', icon: LuSmile, id: 'fun-facts' }
   ],
-  "/trivia": [
-    { label: "Cool EIP Facts", icon: LuSparkles, id: "cool-facts" },
-    { label: "Fun EIP Facts", icon: LuSmile, id: "fun-facts" },
+  '/status': [
+    { label: 'Draft vs Final', icon: LuGitCommit, id: 'draft-vs-final' },
+    { label: 'Draft', icon: LuFileText, id: 'draft' },
+    { label: 'Review', icon: LuEye, id: 'review' },
+    { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
+    { label: 'Final', icon: LuArchive, id: 'final' },
+    { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
+    { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' },
+    { label: 'Living', icon: LuCheckCircle2, id: 'living' }
   ],
-  "/status": [
-    { label: "Draft vs Final", icon: LuGitCommit, id: "draft-vs-final" },
-    { label: "Draft", icon: LuFileText, id: "draft" },
-    { label: "Review", icon: LuEye, id: "review" },
-    { label: "Last Call", icon: LuClock4, id: "lastcall" },
-    { label: "Final", icon: LuArchive, id: "final" },
-    { label: "Stagnant", icon: LuPauseCircle, id: "stagnant" },
-    { label: "Withdrawn", icon: LuBan, id: "withdrawn" },
-    { label: "Living", icon: LuCheckCircle2, id: "living" },
+  '/issue': [
+    { label: 'Description', icon: LuInfo, id: 'description' },
+    { label: 'All Conversations', icon: LuGitBranch, id: 'conversations' }
   ],
-  "/issue": [
-    { label: "Description", icon: LuInfo, id: "description" },
-    { label: "All Conversations", icon: LuGitBranch, id: "conversations" },
+  '/PR': [
+    { label: 'Description', icon: LuInfo, id: 'description' },
+    { label: 'All Conversations', icon: LuGitPullRequest, id: 'conversations' },
+    { label: 'Review Comments', icon: LuListChecks, id: 'review-comments' }
   ],
-  "/PR": [
-    { label: "Description", icon: LuInfo, id: "description" },
-    { label: "All Conversations", icon: LuGitPullRequest, id: "conversations" },
-    { label: "Review Comments", icon: LuListChecks, id: "review-comments" },
+  '/eips': [
+    { label: 'Status Timeline', icon: LuBarChartBig, id: 'timeline' },
+    { label: 'Simple Summary', icon: LuFileText, id: 'summary' },
+    { label: 'Abstract', icon: LuFileSignature, id: 'abstract' },
+    { label: 'Motivation', icon: LuTrendingUp, id: 'motivation' },
+    { label: 'Specification', icon: LuClipboardList, id: 'specification' },
+    { label: 'Rationale', icon: LuBookOpen, id: 'rationale' },
+    { label: 'Backwards Compatibility', icon: LuGitBranch, id: 'compatibility' },
+    { label: 'Copyright', icon: LuTrophy, id: 'copyright' }
   ],
-  "/eips": [
-    { label: "Status Timeline", icon: LuBarChartBig, id: "timeline" },
-    { label: "Simple Summary", icon: LuFileText, id: "summary" },
-    { label: "Abstract", icon: LuFileSignature, id: "abstract" },
-    { label: "Motivation", icon: LuTrendingUp, id: "motivation" },
-    { label: "Specification", icon: LuClipboardList, id: "specification" },
-    { label: "Rationale", icon: LuBookOpen, id: "rationale" },
-    {
-      label: "Backwards Compatibility",
-      icon: LuGitBranch,
-      id: "compatibility",
-    },
-    { label: "Copyright", icon: LuTrophy, id: "copyright" },
+  '/ercs': [
+    { label: 'Status Timeline', icon: LuBarChartBig, id: 'timeline' },
+    { label: 'Simple Summary', icon: LuFileText, id: 'summary' },
+    { label: 'Abstract', icon: LuFileSignature, id: 'abstract' },
+    { label: 'Motivation', icon: LuTrendingUp, id: 'motivation' },
+    { label: 'Specification', icon: LuClipboardList, id: 'specification' },
+    { label: 'Rationale', icon: LuBookOpen, id: 'rationale' },
+    { label: 'Backwards Compatibility', icon: LuGitBranch, id: 'compatibility' },
+    { label: 'Copyright', icon: LuTrophy, id: 'copyright' }
   ],
-  "/ercs": [
-    { label: "Status Timeline", icon: LuBarChartBig, id: "timeline" },
-    { label: "Simple Summary", icon: LuFileText, id: "summary" },
-    { label: "Abstract", icon: LuFileSignature, id: "abstract" },
-    { label: "Motivation", icon: LuTrendingUp, id: "motivation" },
-    { label: "Specification", icon: LuClipboardList, id: "specification" },
-    { label: "Rationale", icon: LuBookOpen, id: "rationale" },
-    {
-      label: "Backwards Compatibility",
-      icon: LuGitBranch,
-      id: "compatibility",
-    },
-    { label: "Copyright", icon: LuTrophy, id: "copyright" },
+  '/rips': [
+    { label: 'Status Timeline', icon: LuBarChartBig, id: 'timeline' },
+    { label: 'Simple Summary', icon: LuFileText, id: 'summary' },
+    { label: 'Abstract', icon: LuFileSignature, id: 'abstract' },
+    { label: 'Motivation', icon: LuTrendingUp, id: 'motivation' },
+    { label: 'Specification', icon: LuClipboardList, id: 'specification' },
+    { label: 'Rationale', icon: LuBookOpen, id: 'rationale' },
+    { label: 'Backwards Compatibility', icon: LuGitBranch, id: 'compatibility' },
+    { label: 'Copyright', icon: LuTrophy, id: 'copyright' }
   ],
-  "/rips": [
-    { label: "Status Timeline", icon: LuBarChartBig, id: "timeline" },
-    { label: "Simple Summary", icon: LuFileText, id: "summary" },
-    { label: "Abstract", icon: LuFileSignature, id: "abstract" },
-    { label: "Motivation", icon: LuTrendingUp, id: "motivation" },
-    { label: "Specification", icon: LuClipboardList, id: "specification" },
-    { label: "Rationale", icon: LuBookOpen, id: "rationale" },
-    {
-      label: "Backwards Compatibility",
-      icon: LuGitBranch,
-      id: "compatibility",
-    },
-    { label: "Copyright", icon: LuTrophy, id: "copyright" },
-  ],
-  "/insight": [
-    { label: "Summary", icon: LuFileText, id: "Summary" },
-    { label: "Draft", icon: LuFileText, id: "draft" },
-    { label: "Review", icon: LuEye, id: "review" },
-    { label: "Last Call", icon: LuClock4, id: "lastcall" },
-    { label: "Living", icon: LuCheckCircle2, id: "living" },
-    { label: "Final", icon: LuArchive, id: "final" },
-    { label: "Stagnant", icon: LuPauseCircle, id: "stagnant" },
-    { label: "Withdrawn", icon: LuBan, id: "withdrawn" },
+  '/insight': [
+    { label: 'Summary', icon: LuFileText, id: 'Summary' },
+    { label: 'Draft', icon: LuFileText, id: 'draft' },
+    { label: 'Review', icon: LuEye, id: 'review' },
+    { label: 'Last Call', icon: LuClock4, id: 'lastcall' },
+    { label: 'Living', icon: LuCheckCircle2, id: 'living' },
+    { label: 'Final', icon: LuArchive, id: 'final' },
+    { label: 'Stagnant', icon: LuPauseCircle, id: 'stagnant' },
+    { label: 'Withdrawn', icon: LuBan, id: 'withdrawn' }
   ],
   // '/Reviewers': [
   //   { label: 'Editors & Reviewers Leaderboard', icon: LuTrophy, id: 'leaderboard' },
@@ -188,114 +169,107 @@ export const sidebarConfig: Record<
   //   { label: 'Reviewers', icon: LuUsers, id: 'reviewers' },
   //   { label: 'Active Editors PR reviews in each Repository', icon: LuGitBranch, id: 'active-prs' }
   // ],
-  "/rip": [
-    { label: "Graphs", icon: LuBarChartBig, id: "graphs" },
-    { label: "Draft vs Final", icon: LuBarChart2, id: "draftvsfinal" },
-    { label: "Draft", icon: LuFileText, id: "draft" },
-    { label: "Final", icon: LuArchive, id: "final" },
-    { label: "Living", icon: LuCheckCircle2, id: "living" },
-    { label: "Meta", icon: LuListChecks, id: "meta" },
-    { label: "Informational", icon: LuListChecks, id: "informational" },
-    { label: "Core", icon: LuHome, id: "core" },
-    { label: "Networking", icon: LuListChecks, id: "networking" },
-    { label: "Interface", icon: LuListChecks, id: "interface" },
-    { label: "RIP", icon: LuInfo, id: "rip" },
-    { label: "RRC", icon: LuFileSignature, id: "rrc" },
-  ],
-  "/eip": [
-    { label: "Graphs", icon: LuBarChartBig, id: "graphs" },
-    { label: "Draft vs Final", icon: LuBarChart2, id: "draftvsfinal" },
-    { label: "Core", icon: LuHome, id: "core" },
-    { label: "Networking", icon: LuNetwork, id: "networking" },
-    { label: "Interface", icon: LuWrench, id: "interface" },
-    { label: "Meta", icon: LuListChecks, id: "meta" },
-    { label: "Informational", icon: LuInfo, id: "informational" },
-    { label: "Draft", icon: LuFileText, id: "draft" },
-    { label: "Review", icon: LuEye, id: "review" },
-    { label: "Last Call", icon: LuClock4, id: "lastcall" },
-    { label: "Final", icon: LuArchive, id: "final" },
-    { label: "Stagnant", icon: LuPauseCircle, id: "stagnant" },
-    { label: "Withdrawn", icon: LuBan, id: "withdrawn" },
-    { label: "Living", icon: LuCheckCircle2, id: "living" },
-    { label: "Meta Table", icon: LuTable, id: "metatable" },
-    { label: "Informational Table", icon: LuTable, id: "informationaltable" },
-    { label: "Core Table", icon: LuTable, id: "coretable" },
-    { label: "Networking Table", icon: LuTable, id: "networkingtable" },
-    { label: "Interface Table", icon: LuTable, id: "interfacetable" },
-  ],
-  "/erc": [
-    { label: "Graphs", icon: LuBarChartBig, id: "graphs" },
-    {
-      label: "ERC (Progress Over the Years)",
-      icon: LuTrendingUp,
-      id: "ercprogress",
-    },
-    { label: "Draft", icon: LuFileText, id: "draft" },
-    { label: "Review", icon: LuEye, id: "review" },
-    { label: "Last Call", icon: LuClock4, id: "lastcall" },
-    { label: "Final", icon: LuArchive, id: "final" },
-    { label: "Stagnant", icon: LuPauseCircle, id: "stagnant" },
-    { label: "Withdrawn", icon: LuBan, id: "withdrawn" },
-    { label: "Living", icon: LuCheckCircle2, id: "living" },
-    { label: "Meta Table", icon: LuTable, id: "metatable" },
-    { label: "ERC Table", icon: LuTable, id: "erctable" },
-  ],
-  "/upgrade": [
-    { label: "PECTRA", icon: LuTrendingUp, id: "pectra" },
-    {
-      label: "Network Upgrades and EIPs Relationship Graph",
-      icon: LuGitBranch,
-      id: "NetworkUpgradesChartp",
-    },
-    {
-      label: "Network Upgrades Graph",
-      icon: LuBarChartBig,
-      id: "NetworkUpgrades",
-    },
-    { label: "Author Contributions", icon: LuUsers, id: "AuthorContributions" },
-    { label: "Pectra Table", icon: LuTable, id: "pectra-table" },
-  ],
-  "/Analytics": [
-    { label: "Github PR Analytics", icon: LuUsers, id: "GithubAnalytics" },
-    { label: "EIPs Label Chart", icon: LuUsers, id: "EIPsLabelChart" },
-  ],
-  "/boards": [{ label: "EIPs BOARD", icon: LuUsers, id: "EIPsBOARD" }],
+  '/rip': {
+    type: [
+      { label: 'GitHub Stats', icon: LuGithub, id: 'githubstats' },
+      { label: 'Graphs', icon: LuBarChartBig, id: 'charts' },
+      { label: 'Table', icon: LuInfo, id: 'type-tables' },
+    ],
+    status: [
+      { label: 'GitHub Stats', icon: LuGithub, id: 'githubstats' },
+      { label: 'Graphs', icon: LuBarChartBig, id: 'graphs' },
+      { label: 'Draft vs Final', icon: LuBarChart2, id: 'draftvsfinal' },
+      {
+        label: 'Statuses',
+        icon: LuListChecks,
+        id: 'statuses',
+        children: [/*...*/]
+      },
+      { label: 'Table', icon: LuFileSignature, id: 'status-tables' },
 
-  "/Reviewers": [
-    { label: "editors", icon: LuUsers, id: "/Reviewers#editors" },
-    { label: "Reviewers", icon: LuUsers, id: "/Reviewers#Reviewers" },
-    { label: "LeaderBoard", icon: LuUsers, id: "/Reviewers#LeaderBoard" },
+    ]
+  },
+  '/eip': {
+    type: [
+      { label: 'GitHub Stats', icon: LuGithub, id: 'githubstats' },
+      { label: 'Graphs', icon: LuBarChartBig, id: 'charts' },
+      {
+        label: 'Categories',
+        icon: LuListChecks,
+        id: 'categories',
+        children: [/*...*/]
+      },
+      {
+        label: 'Tables',
+        icon: LuTable,
+        id: 'tables',
+        children: [/*...*/]
+      }
+    ],
+    status: [
+      { label: 'GitHub Stats', icon: LuGithub, id: 'githubstats' },
+      { label: 'Graphs', icon: LuBarChartBig, id: 'charts' },
+      { label: 'Draft vs Final', icon: LuBarChart2, id: 'draftvsfinal' },
+      {
+        label: 'Statuses',
+        icon: LuListChecks,
+        id: 'statuses',
+        children: [/*...*/]
+      },
+      {
+        label: 'Tables',
+        icon: LuTable,
+        id: 'tables',
+        children: [/*...*/]
+      }
+    ]
+  },
+  '/erc': {
+    type: [
+      { label: 'GitHub Stats', icon: LuGithub, id: 'githubstats' },
+      { label: 'Graphs', icon: LuBarChartBig, id: 'graphs' },
+      { label: 'ERC (Progress Over the Years)', icon: LuTrendingUp, id: 'ercprogress' },
+      {
+        label: 'Tables',
+        icon: LuTable,
+        id: 'tables',
+        children: [/*...*/]
+      }
+    ],
+    status: [
+      { label: 'GitHub Stats', icon: LuGithub, id: 'githubstats' },
+      { label: 'Graphs', icon: LuBarChartBig, id: 'graphs' },
+      { label: 'Draft vs Final', icon: LuBarChart2, id: 'draftvsfinal' },
+      {
+        label: 'Statuses',
+        icon: LuListChecks,
+        id: 'statuses',
+        children: [/*...*/]
+      },
+      {
+        label: 'Tables',
+        icon: LuTable,
+        id: 'tables',
+        children: [/*...*/]
+      }
+    ]
+  },
+
+  '/upgrade': [
     {
-      label: "Leaderboard FAQ",
-      icon: LuUsers,
-      id: "/Reviewers#Leaderboard FAQ",
+      label: 'Upgrade',
+      icon: LuTrendingUp,
+      id: 'pectrafusaka',
+      children: [
+        { label: 'PECTRA', icon: LuTrendingUp, id: 'pectra' },
+        { label: 'FUSAKA', icon: LuTrendingUp, id: 'fusaka' },
+      ],
     },
-    {
-      label: "ActivityTimeline",
-      icon: LuUsers,
-      id: "/Reviewers#ActivityTimeline",
-    },
-    { label: "PRs Reviewed", icon: LuUsers, id: "/Reviewers#PRs Reviewed" },
-    { label: "active editors", icon: LuUsers, id: "/Reviewers#active editors" },
-    { label: "comments", icon: LuUsers, id: "/Reviewers#comments" },
-  ],
-  "/proposalbuilder": [
-    { label: "EIP Builder", icon: LuUsers, id: "#split#eip#new#EipTemplateEditor" },
-  ],
-  "/authors": [{ label: "Search Author", icon: LuUsers, id: "Search Author" }],
-  "/SearchEip": [{ label: "Search EIP", icon: LuUsers, id: "/Search EIP" }],
-  "/SearchEipTitle": [
-    {
-      label: "Search EIP Title",
-      icon: LuUsers,
-      id: "Search EIP Title",
-    },
-  ],
-  "/SearchPRSandISSUES": [
-    {
-      label: "Search PR/ISSUE",
-      icon: LuSearch,
-      id: "Search PR/ISSUE",
-    },
-  ],
+    { label: 'Network Upgrades Graph', icon: LuBarChartBig, id: 'NetworkUpgrades' },
+    { label: 'Upgrade Table', icon: LuTable, id: 'upgrade-table' },
+    { label: 'Network Upgrades and EIPs Relationship Graph', icon: LuGitBranch, id: 'NetworkUpgradesChartp' },
+    { label: 'Network Upgrades chart', icon: LuBarChartBig, id: 'NetworkUpgradeschart' },
+    { label: 'Author Contributions', icon: LuUsers, id: 'AuthorContributions' },
+
+  ]
 };

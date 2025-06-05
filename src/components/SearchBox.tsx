@@ -339,9 +339,9 @@ const SearchBox: React.FC = () => {
       }
     } else {
       // If query is empty, clear the results
-      setFilteredResults([]);
+      // setFilteredResults([]);
       setFilteredEIPResults([]);
-      setFilteredIssueResults([]);
+      // setFilteredIssueResults([]);
     }
   }, [query]);
 

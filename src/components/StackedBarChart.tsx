@@ -738,7 +738,10 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showD
 
 
             {showDownloadButton && (
-              <Button onClick={downloadData} colorScheme="blue">
+              <Button onClick={downloadData} bg="#40E0D0"
+                color="white"
+                _hover={{ bg: "#30c9c9" }}
+                _active={{ bg: "#1fb8b8" }}>
                 Download CSV
               </Button>
             )}

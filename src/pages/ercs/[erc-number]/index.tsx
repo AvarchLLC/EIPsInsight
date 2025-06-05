@@ -38,6 +38,9 @@ import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { Markdown } from "@/components/MarkdownEIP";
 import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
+import { EipAiSummary } from "@/components/EipAiSummary";
+
+
 
 interface EipMetadataJson {
   eip: number;
@@ -283,6 +286,8 @@ const TestComponent = () => {
                 </Table>
               </Box>
               <br />
+                            <EipAiSummary eipNo={ercNo} content={markdown} />
+              
 
               <Box bg={useColorModeValue('lightgray', 'darkgray')} p="5" borderRadius="md" mt="1">
                           <Flex justify="space-between" align="center">

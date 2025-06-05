@@ -37,11 +37,11 @@ interface NavItem {
 const Navbar: React.FC = () => {
   const NAV_ITEMS: Array<NavItem> = [
     {
-      label:"Upgrade",
-      href:`/upgrade`
+      label: "Upgrade",
+      href: `/upgrade`
     },
     {
-      label: "All-EIPS",
+      label: "Standards",
       children: [
         {
           label: "All",
@@ -49,15 +49,15 @@ const Navbar: React.FC = () => {
         },
         {
           label: "EIP",
-          href: `/eip`,
+          href: `/eip?view=type`,
         },
         {
           label: "ERC",
-          href: `/erc`,
+          href: `/erc?view=type`,
         },
         {
           label: "RIP",
-          href: `/rip`,
+          href: `/rip?view=type`,
         },
       ],
     },
@@ -357,7 +357,7 @@ const Navbar: React.FC = () => {
                       </PopoverContent>
                     )}
 
-                    {navItem.children && navItem.label === "All-EIPS" && (
+                    {navItem.children && navItem.label === "Standards" && (
                       <PopoverContent
                         border={0}
                         boxShadow={"xl"}
@@ -437,7 +437,7 @@ const Navbar: React.FC = () => {
                     {navItem.children &&
                       navItem.label !== "Insight" &&
                       navItem.label !== "Resources" &&
-                      navItem.label !== "All-EIPS" &&
+                      navItem.label !== "Standards" &&
                       navItem.label !== "Tools" && (
                         <PopoverContent
                           border={0}
@@ -460,11 +460,7 @@ const Navbar: React.FC = () => {
                 </Box>
               ))}
             </div>
-            <Box
-              ml={5}
-              display={{ base: "none", md: "block" }}
-              minWidth="302px"
-            >
+            <Box ml={5} display={{ base: "none", md: "block" }} minWidth="302px">
               <SearchBox />
             </Box>
 
@@ -663,7 +659,7 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                        {navItem.children && navItem.label === "Tools" && (
+                        {navItem.children && (navItem.label === "Tools") && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -677,18 +673,12 @@ const Navbar: React.FC = () => {
                             <Stack direction={"column"} spacing={2}>
                               {navItem.children.map((child) =>
                                 child.label === "Search By" ? (
-                                  <DesktopSubNav2
-                                    key={child.label}
-                                    {...child}
-                                  />
+                                  <DesktopSubNav2 key={child.label} {...child} />
                                 ) : (
                                   <Box
                                     key={child.label} // Unique key for React rendering
                                     _hover={{
-                                      bg: useColorModeValue(
-                                        "pink.50",
-                                        "gray.900"
-                                      ),
+                                      bg: useColorModeValue("pink.50", "gray.900"),
                                     }}
                                     p={2}
                                     rounded={"md"}
@@ -699,9 +689,7 @@ const Navbar: React.FC = () => {
                                       _groupHover={{ color: "pink.400" }}
                                       fontWeight={500}
                                     >
-                                      <NextLink href={`${child.href}`}>
-                                        {child.label}
-                                      </NextLink>
+                                      <NextLink href={`${child.href}`}>{child.label}</NextLink>
                                     </Text>
                                   </Box>
                                 )
@@ -710,7 +698,7 @@ const Navbar: React.FC = () => {
                           </PopoverContent>
                         )}
 
-                        {navItem.children && navItem.label === "All-EIPS" && (
+                        {navItem.children && (navItem.label === "Standards") && (
                           <PopoverContent
                             border={0}
                             boxShadow={"xl"}
@@ -729,10 +717,7 @@ const Navbar: React.FC = () => {
                                   <Box
                                     key={child.label} // Unique key for React rendering
                                     _hover={{
-                                      bg: useColorModeValue(
-                                        "pink.50",
-                                        "gray.900"
-                                      ),
+                                      bg: useColorModeValue("pink.50", "gray.900"),
                                     }}
                                     p={2}
                                     rounded={"md"}
@@ -743,9 +728,7 @@ const Navbar: React.FC = () => {
                                       _groupHover={{ color: "pink.400" }}
                                       fontWeight={500}
                                     >
-                                      <NextLink href={`${child.href}`}>
-                                        {child.label}
-                                      </NextLink>
+                                      <NextLink href={`${child.href}`}>{child.label}</NextLink>
                                     </Text>
                                   </Box>
                                 )
@@ -758,7 +741,7 @@ const Navbar: React.FC = () => {
                           navItem.label !== "Insight" &&
                           navItem.label !== "Resources" &&
                           navItem.label !== "Tools" &&
-                          navItem.label !== "All-EIPS" && (
+                          navItem.label !== "Standards" && (
                             <PopoverContent
                               border={0}
                               boxShadow={"xl"}

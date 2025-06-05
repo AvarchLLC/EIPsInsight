@@ -133,7 +133,7 @@ const ChakraGithubStats: React.FC<Props> = ({ type }) => {
         direction={{ base: 'column', sm: 'row' }}
         gap={{ base: 2, sm: 0 }}
       >
-        <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="semibold" color="purple.500">
+        <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="semibold"   color="#40E0D0">
           GitHub Stats – {type}
         </Text>
         {/* <Button onClick={downloadData} colorScheme="purple" size="sm" alignSelf={{ base: 'flex-start', sm: 'auto' }}>
