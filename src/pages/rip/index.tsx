@@ -280,15 +280,17 @@ const RIP = () => {
               />
 
               {/* OtherBox Full Width */}
-              <Box className="w-full mt-6">
+              <Box className="w-full mt-6" id="githubstats">
                 <OtherBox type="RIPs" />
               </Box>
 
               {/* Toggle Buttons */}
               <ButtonGroup size="md" isAttached>
                 <Button
-                  colorScheme="blue"
-                  variant={selected === "type" ? "solid" : "outline"}
+                  bg={selected === "type" ? "#40E0D0" : "white"}
+                  color={selected === "type" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
                   onClick={() => {
                     setSelected("type");
                     router.push("?view=type", undefined, { shallow: true });
@@ -297,8 +299,10 @@ const RIP = () => {
                   Type
                 </Button>
                 <Button
-                  colorScheme="blue"
-                  variant={selected === "status" ? "solid" : "outline"}
+                  bg={selected === "status" ? "#40E0D0" : "white"}
+                  color={selected === "status" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
                   onClick={() => {
                     setSelected("status");
                     router.push("?view=status", undefined, { shallow: true });
@@ -307,6 +311,7 @@ const RIP = () => {
                   Status
                 </Button>
               </ButtonGroup>
+
             </Flex>
             <br />
             <Box
@@ -323,7 +328,7 @@ const RIP = () => {
                   size="lg"
                   marginBottom={2}
                   mt={1}
-                  color={useColorModeValue("#3182CE", "blue.300")}
+                  color="#40E0D0"
                 >
                   RIPs FAQ
                 </Heading>
@@ -466,14 +471,17 @@ const RIP = () => {
             {selected === "status" && (
               <Box paddingY="8" id="draftvsfinal">
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Text fontSize="3xl" fontWeight="bold" color="#A020F0">
+                  <Text fontSize="3xl" fontWeight="bold" color="#40E0D0">
                     Draft vs Final (Over the Years)
                   </Text>
                   <Button
                     onClick={handleCopyAreaChart}
                     size="sm"
                     leftIcon={<CopyIcon />}
-                    colorScheme="blue"
+                    bg="#40E0D0"
+                    color="white"
+                    _hover={{ bg: "#30c9c9" }}
+                    _active={{ bg: "#1fb8b8" }}
                     variant="ghost"
                   >
                     Copy Link
@@ -483,12 +491,12 @@ const RIP = () => {
               </Box>
             )}
 
-            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="status-graphs">
+            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="statuses">
               {selected === "status" && (
                 <>
                   {/* Header and Dropdown to select status */}
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                    <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="blue.500">
+                    <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="#40E0D0">
                       Select RIP Status to View Stats
                     </Text>
                     <Button
@@ -520,7 +528,7 @@ const RIP = () => {
                   </Box>
 
                   {/* Grid with StackedColumnChart and CatTable */}
-                  <Box pt={8}>
+                  <Box pt={8} id="statuses">
                     <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} alignItems="stretch">
                       <GridItem colSpan={{ base: 1, md: 2 }}>
                         <Box

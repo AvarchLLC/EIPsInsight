@@ -10,21 +10,20 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
-  // Define colors and gradients for light and dark modes
-  const headingColorLight = "#333"; // Dark color for light mode
-  const headingColorDark = "#F5F5F5"; // Light color for dark mode
+  // Turquoise color scheme
+  const headingColorLight = "#2C7A7B"; // Dark turquoise
+  const headingColorDark = "#81E6D9"; // Light turquoise
 
-  const headingBgGradientLight = "linear(to-r, #30A0E0, #ffffff)";  // Updated light mode gradient
-  const headingBgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)"; // Dark mode gradient
+  // Turquoise gradients
+  const headingBgGradientLight = "linear(to-r, #4FD1C5, #319795)";
+  const headingBgGradientDark = "linear(to-r, #81E6D9, #4FD1C5)";
 
-  // Use usePathname to get the current pathname
-  const pathname = usePathname(); // Get current path
+  const pathname = usePathname();
 
-  // Determine which gradient to use for light mode based on the current pathname
   const effectiveHeadingBgGradientLight =
     pathname === "/home"
       ? headingBgGradientLight
-      : "linear-gradient(to right, #007BB8, #003B5C)"; // Use dark gradient if not on /home
+      : "linear(to-r, #2C7A7B, #285E61)"; // Darker turquoise gradient for non-home
 
   return (
     <Box>
@@ -36,16 +35,16 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
           transition={{ duration: 0.5 } as any}
           fontSize={{ base: "2xl", md: "2xl", lg: "6xl" }}
           fontWeight="bold"
-          color={useColorModeValue(headingColorLight, headingColorDark)} // Dynamic color
-          bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)} // Dynamic gradient
-          bgClip="text" // Clip gradient to text
+          color={useColorModeValue(headingColorLight, headingColorDark)}
+          bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)}
+          bgClip="text"
         >
           {title}
         </Text>
         {title === "DASHBOARD" && (
           <CopyLink
             link="https://eipsinsight.com//home#Dashboard"
-            style={{ marginLeft: "10px", marginBottom: "3px" }} // Add margin for better spacing
+            style={{ marginLeft: "10px", marginBottom: "3px" }}
           />
         )}
       </Flex>
@@ -55,12 +54,11 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 } as any}
         fontSize={{ base: "lg", md: 'lg', lg: "2xl" }}
-        color={useColorModeValue(headingColorLight, headingColorDark)} // Dynamic color for subtitle
+        color={useColorModeValue("black", "white")}
       >
         {subtitle}
       </Text>
     </Box>
   );
 };
-
 export default Header;

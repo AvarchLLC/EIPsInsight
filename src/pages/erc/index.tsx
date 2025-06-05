@@ -281,25 +281,33 @@ const ERC = () => {
               />
 
               {/* OtherBox Full Width */}
-              <Box className="w-full mt-6">
+              <Box className="w-full mt-6" id="githubstats">
                 <OtherBox type="ERCs" />
               </Box>
 
               {/* Toggle Buttons */}
               <ButtonGroup size="md" isAttached>
                 <Button
-                  colorScheme="blue"
-                  variant={selected === "type" ? "solid" : "outline"}
-                  onClick={() => setSelected("type")}
-                  flex="1"
+                  bg={selected === "type" ? "#40E0D0" : "white"}
+                  color={selected === "type" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
+                  onClick={() => {
+                    setSelected("type");
+                    router.push("?view=type", undefined, { shallow: true });
+                  }}
                 >
                   Type
                 </Button>
                 <Button
-                  colorScheme="blue"
-                  variant={selected === "status" ? "solid" : "outline"}
-                  onClick={() => setSelected("status")}
-                  flex="1"
+                  bg={selected === "status" ? "#40E0D0" : "white"}
+                  color={selected === "status" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
+                  onClick={() => {
+                    setSelected("status");
+                    router.push("?view=status", undefined, { shallow: true });
+                  }}
                 >
                   Status
                 </Button>
@@ -325,7 +333,7 @@ const ERC = () => {
               </Flex>
 
               {/* AllChart - Full Width Below Donut */}
-              <Box className="w-full overflow-hidden">
+              <Box className="w-full overflow-hidden" >
                 <Box className="w-full h-full">
                   {selected === "status" ? (
                     <AllChart3 type="ERC" />
@@ -347,10 +355,10 @@ const ERC = () => {
               </Box>
             </Box>
 
-            <Box paddingTop={8}>
+            <Box paddingTop={8} id= "ercprogress">
               {selected !== "status" && (
                 <>
-                  <Flex justify="flex-end" mb={2}>
+                  <Flex justify="flex-end" mb={2} >
                     <Button
                       onClick={handleCopyERCStatusGraph}
                       size="sm"
@@ -371,10 +379,10 @@ const ERC = () => {
               <Box paddingY="8">
                 <Flex align="center" justify="space-between" mb={4}>
                   <Text
-                    id="ercprogress"
+                    id="draftvsfinal"
                     fontSize="3xl"
                     fontWeight="bold"
-                    color="#A020F0"
+                    color="#40E0D0"
                   >
                     Draft vs Final (Over the Years)
                   </Text>
@@ -395,14 +403,14 @@ const ERC = () => {
               </Box>
             )}
 
-            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto">
+            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="statuses">
               {selected === "status" && (
                 <>
                   <Text
                     fontSize="2xl"
                     fontWeight="bold"
                     textAlign="center"
-                    color="blue.500"
+                    color="#40E0D0"
                     mb={4}
                   >
                     Select ERC Status to View Stats
@@ -486,7 +494,7 @@ const ERC = () => {
             marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
             paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
           >
-            <Box className="w-full mt-6">
+            <Box className="w-full mt-6" id="tables">
               <ErcTable dataset={data4} cat="All" status="All" />
             </Box>
 

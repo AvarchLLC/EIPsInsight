@@ -9,8 +9,6 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-
-
 import { CCardBody, CSmartTable } from "@coreui/react-pro";
 
 interface EIP {
@@ -42,15 +40,13 @@ import "@coreui/coreui/dist/css/coreui.min.css";
 const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
     const [data, setData] = useState<EIP[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(false);
+
     useEffect(() => {
         setInterval(() => {
             setIsLoading(false);
         }, 2000);
     });
-    console.log(dataset);
-    console.log(status);
-    console.log(cat);
+
 
     const factorAuthor = (data: any) => {
         let list = data.split(",");
@@ -78,13 +74,6 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
         fetchData();
     }, []);
 
-    useEffect(() => {
-        if (bg === "#f6f6f7") {
-            setIsDarkMode(false);
-        } else {
-            setIsDarkMode(true);
-        }
-    });
 
     const filteredData = dataset.map((item) => {
         const { eip, title, author, repo, type, category, status } = item;
@@ -99,10 +88,10 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
         };
     });
 
-    console.log("All EIP data:", filteredData);
-
 
     const bg = useColorModeValue("#f6f6f7", "#171923");
+    const isDarkMode = bg !== "#f6f6f7";
+
 
     return (
         <>
@@ -121,8 +110,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                     <CCardBody>
                         <>
                             <h2 className="text-blue-400 font-semibold text-4xl">
-                                {" "}
-                                {status}
+                                EIP
                             </h2>
                             <Box maxH="400px" overflowY="auto" w="full">
                                 <CSmartTable
@@ -133,7 +121,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                     columnFilter
                                     columnSorter
                                     pagination={false}
-                                    itemsPerPage={filteredData.length || 1000} 
+                                    itemsPerPage={filteredData.length || 1000}
                                     tableProps={{
                                         hover: true,
                                         responsive: true,

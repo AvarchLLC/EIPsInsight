@@ -364,11 +364,11 @@ interface EIP {
 }
 
 const categoryColors: string[] = [
-  "#fbc22f", // Meta
-  "#f579ba", // Core
-  "#68aafa", // Interface
-  "#3ed59e", // Networking
-  "#ac91fa", // Informational
+  "rgb(255, 99, 132)", //meta
+  "rgb(255, 159, 64)", //core
+  "rgb(255, 205, 86)", //interface
+  "rgb(75, 192, 192)", //networking
+  "rgb(54, 162, 235)", //informational
 ];
 
 interface ChartProps {
@@ -506,7 +506,10 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
             </NextLink>
             <Button
               size="sm"
-              colorScheme="blue"
+              bg="#40E0D0"
+              color="white"
+              _hover={{ bg: "#30c9c9" }}
+              _active={{ bg: "#1fb8b8" }}
               onClick={async () => {
                 try {
                   downloadData();

@@ -686,7 +686,14 @@ interface EIP {
 }
 
 const categories = ["Core", "Networking", "Interface", "Meta", "Informational", "RIPs", "RRCs"];
-const colors = ["#30A0E0", "#3ed59e", "#fbc22f", "#f579ba", "#68aafa", "#f97316", "#4ade80"];
+const colors = ["rgb(255, 99, 132)", //meta
+  "rgb(255, 159, 64)", //core
+  "rgb(255, 205, 86)", //interface
+  "rgb(75, 192, 192)", //networking
+  "rgb(54, 162, 235)", //informational
+  "rgb(255, 99, 255)", //rips
+  "rgb(50, 205, 50)", //rrc's
+];
 const categoryDescriptions: Record<string, string> = {
   Core: "Includes protocol-level changes impacting consensus or networking.",
   Networking: "Covers improvements and proposals in Ethereum networking stack.",
