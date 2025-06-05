@@ -42,6 +42,19 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+  if (window.location.hash) {
+    const id = window.location.hash.replace("#", "");
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 300); // delay ensures DOM is ready
+  }
+}, []);
+
+
+  useEffect(() => {
     // This ensures hydration is complete before rendering
     setIsHydrated(true);
     const mobile = window.matchMedia("(max-width: 768px)");

@@ -278,6 +278,7 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
               padding={"2 rem"}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
+              id="all"
             // transition={{ duration: 0.5 }}
             >
               <Flex justify="space-between" align="center">
@@ -289,7 +290,8 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
                       fontWeight="bold"
                       color="#30A0E0"
                       cursor="pointer" // Optional: To indicate it's clickable
-                      _hover={{ textDecoration: 'underline' }} // Optional: Adds hover effect
+                      _hover={{ textDecoration: 'underline' }}
+                       // Optional: Adds hover effect
                     >
                       {type === 'Total' ? `All EIPs [${data.length}]` : `${type} - [${data.length}]`}
                     </Text>

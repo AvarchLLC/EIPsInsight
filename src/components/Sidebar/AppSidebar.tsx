@@ -133,6 +133,7 @@ const sidebarStructure = [
     label: "Upgrade",
     href: "/upgrade",
     children: [
+      { label: "FUSAKA", href: "/upgrade#pectra" },
       { label: "PECTRA", href: "/upgrade#pectra" },
       {
         label: "Network Upgrades Graph",
@@ -441,17 +442,42 @@ const variants: Variants = {
           {expanded && (
             <>
               {item.href && !hasChildren ? (
-                <Link href={item.href} passHref legacyBehavior>
-                  <Text
-                    as="a"
-                    flex="1"
-                    fontWeight="medium"
-                    fontSize="sm"
-                    _hover={{ textDecoration: "underline" }}
-                  >
-                    {item.label}
-                  </Text>
-                </Link>
+<Text
+  as="a"
+  onClick={(e) => {
+    const href = item.href;
+    if (!href) return;
+
+    const isHashLink = href.includes("#");
+
+    if (isHashLink) {
+      e.preventDefault();
+      const [path, hash] = href.split("#");
+      
+      if (path && window.location.pathname !== path) {
+        // Navigate to correct page first
+        window.location.href = href; // fallback to default
+        return;
+      }
+
+      const target = document.getElementById(hash);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.pushState(null, "", href); // update the URL without jump
+      }
+    } else {
+      window.location.href = href;
+    }
+  }}
+  cursor="pointer"
+  flex="1"
+  fontWeight="medium"
+  fontSize="sm"
+  _hover={{ textDecoration: "underline" }}
+>
+  {item.label}
+</Text>
+
               ) : (
                 <Text
                   flex="1"

@@ -66,6 +66,7 @@ const ToolsSection: FC = () => {
             bgGradient={useColorModeValue(headingBgGradientLight, headingBgGradientDark)}
             bgClip="text"
             mb={6}
+            id="ourtools"
           >
             Our Tools
           </Heading>
