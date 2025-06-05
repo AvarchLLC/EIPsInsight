@@ -307,13 +307,13 @@ interface EIP {
   __v: number;
 }
 const categoryColors: string[] = [
-  "#00BFA6", // Living - teal
-  "#2F80ED", // Final - blue
-  "#F2994A", // Stagnant - orange
-  "#EB5757", // Withdrawn - red
-  "#F2C94C", // Review - yellow
-  "#9B51E0", // Last Call - purple
-  "#27AE60", // Draft - green
+  "rgb(255, 99, 132)", //living
+  "rgb(255, 159, 64)", //final
+  "rgb(255, 205, 86)", //stagant
+  "rgb(75, 192, 192)", //withdrawn
+  "rgb(54, 162, 235)", //review
+  "rgb(153, 102, 255)", //last call
+  "rgb(255, 99, 255)", //Draft
 
 ];
 
@@ -483,7 +483,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
           <Text
             fontSize={{ base: "md", md: "xl" }}
             fontWeight="bold"
-            color="#30A0E0"
+            color="#40E0D0"
             cursor="pointer"
           >
             {type === "Total"
@@ -493,7 +493,10 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
         </NextLink>
 
         <Button
-          colorScheme="blue"
+          bg="#40E0D0"
+          color="white"
+          _hover={{ bg: "#30c9c9" }}
+          _active={{ bg: "#1fb8b8" }}
           fontSize={{ base: "xs", md: "sm" }}
           onClick={async () => {
             try {

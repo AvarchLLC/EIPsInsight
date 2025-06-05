@@ -114,7 +114,7 @@ export function EipAiSummary({ eipNo, content }: { eipNo: string; content: strin
         className="flex flex-row justify-between items-center cursor-pointer"
         onClick={toggleExpand}
       >
-        <h3 className="font-semibold text-base">🧠 AI Summary</h3>
+        <h3 className="font-semibold text-base"> 🤖AI Summary</h3>
         <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white">
           {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
         </Button>

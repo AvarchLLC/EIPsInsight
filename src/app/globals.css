@@ -11,3 +11,24 @@
   background: #fff !important;
   /* White background */
 }
+
+/* Force table styling to respect theme */
+.table {
+  background-color: transparent !important;
+}
+
+.table th,
+.table td {
+  background-color: #2D3748 !important;
+  color: white !important;
+}
+.table td a {
+  color: inherit !important;
+}
+
+
+[data-theme='light'] .table th,
+[data-theme='light'] .table td {
+  background-color: #F7FAFC !important;
+  color: black !important;
+}

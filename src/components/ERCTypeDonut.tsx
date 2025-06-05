@@ -501,7 +501,11 @@ interface EIP {
 const types = ["Core", "Networking", "Interface", "Meta", "Informational"];
 
 const typeColors = [
-  "#30A0E0", "#3ed59e", "#fbc22f", "#f579ba", "#68aafa",
+  "rgb(255, 159, 64)", // Core
+  "rgb(75, 192, 192)", // Networking
+  "rgb(255, 205, 86)", // Interface
+  "rgb(255, 99, 132)", // Meta
+  "rgb(54, 162, 235)",  // Informational
 ];
 
 const EIPStatusDonut = () => {
@@ -628,7 +632,7 @@ const EIPStatusDonut = () => {
       p={{ base: 3, sm: 4, md: 6 }}
       w="full"
       minH={isLoading ? { base: "400px", md: "500px" } : "auto"}
-       boxShadow="md"
+      boxShadow="md"
       _hover={{ border: "1px", borderColor: "#30A0E0" }}
     >
       {/* <Flex justify="space-between" align="center" mb={4}>

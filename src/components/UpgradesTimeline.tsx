@@ -3,13 +3,15 @@ import { Heading, Box } from '@chakra-ui/react';
 
 interface Props {
   selectedOption: 'pectra' | 'fusaka';
-  setSelectedOption: React.Dispatch<React.SetStateAction<'pectra' | 'fusaka'>>;
+  setSelectedOption?: (option: 'pectra' | 'fusaka') => void; // Only if needed for child toggling
   pectraData: any[];
   fusakaData: any[];
 }
 const EIPTimelinePage: React.FC<Props> = ({ selectedOption, setSelectedOption, pectraData, fusakaData }) => {
   // Pick data based on selected option
   const dataToRender = selectedOption === 'pectra' ? pectraData : fusakaData;
+  const data = selectedOption === 'pectra' ? pectraData : fusakaData;
+
 
   const originalData = [
     { date: '2024-03-21', included: [], scheduled: ['EIP-2537', 'EIP-6110', 'EIP-7002', 'EIP-7251', 'EIP-7549'], declined: [], considered: ['EIP-7547'] },
@@ -40,7 +42,7 @@ const EIPTimelinePage: React.FC<Props> = ({ selectedOption, setSelectedOption, p
     { date: '2025-05-13', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7892', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7762', 'EIP-7825', 'EIP-7907', 'EIP-7917', 'EIP-7918', 'EIP-7934'] },
     { date: '2025-05-21', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7883', 'EIP-7892', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7762', 'EIP-7825', 'EIP-7907', 'EIP-7917', 'EIP-7918', 'EIP-7934'] },
     { date: '2025-05-22', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7918', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7762', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7907', 'EIP-7917', 'EIP-7934'] }
-];
+  ];
 
   // Preprocess to add "declined" field based on removed EIPs
   const processedData = originalData?.map((entry, index, arr) => {
@@ -86,11 +88,10 @@ const EIPTimelinePage: React.FC<Props> = ({ selectedOption, setSelectedOption, p
   return (
     <Box p={4}>
       <TimelineChart
-        data={processedData}
-        data2={processedData2}
+        data={selectedOption === 'pectra' ? processedData : processedData2}
         selectedOption={selectedOption}
-        setSelectedOption={setSelectedOption}
       />
+
     </Box>
   );
 };

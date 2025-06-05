@@ -52,7 +52,7 @@
 // //               item.status = "Draft"; 
 // //           }
 // //       });
-      
+
 // //         setData(jsonData.rip);
 // //         console.log("rip donut data:", jsonData.rip);
 // //         setIsReady(true);
@@ -93,7 +93,7 @@
 // //       status: "Withdrawn",
 // //       value: data.filter((item) => item.status === "Withdrawn").length,
 // //     },
-   
+
 // //   ].filter((item) => item.value > 0);
 // //   const Area = dynamic(
 // //     () => import("@ant-design/plots").then((item) => item.Pie),
@@ -178,23 +178,23 @@
 // //         return `"${repo}","${eip}","${title.replace(/"/g, '""')}","${author.replace(/"/g, '""')}","${status.replace(/"/g, '""')}","${type.replace(/"/g, '""')}","${category.replace(/"/g, '""')}","${discussion.replace(/"/g, '""')}","${created.replace(/"/g, '""')}","${deadlineValue.replace(/"/g, '""')}","${url}"`;
 // //     }).join("\n");
 
-  
+
 // //     // Create a Blob with the CSV content
 // //     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    
+
 // //     // Create a URL for the Blob
 // //     const url = URL.createObjectURL(blob);
-    
+
 // //     // Create an anchor tag to trigger the download
 // //     const a = document.createElement("a");
 // //     a.href = url;
 // //     a.download = "data.csv";  // File name
 // //     a.click();
-    
+
 // //     // Clean up the URL object
 // //     URL.revokeObjectURL(url);
 // //   };
-  
+
 // //   const bg = useColorModeValue("#f6f6f7", "#171923");
 // //   const headingColor = useColorModeValue('black', 'white');
 // //   return (
@@ -491,8 +491,13 @@ const RIPStatusDonut = () => {
   }, []);
 
   const colorsByStatus = [
-    "#2F80ED", "#27AE60", "#F2C94C",
-    "#9B51E0", "#00BFA6", "#F2994A", "#EB5757"
+    "rgb(255, 159, 64)", // Final
+    "rgb(255, 99, 255)", // Draft
+    "rgb(54, 162, 235)", // Review
+    "rgb(153, 102, 255)", // Last Call
+    "rgb(255, 99, 132)", // Living
+    "rgb(255, 205, 86)", // Stagnant
+    "rgb(75, 192, 192)", // Withdrawn
   ];
 
   const descriptionsByStatus: Record<string, string> = {
