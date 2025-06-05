@@ -384,6 +384,8 @@ import ConsentBanner from '@/components/ConsenstBanner';
 import FloatingContributionIcon from '@/components/FloatingContributionIcon';
 import SessionWrapper from '@/components/SessionWrapper';
 import { SidebarProvider, useSidebar } from '@/components/Sidebar/SideBarContext';
+import { useSidebarStore } from '@/stores/useSidebarStore';
+import AppSidebar from '@/components/Sidebar/AppSidebar';
 
 const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
@@ -442,14 +444,14 @@ function RootLayout({ children }: { children: React.ReactNode }) {
 }
 
 function ClientContent({ children }: { children: React.ReactNode }) {
-  const { isCollapsed } = useSidebar();
+  const isCollapsed = useSidebarStore((s) => s.isCollapsed);
 
   return (
     <Flex>
-      <Sidebar />
-      <Box
-        ml={isCollapsed ? '60px' : '200px'}
-        transition="margin 0.2s ease"
+      <AppSidebar />
+ <Box
+        ml={isCollapsed ? "3rem" : "16rem"} // This creates space for the sidebar
+        transition="margin-left 0.3s ease"
         p={4}
       >
         <Navbar />
