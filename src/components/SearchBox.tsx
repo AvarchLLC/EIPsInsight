@@ -375,9 +375,9 @@ if (queryStr2.toLowerCase() === "e") {
       
     } else {
       // If query is empty, clear the results
-      setFilteredResults([]);
+      // setFilteredResults([]);
       setFilteredEIPResults([]);
-      setFilteredIssueResults([]);
+      // setFilteredIssueResults([]);
     }
   }, [query]);
 

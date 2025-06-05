@@ -40,7 +40,6 @@ import "@coreui/coreui/dist/css/coreui.min.css";
 const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
     const [data, setData] = useState<ERC[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(false);
 
 
     useEffect(() => {
@@ -73,19 +72,13 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
         fetchData();
     }, [dataset]);
 
-    useEffect(() => {
-        if (bg === "#f6f6f7") {
-            setIsDarkMode(false);
-        } else {
-            setIsDarkMode(true);
-        }
-    }, []);
+
 
     // Map dataset to filtered data (keeping same keys but replacing eip with erc)
     const filteredData = dataset.map((item) => {
         const { eip, title, author, repo, type, category, status } = item;
         return {
-            eip,
+            erc: eip,
             title,
             author,
             repo,
@@ -94,8 +87,8 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
             status,
         };
     });
-
     const bg = useColorModeValue("#f6f6f7", "#171923");
+    const isDarkMode = bg !== "#f6f6f7";
 
     return (
         <>
@@ -113,11 +106,11 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                 >
                     <CCardBody>
                         <>
-                            <h2 className="text-blue-400 font-semibold text-4xl">{status}</h2>
+                            <h2 className="text-blue-400 font-semibold text-4xl"> ERC</h2>
                             <Box maxH="400px" overflowY="auto" w="full">
                                 <CSmartTable
                                     items={filteredData.sort(
-                                        (a, b) => parseInt(a["eip"]) - parseInt(b["eip"])
+                                        (a, b) => parseInt(a["erc"]) - parseInt(b["erc"])
                                     )}
                                     clickableRows
                                     columnFilter
@@ -134,7 +127,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                     }}
                                     columns={[
                                         {
-                                            key: "eip",
+                                            key: "erc",
                                             label: "ERC",
                                             _style: {
                                                 backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC",
@@ -203,10 +196,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                                             </td>
                                         ),
                                         erc: (item: any) => (
-                                            <td
-                                                key={item.erc}
-                                                style={{ backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC" }}
-                                            >
+                                            <td key={item.erc} style={{ backgroundColor: isDarkMode ? "#2D3748" : "#F7FAFC" }}>
                                                 <Link href={`/ercs/erc-${item.erc}`}>
                                                     <Wrap>
                                                         <WrapItem>

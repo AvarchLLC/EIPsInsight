@@ -355,10 +355,10 @@ const ERC = () => {
               </Box>
             </Box>
 
-            <Box paddingTop={8}>
+            <Box paddingTop={8} id= "ercprogress">
               {selected !== "status" && (
                 <>
-                  <Flex justify="flex-end" mb={2}>
+                  <Flex justify="flex-end" mb={2} >
                     <Button
                       onClick={handleCopyERCStatusGraph}
                       size="sm"
@@ -379,7 +379,7 @@ const ERC = () => {
               <Box paddingY="8">
                 <Flex align="center" justify="space-between" mb={4}>
                   <Text
-                    id="ercprogress"
+                    id="draftvsfinal"
                     fontSize="3xl"
                     fontWeight="bold"
                     color="#40E0D0"

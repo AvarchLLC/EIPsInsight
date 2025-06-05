@@ -43,8 +43,6 @@ import "@coreui/coreui/dist/css/coreui.min.css";
 const RipTable: React.FC<RipTableProps> = ({ dataset, cat, status }) => {
     const [data, setData] = useState<RIP[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(false);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -60,13 +58,8 @@ const RipTable: React.FC<RipTableProps> = ({ dataset, cat, status }) => {
         fetchData();
     }, []);
 
-    const bgColor = useColorModeValue("#f6f6f7", "#171923");
 
-    useEffect(() => {
-        if (bgColor === "#171923") {
-            setIsDarkMode(true);
-        }
-    }, [bgColor]);
+
 
     const factorAuthor = (data: string): string[][] => {
         // First split by comma to get array of strings
@@ -104,7 +97,7 @@ const RipTable: React.FC<RipTableProps> = ({ dataset, cat, status }) => {
     });
 
     const bg = useColorModeValue("#f6f6f7", "#171923");
-    const textColor = useColorModeValue("gray.800", "white");
+    const isDarkMode = bg !== "#f6f6f7"; const textColor = useColorModeValue("gray.800", "white");
 
     const downloadData = () => {
         const header = "Repo,RIP,Title,Author,Status,Type,Category,Discussion,Created at,Deadline,Link\n";
@@ -144,22 +137,15 @@ const RipTable: React.FC<RipTableProps> = ({ dataset, cat, status }) => {
             transition={{ duration: 0.5 } as any}
             className="ease-in duration-200"
         >
-            <Flex justify="space-between" align="center" mb={4}>
-                <Text fontSize="2xl" fontWeight="bold" color="#30A0E0">
-                    RIP Status Table [{data.length}]
-                </Text>
-                <Button size="sm" colorScheme="blue" onClick={handleDownload}>
-                    Download CSV
-                </Button>
-            </Flex>
+
 
             <CCardBody>
-                {isLoading ? (
-                    <Flex justify="center" align="center" minH="200px">
-                        <Spinner size="xl" />
-                    </Flex>
-                ) : (
-                    <Box maxH="500px" overflowY="auto" w="full">
+                <>
+                    <h2 className="text-blue-400 font-semibold text-4xl">
+                        RIP
+                    </h2>
+
+                    <Box maxH="400px" overflowY="auto" w="full">
                         <CSmartTable
                             items={filteredData.sort(
                                 (a, b) => parseInt(a["rip"]) - parseInt(b["rip"])
@@ -234,6 +220,19 @@ const RipTable: React.FC<RipTableProps> = ({ dataset, cat, status }) => {
                                 },
                             ]}
                             scopedColumns={{
+                                "#": (item: any) => (
+                                    <td key={item.eip} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
+                                        <Link href={`/${item.repo === 'erc' ? "ercs/erc" : item.repo === 'rip' ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                                            <Wrap>
+                                                <WrapItem>
+                                                    <Badge colorScheme={getStatusColor(item.status)}>
+                                                        {item["#"]}
+                                                    </Badge>
+                                                </WrapItem>
+                                            </Wrap>
+                                        </Link>
+                                    </td>
+                                ),
                                 rip: (item: any) => (
                                     <td
                                         key={item.rip}
@@ -344,7 +343,7 @@ const RipTable: React.FC<RipTableProps> = ({ dataset, cat, status }) => {
                             }}
                         />
                     </Box>
-                )}
+                </>
             </CCardBody>
             <Box mt={4}>
                 <DateTime />

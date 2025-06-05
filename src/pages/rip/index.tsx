@@ -328,7 +328,7 @@ const RIP = () => {
                   size="lg"
                   marginBottom={2}
                   mt={1}
-                  color={useColorModeValue("#3182CE", "blue.300")}
+                  color="#40E0D0"
                 >
                   RIPs FAQ
                 </Heading>
