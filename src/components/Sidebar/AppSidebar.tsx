@@ -378,7 +378,7 @@ export default function AppSidebar() {
   );
 }
 
-function SidebarItem({
+export function SidebarItem({
   item,
   expanded,
   expandedItems,
@@ -395,10 +395,11 @@ function SidebarItem({
 }) {
   const hasChildren = item.children && item.children.length > 0;
   const isExpanded = expandedItems[item.label];
+  const activeSection = useSidebarStore((s) => s.activeSection);
+
   const textColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const iconColor = useColorModeValue("gray.600", "gray.300");
   const hoverBg = useColorModeValue("gray.200", "gray.700");
-  const activeSection = useSidebarStore((s) => s.activeSection);
 
   const isActive =
     (item.id && activeSection === item.id) ||
@@ -411,12 +412,13 @@ function SidebarItem({
 
   return (
     <Box>
+      {/* Main clickable row */}
       <Tooltip label={isCollapsed ? item.label : ""} placement="right" hasArrow>
         <HStack
           spacing={3}
           px={3}
           py={2}
-          bg={isActive ? "blue.100" : "transparent"}
+          bg={isActive ? useColorModeValue("blue.100", "blue.700") : "transparent"}
           fontWeight={isActive ? "bold" : "normal"}
           borderRadius="md"
           cursor={hasChildren || item.href ? "pointer" : "default"}
@@ -485,6 +487,7 @@ function SidebarItem({
         </HStack>
       </Tooltip>
 
+      {/* Submenu Items */}
       {hasChildren && (
         <AnimatePresence initial={false}>
           {expanded && isExpanded && (
@@ -502,60 +505,68 @@ function SidebarItem({
               overflow="hidden"
               position="relative"
             >
+              {/* Vertical Line */}
               <Box
                 position="absolute"
-                left="0.75rem"
+                left="1rem"
                 top="0"
                 bottom="0"
                 width="2px"
                 bg={useColorModeValue("blue.400", "blue.300")}
                 borderRadius="full"
-                opacity={0.5}
-                zIndex={0}
+                opacity={0.1}
+                zIndex={-1}
               />
-              {item.children.map((child: any) => (
-                <Box
-                  key={child.label}
-                  borderRadius="md"
-                  px={3}
-                  py={1.5}
-                  fontSize="sm"
-                  color={"blue.700"}
-                  bg={
-                    child.id === activeSection ||
-                    child.href?.includes(`#${activeSection}`)
-                      ? "blue.100"
-                      : "transparent"
-                  }
-                  fontWeight={
-                    child.id === activeSection ||
-                    child.href?.includes(`#${activeSection}`)
-                      ? "bold"
-                      : "normal"
-                  }
-                  _hover={{ bg: useColorModeValue("blue.200", "blue.600") }}
-                  transition="all 0.2s ease"
-                  onClick={() => {
-                    if (child.href) {
-                      const [path, hash] = child.href.split("#");
-                      if (path && window.location.pathname !== path) {
-                        window.location.href = child.href;
-                      } else if (hash) {
-                        const el = document.getElementById(hash);
-                        if (el) {
-                          el.scrollIntoView({ behavior: "smooth" });
-                          history.pushState(null, "", child.href);
+
+              {/* Subitems */}
+              {item.children.map((child: any) => {
+                const isChildActive =
+                  child.id === activeSection ||
+                  child.href?.includes(`#${activeSection}`);
+
+                return (
+                  <Box
+                    key={child.label}
+                    borderRadius="md"
+                    px={3}
+                    py={1.5}
+                    fontSize="sm"
+                    color={useColorModeValue(
+                      isChildActive ? "blue.800" : "gray.800",
+                      isChildActive ? "white" : "gray.200"
+                    )}
+                    bg={
+                      isChildActive
+                        ? useColorModeValue("blue.100", "blue.600")
+                        : "transparent"
+                    }
+                    fontWeight={isChildActive ? "bold" : "normal"}
+                    _hover={{
+                      bg: useColorModeValue("blue.200", "blue.500"),
+                    }}
+                    transition="all 0.2s ease"
+                    onClick={() => {
+                      if (child.href) {
+                        const [path, hash] = child.href.split("#");
+                        if (path && window.location.pathname !== path) {
+                          window.location.href = child.href;
+                        } else if (hash) {
+                          const el = document.getElementById(hash);
+                          if (el) {
+                            el.scrollIntoView({ behavior: "smooth" });
+                            history.pushState(null, "", child.href);
+                          }
                         }
                       }
-                    }
-                  }}
-                  cursor="pointer"
-                  position="relative"
-                  zIndex={1}
-                >
-                  {child.label}
-                </Box>
-              ))}
+                    }}
+                    cursor="pointer"
+                    position="relative"
+                    zIndex={1}
+                  >
+                    {child.label}
+                  </Box>
+                );
+              })}
             </MotionDiv>
           )}
         </AnimatePresence>
