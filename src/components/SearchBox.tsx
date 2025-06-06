@@ -544,7 +544,7 @@ const SearchBox: React.FC = () => {
                   onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
                   className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + filteredIssueResults.length + index ? "bg-blue-100" : ""}`}
                 >
-                  {result.repo.toUpperCase()} Number: {result.eip}
+                  {result.repo.toUpperCase()}-{result.eip}
                 </option>
               ))}
             </select>
