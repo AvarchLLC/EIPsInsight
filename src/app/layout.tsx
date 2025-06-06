@@ -1,5 +1,6 @@
 'use client';
 import './globals.css';
+// import './blogs.css';
 import { Inter } from 'next/font/google';
 import { Providers } from './providers';
 import { Box, ColorModeScript, Flex } from '@chakra-ui/react';
@@ -31,18 +32,6 @@ export default function AllLayout({
   return (
     <SessionWrapper>
     <html lang="en">
-      {/* <head>
-      
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-R36R5NJFTW"></script>
-        <script>
-          {`window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'G-R36R5NJFTW');
-          `}
-        </script>
-      </head> */}
       <body className={`${mont.className}`}>
         <ColorModeScript initialColorMode="dark" />
         <AnimatePresence>
@@ -69,17 +58,17 @@ export default function AllLayout({
           >
             <Providers>
  <Flex>
-          <Sidebar />
+          {/* <Sidebar /> */}
       <Box
         ml={isCollapsed ? '60px' : '200px'} // Dynamically adjust margin
         transition="margin 0.2s ease"
         p={4}
       >
-            <Navbar />
+            {/* <Navbar /> */}
             <Suspense>{children}</Suspense>
-            <ConsentBanner />
-            <FloatingContributionIcon />
-            <Footer />
+            {/* <ConsentBanner />
+            <FloatingContributionIcon /> */}
+            {/* <Footer /> */}
           </Box>
         </Flex>
             </Providers>

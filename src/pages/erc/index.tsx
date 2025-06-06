@@ -27,6 +27,7 @@ import { ButtonGroup, Flex} from "@chakra-ui/react";
 import TypeGraphs from "@/components/TypeGraphs4";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
+import ERCsPRChart from "@/components/Ercsprs";
 
 interface EIP {
   _id: string;
@@ -293,6 +294,10 @@ const ERC = () => {
         ))}
 
    
+  </Box>
+
+  <Box>
+    <ERCsPRChart/>
   </Box>
 
   <Box
