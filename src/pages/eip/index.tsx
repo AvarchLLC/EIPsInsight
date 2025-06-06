@@ -74,7 +74,6 @@ interface EIP3 {
   __v: number;
 }
 
-
 interface EIP2 {
   status: string;
   eips: {
@@ -115,6 +114,7 @@ interface Data {
 }
 
 import OtherBox from "@/components/OtherStats";
+import FeedbackWidget from "@/components/FeedbackWidget";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 
@@ -125,7 +125,11 @@ const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stag
 const Type = () => {
   const [data, setData] = useState<EIP[]>([]);
   const [data4, setData4] = useState<EIP[]>([]);
-  const [data2, setData2] = useState<APIResponse>({ eip: [], erc: [], rip: [] });
+  const [data2, setData2] = useState<APIResponse>({
+    eip: [],
+    erc: [],
+    rip: [],
+  });
   const [data3, setData3] = useState<Data>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [selected, setSelected] = useState<"status" | "type">("type");

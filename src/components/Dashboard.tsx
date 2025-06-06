@@ -10,6 +10,7 @@ import {
   useTheme,
   Link as LI,
   Stack,
+  useToast,
 } from "@chakra-ui/react";
 // import React, { useEffect, useState } from "react";
 import React, { useEffect, useState, useLayoutEffect } from "react";
@@ -59,7 +60,12 @@ import {
 } from 'react-icons/fi';
 
 import { useSidebar } from "@/components/Sidebar/SideBarContext";
+
+import DashboardCards from "./DashboardCards";
+import FeedbackWidget from "./FeedbackWidget";
+
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+
 
 
 interface EIP {
@@ -100,17 +106,23 @@ const Dashboard = () => {
   const textColorDark = "#F5F5F5"; // Light color for dark mode
   const bgGradientLight = "linear(to-r, #2980B9, #3498DB)"; // Clear gradient for better visibility in light mode
   const bgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)";
+  const toast = useToast();
+  // useEffect(() => {
+  //   setSections([
+  //     { label: 'All EIPs', icon: FiHome, id: 'all' },
+  //     { label: 'Our Tools', icon: FiTool, id: 'ourtools' },
+  //     { label: 'What is EIPs Insights?', icon: FiInfo, id: 'what' },
+  //     { label: 'EIP Status Changes by Year', icon: FiBarChart2, id: 'statuschanges' },
+  //     { label: 'Dashboard', icon: FiDatabase, id: 'dashboard' },
+  //   ]);
+  // }, []);
 
-  useEffect(() => {
-    setSections([
-      { label: 'All EIPs', icon: FiHome, id: 'all' },
-      { label: 'Our Tools', icon: FiTool, id: 'ourtools' },
-      { label: 'What is EIPs Insights?', icon: FiInfo, id: 'what' },
-      { label: 'EIP Status Changes by Year', icon: FiBarChart2, id: 'statuschanges' },
-      { label: 'Dashboard', icon: FiDatabase, id: 'dashboard' },
-    ]);
-  }, []);
-
+  const scrollToFeedbackSection = () => {
+    const element = document.getElementById("feedback");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -179,17 +191,52 @@ const Dashboard = () => {
     };
   }, [router]);
 
-  useScrollSpy([
+  //  const [showThumbs, setShowThumbs] = useState(false);
+
+  const submitFeedback = async (type: "like" | "dislike") => {
+    try {
+      const res = await fetch("/api/Feedback/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+
+      if (!res.headers.get("content-type")?.includes("application/json")) {
+        throw new Error("Unexpected response format");
+      }
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast({
+          title: "Thanks for your feedback!",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error(data.message || "Something went wrong");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Error submitting feedback",
+        description: err?.message || "Unknown error",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+        useScrollSpy([
   "all",
   "ourtools",
   "what",
   "statuschanges",
   "dashboard",
 ]);
-
-
   return (
     <>
+      <FeedbackWidget />
       <Box
         paddingBottom={{ lg: "10", sm: "10", base: "10" }}
         marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}

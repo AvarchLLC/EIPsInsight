@@ -37,6 +37,7 @@ import { useRouter } from "next/router";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import EipsLabelChart from "@/components/PrLabelsChart";
 import CopyLink from "@/components/CopyLink";
+import FeedbackWidget from "@/components/FeedbackWidget";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 // Dynamic import for Ant Design's Column chart
@@ -1478,143 +1479,146 @@ const GitHubPRTracker: React.FC = () => {
   return loading ? (
     <LoaderComponent />
   ) : (
-    <AllLayout>
-      <Box padding={{ base: 1, md: 4 }} margin={{ base: 2, md: 4 }}>
-        <Heading
-          size="xl"
-          marginBottom={10}
-          textAlign="center"
-          style={{ color: "#42a5f5", fontSize: "2.5rem", fontWeight: "bold" }}
-        >
-          Analytics
-        </Heading>
+    <>
+      <FeedbackWidget />
+      <AllLayout>
+        <Box padding={{ base: 1, md: 4 }} margin={{ base: 2, md: 4 }}>
+          <Heading
+            size="xl"
+            marginBottom={10}
+            textAlign="center"
+            style={{ color: "#42a5f5", fontSize: "2.5rem", fontWeight: "bold" }}
+          >
+            Analytics
+          </Heading>
 
-        <Box
-          pl={4}
-          bg={useColorModeValue("blue.50", "gray.700")}
-          borderRadius="md"
-          pr="8px"
-          marginBottom={2}
-        >
-          <Flex justify="space-between" align="center">
-            <Heading
-              as="h3"
-              size="lg"
-              marginBottom={4}
-              color={useColorModeValue("#3182CE", "blue.300")}
-            >
-              Analytics FAQ
-            </Heading>
-            <Box
-              bg="blue" // Gray background
-              borderRadius="md" // Rounded corners
-              padding={2} // Padding inside the box
-            >
-              <IconButton
-                onClick={toggleCollapse}
-                icon={
-                  show ? (
-                    <ChevronUpIcon boxSize={8} color="white" />
-                  ) : (
-                    <ChevronDownIcon boxSize={8} color="white" />
-                  )
-                }
-                variant="ghost"
-                h="24px" // Smaller height
-                w="20px"
-                aria-label="Toggle Instructions"
-                _hover={{ bg: "blue" }} // Maintain background color on hover
-                _active={{ bg: "blue" }} // Maintain background color when active
-                _focus={{ boxShadow: "none" }} // Remove focus outline
-              />
-            </Box>
-          </Flex>
+          <Box
+            pl={4}
+            bg={useColorModeValue("blue.50", "gray.700")}
+            borderRadius="md"
+            pr="8px"
+            marginBottom={2}
+          >
+            <Flex justify="space-between" align="center">
+              <Heading
+                as="h3"
+                size="lg"
+                marginBottom={4}
+                color={useColorModeValue("#3182CE", "blue.300")}
+              >
+                Analytics FAQ
+              </Heading>
+              <Box
+                bg="blue" // Gray background
+                borderRadius="md" // Rounded corners
+                padding={2} // Padding inside the box
+              >
+                <IconButton
+                  onClick={toggleCollapse}
+                  icon={
+                    show ? (
+                      <ChevronUpIcon boxSize={8} color="white" />
+                    ) : (
+                      <ChevronDownIcon boxSize={8} color="white" />
+                    )
+                  }
+                  variant="ghost"
+                  h="24px" // Smaller height
+                  w="20px"
+                  aria-label="Toggle Instructions"
+                  _hover={{ bg: "blue" }} // Maintain background color on hover
+                  _active={{ bg: "blue" }} // Maintain background color when active
+                  _focus={{ boxShadow: "none" }} // Remove focus outline
+                />
+              </Box>
+            </Flex>
 
-          <Collapse in={show}>
-            <Heading
-              as="h4"
-              size="md"
-              marginBottom={4}
-              color={useColorModeValue("#3182CE", "blue.300")}
-            >
-              What does this tool do?
-            </Heading>
-            <Text
-              fontSize="md"
-              marginBottom={2}
-              color={useColorModeValue("gray.800", "gray.200")}
-              className="text-justify"
-            >
-              This tool aims to automate the process of tracking PRs and issues
-              in GitHub repositories, providing visualizations and reports to
-              streamline project management. The default view utilizes the
-              timeline to observe trends in the number of Created, Closed,
-              Merged, and Open PRs/Issues at the end of each month.
-            </Text>
+            <Collapse in={show}>
+              <Heading
+                as="h4"
+                size="md"
+                marginBottom={4}
+                color={useColorModeValue("#3182CE", "blue.300")}
+              >
+                What does this tool do?
+              </Heading>
+              <Text
+                fontSize="md"
+                marginBottom={2}
+                color={useColorModeValue("gray.800", "gray.200")}
+                className="text-justify"
+              >
+                This tool aims to automate the process of tracking PRs and
+                issues in GitHub repositories, providing visualizations and
+                reports to streamline project management. The default view
+                utilizes the timeline to observe trends in the number of
+                Created, Closed, Merged, and Open PRs/Issues at the end of each
+                month.
+              </Text>
 
-            <Heading
-              as="h4"
-              size="md"
-              marginBottom={4}
-              color={useColorModeValue("#3182CE", "blue.300")}
-            >
-              How can I view data for a specific month?
-            </Heading>
-            <Text
-              fontSize="md"
-              marginBottom={2}
-              color={useColorModeValue("gray.800", "gray.200")}
-              className="text-justify"
-            >
-              To focus on a specific month, click the View More button and
-              choose the desired Year and Month from the dropdown menus. The
-              table and graph will then update to display data exclusively for
-              that selected month.
-            </Text>
+              <Heading
+                as="h4"
+                size="md"
+                marginBottom={4}
+                color={useColorModeValue("#3182CE", "blue.300")}
+              >
+                How can I view data for a specific month?
+              </Heading>
+              <Text
+                fontSize="md"
+                marginBottom={2}
+                color={useColorModeValue("gray.800", "gray.200")}
+                className="text-justify"
+              >
+                To focus on a specific month, click the View More button and
+                choose the desired Year and Month from the dropdown menus. The
+                table and graph will then update to display data exclusively for
+                that selected month.
+              </Text>
 
-            <Heading
-              as="h4"
-              size="md"
-              marginBottom={4}
-              color={useColorModeValue("#3182CE", "blue.300")}
-            >
-              How to customize the chart?
-            </Heading>
-            <Text
-              fontSize="md"
-              marginBottom={2}
-              color={useColorModeValue("gray.800", "gray.200")}
-              className="text-justify"
-            >
-              To customize the chart, you can adjust the timeline scroll bar to
-              display data for a specific month/year. Additionally, you can
-              tailor the graph by selecting or deselecting checkboxes for
-              Created, Closed, Merged, and Open PRs/Issues, allowing you to
-              focus on the trends that are most relevant to you.
-            </Text>
+              <Heading
+                as="h4"
+                size="md"
+                marginBottom={4}
+                color={useColorModeValue("#3182CE", "blue.300")}
+              >
+                How to customize the chart?
+              </Heading>
+              <Text
+                fontSize="md"
+                marginBottom={2}
+                color={useColorModeValue("gray.800", "gray.200")}
+                className="text-justify"
+              >
+                To customize the chart, you can adjust the timeline scroll bar
+                to display data for a specific month/year. Additionally, you can
+                tailor the graph by selecting or deselecting checkboxes for
+                Created, Closed, Merged, and Open PRs/Issues, allowing you to
+                focus on the trends that are most relevant to you.
+              </Text>
 
-            <Heading
-              as="h4"
-              size="md"
-              marginBottom={4}
-              color={useColorModeValue("#3182CE", "blue.300")}
-            >
-              How to download reports?
-            </Heading>
-            <Text
-              fontSize="md"
-              color={useColorModeValue("gray.800", "gray.200")}
-              className="text-justify"
-            >
-              After selecting your preferred data using the View More option,
-              you can download reports based on the filtered data for further
-              analysis or record-keeping. Simply click the download button to
-              export the data in your chosen format.
-            </Text>
-            <br />
-          </Collapse>
+              <Heading
+                as="h4"
+                size="md"
+                marginBottom={4}
+                color={useColorModeValue("#3182CE", "blue.300")}
+              >
+                How to download reports?
+              </Heading>
+              <Text
+                fontSize="md"
+                color={useColorModeValue("gray.800", "gray.200")}
+                className="text-justify"
+              >
+                After selecting your preferred data using the View More option,
+                you can download reports based on the filtered data for further
+                analysis or record-keeping. Simply click the download button to
+                export the data in your chosen format.
+              </Text>
+              <br />
+            </Collapse>
 
-          {/* {!show && (
+            {/* {!show && (
         <Flex justify="center" align="center" marginTop={4}>
           <Text color={useColorModeValue("#3182CE", "blue.300")} cursor="pointer" onClick={toggleCollapse}>
             View Instructions
@@ -1622,170 +1626,130 @@ const GitHubPRTracker: React.FC = () => {
           <ChevronDownIcon color={useColorModeValue("#3182CE", "blue.300")} />
         </Flex>
       )} */}
-        </Box>
+          </Box>
 
-        <Flex justify="center" mb={4}>
-          <Button
-            colorScheme="blue"
-            onClick={() => setActiveTab("PRs")}
-            isActive={activeTab === "PRs"}
-            mr={4}
-          >
-            PRs
-          </Button>
-          <Button
-            colorScheme="blue"
-            onClick={() => setActiveTab("Issues")}
-            isActive={activeTab === "Issues"}
-          >
-            Issues
-          </Button>
-        </Flex>
-
-        <Box
-          bgColor={bg}
-          padding="1rem"
-          borderRadius="0.55rem"
-          // _hover={{
-          //   border: "1px",
-          //   borderColor: "#30A0E0",
-          // }}
-        >
-          <Box id="GithubAnalytics" borderRadius={"0.55rem"}>
-            
-            <Flex
-              justifyContent="space-between"
-              alignItems="center"
-              marginBottom="0.5rem"
+          <Flex justify="center" mb={4}>
+            <Button
+              colorScheme="blue"
+              onClick={() => setActiveTab("PRs")}
+              isActive={activeTab === "PRs"}
+              mr={4}
             >
-              <Heading size="md" color="black">
-                {`Github PR Analytics (Monthly, since 2015)`}
-                <CopyLink
-                  link={`https://eipsinsight.com//Analytics#GithubAnalytics`}
-                />
-              </Heading>
-              {/* Assuming a download option exists for the yearly data as well */}
-              <Button
-                colorScheme="blue"
-                onClick={async () => {
-                  try {
-                    // Trigger the CSV conversion and download
-                    handleDownload2();
+              PRs
+            </Button>
+            <Button
+              colorScheme="blue"
+              onClick={() => setActiveTab("Issues")}
+              isActive={activeTab === "Issues"}
+            >
+              Issues
+            </Button>
+          </Flex>
 
-                    // Trigger the API call
-                    await axios.post("/api/DownloadCounter");
-                  } catch (error) {
-                    console.error("Error triggering download counter:", error);
-                  }
-                }}
-                disabled={loading3}
-                fontSize={{ base: "0.6rem", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
+          <Box
+            bgColor={bg}
+            padding="1rem"
+            borderRadius="0.55rem"
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
+          >
+            <Box id="GithubAnalytics" borderRadius={"0.55rem"}>
+              <Flex
+                justifyContent="space-between"
+                alignItems="center"
+                marginBottom="0.5rem"
               >
-                {loading3 ? <Spinner size="sm" /> : "Download CSV"}
-              </Button>
-            </Flex>
-            <Flex justify="center" mb={8}>
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rightIcon={<ChevronDownIcon />}
+                <Heading size="md" color="black">
+                  {`Github PR Analytics (Monthly, since 2015)`}
+                  <CopyLink
+                    link={`https://eipsinsight.com//Analytics#GithubAnalytics`}
+                  />
+                </Heading>
+                {/* Assuming a download option exists for the yearly data as well */}
+                <Button
                   colorScheme="blue"
-                  size="md"
-                  width="200px"
+                  onClick={async () => {
+                    try {
+                      // Trigger the CSV conversion and download
+                      handleDownload2();
+
+                      // Trigger the API call
+                      await axios.post("/api/DownloadCounter");
+                    } catch (error) {
+                      console.error(
+                        "Error triggering download counter:",
+                        error
+                      );
+                    }
+                  }}
+                  disabled={loading3}
+                  fontSize={{ base: "0.6rem", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
                 >
-                  {selectedRepo || "Select an option"}
-                </MenuButton>
+                  {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+                </Button>
+              </Flex>
+              <Flex justify="center" mb={8}>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<ChevronDownIcon />}
+                    colorScheme="blue"
+                    size="md"
+                    width="200px"
+                  >
+                    {selectedRepo || "Select an option"}
+                  </MenuButton>
 
-                <MenuList maxHeight="200px" overflowY="auto">
-                  {/* Option for All */}
-                  <MenuItem onClick={() => setSelectedRepo("All")}>
-                    All
-                  </MenuItem>
+                  <MenuList maxHeight="200px" overflowY="auto">
+                    {/* Option for All */}
+                    <MenuItem onClick={() => setSelectedRepo("All")}>
+                      All
+                    </MenuItem>
 
-                  {/* Option for EIPs */}
-                  <MenuItem onClick={() => setSelectedRepo("EIPs")}>
-                    EIPs
-                  </MenuItem>
+                    {/* Option for EIPs */}
+                    <MenuItem onClick={() => setSelectedRepo("EIPs")}>
+                      EIPs
+                    </MenuItem>
 
-                  {/* Option for ERCs */}
-                  <MenuItem onClick={() => setSelectedRepo("ERCs")}>
-                    ERCs
-                  </MenuItem>
+                    {/* Option for ERCs */}
+                    <MenuItem onClick={() => setSelectedRepo("ERCs")}>
+                      ERCs
+                    </MenuItem>
 
-                  {/* Option for RIPs */}
-                  <MenuItem onClick={() => setSelectedRepo("RIPs")}>
-                    RIPs
-                  </MenuItem>
-                </MenuList>
-              </Menu>
-            </Flex>
+                    {/* Option for RIPs */}
+                    <MenuItem onClick={() => setSelectedRepo("RIPs")}>
+                      RIPs
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              </Flex>
 
-            {renderChart()}
-            <Box className={"w-full"}>
-              <LastUpdatedDateTime name="AnalyticsScheduler" />
-            </Box>
-            <Box mt={2}>
-              <Text color="gray.500" fontStyle="italic" textAlign="center">
-                *Note: The data is updated daily at 15:00 UTC to maintain
-                accuracy and provide the most current information.*
-              </Text>
-              <Text color="gray.500" fontStyle="italic" textAlign="center">
-                *Note: The data related to the number of PRs might vary when
-                compared to official github repository due to factors like
-                deleted PRs.*
-              </Text>
-            </Box>
-            <br />
+              {renderChart()}
+              <Box className={"w-full"}>
+                <LastUpdatedDateTime name="AnalyticsScheduler" />
+              </Box>
+              <Box mt={2}>
+                <Text color="gray.500" fontStyle="italic" textAlign="center">
+                  *Note: The data is updated daily at 15:00 UTC to maintain
+                  accuracy and provide the most current information.*
+                </Text>
+                <Text color="gray.500" fontStyle="italic" textAlign="center">
+                  *Note: The data related to the number of PRs might vary when
+                  compared to official github repository due to factors like
+                  deleted PRs.*
+                </Text>
+              </Box>
+              <br />
 
-            <Flex justify="center" ml={3} mb={8}>
-              <Checkbox
-                isChecked={showCategory.created}
-                onChange={() =>
-                  setShowCategory((prev) => ({
-                    ...prev,
-                    created: !prev.created,
-                  }))
-                }
-                color="black"
-                borderColor="black"
-                mr={3}
-                fontSize={{ base: "xs", md: "sm" }}
-              >
-                {activeTab === "PRs" ? "Created PRs" : "Created Issues"}
-              </Checkbox>
-
-              <Checkbox
-                isChecked={showCategory.open}
-                onChange={() =>
-                  setShowCategory((prev) => ({ ...prev, open: !prev.open }))
-                }
-                color="black"
-                borderColor="black"
-                mr={3}
-                fontSize={{ base: "xs", md: "sm" }}
-              >
-                Open PRs
-              </Checkbox>
-
-              <Checkbox
-                isChecked={showCategory.closed}
-                onChange={() =>
-                  setShowCategory((prev) => ({ ...prev, closed: !prev.closed }))
-                }
-                color="black"
-                borderColor="black"
-                mr={3}
-                fontSize={{ base: "xs", md: "sm" }}
-              >
-                {activeTab === "PRs" ? "Closed PRs" : "Closed Issues"}
-              </Checkbox>
-              {activeTab === "PRs" && (
+              <Flex justify="center" ml={3} mb={8}>
                 <Checkbox
-                  isChecked={showCategory.merged}
+                  isChecked={showCategory.created}
                   onChange={() =>
                     setShowCategory((prev) => ({
                       ...prev,
-                      merged: !prev.merged,
+                      created: !prev.created,
                     }))
                   }
                   color="black"
@@ -1793,127 +1757,173 @@ const GitHubPRTracker: React.FC = () => {
                   mr={3}
                   fontSize={{ base: "xs", md: "sm" }}
                 >
-                  Merged PRs
+                  {activeTab === "PRs" ? "Created PRs" : "Created Issues"}
                 </Checkbox>
-              )}
-            </Flex>
+
+                <Checkbox
+                  isChecked={showCategory.open}
+                  onChange={() =>
+                    setShowCategory((prev) => ({ ...prev, open: !prev.open }))
+                  }
+                  color="black"
+                  borderColor="black"
+                  mr={3}
+                  fontSize={{ base: "xs", md: "sm" }}
+                >
+                  Open PRs
+                </Checkbox>
+
+                <Checkbox
+                  isChecked={showCategory.closed}
+                  onChange={() =>
+                    setShowCategory((prev) => ({
+                      ...prev,
+                      closed: !prev.closed,
+                    }))
+                  }
+                  color="black"
+                  borderColor="black"
+                  mr={3}
+                  fontSize={{ base: "xs", md: "sm" }}
+                >
+                  {activeTab === "PRs" ? "Closed PRs" : "Closed Issues"}
+                </Checkbox>
+                {activeTab === "PRs" && (
+                  <Checkbox
+                    isChecked={showCategory.merged}
+                    onChange={() =>
+                      setShowCategory((prev) => ({
+                        ...prev,
+                        merged: !prev.merged,
+                      }))
+                    }
+                    color="black"
+                    borderColor="black"
+                    mr={3}
+                    fontSize={{ base: "xs", md: "sm" }}
+                  >
+                    Merged PRs
+                  </Checkbox>
+                )}
+              </Flex>
+            </Box>
           </Box>
-        </Box>
 
-        <br />
+          <br />
 
-        <Flex justify="center" mb={8}>
-          <Button colorScheme="blue" onClick={toggleDropdown}>
-            {showDropdown ? "Hide" : "View More"}
-          </Button>
-        </Flex>
+          <Flex justify="center" mb={8}>
+            <Button colorScheme="blue" onClick={toggleDropdown}>
+              {showDropdown ? "Hide" : "View More"}
+            </Button>
+          </Flex>
 
-        {showDropdown && (
-          <Box mb={8} display="flex" justifyContent="center">
-            <HStack spacing={4}>
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rightIcon={<ChevronDownIcon />}
-                  colorScheme="blue"
-                >
-                  {selectedYear ? `Year: ${selectedYear}` : "Select Year"}
-                </MenuButton>
-                <MenuList>
-                  {getYears()?.map((year) => (
-                    <MenuItem
-                      key={year}
-                      onClick={() => {
-                        setSelectedYear(year.toString());
-                        setSelectedMonth(null);
-                      }}
-                    >
-                      {year}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rightIcon={<ChevronDownIcon />}
-                  colorScheme="blue"
-                  isDisabled={!selectedYear}
-                >
-                  {selectedMonth ? `Month: ${selectedMonth}` : "Select Month"}
-                </MenuButton>
-                <MenuList>
-                  {selectedYear &&
-                    getMonths()?.map((month, index) => (
+          {showDropdown && (
+            <Box mb={8} display="flex" justifyContent="center">
+              <HStack spacing={4}>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<ChevronDownIcon />}
+                    colorScheme="blue"
+                  >
+                    {selectedYear ? `Year: ${selectedYear}` : "Select Year"}
+                  </MenuButton>
+                  <MenuList>
+                    {getYears()?.map((year) => (
                       <MenuItem
-                        key={index}
-                        onClick={() => setSelectedMonth(month)}
+                        key={year}
+                        onClick={() => {
+                          setSelectedYear(year.toString());
+                          setSelectedMonth(null);
+                        }}
                       >
-                        {month}
+                        {year}
                       </MenuItem>
                     ))}
-                </MenuList>
-              </Menu>
-            </HStack>
-          </Box>
-        )}
+                  </MenuList>
+                </Menu>
 
-        {selectedYear && selectedMonth && (
-          <Box mt={8} display="flex" justifyContent="flex-end">
-            {/* Download CSV section */}
-            {/* <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}> */}
-            {/* <Text fontSize="lg"
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<ChevronDownIcon />}
+                    colorScheme="blue"
+                    isDisabled={!selectedYear}
+                  >
+                    {selectedMonth ? `Month: ${selectedMonth}` : "Select Month"}
+                  </MenuButton>
+                  <MenuList>
+                    {selectedYear &&
+                      getMonths()?.map((month, index) => (
+                        <MenuItem
+                          key={index}
+                          onClick={() => setSelectedMonth(month)}
+                        >
+                          {month}
+                        </MenuItem>
+                      ))}
+                  </MenuList>
+                </Menu>
+              </HStack>
+            </Box>
+          )}
+
+          {selectedYear && selectedMonth && (
+            <Box mt={8} display="flex" justifyContent="flex-end">
+              {/* Download CSV section */}
+              {/* <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}> */}
+              {/* <Text fontSize="lg"
                     marginBottom={2}
                     color={useColorModeValue("gray.800", "gray.200")}>
                         You can download the data here:
                       </Text> */}
-            <Button
-              colorScheme="blue"
-              onClick={async () => {
-                try {
-                  // Trigger the CSV conversion and download
-                  handleDownload();
+              <Button
+                colorScheme="blue"
+                onClick={async () => {
+                  try {
+                    // Trigger the CSV conversion and download
+                    handleDownload();
 
-                  // Trigger the API call
-                  await axios.post("/api/DownloadCounter");
-                } catch (error) {
-                  console.error("Error triggering download counter:", error);
-                }
-              }}
-              disabled={loading2}
-            >
-              <DownloadIcon marginEnd={"1.5"} />{" "}
-              {loading2 ? <Spinner size="sm" /> : "Download CSV"}
-            </Button>
-            {/* </Box> */}
+                    // Trigger the API call
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
+                disabled={loading2}
+              >
+                <DownloadIcon marginEnd={"1.5"} />{" "}
+                {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+              </Button>
+              {/* </Box> */}
+            </Box>
+          )}
+          {showDropdown && (
+            <>
+              {selectedYear && selectedMonth && (
+                <Box mt={2}>
+                  {renderTable(selectedYear, selectedMonth, activeTab)}
+                </Box>
+              )}
+            </>
+          )}
+
+          <Box mt={2} id="EIPsLabelChart">
+            <EipsLabelChart />
           </Box>
-        )}
-        {showDropdown && (
-          <>
-            {selectedYear && selectedMonth && (
-              <Box mt={2}>
-                {renderTable(selectedYear, selectedMonth, activeTab)}
-              </Box>
-            )}
-          </>
-        )}
 
-        <Box mt={2} id="EIPsLabelChart">
-          <EipsLabelChart />
+          <Box>
+            <br />
+            <hr></hr>
+            <br />
+            <Text fontSize="3xl" fontWeight="bold">
+              Comments
+            </Text>
+            <Comments page={"Analytics"} />
+          </Box>
         </Box>
-
-        <Box>
-          <br />
-          <hr></hr>
-          <br />
-          <Text fontSize="3xl" fontWeight="bold">
-            Comments
-          </Text>
-          <Comments page={"Analytics"} />
-        </Box>
-      </Box>
-    </AllLayout>
+      </AllLayout>
+    </>
   );
 };
 
