@@ -37,6 +37,7 @@ import { useRouter } from "next/router";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import EipsLabelChart from "@/components/PrLabelsChart";
 import CopyLink from "@/components/CopyLink";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 // Dynamic import for Ant Design's Column chart
 // const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -1467,6 +1468,12 @@ const GitHubPRTracker: React.FC = () => {
       router.events.off("routeChangeComplete", scrollToHash);
     };
   }, [router]);
+
+  useScrollSpy([
+  "GithubAnalytics",
+  "EIPsLabelChart",
+]);
+
 
   return loading ? (
     <LoaderComponent />

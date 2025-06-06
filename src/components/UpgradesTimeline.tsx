@@ -88,7 +88,7 @@ const EIPTimelinePage: React.FC<Props> = ({ selectedOption, setSelectedOption, p
   return (
     <Box p={4}>
       <TimelineChart
-        data={selectedOption === 'pectra' ? processedData : processedData2}
+        data={selectedOption === 'fusaka' ? processedData : processedData2}
         selectedOption={selectedOption}
       />
 

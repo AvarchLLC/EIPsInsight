@@ -59,6 +59,7 @@ import {
 } from 'react-icons/fi';
 
 import { useSidebar } from "@/components/Sidebar/SideBarContext";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 
 interface EIP {
@@ -177,6 +178,15 @@ const Dashboard = () => {
       router.events.off("routeChangeComplete", scrollToHash);
     };
   }, [router]);
+
+  useScrollSpy([
+  "all",
+  "ourtools",
+  "what",
+  "statuschanges",
+  "dashboard",
+]);
+
 
   return (
     <>
@@ -404,7 +414,7 @@ const Dashboard = () => {
                     </Box>
                   </Stack>
                   <br /><br />
-                  <div id="all">
+                  <div>
                     <AllChart type="Total" dataset={data} />
                   </div>
 
@@ -422,7 +432,7 @@ const Dashboard = () => {
                   <SearchBox />
                 </Box>
               </Box>
-              <div id="ourtools">
+              <div>
                 <ToolsSection />
               </div>
 
@@ -504,7 +514,7 @@ const Dashboard = () => {
               <br />
             </motion.div>
             <br />
-            <Box paddingTop={8} paddingBottom={8}>
+            <Box id="statuschanges" paddingTop={8} paddingBottom={8}>
               <TypeGraphs />
             </Box>
 
