@@ -67,7 +67,7 @@ export default function InsightStats() {
   const fetchPRData = async () => {
     try {
         const prResults = await Promise.all(
-            PR_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+            PR_API_ENDPOINTS?.map(endpoint => fetch(endpoint).then(res => res.json()))
           ) as PR[][]; // Define as PR[][] to allow for any number of returned arrays
     
           const [eipsPRs, ercsPRs, ripsPRs] = prResults;
@@ -78,22 +78,22 @@ export default function InsightStats() {
 
       setPrData({
         EIPs: {
-          open: transformedEipsData[key].open.length,
-          created: transformedEipsData[key].created.length,
-          closed: transformedEipsData[key].closed.length,
-          merged: transformedEipsData[key].merged.length,
+          open: transformedEipsData[key].open?.length,
+          created: transformedEipsData[key].created?.length,
+          closed: transformedEipsData[key].closed?.length,
+          merged: transformedEipsData[key].merged?.length,
         },
         ERCs: {
-          open: transformedErcsData[key].open.length,
-          created: transformedErcsData[key].created.length,
-          closed: transformedErcsData[key].closed.length,
-          merged: transformedErcsData[key].merged.length,
+          open: transformedErcsData[key].open?.length,
+          created: transformedErcsData[key].created?.length,
+          closed: transformedErcsData[key].closed?.length,
+          merged: transformedErcsData[key].merged?.length,
         },
         RIPs: {
-          open: transformedRipsData[key].open.length,
-          created: transformedRipsData[key].created.length,
-          closed: transformedRipsData[key].closed.length,
-          merged: transformedRipsData[key].merged.length,
+          open: transformedRipsData[key].open?.length,
+          created: transformedRipsData[key].created?.length,
+          closed: transformedRipsData[key].closed?.length,
+          merged: transformedRipsData[key].merged?.length,
         },
       });
     } catch (error) {
@@ -104,7 +104,7 @@ export default function InsightStats() {
   const fetchIssueData = async () => {
     try {
         const issueResults = await Promise.all(
-            ISSUE_API_ENDPOINTS.map(endpoint => fetch(endpoint).then(res => res.json()))
+            ISSUE_API_ENDPOINTS?.map(endpoint => fetch(endpoint).then(res => res.json()))
           ) as Issue[][]; // Define as Issue[][] to allow for any number of returned arrays
     
       const [eipsIssues, ercsIssues, ripsIssues] = issueResults;
@@ -114,19 +114,19 @@ export default function InsightStats() {
 
       setIssueData({
         EIPs: {
-          open: transformedEipsIssue[key].open.length,
-          created: transformedEipsIssue[key].created.length,
-          closed: transformedEipsIssue[key].closed.length,
+          open: transformedEipsIssue[key].open?.length,
+          created: transformedEipsIssue[key].created?.length,
+          closed: transformedEipsIssue[key].closed?.length,
         },
         ERCs: {
-          open: transformedErcsIssue[key].open.length,
-          created: transformedErcsIssue[key].created.length,
-          closed: transformedErcsIssue[key].closed.length,
+          open: transformedErcsIssue[key].open?.length,
+          created: transformedErcsIssue[key].created?.length,
+          closed: transformedErcsIssue[key].closed?.length,
         },
         RIPs: {
-          open: transformedRipsIssue[key].open.length,
-          created: transformedRipsIssue[key].created.length,
-          closed: transformedRipsIssue[key].closed.length,
+          open: transformedRipsIssue[key].open?.length,
+          created: transformedRipsIssue[key].created?.length,
+          closed: transformedRipsIssue[key].closed?.length,
         },
       });
     } catch (error) {
@@ -137,7 +137,7 @@ export default function InsightStats() {
   // const transformPRData = (data: PR[], key: string) => {
   //   const monthYearData = { PRs: { created: [] as PR[], closed: [] as PR[], merged: [] as PR[], open: [] as PR[] } };
 
-  //   data.forEach(pr => {
+  //   data?.forEach(pr => {
   //     const createdDate = pr.created_at ? new Date(pr.created_at) : null;
   //     const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
   //     const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
@@ -156,7 +156,7 @@ export default function InsightStats() {
   // const transformIssueData = (data: Issue[], key: string) => {
   //   const monthYearData = { Issues: { created: [] as Issue[], closed: [] as Issue[], open: [] as Issue[] } };
 
-  //   data.forEach(issue => {
+  //   data?.forEach(issue => {
   //     const createdDate = new Date(issue.created_at);
   //     const closedDate = issue.closed_at ? new Date(issue.closed_at) : null;
   //     const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
@@ -201,7 +201,7 @@ export default function InsightStats() {
 
   
 
-    data.forEach(pr => {
+    data?.forEach(pr => {
       const createdDate = pr.created_at ? new Date(pr.created_at) : null;
       const closedDate = pr.closed_at ? new Date(pr.closed_at) : null;
       const mergedDate = pr.merged_at ? new Date(pr.merged_at) : null;
@@ -313,7 +313,7 @@ while (openDate < endDate) {
   //       }
   //   };
 
-  //   data.forEach(issue => {
+  //   data?.forEach(issue => {
   //     const createdDate = new Date(issue.created_at);
   //     const createdKey = `${createdDate.getUTCFullYear()}-${String(createdDate.getUTCMonth() + 1).padStart(2, '0')}`;
       
@@ -397,7 +397,7 @@ while (openDate < endDate) {
     };
     const processedIssues = new Set();
 
-    data.forEach(issue => {
+    data?.forEach(issue => {
       if (!processedIssues.has(issue.IssueNumber)) {
         
         processedIssues.add(issue.IssueNumber);

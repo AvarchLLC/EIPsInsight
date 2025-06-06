@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
-import {Box, Grid, useColorModeValue, Text} from '@chakra-ui/react';
+import { Box, Grid, useColorModeValue, Text } from '@chakra-ui/react';
 import CustomBox from '@/components/CustomBox';
 import OtherBox from '@/components/OtherStats';
 import { PieC } from '@/components/InPie';
@@ -45,15 +45,20 @@ const getStatus = (status: string) => {
     switch (status) {
         case "Draft":
             return "Draft";
-        case "Final" || "Accepted" || "Superseded":
+        case "Final":
+        case "Accepted":
+        case "Superseded":
             return "Final";
         case "Last Call":
             return "Last Call";
-        case "Withdrawn" || "Abandoned" || "Rejected":
+        case "Withdrawn":
+        case "Abandoned":
+        case "Rejected":
             return "Withdrawn";
         case "Review":
             return "Review";
-        case "Living" || "Active":
+        case "Living":
+        case "Active":
             return "Living";
         case "Stagnant":
             return "Stagnant";
@@ -61,6 +66,7 @@ const getStatus = (status: string) => {
             return "Final";
     }
 };
+
 
 
 function getMonthName(monthNumber: number): string {
@@ -79,18 +85,18 @@ const Monthd = () => {
 
     if (path) {
         const pathParts = path.split('/');
-       statusx = pathParts[2];
+        statusx = pathParts[2];
         month = pathParts[3].split('-')[0];
         year = pathParts[3].split('-')[1];
     }
-    console.log(year,month)
+    console.log(year, month)
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await fetch(`/api/statusChanges/${year}/${month}`);
                 const jsonData = await response.json();
                 setData(jsonData);
-                
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -99,12 +105,12 @@ const Monthd = () => {
         fetchData();
     }, [year, month]);
     console.log(data)
-  
+
     const [isLoading, setIsLoading] = useState(true);
 
     const finalData = data.find((item) => item._id === "Draft");
     const statusChangesOfData = finalData ? finalData.statusChanges : [];
-   
+
 
     useEffect(() => {
         // Simulating a loading delay
@@ -143,7 +149,7 @@ const Monthd = () => {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                   <TableStatus cat={statusChangesOfData}/>
+                    <TableStatus cat={statusChangesOfData} />
                 </motion.div>
             )}
         </AllLayout>

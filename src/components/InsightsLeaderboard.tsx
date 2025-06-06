@@ -47,7 +47,7 @@ const InsightsLeaderboard = () => {
   
       setLoading2(true);
   
-      const formattedMonth = selectedMonth.length === 1 ? `0${selectedMonth}` : selectedMonth;
+      const formattedMonth = selectedMonth?.length === 1 ? `0${selectedMonth}` : selectedMonth;
       const key = `${selectedYear}-${formattedMonth}`;
       console.log("key1: ", key);
   
@@ -101,7 +101,7 @@ const InsightsLeaderboard = () => {
   
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
-      const reviewers = matches ? Array.from(new Set(matches.map((m) => m.slice(2)))) : [];
+      const reviewers = matches ? Array.from(new Set(matches?.map((m) => m.slice(2)))) : [];
       const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
       // Merge the two arrays and ensure uniqueness
@@ -134,10 +134,10 @@ const InsightsLeaderboard = () => {
       console.log(formattedData);
     
       // Extract unique reviewers from the formattedData
-      const reviewers = Array.from(new Set(formattedData.map(review => review.reviewer)));
+      const reviewers = Array.from(new Set(formattedData?.map(review => review.reviewer)));
       
       // Create the initial state for showing reviewers (set all to true by default)
-      const initialShowReviewer = reviewers.reduce(
+      const initialShowReviewer = reviewers?.reduce(
         (acc, reviewer) => ({ ...acc, [reviewer]: true }), 
         {}
       );
@@ -158,7 +158,7 @@ const InsightsLeaderboard = () => {
       console.log("unique reviewers:", uniqueReviewers);
   
       // Initially, set all reviewers to true
-      const initialShowReviewer = uniqueReviewers.reduce(
+      const initialShowReviewer = uniqueReviewers?.reduce(
         (acc, reviewer) => ({
           ...acc,
           [reviewer]: true, // Set all fetched reviewers to true initially
@@ -167,7 +167,7 @@ const InsightsLeaderboard = () => {
       );
   
       // Set reviewers that aren't in the unique list to false
-      const finalShowReviewer = Object.keys(initialShowReviewer).reduce(
+      const finalShowReviewer = Object.keys(initialShowReviewer)?.reduce(
         (acc, reviewer) => ({
           ...acc,
           [reviewer]: uniqueReviewers.includes(reviewer) ? true : false, // Set false for others
@@ -225,8 +225,8 @@ interface LeaderboardChartsProps {
 // Function to filter PR data for the selected month and year
 const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
   const monthlyData: Record<string, number> = data
-    .filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)  // Filter by year and month
-    .reduce((acc, item) => {
+    ?.filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)  // Filter by year and month
+    ?.reduce((acc, item) => {
       // Only count if the reviewer is shown
       if (showReviewer[item.reviewer]) {
         acc[item.reviewer] = (acc[item.reviewer] || 0) + item.count;  // Accumulate the count
@@ -237,7 +237,7 @@ const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
   // Sort reviewers by count in decreasing order
   const sortedMonthlyData = Object.entries(monthlyData)
     .sort(([, a], [, b]) => b - a)  // Sort by count in decreasing order
-    .reduce((acc, [reviewer, count]) => {
+    ?.reduce((acc, [reviewer, count]) => {
       acc[reviewer] = count;
       return acc;
     }, {} as Record<string, number>);
@@ -248,7 +248,7 @@ const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
 
 // Function to format data into chart-friendly format
 const formatChartData = (rawData: Record<string, number>) => {
-  return Object.entries(rawData).map(([reviewer, count]) => ({
+  return Object.entries(rawData)?.map(([reviewer, count]) => ({
     reviewer,
     count,
   }));
@@ -274,7 +274,7 @@ const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => 
           formatter: (reviewer: string) => reviewer, // Display reviewer names on Y-axis
         },
       },
-      annotations: chartData.map((datum) => ({
+      annotations: chartData?.map((datum) => ({
         type: 'html',
         position: { count: datum.count, reviewer: datum.reviewer }, // Correct position
         html: `
@@ -312,7 +312,7 @@ const generateCSVData = () => {
 
   console.log("recieved data:",data2)
 
-  const csv = data2.map((pr: PR) => ({
+  const csv = data2?.map((pr: PR) => ({
       PR_Number: pr.prNumber,
       Title: pr.prTitle,
       Reviewer: pr.reviewer,
@@ -347,13 +347,13 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 
     if (monthlyChartData) {
         // Assign colors if not already assigned
-        const reviewers = Array.from(new Set(monthlyChartData.map(item => item.reviewer)));
-        const totalReviewers = reviewers.length;
+        const reviewers = Array.from(new Set(monthlyChartData?.map(item => item.reviewer)));
+        const totalReviewers = reviewers?.length;
 
-        monthlyChartData.forEach((item: MonthlyChartData, index: number) => {
+        monthlyChartData?.forEach((item: MonthlyChartData, index: number) => {
             if (!reviewerColorsMap[item.reviewer]) {
                 // Assign a new color only if the reviewer doesn't already have one
-                reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap).length, totalReviewers);
+                reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
             }
         });
     }
@@ -382,7 +382,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 
   {/* Download button next to the text */}
   <CSVLink 
-    data={csvData.length ? csvData : []} 
+    data={csvData?.length ? csvData : []} 
     filename={`reviews_data.csv`} 
     onClick={async (e: any) => {
       try {
@@ -390,7 +390,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         generateCSVData();
   
         // Check if CSV data is empty and prevent default behavior
-        if (csvData.length === 0) {
+        if (csvData?.length === 0) {
           e.preventDefault();
           console.error("CSV data is empty or not generated correctly.");
           return;

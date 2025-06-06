@@ -16,7 +16,7 @@ export default async (req: Request, res: Response) => {
     // Fetch open pull requests count
     // const pullRequestsUrl = `${repositoryUrl}/pulls?state=open`;
     // const pullRequestsResponse = await axios.get(pullRequestsUrl);
-    // const openPullRequestsCount = pullRequestsResponse.data.length;
+    // const openPullRequestsCount = pullRequestsResponse.data?.length;
 
     // Fetch open issues count
     // const issuesUrl = `${repositoryUrl}/issues?state=open`;

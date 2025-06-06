@@ -86,7 +86,7 @@ async function fetchLastCreatedYearAndMonthFromAPI(
 
     const data = await response.json();
 
-    if (Array.isArray(data) && data.length > 0) {
+    if (Array.isArray(data) && data?.length > 0) {
       const lastElement = data[0];
       const lastElementCreatedYear = lastElement.mergedYear;
       const lastElementCreatedMonth = lastElement.mergedMonth;
@@ -124,10 +124,10 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;
@@ -145,12 +145,12 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
           setData(jsonData.rip);
         }
         else {
-          setData(jsonData.eip.concat(jsonData.erc.concat(jsonData.rip)));
+          setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
         }
         setIsLoading(false); // Set isLoading to false after data is fetched
 
         // Fetch merged years and months for each item
-        const mergedDataPromises = jsonData.erc.map((item: any) =>
+        const mergedDataPromises = jsonData.erc?.map((item: any) =>
           fetchLastCreatedYearAndMonthFromAPI(item.eip)
         );
 
@@ -176,7 +176,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
   },[bg]);
 
   const filteredData = data
-    .map((item: any) => {
+    ?.map((item: any) => {
       const { eip, title, author, status, type, category, mergedYear, mergedMonth, repo } = item;
       return {
         eip,
@@ -190,7 +190,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
         mergedMonth
       };
     })
-    .filter((item: any) => item.category === cat);
+    ?.filter((item: any) => item.category === cat);
 
     const filteredDataWithMergedYearsAndMonths = filteredData
   .sort((a, b) => {
@@ -198,7 +198,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
     const eipB = parseInt(b.eip, 10);
     return eipA - eipB; // Sort numerically based on the 'eip' field
   })
-  .map((item, index) => ({
+  ?.map((item, index) => ({
     "#": (index + 1).toString(), // Add the sr number after sorting
     ...item,
   }));
@@ -206,7 +206,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
   
   console.log("filtered data:", filteredDataWithMergedYearsAndMonths);
 
-  const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
+  const DataForFilter = filteredDataWithMergedYearsAndMonths?.filter((item) => {
     const isYearInRange =
       (!selectedYearRange.start ||
         item.mergedYear >= selectedYearRange.start) &&
@@ -225,14 +225,14 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
   });
 
   const convertAndDownloadCSV = () => {
-    if (DataForFilter && DataForFilter.length > 0) {
+    if (DataForFilter && DataForFilter?.length > 0) {
       // Create CSV headers
       const headers =
         Object.keys(filteredDataWithMergedYearsAndMonths[0]).join(",") + "\n";
 
       // Convert data to CSV rows
-      const csvRows = DataForFilter.map((item) => {
-        const values = Object.values(item).map((value) => {
+      const csvRows = DataForFilter?.map((item) => {
+        const values = Object.values(item)?.map((value) => {
           // Ensure values with commas are enclosed in double quotes
           if (typeof value === "string" && value.includes(",")) {
             return `"${value}"`;
@@ -350,7 +350,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       onChange={(e) => setSelectedStatus(e.target.value)}
                     >
                       <option value="">Select Status</option>
-                      {statusArr.map((status) => (
+                      {statusArr?.map((status) => (
                         <option key={status} value={status}>
                           {status}
                         </option>
@@ -362,7 +362,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                       <option value="">Select Category</option>
-                      {catArr.map((item) => (
+                      {catArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -379,7 +379,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       }
                     >
                       <option value="">Start Year</option>
-                      {yearsArr.map((item) => (
+                      {yearsArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -396,7 +396,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       }
                     >
                       <option value="">End Year</option>
-                      {yearsArr.map((item) => (
+                      {yearsArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -413,7 +413,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       }
                     >
                       <option value="">Start Month</option>
-                      {monthArr.map((item) => (
+                      {monthArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -430,7 +430,7 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                       }
                     >
                       <option value="">End Month</option>
-                      {monthArr.map((item) => (
+                      {monthArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -575,19 +575,19 @@ const TableStat: React.FC<TabProps> = ({ cat }) => {
                   author: (it: any) => (
                     <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
-                        {factorAuthor(it.author).map(
+                        {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
-                            let t = item[item.length - 1].substring(
+                            let t = item[item?.length - 1].substring(
                               1,
-                              item[item.length - 1].length - 1
+                              item[item?.length - 1]?.length - 1
                             );
                             return (
                               <Wrap key={index}>
                                 <WrapItem>
                                   <Link
                                     href={`${
-                                      item[item.length - 1].substring(
-                                        item[item.length - 1].length - 1
+                                      item[item?.length - 1].substring(
+                                        item[item?.length - 1]?.length - 1
                                       ) === ">"
                                         ? "mailto:" + t
                                         : "https://github.com/" + t.substring(1)

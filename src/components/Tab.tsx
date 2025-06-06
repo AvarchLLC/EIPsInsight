@@ -241,7 +241,7 @@ const Table = () => {
     fetchData();
   }, []);
 
-  const sortedData = data.map(({ eip, title, author, status, type, category }) => ({
+  const sortedData = data?.map(({ eip, title, author, status, type, category }) => ({
     eip,
     title,
     author,
@@ -313,11 +313,11 @@ const Table = () => {
     //
     let list = data.split(',')
     //
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(' ')
     }
     //
-    if (list[list.length - 1][list[list.length - 1].length - 1] === 'al.') {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === 'al.') {
       list.pop()
     }
     return list
@@ -325,7 +325,7 @@ const Table = () => {
 
   const getString = (data: any) => {
     let ans = ''
-    for (let i = 0; i < data.length - 1; i++) {
+    for (let i = 0; i < data?.length - 1; i++) {
       ans += data[i] + ' '
     }
     return ans
@@ -445,8 +445,8 @@ const Table = () => {
               Author: (it : any) => (
                 <td>
                   <div>
-                    {factorAuthor(it.Author).map((item:any, index:any) => {
-                      let t = item[item.length - 1].substring(1, item[item.length - 1].length - 1)
+                    {factorAuthor(it.Author)?.map((item:any, index:any) => {
+                      let t = item[item?.length - 1].substring(1, item[item?.length - 1]?.length - 1)
 
                       return (
                         <CBadge
@@ -462,7 +462,7 @@ const Table = () => {
                           <a
                             key={index}
                             href={`${
-                              item[item.length - 1].substring(item[item.length - 1].length - 1) ===
+                              item[item?.length - 1].substring(item[item?.length - 1]?.length - 1) ===
                               '>'
                                 ? 'mailto:' + t
                                 : 'https://github.com/' + t.substring(1)

@@ -1,24 +1,22 @@
 import React from "react";
-import logoDark from '@/../public/EIPsInsightsDark.gif';
-import logo from '@/../public/EIPsInsights.gif';
+import logoLight from '@/../public/EIPsInsightsDark.gif'; // for light mode
+import logoDark from '@/../public/EIPsInsights.gif';     // for dark mode
 import Image from 'next/image';
 import { useColorModeValue } from "@chakra-ui/react";
 
 function Logo() {
-    
-    const logoSrc = useColorModeValue( "/EIPsInsightsDark.gif", "/EIPsInsights.gif");
+  const logoSrc = useColorModeValue(logoLight, logoDark); // use the imported image objects
 
-    return (
-        <Image
-    src={logoSrc}
-    width={50}
-    height={50}
-    alt="logo"
-    priority
-    style={{ color: 'inherit', backgroundColor: 'transparent' }}
-/>
-
-    );
+  return (
+    <Image
+      src={logoSrc}
+      width={50}
+      height={50}
+      alt="logo"
+      priority
+      style={{ color: 'inherit', backgroundColor: 'transparent' }}
+    />
+  );
 }
 
 export default Logo;

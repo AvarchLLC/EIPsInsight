@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export function useActiveSection(sectionIds: string[]) {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -17,7 +17,7 @@ export function useActiveSection(sectionIds: string[]) {
         }
       },
       {
-        rootMargin: '0px 0px -60% 0px',
+        rootMargin: "0px 0px -60% 0px",
         threshold: 0.1,
       }
     );

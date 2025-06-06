@@ -3,38 +3,51 @@ import dynamic from 'next/dynamic';
 import { Box, useColorModeValue, Spinner } from '@chakra-ui/react';
 import { useWindowSize } from 'react-use';
 
-const getCat= (cat: string) => {
-    switch (cat) {
-        case "Standards Track" || "Standard Track" || "Standards Track (Core, Networking, Interface, ERC)" || "Standard" || "Process" || "Core" || "core":
-            return "Core";
-        case "ERC":
-            return "ERC";
-        case "Networking":
-            return "Networking";
-        case "Interface":
-            return "Interface";
-        case "Meta":
-            return "Meta";
-        case "Informational":
-            return "Informational";
-        default:
-            return "Core"
-    }
-}
+const getCat = (cat: string) => {
+  switch (cat) {
+    case "Standards Track":
+    case "Standard Track":
+    case "Standards Track (Core, Networking, Interface, ERC)":
+    case "Standard":
+    case "Process":
+    case "Core":
+    case "core":
+      return "Core";
+    case "ERC":
+      return "ERCs";
+    case "RIP":
+      return "RIPs";
+    case "Networking":
+      return "Networking";
+    case "Interface":
+      return "Interface";
+    case "Meta":
+      return "Meta";
+    case "Informational":
+      return "Informational";
+    default:
+      return "Core";
+  }
+};
 
 const getStatus = (status: string) => {
   switch (status) {
     case "Draft":
       return "Draft";
-    case "Final" || "Accepted" || "Superseded":
+    case "Final":
+    case "Accepted":
+    case "Superseded":
       return "Final";
     case "Last Call":
       return "Last Call";
-    case "Withdrawn" || "Abandoned" || "Rejected":
+    case "Withdrawn":
+    case "Abandoned":
+    case "Rejected":
       return "Withdrawn";
     case "Review":
       return "Review";
-    case "Living" || "Active":
+    case "Living":
+    case "Active":
       return "Living";
     case "Stagnant":
       return "Stagnant";
@@ -42,6 +55,7 @@ const getStatus = (status: string) => {
       return "Final";
   }
 };
+
 
 interface AreaProps {
     data: MappedDataItem[];
@@ -144,12 +158,12 @@ interface AreaProps {
 
     
   
-    const filteredData = data.filter((item) =>
+    const filteredData = data?.filter((item) =>
     item.eips.some((eip) => eip.category === status)
 );
   
     const transformedData = filteredData.flatMap((item) =>
-      item.eips.map((eip) => ({
+      item.eips?.map((eip) => ({
         year: eip.year.toString(),
         value: eip.count,
         status: getStatus(item.status)

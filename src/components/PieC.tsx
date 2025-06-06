@@ -59,10 +59,10 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
     Meta: 0,
     Informational: 0,
   };
-  const transformedData: { [key: string]: number } = data.reduce(
+  const transformedData: { [key: string]: number } = data?.reduce(
     (result: { [key: string]: number }, obj) => {
       if (obj._id === status) {
-        obj.statusChanges.forEach((statusChange) => {
+        obj.statusChanges?.forEach((statusChange) => {
           result[statusChange.category] = obj.count;
           if (statusChange.status === "Draft") {
             console.log(statusChange);
@@ -101,7 +101,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
     ],
   };
 
-  if (data.length === 0) {
+  if (data?.length === 0) {
     return (
       <Box
         bgColor={bg}
@@ -121,7 +121,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
   }
 
   if (
-    Object.values(transformedData).reduce(
+    Object.values(transformedData)?.reduce(
       (total, value) => total + value,
       0
     ) === 0
@@ -153,7 +153,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
           paddingTop="1rem"
         >
           {status} :{" "}
-          {Object.values(transformedData).reduce(
+          {Object.values(transformedData)?.reduce(
             (total, value) => total + value,
             0
           )}
@@ -193,7 +193,7 @@ export const PieC: React.FC<CustomBoxProps> = ({ data, status }) => {
         paddingTop="1rem"
       >
         {status} :{" "}
-        {Object.values(transformedData).reduce(
+        {Object.values(transformedData)?.reduce(
           (total, value) => total + value,
           0
         )}

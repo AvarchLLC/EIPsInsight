@@ -41,7 +41,7 @@
  fn pr_identifier(pr: &PullRequest) -> String {
      pr.html_url
          .as_ref()
-         .map(ToString::to_string)
+         ?.map(ToString::to_string)
          .unwrap_or_else(|| pr.url.clone())
  }
  
@@ -178,7 +178,7 @@
          events.retain(|f| f.when >= created);
  
          events.sort_unstable_by_key(|x| x.when);
-         let last_editor = events.iter().filter(|x| x.actor == Actor::Editor).last();
+         let last_editor = events.iter()?.filter(|x| x.actor == Actor::Editor).last();
  
          let last_editor = match last_editor {
              None => {
@@ -202,7 +202,7 @@
      let urls = needs_review
          .into_iter()
          .filter_map(|x| x.1)
-         .map(|x| x.to_string())
+         ?.map(|x| x.to_string())
          .collect();
  
      let markdown = matches!(std::env::args().nth(1).as_deref(), Some("--markdown"));
@@ -246,13 +246,13 @@
  
      let mut reviewers: Vec<_> = reviews
          .into_iter()
-         .filter(|x| {
+         ?.filter(|x| {
              matches!(
                  x.state,
                  Some(ReviewState::ChangesRequested | ReviewState::Commented)
              )
          })
-         .filter(|x| {
+         ?.filter(|x| {
              let user = match &x.user {
                  Some(u) => u,
                  None => return false,
@@ -292,7 +292,7 @@
  
          current_page = new_page;
      }
-     let prs = prs.into_iter().filter(|x| x.draft != Some(true)).collect();
+     let prs = prs.into_iter()?.filter(|x| x.draft != Some(true)).collect();
  
      Ok(prs)
  }
@@ -313,7 +313,7 @@
      let re = Regex::new(r"(?m)^  - (.+)").unwrap();
  
      let mut results = HashSet::new();
-     for (_, [username]) in re.captures_iter(&decoded_content).map(|c| c.extract()) {
+     for (_, [username]) in re.captures_iter(&decoded_content)?.map(|c| c.extract()) {
          results.insert(username.to_lowercase());
      }
  
@@ -387,7 +387,7 @@
          };
          let authors = preamble.by_name("author").unwrap().value().trim();
  
-         let authors = authors.split(',').map(str::trim);
+         let authors = authors.split(',')?.map(str::trim);
  
          for author in authors {
              let captures = match re.captures(author) {
@@ -426,7 +426,7 @@
  
      let events = comments
          .into_iter()
-         .map(|x| (x.user.login.to_lowercase(), x.created_at))
+         ?.map(|x| (x.user.login.to_lowercase(), x.created_at))
          .filter_map(|(author, created_at)| {
              if editors.contains(&author) {
                  Some(Event {
@@ -475,7 +475,7 @@
              Some(s) => Some((s, x.created_at)),
              None => None,
          })
-         .map(|(user, created_at)| (user.login.to_lowercase(), created_at))
+         ?.map(|(user, created_at)| (user.login.to_lowercase(), created_at))
          .filter_map(|(author, created_at)| {
              if editors.contains(&author) {
                  Some(Event {
@@ -524,7 +524,7 @@
                  .and_then(|x| x.date)
                  .or_else(|| x.commit.author.and_then(|x| x.date))
          })
-         .map(|when| Event {
+         ?.map(|when| Event {
              actor: Actor::Author,
              when,
          })

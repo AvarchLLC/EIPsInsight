@@ -24,16 +24,16 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
         page,
       });
 
-      const prsInDateRange = mergedPRs.filter(
+      const prsInDateRange = mergedPRs?.filter(
         (pr: any) =>
           pr.merged_at &&
           new Date(pr.merged_at) >= startDate &&
           new Date(pr.merged_at) <= endDate
       );
 
-      mergedPRsThisMonth = mergedPRsThisMonth.concat(prsInDateRange);
+      mergedPRsThisMonth = mergedPRsThisMonth?.concat(prsInDateRange);
 
-      if (prsInDateRange.length < 100) {
+      if (prsInDateRange?.length < 100) {
         break;
       }
 
@@ -53,7 +53,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
            page: 1,
        });
 
-       const openPRsThisMonth = openPRs.filter(
+       const openPRsThisMonth = openPRs?.filter(
            (pr) => new Date(pr.created_at) >= startDate && new Date(pr.created_at) <= endDate
        );
 
@@ -73,7 +73,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
            page: 1,
        });
 
-       const closedIssuesThisMonth = closedIssues.filter(
+       const closedIssuesThisMonth = closedIssues?.filter(
         (issue) =>
           issue.closed_at &&
           new Date(issue.closed_at) >= startDate &&
@@ -91,7 +91,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
            page: 1,
        });
 
-       const newIssuesThisMonth = newIssues.filter(
+       const newIssuesThisMonth = newIssues?.filter(
            (issue) => new Date(issue.created_at) >= startDate && new Date(issue.created_at) <= endDate
        );
 
@@ -142,7 +142,7 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
           commitDetails.stats.additions &&
           commitDetails.stats.deletions
         ) {
-          filesChanged += commitDetails.files.length;
+          filesChanged += commitDetails.files?.length;
           insertions += commitDetails.stats.additions;
           deletions += commitDetails.stats.deletions;
         }
@@ -151,13 +151,13 @@ async function getGitHubInsightsForMonth(owner: string, repo: string, year: numb
 
        // Return the insights as an object
        const insights = {
-           mergedPRs: mergedPRsThisMonth.length,
-           openPRs: openPRsThisMonth.length,
-           closedIssues: closedIssuesThisMonth.length,
-           newIssues: newIssuesThisMonth.length,
-           commitsToMaster: commitsToMaster.length,
-           commitsToAllBranches: commitsToAllBranches.length,
-           contributors: contributors.length,
+           mergedPRs: mergedPRsThisMonth?.length,
+           openPRs: openPRsThisMonth?.length,
+           closedIssues: closedIssuesThisMonth?.length,
+           newIssues: newIssuesThisMonth?.length,
+           commitsToMaster: commitsToMaster?.length,
+           commitsToAllBranches: commitsToAllBranches?.length,
+           contributors: contributors?.length,
            filesChanged,
            insertions,
            deletions,

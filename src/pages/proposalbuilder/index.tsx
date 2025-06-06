@@ -19,10 +19,14 @@ import {
 import NLink from "next/link";
 import EipTemplateEditor from "@/components/eiptemplate";
 import { motion } from "framer-motion";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 
 const All = () => {
 
+useScrollSpy([
+  "split#eip#new#EipTemplateEditor", // optional: use a more stable ID if available in DOM
+]);
 
 
 

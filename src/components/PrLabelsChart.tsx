@@ -41,7 +41,7 @@ const EipsLabelChart = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRepo, setSelectedRepo] = useState('eips');
   const [showLabels, setShowLabels] = useState<Record<string, boolean>>(
-    availableLabels.reduce((acc, label) => ({ ...acc, [label]: true }), {})
+    availableLabels?.reduce((acc, label) => ({ ...acc, [label]: true }), {})
   );
   const toast = useToast();
 
@@ -85,7 +85,7 @@ const EipsLabelChart = () => {
 
   const convertToCSV = (data: PRDetails[]) => {
     const headers = ['Repo', 'PR Number', 'PR Title', 'Labels', 'Created At', 'Closed At', 'Merged At'];
-    const rows = data.map(pr => [
+    const rows = data?.map(pr => [
       pr.repo,
       pr.prNumber,
       `"${pr.prTitle.replace(/"/g, '""')}"`, // Escape quotes in title
@@ -95,16 +95,16 @@ const EipsLabelChart = () => {
       pr.merged_at || ''
     ]);
   
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
+    return [headers, ...rows]?.map(row => row.join(',')).join('\n');
   };
 
   const handleDownload = () => {
     // Filter PRs that have at least one of the selected labels
-    const filteredPRs = prDetails.filter(pr => 
+    const filteredPRs = prDetails?.filter(pr => 
       pr.labels.some(label => showLabels[label])
     );
 
-    if (filteredPRs.length === 0) {
+    if (filteredPRs?.length === 0) {
       toast({
         title: 'No data to download',
         description: 'No PRs match the currently selected labels',
@@ -123,17 +123,17 @@ const EipsLabelChart = () => {
     const link = document.createElement('a');
     link.href = url;
     link.download = `${selectedRepo}-pr-details-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(link);
+    document.body?.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
   const renderChart = () => {
-      if (!Array.isArray(chartData)) return null;
+      if (!Array?.isArray(chartData)) return null;
   
       // Transform data to group by monthYear and count by label
-      // const transformedData = chartData.reduce<{
+      // const transformedData = chartData?.reduce<{
       //   [key: string]: { [key: string]: number };
       // }>((acc, { monthYear, type, count }) => {
       //   if (showLabels[type]) {
@@ -145,7 +145,7 @@ const EipsLabelChart = () => {
       //   return acc;
       // }, {});
 
-      const transformedData = chartData.reduce<{
+      const transformedData = chartData?.reduce<{
         [key: string]: { [key: string]: number };
       }>((acc, { monthYear, type, count }) => {
         // Determine the actual type to use
@@ -170,11 +170,11 @@ const EipsLabelChart = () => {
       console.log("transformed data:",transformedData);
   
       // Convert to array format for the chart
-      const finalData = Object.keys(transformedData).flatMap(monthYear => {
+      const finalData = Object?.keys(transformedData).flatMap(monthYear => {
         const monthData = transformedData[monthYear];
-        return Object.keys(monthData)
-          .filter(label => showLabels[label])
-          .map(label => ({
+        return Object?.keys(monthData)
+          ?.filter(label => showLabels[label])
+          ?.map(label => ({
             monthYear,
             type: label,
             count: monthData[label]
@@ -277,7 +277,7 @@ const EipsLabelChart = () => {
           position: 'top-right',
           itemName: {
             formatter: (text: string) => {
-              if (text.length > 15) return text.substring(0, 12) + '...';
+              if (text?.length > 15) return text?.substring(0, 12) + '...';
               return text;
             }
           }
@@ -287,7 +287,7 @@ const EipsLabelChart = () => {
             autoRotate: false,
             formatter: (text: string) => {
               const [year, month] = text.split('-');
-              return `${new Date(Number(year), Number(month) - 1).toLocaleString('default', { month: 'short' })} ${year.slice(-2)}`;
+              return `${new Date(Number(year), Number(month) - 1)?.toLocaleString('default', { month: 'short' })} ${year.slice(-2)}`;
             }
           }
         },
@@ -306,7 +306,7 @@ const EipsLabelChart = () => {
                 <ul>
                   {items?.map((item, index) => (
                     <li key={index}>
-                      {item.name}: {item.value}
+                      {item.name}: {item?.value}
                     </li>
                   ))}
                 </ul>
@@ -397,7 +397,7 @@ const EipsLabelChart = () => {
         colorScheme="blue"
         onClick={() => {
           const allSelected: Record<string, boolean> = {};
-          availableLabels.forEach(label => {
+          availableLabels?.forEach(label => {
             allSelected[label] = true;
           });
           setShowLabels(allSelected);
@@ -412,7 +412,7 @@ const EipsLabelChart = () => {
         colorScheme="red"
         onClick={() => {
           const noneSelected: Record<string, boolean> = {};
-          availableLabels.forEach(label => {
+          availableLabels?.forEach(label => {
             noneSelected[label] = false;
           });
           setShowLabels(noneSelected);
@@ -423,7 +423,7 @@ const EipsLabelChart = () => {
     </Flex>
     
     {/* Labels List */}
-    {availableLabels.map(label => (
+    {availableLabels?.map(label => (
       <MenuItem key={label} closeOnSelect={false}>
         <Checkbox
           isChecked={showLabels[label]}

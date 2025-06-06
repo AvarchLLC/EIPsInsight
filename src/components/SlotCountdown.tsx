@@ -185,7 +185,7 @@ const SlotCountdown: React.FC = () => {
     <>
       {/* First Row: 18 Boxes */}
       <HStack spacing={1} wrap="wrap" justify="center" mb={2}>
-        {firstRowSlots.map((slot) => {
+        {firstRowSlots?.map((slot) => {
           const isProcessed = slot < currentSlot;
           const isCurrent = slot === currentSlot;
           const epochOfSlot = Math.floor(slot / 32);
@@ -232,7 +232,7 @@ const SlotCountdown: React.FC = () => {
   
       {/* Second Row: 14 Boxes + Text + Golden Box */}
       <HStack spacing={1} wrap="wrap" justify="center">
-        {secondRowSlots.map((slot) => {
+        {secondRowSlots?.map((slot) => {
           const isProcessed = slot < currentSlot;
           const isCurrent = slot === currentSlot;
           const epochOfSlot = Math.floor(slot / 32);
@@ -356,7 +356,7 @@ const SlotCountdown: React.FC = () => {
       </Tooltip>
 
       {/* Future Epochs */}
-      {Array.from({ length: 17 }, (_, i) => currentEpoch + i + 1).map((epoch) => {
+      {Array.from({ length: 17 }, (_, i) => currentEpoch + i + 1)?.map((epoch) => {
         const isTarget = epoch === networks[network].targetepoch;
         const isFuture = epoch > currentEpoch;
         const isCurrent = epoch === currentEpoch;

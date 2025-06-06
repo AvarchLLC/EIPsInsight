@@ -11,7 +11,7 @@ export const ErrorList: React.FC<ErrorListProps> = ({ errors }) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
 
     // Split the error message by URLs and map over the parts
-    return error.split(urlRegex).map((part, index) => {
+    return error.split(urlRegex)?.map((part, index) => {
       if (part.match(urlRegex)) {
         // If the part is a URL, wrap it in a Link component
         return (
@@ -31,7 +31,7 @@ export const ErrorList: React.FC<ErrorListProps> = ({ errors }) => {
       <Text fontWeight="bold" mb={2}>
         Validation Errors:
       </Text>
-      {errors.map((error, index) => (
+      {errors?.map((error, index) => (
         <Text key={index}>{renderErrorWithLinks(error)}</Text>
       ))}
     </Box>

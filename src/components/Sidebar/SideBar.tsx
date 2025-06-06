@@ -14,6 +14,7 @@ import { useSidebar } from './SideBarContext';
 import { useActiveSection } from './useActiveSection'; // Make sure this path is correct
 
 export default function Sidebar() {
+  
   const { isCollapsed, toggleSidebar, sections } = useSidebar();
   const { colorMode } = useColorMode();
 

@@ -111,11 +111,11 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const eipFinal = EipstatusChanges.map((item: any) => {
+    const eipFinal = EipstatusChanges?.map((item: any) => {
       return { ...item, repo: "eip" };
     });
 
-    const ripFinal = RipstatusChanges.map((item: any) => {
+    const ripFinal = RipstatusChanges?.map((item: any) => {
       return { ...item, repo: "rip" };
     });
 
@@ -136,7 +136,7 @@ export default async (req: Request, res: Response) => {
         },
       ]);
 
-      const ercFrozenFinal = FrozenErcStatusChanges.map((item: any) => {
+      const ercFrozenFinal = FrozenErcStatusChanges?.map((item: any) => {
         return { ...item, repo: "erc" };
       });
       res.json({
@@ -161,7 +161,7 @@ export default async (req: Request, res: Response) => {
         },
       ]);
 
-      const ercFrozenFinal = FrozenErcStatusChanges.map((item: any) => {
+      const ercFrozenFinal = FrozenErcStatusChanges?.map((item: any) => {
         return { ...item, repo: "erc" };
       });
 
@@ -176,7 +176,7 @@ export default async (req: Request, res: Response) => {
         },
       ]);
 
-      const ercFinal = ErcstatusChanges.map((item: any) => {
+      const ercFinal = ErcstatusChanges?.map((item: any) => {
         return { ...item, repo: "erc" };
       });
 
@@ -197,7 +197,7 @@ export default async (req: Request, res: Response) => {
         },
       ]);
 
-      const ercFinal = ErcstatusChanges.map((item: any) => {
+      const ercFinal = ErcstatusChanges?.map((item: any) => {
         return { ...item, repo: "erc" };
       });
       res.json({ eip: eipFinal, erc: ercFinal, rip: ripFinal });

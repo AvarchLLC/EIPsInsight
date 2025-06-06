@@ -42,7 +42,7 @@ export default async function handler(
       limit: 1
     });
 
-    if (subscriptions.data.length === 0) {
+    if (subscriptions.data?.length === 0) {
       return res.status(400).json({ error: 'No active subscription' });
     }
 

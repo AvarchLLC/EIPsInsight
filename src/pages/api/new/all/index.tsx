@@ -74,7 +74,7 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const eipModified = eipResult.map((item: any) => {
+    const eipModified = eipResult?.map((item: any) => {
       return { ...item, repo: "eip" };
     });
 
@@ -86,7 +86,7 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const ercModified = ercResult.map((item: any) => {
+    const ercModified = ercResult?.map((item: any) => {
       return { ...item, repo: "erc" };
     });
 
@@ -98,7 +98,7 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const ripModified = ripResult.map((item: any) => {
+    const ripModified = ripResult?.map((item: any) => {
       return { ...item, repo: "rip" };
     });
 

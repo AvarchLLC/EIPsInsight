@@ -27,7 +27,7 @@ const ERCTable = () => {
           paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
           marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
-          <Header title={`ERC - [${data.length}]`} subtitle="" />
+          <Header title={`ERC - [${data?.length}]`} subtitle="" />
           <Table type="ERC" />
         </Box>
       </AllLayout>

@@ -28,7 +28,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const reviewers = await Reviewer.find();
 
     // Format the data as needed
-    const formattedData = reviewers.map(reviewer => ({
+    const formattedData = reviewers?.map(reviewer => ({
       reviewer: reviewer.reviewer,
       startDate: reviewer.startDate?.toISOString(),
       endDate: reviewer.endDate ? reviewer.endDate.toISOString() : null,

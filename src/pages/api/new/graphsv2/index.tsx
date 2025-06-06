@@ -94,11 +94,11 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const formattedResult = eipResult.map(
+    const formattedResult = eipResult?.map(
       (group: { _id: any; eips: any[] }) => ({
         status: group._id,
         eips: group.eips
-          .reduce((acc, eipGroup) => {
+          ?.reduce((acc, eipGroup) => {
             const { category, changedYear, changedMonth, count, eips } =
               eipGroup;
             acc.push({
@@ -153,11 +153,11 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const formattedFrozenErcResult = frozenErcResult.map(
+    const formattedFrozenErcResult = frozenErcResult?.map(
       (group: { _id: any; eips: any[] }) => ({
         status: group._id,
         eips: group.eips
-          .reduce((acc, eipGroup) => {
+          ?.reduce((acc, eipGroup) => {
             const { category, changedYear, changedMonth, count, eips } =
               eipGroup;
             acc.push({
@@ -212,11 +212,11 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const ERCformattedResult = ercResult.map(
+    const ERCformattedResult = ercResult?.map(
       (group: { _id: any; eips: any[] }) => ({
         status: group._id,
         eips: group.eips
-          .reduce((acc, eipGroup) => {
+          ?.reduce((acc, eipGroup) => {
             const { category, changedYear, changedMonth, count, eips } =
               eipGroup;
             acc.push({
@@ -271,11 +271,11 @@ export default async (req: Request, res: Response) => {
       },
     ]);
 
-    const RIPformattedResult = ripResult.map(
+    const RIPformattedResult = ripResult?.map(
       (group: { _id: any; eips: any[] }) => ({
         status: group._id,
         eips: group.eips
-          .reduce((acc, eipGroup) => {
+          ?.reduce((acc, eipGroup) => {
             const { category,changedYear, changedMonth, count, eips } = eipGroup;
             acc.push({
               category,

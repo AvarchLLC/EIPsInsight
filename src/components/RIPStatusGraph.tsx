@@ -89,7 +89,7 @@ const RIPStatusGraph = () => {
     const csvContent = [
       ["Year", "EIP", "Last Status", "EIP Title", "EIP Category", "Link"], // Headers
       ...data.flatMap((item) =>
-        item.statusChanges.map((statusChange) => [
+        item.statusChanges?.map((statusChange) => [
           item.year,
           statusChange.eip,
           statusChange.lastStatus,
@@ -98,7 +98,7 @@ const RIPStatusGraph = () => {
           `https://eipsinsight.com/rips/rip-${statusChange.eip}`,
         ])
       ),
-    ].map((row) => row.join(","))
+    ]?.map((row) => row.join(","))
       .join("\n");
   
     // Create a Blob and trigger download
@@ -130,7 +130,7 @@ const RIPStatusGraph = () => {
 
   const transformedData = graphData
     .flatMap((item) =>
-      item.statusChanges.map((change) => ({
+      item.statusChanges?.map((change) => ({
         status: getStatus(change.lastStatus),
         year: item.year,
         value: 1,
@@ -183,7 +183,7 @@ const RIPStatusGraph = () => {
       <Flex justifyContent="space-between" alignItems="center" marginBottom="1rem">
         <NextLink href={"/riptable"}>
           <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-            RIP (Progress Over the Years) - [{data.length}]
+            RIP (Progress Over the Years) - [{data?.length}]
           </Text>
         </NextLink>
         <Button

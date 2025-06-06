@@ -20,7 +20,7 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
   const processData = () => {
     console.log("block:", blocks[0]);
     return blocks
-      .map((block) => ({
+      ?.map((block) => ({
         time: new Date(block.timestamp).toLocaleTimeString(), // Convert timestamp to readable time
         blockNumber: block.blockNumber,
         overall: block.total, // Use the total field for overall transactions
@@ -111,7 +111,7 @@ const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
       <br />
       <Flex mb={4} gap={2} wrap="wrap">
         <Flex mb={4} gap={4} wrap="wrap">
-          {(['all', 'type0', 'type1', 'type2', 'type3', 'type4', 'overall'] as TransactionType[]).map((type) => (
+          {(['all', 'type0', 'type1', 'type2', 'type3', 'type4', 'overall'] as TransactionType[])?.map((type) => (
             <Button
               key={type}
               onClick={() => setTransactionType(type)}

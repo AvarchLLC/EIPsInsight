@@ -150,10 +150,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;
@@ -181,7 +181,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
         function getEarliestEntries(data:any, key:any) {
           const uniqueEntries:any = {};
 
-          data.forEach((entry:any) => {
+          data?.forEach((entry:any) => {
             const entryKey = entry[key];
             
             // If this is the first time we see this `key` or if the current entry's date is earlier, store it
@@ -207,7 +207,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
             "Standard"
           ];
         
-          data.forEach((entry: any) => {
+          data?.forEach((entry: any) => {
             const { eip, type,category,fromStatus, toStatus, changedDay, changedMonth, changedYear } = entry;
 
             if(eip=='615'){
@@ -230,7 +230,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
             }
 
             if (eipTypeChangesMap[eip]) {
-              let previousType = eipTypeChangesMap[eip][eipTypeChangesMap[eip].length - 1];
+              let previousType = eipTypeChangesMap[eip][eipTypeChangesMap[eip]?.length - 1];
               
               if(standardTrackTypes.includes(eipType)){
                 eipType="Standards Track"
@@ -263,7 +263,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
           });
         
           // Now, build the final entries with status changes concatenated into one string for each EIP
-          data.forEach((entry: any) => {
+          data?.forEach((entry: any) => {
             const { eip, title, author, status, type, category, repo } = entry;
             
             // Join the status changes into a single string
@@ -313,10 +313,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
           //   ...getallEntries(jsonData5.rip, 'eip'),
           // ];
           
-          filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
+          filteredData = filteredData?.filter((entry: EIPData, index: number, self: EIPData[]) =>
             entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
           ); 
-          // filteredData2 = filteredData2.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
+          // filteredData2 = filteredData2?.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
           //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
           // );          
         }
@@ -348,10 +348,10 @@ const Table: React.FC<TableProps> = ({ type }) => {
             ...getallEntries(jsonData5.rip, 'eip'),
           ];
           
-          filteredData = filteredData.filter((entry: EIPData, index: number, self: EIPData[]) =>
+          filteredData = filteredData?.filter((entry: EIPData, index: number, self: EIPData[]) =>
             entry.eip !== '1' || index === self.findIndex((e: EIPData) => e.eip === '1')
           ); 
-          // filteredData2 = filteredData2.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
+          // filteredData2 = filteredData2?.filter((entry: EIPEntry, index: number, self: EIPEntry[]) =>
           //   entry.eip !== '1' || index === self.findIndex((e: EIPEntry) => e.eip === '1')
           // );          
         }
@@ -379,7 +379,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
     }
   });
 
-  const filteredData = data2.map((item: any) => {
+  const filteredData = data2?.map((item: any) => {
     const { eip, title, author, status, type, category, repo, changedMonth, changedYear } = item;
     return {
       eip,
@@ -397,7 +397,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
 
   console.log("filtered data:", filteredDataWithMergedYearsAndMonths)
 
-  const DataForFilter = filteredDataWithMergedYearsAndMonths.filter((item) => {
+  const DataForFilter = filteredDataWithMergedYearsAndMonths?.filter((item) => {
     const isYearInRange =
       (!selectedYearRange.start ||
         item.changedYear >= selectedYearRange.start) &&
@@ -425,9 +425,9 @@ const Table: React.FC<TableProps> = ({ type }) => {
   const convertAndDownloadCSV = () => {
     // console.log(DataForFilter);
     
-    if (DataForFilter && DataForFilter.length > 0) {
+    if (DataForFilter && DataForFilter?.length > 0) {
       // Create CSV headers
-      const mergedData = DataForFilter.map((item) => {
+      const mergedData = DataForFilter?.map((item) => {
         const matchingEntry = data3.find((entry) => entry.eip === item.eip);
         return {
           ...item,
@@ -441,8 +441,8 @@ const Table: React.FC<TableProps> = ({ type }) => {
       const headers = Object.keys(mergedData[0]).join(",") + "\n";
   
       // Convert data to CSV rows
-      const csvRows = mergedData.map((item) => {
-        const values = Object.values(item).map((value) => {
+      const csvRows = mergedData?.map((item) => {
+        const values = Object.values(item)?.map((value) => {
           // Ensure values with commas are enclosed in double quotes
           if (typeof value === "string" && value.includes(",")) {
             return `"${value}"`;
@@ -591,7 +591,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       onChange={(e) => setSelectedStatus(e.target.value)}
                     >
                       <option value="">Select Status</option>
-                      {statusArr.map((status) => (
+                      {statusArr?.map((status) => (
                         <option key={status} value={status}>
                           {status}
                         </option>
@@ -603,7 +603,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                       <option value="">Select Category</option>
-                      {catArr.map((item) => (
+                      {catArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -620,7 +620,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       }
                     >
                       <option value="">Start Year</option>
-                      {yearsArr.map((item) => (
+                      {yearsArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -637,7 +637,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       }
                     >
                       <option value="">End Year</option>
-                      {yearsArr.map((item) => (
+                      {yearsArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -654,7 +654,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       }
                     >
                       <option value="">Start Month</option>
-                      {monthArr.map((item) => (
+                      {monthArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -671,7 +671,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
                       }
                     >
                       <option value="">End Month</option>
-                      {monthArr.map((item) => (
+                      {monthArr?.map((item) => (
                         <option key={item} value={item}>
                           {item}
                         </option>
@@ -803,19 +803,19 @@ const Table: React.FC<TableProps> = ({ type }) => {
                   author: (it: any) => (
                     <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
                       <div>
-                        {factorAuthor(it.author).map(
+                        {factorAuthor(it.author)?.map(
                           (item: any, index: any) => {
-                            let t = item[item.length - 1].substring(
+                            let t = item[item?.length - 1].substring(
                               1,
-                              item[item.length - 1].length - 1
+                              item[item?.length - 1]?.length - 1
                             );
                             return (
                               <Wrap key={index}>
                                 <WrapItem>
                                   <Link
                                     href={`${
-                                      item[item.length - 1].substring(
-                                        item[item.length - 1].length - 1
+                                      item[item?.length - 1].substring(
+                                        item[item?.length - 1]?.length - 1
                                       ) === ">"
                                         ? "mailto:" + t
                                         : "https://github.com/" + t.substring(1)

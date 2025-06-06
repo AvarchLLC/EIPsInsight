@@ -9,7 +9,7 @@ export const useActiveSection = () => {
       const scrollPosition = window.scrollY + 100; // Add offset for better readability
       let currentId: string | null = null;
 
-      sections.forEach((section) => {
+      sections?.forEach((section) => {
         if (section instanceof HTMLElement) {
           const offsetTop = section.offsetTop;
           const offsetHeight = section.offsetHeight;

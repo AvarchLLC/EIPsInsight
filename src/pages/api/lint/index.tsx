@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       console.log('Lint Results:', lintResults);
 
-      if (lintResults.errors && lintResults.errors.length > 0) {
+      if (lintResults.errors && lintResults.errors?.length > 0) {
         return res.status(400).json({ errors: lintResults.errors });
       }
 

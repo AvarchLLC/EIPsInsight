@@ -62,7 +62,7 @@ async function fetchLastCreatedYearAndMonthFromAPI(
 
     const data = await response.json();
 
-    if (Array.isArray(data) && data.length > 0) {
+    if (Array.isArray(data) && data?.length > 0) {
       const lastElement = data[0];
       const lastElementCreatedYear = lastElement.mergedYear;
       const lastElementCreatedMonth = lastElement.mergedMonth;
@@ -89,10 +89,10 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
 
   const factorAuthor = (data: any) => {
     let list = data.split(",");
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < list?.length; i++) {
       list[i] = list[i].split(" ");
     }
-    if (list[list.length - 1][list[list.length - 1].length - 1] === "al.") {
+    if (list[list?.length - 1][list[list?.length - 1]?.length - 1] === "al.") {
       list.pop();
     }
     return list;
@@ -113,7 +113,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
         setIsLoading(false); // Set isLoading to false after data is fetched
 
         // Fetch merged years and months for each item
-        const mergedDataPromises = jsonData.map((item: any) =>
+        const mergedDataPromises = jsonData?.map((item: any) =>
           fetchLastCreatedYearAndMonthFromAPI(item.eip)
         );
 
@@ -137,7 +137,7 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
   });
 
   const filteredData = data
-    .map((item: any) => {
+    ?.map((item: any) => {
       const { eip, title, author, status, type, category,repo,deadline } = item;
       return {
         eip,
@@ -150,9 +150,9 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
         deadline,
       };
     })
-    .filter((item: any) => item.status === cat);
+    ?.filter((item: any) => item.status === cat);
 
-  const filteredDataWithMergedYearsAndMonths = filteredData.map(
+  const filteredDataWithMergedYearsAndMonths = filteredData?.map(
     (item, index) => ({
       "#": (index + 1).toString(), // Add the sr number
       ...item,
@@ -166,16 +166,16 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
   const convertAndDownloadCSV = () => {
     if (
       filteredDataWithMergedYearsAndMonths &&
-      filteredDataWithMergedYearsAndMonths.length > 0
+      filteredDataWithMergedYearsAndMonths?.length > 0
     ) {
       // Create CSV headers
       const headers =
         Object.keys(filteredDataWithMergedYearsAndMonths[0]).join(",") + "\n";
 
       // Convert data to CSV rows
-      const csvRows = filteredDataWithMergedYearsAndMonths.map((item) =>
+      const csvRows = filteredDataWithMergedYearsAndMonths?.map((item) =>
         Object.values(item)
-          .map((value) =>
+          ?.map((value) =>
             typeof value === "string" && value.includes(",")
               ? `"${value}"`
               : value
@@ -404,19 +404,19 @@ const TableStat: React.FC<TabProps> = ({ cat, type }) => {
     author: (it: any) => (
       <td key={it.author} style={{ backgroundColor: isDarkMode ? '#2D3748' : '#F7FAFC' }}>
         <div>
-          {factorAuthor(it.author).map(
+          {factorAuthor(it.author)?.map(
             (item: any, index: any) => {
-              let t = item[item.length - 1].substring(
+              let t = item[item?.length - 1].substring(
                 1,
-                item[item.length - 1].length - 1
+                item[item?.length - 1]?.length - 1
               );
               return (
                 <Wrap key={index}>
                   <WrapItem>
                     <Link
                       href={`${
-                        item[item.length - 1].substring(
-                          item[item.length - 1].length - 1
+                        item[item?.length - 1].substring(
+                          item[item?.length - 1]?.length - 1
                         ) === ">"
                           ? "mailto:" + t
                           : "https://github.com/" + t.substring(1)

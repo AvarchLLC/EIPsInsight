@@ -100,18 +100,18 @@ import {
                 <FiBookmark style={{ marginRight: '10px' }} />
                 Saved Bookmarks
                 <Badge ml={2} colorScheme="teal">
-                  {bookmarks.length}
+                  {bookmarks?.length}
                 </Badge>
               </Flex>
             </DrawerHeader>
             <DrawerBody>
-              {bookmarks.length === 0 ? (
+              {bookmarks?.length === 0 ? (
                 <Text mt={4} color="gray.500">
                   No bookmarks saved yet. Click the bookmark icon on any page to save it.
                 </Text>
               ) : (
                 <List spacing={3} mt={4}>
-                  {bookmarks.map((bookmark, index) => (
+                  {bookmarks?.map((bookmark, index) => (
                     <ListItem 
                       key={index}
                       p={3}

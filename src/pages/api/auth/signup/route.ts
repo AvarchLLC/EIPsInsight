@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: "Passwords do not match" }, { status: 400 });
     }
 
-    if (password.length < 6) {
+    if (password?.length < 6) {
         return NextResponse.json({ message: "Password must be at least 6 characters long" }, { status: 400 });
     }
 

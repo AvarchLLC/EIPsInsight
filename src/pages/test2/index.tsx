@@ -1,7 +1,20 @@
+'use client';
+
 import TimelineChart from '@/components/TimelineChart';
 import { Heading, Box } from '@chakra-ui/react';
+import { useSidebar } from '@/components/Sidebar/SideBarContext';
+import { SetStateAction } from 'react';
+interface Props {
+  selectedOption: 'pectra' | 'fusaka';
+  setSelectedOption?: (option: 'pectra' | 'fusaka') => void; // Only if needed for child toggling
+  pectraData: any[];
+  fusakaData: any[];
+}
 
 const EIPTimelinePage = () => {
+  const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
+  const selectedOption = selectedUpgrade;       // just alias so rest of code works
+  const setSelectedOption = setSelectedUpgrade;
   const originalData = [
     { date: '2024-03-21', included: [], scheduled: ['EIP-2537', 'EIP-6110', 'EIP-7002', 'EIP-7251', 'EIP-7549'], declined: [], considered: ['EIP-7547'] },
     { date: '2024-04-11', included: [], scheduled: ['EIP-2537', 'EIP-2935', 'EIP-3074', 'EIP-6110', 'EIP-7002', 'EIP-7251', 'EIP-7549'], declined: [], considered: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7547', 'EIP-7620', 'EIP-7623'] },
@@ -27,11 +40,11 @@ const EIPTimelinePage = () => {
   ];
 
   // Preprocess to add "declined" field based on removed EIPs
-  const processedData = originalData.map((entry, index, arr) => {
+  const processedData = originalData?.map((entry, index, arr) => {
     const allPrevEIPs = new Set<string>();
     for (let i = 0; i < index; i++) {
-      arr[i].scheduled.forEach((eip) => allPrevEIPs.add(eip));
-      arr[i].considered.forEach((eip) => allPrevEIPs.add(eip));
+      arr[i].scheduled?.forEach((eip) => allPrevEIPs.add(eip));
+      arr[i].considered?.forEach((eip) => allPrevEIPs.add(eip));
     }
 
     const currentEIPs = new Set([
@@ -39,7 +52,7 @@ const EIPTimelinePage = () => {
       ...entry.considered,
     ]);
 
-    const declined = [...allPrevEIPs].filter((eip) => !currentEIPs.has(eip));
+    const declined = [...allPrevEIPs]?.filter((eip) => !currentEIPs.has(eip));
 
     return {
       ...entry,
@@ -47,11 +60,11 @@ const EIPTimelinePage = () => {
     };
   });
 
-  const processedData2 = data2.map((entry, index, arr) => {
+  const processedData2 = data2?.map((entry, index, arr) => {
     const allPrevEIPs = new Set<string>();
     for (let i = 0; i < index; i++) {
-      arr[i].scheduled.forEach((eip) => allPrevEIPs.add(eip));
-      arr[i].considered.forEach((eip) => allPrevEIPs.add(eip));
+      arr[i].scheduled?.forEach((eip) => allPrevEIPs.add(eip));
+      arr[i].considered?.forEach((eip) => allPrevEIPs.add(eip));
     }
 
     const currentEIPs = new Set([
@@ -59,7 +72,7 @@ const EIPTimelinePage = () => {
       ...entry.considered,
     ]);
 
-    const declined = [...allPrevEIPs].filter((eip) => !currentEIPs.has(eip));
+    const declined = [...allPrevEIPs]?.filter((eip) => !currentEIPs.has(eip));
 
     return {
       ...entry,
@@ -70,7 +83,8 @@ const EIPTimelinePage = () => {
   return (
     <Box p={4}>
       <Heading mb={4}>EIP Timeline</Heading>
-      <TimelineChart data={processedData} data2={data2}/>
+      <TimelineChart data={selectedOption === 'pectra' ? processedData : processedData2}
+        selectedOption={selectedOption} />
     </Box>
   );
 };
