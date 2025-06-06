@@ -57,6 +57,7 @@ import {
 import { MarkdownViewer } from "react-github-markdown";
 import { ErrorList } from "./ErrorToast";
 import axios from "axios";
+import FeedbackWidget from "./FeedbackWidget";
 
 var initialTemplateData = {
   eip: "<TBD>",
@@ -959,6 +960,8 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
   };
 
   return (
+    <>
+    <FeedbackWidget/>
     <Box
       p={5}
       mx="auto"
@@ -1781,6 +1784,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         </HStack>
       </Box>
     </Box>
+    </>
   );
 };
 

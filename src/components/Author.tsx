@@ -24,6 +24,7 @@ import NextLink from "next/link";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { SearchIcon } from "@chakra-ui/icons";
 import axios from "axios";
+import FeedbackWidget from "./FeedbackWidget";
 
 interface EIP {
   _id: string;
@@ -219,6 +220,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
 
   return (
     <>
+      <FeedbackWidget />
       <Box p={5} maxW="1200px" mx="auto" id="Search Author">
         {/* Search Bar & Dropdown */}
         <Flex justifyContent="center" mt={3} alignItems="center" gap={4}>
@@ -276,6 +278,7 @@ const Author: React.FC<AuthorProps> = ({ defaultQuery }) => {
           <Text textAlign="center">Loading...</Text>
         ) : (
           <>
+            <FeedbackWidget />
             <Flex
               wrap="wrap"
               //   direction="column"

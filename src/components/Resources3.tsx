@@ -28,8 +28,15 @@ import {
   Grid,
   Center,
 } from "@chakra-ui/react";
-import { FaYoutube, FaNewspaper, FaBlog, FaQuestionCircle, FaTools } from "react-icons/fa";
-import NextLink from 'next/link';
+import {
+  FaYoutube,
+  FaNewspaper,
+  FaBlog,
+  FaQuestionCircle,
+  FaTools,
+} from "react-icons/fa";
+import NextLink from "next/link";
+import FeedbackWidget from "./FeedbackWidget";
 
 const ResourcesPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -60,9 +67,19 @@ const ResourcesPage: React.FC = () => {
     if (index !== -1) setTabIndex(index);
   }, []);
 
-
-
-  const Card = ({ image, title, content, link, tag }: { image?: string; title: string; content: string; link: string; tag?: string }) => (
+  const Card = ({
+    image,
+    title,
+    content,
+    link,
+    tag,
+  }: {
+    image?: string;
+    title: string;
+    content: string;
+    link: string;
+    tag?: string;
+  }) => (
     <Box
       bg={cardBg}
       p={5}
@@ -95,7 +112,7 @@ const ResourcesPage: React.FC = () => {
         href={link}
         color={accentColor}
         fontWeight="semibold"
-        isExternal={!link.startsWith('/')}
+        isExternal={!link.startsWith("/")}
         display="inline-flex"
         alignItems="center"
       >
@@ -136,7 +153,9 @@ const ResourcesPage: React.FC = () => {
         </AspectRatio>
         <Box p={3}>
           <Link
-            href={url.replace("embed/", "watch?v=").replace("youtube.com/embed/", "youtu.be/")}
+            href={url
+              .replace("embed/", "watch?v=")
+              .replace("youtube.com/embed/", "youtu.be/")}
             color={accentColor}
             fontSize="sm"
             fontWeight="semibold"
@@ -156,64 +175,68 @@ const ResourcesPage: React.FC = () => {
       title: "Analytics",
       description: "Track and visualize EIP activity and trends",
       link: "/Analytics",
-      icon: "📊"
+      icon: "📊",
     },
     {
       title: "Boards",
       description: "Manage and organize EIP proposals",
       link: "/boards",
-      icon: "📋"
+      icon: "📋",
     },
     {
       title: "Editors & Reviewers Leaderboard",
       description: "See top contributors in the EIP ecosystem",
       link: "/Reviewers",
-      icon: "🏆"
+      icon: "🏆",
     },
     {
       title: "EIP Proposal Builder",
       description: "Create and format new EIP proposals easily",
       link: "/proposalbuilder",
-      icon: "🛠️"
+      icon: "🛠️",
     },
     {
       title: "Search by Author",
       description: "Find EIPs by their authors",
       link: "/authors",
-      icon: "🔍"
+      icon: "🔍",
     },
     {
       title: "Search by EIP",
       description: "Quickly find specific EIPs",
       link: "/SearchEip",
-      icon: "🔎"
-    }
+      icon: "🔎",
+    },
   ];
 
   const FAQs = [
     {
       title: "What is an Ethereum Improvement Proposal (EIP)?",
-      content: "EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community,",
+      content:
+        "EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community,",
       link: "/FAQs/EIP",
-      tag: "Beginner"
+      tag: "Beginner",
     },
     {
       title: "What is an Ethereum Request for Change (ERC)?",
-      content: "The goal of Ethereum Request for Change (ERCs) is to standardize and provide high-quality documentation for the Ethereum application layer.",
+      content:
+        "The goal of Ethereum Request for Change (ERCs) is to standardize and provide high-quality documentation for the Ethereum application layer.",
       link: "/FAQs/ERC",
-      tag: "Intermediate"
+      tag: "Intermediate",
     },
     {
       title: "What is an Rollup Improvement Proposal (RIP)?",
-      content: "A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions",
+      content:
+        "A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions",
       link: "/FAQs/RIP",
-      tag: "Advanced"
+      tag: "Advanced",
     },
     {
       title: "What is EIPsInsight?",
-      content: "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period.",
+      content:
+        "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period.",
       link: "/About",
-      tag: "About"
+      tag: "About",
     },
   ];
 
@@ -222,42 +245,48 @@ const ResourcesPage: React.FC = () => {
       image: "/EIP_blog1.png",
       title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
       content: "Bringing You the Latest in Ethereum Improvement Proposals",
-      link: "/Blogs/blog1"
+      link: "/Blogs/blog1",
     },
     {
       image: "/news1.jpg",
       title: "The EIP Proposal Builder: Simplify, Streamline, Succeed",
-      content: "Introducing the EIP Proposal Builder: Simplify the creation of Ethereum Improvement Proposals with ease.",
+      content:
+        "Introducing the EIP Proposal Builder: Simplify the creation of Ethereum Improvement Proposals with ease.",
       link: "https://etherworld.co/2025/01/20/the-eip-proposal-builder-simplify-streamline-succeed/",
-      tag: "New Feature"
+      tag: "New Feature",
     },
     {
       image: "/news2.jpg",
       title: "Unveiling the Analytics Tool on EIPsInsight",
-      content: "Discover EIPsInsight Analytics – a tool designed to streamline project management with visualized GitHub data.",
+      content:
+        "Discover EIPsInsight Analytics – a tool designed to streamline project management with visualized GitHub data.",
       link: "https://etherworld.co/2025/01/07/unveiling-the-analytics-tool-on-eipsinsight/",
-      tag: "Tool"
+      tag: "Tool",
     },
     {
       image: "/news3.png",
-      title: "Boosting EIP Contributions: Unleashing the Power of Editors Leaderboard",
-      content: "The Editors Leaderboard and EIP Board streamline EIP reviews by tracking individual contributions.",
+      title:
+        "Boosting EIP Contributions: Unleashing the Power of Editors Leaderboard",
+      content:
+        "The Editors Leaderboard and EIP Board streamline EIP reviews by tracking individual contributions.",
       link: "https://etherworld.co/2024/12/26/boosting-eip-contributions-unleashing-the-power-of-editors-leaderboard-and-eip-board/",
-      tag: "Community"
+      tag: "Community",
     },
     {
       image: "/news4.jpg",
       title: "Introducing EIP-Board: Simplifying Pull Request Management",
-      content: "EIP-Board simplifies Ethereum Improvement Proposal management by prioritizing pull requests.",
+      content:
+        "EIP-Board simplifies Ethereum Improvement Proposal management by prioritizing pull requests.",
       link: "https://etherworld.co/2024/12/04/introducing-eip-board-simplifying-pull-request-management-for-eip-editors/",
-      tag: "New Feature"
+      tag: "New Feature",
     },
     {
       image: "/news5.jpg",
       title: "Introducing 'Search by Author' Feature on EIPsInsight",
-      content: "Tracking and exploring Ethereum proposals just got a whole lot easier.",
+      content:
+        "Tracking and exploring Ethereum proposals just got a whole lot easier.",
       link: "https://etherworld.co/2024/11/26/search-by-author-eipsinsight/",
-      tag: "Feature"
+      tag: "Feature",
     },
   ];
 
@@ -265,44 +294,50 @@ const ResourcesPage: React.FC = () => {
     {
       image: "/blog3.jpg",
       title: "ICYMI: New Features on EIPsInsight",
-      content: "EIPsInsight introduces new features, including filters, reviewer tracking, Pectra countdown, and improved analytics.",
+      content:
+        "EIPsInsight introduces new features, including filters, reviewer tracking, Pectra countdown, and improved analytics.",
       link: "https://etherworld.co/2025/04/01/icymi-new-features-on-eipsinsight/",
-      tag: "Update"
+      tag: "Update",
     },
     {
       image: "/EipsInsightRecap.jpg",
       title: "Eipsinsight milestones 2024",
-      content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities.",
+      content:
+        "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities.",
       link: "/milestones2024",
-      tag: "Year in Review"
+      tag: "Year in Review",
     },
     {
       image: "/blog1.jpg",
       title: "ERC-7779: Understanding & Redefining Wallet Interoperability",
-      content: "ERC-7779 revolutionizes Ethereum by enhancing wallet interoperability, simplifying user transitions.",
+      content:
+        "ERC-7779 revolutionizes Ethereum by enhancing wallet interoperability, simplifying user transitions.",
       link: "https://etherworld.co/2025/01/24/erc-7779-understanding-redefining-wallet-interoperability/",
-      tag: "Technical"
+      tag: "Technical",
     },
     {
       image: "/resources3.jpg",
       title: "Ethereum's Dencun upgrade moving towards Devnet 8",
-      content: "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
+      content:
+        "Devnet 8 Specs, Challenges in Devnet 7, Geth-Related Bugs & c-kzg Library",
       link: "https://etherworld.co/2023/07/11/ethereums-dencun-upgrade-moving-towards-devnet-8/",
-      tag: "Upgrade"
+      tag: "Upgrade",
     },
     {
       image: "/resources7.png",
       title: "Eip - 7516 : BLOBBASEFEE opcode",
-      content: "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently.",
+      content:
+        "EIP proposes BLOBBASEFEE opcode for smart contracts to manage blob data costs efficiently.",
       link: "https://etherworld.co/2024/01/25/eip-7516-blobbasefee-opcode/",
-      tag: "Technical"
+      tag: "Technical",
     },
     {
       image: "/resources9.jpg",
       title: "EIP - 7045 Increase Max Attestation Inclusion Slot",
-      content: "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security.",
+      content:
+        "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security.",
       link: "https://etherworld.co/2024/01/09/eip-7045/",
-      tag: "Technical"
+      tag: "Technical",
     },
   ];
 
@@ -318,7 +353,6 @@ const ResourcesPage: React.FC = () => {
     "https://www.youtube.com/embed/videoseries?list=PL4cwHXAawZxpok0smGmq-dFGVHQzW84a2",
   ];
 
-
   const [currentVideoPage, setCurrentVideoPage] = useState(0);
   const videosPerPage = 4;
 
@@ -331,30 +365,32 @@ const ResourcesPage: React.FC = () => {
 
   const FAQContent = () => (
     <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
-      <Box width="100%"
+      <Box
+        width="100%"
         position="relative"
         overflow="hidden"
         borderRadius="xl"
-        boxShadow="md" >
+        boxShadow="md"
+      >
         <AspectRatio ratio={9 / 10} maxH="600px">
-          <video autoPlay
+          <video
+            autoPlay
             loop
             muted
             playsInline
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              position: 'absolute',
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              position: "absolute",
               top: 0,
-              left: 0
+              left: 0,
             }}
           >
             <source src="/single.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </AspectRatio>
-
       </Box>
 
       <Box>
@@ -365,18 +401,26 @@ const ResourcesPage: React.FC = () => {
           boxShadow="md"
           mb={6}
         />
-        <Heading size="xl" // Increased from lg to xl
+        <Heading
+          size="xl" // Increased from lg to xl
           mb={8}
           display="flex"
           alignItems="center"
           gap={3}
           fontSize={{ base: "2xl", md: "3xl" }}
         >
-          <Icon as={FaQuestionCircle} color={accentColor} /> Frequently Asked Questions
+          <Icon as={FaQuestionCircle} color={accentColor} /> Frequently Asked
+          Questions
         </Heading>
         <Accordion allowToggle>
           {FAQs?.map((item, index) => (
-            <AccordionItem key={index} mb={4} borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <AccordionItem
+              key={index}
+              mb={4}
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+            >
               <AccordionButton
                 bg={cardBg}
                 _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
@@ -387,7 +431,10 @@ const ResourcesPage: React.FC = () => {
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
-              <AccordionPanel pb={4} bg={useColorModeValue("gray.50", "gray.700")}>
+              <AccordionPanel
+                pb={4}
+                bg={useColorModeValue("gray.50", "gray.700")}
+              >
                 <Text mb={3}>{item?.content}</Text>
                 <NextLink href={item.link} passHref legacyBehavior>
                   <Link
@@ -411,7 +458,7 @@ const ResourcesPage: React.FC = () => {
     {
       label: "FAQ",
       icon: FaQuestionCircle,
-      content: <FAQContent />
+      content: <FAQContent />,
     },
     {
       label: "Blogs",
@@ -427,7 +474,7 @@ const ResourcesPage: React.FC = () => {
             ))}
           </SimpleGrid>
         </Box>
-      )
+      ),
     },
     {
       label: "Videos",
@@ -441,8 +488,8 @@ const ResourcesPage: React.FC = () => {
           <SimpleGrid
             columns={{ base: 1, sm: 2 }}
             spacing={4}
-            maxW="auto"  // Constrain the maximum width
-            mx="auto"   // Center the grid
+            maxW="auto" // Constrain the maximum width
+            mx="auto" // Center the grid
           >
             {paginatedVideos?.map((url, index) => (
               <VideoCard key={index} url={url} />
@@ -452,7 +499,9 @@ const ResourcesPage: React.FC = () => {
             <Flex justify="center" mt={6}>
               <Stack direction="row" spacing={2}>
                 <Button
-                  onClick={() => setCurrentVideoPage(prev => Math.max(prev - 1, 0))}
+                  onClick={() =>
+                    setCurrentVideoPage((prev) => Math.max(prev - 1, 0))
+                  }
                   disabled={currentVideoPage === 0}
                   size="sm"
                   colorScheme="blue"
@@ -464,15 +513,19 @@ const ResourcesPage: React.FC = () => {
                   <Button
                     key={index}
                     onClick={() => setCurrentVideoPage(index)}
-                    colorScheme={currentVideoPage === index ? 'blue' : 'gray'}
+                    colorScheme={currentVideoPage === index ? "blue" : "gray"}
                     size="sm"
-                    variant={currentVideoPage === index ? 'solid' : 'outline'}
+                    variant={currentVideoPage === index ? "solid" : "outline"}
                   >
                     {index + 1}
                   </Button>
                 ))}
                 <Button
-                  onClick={() => setCurrentVideoPage(prev => Math.min(prev + 1, totalVideoPages - 1))}
+                  onClick={() =>
+                    setCurrentVideoPage((prev) =>
+                      Math.min(prev + 1, totalVideoPages - 1)
+                    )
+                  }
                   disabled={currentVideoPage === totalVideoPages - 1}
                   size="sm"
                   colorScheme="blue"
@@ -484,7 +537,7 @@ const ResourcesPage: React.FC = () => {
             </Flex>
           )}
         </Box>
-      )
+      ),
     },
     {
       label: "News",
@@ -500,8 +553,8 @@ const ResourcesPage: React.FC = () => {
             ))}
           </SimpleGrid>
         </Box>
-      )
-    }
+      ),
+    },
   ];
 
   const ToolsSection = () => (
@@ -524,10 +577,14 @@ const ResourcesPage: React.FC = () => {
             }}
           >
             <Flex align="center" mb={3}>
-              <Text fontSize="2xl" mr={3}>{tool.icon}</Text>
+              <Text fontSize="2xl" mr={3}>
+                {tool.icon}
+              </Text>
               <Heading size="md">{tool.title}</Heading>
             </Flex>
-            <Text mb={4} color={textColor}>{tool.description}</Text>
+            <Text mb={4} color={textColor}>
+              {tool.description}
+            </Text>
             <NextLink href={tool.link} passHref legacyBehavior>
               <Link
                 color={accentColor}
@@ -544,76 +601,87 @@ const ResourcesPage: React.FC = () => {
     </Box>
   );
   return (
-    <Box minH="100vh">
-      <Box maxW="7xl" mx="auto" px={8}> {/* This centers content with padding */}
-        <Header
-          title="Resources"
-          subtitle="Learn, explore, and stay updated with Ethereum improvements"
-        />
-      </Box>
-      <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} py={8}>
-        <Center mb={8}>
-          <Tabs
-            index={tabIndex}
-            onChange={setTabIndex}
-            variant="unstyled"
-            isFitted={isMobile}
-          >
-            <TabList
-              display="flex"
-              flexWrap="wrap"
-              justifyContent="center"
-              gap={2}
-              bg="transparent"
+    <>
+      <FeedbackWidget />
+      <Box minH="100vh">
+        <Box maxW="7xl" mx="auto" px={8}>
+          {" "}
+          {/* This centers content with padding */}
+          <Header
+            title="Resources"
+            subtitle="Learn, explore, and stay updated with Ethereum improvements"
+          />
+        </Box>
+        <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} py={8}>
+          <Center mb={8}>
+            <Tabs
+              index={tabIndex}
+              onChange={setTabIndex}
+              variant="unstyled"
+              isFitted={isMobile}
             >
-              {tabContent?.map((tab, index) => (
-                <Tab
-                  key={index}
-                  onClick={() => handleSelection(tab.label)}
-                  fontSize={tabSize}
-                  fontWeight="semibold"
-                  bg={tabBg}
-                  borderWidth="1px"
-                  borderColor={tabIndex === index ? accentColor : tabBorderColor}
-                  borderRadius="lg"
-                  py={3}
-                  px={2}
-                  flex={1}
-                  mx={0.5}
-                  _selected={{
-                    color: "black",
-                    bg: accentColor,
-                    boxShadow: "md",
-                  }}
-                  _hover={{
-                    bg: useColorModeValue("gray.100", "gray.600"),
-                  }}
-                  transition="all 0.2s ease"
-                  minW={{ base: "auto", md: "200px" }}
-                  maxW={{ md: "250px" }}
-                  color={tabIndex === index ? "white" : textColor}
-                >
-                  <Stack direction="row" align="center" justify="center" spacing={2}>
-                    <Icon as={tab.icon} />
-                    {!isMobile && <Text>{tab.label}</Text>}
-                  </Stack>
-                </Tab>
-              ))}
-            </TabList>
+              <TabList
+                display="flex"
+                flexWrap="wrap"
+                justifyContent="center"
+                gap={2}
+                bg="transparent"
+              >
+                {tabContent?.map((tab, index) => (
+                  <Tab
+                    key={index}
+                    onClick={() => handleSelection(tab.label)}
+                    fontSize={tabSize}
+                    fontWeight="semibold"
+                    bg={tabBg}
+                    borderWidth="1px"
+                    borderColor={
+                      tabIndex === index ? accentColor : tabBorderColor
+                    }
+                    borderRadius="lg"
+                    py={3}
+                    px={2}
+                    flex={1}
+                    mx={0.5}
+                    _selected={{
+                      color: "black",
+                      bg: accentColor,
+                      boxShadow: "md",
+                    }}
+                    _hover={{
+                      bg: useColorModeValue("gray.100", "gray.600"),
+                    }}
+                    transition="all 0.2s ease"
+                    minW={{ base: "auto", md: "200px" }}
+                    maxW={{ md: "250px" }}
+                    color={tabIndex === index ? "white" : textColor}
+                  >
+                    <Stack
+                      direction="row"
+                      align="center"
+                      justify="center"
+                      spacing={2}
+                    >
+                      <Icon as={tab.icon} />
+                      {!isMobile && <Text>{tab.label}</Text>}
+                    </Stack>
+                  </Tab>
+                ))}
+              </TabList>
 
-
-            <TabPanels mt={8}>
-              {tabContent?.map((tab, index) => (
-                <TabPanel key={index} px={0}>
-                  {tab.content}
-                  <ToolsSection />
-                </TabPanel>
-              ))}
-            </TabPanels>
-          </Tabs>
-        </Center>
+              <TabPanels mt={8}>
+                {tabContent?.map((tab, index) => (
+                  <TabPanel key={index} px={0}>
+                    {tab.content}
+                    <ToolsSection />
+                  </TabPanel>
+                ))}
+              </TabPanels>
+            </Tabs>
+          </Center>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

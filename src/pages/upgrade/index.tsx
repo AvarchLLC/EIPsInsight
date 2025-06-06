@@ -1066,6 +1066,7 @@ import { Card } from "@/components/pectraCards";
 import StatusGraph from "@/components/Statuschangesgraph";
 import { useSidebar } from '@/components/Sidebar/SideBarContext';
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+import FeedbackWidget from "@/components/FeedbackWidget";
 
 const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
@@ -1116,13 +1117,13 @@ const All = () => {
 
   const scrollLeft = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+      containerRef.current.scrollBy({ left: -300, behavior: "smooth" });
     }
   };
 
   const scrollRight = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+      containerRef.current.scrollBy({ left: 300, behavior: "smooth" });
     }
   };
 
@@ -1178,36 +1179,106 @@ const All = () => {
     {
       image: "pectraimg1.jpg",
       title: "Holesky Testnet Support Ends in September",
-      content: "Holesky testnet support ends in September as Ethereum transitions to Hoodi for improved validator testing & Pectra upgrade readiness.",
-      link: "https://etherworld.co/2025/03/19/holesky-testnet-support-ends-in-september/"
+      content:
+        "Holesky testnet support ends in September as Ethereum transitions to Hoodi for improved validator testing & Pectra upgrade readiness.",
+      link: "https://etherworld.co/2025/03/19/holesky-testnet-support-ends-in-september/",
     },
     {
       image: "pectraimg3.jpg",
       title: "New Ethereum Testnet ‘Hoodi’ Announced for Pectra Testing",
-      content: "Hoodi is Ethereum’s new testnet, designed to replace Holesky with a mainnet-like environment for testing Pectra, validator exits, & staking operations.",
-      link: "https://etherworld.co/2025/03/14/new-ethereum-testnet-hoodi-announced-for-pectra-testing/"
+      content:
+        "Hoodi is Ethereum’s new testnet, designed to replace Holesky with a mainnet-like environment for testing Pectra, validator exits, & staking operations.",
+      link: "https://etherworld.co/2025/03/14/new-ethereum-testnet-hoodi-announced-for-pectra-testing/",
     },
     {
       image: "pectraimg4.jpg",
       title: "How Holesky Finally Reached Stability",
-      content: "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
-      link: "https://etherworld.co/2025/03/11/how-holesky-finally-reached-stability/"
+      content:
+        "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
+      link: "https://etherworld.co/2025/03/11/how-holesky-finally-reached-stability/",
     },
     {
       image: "pectraimg5.png",
       title: "Holesky and Hoodi Testnet Updates",
-      content: "The Pectra testnet activation revealed issues in clients with deposit contract configurations changes on Ethereum testnets. While Sepolia's recovery was straightforward and the network has since fully recovered, Holesky experienced extensive inactivity leaks as pa...",
-      link: "https://blog.ethereum.org/2025/03/18/hoodi-holesky"
+      content:
+        "The Pectra testnet activation revealed issues in clients with deposit contract configurations changes on Ethereum testnets. While Sepolia's recovery was straightforward and the network has since fully recovered, Holesky experienced extensive inactivity leaks as pa...",
+      link: "https://blog.ethereum.org/2025/03/18/hoodi-holesky",
     },
     {
       image: "pectraimg6.jpg",
       title: "Sepolia Pectra Incident Update",
-      content: "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
-      link: "At 7:29 UTC today, on epoch 222464, the Pectra network upgrade went live on the Sepolia testnet. Unfortunately, an issue with Sepolia's permissioned deposit contract prevented many execution layer clients from including transactions in blocks."
+      content:
+        "A sneak peek at how the Ethereum community came together to fix Holesky after two weeks of chaos.",
+      link: "At 7:29 UTC today, on epoch 222464, the Pectra network upgrade went live on the Sepolia testnet. Unfortunately, an issue with Sepolia's permissioned deposit contract prevented many execution layer clients from including transactions in blocks.",
     },
   ]
 
   const pectraData = [
+    {
+      eip: "2537",
+      title: "Precompile for BLS12-381 curve operations",
+      author:
+        "Alex Vlasov (@shamatar), Kelly Olson (@ineffectualproperty), Alex Stokes (@ralexstokes), Antonio Sanso (@asanso)",
+      link: "https://eipsinsight.com/eips/eip-2537",
+      type: "Standards Track",
+      category: "Core",
+      discussion:
+        "https://ethereum-magicians.org/t/eip2537-bls12-precompile-discussion-thread/4187",
+    },
+    {
+      eip: "2935",
+      title: "Serve historical block hashes from state",
+      author:
+        "Vitalik Buterin (@vbuterin), Tomasz Stanczak (@tkstanczak), Guillaume Ballet (@gballet), Gajinder Singh (@g11tech), Tanishq Jasoria (@tanishqjasoria), Ignacio Hagopian (@jsign), Jochem Brouwer (@jochem-brouwer)",
+      link: "https://eipsinsight.com/eips/eip-2935",
+      type: "Standards Track",
+      category: "Core",
+      discussion:
+        "https://ethereum-magicians.org/t/eip-2935-save-historical-block-hashes-in-state/4565",
+    },
+    {
+      eip: "6110",
+      title: "Supply validator deposits on chain",
+      author:
+        "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo), Peter Davies (@petertdavies)",
+      link: "https://eipsinsight.com/eips/eip-6110",
+      type: "Standards Track",
+      category: "Core",
+      discussion:
+        "https://ethereum-magicians.org/t/eip-6110-supply-validator-deposits-on-chain/12072",
+    },
+    {
+      eip: "7002",
+      title: "Execution layer triggerable withdrawals",
+      author:
+        "Danny Ryan (@djrtwo), Mikhail Kalinin (@mkalinin), Ansgar Dietrichs (@adietrichs), Hsiao-Wei Wang (@hwwhww), lightclient (@lightclient)",
+      link: "https://eipsinsight.com/eips/eip-7002",
+      type: "Standards Track",
+      category: "Core",
+      discussion:
+        "https://ethereum-magicians.org/t/eip-7002-execution-layer-triggerable-exits/14195",
+    },
+    {
+      eip: "7251",
+      title: "Increase the MAX_EFFECTIVE_BALANCE",
+      author:
+        "mike (@michaelneuder), Francesco (@fradamt), dapplion (@dapplion), Mikhail (@mkalinin), Aditya (@adiasg), Justin (@justindrake), lightclient (@lightclient)",
+      link: "https://eipsinsight.com/eips/eip-2251",
+      type: "Standards Track",
+      category: "Core",
+      discussion:
+        "https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982",
+    },
+    {
+      eip: "7549",
+      title: "Move committee index outside Attestation",
+      author: "dapplion (@dapplion)",
+      link: "https://eipsinsight.com/eips/eip-7549",
+      type: "Standards Track",
+      category: "Core",
+      discussion:
+        "https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390",
+    },
 
     {
       eip: "2537",
@@ -1477,9 +1548,16 @@ const All = () => {
   "pectra-table",
 ]);
 
+  useLayoutEffect(() => {
+    router.events.on("routeChangeComplete", scrollToHash);
+    return () => {
+      router.events.off("routeChangeComplete", scrollToHash);
+    };
+  }, [router]);
 
   return (
     <>
+      <FeedbackWidget />
       <AllLayout>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
