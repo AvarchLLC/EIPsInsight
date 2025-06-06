@@ -31,6 +31,7 @@ import { useSidebar } from "@/components/Sidebar/SideBarContext";
 import DashboardCards from "./DashboardCards";
 import SearchBox from "./SearchBox";
 import BoyGirl from "./BoyGirl3";
+import FeedbackWidget from "./FeedbackWidget";
 
 interface EIP {
   _id: string;
@@ -71,7 +72,7 @@ const Dashboard = () => {
   const textColorDark = "#F5F5F5";
   const bgGradientLight = "linear(to-r, #2980B9, #3498DB)";
   const bgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)";
-const toast = useToast();
+  const toast = useToast();
   // useEffect(() => {
   //   setSections([
   //     { label: 'All EIPs', icon: FiHome, id: 'all' },
@@ -156,8 +157,8 @@ const toast = useToast();
     };
   }, [router]);
   //  const [showThumbs, setShowThumbs] = useState(false);
-  
- const submitFeedback = async (type: "like" | "dislike") => {
+
+  const submitFeedback = async (type: "like" | "dislike") => {
     try {
       const res = await fetch("/api/Feedback/feedback", {
         method: "POST",
@@ -193,117 +194,7 @@ const toast = useToast();
   };
   return (
     <>
-      <Box
-        position="fixed"
-        right="0"
-        top="50%"
-        transform="translateY(-50%)"
-        zIndex="1000"
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        gap="10px"
-        onMouseEnter={() => setShowThumbs(true)}
-        onMouseLeave={() => setShowThumbs(false)}
-      >
-        <Tooltip label="Give Feedback" aria-label="Feedback Tooltip">
-          <Box
-            bg="#48BB78"
-            color="white"
-            p="9px"
-            position="fixed"
-            right="-60px"
-            borderRadius="8px 8px 0px 0px"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            fontSize="12px"
-            cursor="pointer"
-            lineHeight="0.5"
-            minWidth="140px"
-            transition="translateY(-55%), transform 0.3s ease, box-shadow 0.3s ease"
-            boxShadow="lg"
-            style={{
-              transform: "rotate(-90deg)",
-              transformOrigin: "center center",
-            }}
-            _hover={{
-              transform: "scale(1.05) rotate(-90deg)",
-              bg: "#2B6CB0",
-              boxShadow: "xl",
-            }}
-            onClick={() => setShowThumbs((prev) => !prev)}
-          >
-            Is this page helpful?
-          </Box>
-        </Tooltip>
-
-        {showThumbs && (
-          <Box
-            bg="white"
-            color="#3182CE"
-            p="10px"
-            borderRadius="15px"
-            position="fixed"
-            right="25px"
-            top="-70px"
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            gap="12px"
-            mt="10px"
-            boxShadow="lg"
-            border="1px solid #E2E8F0"
-            transition="transform 0.3s ease, box-shadow 0.3s ease"
-            _hover={{
-              transform: "scale(1.05)",
-            }}
-          >
-            <Tooltip label="I like this!" aria-label="Thumbs-Up Tooltip">
-              <Box
-                as="button"
-                bg="#E6FFFA"
-                color="#2C7A7B"
-                borderRadius="50%"
-                p="12px"
-                fontSize="20px"
-                boxShadow="md"
-                transition="background 0.3s ease, transform 0.3s ease"
-                _hover={{
-                  bg: "#B2F5EA",
-                  transform: "scale(1.1)",
-                }}
-                onClick={() => submitFeedback("like")}
-                aria-label="Thumbs up"
-              >
-                👍
-              </Box>
-            </Tooltip>
-
-            <Tooltip label="Needs Improvement" aria-label="Thumbs-Down Tooltip">
-              <Box
-                as="button"
-                bg="#FED7D7"
-                color="#C53030"
-                borderRadius="50%"
-                p="12px"
-                fontSize="20px"
-                boxShadow="md"
-                transition="background 0.3s ease, transform 0.3s ease"
-                _hover={{
-                  bg: "#FEB2B2",
-                  transform: "scale(1.1)",
-                }}
-                onClick={() => submitFeedback("dislike")}
-                aria-label="Thumbs down"
-              >
-                👎
-              </Box>
-            </Tooltip>
-          </Box>
-        )}
-      </Box>
+      <FeedbackWidget />
       <Box
         paddingBottom={{ lg: "10", sm: "10", base: "10" }}
         marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}

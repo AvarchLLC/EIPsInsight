@@ -11,7 +11,7 @@ import {
   IconButton,
   Flex,
   Collapse,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 
 import AllLayout from "@/components/Layout";
@@ -28,7 +28,7 @@ import InsightsAllStats from "@/components/InsitghtAllstats";
 import { useRouter } from "next/router";
 
 import CopyLink from "@/components/CopyLink";
-
+import FeedbackWidget from "@/components/FeedbackWidget";
 
 interface StatusChange {
   _id: string;
@@ -75,7 +75,7 @@ interface EIP {
     date: string;
     count: number;
     category: string;
-    repo:string;
+    repo: string;
     eips: any[];
   }[];
 }
@@ -135,8 +135,8 @@ const Month = () => {
   let filteredData5 = data?.filter((item) => item.status === "Final");
   let filteredData6 = data?.filter((item) => item.status === "Stagnant");
   let filteredData7 = data?.filter((item) => item.status === "Withdrawn");
-  
-  console.log("meta data:",filteredData3)
+
+  console.log("meta data:", filteredData3);
 
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const prevMonth = Number(month) - 1;
@@ -167,165 +167,247 @@ const Month = () => {
     };
   }, [router]);
   return (
-    <AllLayout>
-      {isLoading ? ( // Check if the data is still loading
-        // Show loader if data is loading 
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+    <>
+      <FeedbackWidget />
+      <AllLayout>
+        {isLoading ? ( // Check if the data is still loading
+          // Show loader if data is loading
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="100vh"
           >
-            <LoaderComponent />
-          </motion.div>
-        </Box>
-      ) : (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Box
-              paddingBottom={{ lg: "5", sm: "5", base: "5" }}
-              marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-              paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-              marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              <NextLink href={`/insight/${year}/${month}`}>
-                <Header title={getMonthName(Number(month))} subtitle={year} />
-              </NextLink>
-              <br/>
+              <LoaderComponent />
+            </motion.div>
+          </Box>
+        ) : (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <Box
-      pl={4}
-      bg={useColorModeValue("blue.50", "gray.700")}
-      borderRadius="md"
-      pr="8px"
-      pt="3px"
-      marginBottom={5}
-    >
+                paddingBottom={{ lg: "5", sm: "5", base: "5" }}
+                marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
+                paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+                marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+              >
+                <NextLink href={`/insight/${year}/${month}`}>
+                  <Header title={getMonthName(Number(month))} subtitle={year} />
+                </NextLink>
+                <br />
+                <Box
+                  pl={4}
+                  bg={useColorModeValue("blue.50", "gray.700")}
+                  borderRadius="md"
+                  pr="8px"
+                  pt="3px"
+                  marginBottom={5}
+                >
+                  <Flex justify="space-between" align="center">
+                    <Heading
+                      as="h3"
+                      size="lg"
+                      marginBottom={4}
+                      color={useColorModeValue("#3182CE", "blue.300")}
+                    >
+                      EIPS Insight FAQ
+                    </Heading>
+                    <Box
+                      bg="blue" // Gray background
+                      borderRadius="md" // Rounded corners
+                      padding={2} // Padding inside the box
+                    >
+                      <IconButton
+                        onClick={toggleCollapse}
+                        icon={
+                          show ? (
+                            <ChevronUpIcon boxSize={8} color="white" />
+                          ) : (
+                            <ChevronDownIcon boxSize={8} color="white" />
+                          )
+                        }
+                        variant="ghost"
+                        h="24px" // Smaller height
+                        w="20px"
+                        aria-label="Toggle Instructions"
+                        _hover={{ bg: "blue" }} // Maintain background color on hover
+                        _active={{ bg: "blue" }} // Maintain background color when active
+                        _focus={{ boxShadow: "none" }} // Remove focus outline
+                      />
+                    </Box>
+                  </Flex>
+                  <Collapse in={show}>
+                    <Text
+                      fontSize="md"
+                      marginBottom={2}
+                      color={useColorModeValue("gray.800", "gray.200")}
+                    >
+                      <strong>Insight Summary:</strong> The numbers shown in the
+                      table represent the status changes or new drafts that
+                      appeared during a specific month. For a detailed view of
+                      this data, simply click on the numbers.
+                    </Text>
 
-    <Flex justify="space-between" align="center">
-        <Heading
-          as="h3"
-          size="lg"
-          marginBottom={4}
-          color={useColorModeValue("#3182CE", "blue.300")}
-        >
-          EIPS Insight FAQ
-        </Heading>
-        <Box
-  bg="blue" // Gray background
-  borderRadius="md" // Rounded corners
-  padding={2} // Padding inside the box
->
-  <IconButton
-    onClick={toggleCollapse}
-    icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
-    variant="ghost"
-    h="24px" // Smaller height
-     w="20px"
-    aria-label="Toggle Instructions"
-    _hover={{ bg: 'blue' }} // Maintain background color on hover
-    _active={{ bg: 'blue' }} // Maintain background color when active
-    _focus={{ boxShadow: 'none' }} // Remove focus outline
-  />
-</Box>
+                    <Text
+                      fontSize="md"
+                      marginBottom={2}
+                      color={useColorModeValue("gray.800", "gray.200")}
+                    >
+                      <strong>Graph Breakdown:</strong> Each graph focuses on a
+                      specific status, such as "Draft" or "Final." Within each
+                      status, the columns show the data divided by individual
+                      categories, giving you a clear breakdown of how many EIPs
+                      from each category transitioned to that status.
+                    </Text>
+                  </Collapse>
+                </Box>
+                <Box id="Summary">
+                  <InsightsAllStats />
+                </Box>
 
+                {/* Defining the stats table here */}
+                {/* <InsightStats/> */}
 
-      </Flex>
-      <Collapse in={show}>
-    <Text
-      fontSize="md"
-      marginBottom={2}
-      color={useColorModeValue("gray.800", "gray.200")}
-    >
-      <strong>Insight Summary:</strong> The numbers shown in the table represent the status changes or new drafts that appeared during a specific month. For a detailed view of this data, simply click on the numbers.
-    </Text>
+                <Text
+                  id="draft"
+                  fontSize="3xl"
+                  fontWeight="bold"
+                  color="blue.400"
+                  paddingTop={8}
+                >
+                  Draft{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#Draft`}
+                  />
+                </Text>
+                <Box paddingTop={"8"} id="Draft">
+                  <StackedColumnChart dataset={filteredData1} status="Draft" />
+                </Box>
 
-    <Text
-      fontSize="md"
-      marginBottom={2}
-      color={useColorModeValue("gray.800", "gray.200")}
-    >
-      <strong>Graph Breakdown:</strong> Each graph focuses on a specific status, such as "Draft" or "Final." Within each status, the columns show the data divided by individual categories, giving you a clear breakdown of how many EIPs from each category transitioned to that status.
-      </Text>
-      </Collapse>
-  </Box>
-<Box id="Summary">
-<InsightsAllStats/>
-</Box>
+                <Text
+                  id="review"
+                  fontSize="3xl"
+                  fontWeight="bold"
+                  color="blue.400"
+                  paddingTop={8}
+                >
+                  Review{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#Review`}
+                  />
+                </Text>
+                <Box paddingY={"8"} id="Review">
+                  <StackedColumnChart dataset={filteredData2} status="Review" />
+                </Box>
 
+                <Text
+                  id="lastcall"
+                  fontSize="3xl"
+                  fontWeight="bold"
+                  color="blue.400"
+                  paddingTop={8}
+                >
+                  Last Call{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#LastCall`}
+                  />
+                </Text>
 
-              {/* Defining the stats table here */}
-              {/* <InsightStats/> */}
-
-              <Text id="draft" fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Draft <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Draft`} />
-      </Text>
-      <Box paddingTop={"8"} id="Draft">
-        <StackedColumnChart dataset={filteredData1} status="Draft" />
-      </Box>
-
-      <Text id="review" fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Review <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Review`} />
-      </Text>
-      <Box paddingY={"8"} id="Review">
-        <StackedColumnChart dataset={filteredData2} status="Review" />
-      </Box>
-
-      <Text id="lastcall" fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Last Call <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#LastCall`} />
-      </Text>
-
-      {/* <Text fontSize="sm" color="gray.500" paddingTop={2}>
+                {/* <Text fontSize="sm" color="gray.500" paddingTop={2}>
        Note:  Due to some technical issues, a few of the Last Call deadlines are missing in the downloaded report. We are working on it and will get back to it ASAP.
       </Text> */}
 
-      <Box paddingY={"8"} id="LastCall">
-        <StackedColumnChart dataset={filteredData3} status="Last Call" />
-      </Box>
+                <Box paddingY={"8"} id="LastCall">
+                  <StackedColumnChart
+                    dataset={filteredData3}
+                    status="Last Call"
+                  />
+                </Box>
 
-      <Text id="living" fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Living <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Living`} />
-      </Text>
-      <Box paddingY={"8"} id="Living">
-        <StackedColumnChart dataset={filteredData4} status="Living" />
-      </Box>
+                <Text
+                  id="living"
+                  fontSize="3xl"
+                  fontWeight="bold"
+                  color="blue.400"
+                  paddingTop={8}
+                >
+                  Living{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#Living`}
+                  />
+                </Text>
+                <Box paddingY={"8"} id="Living">
+                  <StackedColumnChart dataset={filteredData4} status="Living" />
+                </Box>
 
-      <Text id="final" fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Final <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Final`} />
-      </Text>
-      <Box paddingY={"8"} id="Final">
-        <StackedColumnChart dataset={filteredData5} status="Final" />
-      </Box>
+                <Text
+                  id="final"
+                  fontSize="3xl"
+                  fontWeight="bold"
+                  color="blue.400"
+                  paddingTop={8}
+                >
+                  Final{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#Final`}
+                  />
+                </Text>
+                <Box paddingY={"8"} id="Final">
+                  <StackedColumnChart dataset={filteredData5} status="Final" />
+                </Box>
 
-      <Text id="stagnant" fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Stagnant <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Stagnant`} />
-      </Text>
-      <Box paddingY={"8"} id="Stagnant">
-        <StackedColumnChart dataset={filteredData6} status="Stagnant" />
-      </Box>
+                <Text
+                  id="stagnant"
+                  fontSize="3xl"
+                  fontWeight="bold"
+                  color="blue.400"
+                  paddingTop={8}
+                >
+                  Stagnant{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#Stagnant`}
+                  />
+                </Text>
+                <Box paddingY={"8"} id="Stagnant">
+                  <StackedColumnChart
+                    dataset={filteredData6}
+                    status="Stagnant"
+                  />
+                </Box>
 
-      <Text id="withdrawn" fontSize="3xl" fontWeight="bold" color="blue.400" paddingTop={8}>
-        Withdrawn <CopyLink link={`https://eipsinsight.com//insight/${year}/${month}#Withdrawn`} />
-      </Text>
-      <Box paddingY={"8"} id="Withdrawn">
-        <StackedColumnChart dataset={filteredData7} status="Withdrawn" />
-      </Box>
-            </Box>
-           
-          </motion.div>
-        </>
-      )}
-
-    </AllLayout>
+                <Text
+                  id="withdrawn"
+                  fontSize="3xl"
+                  fontWeight="bold"
+                  color="blue.400"
+                  paddingTop={8}
+                >
+                  Withdrawn{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#Withdrawn`}
+                  />
+                </Text>
+                <Box paddingY={"8"} id="Withdrawn">
+                  <StackedColumnChart
+                    dataset={filteredData7}
+                    status="Withdrawn"
+                  />
+                </Box>
+              </Box>
+            </motion.div>
+          </>
+        )}
+      </AllLayout>
+    </>
   );
 };
 
