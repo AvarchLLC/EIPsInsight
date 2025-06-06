@@ -1065,6 +1065,7 @@ import UpgradesTimeline from "@/components/UpgradesTimeline";
 import { Card } from "@/components/pectraCards";
 import StatusGraph from "@/components/Statuschangesgraph";
 import { useSidebar } from '@/components/Sidebar/SideBarContext';
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
@@ -1467,6 +1468,15 @@ const All = () => {
   const currentPosts = selectedOption === 'pectra' ? PectraPosts : FusakaPosts;
   const currentData = selectedOption === 'pectra' ? pectraData : fusakaData;
   const upgradeName = selectedOption === 'pectra' ? 'Pectra' : 'Fusaka';
+  
+  useScrollSpy([
+  "pectra",
+  "NetworkUpgradesChartp",
+  "NetworkUpgrades",
+  "AuthorContributions",
+  "pectra-table",
+]);
+
 
   return (
     <>

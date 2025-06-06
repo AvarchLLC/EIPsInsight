@@ -21,6 +21,8 @@ import TableOfContents from '@/components/TableOfContents';
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import FeedbackButton from "@/components/FeedbackButton";
 import { Tooltip } from "@chakra-ui/react";
+import Link from "next/link";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -1408,6 +1410,18 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
     fetchData(); // Invoke the fetch function
 
   }, [activeTab]);
+  
+  useScrollSpy([
+  "editors",
+  "Reviewers",
+  "LeaderBoard",
+  "Leaderboard FAQ",
+  "ActivityTimeline",
+  "PRs Reviewed",
+  "active editors",
+  "comments",
+]);
+
 
   const renderTable = (year: string, month: string, reviewerFilter: any) => {
     // console.log(data);
@@ -1542,15 +1556,18 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
                                     {status}
                                 </Td>
                                 <Td p="8px" textAlign="center" verticalAlign="middle">
+                                  <Link href={`/PR/${pr.repo}/${pr.prNumber}`} target="_blank" rel="noopener noreferrer">
                                     <Button
                                         as="a"
-                                        href={`/PR/${pr.repo}/${pr.prNumber}`}
-                                        target="_blank"
+                                        
+                                      
+                                        rel="noopener noreferrer"
                                         colorScheme="blue"
                                         variant="solid"
                                     >
                                         Pull Request
                                     </Button>
+                                    </Link>
                                 </Td>
                             </Tr>
                         );

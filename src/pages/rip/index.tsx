@@ -24,6 +24,7 @@ import CatTable2 from "@/components/CatTable2";
 import NextLink from "next/link";
 import RipTable from "@/components/RipTable";
 import { useRouter } from "next/router";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 interface EIP {
   _id: string;
@@ -217,6 +218,22 @@ const RIP = () => {
   }, []);
 
   const toggleCollapse = () => setShow(!show);
+  
+  useScrollSpy([
+  "graphs",
+  "draftvsfinal",
+  "draft",
+  "final",
+  "living",
+  "meta",
+  "informational",
+  "core",
+  "networking",
+  "interface",
+  "rip",
+  "rrc",
+]);
+
 
 
   return (

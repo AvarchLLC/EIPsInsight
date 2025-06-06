@@ -59,6 +59,7 @@ import {
 } from 'react-icons/fi';
 
 import { useSidebar } from "@/components/Sidebar/SideBarContext";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 
 interface EIP {
@@ -177,6 +178,15 @@ const Dashboard = () => {
       router.events.off("routeChangeComplete", scrollToHash);
     };
   }, [router]);
+
+  useScrollSpy([
+  "all",
+  "ourtools",
+  "what",
+  "statuschanges",
+  "dashboard",
+]);
+
 
   return (
     <>

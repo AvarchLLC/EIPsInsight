@@ -116,6 +116,7 @@ interface Data {
 
 import OtherBox from "@/components/OtherStats";
 import EipTable from "@/components/EipTable";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
@@ -133,6 +134,28 @@ const Type = () => {
   const router = useRouter();
   const basePath = typeof window !== "undefined" ? window.location.origin : "";
   const toast = useToast();
+  useScrollSpy([
+  "graphs",
+  "draftvsfinal",
+  "core",
+  "networking",
+  "interface",
+  "meta",
+  "informational",
+  "draft",
+  "review",
+  "lastcall",
+  "final",
+  "stagnant",
+  "withdrawn",
+  "living",
+  "metatable",
+  "informationaltable",
+  "coretable",
+  "networkingtable",
+  "interfacetable",
+]);
+
 
   const handleCopyOverviewChart = () => {
     const url = `${window.location.origin}/eip?view=${selected}${selected === 'type' ? '&filter=Core' : ''}#${selected}-graphs`;

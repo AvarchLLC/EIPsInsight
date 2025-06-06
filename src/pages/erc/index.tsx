@@ -29,6 +29,7 @@ import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
 import ErcTable from "@/components/ErcTable";
 import { useRouter } from "next/router";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 interface EIP {
   _id: string;
@@ -126,6 +127,21 @@ const ERC = () => {
   const router = useRouter();
   const basePath = typeof window !== "undefined" ? window.location.origin : "";
   const toast = useToast();
+  
+  useScrollSpy([
+  "graphs",
+  "ercprogress",
+  "draft",
+  "review",
+  "lastcall",
+  "final",
+  "stagnant",
+  "withdrawn",
+  "living",
+  "metatable",
+  "erctable",
+]);
+
 
   const handleCopyOverviewChart = () => {
     const url = `${window.location.origin}/erc?view=${selected}#charts`;
