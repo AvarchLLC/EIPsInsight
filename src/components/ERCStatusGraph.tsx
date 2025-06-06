@@ -147,7 +147,7 @@ const ERCStatusGraph = () => {
       ),
     ]?.map((row) => row.join(","))
       .join("\n");
-  
+
     // Create a Blob and trigger download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -162,25 +162,28 @@ const ERCStatusGraph = () => {
   return (
     <>
       <Box className="h-full" bg={bg} paddingY={4} paddingX={6} borderRadius={"0.55rem"}>
-      <Flex justifyContent="space-between" alignItems="center" marginBottom="1rem">
-        <NextLink href={"/riptable"}>
-          <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-            ERC (Progress Over the Years) - [{data?.length}]
-          </Text>
-        </NextLink>
-        <Button
-          colorScheme="blue"
-          fontSize={{ base: "0.6rem", md: "md" }}
-          onClick={() => handleDownloadCSV(graphData)}
-        >
-          Download CSV
-        </Button>
-      </Flex>
-      <Area {...config} />
-      <Box className={"w-full"}>
+        <Flex justifyContent="space-between" alignItems="center" marginBottom="1rem">
+          <NextLink href={"/riptable"}>
+            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+              ERC (Progress Over the Years) - [{data.length}]
+            </Text>
+          </NextLink>
+          <Button
+            bg="#40E0D0"
+            color="white"
+            _hover={{ bg: "#30c9c9" }}
+            _active={{ bg: "#1fb8b8" }}
+            fontSize={{ base: "0.6rem", md: "md" }}
+            onClick={() => handleDownloadCSV(graphData)}
+          >
+            Download CSV
+          </Button>
+        </Flex>
+        <Area {...config} />
+        <Box className={"w-full"}>
           <DateTime />
         </Box>
-    </Box>
+      </Box>
     </>
   );
 };

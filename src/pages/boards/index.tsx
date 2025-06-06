@@ -28,6 +28,7 @@ import LabelFilter from "@/components/LabelFilter";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import EipsLabelChart from "@/components/PrLabelsChart";
 import FeedbackWidget from "@/components/FeedbackWidget";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 // Helper function to extract PR number from URL
 const extractPrNumber = (url: string) => {
@@ -350,6 +351,11 @@ const DashboardPage = () => {
 
   // Determine which data to show based on the active tab
   // const displayedData = activeTab === 'EIPs' ? eipData : ercData;
+
+  useScrollSpy([
+  "EIPsBOARD",
+]);
+
 
   return (
     <>

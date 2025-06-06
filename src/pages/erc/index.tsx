@@ -6,10 +6,11 @@ import {
   Text,
   useColorModeValue,
   Link as LI,
+  useToast,
 } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
-import { DownloadIcon } from "@chakra-ui/icons";
+import { CopyIcon, DownloadIcon } from "@chakra-ui/icons";
 import TableStatus from "@/components/TableStatus";
 import AreaStatus from "@/components/AreaStatus";
 import React, { useEffect, useState } from "react";
@@ -35,6 +36,9 @@ import TypeGraphs from "@/components/TypeGraphs4";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
 import FeedbackWidget from "@/components/FeedbackWidget";
+import ErcTable from "@/components/ErcTable";
+import { useRouter } from "next/router";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 interface EIP {
   _id: string;
@@ -115,6 +119,10 @@ interface Data {
   erc: APIResponse2[];
   rip: APIResponse2[];
 }
+const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
+const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
+
+
 
 const ERC = () => {
   const [data, setData] = useState<EIP[]>([]);
@@ -127,6 +135,78 @@ const ERC = () => {
   const [data3, setData3] = useState<Data>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [selected, setSelected] = useState<"status" | "type">("type");
+
+  const [selectedStatusInner, setSelectedStatusInner] = useState(Status_OPTIONS[0]);
+  const router = useRouter();
+  const basePath = typeof window !== "undefined" ? window.location.origin : "";
+  const toast = useToast();
+  
+  useScrollSpy([
+  "graphs",
+  "ercprogress",
+  "draft",
+  "review",
+  "lastcall",
+  "final",
+  "stagnant",
+  "withdrawn",
+  "living",
+  "metatable",
+  "erctable",
+]);
+
+
+  const handleCopyOverviewChart = () => {
+    const url = `${window.location.origin}/erc?view=${selected}#charts`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: `Shared view for ${selected === "status" ? "Status Chart" : "Type Chart"}`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const handleCopyERCStatusGraph = () => {
+    const url = `${window.location.origin}/erc?view=type#erc-status-graph`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: "Shared view for ERC Status Graph",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const handleCopyStatusDetail = () => {
+    const url = `${window.location.origin}/erc?view=status&status=${encodeURIComponent(selectedStatusInner)}#status-graphs`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: `Shared view for Status: ${selectedStatusInner}`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const handleCopyAreaChart = () => {
+    const url = `${window.location.origin}/erc?view=status#draftvsfinal`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: "Shared Draft vs Final view",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -388,6 +468,7 @@ const ERC = () => {
       </AllLayout>
     </>
   );
+
 };
 
 export default ERC;

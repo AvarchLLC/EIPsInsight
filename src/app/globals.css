@@ -3,9 +3,32 @@
 @tailwind utilities;
 
 .chakra-ui-dark body {
-    background: linear-gradient(135deg, #1a202c, #2d3748) !important;
-  }
-  
-  .chakra-ui-light body {
-    background: linear-gradient(135deg, #f7fafc, #e2e8f0) !important;
-  }
+  background: #000 !important;
+  /* Black background */
+}
+
+.chakra-ui-light body {
+  background: #fff !important;
+  /* White background */
+}
+
+/* Force table styling to respect theme */
+.table {
+  background-color: transparent !important;
+}
+
+.table th,
+.table td {
+  background-color: #2D3748 !important;
+  color: white !important;
+}
+.table td a {
+  color: inherit !important;
+}
+
+
+[data-theme='light'] .table th,
+[data-theme='light'] .table td {
+  background-color: #F7FAFC !important;
+  color: black !important;
+}

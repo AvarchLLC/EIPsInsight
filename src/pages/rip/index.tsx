@@ -12,6 +12,7 @@ import {
   useDisclosure,
   Link as LI,
   ButtonGroup,
+  useToast,
 } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
@@ -28,7 +29,7 @@ import AllChart3 from "@/components/AllChart3";
 import AreaC from "@/components/AreaC";
 import RIPStatusGraph from "@/components/RIPStatusGraph";
 import OtherBox from "@/components/OtherStats";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, CopyIcon } from "@chakra-ui/icons";
 import { ChevronUpIcon } from "@chakra-ui/icons";
 import RipCatTable from "@/components/RipCatTable";
 import AreaStatus from "@/components/AreaStatus";
@@ -36,6 +37,9 @@ import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
 import NextLink from "next/link";
 import FeedbackWidget from "@/components/FeedbackWidget";
+import RipTable from "@/components/RipTable";
+import { useRouter } from "next/router";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 interface EIP {
   _id: string;
@@ -116,6 +120,7 @@ interface Data {
   erc: APIResponse2[];
   rip: APIResponse2[];
 }
+const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
 
 const RIP = () => {
   const [data, setData] = useState<EIP[]>([]);
@@ -128,6 +133,46 @@ const RIP = () => {
   const [data3, setData3] = useState<Data>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [selected, setSelected] = useState<"status" | "type">("type");
+  const [selectedStatusInner, setSelectedStatusInner] = useState(Status_OPTIONS[0]);
+  const router = useRouter();
+  const basePath = typeof window !== "undefined" ? window.location.origin : "";
+  const toast = useToast();
+  const handleCopyOverviewChart = () => {
+    const url = `${window.location.origin}/rip?view=${selected}#charts`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: `Shared view for ${selected === "status" ? "Status Chart" : "Type Chart"}`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const handleCopyStatusDetail = () => {
+    const url = `${window.location.origin}/rip?view=status&status=${encodeURIComponent(selectedStatusInner)}#status-graphs`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: `Shared view for Status: ${selectedStatusInner}`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const handleCopyAreaChart = () => {
+    const url = `${window.location.origin}/rip?view=status#draftvsfinal`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: "Shared Draft vs Final view",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -187,6 +232,23 @@ const RIP = () => {
   }, []);
 
   const toggleCollapse = () => setShow(!show);
+  
+  useScrollSpy([
+  "graphs",
+  "draftvsfinal",
+  "draft",
+  "final",
+  "living",
+  "meta",
+  "informational",
+  "core",
+  "networking",
+  "interface",
+  "rip",
+  "rrc",
+]);
+
+
 
   return (
     <>
@@ -349,14 +411,14 @@ const RIP = () => {
                   {/* <br/> */}
                   <Text
                     fontSize="md"
-                    className="text-md text-left text-justify"
+                    className="text-md text-justify"
                     mt={4}
                     textAlign="justify"
                   >
                     RIPs help coordinate technical improvements for rollups in a
                     transparent, collaborative way. They:
                   </Text>
-                  <ul className="list-disc list-inside space-y-2 text-md text-left text-justify">
+                  <ul className="list-disc list-inside space-y-2 text-md text-justify">
                     <li>Propose new features and optimizations.</li>
                     <li>
                       Collect community feedback on rollup-related issues.

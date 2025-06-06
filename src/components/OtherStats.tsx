@@ -1,263 +1,189 @@
 import {
-  Badge,
   Box,
-  Link,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
   Flex,
-  Button,
-  Wrap,
-  WrapItem,
+  Icon,
+  Text,
   useColorModeValue,
-} from "@chakra-ui/react";
-import { motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
-import DateTime from "@/components/DateTime";
-import { type } from "os";
+  Button,
+  SimpleGrid,
+  Badge,
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  GitBranch,
+  Star,
+  Eye,
+  AlertCircle,
+} from 'lucide-react';
+import axios from 'axios';
 
 interface EIP {
   forksCount: number;
+  forksPrev: number;
   watchlistCount: number;
+  watchlistPrev: number;
   stars: number;
+  starsPrev: number;
   openIssuesCount: number;
+  openIssuesPrev: number;
 }
 
 interface Props {
-  type: string;
-} 
+  type: 'EIPs' | 'ERCs' | 'RIPs';
+}
 
-const OtherBox: React.FC<Props> = ({ type }) => {
-  const [EIPdata, setEIPData] = useState<EIP>({
-    forksCount: 0,
-    watchlistCount: 0,
-    stars: 0,
-    openIssuesCount: 0,
-  });
-  const [ERCdata, setERCData] = useState<EIP>({
-    forksCount: 0,
-    watchlistCount: 0,
-    stars: 0,
-    openIssuesCount: 0,
-  });
-  const [RIPdata, setRIPData] = useState<EIP>({
-    forksCount: 0,
-    watchlistCount: 0,
-    stars: 0,
-    openIssuesCount: 0,
-  });
+// const getChange = (current: number = 0, previous: number = 0) => {
+//   if (previous === 0) {
+//     return { text: '+0.0%', direction: 'increase' };
+//   }
+//   const change = ((current - previous) / previous) * 100;
+//   return {
+//     text: `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`,
+//     direction: change >= 0 ? 'increase' : 'decrease',
+//   };
+// };
 
-  const bg = useColorModeValue("#f6f6f7", "#171923");
+const ChakraGithubStats: React.FC<Props> = ({ type }) => {
+  const [EIPdata, setEIPData] = useState<EIP | null>(null);
+  const [ERCdata, setERCData] = useState<EIP | null>(null);
+  const [RIPdata, setRIPData] = useState<EIP | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/EIPinfo`);
-        const jsonData = await response.json();
-        setEIPData(jsonData);
+        const eip = await (await fetch('/api/EIPinfo')).json();
+        const erc = await (await fetch('/api/ERCinfo')).json();
+        const rip = await (await fetch('/api/RIPInfo')).json();
+
+        setEIPData(eip);
+        setERCData(erc);
+        setRIPData(rip);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/ERCinfo`);
-        const jsonData = await response.json();
-        setERCData(jsonData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const data = type === 'EIPs' ? EIPdata : type === 'ERCs' ? ERCdata : RIPdata;
 
-    fetchData();
-  }, []);
+  // const downloadData = async () => {
+  //   if (!data) return;
+  //   const csvContent = [
+  //     ['Type', 'Forks Count', 'Watchlist Count', 'Stars', 'Open Issues Count'],
+  //     [type, data.forksCount, data.watchlistCount, data.stars, data.openIssuesCount],
+  //   ]
+  //     .map((row) => row.join(','))
+  //     .join('\n');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/RIPInfo`);
-        const jsonData = await response.json();
-        setRIPData(jsonData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  //   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement('a');
+  //   link.href = url;
+  //   link.setAttribute('download', `${type}_stats_report.csv`);
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
 
-    fetchData();
-  }, []);
+  //   try {
+  //     await axios.post('/api/DownloadCounter');
+  //   } catch (err) {
+  //     console.error('Failed to update download counter:', err);
+  //   }
+  // };
+
+  if (!data) return null;
+
+  const statCards = [
+    {
+      title: 'Forks',
+      icon: GitBranch,
+      value: data.forksCount,
+      // change: getChange(data.forksCount, data.forksPrev),
+    },
+    {
+      title: 'Watchlist',
+      icon: Eye,
+      value: data.watchlistCount,
+      // change: getChange(data.watchlistCount, data.watchlistPrev),
+    },
+    {
+      title: 'Stars',
+      icon: Star,
+      value: data.stars,
+      // change: getChange(data.stars, data.starsPrev),
+    },
+    {
+      title: 'Open Issues & PR',
+      icon: AlertCircle,
+      value: data.openIssuesCount,
+      // change: getChange(data.openIssuesCount, data.openIssuesPrev),
+    },
+  ];
 
   return (
-    <Box
-      bgColor={bg}
-      p="1rem"
-      minHeight="605px"
-      borderRadius="0.55rem"
-      _hover={{
-        border: "1px",
-        borderColor: "#30A0E0",
-      }}
-      className="hover:cursor-pointer ease-in duration-200 overflow-y-hidden h-[32.5rem]"
-      // display="flex"
-      // justifyContent="center"
-      // alignItems="center"
-    >
-      <Box width="100%" maxWidth="800px">
-      <Flex justifyContent="flex-end" marginBottom="1rem">
-    <Button
-      colorScheme="blue"
-      onClick={() => {
-        const csvContent = [
-          ["Type", "Forks Count", "Watchlist Count", "Stars", "Open Issues Count"], // Headers
-          type === "EIPs"
-            ? ["EIPs", EIPdata.forksCount, EIPdata.watchlistCount, EIPdata.stars, EIPdata.openIssuesCount]
-            : type === "ERCs"
-            ? ["ERCs", ERCdata.forksCount, ERCdata.watchlistCount, ERCdata.stars, ERCdata.openIssuesCount]
-            : ["RIPs", RIPdata.forksCount, RIPdata.watchlistCount, RIPdata.stars, RIPdata.openIssuesCount],
-        ]
-          ?.map((row) => row.join(","))
-          .join("\n");
-
-        // Create a Blob and trigger download
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", `${type}_stats_report.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }}
-    >
-      Download CSV
-    </Button>
-  </Flex>
-  <Box
-  //  display="flex"
-  //     justifyContent="center"
-  //     alignItems="center"
+    <Box px={{ base: 4, md: 6 }} py={6} maxW="7xl" mx="auto">
+      <Flex
+        justify="space-between"
+        align={{ base: 'flex-start', sm: 'center' }}
+        mb={4}
+        direction={{ base: 'column', sm: 'row' }}
+        gap={{ base: 2, sm: 0 }}
       >
-        <TableContainer>
-          <Table variant="simple" minW="50%" layout="fixed">
-            <Thead>
-              <Tr>
-                <Th minW="50px">Github Stats</Th>
-                <Th minW="200px">Numbers</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              <Tr key="forks">
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme="orange">Forks</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-                <Td>
-                  <Text
-                    // href={`https://github.com/ethereum/EIPs`}
-                    className="text-blue-400 hover:cursor-pointer font-semibold"
-                  >
-                    {type === "EIPs"
-                      ? EIPdata.forksCount
-                      : type === "ERCs"
-                      ? ERCdata.forksCount
-                      : type === "RIPs"
-                      ? RIPdata.forksCount
-                      : EIPdata.forksCount}
-                  </Text>
-                </Td>
-              </Tr>
-              <Tr key="watchlist">
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme="orange">Watchlist</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-                <Td>
-                  <Text
-                    // href={`https://github.com/ethereum/EIPs`}
-                    className="text-blue-400 hover:cursor-pointer font-semibold"
-                  >
-                    {type === "EIPs"
-                      ? EIPdata.watchlistCount
-                      : type === "ERCs"
-                      ? ERCdata.watchlistCount
-                      : type === "RIPs"
-                      ? RIPdata.watchlistCount
-                      : EIPdata.watchlistCount}
-                  </Text>
-                </Td>
-              </Tr>
-              <Tr key="stars">
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme="orange">Stars</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-                <Td>
-                  <Text
-                    // href={`https://github.com/ethereum/EIPs`}
-                    className="text-blue-400 hover:cursor-pointer font-semibold"
-                  >
-                    {type === "EIPs"
-                      ? EIPdata.stars
-                      : type === "ERCs"
-                      ? ERCdata.stars
-                      : type === "RIPs"
-                      ? RIPdata.stars
-                      : EIPdata.stars}
-                  </Text>
-                </Td>
-              </Tr>
-              <Tr key="openissues">
-                <Td minW="100px">
-                  <Wrap>
-                    <WrapItem>
-                      <Badge colorScheme="orange">Open Issues & PR</Badge>
-                    </WrapItem>
-                  </Wrap>
-                </Td>
-                <Td>
-                  <Text
-                    // href={`https://github.com/ethereum/EIPs`}
-                    className="text-blue-400 hover:cursor-pointer font-semibold"
-                  >
-                    {type === "EIPs"
-                      ? EIPdata.openIssuesCount
-                      : type === "ERCs"
-                      ? ERCdata.openIssuesCount
-                      : type === "RIPs"
-                      ? RIPdata.openIssuesCount
-                      : EIPdata.openIssuesCount}
-                  </Text>
-                </Td>
-              </Tr>
-            </Tbody>
-          </Table>
-        </TableContainer>
-        </Box>
-        <Box className="w-full" mt="1rem">
-          <DateTime />
-        </Box>
-      </Box>
+        <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="semibold"   color="#40E0D0">
+          GitHub Stats – {type}
+        </Text>
+        {/* <Button onClick={downloadData} colorScheme="purple" size="sm" alignSelf={{ base: 'flex-start', sm: 'auto' }}>
+          Download CSV
+        </Button> */}
+      </Flex>
+
+      <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>
+        {statCards.map(({ title, icon, value }) => (
+          <Box
+            key={title}
+            bg={useColorModeValue('gray.100', 'gray.800')}
+            p={{ base: 3, md: 4 }}
+            borderRadius="lg"
+            shadow="md"
+            _hover={{ shadow: 'lg' }}
+            minW={{ base: 'auto', md: '250px' }}
+          >
+            <Flex align="center" justify="space-between" flexWrap="wrap" gap={2}>
+              <Box flex="1" minW="0">
+                <Text fontSize={{ base: 'xs', md: 'sm' }} color="gray.500" noOfLines={1}>
+                  {title}
+                </Text>
+                <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold" noOfLines={1}>
+                  {value}
+                </Text>
+              </Box>
+              <Icon as={icon} boxSize={{ base: 5, md: 6 }} color="gray.600" />
+            </Flex>
+
+            {/* <Flex mt={2} align="center" flexWrap="wrap" gap={1}>
+              <Icon
+                as={change.direction === 'increase' ? ArrowUpRight : ArrowDownRight}
+                color={change.direction === 'increase' ? 'green.400' : 'red.400'}
+                boxSize={{ base: 3, md: 4 }}
+              />
+              <Badge
+                variant="subtle"
+                colorScheme={change.direction === 'increase' ? 'green' : 'red'}
+                fontSize={{ base: 'xs', md: 'sm' }}
+              >
+                {change.text}
+              </Badge>
+            </Flex> */}
+          </Box>
+        ))}
+      </SimpleGrid>
     </Box>
+
   );
-  
 };
 
-export default OtherBox;
+export default ChakraGithubStats;

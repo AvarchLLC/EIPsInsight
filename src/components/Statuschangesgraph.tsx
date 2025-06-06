@@ -6,6 +6,7 @@ import { OrbitControls, Text } from "@react-three/drei";
 import * as THREE from "three";
 import FeedbackWidget from "./FeedbackWidget";
 
+
 interface EIPEntry {
   eip: string;
   title: string;
@@ -98,7 +99,7 @@ const StatusNode = ({
   const color = statusColors[node.to] || "#ffffff";
 
   return (
-    <group position={position}>
+    <group  position={position}>
       <mesh>
         <sphereGeometry args={[1.2, 32, 32]} />
         <meshStandardMaterial color={color} />
