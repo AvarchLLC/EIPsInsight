@@ -50,6 +50,8 @@ const ResourcesPage: React.FC = () => {
   const tabSize = useBreakpointValue({ base: "sm", md: "md" });
   const isMobile = useBreakpointValue({ base: true, md: false });
 
+  // const posts = await getAllPosts();
+
   const handleSelection = (hash: any) => {
     const upperHash = hash.toUpperCase();
     const tabs = ["FAQ", "BLOGS", "VIDEOS", "NEWS"];
@@ -288,9 +290,6 @@ const ResourcesPage: React.FC = () => {
       link: "https://etherworld.co/2024/11/26/search-by-author-eipsinsight/",
       tag: "Feature",
     },
-  ];
-
-  const BLOGS = [
     {
       image: "/blog3.jpg",
       title: "ICYMI: New Features on EIPsInsight",
@@ -338,6 +337,16 @@ const ResourcesPage: React.FC = () => {
         "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security.",
       link: "https://etherworld.co/2024/01/09/eip-7045/",
       tag: "Technical",
+    },
+  ];
+
+  const BLOGS = [
+    {
+      image: "/EipsInsightRecap.jpg",
+      title: "Eipsinsight milestones 2024",
+      content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities.",
+      link: "/milestones2024",
+      tag: "Year in Review"
     },
   ];
 
