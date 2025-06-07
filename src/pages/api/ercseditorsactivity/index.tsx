@@ -43,7 +43,7 @@ export default async (req: Request, res: Response) => {
             "lightclient", "SamWilsn", "xinbenlv", "g11tech", "bomanaps", "axic", "gcolvin", "yoavw"
         ];
 
-        const twentyFourHoursAgo = new Date(Date.now() - 1000 * 60 * 60 * 1000);
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
         const resultByReviewer: { [key: string]: any[] } = {};
         reviewersList.forEach(handle => {
