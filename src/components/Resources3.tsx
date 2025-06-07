@@ -348,6 +348,13 @@ const ResourcesPage: React.FC = () => {
       link: "/milestones2024",
       tag: "Year in Review"
     },
+    {
+      image: "/EipsInsightRecap.jpg",
+      title: "The Need for BPO Forks in Ethereum’s Scaling Roadmap (EIP-7892 Explained)",
+      content: "Ethereum scales blob capacity with Blob Parameter Only (BPO) forks to support Layer 2 growth before Fusaka and PeerDAS, preserving decentralization.",
+      link: "/bpo-forks-eip-7892",
+      tag: "Technical"
+    },
   ];
 
   const VIDEOS = [
