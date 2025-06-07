@@ -117,6 +117,8 @@ import OtherBox from "@/components/OtherStats";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+import { SubscribeForm } from '@/components/SubscriptionForm';
+
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
@@ -139,26 +141,26 @@ const Type = () => {
   const basePath = typeof window !== "undefined" ? window.location.origin : "";
   const toast = useToast();
   useScrollSpy([
-  "graphs",
-  "draftvsfinal",
-  "core",
-  "networking",
-  "interface",
-  "meta",
-  "informational",
-  "draft",
-  "review",
-  "lastcall",
-  "final",
-  "stagnant",
-  "withdrawn",
-  "living",
-  "metatable",
-  "informationaltable",
-  "coretable",
-  "networkingtable",
-  "interfacetable",
-]);
+    "graphs",
+    "draftvsfinal",
+    "core",
+    "networking",
+    "interface",
+    "meta",
+    "informational",
+    "draft",
+    "review",
+    "lastcall",
+    "final",
+    "stagnant",
+    "withdrawn",
+    "living",
+    "metatable",
+    "informationaltable",
+    "coretable",
+    "networkingtable",
+    "interfacetable",
+  ]);
 
 
   const handleCopyOverviewChart = () => {
@@ -339,7 +341,10 @@ const Type = () => {
                     </Button>
                   </Flex>
                 }
-              />
+              /><Box mt={4}>
+                <SubscribeForm type="eips" id="all" filter="all" />
+              </Box>
+
 
               <Box className="w-full mt-6" id="githubstats">
                 <OtherBox type="EIPs" />

@@ -256,7 +256,7 @@ export const sidebarConfig: SidebarConfig = {
   },
 
   '/upgrade': [
-    {
+     {
       label: 'Upgrade',
       icon: LuTrendingUp,
       id: 'pectrafusaka',
