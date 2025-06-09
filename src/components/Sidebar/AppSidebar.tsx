@@ -54,10 +54,23 @@ const MotionDiv = chakra(motion.div, {
 });
 
 
+
 const mont = Rajdhani({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
+
+
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+  tier: string;
+  walletAddress?: string;
+}
+
+
 function generateYearlyInsights() {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -302,14 +315,17 @@ const sidebarStructure = [
   { icon: BookOpen, label: "Resources", href: "/resources" },
 ];
 
-const bottomItems = [
+
+export default function AppSidebar() {
+  const { isCollapsed, toggleCollapse } = useSidebarStore();
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+    const [userData, setUserData] = useState<UserData | null>(null);
+
+    const bottomItems = [
   // { icon: Search, label: "Search", href: "/search" },
   { icon: UserCircle2, label: "Profile", href: "/profile" },
   { icon: Settings, label: "Settings", href: "/" },
 ];
-export default function AppSidebar() {
-  const { isCollapsed, toggleCollapse } = useSidebarStore();
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const bg = useColorModeValue("gray.100", "gray.900");
   const borderColor = useColorModeValue("gray.300", "gray.700");

@@ -201,6 +201,10 @@ const DashboardPage = () => {
   const [show, setShow] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
+    useScrollSpy([
+  "EIPsBOARD",
+]);
+
   const toggleCollapse = () => setShow(!show);
 
   const handleLabelToggle = (label: string) => {
@@ -352,9 +356,7 @@ const DashboardPage = () => {
   // Determine which data to show based on the active tab
   // const displayedData = activeTab === 'EIPs' ? eipData : ercData;
 
-  useScrollSpy([
-  "EIPsBOARD",
-]);
+
 
 
   return (
