@@ -25,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
       : "linear(to-r, #2C7A7B, #285E61)";
 
   // Create dynamic link if sectionId is provided
-  const dynamicLink = sectionId ? `http://localhost:3000/#${sectionId}` : "";
+  const dynamicLink = sectionId ? `https://eipsinsight.com/#${sectionId}` : "";
 
   return (
     <Box>
