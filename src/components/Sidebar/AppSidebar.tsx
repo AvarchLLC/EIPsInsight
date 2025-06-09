@@ -44,6 +44,7 @@ import {
 
 import { chakra, shouldForwardProp } from "@chakra-ui/react";
 import { isValidMotionProp } from "framer-motion";
+import { Rajdhani } from "next/font/google";
 
 // Extend chakra with motion.div
 const MotionDiv = chakra(motion.div, {
@@ -52,6 +53,12 @@ const MotionDiv = chakra(motion.div, {
     isValidMotionProp(prop) || shouldForwardProp(prop),
 });
 
+
+
+const mont = Rajdhani({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 
 interface UserData {
@@ -346,6 +353,7 @@ export default function AppSidebar() {
       overflowY="auto"
       py={4}
       sx={{ scrollbarWidth: "none", msOverflowStyle: "none", "&::-webkit-scrollbar": { display: "none" } }}
+      className={`${mont.className} base-page-size`}
     >
       <Box px={2} mb={2}>
         <IconButton

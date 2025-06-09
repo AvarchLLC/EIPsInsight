@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { Box, useColorModeValue, Spinner, Text, Select, Flex, Link } from "@chakra-ui/react";
+import {
+  Box,
+  useColorModeValue,
+  Spinner,
+  Text,
+  Select,
+  Flex,
+  Link,
+} from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import { motion } from "framer-motion";
 import DateTime from "@/components/DateTime";
 import Dashboard from "./Dashboard";
 import NextLink from "next/link";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -62,8 +69,6 @@ const getStatus = (status: string) => {
   }
 };
 
-
-
 interface EIP {
   _id: string;
   eip: string;
@@ -81,7 +86,6 @@ interface EIP {
   __v: number;
 }
 
-
 const categoryColors: string[] = [
   "rgb(255, 99, 132)", //meta
   "rgb(255, 159, 64)", //core
@@ -94,7 +98,6 @@ const categoryColors: string[] = [
   "rgb(255, 0, 0)",
   "rgb(0, 128, 0)",
 ];
-
 
 interface APIResponse {
   eip: EIP[];
@@ -150,10 +153,12 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
 
   const transformedData = data.reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
-    const category = item.repo === 'rip' ? 'RIPs' : getCat(item.category);
+    const category = item.repo === "rip" ? "RIPs" : getCat(item.category);
 
     // Check if a record for the same category and year already exists
-    const existingEntry = acc.find((entry) => entry.year === year && entry.category === category);
+    const existingEntry = acc.find(
+      (entry) => entry.year === year && entry.category === category
+    );
 
     if (existingEntry) {
       // If it exists, increment the value
@@ -175,7 +180,9 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     const status = getStatus(item.status);
 
     // Check if a record for the same category and year already exists
-    const existingEntry = acc.find((entry) => entry.year === year && entry.category === status);
+    const existingEntry = acc.find(
+      (entry) => entry.year === year && entry.category === status
+    );
 
     if (existingEntry) {
       // If it exists, increment the value
@@ -192,10 +199,6 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     return acc;
   }, []);
 
-
-
-
-
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Column),
     {
@@ -203,7 +206,8 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     }
   );
 
-  const transformedData3 = chart === "status" ? transformedData2 : transformedData;
+  const transformedData3 =
+    chart === "status" ? transformedData2 : transformedData;
 
   console.log(transformedData3);
 
@@ -239,11 +243,7 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     //     opacity: 0.6,
     //   },
     // } as any,
-
   };
-
-
-
 
   return (
     <>
@@ -267,19 +267,18 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
               borderColor: "#30A0E0",
             }}
           >
-
             <Box
-              width={"100%"}       // Make the container full width
-              minWidth={"100px"}  // Set a minimum width
+              width={"100%"} // Make the container full width
+              minWidth={"100px"} // Set a minimum width
               height={400}
-              overflowX="auto"     // Enable horizontal scrolling if necessary
+              overflowX="auto" // Enable horizontal scrolling if necessary
               overflowY="hidden"
               as={motion.div}
-              padding={"2 rem"}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              id="all"
-            // transition={{ duration: 0.5 }}
+              // id="all"
+              // transition={{ duration: 0.5 }}
+              marginTop={3}
             >
               <Flex justify="space-between" align="center">
                 {/* Label and Dropdown in the same row */}
@@ -290,10 +289,12 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
                       fontWeight="bold"
                       color="#30A0E0"
                       cursor="pointer" // Optional: To indicate it's clickable
-                      _hover={{ textDecoration: 'underline' }}
-                       // Optional: Adds hover effect
+                      _hover={{ textDecoration: "underline" }}
+                      // Optional: Adds hover effect
                     >
-                      {type === 'Total' ? `All EIPs [${data.length}]` : `${type} - [${data.length}]`}
+                      {type === "Total"
+                        ? `All EIPs [${data.length}]`
+                        : `${type} - [${data.length}]`}
                     </Text>
                   </Link>
                 </Box>
@@ -341,7 +342,6 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
                 <DateTime />
               </Box>
             </Box>
-
           </Box>
         </>
       )}
