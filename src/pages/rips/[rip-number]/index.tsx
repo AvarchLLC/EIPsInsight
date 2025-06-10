@@ -203,7 +203,6 @@ const TestComponent = () => {
               <Header
                 title={`RIP- ${RIPNo}`}
                 subtitle={metadataJson?.title || ""}
-                
               />
               <Box overflowX="auto">
                 <Table variant="simple">
