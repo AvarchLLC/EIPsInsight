@@ -234,8 +234,8 @@ const RIP = () => {
   const toggleCollapse = () => setShow(!show);
   
   useScrollSpy([
-  "graphs",
-  "draftvsfinal",
+  "Ethereum Improvement",
+  "GitHub Stats – RIPs",
   "draft",
   "final",
   "living",
@@ -294,7 +294,8 @@ const RIP = () => {
                 {/* Header Section */}
                 <Header
                   title={`Rollup Improvement Proposal - [ ${data?.length} ]`}
-                  subtitle="RIPs describe changes to the RIP process, or other non-optional changes."
+                  subtitle="Overview"
+                  description="RIPs describe changes to the RIP process, or other non-optional changes."
                 />
 
                 {/* Toggle Buttons */}
@@ -454,7 +455,7 @@ const RIP = () => {
 
               <Box
                 className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-8 gap-5"
-                id="graphs"
+                id="GitHub Stats – RIPs"
               >
                 <Box>
                   {selected === "status" ? (
@@ -503,6 +504,7 @@ const RIP = () => {
                   key={status}
                   className={"group relative flex flex-col gap-3"}
                   paddingBottom={8}
+                  id="draft"
                 >
                   {/* Label Section aligned to the left */}
                   <Box className={"flex gap-3"}>

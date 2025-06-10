@@ -356,8 +356,7 @@ const DashboardPage = () => {
   // Determine which data to show based on the active tab
   // const displayedData = activeTab === 'EIPs' ? eipData : ercData;
 
-
-
+  // useScrollSpy(["EIPsBOARD"]);
 
   return (
     <>

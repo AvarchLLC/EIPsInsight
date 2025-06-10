@@ -106,6 +106,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 } as any}
                     className="ease-in duration-200 z-0"
+                    id="Eip Table"
                 >
                     <CCardBody>
                         <>

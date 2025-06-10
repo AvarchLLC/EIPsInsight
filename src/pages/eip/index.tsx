@@ -1,6 +1,6 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
-import Header from "@/components/Header";
+// import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
@@ -117,6 +117,7 @@ import OtherBox from "@/components/OtherStats";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+import Header from "@/components/Header";
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
@@ -323,7 +324,8 @@ const Type = () => {
             >
               <Header
                 title={`Ethereum Improvement Proposal - [${data.length}]`}
-                subtitle={
+                subtitle={"Overview"}
+                description={
                   <Flex align="center" gap={2} flexWrap="wrap">
                     <Text>
                       EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature
@@ -375,7 +377,7 @@ const Type = () => {
               <SearchBox />
             </Box>
 
-            <Box className="w-full flex flex-col gap-5 pt-8" id="graphs">
+            <Box className="w-full flex flex-col gap-5 pt-8" id="chart type">
               <Box id="charts" className="w-full overflow-hidden">
                 <Box display="flex" justifyContent="space-between" alignItems="center" px={4} pb={2}>
                   <Text fontSize="xl" fontWeight="bold">
@@ -411,7 +413,7 @@ const Type = () => {
               </Box>
             </Box>
 
-            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="categories">
+            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="View EIP Stats">
               {selected === "type" && (
                 <>
                   <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="#40E0D0">

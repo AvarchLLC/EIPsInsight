@@ -27,8 +27,6 @@ import {
   Flex,
 } from "@chakra-ui/react";
 
-
-
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -163,59 +161,55 @@ const sidebarStructure = [
   },
   {
     icon: Layers3,
-    label: "All EIPs",
+    label: "Standards",
     children: [
+      {
+        label: "All",
+        href: "/all",
+        children: [{ label: "All EIP ERC RIP", href: "/all#All EIP ERC RIP" }],
+      },
       {
         label: "EIPs",
         href: "/eip",
         children: [
-          { label: "Graphs", href: "/eip#graphs" },
-          { label: "Draft vs Final", href: "/eip#draftvsfinal" },
-          { label: "Core", href: "/eip#core" },
-          { label: "Networking", href: "/eip#networking" },
-          { label: "Interface", href: "/eip#interface" },
-          { label: "Meta", href: "/eip#meta" },
-          { label: "Informational", href: "/eip#informational" },
-          { label: "Draft", href: "/eip#draft" },
-          { label: "Review", href: "/eip#review" },
-          { label: "Last Call", href: "/eip#lastcall" },
-          { label: "Final", href: "/eip#final" },
-          { label: "Stagnant", href: "/eip#stagnant" },
-          { label: "Withdrawn", href: "/eip#withdrawn" },
-          { label: "Living", href: "/eip#living" },
-          { label: "Meta Table", href: "/eip#metatable" },
-          { label: "Informational Table", href: "/eip#informationaltable" },
-          { label: "Core Table", href: "/eip#coretable" },
-          { label: "Networking Table", href: "/eip#networkingtable" },
-          { label: "Interface Table", href: "/eip#interfacetable" },
+          { label: "Ethereum Improvement", href: "/eip#Ethereum Improvement" },
+          { label: "chart type", href: "/eip#chart type" },
+          { label: "View EIP Stats", href: "/eip#View EIP Stats" },
+          { label: "Eip Table", href: "/eip#Eip Table" },
         ],
       },
       {
         label: "ERCs",
         href: "/erc",
         children: [
-          { label: "Graphs", href: "/erc#graphs" },
-          { label: "ERC (Progress Over the Years)", href: "/erc#ercprogress" },
+          { label: "Ethereum Request", href: "/erc#Ethereum Improvement" },
+          {
+            label: "ERC (Progress Over the Years)",
+            href: "/erc#ERC progress bar",
+          },
           { label: "Draft", href: "/erc#draft" },
-          { label: "Review", href: "/erc#review" },
-          { label: "Last Call", href: "/erc#lastcall" },
-          { label: "Final", href: "/erc#final" },
-          { label: "Stagnant", href: "/erc#stagnant" },
-          { label: "Withdrawn", href: "/erc#withdrawn" },
-          { label: "Living", href: "/erc#living" },
-          { label: "Meta Table", href: "/erc#metatable" },
-          { label: "ERC Table", href: "/erc#erctable" },
+          { label: "ERC Activity", href: "/erc#ERC Activity" },
+          { label: "Satus Activity", href: "/erc#Satus Activity" },
+          // { label: "Final", href: "/erc#final" },
+          // { label: "Stagnant", href: "/erc#stagnant" },
+          // { label: "Withdrawn", href: "/erc#withdrawn" },
+          // { label: "Living", href: "/erc#living" },
+          // { label: "Meta Table", href: "/erc#metatable" },
+          // { label: "ERC Table", href: "/erc#erctable" },
         ],
       },
       {
         label: "RIPs",
         href: "/rip",
         children: [
-          { label: "Graphs", href: "/rip#graphs" },
-          { label: "Draft vs Final", href: "/rip#draftvsfinal" },
+          {
+            label: "Rollup Improvement Proposal",
+            href: "/rip#Ethereum Improvement",
+          },
+          { label: "GitHub Stats – RIPs", href: "/rip#GitHub Stats – RIPs" },
           { label: "Draft", href: "/rip#draft" },
-          { label: "Final", href: "/rip#final" },
           { label: "Living", href: "/rip#living" },
+          { label: "Final", href: "/rip#final" },
           { label: "Meta", href: "/rip#meta" },
           { label: "Informational", href: "/rip#informational" },
           { label: "Core", href: "/rip#core" },
@@ -352,9 +346,14 @@ export default function AppSidebar() {
       roundedRight="xl"
       overflowY="auto"
       py={4}
-      sx={{ scrollbarWidth: "none", msOverflowStyle: "none", "&::-webkit-scrollbar": { display: "none" } }}
+      sx={{
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+        "&::-webkit-scrollbar": { display: "none" },
+      }}
       className={`${mont.className} base-page-size`}
     >
+      {/* Collapse/Expand Button */}
       <Box px={2} mb={2}>
         <IconButton
           aria-label="Toggle Sidebar"
@@ -366,7 +365,8 @@ export default function AppSidebar() {
         />
       </Box>
 
-      <VStack spacing={1} px={2} align="stretch" flex="1">
+      {/* Main Items */}
+      <VStack spacing={1} px={2} align="stretch" flex="1" overflowY="auto">
         {sidebarStructure.map((item) => (
           <SidebarItem
             key={item.label}
@@ -382,6 +382,7 @@ export default function AppSidebar() {
 
       <Divider borderColor={borderColor} my={2} />
 
+      {/* Bottom Items */}
       <VStack spacing={1} px={2} align="stretch">
         {bottomItems.map((item) => (
           <SidebarItem
@@ -427,8 +428,18 @@ export function SidebarItem({
     item.href?.includes(`#${activeSection}`);
 
   const variants: Variants = {
-    open: { opacity: 1, height: "auto", pointerEvents: "auto", transition: { duration: 0.3 } },
-    isCollapsed: { opacity: 0, height: 0, pointerEvents: "none", transition: { duration: 0.2 } },
+    open: {
+      opacity: 1,
+      height: "auto",
+      pointerEvents: "auto",
+      transition: { duration: 0.3 },
+    },
+    isCollapsed: {
+      opacity: 0,
+      height: 0,
+      pointerEvents: "none",
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
@@ -439,7 +450,9 @@ export function SidebarItem({
           spacing={3}
           px={3}
           py={2}
-          bg={isActive ? useColorModeValue("blue.100", "blue.700") : "transparent"}
+          bg={
+            isActive ? useColorModeValue("blue.100", "blue.700") : "transparent"
+          }
           fontWeight={isActive ? "bold" : "normal"}
           borderRadius="md"
           cursor={hasChildren || item.href ? "pointer" : "default"}
@@ -475,7 +488,10 @@ export function SidebarItem({
 
                       const target = document.getElementById(hash);
                       if (target) {
-                        target.scrollIntoView({ behavior: "smooth", block: "start" });
+                        target.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
                         history.pushState(null, "", href);
                       }
                     } else {
@@ -526,7 +542,6 @@ export function SidebarItem({
               overflow="hidden"
               position="relative"
             >
-              {/* Vertical Line */}
               <Box
                 position="absolute"
                 left="1rem"
@@ -538,56 +553,17 @@ export function SidebarItem({
                 opacity={0.1}
                 zIndex={-1}
               />
-
-              {/* Subitems */}
-              {item.children.map((child: any) => {
-                const isChildActive =
-                  child.id === activeSection ||
-                  child.href?.includes(`#${activeSection}`);
-
-                return (
-                  <Box
-                    key={child.label}
-                    borderRadius="md"
-                    px={3}
-                    py={1.5}
-                    fontSize="sm"
-                    color={useColorModeValue(
-                      isChildActive ? "blue.800" : "gray.800",
-                      isChildActive ? "white" : "gray.200"
-                    )}
-                    bg={
-                      isChildActive
-                        ? useColorModeValue("blue.100", "blue.600")
-                        : "transparent"
-                    }
-                    fontWeight={isChildActive ? "bold" : "normal"}
-                    _hover={{
-                      bg: useColorModeValue("blue.200", "blue.500"),
-                    }}
-                    transition="all 0.2s ease"
-                    onClick={() => {
-                      if (child.href) {
-                        const [path, hash] = child.href.split("#");
-                        if (path && window.location.pathname !== path) {
-                          window.location.href = child.href;
-                        } else if (hash) {
-                          const el = document.getElementById(hash);
-                          if (el) {
-                            el.scrollIntoView({ behavior: "smooth" });
-                            history.pushState(null, "", child.href);
-                          }
-                        }
-                      }
-                    }}
-                    cursor="pointer"
-                    position="relative"
-                    zIndex={1}
-                  >
-                    {child.label}
-                  </Box>
-                );
-              })}
+              {item.children.map((child: any) => (
+                <SidebarItem
+                  key={child.label}
+                  item={child}
+                  expanded={expanded}
+                  expandedItems={expandedItems}
+                  toggleExpand={toggleExpand}
+                  depth={depth + 1}
+                  isCollapsed={isCollapsed}
+                />
+              ))}
             </MotionDiv>
           )}
         </AnimatePresence>

@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
   const dynamicLink = sectionId ? `https://eipsinsight.com/#${sectionId}` : "";
 
   return (
-    <Box>
+    <Box id="Ethereum Improvement">
       <Flex alignItems="center">
         <Text
           as={motion.div}
