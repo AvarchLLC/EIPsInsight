@@ -249,7 +249,7 @@ interface EIP {
 }
 
 
-const TypeGraphs =  ({ selected }: { selected: string }) =>  {
+const   TypeGraphs =  ({ selected }: { selected: string }) =>  {
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const [data, setData] = useState<EIP[]>([]);
@@ -281,7 +281,7 @@ const TypeGraphs =  ({ selected }: { selected: string }) =>  {
      <Box
       bg={bg}
       w="full"
-      p={4}
+      p={0}
       borderRadius="lg"
       boxShadow="md"
       position="relative"

@@ -567,6 +567,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { motion } from "framer-motion";
+import DateTime from "./DateTime";
 
 interface EIP {
   _id: string;
@@ -700,7 +701,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
     <Box
       bg={bg}
       borderRadius="xl"
-      p={4}
+      p={{ base: 2, md: 3 }}
       mt={4}
       as={motion.div}
       initial={{ opacity: 0, y: -10 }}
@@ -709,7 +710,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
     >
       <Stack direction="row" justify="space-between" align="center" mb={4}>
         <Text fontSize="2xl" fontWeight="bold" color="blue.400">
-          {status}
+          {status} Recent Activity's
         </Text>
         <Button size="sm" bg="#40E0D0"
           color="white"
@@ -742,9 +743,9 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
           },
         }}
       >
-        <Wrap spacing={4}>
+        <Stack spacing={4}>
           {filteredData.map((item, idx) => (
-            <WrapItem key={idx} flex="1 1 100%">
+            <Box key={idx} w="100%">
               <Box
                 p={4}
                 w="100%"
@@ -796,9 +797,13 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                   </Wrap>
                 </HStack>
               </Box>
-            </WrapItem>
+            </Box>
           ))}
-        </Wrap>
+        </Stack>
+      </Box>
+
+      <Box overflowX={{ base: "auto", md: "visible" }} mt={6}>
+        <DateTime />
       </Box>
     </Box>
   );

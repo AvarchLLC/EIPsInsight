@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 } as any}
-          fontSize={{ base: "2xl", md: "2xl", lg: "6xl" }}
+          fontSize={{ base: "40px", sm: "42px", md: "44px", lg: "48px" }}
           fontWeight="bold"
           color={useColorModeValue(headingColorLight, headingColorDark)}
           bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)}
@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 } as any}
-        fontSize={{ base: "lg", md: 'lg', lg: "2xl" }}
+        fontSize={{ base: "24px", sm: "24px", md: "26px", lg: "28px" }}
         color={useColorModeValue("black", "white")}
       >
         {subtitle}

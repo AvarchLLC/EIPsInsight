@@ -381,7 +381,7 @@ const ERCStatusDonut = () => {
           <Spinner size="xl" />
         </Flex>
       ) : (
-        <SimpleGrid minChildWidth="220px" spacing={5}>
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 4 }} spacing={6}>
           {chartData.map(({ status, count, percent, description, color }) => (
             <Box
               key={status}
@@ -431,7 +431,7 @@ const ERCStatusDonut = () => {
         </SimpleGrid>
       )}
 
-      <Box mt={6}>
+      <Box overflowX={{ base: "auto", md: "visible" }} mt={6}>
         <DateTime />
       </Box>
     </Box>
