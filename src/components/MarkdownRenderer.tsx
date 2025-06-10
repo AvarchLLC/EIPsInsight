@@ -22,6 +22,52 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CodeBlock } from './Codehelper'; // adjust if needed
 import NextLink from 'next/link';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
+import { ReactNode } from 'react';
+// import { Heading } from '@chakra-ui/react';
+import slugify from 'slugify';
+
+type HeadingProps = {
+  children: ReactNode[];
+};
+
+// Modify the createHeadingRenderer function in your MarkdownRenderer
+const normalizeId = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/&/g, 'and')     // Replace "&" with "and"
+    .replace(/\?/g, '')       // Remove "?"
+    .replace(/\s+/g, '-')     // Spaces to hyphens
+    .replace(/[^\w-]/g, '')   // Remove non-word chars
+    .replace(/-+/g, '-')      // Collapse multiple hyphens
+    .replace(/^-|-$/g, '');    // Trim hyphens
+};
+
+const createHeadingRenderer = (level: number) => {
+  return ({ children }: HeadingProps) => {
+    const text = children
+      .map((child: any) => (typeof child === 'string' ? child : child.props?.children || ''))
+      .join('');
+    
+    const id = normalizeId(text);
+
+    return (
+      <Heading
+        as={`h${level}` as any}
+        id={id}
+        size={['2xl', 'xl', 'lg', 'md', 'sm', 'xs'][level - 1]}
+        my={4}
+        scrollMarginTop="100px"
+      >
+        {children}
+      </Heading>
+    );
+  };
+};
+
+
+
 
 const getCoreProps = (props: any) =>
   props['data-sourcepos'] ? { 'data-sourcepos': props['data-sourcepos'] } : {};
@@ -30,6 +76,7 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw, rehypeSanitize]}
       components={{
         p: ({ children }) => <Text mb={2}>{children}</Text>,
         em: ({ children }) => <Text as="em">{children}</Text>,
@@ -69,11 +116,45 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
           );
         },
         hr: () => <Divider my={4} />,
-        a: ({ href = '', children }) => (
-          <ChakraLink as={NextLink} href={href} color="blue.500" isExternal>
-            {children}
-          </ChakraLink>
-        ),
+        // a: ({ href = '', children }) => {
+        //   const isHashLink = href.startsWith('#');
+
+        //   if (isHashLink) {
+        //     return (
+        //       <ChakraLink href={href} color="blue.400">
+        //         {children}
+        //       </ChakraLink>
+        //     );
+        //   }
+
+        //   return (
+        //     <ChakraLink as={NextLink} href={href} color="blue.500" isExternal>
+        //       {children}
+        //     </ChakraLink>
+        //   );
+        // },
+        a: ({ href = '', children }) => {
+          if (href.startsWith('#')) {
+            const normalizedHref = '#' + normalizeId(href.slice(1));
+            return (
+              <ChakraLink 
+                href={normalizedHref}
+                color="blue.400"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById(normalizedHref.slice(1));
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    window.history.pushState(null, '', normalizedHref);
+                  }
+                }}
+              >
+                {children}
+              </ChakraLink>
+            );
+          }
+          // ... rest of your external link handling
+        },
         img: ({ src = '', alt = '' }) => (
           <ChakraImage src={src} alt={alt} my={4} mx="auto" />
         ),
@@ -90,36 +171,12 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
         li: ({ children, ...props }) => (
           <ListItem {...getCoreProps(props)}>{children}</ListItem>
         ),
-        h1: ({ children, ...props }) => (
-          <Heading my={4} as="h1" size="2xl" {...getCoreProps(props)}>
-            {children}
-          </Heading>
-        ),
-        h2: ({ children, ...props }) => (
-          <Heading my={4} as="h2" size="xl" {...getCoreProps(props)}>
-            {children}
-          </Heading>
-        ),
-        h3: ({ children, ...props }) => (
-          <Heading my={4} as="h3" size="lg" {...getCoreProps(props)}>
-            {children}
-          </Heading>
-        ),
-        h4: ({ children, ...props }) => (
-          <Heading my={4} as="h4" size="md" {...getCoreProps(props)}>
-            {children}
-          </Heading>
-        ),
-        h5: ({ children, ...props }) => (
-          <Heading my={4} as="h5" size="sm" {...getCoreProps(props)}>
-            {children}
-          </Heading>
-        ),
-        h6: ({ children, ...props }) => (
-          <Heading my={4} as="h6" size="xs" {...getCoreProps(props)}>
-            {children}
-          </Heading>
-        ),
+         h1: createHeadingRenderer(1),
+        h2: createHeadingRenderer(2),
+        h3: createHeadingRenderer(3),
+        h4: createHeadingRenderer(4),
+        h5: createHeadingRenderer(5),
+        h6: createHeadingRenderer(6),
         table: ({ children }) => (
           <Box overflowX="auto" my={4}>
             <Table variant="simple" border="1px solid" borderColor="gray.200">
