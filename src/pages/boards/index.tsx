@@ -201,6 +201,10 @@ const DashboardPage = () => {
   const [show, setShow] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
+    useScrollSpy([
+  "EIPsBOARD",
+]);
+
   const toggleCollapse = () => setShow(!show);
 
   const handleLabelToggle = (label: string) => {
