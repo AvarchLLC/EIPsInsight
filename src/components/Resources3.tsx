@@ -626,6 +626,7 @@ const ResourcesPage: React.FC = () => {
           <Header
             title="Resources"
             subtitle="Learn, explore, and stay updated with Ethereum improvements"
+            description="Explore FAQs, blogs, videos, news, and tools to deepen your understanding of Ethereum Improvement Proposals."
           />
         </Box>
         <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} py={8}>
