@@ -197,7 +197,7 @@ const Status = () => {
             paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
             marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
           >
-            <Header title="Status" subtitle="Your Roadway to Status"></Header>
+            <Header title="Status" subtitle="Your Roadway to Status" description="" />
 
             <Text
               fontSize="3xl" fontWeight="bold" color="#30A0E0"

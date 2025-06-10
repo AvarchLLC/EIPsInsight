@@ -254,7 +254,11 @@ const PrPage: React.FC<PrPageProps> = ({ Type,number }) => {
                                 <>
                                     <Box>
                                     <FlexBetween flexDirection={{ base: 'column', md: 'row' }} alignItems="center">
-                                        <Header title={"Pull Request"} subtitle={`#${data?.prDetails?.prNumber}`} />
+                                        <Header
+                                            title={"Pull Request"}
+                                            subtitle={`#${data?.prDetails?.prNumber}`}
+                                            description={data?.prDetails?.prDescription || ""}
+                                        />
                                         {/* <Box display={{ base: 'none', md: 'block' }} width="100%" maxWidth="400px">
                                             <SearchBox />
                                         </Box> */}
