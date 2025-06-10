@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 import CopyLink from "@/components/CopyLink";
 import axios from "axios";
 import type { PieConfig } from '@ant-design/plots';
+import LastUpdatedDateTime from "./LastUpdatedDateTime";
 
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
 const Pie = dynamic(() => import('@ant-design/plots').then(mod => mod.Pie), { ssr: false });
@@ -412,6 +413,7 @@ const donutData = Object.entries(editorReviews)
         </Heading>
       </Flex>
       {renderChart()}
+      <LastUpdatedDateTime name="Prs&IssueData"/>
     </Box>
 
     {/* Recently Closed/Merged PRs */}
@@ -484,6 +486,7 @@ const donutData = Object.entries(editorReviews)
           })}
         </VStack>
       </Box>
+      <LastUpdatedDateTime name="Prs&IssueData"/>
     </Box>
   </Flex>
 
@@ -512,7 +515,10 @@ const donutData = Object.entries(editorReviews)
       {!hasReviews ? (
         <Text color="gray.500">No reviews in last 24 hours</Text>
       ) : (
+        <Box>
         <Pie {...config} />
+        <LastUpdatedDateTime name="ERCReviews"/>
+        </Box>
       )}
     </Box>
 
@@ -539,8 +545,17 @@ const donutData = Object.entries(editorReviews)
           <VStack align="stretch" spacing={4}>
             
                   {allReviews.map((pr) => {
-                    const status = pr.merged_at ? "Merged" : "Closed";
-                    const statusColor = pr.merged_at ? "purple" : "red";
+                    let status = "Open";
+                    let statusColor = "teal";
+
+                    if (pr.merged_at) {
+                      status = "Merged";
+                      statusColor = "purple";
+                    } else if (pr.closed_at) {
+                      status = "Closed";
+                      statusColor = "red";
+                    }
+
                     const date = pr.reviewDate;
 
                     return (
@@ -563,9 +578,9 @@ const donutData = Object.entries(editorReviews)
                               <Badge colorScheme="blue" px={2} py={1} borderRadius="full">
                                 #{pr.prNumber}
                               </Badge>
-                              <Badge colorScheme={statusColor} px={2} py={1} borderRadius="full">
+                              {/* <Badge colorScheme={statusColor} px={2} py={1} borderRadius="full">
                                 {status}
-                              </Badge>
+                              </Badge> */}
                               <Badge colorScheme="teal" px={2} py={1} borderRadius="full">
                                 Reviewer:{pr.reviewer}
                               </Badge>
@@ -596,8 +611,10 @@ const donutData = Object.entries(editorReviews)
                   })}
                 
           </VStack>
+          
         </Box>
       )}
+      <LastUpdatedDateTime name="ERCReviews"/>
     </Box>
   </Flex>
 </>

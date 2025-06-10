@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { getPostBySlug, PostNotFoundError } from '@/lib/blog';
 import { notFound } from 'next/navigation';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import { ScrollToHashOnLoad } from '@/components/ScrollToHashOnLoad';
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -21,9 +22,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   const { frontmatter, content } = post;
 
+  // console.log("content data:", content);
+
   return (
     <div className='flex flex-col min-h-screen'>
-      <div className='flex flex-col w-full max-w-5xl mx-auto mt-12 px-4'>
+      <div className='flex flex-col w-full max-w-7xl mx-auto mt-12 px-4'>
         <Link href='/resources' className='text-blue-600 hover:text-blue-700'>
           <div className='flex items-center gap-2'>
             <ArrowLeftIcon className='w-4 h-4' />
@@ -32,12 +35,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </Link>
 
         {frontmatter.image && (
-          <div className='relative w-full h-96 mt-6 overflow-hidden rounded-lg'>
+          <div className="w-full mt-6 overflow-hidden rounded-lg">
             <Image
               src={frontmatter.image}
               alt={frontmatter.title}
-              className='object-cover w-full h-full'
-              fill
+              layout="responsive"
+              width={900} // image aspect ratio base
+              height={450} // adjust based on your desired ratio
+              className="rounded-lg object-cover"
             />
           </div>
         )}
@@ -47,7 +52,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <p className='text-sm text-gray-500 mb-6'>
             Written by {frontmatter.author} on {frontmatter.date.toLocaleDateString()}
           </p>
-
+          <ScrollToHashOnLoad />
           <MarkdownRenderer markdown={content} />
         </div>
       </div>

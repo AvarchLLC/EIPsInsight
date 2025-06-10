@@ -34,7 +34,7 @@ const nextConfig = withMDX(
     trailingSlash: false,
 
     images: {
-      domains: ['hackmd.io'], 
+      domains: ['hackmd.io', 'etherworld.co'], 
     },
 
     // Add the redirects method here
