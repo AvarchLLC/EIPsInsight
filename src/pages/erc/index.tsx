@@ -295,7 +295,8 @@ const ERC = () => {
                 {/* Header Section */}
                 <Header
                   title={`Ethereum Request for Comment -      [ ${data?.length} ]`}
-                  subtitle="ERCs describe application-level standard for the Ethereum ecosystem."
+                  subtitle="Overview"
+                  description="ERCs describe application-level standard for the Ethereum ecosystem."
                 />
 
                 {/* Toggle Buttons */}
@@ -371,6 +372,7 @@ const ERC = () => {
                   key={status}
                   className={"group relative flex flex-col gap-3"}
                   paddingBottom={8}
+                  id={"Draft"}
                 >
                   {/* Label Section aligned to the left */}
                   <Box className={"flex gap-3"}>
