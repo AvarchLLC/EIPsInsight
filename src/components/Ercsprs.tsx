@@ -396,6 +396,7 @@ const donutData = Object.entries(editorReviews)
     ml="4rem"
     mr="2rem"
     mb="2rem"
+    id="ERC Activity"
   >
     {/* ERCs Activity Chart */}
     <Box
