@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronDown,
 } from "lucide-react";
+import { signOut } from 'next-auth/react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { IconButton, Tooltip } from "@chakra-ui/react";
 import { Variants } from "framer-motion";
@@ -39,6 +40,18 @@ import {
   FiInfo,
   FiTool,
 } from "react-icons/fi";
+import {
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
+  useToast,
+} from "@chakra-ui/react";
+import { useRouter } from "next/router";
+
+
 
 import { chakra, shouldForwardProp } from "@chakra-ui/react";
 import { isValidMotionProp } from "framer-motion";
@@ -361,7 +374,7 @@ export default function AppSidebar() {
 
     const bottomItems = [
   // { icon: Search, label: "Search", href: "/search" },
-  { icon: UserCircle2, label: "Profile", href: "/profile" },
+  // { icon: UserCircle2, label: "Profile", href: "/profile" },
   { icon: Settings, label: "Settings", href: "/" },
 ];
 
@@ -398,6 +411,67 @@ export default function AppSidebar() {
     }
   }
 }, [activeSection]);
+
+useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    setUserData(JSON.parse(storedUser));
+  }
+}, []);
+
+const toast = useToast();
+
+const handleRefresh = async () => {
+  try {
+    const response = await fetch('/api/GetUserStatus');
+    const data = await response.json();
+
+    const updatedUser = {
+      ...userData!,
+      tier: data.tier || userData?.tier || 'Free'
+    };
+
+    setUserData(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+
+    toast({
+      title: 'Status refreshed',
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
+  } catch (error) {
+    toast({
+      title: 'Refresh failed',
+      description: 'Could not fetch latest status',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+};
+const router = useRouter();
+
+const handleLogout = async () => {
+  try {
+    localStorage.removeItem('user');
+    await signOut({ redirect: false });
+    toast({
+      title: 'Logged out successfully',
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
+    setTimeout(() => router.push('/signin'), 500);
+  } catch (error) {
+    toast({
+      title: 'Logout failed',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+};
 
 
   return (
@@ -461,13 +535,53 @@ export default function AppSidebar() {
             key={item.label}
             item={item}
             expanded={!isCollapsed}
-            expandedItems={{}}
-            toggleExpand={() => { }}
+  expandedItems={expandedItems}
+  toggleExpand={toggleExpand}
             depth={0}
             isCollapsed={isCollapsed}
           />
         ))}
       </VStack>
+
+      <Box mt={2} px={isCollapsed ? 0 : 4}>
+  <Menu placement="top" isLazy>
+    <MenuButton
+      as={HStack}
+      spacing={isCollapsed ? 0 : 3}
+      align="center"
+      px={isCollapsed ? 2 : 3}
+      py={2}
+      w="full"
+      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+      borderRadius="md"
+      transition="background 0.2s"
+      justify={isCollapsed ? "center" : "flex-start"}
+      cursor="pointer"
+    >
+      <Avatar
+        size="sm"
+        name={userData?.name}
+        src={userData?.image || undefined}
+      />
+      {!isCollapsed && (
+        <>
+          <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
+            {userData?.name || "Profile"}
+          </Text>
+          <Box as={ChevronDown} size="16px" />
+        </>
+      )}
+    </MenuButton>
+
+    <MenuList zIndex={1000}>
+      <MenuItem onClick={() => router.push("/profile")}>👤 Profile</MenuItem>
+      <MenuItem onClick={handleRefresh}>🔄 Refresh Status</MenuItem>
+      <MenuDivider />
+      <MenuItem onClick={handleLogout}>🚪 Logout</MenuItem>
+    </MenuList>
+  </Menu>
+</Box>
+
     </Box>
 
   );
@@ -505,6 +619,8 @@ const getHrefHash = (href: string) => {
 const itemHash = item.href ? getHrefHash(item.href) : item.id || null;
 const isLeafNode = !item.children || item.children.length === 0;
 const isActive = isLeafNode && itemHash === activeSection;
+
+const router = useRouter();
 
 
   const variants: Variants = {
@@ -569,42 +685,39 @@ const isActive = isLeafNode && itemHash === activeSection;
           {expanded && (
             <>
               {item.href ? (
-                <Text
-                  as="a"
-                  onClick={(e) => {
-                    const href = item.href;
-                    if (!href) return;
+<Text
+  as="a"
+  onClick={(e) => {
+    e.preventDefault();
 
-                    const isHashLink = href.includes("#");
-                    if (isHashLink) {
-                      e.preventDefault();
-                      const [path, hash] = href.split("#");
+    if (!item.href) return;
 
-                      if (path && window.location.pathname !== path) {
-                        window.location.href = href;
-                        return;
-                      }
+    const [path, hash] = item.href.split("#");
 
-                      const target = document.getElementById(hash);
-                      if (target) {
-                        target.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                        history.pushState(null, "", href);
-                      }
-                    } else {
-                      window.location.href = href;
-                    }
-                  }}
-                  cursor="pointer"
-                  flex="1"
-                  fontWeight="medium"
-                  fontSize="sm"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  {item.label}
-                </Text>
+    const isSamePage = window.location.pathname === path;
+
+    if (isSamePage && hash) {
+      const target = document.getElementById(hash);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.pushState(null, "", item.href); // Update URL hash without reload
+      }
+    } else if (!hash) {
+      router.push(item.href); // Normal page change
+    } else {
+      // Different page + hash — use router.push with hash
+      router.push(item.href);
+    }
+  }}
+  cursor="pointer"
+  flex="1"
+  fontWeight="medium"
+  fontSize="sm"
+  _hover={{ textDecoration: "underline" }}
+>
+  {item.label}
+</Text>
+
               ) : (
                 <Text flex="1" fontWeight="medium" fontSize="sm">
                   {item.label}
