@@ -32,6 +32,7 @@ import {
   LuTrophy,
   LuBarChart2,
   LuRocket,
+  LuGithub
 } from "react-icons/lu";
 
 export const sidebarGroupIcons: Record<string, React.ElementType> = {
@@ -206,11 +207,10 @@ export const sidebarConfig: Record<
       label: "Ethereum Improvement",
       icon: LuWrench,
       id: "Ethereum Improvement",
-    },
-    { label: "chart type", icon: LuWrench, id: "chart type" },
-    { label: "View EIP Stats", icon: LuWrench, id: "View EIP Stats" },
-    { label: "Eip Table", icon: LuWrench, id: "Eip Table" },
-  ],
+      
+
+    }
+  ], 
   "/all": [
     {
       label: "All EIP ERC RIP",
@@ -218,38 +218,6 @@ export const sidebarConfig: Record<
       id: "All EIP ERC RIP",
     },
    
-  ],
-  "/erc": [
-    { label: "Graphs", icon: LuBarChartBig, id: "graphs" },
-    {
-      label: "ERC (Progress Over the Years)",
-      icon: LuTrendingUp,
-      id: "ercprogress",
-    },
-    { label: "Draft", icon: LuFileText, id: "draft" },
-    { label: "Review", icon: LuEye, id: "review" },
-    { label: "Last Call", icon: LuClock4, id: "lastcall" },
-    { label: "Final", icon: LuArchive, id: "final" },
-    { label: "Stagnant", icon: LuPauseCircle, id: "stagnant" },
-    { label: "Withdrawn", icon: LuBan, id: "withdrawn" },
-    { label: "Living", icon: LuCheckCircle2, id: "living" },
-    { label: "Meta Table", icon: LuTable, id: "metatable" },
-    { label: "ERC Table", icon: LuTable, id: "erctable" },
-  ],
-  "/upgrade": [
-    { label: "PECTRA", icon: LuTrendingUp, id: "pectra" },
-    {
-      label: "Network Upgrades and EIPs Relationship Graph",
-      icon: LuGitBranch,
-      id: "NetworkUpgradesChartp",
-    },
-    {
-      label: "Network Upgrades Graph",
-      icon: LuBarChartBig,
-      id: "NetworkUpgrades",
-    },
-    { label: "Author Contributions", icon: LuUsers, id: "AuthorContributions" },
-    { label: "Pectra Table", icon: LuTable, id: "pectra-table" },
   ],
   "/Analytics": [
     { label: "Github PR Analytics", icon: LuUsers, id: "GithubAnalytics" },
@@ -298,4 +266,5 @@ export const sidebarConfig: Record<
       id: "Search PR/ISSUE",
     },
   ],
-};
+
+}

@@ -30,28 +30,19 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
   return (
     <Box id="Ethereum Improvement">
       <Flex alignItems="center">
-        <Text
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          fontSize={{
-            base: "2xl",
-            md: "3xl",
-            lg: "4xl",
-            xl: "5xl",
-            "2xl": "6xl",
-          }}
-          fontWeight="extrabold"
-          color={useColorModeValue(headingColorLight, headingColorDark)}
-          bgGradient={useColorModeValue(
-            effectiveHeadingBgGradientLight,
-            headingBgGradientDark
-          )}
-          bgClip="text"
-        >
-          {title}
-        </Text>
+<Text
+  as={motion.div}
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  fontSize={{ base: "40px", sm: "42px", md: "44px", lg: "48px", xl: "56px", "2xl": "64px" }}
+  fontWeight="extrabold"
+  color={useColorModeValue(headingColorLight, headingColorDark)}
+  bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)}
+  bgClip="text"
+>
+  {title}
+</Text>
+
 
         {/* Show dynamic CopyLink if sectionId is passed */}
         {sectionId && (

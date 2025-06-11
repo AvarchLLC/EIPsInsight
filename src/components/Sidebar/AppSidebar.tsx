@@ -13,7 +13,7 @@ import {
   ChevronLeft,
   ChevronDown,
 } from "lucide-react";
-
+import { usePathname, useSearchParams } from 'next/navigation';
 import { IconButton, Tooltip } from "@chakra-ui/react";
 import { Variants } from "framer-motion";
 import {
@@ -147,17 +147,22 @@ const sidebarStructure = [
     icon: LayoutDashboard,
     label: "Upgrade",
     href: "/upgrade",
+    id: 'upgrade-section',
     children: [
-      { label: "FUSAKA", href: "/upgrade#pectra" },
-      { label: "PECTRA", href: "/upgrade#pectra" },
       {
-        label: "Network Upgrades Graph",
-        href: "/upgrade#NetworkUpgradesChartp",
+        label: 'Upgrade Details',
+        children: [
+          { label: 'PECTRA', id: 'pectra', href: '/upgrade#pectra' },
+          { label: 'FUSAKA', id: 'fusaka', href: '/upgrade#fusaka' },
+        ]
       },
-      { label: "Network Upgrades Graph", href: "/upgrade#NetworkUpgrades" },
-      { label: "Author Contributions", href: "/upgrade#AuthorContributions" },
-      { label: "Pectra Table", href: "/upgrade#pectra-table" },
+      { label: 'Network Upgrades Graph', id: 'NetworkUpgrades', href: '/upgrade#NetworkUpgrades' },
+      { label: 'Upgrade Table', id: 'upgrade-table', href: '/upgrade#upgrade-table' },
+      { label: 'Network Upgrades and EIPs Relationship Graph', id: 'NetworkUpgradesChartp', href: '/upgrade#NetworkUpgradesChartp' },
+      { label: 'Network Upgrades chart', id: 'NetworkUpgradeschart', href: '/upgrade#NetworkUpgradeschart' },
+      { label: 'Author Contributions', id: 'AuthorContributions', href: '/upgrade#AuthorContributions' },
     ],
+
   },
   {
     icon: Layers3,
@@ -170,17 +175,39 @@ const sidebarStructure = [
       },
       {
         label: "EIPs",
-        href: "/eip",
+        href: "/eip?view=type",
         children: [
           { label: "Ethereum Improvement", href: "/eip#Ethereum Improvement" },
           { label: "chart type", href: "/eip#chart type" },
           { label: "View EIP Stats", href: "/eip#View EIP Stats" },
           { label: "Eip Table", href: "/eip#Eip Table" },
+          { label: "GitHub Stats", href: "/eip#githubstats" },
+          { label: "Graphs", href: "/eip#charts" },
+          {
+            label: "Categories",
+            children: [
+              { label: "Core", href: "/eip#core" },
+              { label: "Networking", href: "/eip#networking" },
+              { label: "Interface", href: "/eip#interface" },
+              { label: "Meta", href: "/eip#meta" },
+              { label: "Informational", href: "/eip#informational" },
+            ],
+          },
+          {
+            label: "Tables",
+            children: [
+              { label: "Core Table", href: "/eip#coretable" },
+              { label: "Networking Table", href: "/eip#networkingtable" },
+              { label: "Interface Table", href: "/eip#interfacetable" },
+              { label: "Meta Table", href: "/eip#metatable" },
+              { label: "Informational Table", href: "/eip#informationaltable" },
+            ],
+          },
         ],
       },
       {
         label: "ERCs",
-        href: "/erc",
+        href: "/erc?view=type",
         children: [
           { label: "Ethereum Request", href: "/erc#Ethereum Improvement" },
           {
@@ -196,11 +223,21 @@ const sidebarStructure = [
           // { label: "Living", href: "/erc#living" },
           // { label: "Meta Table", href: "/erc#metatable" },
           // { label: "ERC Table", href: "/erc#erctable" },
+          { label: "GitHub Stats", href: "/erc#githubstats" },
+          { label: "Graphs", href: "/erc#graphs" },
+          { label: "ERC (Progress Over the Years)", href: "/erc#ercprogress" },
+          {
+            label: "Tables",
+            children: [
+              { label: "ERC Table", href: "/erc#erctable" },
+              { label: "Meta Table", href: "/erc#metatable" },
+            ],
+          },
         ],
       },
       {
         label: "RIPs",
-        href: "/rip",
+        href: "/rip?view=type",
         children: [
           {
             label: "Rollup Improvement Proposal",
@@ -217,6 +254,12 @@ const sidebarStructure = [
           { label: "Interface", href: "/rip#interface" },
           { label: "RIP", href: "/rip#rip" },
           { label: "RRC", href: "/rip#rrc" },
+          { label: "GitHub Stats", href: "/rip#githubstats" },
+          { label: "Graphs", href: "/rip#charts" },
+          {
+            label: "Table",
+            href: "/rip#type-tables"
+          }
         ],
       },
     ],
@@ -390,19 +433,20 @@ export default function AppSidebar() {
             item={item}
             expanded={!isCollapsed}
             expandedItems={{}}
-            toggleExpand={() => {}}
+            toggleExpand={() => { }}
             depth={0}
             isCollapsed={isCollapsed}
           />
         ))}
       </VStack>
     </Box>
+
   );
 }
 
 export function SidebarItem({
   item,
-  expanded,
+  expanded, // Top-level sidebar expanded state
   expandedItems,
   toggleExpand,
   depth = 0,
@@ -422,6 +466,7 @@ export function SidebarItem({
   const textColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const iconColor = useColorModeValue("gray.600", "gray.300");
   const hoverBg = useColorModeValue("gray.200", "gray.700");
+  const borderColor = useColorModeValue("gray.300", "gray.700");
 
   const isActive =
     (item.id && activeSection === item.id) ||
@@ -442,6 +487,25 @@ export function SidebarItem({
     },
   };
 
+  const handleNavigation = (e: React.MouseEvent, href: string) => {
+    const isHashLink = href.includes("#");
+    if (!isHashLink) return;
+
+    e.preventDefault();
+    const [path, hash] = href.split("#");
+
+    if (path && window.location.pathname !== path) {
+      window.location.href = href;
+      return;
+    }
+
+    const target = document.getElementById(hash);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.pushState(null, "", href);
+    }
+  };
+  const shouldShowChildren = expanded && isExpanded;
   return (
     <Box>
       {/* Main clickable row */}
@@ -456,7 +520,7 @@ export function SidebarItem({
           fontWeight={isActive ? "bold" : "normal"}
           borderRadius="md"
           cursor={hasChildren || item.href ? "pointer" : "default"}
-          onClick={() => hasChildren && toggleExpand(item.label)}
+          onClick={() => hasChildren ? toggleExpand(item.label) : {}}
           _hover={{ bg: hoverBg }}
           justifyContent={expanded ? "flex-start" : "center"}
           color={textColor}
@@ -469,7 +533,7 @@ export function SidebarItem({
 
           {expanded && (
             <>
-              {item.href && !hasChildren ? (
+              {item.href ? (
                 <Text
                   as="a"
                   onClick={(e) => {
@@ -517,6 +581,7 @@ export function SidebarItem({
                   as={isExpanded ? ChevronDown : ChevronRight}
                   boxSize={4}
                   color={iconColor}
+                  onClick={() => toggleExpand(item.label)}
                 />
               )}
             </>

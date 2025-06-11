@@ -287,10 +287,10 @@ const All = () => {
             </Text>
           </MotionBox>
         ) : (
-          <Box bgColor={bg} borderRadius="md" p={4} overflowX="auto">
+          <Box bgColor={tableBg} borderRadius="md" p={4} overflowX="auto">
             <CCardBody style={{ backgroundColor: tableBg }}>
               <Box maxH="60vh" overflowY="auto">
-                <CSmartTable
+                <CSmartTable  
                   items={filteredData.sort(
                     (a, b) => parseInt(a["eip"]) - parseInt(b["eip"])
                   )}

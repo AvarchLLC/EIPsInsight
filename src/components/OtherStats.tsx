@@ -125,21 +125,11 @@ const ChakraGithubStats: React.FC<Props> = ({ type }) => {
   ];
 
   return (
-    <Box px={{ base: 4, md: 6 }} py={6} maxW="7xl" mx="auto">
-      <Flex
-        justify="space-between"
-        align={{ base: 'flex-start', sm: 'center' }}
-        mb={4}
-        direction={{ base: 'column', sm: 'row' }}
-        gap={{ base: 2, sm: 0 }}
-      >
-        <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="semibold"   color="#40E0D0">
-          GitHub Stats – {type}
-        </Text>
-        {/* <Button onClick={downloadData} colorScheme="purple" size="sm" alignSelf={{ base: 'flex-start', sm: 'auto' }}>
-          Download CSV
-        </Button> */}
-      </Flex>
+    <Box w="full" px={0} mb={6}>
+      <Text fontSize="2xl" fontWeight="bold" color="#40E0D0" mb={4}>
+        GitHub Stats – {type}
+      </Text>
+
 
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>
         {statCards.map(({ title, icon, value }) => (
@@ -154,36 +144,25 @@ const ChakraGithubStats: React.FC<Props> = ({ type }) => {
           >
             <Flex align="center" justify="space-between" flexWrap="wrap" gap={2}>
               <Box flex="1" minW="0">
-                <Text fontSize={{ base: 'xs', md: 'sm' }} color="gray.500" noOfLines={1}>
+                <Text
+                  fontSize={{ base: "24px", md: "28px" }}
+                  color="gray.500"
+                  noOfLines={1}
+                >
                   {title}
                 </Text>
-                <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold" noOfLines={1}>
+                <Text fontSize={{ base: "20px", md: "24px" }} fontWeight="bold" noOfLines={1}>
                   {value}
                 </Text>
               </Box>
               <Icon as={icon} boxSize={{ base: 5, md: 6 }} color="gray.600" />
             </Flex>
-
-            {/* <Flex mt={2} align="center" flexWrap="wrap" gap={1}>
-              <Icon
-                as={change.direction === 'increase' ? ArrowUpRight : ArrowDownRight}
-                color={change.direction === 'increase' ? 'green.400' : 'red.400'}
-                boxSize={{ base: 3, md: 4 }}
-              />
-              <Badge
-                variant="subtle"
-                colorScheme={change.direction === 'increase' ? 'green' : 'red'}
-                fontSize={{ base: 'xs', md: 'sm' }}
-              >
-                {change.text}
-              </Badge>
-            </Flex> */}
           </Box>
         ))}
       </SimpleGrid>
     </Box>
-
   );
+
 };
 
 export default ChakraGithubStats;

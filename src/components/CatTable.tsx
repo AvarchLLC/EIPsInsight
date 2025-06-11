@@ -1214,6 +1214,7 @@ import {
 import React from "react";
 import { motion } from "framer-motion";
 import { FaRegClock } from "react-icons/fa";
+import DateTime from "./DateTime";
 
 interface EIP {
   _id: string;
@@ -1359,7 +1360,7 @@ const CatTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
           {/* Header + Download Button */}
           <Stack direction="row" justify="space-between" align="center" mb={4}>
             <Text fontSize="2xl" fontWeight="bold" color="blue.400">
-              {status}
+              {status} Recent Activity's
             </Text>
             <Button size="sm"
               bg="#40E0D0"
@@ -1465,6 +1466,9 @@ const CatTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
                 </Box>
               ))}
             </VStack>
+          </Box>
+          <Box overflowX={{ base: "auto", md: "visible" }} mt={6}>
+            <DateTime />
           </Box>
         </MotionBox>
       )}

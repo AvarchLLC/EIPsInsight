@@ -233,7 +233,7 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
     <>
       <Flex justifyContent="space-between" alignItems="center" mb="0.5rem" width="100%" flexWrap="wrap" gap={2}>
         <Heading size="md" color={headingColor}>
-          {category}
+          {category} Over Time
         </Heading>
 
         <Flex gap={2} alignItems="center" flexWrap="wrap">

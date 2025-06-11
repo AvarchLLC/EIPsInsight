@@ -1,19 +1,5 @@
 import AllLayout from "@/components/Layout";
-import {
-  Box,
-  Button,
-  Grid,
-  Text,
-  useColorModeValue,
-  IconButton,
-  Flex,
-  Collapse,
-  Heading,
-  useDisclosure,
-  Link as LI,
-  ButtonGroup,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, Grid, Text, useColorModeValue, IconButton, Flex, Collapse, Heading, useDisclosure, Link as LI, ButtonGroup, GridItem, Select, SimpleGrid, Link, useToast } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
 import React, { useEffect, useState } from "react";
@@ -36,7 +22,6 @@ import AreaStatus from "@/components/AreaStatus";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
 import NextLink from "next/link";
-import FeedbackWidget from "@/components/FeedbackWidget";
 import RipTable from "@/components/RipTable";
 import { useRouter } from "next/router";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
@@ -82,6 +67,7 @@ interface EIP3 {
   __v: number;
 }
 
+
 interface EIP2 {
   status: string;
   eips: {
@@ -122,14 +108,11 @@ interface Data {
 }
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
 
+
 const RIP = () => {
   const [data, setData] = useState<EIP[]>([]);
   const [data4, setData4] = useState<EIP[]>([]);
-  const [data2, setData2] = useState<APIResponse>({
-    eip: [],
-    erc: [],
-    rip: [],
-  });
+  const [data2, setData2] = useState<APIResponse>({ eip: [], erc: [], rip: [] });
   const [data3, setData3] = useState<Data>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [selected, setSelected] = useState<"status" | "type">("type");
@@ -179,7 +162,7 @@ const RIP = () => {
         const response = await fetch(`/api/new/all`);
         console.log(response);
         let jsonData = await response.json();
-        jsonData.rip?.forEach((item: EIP) => {
+        jsonData.rip.forEach((item: EIP) => {
           if (item.eip === "7859") {
             item.status = "Draft"; // Update the status
           }
@@ -196,6 +179,9 @@ const RIP = () => {
 
     fetchData();
   }, []);
+
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -251,358 +237,400 @@ const RIP = () => {
 
 
   return (
-    <>
-      <FeedbackWidget />
-      <AllLayout>
-        {isLoading ? ( // Check if the data is still loading
-          // Show loader if data is loading
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="100vh"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Your loader component */}
-              <LoaderComponent />
-            </motion.div>
-          </Box>
-        ) : (
+    <AllLayout>
+      {isLoading ? ( // Check if the data is still loading
+        // Show loader if data is loading
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+        >
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Box
-              paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}
-              marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-              paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-              marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+            {/* Your loader component */}
+            <LoaderComponent />
+          </motion.div>
+        </Box>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Box
+            ml="4rem"
+            mr="2rem"
+            mt="2rem"
+            mb="2rem"
+            px="1rem"
+          >
+
+            <Flex
+              direction={{ base: "column", md: "row" }} // Stack on smaller screens, horizontal on larger screens
+              justify="space-between"
+              align="center"
+              wrap="wrap" // Enable wrapping for responsiveness
+              gap={4} // Add spacing between wrapped elements
             >
-              <Flex
-                direction={{ base: "column", md: "row" }} // Stack on smaller screens, horizontal on larger screens
-                justify="space-between"
-                align="center"
-                wrap="wrap" // Enable wrapping for responsiveness
-                gap={4} // Add spacing between wrapped elements
-              >
-                {/* Header Section */}
-                <Header
-                  title={`Rollup Improvement Proposal - [ ${data?.length} ]`}
-                  subtitle="Overview"
-                  description="RIPs describe changes to the RIP process, or other non-optional changes."
-                />
-
-                {/* Toggle Buttons */}
-                <ButtonGroup size="md" isAttached>
-                  <Button
-                    colorScheme="blue"
-                    variant={selected === "type" ? "solid" : "outline"}
-                    onClick={() => setSelected("type")}
-                    flex="1" // Equal size buttons
-                  >
-                    Type
-                  </Button>
-                  <Button
-                    colorScheme="blue"
-                    variant={selected === "status" ? "solid" : "outline"}
-                    onClick={() => setSelected("status")}
-                    flex="1" // Equal size buttons
-                  >
-                    Status
-                  </Button>
-                </ButtonGroup>
-              </Flex>
-              <br />
-              <Box
-                pl={4}
-                mt={1}
-                bg={useColorModeValue("blue.50", "gray.700")}
-                borderRadius="md"
-                pr="8px"
-                // marginBottom={2}
-              >
-                <Flex justify="space-between" align="center">
-                  <Heading
-                    as="h3"
-                    size="lg"
-                    marginBottom={2}
-                    mt={1}
-                    color={useColorModeValue("#3182CE", "blue.300")}
-                  >
-                    RIPs FAQ
-                  </Heading>
-                  <Box
-                    bg="blue" // Gray background
-                    borderRadius="md" // Rounded corners
-                    padding={2} // Padding inside the box
-                  >
-                    <IconButton
-                      onClick={toggleCollapse}
-                      icon={
-                        show ? (
-                          <ChevronUpIcon boxSize={8} color="white" />
-                        ) : (
-                          <ChevronDownIcon boxSize={8} color="white" />
-                        )
-                      }
-                      variant="ghost"
-                      mt={1}
-                      h="24px" // Smaller height
-                      w="20px"
-                      aria-label="Toggle Instructions"
-                      _hover={{ bg: "blue" }} // Maintain background color on hover
-                      _active={{ bg: "blue" }} // Maintain background color when active
-                      _focus={{ boxShadow: "none" }} // Remove focus outline
-                    />
-                  </Box>
-                </Flex>
-
-                <Collapse in={show}>
-                  <Heading
-                    as="h4"
-                    size="md"
-                    marginBottom={4}
-                    color={useColorModeValue("#3182CE", "blue.300")}
-                  >
-                    What is a Rollup Improvement Proposal (RIP)?
-                  </Heading>
-                  <Text
-                    fontSize="md"
-                    marginBottom={2}
-                    color={useColorModeValue("gray.800", "gray.200")}
-                    className="text-justify"
-                  >
-                    A Rollup Improvement Proposal (RIP) is a formal document
-                    that outlines new features, processes, or optimizations for
-                    rollup solutions in the Ethereum ecosystem. RIPs act as
-                    specifications to improve rollups, enhance interoperability,
-                    and standardize development processes. All RIPs are
-                    optional. RIPs are and will always remain optional standards
-                    for Rollups and participants in the larger EVM ecosystem.
-                  </Text>
-                  {/* <br/> */}
-                  <Heading
-                    as="h4"
-                    size="md"
-                    marginBottom={4}
-                    color={useColorModeValue("#3182CE", "blue.300")}
-                  >
-                    Why are RIPs Important?
-                  </Heading>
-                  <Text
-                    fontSize="md"
-                    marginBottom={2}
-                    color={useColorModeValue("gray.800", "gray.200")}
-                    className="text-justify"
-                  >
-                    A Rollup Improvement Proposal (RIP) is a formal document
-                    that outlines new features, processes, or optimizations for
-                    rollup solutions in the Ethereum ecosystem. RIPs act as
-                    specifications to improve rollups, enhance interoperability,
-                    and standardize development processes. All RIPs are
-                    optional. RIPs are and will always remain optional standards
-                    for Rollups and participants in the larger EVM ecosystem.
-                  </Text>
-                  {/* <br/> */}
-                  <Text
-                    fontSize="md"
-                    className="text-md text-justify"
-                    mt={4}
-                    textAlign="justify"
-                  >
-                    RIPs help coordinate technical improvements for rollups in a
-                    transparent, collaborative way. They:
-                  </Text>
-                  <ul className="list-disc list-inside space-y-2 text-md text-justify">
-                    <li>Propose new features and optimizations.</li>
-                    <li>
-                      Collect community feedback on rollup-related issues.
-                    </li>
-                    <li>Serve as a historical record of design decisions.</li>
-                    <li>
-                      Help rollups track progress, especially for multi-client
-                      implementations.
-                    </li>
-                  </ul>
-
-                  <Box mt={2}>
-                    <LI
+              {/* Header Section */}
+              <Header
+                title={`Rollup Improvement Proposal - [ ${data.length} ]`}
+                subtitle={
+                  <Flex align="center" gap={2} flexWrap="wrap">
+                    <Text>
+                      A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem.
+                    </Text>
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      variant="link"
+                      as={Link}
                       href="/FAQs/RIP"
-                      fontSize="md"
-                      color="blue.500"
-                      fontWeight="semibold"
-                      _hover={{ textDecoration: "underline" }}
                     >
-                      Continue Reading {">>"}
-                    </LI>
-                  </Box>
-                  <br />
-                </Collapse>
+                      Learn More
+                    </Button>
+                  </Flex>
+                }
+                description={
+                  <Text>
+                    Explore the latest Rollup Improvement Proposals (RIPs) and their impact on the Ethereum rollup ecosystem.
+                  </Text>
+                }
+              />
+
+              {/* OtherBox Full Width */}
+              <Box id="githubstats">
+                <OtherBox type="RIPs" />
               </Box>
 
-              <Box
-                display={{ base: "block", md: "block", lg: "none" }}
-                className="w-full pt-4"
-              >
-                <SearchBox />
-              </Box>
+              {/* Toggle Buttons */}
+              <ButtonGroup size="md" isAttached>
+                <Button
+                  bg={selected === "type" ? "#40E0D0" : "white"}
+                  color={selected === "type" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
+                  onClick={() => {
+                    setSelected("type");
+                    router.push("?view=type", undefined, { shallow: true });
+                  }}
+                >
+                  Category
+                </Button>
+                <Button
+                  bg={selected === "status" ? "#40E0D0" : "white"}
+                  color={selected === "status" ? "white" : "#40E0D0"}
+                  borderColor="#40E0D0"
+                  variant="outline"
+                  onClick={() => {
+                    setSelected("status");
+                    router.push("?view=status", undefined, { shallow: true });
+                  }}
+                >
+                  Status
+                </Button>
+              </ButtonGroup>
 
-              <Box
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-8 gap-5"
-                id="GitHub Stats – RIPs"
-              >
-                <Box>
-                  {selected === "status" ? (
-                    <RIPStatusDonut />
-                  ) : (
-                    <RIPTypeDonut />
-                  )}
+            </Flex>
+            <br />
+            <Box
+              pl={4}
+              mt={1}
+              bg={useColorModeValue("blue.50", "gray.700")}
+              borderRadius="md"
+              pr="8px"
+            // marginBottom={2}
+            >
+              <Flex justify="space-between" align="center">
+                <Heading
+                  as="h3"
+                  size="lg"
+                  marginBottom={2}
+                  mt={1}
+                  color={useColorModeValue("#3182CE", "blue.300")}
+                >
+                  RIPs FAQ
+                </Heading>
+                <Box
+                  bg="blue" // Gray background
+                  borderRadius="md" // Rounded corners
+                  padding={2} // Padding inside the box
+                >
+                  <IconButton
+                    onClick={toggleCollapse}
+                    icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
+                    variant="ghost"
+                    mt={1}
+                    h="24px" // Smaller height
+                    w="20px"
+                    aria-label="Toggle Instructions"
+                    _hover={{ bg: 'blue' }} // Maintain background color on hover
+                    _active={{ bg: 'blue' }} // Maintain background color when active
+                    _focus={{ boxShadow: 'none' }} // Remove focus outline
+
+                  />
                 </Box>
-                <Box>
+
+
+              </Flex>
+
+              <Collapse in={show}>
+                <Heading
+                  as="h4"
+                  size="md"
+                  marginBottom={4}
+                  color={useColorModeValue("#3182CE", "blue.300")}
+                >
+                  What is a Rollup Improvement Proposal (RIP)?
+                </Heading>
+                <Text
+                  fontSize="md"
+                  marginBottom={2}
+                  color={useColorModeValue("gray.800", "gray.200")}
+                  className="text-justify"
+                >
+                  A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem. RIPs act as specifications to improve rollups, enhance interoperability, and standardize development processes.
+
+                  All RIPs are optional. RIPs are and will always remain optional standards for Rollups and participants in the larger EVM ecosystem.</Text>
+                {/* <br/> */}
+                <Heading
+                  as="h4"
+                  size="md"
+                  marginBottom={4}
+                  color={useColorModeValue("#3182CE", "blue.300")}
+                >
+                  Why are RIPs Important?
+                </Heading>
+                <Text
+                  fontSize="md"
+                  marginBottom={2}
+                  color={useColorModeValue("gray.800", "gray.200")}
+                  className="text-justify"
+                >
+                  A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem. RIPs act as specifications to improve rollups, enhance interoperability, and standardize development processes.
+
+                  All RIPs are optional. RIPs are and will always remain optional standards for Rollups and participants in the larger EVM ecosystem.</Text>
+                {/* <br/> */}
+                <Text fontSize="md" className="text-md text-left text-justify" mt={4} textAlign="justify">
+                  RIPs help coordinate technical improvements for rollups in a transparent, collaborative way. They:
+                </Text>
+                <ul className="list-disc list-inside space-y-2 text-md text-left text-justify">
+                  <li>Propose new features and optimizations.</li>
+                  <li>Collect community feedback on rollup-related issues.</li>
+                  <li>Serve as a historical record of design decisions.</li>
+                  <li>Help rollups track progress, especially for multi-client implementations.</li>
+                </ul>
+
+                <Box mt={2}>
+                  <LI
+                    href="/FAQs/RIP"
+                    fontSize="md"
+                    color="blue.500"
+                    fontWeight="semibold"
+                    _hover={{ textDecoration: 'underline' }}
+                  >
+                    Continue Reading {'>>'}
+                  </LI>
+                </Box>
+                <br />
+              </Collapse>
+
+            </Box>
+
+            <Box display={{ base: "block", md: "block", lg: "none" }} className="w-full pt-4">
+              <SearchBox />
+            </Box>
+
+            <Box className="w-full flex flex-col gap-5 pt-8" id="graphs">
+              <Box id="charts" className="w-full overflow-hidden">
+                <Box display="flex" justifyContent="space-between" alignItems="center" px={4} pb={2}>
+                  <Text fontSize="xl" fontWeight="bold">
+                    {selected === "status" ? "Status Chart" : "Type Chart"}
+                  </Text>
+                  <Button
+                    onClick={handleCopyOverviewChart}
+                    size="sm"
+                    leftIcon={<CopyIcon />}
+                    colorScheme="blue"
+                    variant="ghost"
+                  >
+                    Copy Link
+                  </Button>
+                </Box>
+                <Box className="w-full h-full">
                   {selected === "status" ? (
                     <AllChart3 type="RIP" />
                   ) : (
                     <AllChart type="RIP" />
                   )}
                 </Box>
-                <Box className="h-fit">
-                  <OtherBox type="RIPs" />
-                </Box>
               </Box>
 
-              {/* <Box paddingTop={8}>
-          {selected === "status" ? (
-           <></>
-          ) : (
-            <RIPStatusGraph />
-          )}
-    </Box> */}
-              <br />
+              {/* Donut Chart - Full Width on Top */}
+              <Box className="w-full  overflow-hidden">
+                <Box className="w-full h-full">
+                  {selected === "status" ? (
+                    <RIPStatusDonut />
+                  ) : (
+                    <RIPTypeDonut />
+                  )}
+                </Box>
+              </Box>
+            </Box>
 
-              {selected === "status" && (
-                <Box paddingY="8">
-                  <Text
-                    id="draftvsfinal"
-                    fontSize="3xl"
-                    fontWeight="bold"
-                    color="#A020F0"
-                  >
-                    Draft vs Final (Over the Years)
-                  </Text>
+
+
+            {selected === "status" && (
+              <Box paddingBottom={{ lg: "5", md: "5", sm: "5", base: "5" }} w="full">
+                {/* Draft vs Final Chart */}
+                <Box paddingY="8" id="draftvsfinal">
+                  <Flex justify="space-between" align="center" mb={4}>
+                    <Text
+                      fontSize={{ base: "32px", sm: "32px", md: "34px", lg: "36px" }}
+                      fontWeight="bold"
+                      color="#40E0D0"
+                    >
+                      Draft vs Final (Over the Years)
+                    </Text>
+                    <Button
+                      onClick={handleCopyAreaChart}
+                      size="sm"
+                      leftIcon={<CopyIcon />}
+                      colorScheme="blue"
+                      variant="ghost"
+                    >
+                      Copy Link
+                    </Button>
+                  </Flex>
                   <AreaStatus type="RIPs" />
                 </Box>
-              )}
 
-              {["Draft", "Living", "Final"]?.map((status) => (
-                <Box
-                  key={status}
-                  className={"group relative flex flex-col gap-3"}
-                  paddingBottom={8}
-                  id="draft"
-                >
-                  {/* Label Section aligned to the left */}
-                  <Box className={"flex gap-3"}>
-                    <Text
-                      id={`${status.toLowerCase().replace(/\s+/g, "")}`}
-                      fontSize="3xl"
-                      fontWeight="bold"
-                      color="#30A0E0"
+                {/* Status Selection and Content */}
+                <Box w="100%" px={0} py={6} id="statuses" maxW="100%" mx="auto">
+                  <Heading
+                    fontSize={{ base: "32px", md: "34px", lg: "36px" }}
+                    fontWeight="bold"
+                    color="#40E0D0"
+                    mb={4}
+                  >
+                    Select Status to View RIP Dashboard
+                  </Heading>
+
+                  <Flex
+                    mb={4}
+                    gap={4}
+                    wrap="wrap"
+                    direction={{ base: "column", sm: "row" }}
+                    align={{ base: "stretch", sm: "center" }}
+                  >
+                    <Select
+                      maxW={{ base: "100%", sm: "320px" }}
+                      value={selectedStatusInner}
+                      onChange={(e) => setSelectedStatusInner(e.target.value)}
+                      borderColor="blue.400"
+                      _hover={{ borderColor: "blue.500" }}
+                      focusBorderColor="blue.500"
                     >
-                      {status} -{" "}
-                      <NextLink href={`/tableStatus/rip/${status}`}>
-                        [
-                        {data?.filter((item) => item.status === status)?.length}
-                        ]
-                      </NextLink>
-                    </Text>
-                    <p className={"text-red-700"}>*</p>
-                    <p className={"hidden group-hover:block text-lg"}>
-                      Count as on date
-                    </p>
-                  </Box>
+                      {["Draft", "Living", "Final"].map((status) => (
+                        <option key={status} value={status}>
+                          {status} ({data.filter((item) => item.status === status).length})
+                        </option>
+                      ))}
+                    </Select>
 
-                  {/* Scrollable Charts Grid */}
-                  <Box overflowX="auto">
-                    <Grid
-                      templateColumns={{
-                        base: "1fr",
-                        sm: "1fr",
-                        lg: "repeat(2, 1fr)",
-                      }}
-                      gap={6}
+                    <Button
+                      onClick={handleCopyStatusDetail}
+                      size="sm"
+                      leftIcon={<CopyIcon />}
+                      colorScheme="blue"
+                      variant="ghost"
+                    >
+                      Copy Link
+                    </Button>
+                  </Flex>
+
+                  <Flex
+                    direction={{ base: "column", md: "row" }}
+                    gap={6}
+                    w="100%"
+                    wrap="wrap"
+                  >
+                    {/* Status Chart */}
+                    <Box
+                      flex={1}
+                      bg="gray.50"
+                      p={{ base: 2, md: 4 }}
+                      borderRadius="xl"
+                      overflowX="auto"
                     >
                       <StackedColumnChart
-                        type={"RIPs"}
-                        status={status}
+                        type="RIPs"
+                        status={selectedStatusInner}
                         dataset={data2}
                       />
-                      <CBoxStatus
-                        status={status}
-                        type={"RIPs"}
-                        dataset={data3}
+                    </Box>
+
+                    {/* Status Table */}
+                    <Box
+                      flex={1}
+                      bg="gray.50"
+                      p={{ base: 2, md: 4 }}
+                      borderRadius="xl"
+                      overflowX="auto"
+                    >
+                      <CatTable
+                        dataset={data4}
+                        cat="All"
+                        status={selectedStatusInner}
                       />
-                    </Grid>
-                  </Box>
+                    </Box>
+                  </Flex>
                 </Box>
-              ))}
-              {selected === "status" ? (
-                <>
-                  <CatTable dataset={data4} cat="All" status="Draft" />
-                  <CatTable dataset={data4} cat="All" status="Final" />
-                  <CatTable dataset={data4} cat="All" status="Review" />
-                  <CatTable dataset={data4} cat="All" status="Last Call" />
-                  <CatTable dataset={data4} cat="All" status="Living" />
-                  <CatTable dataset={data4} cat="All" status="Withdrawn" />
-                  <CatTable dataset={data4} cat="All" status="Stagnant" />
-                </>
-              ) : (
-                <>
-                  {[
-                    "Meta",
-                    "Informational",
-                    "Core",
-                    "Networking",
-                    "Interface",
-                    "RIP",
-                    "RRC",
-                  ]?.map((status) => (
-                    <div key={status} id={`${status.toLowerCase()}`}>
-                      <CatTable2 dataset={data4} cat="All" status={status} />
-                    </div>
-                  ))}
-                </>
-              )}
-              <Box
-                bg={useColorModeValue("blue.50", "gray.700")} // Background color for the box
-                color="black" // Text color
-                borderRadius="md" // Rounded corners
-                padding={4} // Padding inside the box
-                marginTop={4} // Margin above the box
-              >
-                <Text>
-                  Also checkout{" "}
-                  <LI href="/eip" color="blue" isExternal>
-                    EIPs
-                  </LI>{" "}
-                  and{" "}
-                  <LI href="/erc" color="blue" isExternal>
-                    ERCs
-                  </LI>
-                  .
-                </Text>
               </Box>
-              {/* </Box> */}
+            )}
+
+          </Box>
+
+          <Box
+            ml="4rem"
+            mr="2rem"
+            mb="2rem"
+          >
+
+            <Box className="w-full mt-6" id="status-tables">
+              <RipTable dataset={data4} cat="All" status="All" />
             </Box>
-          </motion.div>
-        )}
-      </AllLayout>
-    </>
+
+            <Box
+              bg={useColorModeValue("blue.50", "gray.700")}
+              color="black"
+              borderRadius="md"
+              padding={4}
+              marginTop={4}
+            >
+              <Text>
+                Also checkout{' '}
+                <LI href="/eip" color="blue" isExternal>
+                  EIPs
+                </LI>{' '}
+                and{' '}
+                <LI href="/erc" color="blue" isExternal>
+                  ERCs
+                </LI>.
+              </Text>
+            </Box>
+            {/* </Box> */}
+
+          </Box>
+        </motion.div>
+
+      )}
+    </AllLayout>
   );
 };
 
