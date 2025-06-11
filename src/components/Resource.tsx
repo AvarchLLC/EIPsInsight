@@ -53,7 +53,7 @@ const Resource = () => {
       marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
       className="flex flex-col space-x-6"
     >
-      <Header title="Resources" subtitle="" />
+      <Header title="Resources" subtitle="" description="" />
 
       <Box className="grid grid-cols-1 md:grid-cols-3 gap-x-8">
   <Box

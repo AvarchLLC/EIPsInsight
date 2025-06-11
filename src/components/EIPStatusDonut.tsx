@@ -548,7 +548,7 @@ const EIPStatusDonut = () => {
     "rgb(255, 99, 255)", // Draft
     "rgb(54, 162, 235)", // Review
     "rgb(153, 102, 255)", // Last Call
-     "rgb(255, 99, 132)", // Living
+    "rgb(255, 99, 132)", // Living
     "rgb(255, 205, 86)", // Stagnant
     "rgb(75, 192, 192)", // Withdrawn
   ];
@@ -669,7 +669,7 @@ const EIPStatusDonut = () => {
             <Spinner size="xl" />
           </Flex>
         ) : (
-          <SimpleGrid minChildWidth="220px" spacing={6}>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 4 }} spacing={6}>
             {chartData.map(({ status, count, percent, description, color }) => (
               <Box
                 key={status}
@@ -682,16 +682,16 @@ const EIPStatusDonut = () => {
                 transition="all 0.3s ease"
                 _hover={{ borderColor: color, boxShadow: "2xl" }}
               >
-                <Text fontSize="sm" color={color} fontWeight="semibold" mb={1}>
+                <Text fontSize={{ base: "24px", sm: "24px", md: "26px", lg: "28px" }} color={color} fontWeight="semibold" mb={1}>
                   {status}
                 </Text>
-                <Text fontSize="3xl" fontWeight="extrabold" color={textColor}>
+                <Text fontSize={{ base: "20px", sm: "20px", md: "22px", lg: "24px" }} fontWeight="extrabold" color={textColor}>
                   {count}{" "}
-                  <Text as="span" fontSize="md">
+                  <Text as="span" fontSize={{ base: "18px", sm: "18px", md: "20px", lg: "22px" }}>
                     ({percent}%)
                   </Text>
                 </Text>
-                <Text fontSize="sm" mt={2} color="gray.500">
+                <Text fontSize={{ base: "16px", sm: "16px", md: "18px", lg: "20px" }} mt={2} color="gray.500">
                   {description}
                 </Text>
               </Box>

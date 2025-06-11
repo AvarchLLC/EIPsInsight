@@ -114,7 +114,11 @@ const EmptyInsight = () => {
           paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
           marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
-          <Header title={getMonthName(Number(month))} subtitle={year} />
+          <Header
+            title={getMonthName(Number(month))}
+            subtitle={year}
+            description={""}
+          />
 
           <Box paddingY={8}>
             <p className={"text-2xl"}>

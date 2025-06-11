@@ -1,6 +1,6 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
-import Header from "@/components/Header";
+// import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
@@ -8,7 +8,7 @@ import TypeGraphs from "@/components/TypeGraphs";
 import TypeGraphs3 from "@/components/TypeGraphs3";
 import SearchBox from "@/components/SearchBox";
 import { useRouter } from "next/router";
-import { CopyIcon } from "@chakra-ui/icons"; // or any icon
+import { CopyIcon } from "@chakra-ui/icons";
 import {
   Box,
   Grid,
@@ -117,6 +117,9 @@ import OtherBox from "@/components/OtherStats";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+import Header from "@/components/Header";
+import { SubscribeForm } from '@/components/SubscriptionForm';
+
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
@@ -139,26 +142,26 @@ const Type = () => {
   const basePath = typeof window !== "undefined" ? window.location.origin : "";
   const toast = useToast();
   useScrollSpy([
-  "graphs",
-  "draftvsfinal",
-  "core",
-  "networking",
-  "interface",
-  "meta",
-  "informational",
-  "draft",
-  "review",
-  "lastcall",
-  "final",
-  "stagnant",
-  "withdrawn",
-  "living",
-  "metatable",
-  "informationaltable",
-  "coretable",
-  "networkingtable",
-  "interfacetable",
-]);
+    "graphs",
+    "draftvsfinal",
+    "core",
+    "networking",
+    "interface",
+    "meta",
+    "informational",
+    "draft",
+    "review",
+    "lastcall",
+    "final",
+    "stagnant",
+    "withdrawn",
+    "living",
+    "metatable",
+    "informationaltable",
+    "coretable",
+    "networkingtable",
+    "interfacetable",
+  ]);
 
 
   const handleCopyOverviewChart = () => {
@@ -309,11 +312,13 @@ const Type = () => {
           transition={{ duration: 0.5 }}
         >
           <Box
-            paddingBottom={{ lg: "10", md: "10", sm: "10", base: "10" }}
-            marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-            paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-            marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+            ml="4rem"
+            mr="2rem"
+            mt="2rem"
+            mb="2rem"
+            px="1rem"
           >
+
             <Flex
               direction={{ base: "column", md: "row" }}
               justify="space-between"
@@ -323,7 +328,8 @@ const Type = () => {
             >
               <Header
                 title={`Ethereum Improvement Proposal - [${data.length}]`}
-                subtitle={
+                subtitle={"Overview"}
+                description={
                   <Flex align="center" gap={2} flexWrap="wrap">
                     <Text>
                       EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature
@@ -340,10 +346,15 @@ const Type = () => {
                   </Flex>
                 }
               />
+              {/* <Box mt={4}>
+                <SubscribeForm type="eips" id="all" filter="all" />
+              </Box> */}
 
-              <Box className="w-full mt-6" id="githubstats">
+
+              <Box id="githubstats">
                 <OtherBox type="EIPs" />
               </Box>
+
               <ButtonGroup size="md" isAttached>
                 <Button
                   bg={selected === "type" ? "#40E0D0" : "white"}
@@ -355,7 +366,7 @@ const Type = () => {
                     router.push("?view=type", undefined, { shallow: true });
                   }}
                 >
-                  Type
+                  Category
                 </Button>
                 <Button
                   bg={selected === "status" ? "#40E0D0" : "white"}
@@ -371,15 +382,17 @@ const Type = () => {
                 </Button>
               </ButtonGroup>
             </Flex>
+
+
             <Box display={{ base: "block", md: "block", lg: "none" }} className={"w-full pt-10"}>
               <SearchBox />
             </Box>
 
-            <Box className="w-full flex flex-col gap-5 pt-8" id="graphs">
+            <Box className="w-full flex flex-col gap-5 pt-8" id="chart type">
               <Box id="charts" className="w-full overflow-hidden">
                 <Box display="flex" justifyContent="space-between" alignItems="center" px={4} pb={2}>
-                  <Text fontSize="xl" fontWeight="bold">
-                    {selected === "status" ? "Status Chart" : "Type Chart"}
+                  <Text fontSize={{ base: "32px", sm: "32px", md: "34px", lg: "36px" }} fontWeight="bold">
+                    {selected === "status" ? "Distribution over the year(Based on status)" : "Distribution over the year(Based on category)"}
                   </Text>
                   <Button
                     onClick={handleCopyOverviewChart}
@@ -411,15 +424,29 @@ const Type = () => {
               </Box>
             </Box>
 
-            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="categories">
+            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="View EIP Stats">
               {selected === "type" && (
                 <>
-                  <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="#40E0D0">
-                    Select Category or Type to View EIP Stats
-                  </Text>
-                  <Box display="flex" justifyContent="center" my={4}>
+                  <Heading
+                    fontSize={{ base: "32px", sm: "34px", md: "36px" }}
+                    fontWeight="bold"
+                    color="#40E0D0"
+                    mb={4}
+                  >
+                    Select Category to View EIP Dashboard
+                    <Button
+                      onClick={handleCopyTypeDetail}
+                      size="md"
+                      leftIcon={<CopyIcon />}
+                      colorScheme="blue"
+                      variant="ghost"
+                      ml={2}
+                    />
+                  </Heading>
+
+                  <Flex mb={4} gap={4} wrap="wrap">
                     <Select
-                      maxW="320px"
+                      maxW={{ base: "100%", md: "320px" }}  // Responsive width
                       value={selectedInner}
                       onChange={(e) => setSelectedInner(e.target.value)}
                       borderColor="blue.400"
@@ -432,69 +459,46 @@ const Type = () => {
                         </option>
                       ))}
                     </Select>
-                  </Box>
+                  </Flex>
 
-                  {/* Copy button for TypeGraphs + CatTable2 section */}
-                  <Box display="flex" justifyContent="center" mb={4}>
-                    <Button
-                      onClick={handleCopyTypeDetail}
-                      size="sm"
-                      leftIcon={<CopyIcon />}
-                      colorScheme="blue"
-                      variant="ghost"
+                  <Flex
+                    direction={{ base: "column", md: "row" }}
+                    gap={6}
+                    w="full"
+                  >
+                    {/* Removed minW="0" from both boxes */}
+                    <Box
+                      flex={1}
+                      bg="gray.50"
+                      p={{ base: 2, md: 4 }}  // Responsive padding
+                      borderRadius="xl"
+                      overflowX="auto"  // Allow horizontal scrolling
                     >
-                      Copy Link
-                    </Button>
-                  </Box>
+                      <TypeGraphs selected={selectedInner} />
+                    </Box>
+
+                    <Box
+                      flex={1}
+                      bg="gray.50"
+                      p={{ base: 2, md: 4 }}   // Responsive padding
+                      borderRadius="xl"
+                      overflowX="auto"   // Allow horizontal scrolling
+                    >
+                      <CatTable2 dataset={data4} cat="All" status={selectedInner} />
+                    </Box>
+                  </Flex>
                 </>
               )}
-
-              <Box pt={12}>
-                {selected !== "status" && (
-                  <SimpleGrid
-                    columns={{ base: 1, md: 3 }}
-                    spacing={6}
-                    pt={12}
-                    alignItems="stretch"
-                    id="type-graphs"
-                  >
-                    <GridItem colSpan={{ base: 1, md: 2 }}>
-                      <Box
-                        minH="100%"
-                        h="full"
-                        display="flex"
-                        flexDirection="column"
-                        borderRadius="xl"
-                        bg="gray.50"
-                        p={4}
-                      >
-                        <TypeGraphs selected={selectedInner} />
-                      </Box>
-                    </GridItem>
-                    <GridItem colSpan={{ base: 1, md: 1 }}>
-                      <Box
-                        minH="100%"
-                        h="full"
-                        display="flex"
-                        flexDirection="column"
-                        borderRadius="xl"
-                        bg="gray.50"
-                        p={4}
-                      >
-                        <CatTable2 dataset={data4} cat="All" status={selectedInner} />
-                      </Box>
-                    </GridItem>
-                  </SimpleGrid>
-                )}
-              </Box>
             </Box>
+
+
 
             <Box paddingBottom={{ lg: "5", md: "5", sm: "5", base: "5" }} >
               {selected === "status" && (
                 <>
                   <Box paddingY="8">
                     <Flex justify="space-between" align="center" mb={4} id="draftvsfinal">
-                      <Text fontSize="3xl" fontWeight="bold" color="#40E0D0">
+                      <Text fontSize={{ base: "32px", sm: "32px", md: "34px", lg: "36px" }} fontWeight="bold" color="#40E0D0">
                         Draft vs Final (Over the Years)
                       </Text>
                       <Button
@@ -510,30 +514,38 @@ const Type = () => {
                     <AreaStatus type="EIPs" />
                   </Box>
 
-                  <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="statuses">
-                    <Text fontSize="2xl" fontWeight="bold" textAlign="center" color="#40E0D0">
-                      EIP Status Dashboard
-                    </Text>
+                  <Box w="100%" px={0} py={6} id="statuses" maxW="100%" mx="auto">
+                    <Heading
+                      fontSize={{ base: "32px", md: "34px", lg: "36px" }}
+                      fontWeight="bold"
+                      color="#40E0D0"
+                      mb={4}
+                    >
+                      Select Status to View EIP Dashboard
+                    </Heading>
 
-                    <Box display="flex" justifyContent="center" my={4}>
+                    <Flex
+                      mb={4}
+                      gap={4}
+                      wrap="wrap"
+                      direction={{ base: "column", sm: "row" }}
+                      align={{ base: "stretch", sm: "center" }}
+                    >
                       <Select
-                        maxW="320px"
+                        maxW={{ base: "100%", sm: "320px" }}
                         value={selectedStatusInner}
                         onChange={(e) => setSelectedStatusInner(e.target.value)}
                         borderColor="blue.400"
                         _hover={{ borderColor: "blue.500" }}
                         focusBorderColor="blue.500"
                       >
-                        {["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"].map((status) => (
+                        {Status_OPTIONS.map((status) => (
                           <option key={status} value={status}>
                             {status} ({data.filter((item) => item.status === status).length})
                           </option>
                         ))}
                       </Select>
-                    </Box>
 
-                    {/* Copy button for StackedColumnChart + CatTable section */}
-                    <Box display="flex" justifyContent="center" mb={4}>
                       <Button
                         onClick={handleCopyStatusDetail}
                         size="sm"
@@ -543,50 +555,42 @@ const Type = () => {
                       >
                         Copy Link
                       </Button>
-                    </Box>
+                    </Flex>
 
-                    <SimpleGrid
-                      columns={{ base: 1, md: 3 }}
-                      spacing={6}
-                      alignItems="stretch"
-                      width="100%"
+                    <Flex
+                      direction={{ base: "column", md: "row" }}
+                      gap={6}
+                      w="100%"
+                      wrap="wrap"
                     >
-                      <GridItem colSpan={{ base: 1, md: 2 }}>
-                        <Box
-                          w="100%"
-                          h="full"
-                          display="flex"
-                          flexDirection="column"
-                          borderRadius="xl"
-                          bg="gray.50"
-                          p={4}
-                        >
-                          <StackedColumnChart
-                            status={selectedStatusInner}
-                            type="EIPs"
-                            dataset={data2}
-                          />
-                        </Box>
-                      </GridItem>
+                      <Box
+                        flex={1}
+                        bg="gray.50"
+                        p={{ base: 2, md: 4 }}
+                        borderRadius="xl"
+                        overflowX="auto"
+                      >
+                        <StackedColumnChart
+                          status={selectedStatusInner}
+                          type="EIPs"
+                          dataset={data2}
+                        />
+                      </Box>
 
-                      <GridItem colSpan={{ base: 1, md: 1 }}>
-                        <Box
-                          h="full"
-                          display="flex"
-                          flexDirection="column"
-                          borderRadius="xl"
-                          bg="gray.50"
-                          p={4}
-                          width="100%"
-                        >
-                          <CatTable
-                            dataset={data4}
-                            cat="All"
-                            status={selectedStatusInner}
-                          />
-                        </Box>
-                      </GridItem>
-                    </SimpleGrid>
+                      <Box
+                        flex={1}
+                        bg="gray.50"
+                        p={{ base: 2, md: 4 }}
+                        borderRadius="xl"
+                        overflowX="auto"
+                      >
+                        <CatTable
+                          dataset={data4}
+                          cat="All"
+                          status={selectedStatusInner}
+                        />
+                      </Box>
+                    </Flex>
                   </Box>
                 </>
               )}
@@ -595,10 +599,11 @@ const Type = () => {
           </Box>
 
           <Box
-            paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-            marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-            paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
+            ml="4rem"
+            mr="2rem"
+            mb="2rem"
           >
+
             <Box className="w-full mt-6" id="tables">
               <EipTable dataset={data4} cat="All" status="All" />
             </Box>

@@ -1074,7 +1074,7 @@ const All = () => {
   const [selected, setSelected] = useState("Meta");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
-  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka'>('pectra');
+  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka'>('fusaka');
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
   // const selectedOption = selectedUpgrade;       // just alias so rest of code works
   // const setSelectedOption = setSelectedUpgrade;
@@ -1539,14 +1539,14 @@ const All = () => {
   const currentPosts = selectedOption === 'pectra' ? PectraPosts : FusakaPosts;
   const currentData = selectedOption === 'pectra' ? pectraData : fusakaData;
   const upgradeName = selectedOption === 'pectra' ? 'Pectra' : 'Fusaka';
-  
+
   useScrollSpy([
-  "pectra",
-  "NetworkUpgradesChartp",
-  "NetworkUpgrades",
-  "AuthorContributions",
-  "pectra-table",
-]);
+    "pectra",
+    "NetworkUpgradesChartp",
+    "NetworkUpgrades",
+    "AuthorContributions",
+    "pectra-table",
+  ]);
 
   useLayoutEffect(() => {
     router.events.on("routeChangeComplete", scrollToHash);
@@ -1565,10 +1565,11 @@ const All = () => {
           transition={{ duration: 0.8 }}
         >
           <Box
-            paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-            marginX={{ lg: "20", md: "2", sm: "2", base: "2" }}
-            paddingX={{ lg: "5", md: "5", sm: "5", base: "5" }}
-            marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+            ml="4rem"
+            mr="2rem"
+            mt="2rem"
+            mb="2rem"
+            px="1rem"
           >
             <Box>
               <Text
@@ -1588,7 +1589,7 @@ const All = () => {
               <Box mt={4} mb={4}>
                 <select
                   value={selectedOption}
-                  onChange={(e) => setSelectedOption(e.target.value as 'pectra' | 'fusaka')}
+                  onChange={(e) => setSelectedOption(e.target.value as 'fusaka' | 'pectra')}
                   style={{
                     padding: '10px',
                     fontSize: '20px',
@@ -1596,205 +1597,204 @@ const All = () => {
                     border: '1px solid gray',
                   }}
                 >
-                <option value="pectra">Pectra</option>
-                <option value="fusaka">Fusaka</option>
-              </select>
-            </Box>
+                  <option value="fusaka">Fusaka</option>
 
-            <Box id="NetworkUpgrades" mt={2}>
-              <UpgradesTimeline
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-                pectraData={pectraData}
-                fusakaData={fusakaData}
-              />
-            </Box>
+                  <option value="pectra">Pectra</option>
+                </select>
+              </Box>
 
-            <Flex
-              direction={{ base: "column", md: "row" }}
-              align="flex-start"
-              gap={{ base: 4, md: 6 }}
-              width="100%"
-              justify="space-between"
-              wrap="wrap"
-            >
-              <Text
-                flex={{ base: "1 1 auto", md: "3" }}
-                fontSize={{ base: "md", md: "lg", lg: "2xl" }}
-                textAlign="justify"
-                lineHeight="1.6"
+              <Box id="NetworkUpgrades" mt={2}>
+                <UpgradesTimeline
+                  selectedOption={selectedOption}
+                  setSelectedOption={setSelectedOption}
+                  pectraData={pectraData}
+                  fusakaData={fusakaData}
+                />
+              </Box>
+
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                align="flex-start"
+                gap={{ base: 4, md: 6 }}
+                width="100%"
+                justify="space-between"
+                wrap="wrap"
               >
-                {selectedOption === 'pectra' ? (
-                  <>
-                    Ethereum developers are moving toward the next major network upgrade, Prague and Electra,
-                    collectively known as{" "}
-                    <NLink href="https://eipsinsight.com/eips/eip-7600">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Pectra
-                      </Text>
-                    </NLink>. This upgrade will involve significant changes to both the{" "}
-                    <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Execution and Consensus layers
-                      </Text>
-                    </NLink>{" "}
-                    on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
-                    <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Ethereum Improvement Proposals (EIPs)
-                      </Text>
-                    </NLink>,
-                    the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have
-                    now been shifted to the upcoming{" "}
-                    <NLink href="https://eipsinsight.com/eips/eip-7607">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Fusaka
-                      </Text>
-                    </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
-                    <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Devnet 6
-                      </Text>
-                    </NLink>
-                  </>
-                ) : (
-                  <>
-                    <NLink href="https://eipsinsight.com/eips/eip-7607">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Fusaka
-                      </Text>
-                    </NLink> upgrade is Ethereum's next major network enhancement expected in late 2025, aiming to improve scalability, efficiency, and cryptographic performance. Key features include <NLink href="https://eipsinsight.com/eips/eip-7594">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        PeerDAS
-                      </Text>
-                    </NLink> (Peer Data Availability Sampling) to reduce bandwidth and enhance Layer 2 support, Blob Parameter Override (BPO) for dynamic data load testing, and ModExp precompiles (<NLink href="https://eipsinsight.com/eips/eip-7823">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        EIP-7823
-                      </Text>
-                    </NLink> & <NLink href="https://eipsinsight.com/eips/eip-7883">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        EIP-7883
-                      </Text>
-                    </NLink>) to speed up cryptographic operations like RSA & zk-SNARKs. Currently, testing is underway via
-                    <NLink href="https://notes.ethereum.org/@ethpandaops/fusaka-devnet-0">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Devnet 0
-                      </Text>
-                    </NLink>, validating these core components ahead of June's in-person dev meeting. Despite tight timelines and coordination challenges across teams, Fusaka is seen as essential for Ethereum's roadmap, setting the stage for the upcoming <NLink href="https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Glamsterdam
-                      </Text>
-                    </NLink> upgrade.</>
-                )}
-              </Text>
-            </Flex>
-
-            {/* Blog Cards Section - Vertical Scroll with same width and responsive */}
-
-            <Box
-              maxHeight="450px"
-              overflowY="auto"
-              width="100%"
-              padding="4"
-            >
-              <Grid
-                // Responsive: 1 column on small screens, 3 columns on medium and up
-                templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
-                gap={6}
-              >
-                {currentPosts?.map((post, index) => {
-                  const isLastRow =
-                    index >= currentPosts.length - (currentPosts.length % 3 || 3);
-
-                  const lastRowCount = currentPosts.length % 3;
-                  // Only apply colSpan logic on md and up, else always 1 on small screens
-                  const colSpan =
-                    lastRowCount === 2 && isLastRow && isMediumOrLarger ? 1.5 : 1;
-
-
-                  return (
-                    <GridItem
-                      key={index}
-                      colSpan={colSpan}
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="stretch"
-                    >
-                      <Box
-                        width="100%"
-                        height="100%"
-                        borderWidth="1px"
-                        borderRadius="md"
-                        overflow="hidden"
-                      >
-                        <Card
-                          image={post.image}
-                          title={post.title}
-                          content={post.content}
-                          link={post.link}
-                        />
-                      </Box>
-                    </GridItem>
-                  );
-                })}
-              </Grid>
-            </Box>
-            <Box
-              id="upgrade-table"  // Consistent ID
-              display={{ base: "none", md: "block" }}
-            >
-              {/* Content changes based on selection */}
-              <PectraTable
-                PectraData={selectedOption === 'pectra' ? pectraData : fusakaData}
-                title={selectedOption === 'pectra' ? 'Pectra' : 'Fusaka'}
-              />
-              <br />
-            </Box>
-
-
-            {/* Network Upgrades Chart - Remains the same for both */}
-            <Box
-              id="NetworkUpgradesChartp"
-              mt={2}
-              mb={2}
-              px={{ base: 2, md: 4, lg: 6 }}
-              width="100%"
-              maxWidth="100vw"
-              overflowX="auto"
-            >
-              <Text
-                fontSize={{ base: '2xl', md: '3xl', lg: '3xl' }}
-                fontWeight="bold"
-                color="#00CED1"
-                mt={2}
-                textAlign="center"
-              >
-                Network Upgrades and EIPs Relationship Graph
-              </Text>
-              <br />
-              <Flex justifyContent="center" alignItems="center" width="100%">
-                <Box width="100%" maxWidth="100%" overflow="hidden">
-                  <Graph />
-                </Box>
+                <Text
+                  flex={{ base: "1 1 auto", md: "3" }}
+                  fontSize={{ base: "md", md: "lg", lg: "2xl" }}
+                  textAlign="justify"
+                  lineHeight="1.6"
+                >
+                  {selectedOption === 'pectra' ? (
+                    <>
+                      Ethereum developers are moving toward the next major network upgrade, Prague and Electra,
+                      collectively known as{" "}
+                      <NLink href="https://eipsinsight.com/eips/eip-7600">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Pectra
+                        </Text>
+                      </NLink>. This upgrade will involve significant changes to both the{" "}
+                      <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Execution and Consensus layers
+                        </Text>
+                      </NLink>{" "}
+                      on the mainnet. Given the complexities of testing and the scope of changes, including 11{" "}
+                      <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Ethereum Improvement Proposals (EIPs)
+                        </Text>
+                      </NLink>,
+                      the developers recently decided to reduce the scope of the Pectra upgrade. Some EIPs have
+                      now been shifted to the upcoming{" "}
+                      <NLink href="https://eipsinsight.com/eips/eip-7607">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Fusaka
+                        </Text>
+                      </NLink>(a combination of Fulu and Osaka) upgrade. Currently, the testing team is working on Pectra{" "}
+                      <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Devnet 6
+                        </Text>
+                      </NLink>
+                    </>
+                  ) : (
+                    <>
+                      <NLink href="https://eipsinsight.com/eips/eip-7607">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Fusaka
+                        </Text>
+                      </NLink> upgrade is Ethereum's next major network enhancement expected in late 2025, aiming to improve scalability, efficiency, and cryptographic performance. Key features include <NLink href="https://eipsinsight.com/eips/eip-7594">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          PeerDAS
+                        </Text>
+                      </NLink> (Peer Data Availability Sampling) to reduce bandwidth and enhance Layer 2 support, Blob Parameter Override (BPO) for dynamic data load testing, and ModExp precompiles (<NLink href="https://eipsinsight.com/eips/eip-7823">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          EIP-7823
+                        </Text>
+                      </NLink> & <NLink href="https://eipsinsight.com/eips/eip-7883">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          EIP-7883
+                        </Text>
+                      </NLink>) to speed up cryptographic operations like RSA & zk-SNARKs. Currently, testing is underway via
+                      <NLink href="https://notes.ethereum.org/@ethpandaops/fusaka-devnet-0">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Devnet 0
+                        </Text>
+                      </NLink>, validating these core components ahead of June's in-person dev meeting. Despite tight timelines and coordination challenges across teams, Fusaka is seen as essential for Ethereum's roadmap, setting the stage for the upcoming <NLink href="https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/">
+                        <Text as="span" color="blue.500" textDecor="underline">
+                          Glamsterdam
+                        </Text>
+                      </NLink> upgrade.</>
+                  )}
+                </Text>
               </Flex>
+
+              {/* Blog Cards Section - Vertical Scroll with same width and responsive */}
+
+              <Box
+                maxHeight="450px"
+                overflowY="auto"
+                width="100%"
+                padding="4"
+              >
+                <Grid
+                  // Responsive: 1 column on small screens, 3 columns on medium and up
+                  templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
+                  gap={6}
+                >
+                  {currentPosts?.map((post, index) => {
+                    const isLastRow =
+                      index >= currentPosts.length - (currentPosts.length % 3 || 3);
+
+                    const lastRowCount = currentPosts.length % 3;
+                    // Only apply colSpan logic on md and up, else always 1 on small screens
+                    const colSpan =
+                      lastRowCount === 2 && isLastRow && isMediumOrLarger ? 1.5 : 1;
+
+
+                    return (
+                      <GridItem
+                        key={index}
+                        colSpan={colSpan}
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="stretch"
+                      >
+                        <Box
+                          width="100%"
+                          height="100%"
+                          borderWidth="1px"
+                          borderRadius="md"
+                          overflow="hidden"
+                        >
+                          <Card
+                            image={post.image}
+                            title={post.title}
+                            content={post.content}
+                            link={post.link}
+                          />
+                        </Box>
+                      </GridItem>
+                    );
+                  })}
+                </Grid>
+              </Box>
+              <Box
+                id="upgrade-table"  // Consistent ID
+                display={{ base: "none", md: "block" }}
+              >
+                {/* Content changes based on selection */}
+                <PectraTable
+                  PectraData={selectedOption === 'pectra' ? pectraData : fusakaData}
+                  title={selectedOption === 'pectra' ? 'Pectra' : 'Fusaka'}
+                />
+                <br />
+              </Box>
+
+
+              {/* Network Upgrades Chart - Remains the same for both */}
+              <Box
+                id="NetworkUpgradesChartp"
+                mt={2}
+                mb={2}
+                px={{ base: 2, md: 4, lg: 6 }}
+                width="100%"
+                maxWidth="100vw"
+                overflowX="auto"
+              >
+                <Text
+                  fontSize={{ base: '2xl', md: '3xl', lg: '3xl' }}
+                  fontWeight="bold"
+                  color="#00CED1"
+                  mt={2}
+                  textAlign="center"
+                >
+                  Network Upgrades and EIPs Relationship Graph
+                </Text>
+                <br />
+                <Flex justifyContent="center" alignItems="center" width="100%">
+                  <Box width="100%" maxWidth="100%" overflow="hidden">
+                    <Graph />
+                  </Box>
+                </Flex>
+                <br />
+              </Box>
+
+              <Box id="NetworkUpgradeschart" mt={2}>
+                <NetworkUpgradesChart />
+              </Box>
               <br />
+              <Box id="AuthorContributions">
+                <NetworkUpgradesChart2 />
+              </Box>
+
+              {/* Table Section */}
             </Box>
-
-            <Box id="NetworkUpgradeschart" mt={2}>
-              <NetworkUpgradesChart />
-            </Box>
-            <br />
-            <Box id="AuthorContributions">
-              <NetworkUpgradesChart2 />
-            </Box>
-
-            {/* Table Section */}
-
-
           </Box>
-        </Box>
-      </motion.div>
-    </AllLayout >
+        </motion.div>
+      </AllLayout >
     </>
   );
 };

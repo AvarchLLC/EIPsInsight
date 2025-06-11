@@ -480,7 +480,7 @@ const INSIGHT= [
       marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
       className="flex flex-col space-x-6"
     >  <Box ml={5}>
-      <Header title="Resources" subtitle="" />
+      <Header title="Resources" subtitle="" description="" />
       </Box>
       <Tabs isFitted variant="soft-rounded" index={tabIndex} // Control the active tab
       onChange={(key) => {

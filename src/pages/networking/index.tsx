@@ -117,6 +117,7 @@ const Networking = () => {
                   )?.length
                 } ]`}
                 subtitle="Networking EIPs describe changes to the Ethereum network protocol."
+                description="This section lists all Networking EIPs, which propose changes to the Ethereum network protocol."
               />
             </FlexBetween>
             <TableStatus cat="Networking" />
