@@ -66,7 +66,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
 
   if (!isHydrated) return null;
 
-  const sidebarVisible = shouldShowSidebar && !isMobile;
+  const sidebarVisible = !isMobile;
   const sidebarWidth = sidebarVisible ? (isCollapsed ? "3rem" : "16rem") : "0";
 
   return (
