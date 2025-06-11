@@ -27,7 +27,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSidebarStore } from "@/stores/useSidebarStore";
@@ -355,8 +355,9 @@ const sidebarStructure = [
 
 export default function AppSidebar() {
   const { isCollapsed, toggleCollapse } = useSidebarStore();
+  const activeSection = useSidebarStore((s) => s.activeSection);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
-    const [userData, setUserData] = useState<UserData | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
     const bottomItems = [
   // { icon: Search, label: "Search", href: "/search" },
@@ -370,6 +371,34 @@ export default function AppSidebar() {
   const toggleExpand = (label: string) => {
     setExpandedItems((prev) => ({ ...prev, [label]: !prev[label] }));
   };
+
+  useEffect(() => {
+  const expandParents = (items: any[], activeId: string, path: string[] = []): string[] | null => {
+    for (const item of items) {
+      const itemHash = item.href?.split("#")[1] || item.id;
+      if (itemHash === activeId) return path;
+      if (item.children) {
+        const result = expandParents(item.children, activeId, [...path, item.label]);
+        if (result) return result;
+      }
+    }
+    return null;
+  };
+
+  if (activeSection) {
+    const activePath = expandParents(sidebarStructure, activeSection);
+    if (activePath) {
+      setExpandedItems((prev) => {
+        const updated = { ...prev };
+        activePath.forEach((label) => {
+          updated[label] = true;
+        });
+        return updated;
+      });
+    }
+  }
+}, [activeSection]);
+
 
   return (
     <Box
@@ -468,9 +497,15 @@ export function SidebarItem({
   const hoverBg = useColorModeValue("gray.200", "gray.700");
   const borderColor = useColorModeValue("gray.300", "gray.700");
 
-  const isActive =
-    (item.id && activeSection === item.id) ||
-    item.href?.includes(`#${activeSection}`);
+const getHrefHash = (href: string) => {
+  const parts = href.split("#");
+  return parts.length > 1 ? parts[1] : null;
+};
+
+const itemHash = item.href ? getHrefHash(item.href) : item.id || null;
+const isLeafNode = !item.children || item.children.length === 0;
+const isActive = isLeafNode && itemHash === activeSection;
+
 
   const variants: Variants = {
     open: {
