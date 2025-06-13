@@ -199,22 +199,23 @@ const SearchBox: React.FC = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
+    useEffect(() => {
     var queryStr = query.trim();
-    let queryStr2 = ""; // To store the non-numeric part at the beginning
+    let queryStr2 = ''; // To store the non-numeric part at the beginning
 
     // Regular expression to split the query into numeric and non-numeric parts
     const match = queryStr.match(/^(\D+)?(\d+)?/);
 
     if (match) {
-      queryStr2 = match[1]?.trim() || ""; // Non-numeric prefix
-      queryStr = match[2]?.trim() || ""; // Numeric part
+      queryStr2 = match[1]?.trim() || ''; // Non-numeric prefix
+      queryStr = match[2]?.trim() || '';  // Numeric part
     }
 
-    console.log("Query Numeric Part:", queryStr);
-    console.log("Query Non-Numeric Part:", queryStr2);
+    console.log('Query Numeric Part:', queryStr);
+    console.log('Query Non-Numeric Part:', queryStr2);
 
-    if (queryStr || queryStr2) {
+
+    if (queryStr ||queryStr2) {
       // Deduplicate using a Set to track unique (prNumber, repo) combinations
       const seenPRs = new Set<string>();
 
@@ -259,7 +260,8 @@ const SearchBox: React.FC = () => {
       });
 
       // Filter PR results for partial matches (those that start with the query)
-      const partialIssueMatches = IssueData.filter((item) => item.issueNumber.toString().startsWith(queryStr))
+      const partialIssueMatches = IssueData
+        .filter((item) => item.issueNumber.toString().startsWith(queryStr))
         .filter((item) => item.issueNumber.toString() !== queryStr) // Exclude exact matches
         .filter((item) => {
           const key = `${item.issueNumber}-${item.repo}`;
@@ -279,31 +281,61 @@ const SearchBox: React.FC = () => {
       ];
       // console.log(newFilteredIssueResults);
 
-      // Deduplicate for EIP data
-      const seenEIPs = new Set<string>();
+      // Replace the EIP filtering section with this:
 
-      // Filter EIP results based on exact match first
-      const exactEIPMatches = eipData.filter((item) => {
-        const key = `${item.eip}-${item.repo}`;
-        if (seenEIPs.has(key)) return false; // Skip if already seen
-        seenEIPs.add(key); // Mark as seen
-        return item.eip === queryStr;
-      });
+// Deduplicate for EIP data
+const seenEIPs = new Set<string>();
 
-      // Filter EIP results for partial matches (those that start with the query)
-      const partialEIPMatches = queryStr
-        ? eipData
-            .filter((item) => item.eip.startsWith(queryStr)) // Match the partial query
-            .filter((item) => item.eip !== queryStr) // Exclude exact matches
-            .filter((item) => {
-              const key = `${item.eip}-${item.repo}`;
-              if (seenEIPs.has(key)) return false; // Skip if already seen
-              seenEIPs.add(key); // Mark as seen
-              return true;
-            })
-        : eipData; // If queryStr is empty, return the full data
+// Filter EIP results based on exact match first
+const exactEIPMatches = eipData.filter((item) => {
+  const key = `${item.eip}-${item.repo}`;
+  if (seenEIPs.has(key)) return false;
+  
+  // Check if query is numeric - then match EIP numbers
+  if (/^\d+$/.test(queryStr)) {
+    const eipNum = item.eip.replace(/\D/g, '');
+    if (eipNum === queryStr) {
+      seenEIPs.add(key);
+      return true;
+    }
+  } 
+  // For non-numeric queries, match title or author
+  else {
+    if (item.title.toLowerCase().includes(queryStr.toLowerCase()) || 
+        item.author.toLowerCase().includes(queryStr.toLowerCase())) {
+      seenEIPs.add(key);
+      return true;
+    }
+  }
+  return false;
+});
 
-      // Continue with the rest of your logic as before
+// Filter EIP results for partial matches
+const partialEIPMatches = queryStr 
+  ? eipData.filter((item) => {
+      const key = `${item.eip}-${item.repo}`;
+      if (seenEIPs.has(key)) return false;
+      
+      // For numeric queries - match EIP numbers starting with query
+      if (/^\d+$/.test(queryStr)) {
+        const eipNum = item.eip.replace(/\D/g, '');
+        if (eipNum.startsWith(queryStr) && eipNum !== queryStr) {
+          seenEIPs.add(key);
+          return true;
+        }
+      }
+      // For non-numeric queries - match title or author containing query
+      else {
+        if (item.title.toLowerCase().includes(queryStr.toLowerCase()) || 
+            item.author.toLowerCase().includes(queryStr.toLowerCase())) {
+          seenEIPs.add(key);
+          return true;
+        }
+      }
+      return false;
+    })
+  : eipData;
+
 
       // Combine exact EIP matches and partial matches, sorting by length
       const newFilteredEIPResults = [
@@ -317,34 +349,36 @@ const SearchBox: React.FC = () => {
 
       // Update the state with the filtered and sorted results
       // Update the state with the filtered and sorted results
-      // if (["p", "pr", ""].includes(queryStr2.toLowerCase())) {
-      setFilteredResults(newFilteredResults);
-      // }
+// if (["p", "pr", ""].includes(queryStr2.toLowerCase())) {
+  setFilteredResults(newFilteredResults);
+// }
 
-      // if (["i", "is", "iss", "issu", "issue", ""].includes(queryStr2.toLowerCase())) {
-      setFilteredIssueResults(newFilteredIssueResults);
-      // }
-      console.log("final data:", newFilteredEIPResults);
+// if (["i", "is", "iss", "issu", "issue", ""].includes(queryStr2.toLowerCase())) {
+  setFilteredIssueResults(newFilteredIssueResults);
+// }
+console.log("final data:",newFilteredEIPResults)
 
-      if (queryStr2.toLowerCase() === "e") {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => ["eip", "erc"].includes(item.repo)));
-      } else if (["r", "ri", "rip", "rip n", "rip nu", "rip num", "rip numb", "rip number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "rip"));
-      } else if (["e", "ei", "eip", "eip n", "eip nu", "eip num", "eip numb", "eip number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "eip"));
-      } else if (["er", "erc", "erc n", "erc nu", "erc num", "erc numb", "erc number"].includes(queryStr2)) {
-        setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "erc"));
-      } else {
-        setFilteredEIPResults(newFilteredEIPResults);
-      }
+if (queryStr2.toLowerCase() === "e") {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => ["eip", "erc"].includes(item.repo)));
+} else if (["r", "ri", "rip", "rip n", "rip nu", "rip num", "rip numb", "rip number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "rip"));
+} else if (["e", "ei", "eip", "eip n", "eip nu", "eip num", "eip numb", "eip number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "eip"));
+} else if (["er", "erc", "erc n", "erc nu", "erc num", "erc numb", "erc number"].includes(queryStr2)) {
+  setFilteredEIPResults(newFilteredEIPResults.filter((item) => item.repo === "erc"));
+} else {
+  setFilteredEIPResults(newFilteredEIPResults);
+}
+
+      
+      
     } else {
       // If query is empty, clear the results
-      // setFilteredResults([]);
+      setFilteredResults([]);
       setFilteredEIPResults([]);
-      // setFilteredIssueResults([]);
+      setFilteredIssueResults([]);
     }
   }, [query]);
-
   const handleSearchResultClick = async (selectedNumber: number, repo: string) => {
     try {
       window.location.href = `/PR/${repo}/${selectedNumber}`;
@@ -489,12 +523,10 @@ const SearchBox: React.FC = () => {
           ref={dropdownRef}
           className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto"
         >
-          {filteredResults.length === 0 &&
-          filteredEIPResults.length === 0 &&
-          filteredIssueResults.length === 0 &&
+          {filteredEIPResults.length === 0 &&
           filteredAuthors.length === 0 ? (
             <p className="p-2 text-red-500 text-center font-bold">
-              Invalid EIP/ERC/RIP/PR/Issue/Author
+              Invalid EIP/ERC/RIP/Author
             </p>
           ) : (
             <select
@@ -507,36 +539,6 @@ const SearchBox: React.FC = () => {
                 }
               }}
             >
-              {filteredAuthors.map((result, index) => (
-                <option
-                  key={result.name}
-                  value={result.name}
-                  onClick={() => handleAuthorSearchResultClick(result.name)}
-                  className={`text-lg py-3 ${selectedIndex === index ? "bg-blue-100" : ""}`}
-                >
-                  {result.name} ({result.count})
-                </option>
-              ))}
-              {uniqueResults.map((result, index) => (
-                <option
-                  key={result.prNumber}
-                  value={result.prNumber}
-                  onClick={() => handleSearchResultClick(result.prNumber, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + index ? "bg-blue-100" : ""}`}
-                >
-                  {result.repo} PR: {result.prNumber}
-                </option>
-              ))}
-              {filteredIssueResults.map((result, index) => (
-                <option
-                  key={result.issueNumber}
-                  value={result.issueNumber}
-                  onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + index ? "bg-blue-100" : ""}`}
-                >
-                  {result.repo} ISSUE: {result.issueNumber}
-                </option>
-              ))}
               {filteredEIPResults.map((result, index) => (
                 <option
                   key={result.eip}
@@ -547,6 +549,36 @@ const SearchBox: React.FC = () => {
                   {result.repo.toUpperCase()}-{result.eip}
                 </option>
               ))}
+              {filteredAuthors.map((result, index) => (
+                <option
+                  key={result.name}
+                  value={result.name}
+                  onClick={() => handleAuthorSearchResultClick(result.name)}
+                  className={`text-lg py-3 ${selectedIndex === index ? "bg-blue-100" : ""}`}
+                >
+                  {result.name} ({result.count})
+                </option>
+              ))}
+              {/* {uniqueResults.map((result, index) => (
+                <option
+                  key={result.prNumber}
+                  value={result.prNumber}
+                  onClick={() => handleSearchResultClick(result.prNumber, result.repo)}
+                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + index ? "bg-blue-100" : ""}`}
+                >
+                  {result.repo} PR: {result.prNumber}
+                </option>
+              ))} */}
+              {/* {filteredIssueResults.map((result, index) => (
+                <option
+                  key={result.issueNumber}
+                  value={result.issueNumber}
+                  onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
+                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + index ? "bg-blue-100" : ""}`}
+                >
+                  {result.repo} ISSUE: {result.issueNumber}
+                </option>
+              ))} */}
             </select>
           )}
         </div>

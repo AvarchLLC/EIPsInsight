@@ -8,6 +8,7 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
 import { saveAs } from 'file-saver';
+import Link from "next/link";
 
 type StatusType = 'included' | 'scheduled' | 'declined' | 'considered';
 
@@ -115,11 +116,24 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const bg = useColorModeValue('gray.100', 'gray.700');
   const headingColor = useColorModeValue('gray.700', 'gray.100');
 
+  const linkHref =
+  selectedOption === "pectra"
+    ? "/eips/eip-7600"
+    : selectedOption === "fusaka"
+    ? "/eips/eip-7607"
+    : "#";
+
   return (
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
       <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={3}>
         <Heading size="md" color={headingColor}>
-          {`Network Upgrade Inclusion Stages (${selectedOption.toUpperCase()})`}
+          Network Upgrade Inclusion Stages (
+          <Link href={linkHref}>
+            <Text as="span" color="blue.400" fontWeight="bold">
+              {selectedOption.toUpperCase()}
+            </Text>
+          </Link>
+          )
         </Heading>
         <HStack>
           <IconButton aria-label="Zoom In" icon={<AddIcon />} size="sm" onClick={() => setZoomLevel(z => z * 1.2)} />

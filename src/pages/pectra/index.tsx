@@ -441,8 +441,8 @@ const All = () => {
 
               <br />
               {/* <br/> */}
-              <SlotCountdown />
-              <br />
+              {/* <SlotCountdown /> */}
+              {/* <br /> */}
               <Text
                 as={motion.div}
                 initial={{ opacity: 0, y: -20 }}

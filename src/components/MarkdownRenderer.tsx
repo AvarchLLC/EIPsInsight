@@ -78,11 +78,11 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw, rehypeSanitize]}
       components={{
-        p: ({ children }) => <Text mb={2}>{children}</Text>,
-        em: ({ children }) => <Text as="em">{children}</Text>,
+        p: ({ children }) => <Text fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} mb={2}>{children}</Text>,
+        em: ({ children }) => <Text fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} as="em">{children}</Text>,
         del: ({ children }) => <Text as="del">{children}</Text>,
         blockquote: ({ children }) => (
-          <Code as="blockquote" p={2} rounded="lg">
+          <Code fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} as="blockquote" p={2} rounded="lg">
             {children}
           </Code>
         ),
@@ -91,7 +91,7 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
 
           if (!isMultiLine) {
             return (
-              <Code mt={1} p={1} rounded="lg">
+              <Code fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} mt={1} p={1} rounded="lg">
                 {children}
               </Code>
             );
@@ -110,6 +110,7 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
               p={5}
               mx="auto"
               textAlign="left"
+              fontSize={{ base: 'md', md: 'lg', lg: 'xl' }}
             >
               <CodeBlock language={language}>{String(children)}</CodeBlock>
             </Box>
@@ -134,42 +135,84 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
         //   );
         // },
         a: ({ href = '', children }) => {
-          if (href.startsWith('#')) {
-            const normalizedHref = '#' + normalizeId(href.slice(1));
-            return (
-              <ChakraLink 
-                href={normalizedHref}
-                color="blue.400"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const element = document.getElementById(normalizedHref.slice(1));
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    window.history.pushState(null, '', normalizedHref);
-                  }
-                }}
-              >
-                {children}
-              </ChakraLink>
-            );
+  if (href.startsWith('#')) {
+    const normalizedHref = '#' + normalizeId(href.slice(1));
+    return (
+      <ChakraLink 
+        href={normalizedHref}
+        fontSize={{ base: 'md', md: 'lg', lg: 'xl' }}
+        color="blue.400"
+        onClick={(e) => {
+          e.preventDefault();
+          const element = document.getElementById(normalizedHref.slice(1));
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.history.pushState(null, '', normalizedHref);
           }
-          // ... rest of your external link handling
-        },
+        }}
+      >
+        {children}
+      </ChakraLink>
+    );
+  }
+
+  // 🧠 Handle external and relative links (fallback)
+  return (
+    <ChakraLink 
+      as={NextLink} 
+      fontSize={{ base: 'md', md: 'lg', lg: 'xl' }}
+      href={href} 
+      color="blue.500" 
+      isExternal={href.startsWith('http')}
+    >
+      {children}
+    </ChakraLink>
+  );
+},
+
         img: ({ src = '', alt = '' }) => (
-          <ChakraImage src={src} alt={alt} my={4} mx="auto" />
-        ),
+  <Box
+    display="flex"
+    justifyContent="center"
+    my={6}
+    px={2}
+  >
+    <Box
+      border="2px solid teal"
+      borderRadius="lg"
+      overflow="hidden"
+      width={{ base: '100%', sm: '90%', md: '80%', lg: '70%' }}
+      height={{ base: '200px', sm: '300px', md: '350px' }} // Fixed window height
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      bg="gray.50" // Optional background
+    >
+      <ChakraImage
+        src={src}
+        alt={alt}
+        width="100%"
+        height="100%"
+        objectFit="contain" // Fit entirely in box, preserve aspect ratio
+      />
+    </Box>
+  </Box>
+),
+
+
+
         ul: ({ children, ...props }) => (
-          <UnorderedList spacing={2} pl={4} {...getCoreProps(props)}>
+          <UnorderedList fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} spacing={2} pl={4} {...getCoreProps(props)}>
             {children}
           </UnorderedList>
         ),
         ol: ({ children, ...props }) => (
-          <OrderedList spacing={2} pl={4} {...getCoreProps(props)}>
+          <OrderedList fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} spacing={2} pl={4} {...getCoreProps(props)}>
             {children}
           </OrderedList>
         ),
         li: ({ children, ...props }) => (
-          <ListItem {...getCoreProps(props)}>{children}</ListItem>
+          <ListItem fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} {...getCoreProps(props)}>{children}</ListItem>
         ),
          h1: createHeadingRenderer(1),
         h2: createHeadingRenderer(2),
@@ -185,23 +228,23 @@ export default function MarkdownRenderer({ markdown }: { markdown: string }) {
           </Box>
         ),
         thead: ({ children }) => (
-          <Thead borderBottom="2px solid" borderColor="gray.500">
+          <Thead fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} borderBottom="2px solid" borderColor="gray.500">
             {children}
           </Thead>
         ),
         tbody: Tbody,
         tr: ({ children }) => (
-          <Tr borderBottom="1px solid" borderColor="gray.300">
+          <Tr fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} borderBottom="1px solid" borderColor="gray.300">
             {children}
           </Tr>
         ),
         td: ({ children }) => (
-          <Td border="1px solid" borderColor="gray.300" p={3}>
+          <Td fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} border="1px solid" borderColor="gray.300" p={3}>
             {children}
           </Td>
         ),
         th: ({ children }) => (
-          <Th border="1px solid" borderColor="gray.300" p={3}>
+          <Th fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} border="1px solid" borderColor="gray.300" p={3}>
             {children}
           </Th>
         ),
