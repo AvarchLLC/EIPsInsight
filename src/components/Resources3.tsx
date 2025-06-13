@@ -243,12 +243,6 @@ const ResourcesPage: React.FC = () => {
   ];
 
   const NEWS = [
-    // {
-    //   image: "/EIP_blog1.png",
-    //   title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
-    //   content: "Bringing You the Latest in Ethereum Improvement Proposals",
-    //   link: "/Blogs/blog1",
-    // },
     {
       image: "/news1.jpg",
       title: "The EIP Proposal Builder: Simplify, Streamline, Succeed",
@@ -354,6 +348,12 @@ const ResourcesPage: React.FC = () => {
       content: "Ethereum scales blob capacity with Blob Parameter Only (BPO) forks to support Layer 2 growth before Fusaka and PeerDAS, preserving decentralization.",
       link: "/Blogs/bpo-forks-eip-7892",
       tag: "Technical"
+    },
+    {
+      image: "/EIP_blog1.png",
+      title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
+      content: "Bringing You the Latest in Ethereum Improvement Proposals",
+      link: "/newsletter",
     },
   ];
 
