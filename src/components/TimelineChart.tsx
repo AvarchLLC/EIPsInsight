@@ -9,6 +9,7 @@ import {
 import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
 import { saveAs } from 'file-saver';
 import Link from "next/link";
+import DateTime from './DateTime';
 
 type StatusType = 'included' | 'scheduled' | 'declined' | 'considered';
 
@@ -27,15 +28,23 @@ const COLOR_SCHEME: Record<StatusType, string> = {
   declined: '#F56565',
 };
 
+const LEGEND_LABELS: Record<StatusType, string> = {
+  included: 'INCLUDED',
+  scheduled: 'SFI',
+  considered: 'CFI',
+  declined: 'DFI',
+};
+
 interface Props {
   data: EIPData[];
   selectedOption: 'pectra' | 'fusaka';
 }
 
-const cubeSize = 20;
+const cubeSize = 24; // instead of 20
+const blockHeight = cubeSize;
+const blockWidth = cubeSize * 2; // or adjust further
 const padding = 10;
 const rowHeight = cubeSize + 12;
-const blockHeight = cubeSize;
 
 const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const [scrollIndex, setScrollIndex] = useState(0);
@@ -151,10 +160,11 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
           <Flex key={status} align="center" gap={2}>
             <Box w="12px" h="12px" borderRadius="full" bg={color} />
             <Box as="span" fontSize="sm" fontWeight="medium" lineHeight="normal">
-              {status}
+              {LEGEND_LABELS[status]}
             </Box>
           </Flex>
         ))}
+
       </Flex>
       <Flex direction="row">
         <svg
@@ -181,7 +191,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
                   <text
                     x={0}
                     y={blockHeight / 1.5}
-                    fontSize={12}
+                    fontSize={16}
                     fontWeight="bold"
                     fill="gray"
                     vectorEffect="non-scaling-stroke"
@@ -214,7 +224,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
                             <text
                               x={xScale(i) + blockWidth / 2}
                               y={blockHeight / 1.5}
-                              fontSize={12}
+                              fontSize={16}
                               textAnchor="middle"
                               fill="white"
                               vectorEffect="non-scaling-stroke"
@@ -252,15 +262,44 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
           px={4}
           py={3}
           borderRadius="md"
-          fontSize="lg"
-          fontWeight="bold"
+          fontSize="md"
+          fontWeight="normal"
           pointerEvents="none"
           boxShadow="lg"
+          maxW="250px"
         >
-          <Text fontSize="lg">EIP: {hoveredEip.eip}</Text>
-          <Text>Status: {hoveredEip.type}</Text>
+          <Text fontSize="lg" fontWeight="bold">{hoveredEip.eip}</Text>
+          <Text>Status: {hoveredEip.type.toUpperCase()}</Text>
+          {/* Find data item for this hovered EIP */}
+          {(() => {
+            const item = dataToRender.find(d =>
+              [...d.included, ...d.scheduled, ...d.considered, ...d.declined].includes(hoveredEip.eip)
+            );
+            if (!item) return null;
+
+            const counts = {
+              included: item.included.length,
+              scheduled: item.scheduled.length,
+              considered: item.considered.length,
+              declined: item.declined.length,
+            };
+
+            return (
+              <>
+                <Text>Date: {item.date}</Text>
+                <Text mt={2} fontWeight="bold">Status Count:</Text>
+                <Text fontSize="sm">CFI (Considered): {counts.considered}</Text>
+                <Text fontSize="sm">SFI (Scheduled): {counts.scheduled}</Text>
+                <Text fontSize="sm">DFI (Declined): {counts.declined}</Text>
+                <Text fontSize="sm">Included: {counts.included}</Text>
+              </>
+            );
+          })()}
         </Box>
       )}
+      <Box overflowX={{ base: "auto", md: "visible" }} mt={2}>
+        <DateTime />
+      </Box>
     </Box>
   );
 };

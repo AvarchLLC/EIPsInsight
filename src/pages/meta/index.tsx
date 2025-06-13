@@ -112,6 +112,7 @@ const Meta = () => {
                   data?.filter((item) => item.type === "Meta")?.length
                 } ]`}
                 subtitle="Meta EIPs describe changes to the EIP process, or other non optional changes."
+                description="Meta EIPs are used for process changes, guidelines, or information relevant to the EIP process itself."
               />
             </FlexBetween>
             <Box mt={2}>

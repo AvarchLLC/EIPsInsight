@@ -19,7 +19,6 @@ import { CSmartTable, CCardBody } from "@coreui/react-pro";
 import "@coreui/coreui/dist/css/coreui.min.css";
 import axios from "axios";
 
-
 const MotionBox = motion(Box);
 interface EIP {
   _id: string;
@@ -133,9 +132,22 @@ const All = () => {
               repo === "eip"
                 ? `https://eipsinsight.com/eips/eip-${eip}`
                 : repo === "erc"
-                  ? `https://eipsinsight.com/ercs/erc-${eip}`
-                  : `https://eipsinsight.com/rips/rip-${eip}`;
-            return `"${repo}","${eip}","${(title || "").replace(/"/g, '""')}","${(author || "").replace(/"/g, '""')}","${(status || "").replace(/"/g, '""')}","${(deadline || "-").replace(/"/g, '""')}","${(type || "").replace(/"/g, '""')}","${(category || "").replace(/"/g, '""')}","${(discussion || "").replace(/"/g, '""')}","${(created || "").replace(/"/g, '""')}","${url}"`;
+                ? `https://eipsinsight.com/ercs/erc-${eip}`
+                : `https://eipsinsight.com/rips/rip-${eip}`;
+            return `"${repo}","${eip}","${(title || "").replace(
+              /"/g,
+              '""'
+            )}","${(author || "").replace(/"/g, '""')}","${(
+              status || ""
+            ).replace(/"/g, '""')}","${(deadline || "-").replace(
+              /"/g,
+              '""'
+            )}","${(type || "").replace(/"/g, '""')}","${(
+              category || ""
+            ).replace(/"/g, '""')}","${(discussion || "").replace(
+              /"/g,
+              '""'
+            )}","${(created || "").replace(/"/g, '""')}","${url}"`;
           }
         )
         .join("\n");
@@ -153,7 +165,8 @@ const All = () => {
     const authors = data.split(",").map((a) => a.trim().split(" "));
     if (
       authors.length &&
-      authors[authors.length - 1][authors[authors.length - 1].length - 1] === "al."
+      authors[authors.length - 1][authors[authors.length - 1].length - 1] ===
+        "al."
     ) {
       authors.pop(); // Remove "et al." if present
     }
@@ -183,6 +196,7 @@ const All = () => {
         mt={{ base: 5, md: 10 }}
         pb={10}
         mx={{ lg: "40", base: "2" }}
+        id="All EIP ERC RIP"
       >
         {/* Filters */}
         <Box
@@ -204,7 +218,6 @@ const All = () => {
               >
                 {item}
               </Button>
-
             ))}
           </Box>
 
@@ -244,7 +257,8 @@ const All = () => {
             bg="#40E0D0"
             color="white"
             _hover={{ bg: "#30c9c9" }}
-            _active={{ bg: "#1fb8b8" }} onClick={async () => {
+            _active={{ bg: "#1fb8b8" }}
+            onClick={async () => {
               handleDownload();
               await axios.post("/api/DownloadCounter");
             }}
@@ -273,10 +287,10 @@ const All = () => {
             </Text>
           </MotionBox>
         ) : (
-          <Box bgColor={bg} borderRadius="md" p={4} overflowX="auto">
+          <Box bgColor={tableBg} borderRadius="md" p={4} overflowX="auto">
             <CCardBody style={{ backgroundColor: tableBg }}>
               <Box maxH="60vh" overflowY="auto">
-                <CSmartTable
+                <CSmartTable  
                   items={filteredData.sort(
                     (a, b) => parseInt(a["eip"]) - parseInt(b["eip"])
                   )}
@@ -365,7 +379,15 @@ const All = () => {
                   scopedColumns={{
                     "#": (item: any) => (
                       <td key={item.eip} style={{ backgroundColor: tableBg }}>
-                        <Link href={`/${item.repo === 'erc' ? "ercs/erc" : item.repo === 'rip' ? "rips/rip" : "eips/eip"}-${item.eip}`}>
+                        <Link
+                          href={`/${
+                            item.repo === "erc"
+                              ? "ercs/erc"
+                              : item.repo === "rip"
+                              ? "rips/rip"
+                              : "eips/eip"
+                          }-${item.eip}`}
+                        >
                           <Wrap>
                             <WrapItem>
                               <Badge colorScheme={getStatusColor(item.status)}>
@@ -376,17 +398,18 @@ const All = () => {
                         </Link>
                       </td>
                     ),
-                    eip: (item: { repo: string; eip: any; status: any; }) => (
+                    eip: (item: { repo: string; eip: any; status: any }) => (
                       <td style={{ backgroundColor: tableBg }}>
                         <Wrap>
                           <WrapItem>
                             <Link
-                              href={`/${item.repo === "erc"
-                                ? "ercs/erc"
-                                : item.repo === "rip"
+                              href={`/${
+                                item.repo === "erc"
+                                  ? "ercs/erc"
+                                  : item.repo === "rip"
                                   ? "rips/rip"
                                   : "eips/eip"
-                                }-${item.eip}`}
+                              }-${item.eip}`}
                             >
                               <Badge colorScheme={getStatusColor(item.status)}>
                                 {`${item.repo.toUpperCase()}-${item.eip}`}
@@ -396,7 +419,23 @@ const All = () => {
                         </Wrap>
                       </td>
                     ),
-                    title: (item: { repo: string; eip: any; title: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }) => (
+                    title: (item: {
+                      repo: string;
+                      eip: any;
+                      title:
+                        | string
+                        | number
+                        | boolean
+                        | React.ReactElement<
+                            any,
+                            string | React.JSXElementConstructor<any>
+                          >
+                        | Iterable<React.ReactNode>
+                        | React.ReactPortal
+                        | React.PromiseLikeOfReactNode
+                        | null
+                        | undefined;
+                    }) => (
                       <td
                         style={{
                           fontWeight: "bold",
@@ -408,12 +447,13 @@ const All = () => {
                         <Wrap>
                           <WrapItem>
                             <Link
-                              href={`/${item.repo === "erc"
-                                ? "ercs/erc"
-                                : item.repo === "rip"
+                              href={`/${
+                                item.repo === "erc"
+                                  ? "ercs/erc"
+                                  : item.repo === "rip"
                                   ? "rips/rip"
                                   : "eips/eip"
-                                }-${item.eip}`}
+                              }-${item.eip}`}
                               fontSize="13px"
                               sx={{
                                 color: `${textColor} !important`,
@@ -422,71 +462,125 @@ const All = () => {
                             >
                               {item.title}
                             </Link>
-
                           </WrapItem>
                         </Wrap>
                       </td>
                     ),
 
-                    author: (item: { author: string; }) => (
-                      <td style={{ backgroundColor: tableBg, color: textColor }}>
+                    author: (item: { author: string }) => (
+                      <td
+                        style={{ backgroundColor: tableBg, color: textColor }}
+                      >
                         <div>
-                          {factorAuthor(item.author).map((authorPart, index) => {
-                            const lastToken = authorPart[authorPart.length - 1];
-                            const isEmail = lastToken.endsWith(">");
-                            const clean = lastToken.substring(1, lastToken.length - 1);
+                          {factorAuthor(item.author).map(
+                            (authorPart, index) => {
+                              const lastToken =
+                                authorPart[authorPart.length - 1];
+                              const isEmail = lastToken.endsWith(">");
+                              const clean = lastToken.substring(
+                                1,
+                                lastToken.length - 1
+                              );
 
-                            const link = isEmail && clean.includes("@")
-                              ? `mailto:${clean}`
-                              : `https://github.com/${clean.replace(/^@/, "")}`;
+                              const link =
+                                isEmail && clean.includes("@")
+                                  ? `mailto:${clean}`
+                                  : `https://github.com/${clean.replace(
+                                      /^@/,
+                                      ""
+                                    )}`;
 
-                            return (
-                              <Wrap key={index}>
-                                <WrapItem>
-                                  <Link
-                                    href={link}
-                                    target="_blank"
-                                    fontSize="13px"
-                                    sx={{
-                                      color: `${textColor} !important`,
-                                      _hover: { color: "#1c7ed6 !important" },
-                                    }}
-                                  >
-                                    {authorPart.join(" ")}
-                                  </Link>
-
-                                </WrapItem>
-                              </Wrap>
-                            );
-                          })}
+                              return (
+                                <Wrap key={index}>
+                                  <WrapItem>
+                                    <Link
+                                      href={link}
+                                      target="_blank"
+                                      fontSize="13px"
+                                      sx={{
+                                        color: `${textColor} !important`,
+                                        _hover: { color: "#1c7ed6 !important" },
+                                      }}
+                                    >
+                                      {authorPart.join(" ")}
+                                    </Link>
+                                  </WrapItem>
+                                </Wrap>
+                              );
+                            }
+                          )}
                         </div>
                       </td>
                     ),
 
-                    type: (item: { type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }) => (
+                    type: (item: {
+                      type:
+                        | string
+                        | number
+                        | boolean
+                        | React.ReactElement<
+                            any,
+                            string | React.JSXElementConstructor<any>
+                          >
+                        | Iterable<React.ReactNode>
+                        | React.ReactPortal
+                        | React.PromiseLikeOfReactNode
+                        | null
+                        | undefined;
+                    }) => (
                       <td
                         style={{ backgroundColor: tableBg, color: textColor }}
                       >
                         {item.type}
                       </td>
                     ),
-                    category: (item: { category: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }) => (
+                    category: (item: {
+                      category:
+                        | string
+                        | number
+                        | boolean
+                        | React.ReactElement<
+                            any,
+                            string | React.JSXElementConstructor<any>
+                          >
+                        | Iterable<React.ReactNode>
+                        | React.ReactPortal
+                        | React.PromiseLikeOfReactNode
+                        | null
+                        | undefined;
+                    }) => (
                       <td
                         style={{ backgroundColor: tableBg, color: textColor }}
                       >
                         {item.category}
                       </td>
                     ),
-                    status: (item: { status: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }) => (
+                    status: (item: {
+                      status:
+                        | string
+                        | number
+                        | boolean
+                        | React.ReactElement<
+                            any,
+                            string | React.JSXElementConstructor<any>
+                          >
+                        | Iterable<React.ReactNode>
+                        | React.ReactPortal
+                        | React.PromiseLikeOfReactNode
+                        | null
+                        | undefined;
+                    }) => (
                       <td style={{ backgroundColor: tableBg }}>
                         <Badge colorScheme={getStatusColor(item.status)}>
                           {item.status}
                         </Badge>
                       </td>
                     ),
-                    repo: (item: { repo: string; }) => (
+                    repo: (item: { repo: string }) => (
                       <td style={{ backgroundColor: tableBg }}>
-                        <Badge colorScheme="cyan">{item.repo.toUpperCase()}</Badge>
+                        <Badge colorScheme="cyan">
+                          {item.repo.toUpperCase()}
+                        </Badge>
                       </td>
                     ),
                   }}

@@ -198,7 +198,11 @@ const issuePage: React.FC<issuePageProps> = ({ Type,number }) => {
                                 <>
                                     <Box>
                                     <FlexBetween flexDirection={{ base: 'column', md: 'row' }} alignItems="center">
-    <Header title={"Issue"} subtitle={`#${data?.issueDetails?.issueNumber}`} />
+    <Header
+        title={"Issue"}
+        subtitle={`#${data?.issueDetails?.issueNumber}`}
+        description={data?.issueDetails?.issueTitle || ""}
+    />
     
 </FlexBetween>
 

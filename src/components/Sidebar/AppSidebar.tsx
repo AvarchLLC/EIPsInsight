@@ -13,7 +13,8 @@ import {
   ChevronLeft,
   ChevronDown,
 } from "lucide-react";
-
+import { signOut } from 'next-auth/react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { IconButton, Tooltip } from "@chakra-ui/react";
 import { Variants } from "framer-motion";
 import {
@@ -27,9 +28,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 
-
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSidebarStore } from "@/stores/useSidebarStore";
@@ -41,9 +40,22 @@ import {
   FiInfo,
   FiTool,
 } from "react-icons/fi";
+import {
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
+  useToast,
+} from "@chakra-ui/react";
+import { useRouter } from "next/router";
+
+
 
 import { chakra, shouldForwardProp } from "@chakra-ui/react";
 import { isValidMotionProp } from "framer-motion";
+import { Rajdhani } from "next/font/google";
 
 // Extend chakra with motion.div
 const MotionDiv = chakra(motion.div, {
@@ -52,6 +64,22 @@ const MotionDiv = chakra(motion.div, {
     isValidMotionProp(prop) || shouldForwardProp(prop),
 });
 
+
+
+const mont = Rajdhani({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+  tier: string;
+  walletAddress?: string;
+}
 
 
 function generateYearlyInsights() {
@@ -132,73 +160,106 @@ const sidebarStructure = [
     icon: LayoutDashboard,
     label: "Upgrade",
     href: "/upgrade",
+    id: 'upgrade-section',
     children: [
-      { label: "FUSAKA", href: "/upgrade#pectra" },
-      { label: "PECTRA", href: "/upgrade#pectra" },
       {
-        label: "Network Upgrades Graph",
-        href: "/upgrade#NetworkUpgradesChartp",
+        label: 'Upgrade Details',
+        children: [
+          { label: 'PECTRA', id: 'pectra', href: '/upgrade#pectra' },
+          { label: 'FUSAKA', id: 'fusaka', href: '/upgrade#fusaka' },
+        ]
       },
-      { label: "Network Upgrades Graph", href: "/upgrade#NetworkUpgrades" },
-      { label: "Author Contributions", href: "/upgrade#AuthorContributions" },
-      { label: "Pectra Table", href: "/upgrade#pectra-table" },
+      { label: 'Network Upgrades Graph', id: 'NetworkUpgrades', href: '/upgrade#NetworkUpgrades' },
+      { label: 'Upgrade Table', id: 'upgrade-table', href: '/upgrade#upgrade-table' },
+      { label: 'Network Upgrades and EIPs Relationship Graph', id: 'NetworkUpgradesChartp', href: '/upgrade#NetworkUpgradesChartp' },
+      { label: 'Network Upgrades chart', id: 'NetworkUpgradeschart', href: '/upgrade#NetworkUpgradeschart' },
+      { label: 'Author Contributions', id: 'AuthorContributions', href: '/upgrade#AuthorContributions' },
     ],
+
   },
   {
     icon: Layers3,
-    label: "All EIPs",
+    label: "Standards",
     children: [
       {
+        label: "All",
+        href: "/all",
+        children: [{ label: "All EIP ERC RIP", href: "/all#All EIP ERC RIP" }],
+      },
+      {
         label: "EIPs",
-        href: "/eip",
+        href: "/eip?view=type",
         children: [
-          { label: "Graphs", href: "/eip#graphs" },
-          { label: "Draft vs Final", href: "/eip#draftvsfinal" },
-          { label: "Core", href: "/eip#core" },
-          { label: "Networking", href: "/eip#networking" },
-          { label: "Interface", href: "/eip#interface" },
-          { label: "Meta", href: "/eip#meta" },
-          { label: "Informational", href: "/eip#informational" },
-          { label: "Draft", href: "/eip#draft" },
-          { label: "Review", href: "/eip#review" },
-          { label: "Last Call", href: "/eip#lastcall" },
-          { label: "Final", href: "/eip#final" },
-          { label: "Stagnant", href: "/eip#stagnant" },
-          { label: "Withdrawn", href: "/eip#withdrawn" },
-          { label: "Living", href: "/eip#living" },
-          { label: "Meta Table", href: "/eip#metatable" },
-          { label: "Informational Table", href: "/eip#informationaltable" },
-          { label: "Core Table", href: "/eip#coretable" },
-          { label: "Networking Table", href: "/eip#networkingtable" },
-          { label: "Interface Table", href: "/eip#interfacetable" },
+          { label: "Ethereum Improvement", href: "/eip#Ethereum Improvement" },
+          { label: "chart type", href: "/eip#chart type" },
+          { label: "View EIP Stats", href: "/eip#View EIP Stats" },
+          { label: "Eip Table", href: "/eip#Eip Table" },
+          { label: "GitHub Stats", href: "/eip#githubstats" },
+          { label: "Graphs", href: "/eip#charts" },
+          {
+            label: "Categories",
+            children: [
+              { label: "Core", href: "/eip#core" },
+              { label: "Networking", href: "/eip#networking" },
+              { label: "Interface", href: "/eip#interface" },
+              { label: "Meta", href: "/eip#meta" },
+              { label: "Informational", href: "/eip#informational" },
+            ],
+          },
+          {
+            label: "Tables",
+            children: [
+              { label: "Core Table", href: "/eip#coretable" },
+              { label: "Networking Table", href: "/eip#networkingtable" },
+              { label: "Interface Table", href: "/eip#interfacetable" },
+              { label: "Meta Table", href: "/eip#metatable" },
+              { label: "Informational Table", href: "/eip#informationaltable" },
+            ],
+          },
         ],
       },
       {
         label: "ERCs",
-        href: "/erc",
+        href: "/erc?view=type",
         children: [
+          { label: "Ethereum Request", href: "/erc#Ethereum Improvement" },
+          {
+            label: "ERC (Progress Over the Years)",
+            href: "/erc#ERC progress bar",
+          },
+          { label: "Draft", href: "/erc#draft" },
+          { label: "ERC Activity", href: "/erc#ERC Activity" },
+          { label: "Satus Activity", href: "/erc#Satus Activity" },
+          // { label: "Final", href: "/erc#final" },
+          // { label: "Stagnant", href: "/erc#stagnant" },
+          // { label: "Withdrawn", href: "/erc#withdrawn" },
+          // { label: "Living", href: "/erc#living" },
+          // { label: "Meta Table", href: "/erc#metatable" },
+          // { label: "ERC Table", href: "/erc#erctable" },
+          { label: "GitHub Stats", href: "/erc#githubstats" },
           { label: "Graphs", href: "/erc#graphs" },
           { label: "ERC (Progress Over the Years)", href: "/erc#ercprogress" },
-          { label: "Draft", href: "/erc#draft" },
-          { label: "Review", href: "/erc#review" },
-          { label: "Last Call", href: "/erc#lastcall" },
-          { label: "Final", href: "/erc#final" },
-          { label: "Stagnant", href: "/erc#stagnant" },
-          { label: "Withdrawn", href: "/erc#withdrawn" },
-          { label: "Living", href: "/erc#living" },
-          { label: "Meta Table", href: "/erc#metatable" },
-          { label: "ERC Table", href: "/erc#erctable" },
+          {
+            label: "Tables",
+            children: [
+              { label: "ERC Table", href: "/erc#erctable" },
+              { label: "Meta Table", href: "/erc#metatable" },
+            ],
+          },
         ],
       },
       {
         label: "RIPs",
-        href: "/rip",
+        href: "/rip?view=type",
         children: [
-          { label: "Graphs", href: "/rip#graphs" },
-          { label: "Draft vs Final", href: "/rip#draftvsfinal" },
+          {
+            label: "Rollup Improvement Proposal",
+            href: "/rip#Ethereum Improvement",
+          },
+          { label: "GitHub Stats – RIPs", href: "/rip#GitHub Stats – RIPs" },
           { label: "Draft", href: "/rip#draft" },
-          { label: "Final", href: "/rip#final" },
           { label: "Living", href: "/rip#living" },
+          { label: "Final", href: "/rip#final" },
           { label: "Meta", href: "/rip#meta" },
           { label: "Informational", href: "/rip#informational" },
           { label: "Core", href: "/rip#core" },
@@ -206,6 +267,12 @@ const sidebarStructure = [
           { label: "Interface", href: "/rip#interface" },
           { label: "RIP", href: "/rip#rip" },
           { label: "RRC", href: "/rip#rrc" },
+          { label: "GitHub Stats", href: "/rip#githubstats" },
+          { label: "Graphs", href: "/rip#charts" },
+          {
+            label: "Table",
+            href: "/rip#type-tables"
+          }
         ],
       },
     ],
@@ -298,14 +365,18 @@ const sidebarStructure = [
   { icon: BookOpen, label: "Resources", href: "/resources" },
 ];
 
-const bottomItems = [
-  // { icon: Search, label: "Search", href: "/search" },
-  { icon: UserCircle2, label: "Profile", href: "/profile" },
-  { icon: Settings, label: "Settings", href: "/" },
-];
+
 export default function AppSidebar() {
   const { isCollapsed, toggleCollapse } = useSidebarStore();
+  const activeSection = useSidebarStore((s) => s.activeSection);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+    const bottomItems = [
+  // { icon: Search, label: "Search", href: "/search" },
+  // { icon: UserCircle2, label: "Profile", href: "/profile" },
+  { icon: Settings, label: "Settings", href: "/" },
+];
 
   const bg = useColorModeValue("gray.100", "gray.900");
   const borderColor = useColorModeValue("gray.300", "gray.700");
@@ -313,6 +384,95 @@ export default function AppSidebar() {
   const toggleExpand = (label: string) => {
     setExpandedItems((prev) => ({ ...prev, [label]: !prev[label] }));
   };
+
+  useEffect(() => {
+  const expandParents = (items: any[], activeId: string, path: string[] = []): string[] | null => {
+    for (const item of items) {
+      const itemHash = item.href?.split("#")[1] || item.id;
+      if (itemHash === activeId) return path;
+      if (item.children) {
+        const result = expandParents(item.children, activeId, [...path, item.label]);
+        if (result) return result;
+      }
+    }
+    return null;
+  };
+
+  if (activeSection) {
+    const activePath = expandParents(sidebarStructure, activeSection);
+    if (activePath) {
+      setExpandedItems((prev) => {
+        const updated = { ...prev };
+        activePath.forEach((label) => {
+          updated[label] = true;
+        });
+        return updated;
+      });
+    }
+  }
+}, [activeSection]);
+
+useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    setUserData(JSON.parse(storedUser));
+  }
+}, []);
+
+const toast = useToast();
+
+const handleRefresh = async () => {
+  try {
+    const response = await fetch('/api/GetUserStatus');
+    const data = await response.json();
+
+    const updatedUser = {
+      ...userData!,
+      tier: data.tier || userData?.tier || 'Free'
+    };
+
+    setUserData(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+
+    toast({
+      title: 'Status refreshed',
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
+  } catch (error) {
+    toast({
+      title: 'Refresh failed',
+      description: 'Could not fetch latest status',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+};
+const router = useRouter();
+
+const handleLogout = async () => {
+  try {
+    localStorage.removeItem('user');
+    await signOut({ redirect: false });
+    toast({
+      title: 'Logged out successfully',
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
+    setTimeout(() => router.push('/signin'), 500);
+  } catch (error) {
+    toast({
+      title: 'Logout failed',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+};
+
 
   return (
     <Box
@@ -332,8 +492,14 @@ export default function AppSidebar() {
       roundedRight="xl"
       overflowY="auto"
       py={4}
-      sx={{ scrollbarWidth: "none", msOverflowStyle: "none", "&::-webkit-scrollbar": { display: "none" } }}
+      sx={{
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+        "&::-webkit-scrollbar": { display: "none" },
+      }}
+      className={`${mont.className} base-page-size`}
     >
+      {/* Collapse/Expand Button */}
       <Box px={2} mb={2}>
         <IconButton
           aria-label="Toggle Sidebar"
@@ -345,7 +511,8 @@ export default function AppSidebar() {
         />
       </Box>
 
-      <VStack spacing={1} px={2} align="stretch" flex="1">
+      {/* Main Items */}
+      <VStack spacing={1} px={2} align="stretch" flex="1" overflowY="auto">
         {sidebarStructure.map((item) => (
           <SidebarItem
             key={item.label}
@@ -361,26 +528,68 @@ export default function AppSidebar() {
 
       <Divider borderColor={borderColor} my={2} />
 
+      {/* Bottom Items */}
       <VStack spacing={1} px={2} align="stretch">
         {bottomItems.map((item) => (
           <SidebarItem
             key={item.label}
             item={item}
             expanded={!isCollapsed}
-            expandedItems={{}}
-            toggleExpand={() => {}}
+  expandedItems={expandedItems}
+  toggleExpand={toggleExpand}
             depth={0}
             isCollapsed={isCollapsed}
           />
         ))}
       </VStack>
+
+      <Box mt={2} px={isCollapsed ? 0 : 4}>
+  <Menu placement="top" isLazy>
+    <MenuButton
+      as={HStack}
+      spacing={isCollapsed ? 0 : 3}
+      align="center"
+      px={isCollapsed ? 2 : 3}
+      py={2}
+      w="full"
+      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+      borderRadius="md"
+      transition="background 0.2s"
+      justify={isCollapsed ? "center" : "flex-start"}
+      cursor="pointer"
+    >
+      <Avatar
+        size="sm"
+        name={userData?.name}
+        src={userData?.image || undefined}
+      />
+      {!isCollapsed && (
+        <>
+          <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
+            {userData?.name || "Profile"}
+          </Text>
+          <Box as={ChevronDown} size="16px" />
+        </>
+      )}
+    </MenuButton>
+
+    <MenuList zIndex={1000}>
+      <MenuItem onClick={() => router.push("/profile")}>👤 Profile</MenuItem>
+      <MenuItem onClick={handleRefresh}>🔄 Refresh Status</MenuItem>
+      <MenuDivider />
+      <MenuItem onClick={handleLogout}>🚪 Logout</MenuItem>
+    </MenuList>
+  </Menu>
+</Box>
+
     </Box>
+
   );
 }
 
 export function SidebarItem({
   item,
-  expanded,
+  expanded, // Top-level sidebar expanded state
   expandedItems,
   toggleExpand,
   depth = 0,
@@ -400,16 +609,54 @@ export function SidebarItem({
   const textColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const iconColor = useColorModeValue("gray.600", "gray.300");
   const hoverBg = useColorModeValue("gray.200", "gray.700");
+  const borderColor = useColorModeValue("gray.300", "gray.700");
 
-  const isActive =
-    (item.id && activeSection === item.id) ||
-    item.href?.includes(`#${activeSection}`);
+const getHrefHash = (href: string) => {
+  const parts = href.split("#");
+  return parts.length > 1 ? parts[1] : null;
+};
+
+const itemHash = item.href ? getHrefHash(item.href) : item.id || null;
+const isLeafNode = !item.children || item.children.length === 0;
+const isActive = isLeafNode && itemHash === activeSection;
+
+const router = useRouter();
+
 
   const variants: Variants = {
-    open: { opacity: 1, height: "auto", pointerEvents: "auto", transition: { duration: 0.3 } },
-    isCollapsed: { opacity: 0, height: 0, pointerEvents: "none", transition: { duration: 0.2 } },
+    open: {
+      opacity: 1,
+      height: "auto",
+      pointerEvents: "auto",
+      transition: { duration: 0.3 },
+    },
+    isCollapsed: {
+      opacity: 0,
+      height: 0,
+      pointerEvents: "none",
+      transition: { duration: 0.2 },
+    },
   };
 
+  const handleNavigation = (e: React.MouseEvent, href: string) => {
+    const isHashLink = href.includes("#");
+    if (!isHashLink) return;
+
+    e.preventDefault();
+    const [path, hash] = href.split("#");
+
+    if (path && window.location.pathname !== path) {
+      window.location.href = href;
+      return;
+    }
+
+    const target = document.getElementById(hash);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.pushState(null, "", href);
+    }
+  };
+  const shouldShowChildren = expanded && isExpanded;
   return (
     <Box>
       {/* Main clickable row */}
@@ -418,11 +665,13 @@ export function SidebarItem({
           spacing={3}
           px={3}
           py={2}
-          bg={isActive ? useColorModeValue("blue.100", "blue.700") : "transparent"}
+          bg={
+            isActive ? useColorModeValue("blue.100", "blue.700") : "transparent"
+          }
           fontWeight={isActive ? "bold" : "normal"}
           borderRadius="md"
           cursor={hasChildren || item.href ? "pointer" : "default"}
-          onClick={() => hasChildren && toggleExpand(item.label)}
+          onClick={() => hasChildren ? toggleExpand(item.label) : {}}
           _hover={{ bg: hoverBg }}
           justifyContent={expanded ? "flex-start" : "center"}
           color={textColor}
@@ -435,40 +684,40 @@ export function SidebarItem({
 
           {expanded && (
             <>
-              {item.href && !hasChildren ? (
-                <Text
-                  as="a"
-                  onClick={(e) => {
-                    const href = item.href;
-                    if (!href) return;
+              {item.href ? (
+<Text
+  as="a"
+  onClick={(e) => {
+    e.preventDefault();
 
-                    const isHashLink = href.includes("#");
-                    if (isHashLink) {
-                      e.preventDefault();
-                      const [path, hash] = href.split("#");
+    if (!item.href) return;
 
-                      if (path && window.location.pathname !== path) {
-                        window.location.href = href;
-                        return;
-                      }
+    const [path, hash] = item.href.split("#");
 
-                      const target = document.getElementById(hash);
-                      if (target) {
-                        target.scrollIntoView({ behavior: "smooth", block: "start" });
-                        history.pushState(null, "", href);
-                      }
-                    } else {
-                      window.location.href = href;
-                    }
-                  }}
-                  cursor="pointer"
-                  flex="1"
-                  fontWeight="medium"
-                  fontSize="sm"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  {item.label}
-                </Text>
+    const isSamePage = window.location.pathname === path;
+
+    if (isSamePage && hash) {
+      const target = document.getElementById(hash);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.pushState(null, "", item.href); // Update URL hash without reload
+      }
+    } else if (!hash) {
+      router.push(item.href); // Normal page change
+    } else {
+      // Different page + hash — use router.push with hash
+      router.push(item.href);
+    }
+  }}
+  cursor="pointer"
+  flex="1"
+  fontWeight="medium"
+  fontSize="sm"
+  _hover={{ textDecoration: "underline" }}
+>
+  {item.label}
+</Text>
+
               ) : (
                 <Text flex="1" fontWeight="medium" fontSize="sm">
                   {item.label}
@@ -480,6 +729,7 @@ export function SidebarItem({
                   as={isExpanded ? ChevronDown : ChevronRight}
                   boxSize={4}
                   color={iconColor}
+                  onClick={() => toggleExpand(item.label)}
                 />
               )}
             </>
@@ -505,7 +755,6 @@ export function SidebarItem({
               overflow="hidden"
               position="relative"
             >
-              {/* Vertical Line */}
               <Box
                 position="absolute"
                 left="1rem"
@@ -517,56 +766,17 @@ export function SidebarItem({
                 opacity={0.1}
                 zIndex={-1}
               />
-
-              {/* Subitems */}
-              {item.children.map((child: any) => {
-                const isChildActive =
-                  child.id === activeSection ||
-                  child.href?.includes(`#${activeSection}`);
-
-                return (
-                  <Box
-                    key={child.label}
-                    borderRadius="md"
-                    px={3}
-                    py={1.5}
-                    fontSize="sm"
-                    color={useColorModeValue(
-                      isChildActive ? "blue.800" : "gray.800",
-                      isChildActive ? "white" : "gray.200"
-                    )}
-                    bg={
-                      isChildActive
-                        ? useColorModeValue("blue.100", "blue.600")
-                        : "transparent"
-                    }
-                    fontWeight={isChildActive ? "bold" : "normal"}
-                    _hover={{
-                      bg: useColorModeValue("blue.200", "blue.500"),
-                    }}
-                    transition="all 0.2s ease"
-                    onClick={() => {
-                      if (child.href) {
-                        const [path, hash] = child.href.split("#");
-                        if (path && window.location.pathname !== path) {
-                          window.location.href = child.href;
-                        } else if (hash) {
-                          const el = document.getElementById(hash);
-                          if (el) {
-                            el.scrollIntoView({ behavior: "smooth" });
-                            history.pushState(null, "", child.href);
-                          }
-                        }
-                      }
-                    }}
-                    cursor="pointer"
-                    position="relative"
-                    zIndex={1}
-                  >
-                    {child.label}
-                  </Box>
-                );
-              })}
+              {item.children.map((child: any) => (
+                <SidebarItem
+                  key={child.label}
+                  item={child}
+                  expanded={expanded}
+                  expandedItems={expandedItems}
+                  toggleExpand={toggleExpand}
+                  depth={depth + 1}
+                  isCollapsed={isCollapsed}
+                />
+              ))}
             </MotionDiv>
           )}
         </AnimatePresence>

@@ -42,17 +42,16 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-  if (window.location.hash) {
-    const id = window.location.hash.replace("#", "");
-    setTimeout(() => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 300); // delay ensures DOM is ready
-  }
-}, []);
-
+    if (window.location.hash) {
+      const id = window.location.hash.replace("#", "");
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 300); // delay ensures DOM is ready
+    }
+  }, []);
 
   useEffect(() => {
     // This ensures hydration is complete before rendering
@@ -67,12 +66,8 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
 
   if (!isHydrated) return null;
 
-  const sidebarVisible = shouldShowSidebar && !isMobile;
-  const sidebarWidth = sidebarVisible
-    ? isCollapsed
-      ? "3rem"
-      : "16rem"
-    : "0";
+  const sidebarVisible = !isMobile;
+  const sidebarWidth = sidebarVisible ? (isCollapsed ? "3rem" : "16rem") : "0";
 
   return (
     <SessionWrapper>
@@ -137,7 +132,14 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
             )}
 
             {/* NAVBAR + CONTENT */}
-            <Box ml={sidebarWidth} transition="margin 0.3s ease">
+            <Box
+              ml={sidebarWidth}
+              transition="margin 0.3s ease"
+              // className="border border-red-800"
+              w={{ base: "100%", md: "auto" }} // 👈 100% only on mobile
+              maxW={{ base: "100vw", md: "none" }} // 👈 prevent overflow only on mobile
+              overflowX={{ base: "hidden", md: "visible" }} // 👈 only restrict horizontal scroll on mobile
+            >
               <Navbar />
               <AuthLocalStorageInitializer />
               {children}

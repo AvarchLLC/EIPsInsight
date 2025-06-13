@@ -686,7 +686,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type, showD
           maxWidth="900px"
         >
           <Heading size="md" mb={4} color={headingColor}>
-            {type} {status === "All" ? "" : `- ${status}`} Over Time
+              {`${status}`} Over Time
           </Heading>
 
           <Flex gap={4} direction={{ base: "column", md: "row" }} mb={4} align="center" wrap="wrap">

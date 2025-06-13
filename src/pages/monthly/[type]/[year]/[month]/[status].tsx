@@ -141,6 +141,7 @@ const Insi = () => {
               <Header
                 title={`${monthNames[Number(month) - 1]} - ${year}`}
                 subtitle={getStatus(status)}
+                description={""}
               />
             </NextLink>
           </FlexBetween>
