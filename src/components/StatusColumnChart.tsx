@@ -225,13 +225,13 @@ const StatusChart: React.FC<AreaCProps> = ({ category, type }) => {
   };
 
 
-  const headingColor = useColorModeValue('black', 'white');
+  const headingColor = useColorModeValue('color="blue.400"', 'color="blue.400"');
   const chartHeight = Math.min(400, windowSize.height * 0.6);
 
 
   return (
     <>
-      <Flex justifyContent="space-between" alignItems="center" mb="0.5rem" width="100%" flexWrap="wrap" gap={2}>
+      <Flex justifyContent="space-between" alignItems="center" mb={4} width="100%" flexWrap="wrap" gap={2}>
         <Heading size="md" color={headingColor}>
           {category} Over Time
         </Heading>

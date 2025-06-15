@@ -133,7 +133,6 @@ interface APIResponse {
 
 const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => {
   const [data, setData] = useState<APIResponse>();
-  const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [isLoading, setIsLoading] = useState(true);
   const [fromYear, setFromYear] = useState<string>("");
@@ -205,12 +204,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status, type }) => 
     }
   );
 
-  const chartWidth = windowSize.width
-    ? Math.min(windowSize.width * 0.6, 500)
-    : "100%";
-  const chartHeight = windowSize.height
-    ? Math.min(windowSize.height * 0.6, 500)
-    : "100%";
+
   const availableYears = Array.from(
     new Set(
       filteredData.flatMap((item) => item.eips.map((eip) => eip.year.toString()))
