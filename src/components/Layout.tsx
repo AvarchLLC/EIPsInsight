@@ -70,7 +70,6 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const sidebarWidth = sidebarVisible ? (isCollapsed ? "3rem" : "16rem") : "0";
 
   return (
-    <SessionWrapper>
       <motion.div
         key={router}
         initial="initialState"
@@ -159,7 +158,6 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
           </BookmarkProvider>
         </Providers>
       </motion.div>
-    </SessionWrapper>
   );
 };
 

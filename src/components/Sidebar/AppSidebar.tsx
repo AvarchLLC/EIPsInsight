@@ -56,6 +56,7 @@ import { useRouter } from "next/router";
 import { chakra, shouldForwardProp } from "@chakra-ui/react";
 import { isValidMotionProp } from "framer-motion";
 import { Rajdhani } from "next/font/google";
+import { useUserStore } from "@/stores/userStore";
 
 // Extend chakra with motion.div
 const MotionDiv = chakra(motion.div, {
@@ -371,6 +372,7 @@ export default function AppSidebar() {
   const activeSection = useSidebarStore((s) => s.activeSection);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [userData, setUserData] = useState<UserData | null>(null);
+    const { user, setUser, clearUser } = useUserStore();
 
     const bottomItems = [
   // { icon: Search, label: "Search", href: "/search" },
@@ -420,58 +422,60 @@ useEffect(() => {
 }, []);
 
 const toast = useToast();
+  const router = useRouter();
 
-const handleRefresh = async () => {
-  try {
-    const response = await fetch('/api/GetUserStatus');
-    const data = await response.json();
+ const handleRefresh = async () => {
+    if (!user) return;
 
-    const updatedUser = {
-      ...userData!,
-      tier: data.tier || userData?.tier || 'Free'
-    };
+    try {
+      const response = await fetch('/api/GetUserStatus');
+      const data = await response.json();
 
-    setUserData(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+      const updatedUser = {
+        ...user,
+        tier: data.tier || user.tier || 'Free',
+      };
 
-    toast({
-      title: 'Status refreshed',
-      status: 'success',
-      duration: 2000,
-      isClosable: true,
-    });
-  } catch (error) {
-    toast({
-      title: 'Refresh failed',
-      description: 'Could not fetch latest status',
-      status: 'error',
-      duration: 3000,
-      isClosable: true,
-    });
-  }
-};
-const router = useRouter();
+      setUser(updatedUser);
+      toast({
+        title: 'Status refreshed',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: 'Refresh failed',
+        description: 'Could not fetch latest status',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
-const handleLogout = async () => {
-  try {
-    localStorage.removeItem('user');
-    await signOut({ redirect: false });
-    toast({
-      title: 'Logged out successfully',
-      status: 'success',
-      duration: 2000,
-      isClosable: true,
-    });
-    setTimeout(() => router.push('/signin'), 500);
-  } catch (error) {
-    toast({
-      title: 'Logout failed',
-      status: 'error',
-      duration: 3000,
-      isClosable: true,
-    });
-  }
-};
+  const handleLogout = async () => {
+    try {
+      clearUser();
+      await signOut({ redirect: false });
+
+      toast({
+        title: 'Logged out successfully',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+
+      setTimeout(() => router.push('/signin'), 500);
+    } catch (error) {
+      toast({
+        title: 'Logout failed',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
 
   return (
