@@ -1,5 +1,14 @@
-import { Box, Grid, Heading, Link, Image, Text, useColorModeValue } from "@chakra-ui/react";
+import {
+  Box,
+  Grid,
+  Heading,
+  Link,
+  Image,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { FC } from "react";
+import Header from "./Header";
 
 interface ToolCardProps {
   imageSrc: string;
@@ -34,11 +43,11 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link }) => {
         color="#30A0E0"
         overflow="hidden"
       >
-        <Image 
-          src={imageSrc} 
-          boxSize="150px" 
-          objectFit="contain" 
-          // mb={4} 
+        <Image
+          src={imageSrc}
+          boxSize="150px"
+          objectFit="contain"
+          // mb={4}
         />
         <Text fontSize="2xl" fontWeight="bold" noOfLines={2}>
           {label}
@@ -55,39 +64,92 @@ const ToolsSection: FC = () => {
   const headingBgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)";
 
   return (
-    <Box textAlign="center" bg="rgba(0, 0, 0, 0.5)" borderRadius="md" padding={8} boxShadow="md">
-      <Heading
-            color={useColorModeValue(headingColorLight, headingColorDark)}
-            fontWeight="bold"
-            fontSize={{ base: "4xl", md: "6xl", lg: "7xl" }}
-            textAlign="center"
-            textShadow={useColorModeValue("none", "0 2px 5px rgba(0, 0, 0, 0.3)")}
-            letterSpacing="wide"
-            bgGradient={useColorModeValue(headingBgGradientLight, headingBgGradientDark)}
-            bgClip="text"
-            mb={6}
-            id="ourtools"
-          >
-            Our Tools
-          </Heading>
-
-      <Grid
-        templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
-        gap={6}
-        justifyContent="center"
-        alignItems="center"
-        width="100%"
+    <div className="py-10" id="ourtools">
+     
+      <Box
+        textAlign="left"
+        bg="rgba(0, 0, 0, 0.5)"
+        borderRadius="md"
+        padding={8}
+        boxShadow="md"
+        py={4}
       >
-        <ToolCard imageSrc="/DashboardCard1.png" label="Analytics" link="/Analytics" />
-        <ToolCard imageSrc="/DashboardCard2.png" label="Editors Leaderboard" link="/Reviewers" />
-        <ToolCard imageSrc="/DashboardCard3.png" label="Boards" link="/boards" />
-        <ToolCard imageSrc="/DashboardCard7.png" label="Search by Author" link="/authors" />
-        <ToolCard imageSrc="/DashboardCard5.png" label="All EIPs" link="/all" />
-        <ToolCard imageSrc="/DashBoardCard4.png" label="Did you Know" link="/trivia" />
-        <ToolCard imageSrc="/DashboardCard6.png" label="Feedback Form" link="/Feedback" />
-        <ToolCard imageSrc="/dashBoardCard8.png" label="More Resources" link="/resources" />
-      </Grid>
-    </Box>
+        {/* <Heading
+          color={useColorModeValue(headingColorLight, headingColorDark)}
+          fontWeight="bold"
+          fontSize={{ base: "4xl", md: "6xl", lg: "7xl" }}
+          textAlign="center"
+          textShadow={useColorModeValue("none", "0 2px 5px rgba(0, 0, 0, 0.3)")}
+          letterSpacing="wide"
+          bgGradient={useColorModeValue(
+            headingBgGradientLight,
+            headingBgGradientDark
+          )}
+          bgClip="text"
+          mb={6}
+        
+        >
+          Our Tools
+        </Heading> */}
+         <Header
+        title="OUR TOOLS"
+        subtitle="Overview"
+        description="A high-level overview of Ethereum Standards by Analytics, Editors Leaderboard, Boards,Search by Author,All EIPs, and More Resources.
+"
+        sectionId="ourtools"
+      />
+
+        <Grid
+          templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+          gap={6}
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          className="mt-3"
+        >
+          <ToolCard
+            imageSrc="/DashboardCard1.png"
+            label="Analytics"
+            link="/Analytics"
+          />
+          <ToolCard
+            imageSrc="/DashboardCard2.png"
+            label="Editors Leaderboard"
+            link="/Reviewers"
+          />
+          <ToolCard
+            imageSrc="/DashboardCard3.png"
+            label="Boards"
+            link="/boards"
+          />
+          <ToolCard
+            imageSrc="/DashboardCard7.png"
+            label="Search by Author"
+            link="/authors"
+          />
+          <ToolCard
+            imageSrc="/DashboardCard5.png"
+            label="All EIPs"
+            link="/all"
+          />
+          <ToolCard
+            imageSrc="/DashBoardCard4.png"
+            label="Did you Know"
+            link="/trivia"
+          />
+          <ToolCard
+            imageSrc="/DashboardCard6.png"
+            label="Feedback Form"
+            link="/Feedback"
+          />
+          <ToolCard
+            imageSrc="/dashBoardCard8.png"
+            label="More Resources"
+            link="/resources"
+          />
+        </Grid>
+      </Box>
+    </div>
   );
 };
 

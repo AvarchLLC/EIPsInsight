@@ -24,7 +24,11 @@ import CatTable2 from "@/components/CatTable2";
 import NextLink from "next/link";
 import RipTable from "@/components/RipTable";
 import { useRouter } from "next/router";
+<<<<<<< dev
 import SubscriptionButton from "@/components/SubscribtionButton";
+=======
+import { useScrollSpy } from "@/hooks/useScrollSpy";
+>>>>>>> dev
 
 interface EIP {
   _id: string;
@@ -218,6 +222,22 @@ const RIP = () => {
   }, []);
 
   const toggleCollapse = () => setShow(!show);
+  
+  useScrollSpy([
+  "Ethereum Improvement",
+  "GitHub Stats – RIPs",
+  "draft",
+  "final",
+  "living",
+  "meta",
+  "informational",
+  "core",
+  "networking",
+  "interface",
+  "rip",
+  "rrc",
+]);
+
 
 
   return (
@@ -267,7 +287,8 @@ const RIP = () => {
                 subtitle={
                   <Flex align="center" gap={2} flexWrap="wrap">
                     <Text>
-                      A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem.                    </Text>
+                      A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem.
+                    </Text>
                     <Button
                       size="sm"
                       colorScheme="blue"
@@ -278,6 +299,11 @@ const RIP = () => {
                       Learn More
                     </Button>
                   </Flex>
+                }
+                description={
+                  <Text>
+                    Explore the latest Rollup Improvement Proposals (RIPs) and their impact on the Ethereum rollup ecosystem.
+                  </Text>
                 }
               />
               <div className="flex items-center mb-4">

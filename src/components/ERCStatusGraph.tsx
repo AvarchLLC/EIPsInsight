@@ -161,7 +161,7 @@ const ERCStatusGraph = () => {
 
   return (
     <>
-      <Box className="h-full" bg={bg} paddingY={4} paddingX={6} borderRadius={"0.55rem"}>
+      <Box className="h-full" bg={bg} paddingY={4} paddingX={6} borderRadius={"0.55rem"} id="ERC progress bar">
         <Flex justifyContent="space-between" alignItems="center" marginBottom="1rem">
           <NextLink href={"/riptable"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">

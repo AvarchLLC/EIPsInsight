@@ -32,7 +32,6 @@ import { FaEye, FaEyeSlash, FaSignOutAlt, FaUserEdit, FaArrowLeft } from 'react-
 import AllLayout from '@/components/LoginLayout';
 import { RepeatIcon } from '@chakra-ui/icons';
 import { signOut } from 'next-auth/react';
-
 interface UserData {
   id: string;
   name: string;
@@ -63,39 +62,6 @@ export default function ProfilePage() {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
-  // Load user data from localStorage on component mount
-  // useEffect(() => {
-  //   const loadUserData = () => {
-  //     try {
-  //       const storedUser = localStorage.getItem('user');
-  //       console.log("initial data:", storedUser);
-  //       if (storedUser) {
-  //         const parsedUser = JSON.parse(storedUser);
-  //         setName(parsedUser.name || '');
-  //         setEmail(parsedUser.email || '');
-  //         setUserData({
-  //           id: parsedUser.id || '',
-  //           name: parsedUser.name || '',
-  //           email: parsedUser.email || '',
-  //           image: parsedUser.image || '',
-  //           tier: parsedUser.tier || 'Free',
-  //           walletAddress: parsedUser.walletAddress || null
-  //         });
-  //       } else {
-          
-  //         router.push('/signin');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error loading user data:', error);
-  //       router.push('/signin');
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   loadUserData();
-  // }, [router]);
 
   useEffect(() => {
     const loadUserData = async () => {

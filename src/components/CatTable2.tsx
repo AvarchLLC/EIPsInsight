@@ -707,6 +707,7 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition="all 0.4s ease-in-out"
+      id={"Satus Activity"}
     >
 
       <Stack direction="row" justify="space-between" align="center" mb={4}>

@@ -45,7 +45,7 @@ import BoyGirl from "@/components/BoyGirl";
 import BoyGirl2 from "@/components/BoyGirl2";
 import BoyGirl3 from "@/components/BoyGirl3";
 import AllChart from "./AllChart2";
-import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png"
+import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png";
 import ToolsSection from "./AvailableTools";
 import TypeGraphs from "@/components/TypeGraphs2";
 import CopyLink from "./CopyLink";
@@ -57,7 +57,7 @@ import {
   FiTool,
   FiInfo,
   FiDatabase,
-} from 'react-icons/fi';
+} from "react-icons/fi";
 
 import { useSidebar } from "@/components/Sidebar/SideBarContext";
 
@@ -65,8 +65,6 @@ import DashboardCards from "./DashboardCards";
 import FeedbackWidget from "./FeedbackWidget";
 
 import { useScrollSpy } from "@/hooks/useScrollSpy";
-
-
 
 interface EIP {
   _id: string;
@@ -140,8 +138,8 @@ const Dashboard = () => {
 
     fetchData();
   }, []);
-  const allData: EIP[] = data?.eip.concat(data?.erc.concat(data?.rip)) || [];
-  const uniqueStatuses = [...new Set(allData.map(item => item.status))];
+  const allData: EIP[] = data?.eip?.concat(data?.erc?.concat(data?.rip)) || [];
+  const uniqueStatuses = [...new Set(allData.map((item) => item.status))];
   console.log(uniqueStatuses);
   const uniqueeip = allData.filter((item) => item.status === "");
   console.log("unique eip1:", uniqueeip);
@@ -227,19 +225,26 @@ const Dashboard = () => {
       });
     }
   };
-        useScrollSpy([
-  "all",
-  "ourtools",
-  "what",
-  "statuschanges",
-  "dashboard",
-]);
+
+  useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.replace("#", "");
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 300); // delay ensures DOM is ready
+    }
+  }, []);
+
+  useScrollSpy(["all", "ourtools", "what", "statuschanges", "dashboard"]);
   return (
     <>
       <FeedbackWidget />
       <Box
         paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-        marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
+        marginX={{ lg: "2", md: "2", sm: "2", base: "2" }}
         paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
         marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
       >
@@ -288,13 +293,19 @@ const Dashboard = () => {
                         borderRadius="md" // Rounded corners
                         padding={4} // Padding around the text
                         paddingLeft="6"
-                        // boxShadow="md" 
+                        // boxShadow="md"
                         maxWidth="550px"
                       >
                         <Text
-                          color={useColorModeValue(textColorLight, textColorDark)} // Switch color based on mode
+                          color={useColorModeValue(
+                            textColorLight,
+                            textColorDark
+                          )} // Switch color based on mode
                           fontWeight={"bold"}
-                          bgGradient={useColorModeValue(bgGradientLight, bgGradientDark)} // Optional: add a gradient background
+                          bgGradient={useColorModeValue(
+                            bgGradientLight,
+                            bgGradientDark
+                          )} // Optional: add a gradient background
                           bgClip="text" // Optional: clip background to the text
                           fontSize={{
                             lg: "6xl",
@@ -303,7 +314,8 @@ const Dashboard = () => {
                             base: "xl",
                           }}
                         >
-                          Ethereum <br /> Improvement <br /> Proposal <br /> Insight
+                          Ethereum <br /> Improvement <br /> Proposal <br />{" "}
+                          Insight
                         </Text>
                       </Box>
                       <br />
@@ -330,7 +342,10 @@ const Dashboard = () => {
                               rightIcon={<BsArrowUpRight />}
                               bgColor={"#30A0E0"}
                               _hover={{
-                                bgColor: useColorModeValue("#2B6CB0", "#4A5568"),
+                                bgColor: useColorModeValue(
+                                  "#2B6CB0",
+                                  "#4A5568"
+                                ),
                                 color: useColorModeValue("white", "#F5F5F5"),
                               }}
                             >
@@ -362,7 +377,10 @@ const Dashboard = () => {
                               rightIcon={<BsGraphUp />}
                               bgColor={"#30A0E0"}
                               _hover={{
-                                bgColor: useColorModeValue("#2B6CB0", "#4A5568"),
+                                bgColor: useColorModeValue(
+                                  "#2B6CB0",
+                                  "#4A5568"
+                                ),
                                 color: useColorModeValue("white", "#F5F5F5"),
                               }}
                             >
@@ -376,14 +394,26 @@ const Dashboard = () => {
                     <BoyGirl3 />
                     {/* <AllChart type="Total" /> */}
                   </Box>
-                  <br /><br /><br />
+                  <br />
+                  <br />
+                  <br />
                   <Box
                     bg="rgba(0, 0, 0, 0.5)"
                     borderRadius="md" // Rounded corners
                     padding={4} // Padding around the text
                     boxShadow="md"
+                    id="all"
+                    py={5}
                   >
-                    <AllChart type="Total" dataset={data} />
+                    <div className="py-10">
+                      <Header
+                        title="ALL CATEGORIES AND STATUS"
+                        subtitle="Overview"
+                        description="A high-level overview of Ethereum Standards by categories, and status."
+                        sectionId="all"
+                      />
+                      <AllChart type="Total" dataset={data} />
+                    </div>
                   </Box>
                 </div>
 
@@ -394,12 +424,20 @@ const Dashboard = () => {
                     className="text-5xl text-center pb-5 sm:text-6xl md:text-7xl"
                     fontWeight={"bold"}
                     color={useColorModeValue(textColorLight, textColorDark)}
-                    bgGradient={useColorModeValue(bgGradientLight, bgGradientDark)}
+                    bgGradient={useColorModeValue(
+                      bgGradientLight,
+                      bgGradientDark
+                    )}
                     bgClip="text"
                   >
                     Ethereum <br /> Improvement <br /> Proposals <br /> Insight
                   </Text>
-                  <Stack direction={"row"} spacing={"6"} paddingTop={"20"} justifyContent={"center"}>
+                  <Stack
+                    direction={"row"}
+                    spacing={"6"}
+                    paddingTop={"20"}
+                    justifyContent={"center"}
+                  >
                     <Box>
                       <NextLink href={"/home#1"}>
                         <Button
@@ -460,11 +498,11 @@ const Dashboard = () => {
                       </NextLink>
                     </Box>
                   </Stack>
-                  <br /><br />
+                  <br />
+                  <br />
                   <div>
                     <AllChart type="Total" dataset={data} />
                   </div>
-
                 </div>
               </Box>
 
@@ -493,313 +531,445 @@ const Dashboard = () => {
 
               {/* </Box> */}
               {/* </div> */}
+              <div className="py-16" id="what">
+                <Header
+                  title="WHAT IS EIPsInsight ?"
+                  subtitle="Overview "
+                  description="EIPsInsight visualizes Ethereum proposal activity to track progress and editor workloads."
+                  sectionId="what"
+                />
+                <Box
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-8"
+                  bg="rgba(0, 0, 0, 0.5)"
+                  borderRadius="md" // Rounded corners
+                  // padding={5}
+                  boxShadow="md"
+                  marginTop={10}
+                >
+                  {/* Centered Heading */}
 
-
-              <Box
-                className="grid grid-cols-1 lg:grid-cols-2 pb-10 gap-8 lg:gap-8"
-                bg="rgba(0, 0, 0, 0.5)"
-                borderRadius="md" // Rounded corners
-                padding={5}
-                boxShadow="md"
-                marginTop={10}
-              >
-                {/* Centered Heading */}
-                <div className="col-span-full text-center" id="what">
-                  <h1 className="text-5xl font-bold">
+                  <div className="col-span-full text-center">
+                    {/* <h1 className="text-5xl font-bold ">
                     <span className="text-gray-200">What is</span>{" "}
                     <span className="text-blue-400">EIPsInsight</span>
                     <span className="text-gray-200">?</span>
-                  </h1>
-                  {/* <hr className="mt-4 border-gray-500" />  */}
-                </div>
+                  </h1> */}
 
-                {/* Left Side - YouTube Video */}
-                <div className="flex justify-center items-center">
-                  <iframe
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/AyidVR6X6J8?start=8"
-                    title="YouTube video"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-
-                {/* Right Side - EIPInsight Info */}
-                <div className="flex justify-center items-center">
-                  <div className="text-center max-w-xl space-y-6">
-                    <p className="text-xl text-justify text-gray-200">
-                      EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposal (
-                      <NextLink href="/eip">
-                        <span className="text-blue-400">EIP</span>
-                      </NextLink>),
-                      Ethereum Request for Comments (
-                      <NextLink href="/erc">
-                        <span className="text-blue-400">ERCs</span>
-                      </NextLink>),
-                      and Rollup Improvement Proposals (
-                      <NextLink href="/rip">
-                        <span className="text-blue-400">RIPs</span>
-                      </NextLink>),
-                      over a specified period. Data provided is used for tracking the progress and workload distribution among
-                      <NextLink href="/eips/eip-1">
-                        <span className="text-blue-400"> EIP Editors</span>
-                      </NextLink>, ensuring transparency and efficiency in the proposal review process.
-                    </p>
-
-
-                    <NextLink href="/resources">
-                      <span className="text-blue-400 text-xl flex items-center space-x-2">
-                        Learn More <BsArrowUpRight className="pt-1" size={25} />
-                      </span>
-                    </NextLink>
+                    {/* <hr className="mt-4 border-gray-500" />  */}
                   </div>
-                </div>
-              </Box>
+
+                  {/* Left Side - YouTube Video */}
+                  <div className="flex justify-center items-center">
+                    <iframe
+                      width="560"
+                      height="315"
+                      src="https://www.youtube.com/embed/AyidVR6X6J8?start=8"
+                      title="YouTube video"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+
+                  {/* Right Side - EIPInsight Info */}
+                  <div className="flex justify-center items-center">
+                    <div className="text-center max-w-xl space-y-6">
+                      <p className="text-xl text-justify text-gray-200">
+                        EIPsInsight is specialized in toolings designed to
+                        provide clear, visual insights into the activity of
+                        Ethereum Improvement Proposal (
+                        <NextLink href="/eip">
+                          <span className="text-blue-400">EIP</span>
+                        </NextLink>
+                        ), Ethereum Request for Comments (
+                        <NextLink href="/erc">
+                          <span className="text-blue-400">ERCs</span>
+                        </NextLink>
+                        ), and Rollup Improvement Proposals (
+                        <NextLink href="/rip">
+                          <span className="text-blue-400">RIPs</span>
+                        </NextLink>
+                        ), over a specified period. Data provided is used for
+                        tracking the progress and workload distribution among
+                        <NextLink href="/eips/eip-1">
+                          <span className="text-blue-400"> EIP Editors</span>
+                        </NextLink>
+                        , ensuring transparency and efficiency in the proposal
+                        review process.
+                      </p>
+
+                      <NextLink href="/resources">
+                        <span className="text-blue-400 text-xl flex items-center space-x-2">
+                          Learn More{" "}
+                          <BsArrowUpRight className="pt-1" size={25} />
+                        </span>
+                      </NextLink>
+                    </div>
+                  </div>
+                </Box>
+              </div>
 
               <br />
             </motion.div>
             <br />
-            <Box id="statuschanges" paddingTop={8} paddingBottom={8}>
-              <TypeGraphs />
-            </Box>
-
-            <Box
-              bg="rgba(0, 0, 0, 0.5)"
-              borderRadius="md" // Rounded corners
-              padding={6} // Padding around the text
-              boxShadow="md"
-            >
-              <FlexBetween>
-
-                <Box color={"rgba(255, 255, 255, 0.7)"} id="dashboard" >
-                  <Header
-                    title="DASHBOARD"
-                    subtitle="Welcome to the dashboard"
-                  />
-                </Box>
-
-                <Box>
-                  {/*<Button*/}
-                  {/*    colorScheme="blue"*/}
-                  {/*    variant="outline"*/}
-                  {/*    fontSize={{lg:'14px',md:'12px', sm:'12px',base:'10px'}}*/}
-                  {/*    fontWeight={'bold'}*/}
-                  {/*    padding={{lg:'10px 20px',md:'5px 10px', sm:'5px 10px',base:'5px 10px'}}*/}
-                  {/*>*/}
-                  {/*  <DownloadIcon marginEnd={'1.5'} />*/}
-                  {/*  Download Reports*/}
-                  {/*</Button>*/}
-                </Box>
-              </FlexBetween>
-
+            <div className="py-16" id="statuschanges">
+              <Box color={"rgba(255, 255, 255, 0.7)"}>
+                <Header
+                  title="EIP STATUS CHANGES BY YEAR"
+                  subtitle="Overview"
+                  description="Insights of EIPs"
+                  sectionId="statuschanges"
+                />
+              </Box>
+              <Box paddingTop={8} paddingBottom={8}>
+                <TypeGraphs />
+              </Box>
+            </div>
+            <Box id="dashboard" sx={{ scrollMarginTop: "100px" }}>
               <Box
-                display="grid"
-                gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
-                gap={"6"}
-                marginTop={"20px"}
+                bg="rgba(0, 0, 0, 0.5)"
+                borderRadius="md" // Rounded corners
+                // padding={6} // Padding around the text
+                boxShadow="md"
+                // className="border border-red-700"
+                width="1400px"
+                maxWidth="100%"
+                overflow="hidden"
+                mx="auto"
               >
+                <FlexBetween>
+                  <Box color={"rgba(255, 255, 255, 0.7)"}>
+                    <Header
+                      title="DASHBOARD"
+                      subtitle="WELCOME TO DASHBOARD"
+                      description="A high-level overview of Ethereum Standards by type, status, and lifecycle progress.
+"
+                      sectionId="dashboard"
+                    />
+                  </Box>
 
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="col-span-2">
+                  <Box>
+                    {/*<Button*/}
+                    {/*    colorScheme="blue"*/}
+                    {/*    variant="outline"*/}
+                    {/*    fontSize={{lg:'14px',md:'12px', sm:'12px',base:'10px'}}*/}
+                    {/*    fontWeight={'bold'}*/}
+                    {/*    padding={{lg:'10px 20px',md:'5px 10px', sm:'5px 10px',base:'5px 10px'}}*/}
+                    {/*>*/}
+                    {/*  <DownloadIcon marginEnd={'1.5'} />*/}
+                    {/*  Download Reports*/}
+                    {/*</Button>*/}
+                  </Box>
+                </FlexBetween>
+
+                <Box
+                  display="grid"
+                  gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
+                  gap={"6"}
+                  marginTop={"20px"}
+                >
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="col-span-2">
+                      <StatBox
+                        title="Meta EIPs"
+                        value={
+                          new Set(
+                            allData
+                              .filter((item) => item.type === "Meta")
+                              .map((item) => item.eip)
+                          ).size
+                        }
+                        description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
+                        icon={
+                          <Icon
+                            as={Briefcase}
+                            fontSize={{ base: "10", lg: "15" }}
+                          />
+                        }
+                        url="meta"
+                      />
+                    </div>
+
                     <StatBox
-                      title="Meta EIPs"
-                      value={(new Set(allData.filter((item) => item.type === "Meta").map((item) => item.eip)).size)}
-                      description="Meta EIPs describe changes to the EIP process, or other non-optional changes."
-                      icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
-                      url="meta"
+                      title="Core EIPs"
+                      value={
+                        data?.eip?.filter(
+                          (item) =>
+                            item.type === "Standards Track" &&
+                            item.category === "Core"
+                        ).length || 0
+                      }
+                      description="Core EIPs describe changes to the Ethereum protocol."
+                      icon={
+                        <Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />
+                      }
+                      url="core"
+                    />
+
+                    <StatBox
+                      title="ERCs"
+                      value={
+                        new Set(
+                          allData
+                            .filter((item) => item.category === "ERC")
+                            .map((item) => item.eip)
+                        ).size
+                      }
+                      description="ERCs describe application-level standards for the Ethereum ecosystem."
+                      icon={
+                        <Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />
+                      }
+                      url="erc"
+                    />
+
+                    <StatBox
+                      title="Networking EIPs"
+                      value={
+                        new Set(
+                          allData
+                            .filter((item) => item.category === "Networking")
+                            .map((item) => item.eip)
+                        ).size
+                      }
+                      description="Networking EIPs describe changes to the Ethereum network protocol."
+                      icon={
+                        <Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />
+                      }
+                      url="networking"
+                    />
+
+                    <StatBox
+                      title="Interface EIPs"
+                      value={
+                        new Set(
+                          allData
+                            .filter((item) => item.category === "Interface")
+                            .map((item) => item.eip)
+                        ).size
+                      }
+                      description="Interface EIPs describe changes to the Ethereum client API."
+                      icon={
+                        <Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />
+                      }
+                      url="interface"
+                    />
+
+                    <StatBox
+                      title="Informational EIPs"
+                      value={
+                        new Set(
+                          allData
+                            .filter((item) => item.type === "Informational")
+                            .map((item) => item.eip)
+                        ).size
+                      }
+                      description="Informational EIPs describe other changes to the Ethereum ecosystem."
+                      icon={
+                        <Icon
+                          as={Clipboard}
+                          fontSize={{ base: "10", lg: "15" }}
+                        />
+                      }
+                      url="informational"
+                    />
+
+                    <StatBox
+                      title="RIPs"
+                      value={
+                        new Set(
+                          allData
+                            .filter((item) => item.repo === "rip")
+                            .map((item) => item.eip)
+                        ).size
+                      }
+                      description="RIPs describe changes to the RIP process, or other non-optional changes."
+                      icon={
+                        <Icon
+                          as={Briefcase}
+                          fontSize={{ base: "10", lg: "15" }}
+                        />
+                      }
+                      url="rip"
                     />
                   </div>
 
-                  <StatBox
-                    title="Core EIPs"
-                    value={data?.eip.filter(
-                      (item) =>
-                        item.type === "Standards Track" &&
-                        item.category === "Core"
-                    ).length || 0}
-                    description="Core EIPs describe changes to the Ethereum protocol."
-                    icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
-                    url="core"
-                  />
-
-                  <StatBox
-                    title="ERCs"
-                    value={new Set(allData.filter((item) => item.category === "ERC").map((item) => item.eip)).size}
-                    description="ERCs describe application-level standards for the Ethereum ecosystem."
-                    icon={<Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />}
-                    url="erc"
-                  />
-
-                  <StatBox
-                    title="Networking EIPs"
-                    value={new Set(allData.filter((item) => item.category === "Networking").map((item) => item.eip)).size}
-                    description="Networking EIPs describe changes to the Ethereum network protocol."
-                    icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
-                    url="networking"
-                  />
-
-                  <StatBox
-                    title="Interface EIPs"
-                    value={new Set(allData.filter((item) => item.category === "Interface").map((item) => item.eip)).size}
-                    description="Interface EIPs describe changes to the Ethereum client API."
-                    icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
-                    url="interface"
-                  />
-
-                  <StatBox
-                    title="Informational EIPs"
-                    value={new Set(allData.filter((item) => item.type === "Informational").map((item) => item.eip)).size}
-                    description="Informational EIPs describe other changes to the Ethereum ecosystem."
-                    icon={<Icon as={Clipboard} fontSize={{ base: "10", lg: "15" }} />}
-                    url="informational"
-                  />
-
-                  <StatBox
-                    title="RIPs"
-                    value={new Set(allData.filter((item) => item.repo === "rip").map((item) => item.eip)).size}
-                    description="RIPs describe changes to the RIP process, or other non-optional changes."
-                    icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
-                    url="rip"
-                  />
-                </div>
-
-                <Box
-                  as={motion.div}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 } as any}
-                  bgColor={bg}
-                  paddingY={{ lg: "2rem", sm: "2rem" }}
-                  paddingX={{ lg: "2rem", sm: "0.5rem" }}
-                  borderRadius="0.55rem"
-                  _hover={{
-                    border: "1px",
-                    borderColor: "#30A0E0",
-                  }}
-                  className="hover: cursor-pointer ease-in duration-200"
-                >
-                  <NextLink href="/all">
-                    <Text
-                      fontSize="2xl"
-                      fontWeight="bold"
-                      color="#30A0E0"
-                      marginRight="6"
-                      paddingBottom={6}
-                    >
-                      {`Category - [${allData.length}]`}
-                    </Text>
-                  </NextLink>
-                  <DashboardDonut2 dataset={data} />
-                </Box>
-              </Box>
-
-              <Box
-                display="grid"
-                gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
-                gap={"6"}
-                marginTop={"20px"}
-              >
-
-                <Box
-                  as={motion.div}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 } as any}
-                  bgColor={bg}
-                  paddingY={{ lg: "2rem", sm: "2rem" }}
-                  paddingX={{ lg: "2rem", sm: "0.5rem" }}
-                  borderRadius="0.55rem"
-                  _hover={{
-                    border: "1px",
-                    borderColor: "#30A0E0",
-                  }}
-                  className="hover: cursor-pointer ease-in duration-200"
-                >
-                  <NextLink href="/status">
-                    <Text
-                      fontSize="2xl"
-                      fontWeight="bold"
-                      color="#30A0E0"
-                      marginRight="6"
-                      paddingBottom={6}
-                    >
-                      {`Status - [${allData.length}]`}
-                    </Text>
-                  </NextLink>
-                  <DashboardDonut dataset={data} />
+                  <Box
+                    as={motion.div}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 } as any}
+                    bgColor={bg}
+                    paddingY={{ lg: "2rem", sm: "2rem" }}
+                    paddingX={{ lg: "2rem", sm: "0.5rem" }}
+                    borderRadius="0.55rem"
+                    _hover={{
+                      border: "1px",
+                      borderColor: "#30A0E0",
+                    }}
+                    className="hover: cursor-pointer ease-in duration-200"
+                  >
+                    <NextLink href="/all">
+                      <Text
+                        fontSize="2xl"
+                        fontWeight="bold"
+                        color="#30A0E0"
+                        marginTop="4"
+                        marginRight="6"
+                        paddingBottom={6}
+                        padding={2}
+                      >
+                        {`Category - [${allData.length}]`}
+                      </Text>
+                    </NextLink>
+                    <DashboardDonut2 dataset={data} />
+                  </Box>
                 </Box>
 
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="col-span-2">
+                <Box
+                  display="grid"
+                  gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
+                  gap={"6"}
+                  marginTop={"20px"}
+                >
+                  <Box
+                    as={motion.div}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 } as any}
+                    bgColor={bg}
+                    paddingY={{ lg: "2rem", sm: "2rem" }}
+                    paddingX={{ lg: "2rem", sm: "0.5rem" }}
+                    borderRadius="0.55rem"
+                    _hover={{
+                      border: "1px",
+                      borderColor: "#30A0E0",
+                    }}
+                    className="hover: cursor-pointer ease-in duration-200"
+                  >
+                    <NextLink href="/status">
+                      <Text
+                        fontSize="2xl"
+                        fontWeight="bold"
+                        color="#30A0E0"
+                        marginTop="4"
+                        marginRight="6"
+                        paddingBottom={6}
+                        padding={2}
+                      >
+                        {`Status - [${allData.length}]`}
+                      </Text>
+                    </NextLink>
+                    <DashboardDonut dataset={data} />
+                  </Box>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="col-span-2">
+                      <StatBox
+                        title="Draft"
+                        value={
+                          allData.filter((item) => item.status === "Draft")
+                            .length
+                        }
+                        description="Draft EIPs are proposals still under initial consideration and open for feedback."
+                        icon={
+                          <Icon
+                            as={Briefcase}
+                            fontSize={{ base: "10", lg: "15" }}
+                          />
+                        }
+                        url="alltable"
+                      />
+                    </div>
+
                     <StatBox
-                      title="Draft"
-                      value={allData.filter((item) => item.status === "Draft").length}
-                      description="Draft EIPs are proposals still under initial consideration and open for feedback."
-                      icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
+                      title="Review"
+                      value={
+                        allData.filter((item) => item.status === "Review")
+                          .length
+                      }
+                      description="EIPs in the Review stage are being actively discussed and evaluated by the community."
+                      icon={
+                        <Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />
+                      }
+                      url="alltable"
+                    />
+
+                    <StatBox
+                      title="Last Call"
+                      value={
+                        allData.filter((item) => item.status === "Last Call")
+                          .length
+                      }
+                      description="Last Call EIPs are nearing finalization, with a short period for final community comments."
+                      icon={
+                        <Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />
+                      }
+                      url="alltable"
+                    />
+
+                    <StatBox
+                      title="Final"
+                      value={
+                        allData.filter((item) => item.status === "Final").length
+                      }
+                      description="Final EIPs have been formally accepted and implemented as part of the Ethereum protocol."
+                      icon={
+                        <Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />
+                      }
+                      url="alltable"
+                    />
+
+                    <StatBox
+                      title="Withdrawn"
+                      value={
+                        allData.filter((item) => item.status === "Withdrawn")
+                          .length
+                      }
+                      description="Withdrawn EIPs have been removed from consideration by the author or due to lack of support."
+                      icon={
+                        <Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />
+                      }
+                      url="alltable"
+                    />
+
+                    <StatBox
+                      title="Stagnant"
+                      value={
+                        allData.filter((item) => item.status === "Stagnant")
+                          .length
+                      }
+                      description="Stagnant EIPs are inactive and have not progressed for a prolonged period."
+                      icon={
+                        <Icon
+                          as={Clipboard}
+                          fontSize={{ base: "10", lg: "15" }}
+                        />
+                      }
+                      url="alltable"
+                    />
+
+                    <StatBox
+                      title="Living"
+                      value={
+                        allData.filter((item) => item.status === "Living")
+                          .length
+                      }
+                      description="Living EIPs are continuously updated and reflect evolving standards or documentation."
+                      icon={
+                        <Icon
+                          as={Briefcase}
+                          fontSize={{ base: "10", lg: "15" }}
+                        />
+                      }
                       url="alltable"
                     />
                   </div>
-
-                  <StatBox
-                    title="Review"
-                    value={allData.filter((item) => item.status === "Review").length}
-                    description="EIPs in the Review stage are being actively discussed and evaluated by the community."
-                    icon={<Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />}
-                    url="alltable"
-                  />
-
-                  <StatBox
-                    title="Last Call"
-                    value={allData.filter((item) => item.status === "Last Call").length}
-                    description="Last Call EIPs are nearing finalization, with a short period for final community comments."
-                    icon={<Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />}
-                    url="alltable"
-                  />
-
-                  <StatBox
-                    title="Final"
-                    value={allData.filter((item) => item.status === "Final").length}
-                    description="Final EIPs have been formally accepted and implemented as part of the Ethereum protocol."
-                    icon={<Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />}
-                    url="alltable"
-                  />
-
-                  <StatBox
-                    title="Withdrawn"
-                    value={allData.filter((item) => item.status === "Withdrawn").length}
-                    description="Withdrawn EIPs have been removed from consideration by the author or due to lack of support."
-                    icon={<Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />}
-                    url="alltable"
-                  />
-
-                  <StatBox
-                    title="Stagnant"
-                    value={allData.filter((item) => item.status === "Stagnant").length}
-                    description="Stagnant EIPs are inactive and have not progressed for a prolonged period."
-                    icon={<Icon as={Clipboard} fontSize={{ base: "10", lg: "15" }} />}
-                    url="alltable"
-                  />
-
-                  <StatBox
-                    title="Living"
-                    value={allData.filter((item) => item.status === "Living").length}
-                    description="Living EIPs are continuously updated and reflect evolving standards or documentation."
-                    icon={<Icon as={Briefcase} fontSize={{ base: "10", lg: "15" }} />}
-                    url="alltable"
-                  />
-                </div>
-
-
+                </Box>
               </Box>
             </Box>
-
-
           </motion.div>
         )}
       </Box>
-
     </>
   );
 };
