@@ -67,7 +67,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     alt={frontmatter.title}
                     width="100%"
                     height="100%"
-                    objectFit="contain" // Fit entirely in box, preserve aspect ratio
+                    objectFit="contain"
                   />
                 </Box>
               </Box>
