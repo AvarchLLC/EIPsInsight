@@ -24,11 +24,8 @@ import CatTable2 from "@/components/CatTable2";
 import NextLink from "next/link";
 import RipTable from "@/components/RipTable";
 import { useRouter } from "next/router";
-<<<<<<< dev
 import SubscriptionButton from "@/components/SubscribtionButton";
-=======
 import { useScrollSpy } from "@/hooks/useScrollSpy";
->>>>>>> dev
 
 interface EIP {
   _id: string;

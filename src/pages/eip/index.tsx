@@ -117,13 +117,10 @@ import OtherBox from "@/components/OtherStats";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
-<<<<<<< dev
 import SubscriptionButton from '@/components/SubscribtionButton';
-=======
 import Header from "@/components/Header";
 import { SubscribeForm } from '@/components/SubscriptionForm';
 
->>>>>>> dev
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
@@ -430,14 +427,9 @@ const Type = () => {
               </Box>
             </Box>
 
-<<<<<<< dev
             <Box w="100%" id="categories">
 
               {selected === "category" && (
-=======
-            <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="View EIP Stats">
-              {selected === "type" && (
->>>>>>> dev
                 <>
                   <Heading
                     fontSize={{ base: "32px", sm: "34px", md: "36px" }}

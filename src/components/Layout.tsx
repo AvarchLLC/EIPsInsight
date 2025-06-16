@@ -53,10 +53,6 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
       }, 300); // delay ensures DOM is ready
     }
   }, []);
-<<<<<<< dev
-
-=======
->>>>>>> dev
 
   useEffect(() => {
     // This ensures hydration is complete before rendering
