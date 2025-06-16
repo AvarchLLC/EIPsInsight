@@ -1358,7 +1358,7 @@ const CatTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
           transition={{ duration: 0.3 }}
         >
           {/* Header + Download Button */}
-          <Stack direction="row" justify="space-between" align="center" mb={4}>
+          <Stack direction="row" justify="space-between" align="center" mb={2}>
             <Text fontSize="2xl" fontWeight="bold" color="blue.400">
               {status} Recent Activity's
             </Text>
@@ -1467,9 +1467,9 @@ const CatTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
               ))}
             </VStack>
           </Box>
-          <Box overflowX={{ base: "auto", md: "visible" }} mt={6}>
+          {/* <Box overflowX={{ base: "auto", md: "visible" }} mt={6}>
             <DateTime />
-          </Box>
+          </Box> */}
         </MotionBox>
       )}
     </>

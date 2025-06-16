@@ -415,16 +415,16 @@ const ERCStatusDonut = () => {
             transition="all 0.3s ease"
             _hover={{ borderColor: "#30A0E0", boxShadow: "2xl" }}
           >
-            <Text fontSize="sm" color="#30A0E0" fontWeight="semibold" mb={1}>
+            <Text fontSize={{ base: "24px", sm: "24px", md: "26px", lg: "28px" }} color="#30A0E0" fontWeight="semibold" mb={1}>
               All ERCs
             </Text>
-            <Text fontSize="3xl" fontWeight="extrabold" color={textColor}>
+            <Text fontSize={{ base: "20px", sm: "20px", md: "22px", lg: "24px" }} fontWeight="extrabold" color={textColor}>
               {data.length}{" "}
-              <Text as="span" fontSize="md">
+              <Text as="span" fontSize={{ base: "18px", sm: "18px", md: "20px", lg: "22px" }}>
                 (100%)
               </Text>
             </Text>
-            <Text fontSize="sm" mt={2} color="gray.500">
+            <Text fontSize={{ base: "16px", sm: "16px", md: "18px", lg: "20px" }} mt={2} color="gray.500">
               Total number of ERCs across all types.
             </Text>
           </Box>

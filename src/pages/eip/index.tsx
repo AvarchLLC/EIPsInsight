@@ -117,9 +117,13 @@ import OtherBox from "@/components/OtherStats";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+<<<<<<< dev
+import SubscriptionButton from '@/components/SubscribtionButton';
+=======
 import Header from "@/components/Header";
 import { SubscribeForm } from '@/components/SubscriptionForm';
 
+>>>>>>> dev
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
@@ -135,9 +139,10 @@ const Type = () => {
   });
   const [data3, setData3] = useState<Data>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
-  const [selected, setSelected] = useState<"status" | "type">("type");
+  const [selected, setSelected] = useState<"status" | "category">("category");
   const [selectedInner, setSelectedInner] = useState(ALL_OPTIONS[0]);
   const [selectedStatusInner, setSelectedStatusInner] = useState(Status_OPTIONS[0]);
+  const [selectedEIP, setSelectedEIP] = useState<string>('all');
   const router = useRouter();
   const basePath = typeof window !== "undefined" ? window.location.origin : "";
   const toast = useToast();
@@ -165,21 +170,21 @@ const Type = () => {
 
 
   const handleCopyOverviewChart = () => {
-    const url = `${window.location.origin}/eip?view=${selected}${selected === 'type' ? '&filter=Core' : ''}#${selected}-graphs`;
+    const url = `${window.location.origin}/eip?view=${selected}${selected === 'category' ? '&filter=Core' : ''}#${selected}-graphs`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
-      description: `Shared view for ${selected === "status" ? "Status Chart" : "Type Chart"}`,
+      description: `Shared view for ${selected === "status" ? "Status Chart" : "category Chart"}`,
       status: "success",
       duration: 3000,
       isClosable: true,
     });
   }; const handleCopyTypeDetail = () => {
-    const url = `${window.location.origin}/eip?view=type&filter=${encodeURIComponent(selectedInner)}#type-graphs`;
+    const url = `${window.location.origin}/eip?view=category&filter=${encodeURIComponent(selectedInner)}#category-graphs`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
-      description: `Shared view for Type: ${selectedInner}`,
+      description: `Shared view for category: ${selectedInner}`,
       status: "success",
       duration: 3000,
       isClosable: true,
@@ -254,7 +259,7 @@ const Type = () => {
       setSelected("status");
     } else {
       // default or if view === "type"
-      setSelected("type");
+      setSelected("category");
     }
   }, [router.query.view]);
 
@@ -346,24 +351,25 @@ const Type = () => {
                   </Flex>
                 }
               />
-              {/* <Box mt={4}>
-                <SubscribeForm type="eips" id="all" filter="all" />
-              </Box> */}
+              <div className="flex items-center mb-4">
+                <SubscriptionButton type="eips" id="all" />
+              </div>
 
 
               <Box id="githubstats">
                 <OtherBox type="EIPs" />
               </Box>
+              <br></br>
 
               <ButtonGroup size="md" isAttached>
                 <Button
-                  bg={selected === "type" ? "#40E0D0" : "white"}
-                  color={selected === "type" ? "white" : "#40E0D0"}
+                  bg={selected === "category" ? "#40E0D0" : "white"}
+                  color={selected === "category" ? "white" : "#40E0D0"}
                   borderColor="#40E0D0"
                   variant="outline"
                   onClick={() => {
-                    setSelected("type");
-                    router.push("?view=type", undefined, { shallow: true });
+                    setSelected("category");
+                    router.push("?view=category", undefined, { shallow: true });
                   }}
                 >
                   Category
@@ -390,7 +396,7 @@ const Type = () => {
 
             <Box className="w-full flex flex-col gap-5 pt-8" id="chart type">
               <Box id="charts" className="w-full overflow-hidden">
-                <Box display="flex" justifyContent="space-between" alignItems="center" px={4} pb={2}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" px={0} pb={2}>
                   <Text fontSize={{ base: "32px", sm: "32px", md: "34px", lg: "36px" }} fontWeight="bold">
                     {selected === "status" ? "Distribution over the year(Based on status)" : "Distribution over the year(Based on category)"}
                   </Text>
@@ -424,8 +430,14 @@ const Type = () => {
               </Box>
             </Box>
 
+<<<<<<< dev
+            <Box w="100%" id="categories">
+
+              {selected === "category" && (
+=======
             <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto" id="View EIP Stats">
               {selected === "type" && (
+>>>>>>> dev
                 <>
                   <Heading
                     fontSize={{ base: "32px", sm: "34px", md: "36px" }}
@@ -461,35 +473,38 @@ const Type = () => {
                     </Select>
                   </Flex>
 
-                  <Flex
-                    direction={{ base: "column", md: "row" }}
-                    gap={6}
-                    w="full"
-                  >
-                    {/* Removed minW="0" from both boxes */}
+                  <Flex direction={{ base: "column", md: "row" }} gap={6} w="full" align="stretch">
                     <Box
                       flex={1}
+                      minH={{ base: "400px", md: "500px" }}
+                      display="flex"
+                      flexDirection="column"
                       bg="gray.50"
-                      p={{ base: 2, md: 4 }}  // Responsive padding
                       borderRadius="xl"
-                      overflowX="auto"  // Allow horizontal scrolling
                     >
                       <TypeGraphs selected={selectedInner} />
                     </Box>
 
                     <Box
                       flex={1}
+                      minH={{ base: "400px", md: "500px" }}
+                      display="flex"
+                      flexDirection="column"
                       bg="gray.50"
-                      p={{ base: 2, md: 4 }}   // Responsive padding
                       borderRadius="xl"
-                      overflowX="auto"   // Allow horizontal scrolling
                     >
                       <CatTable2 dataset={data4} cat="All" status={selectedInner} />
                     </Box>
                   </Flex>
+
+
+
+
+
                 </>
               )}
             </Box>
+
 
 
 
@@ -514,7 +529,7 @@ const Type = () => {
                     <AreaStatus type="EIPs" />
                   </Box>
 
-                  <Box w="100%" px={0} py={6} id="statuses" maxW="100%" mx="auto">
+                  <Box w="100%" px={0} py={2} id="statuses" maxW="100%" mx="auto">
                     <Heading
                       fontSize={{ base: "32px", md: "34px", lg: "36px" }}
                       fontWeight="bold"
@@ -562,35 +577,43 @@ const Type = () => {
                       gap={6}
                       w="100%"
                       wrap="wrap"
+                      align="stretch" // ✅ makes children match height
                     >
                       <Box
                         flex={1}
                         bg="gray.50"
-                        p={{ base: 2, md: 4 }}
+                        p={0}                  // ✅ removed padding
                         borderRadius="xl"
                         overflowX="auto"
+                        h="100%"               // ✅ allow height match
                       >
-                        <StackedColumnChart
-                          status={selectedStatusInner}
-                          type="EIPs"
-                          dataset={data2}
-                        />
+                        <Box h="100%">
+                          <StackedColumnChart
+                            status={selectedStatusInner}
+                            type="EIPs"
+                            dataset={data2}
+                          />
+                        </Box>
                       </Box>
 
                       <Box
                         flex={1}
                         bg="gray.50"
-                        p={{ base: 2, md: 4 }}
+                        p={0}
                         borderRadius="xl"
                         overflowX="auto"
+                        h="100%"
                       >
-                        <CatTable
-                          dataset={data4}
-                          cat="All"
-                          status={selectedStatusInner}
-                        />
+                        <Box h="100%">
+                          <CatTable
+                            dataset={data4}
+                            cat="All"
+                            status={selectedStatusInner}
+                          />
+                        </Box>
                       </Box>
                     </Flex>
+
                   </Box>
                 </>
               )}
