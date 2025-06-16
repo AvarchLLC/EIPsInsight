@@ -702,13 +702,14 @@ const StatusTable: React.FC<AreaCProps> = ({ cat, dataset, status }) => {
       bg={bg}
       borderRadius="xl"
       p={{ base: 2, md: 3 }}
-      mt={4}
+      // mt={4} ← REMOVE or change to mt={0}
       as={motion.div}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition="all 0.4s ease-in-out"
       id={"Satus Activity"}
     >
+
       <Stack direction="row" justify="space-between" align="center" mb={4}>
         <Text fontSize="2xl" fontWeight="bold" color="blue.400">
           {status} Recent Activity's

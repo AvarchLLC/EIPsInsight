@@ -24,7 +24,11 @@ import CatTable2 from "@/components/CatTable2";
 import NextLink from "next/link";
 import RipTable from "@/components/RipTable";
 import { useRouter } from "next/router";
+<<<<<<< dev
+import SubscriptionButton from "@/components/SubscribtionButton";
+=======
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+>>>>>>> dev
 
 interface EIP {
   _id: string;
@@ -115,7 +119,7 @@ const RIP = () => {
   const [data2, setData2] = useState<APIResponse>({ eip: [], erc: [], rip: [] });
   const [data3, setData3] = useState<Data>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
-  const [selected, setSelected] = useState<"status" | "type">("type");
+  const [selected, setSelected] = useState<"status" | "category">("category");
   const [selectedStatusInner, setSelectedStatusInner] = useState(Status_OPTIONS[0]);
   const router = useRouter();
   const basePath = typeof window !== "undefined" ? window.location.origin : "";
@@ -125,7 +129,7 @@ const RIP = () => {
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
-      description: `Shared view for ${selected === "status" ? "Status Chart" : "Type Chart"}`,
+      description: `Shared view for ${selected === "status" ? "Status Chart" : "category Chart"}`,
       status: "success",
       duration: 3000,
       isClosable: true,
@@ -302,6 +306,10 @@ const RIP = () => {
                   </Text>
                 }
               />
+              <div className="flex items-center mb-4">
+                <SubscriptionButton type="rips" id="all" />
+              </div>
+
 
               {/* OtherBox Full Width */}
               <Box id="githubstats">
@@ -311,13 +319,13 @@ const RIP = () => {
               {/* Toggle Buttons */}
               <ButtonGroup size="md" isAttached>
                 <Button
-                  bg={selected === "type" ? "#40E0D0" : "white"}
-                  color={selected === "type" ? "white" : "#40E0D0"}
+                  bg={selected === "category" ? "#40E0D0" : "white"}
+                  color={selected === "category" ? "white" : "#40E0D0"}
                   borderColor="#40E0D0"
                   variant="outline"
                   onClick={() => {
-                    setSelected("type");
-                    router.push("?view=type", undefined, { shallow: true });
+                    setSelected("category");
+                    router.push("?view=category", undefined, { shallow: true });
                   }}
                 >
                   Category
@@ -450,7 +458,7 @@ const RIP = () => {
               <Box id="charts" className="w-full overflow-hidden">
                 <Box display="flex" justifyContent="space-between" alignItems="center" px={4} pb={2}>
                   <Text fontSize="xl" fontWeight="bold">
-                    {selected === "status" ? "Status Chart" : "Type Chart"}
+                    {selected === "status" ? "Status Chart" : "category Chart"}
                   </Text>
                   <Button
                     onClick={handleCopyOverviewChart}
@@ -559,38 +567,46 @@ const RIP = () => {
                     gap={6}
                     w="100%"
                     wrap="wrap"
+                    align="stretch" // ✅ Ensures both boxes stretch to same height
                   >
                     {/* Status Chart */}
                     <Box
                       flex={1}
                       bg="gray.50"
-                      p={{ base: 2, md: 4 }}
+                      p={0} // ✅ Remove padding
                       borderRadius="xl"
                       overflowX="auto"
+                      h="100%"
                     >
-                      <StackedColumnChart
-                        type="RIPs"
-                        status={selectedStatusInner}
-                        dataset={data2}
-                      />
+                      <Box h="100%">
+                        <StackedColumnChart
+                          type="RIPs"
+                          status={selectedStatusInner}
+                          dataset={data2}
+                        />
+                      </Box>
                     </Box>
 
                     {/* Status Table */}
                     <Box
                       flex={1}
                       bg="gray.50"
-                      p={{ base: 2, md: 4 }}
+                      p={0} // ✅ Remove padding
                       borderRadius="xl"
                       overflowX="auto"
+                      h="100%"
                     >
-                      <CatTable
-                        dataset={data4}
-                        cat="All"
-                        status={selectedStatusInner}
-                      />
+                      <Box h="100%">
+                        <CatTable
+                          dataset={data4}
+                          cat="All"
+                          status={selectedStatusInner}
+                        />
+                      </Box>
                     </Box>
                   </Flex>
                 </Box>
+
               </Box>
             )}
 
