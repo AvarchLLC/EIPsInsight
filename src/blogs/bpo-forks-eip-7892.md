@@ -1,5 +1,5 @@
 ---
-title: "The Need for BPO Forks in Ethereum’s Scaling Roadmap (EIP-7892 Explained)"
+title: "Blob Parameter Only (BPO) Forks (EIP-7892)"
 date: 2025-06-07
 author: Yash Kamal Chaturvedi
 image: https://etherworld.co/content/images/2025/06/Your-paragraph-text--1-.jpg
