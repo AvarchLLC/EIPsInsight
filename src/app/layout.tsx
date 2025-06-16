@@ -449,7 +449,7 @@ function ClientContent({ children }: { children: React.ReactNode }) {
 
   return (
     <Flex>
-      <AppSidebar />
+      {/* <AppSidebar /> */}
  <Box
         ml={isCollapsed ? "3rem" : "16rem"} // This creates space for the sidebar
         transition="margin-left 0.3s ease"
