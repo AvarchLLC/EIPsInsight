@@ -7,11 +7,35 @@ import { FaBug } from 'react-icons/fa';
 import { FaGithub } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
 
-const FloatingContributionIcon = () => {
-  const pathname = usePathname();
+const allowedPaths = [
+  '/eips',
+  '/ercs',
+  '/rips',
+  '/PR',
+  '/catTable',
+  '/insight',
+  '/monthly',
+  '/stats',
+  '/tableStatus'
+];
 
-  // Construct the GitHub URL dynamically
-  const githubUrl = `https://github.com/AvarchLLC/EIPsInsight/blob/main/src/pages${pathname === '/' ? '/index.tsx' : `${pathname}`}`;
+const FloatingContributionIcon = () => {
+  const pathname = usePathname() || '/';
+
+  // if the path is /eips/ or /ercs/ or /rips/ or /PR or /catTable or /insight or /monthly or /stats or /tableStatus then just use url as  https://github.com/AvarchLLC/EIPsInsight/blob/main/src/pages/[name like PR or monthly etc]
+
+  const firstSegment = '/' + pathname.split('/').filter(Boolean)[0] || '/';
+
+  let githubUrl = '';
+
+  if (pathname === '/') {
+    githubUrl = 'https://github.com/AvarchLLC/EIPsInsight/blob/main/src/pages/index.tsx';
+  } else if (allowedPaths.includes(firstSegment)) {
+    githubUrl = `https://github.com/AvarchLLC/EIPsInsight/blob/main/src/pages${firstSegment}`;
+  } else {
+    githubUrl = `https://github.com/AvarchLLC/EIPsInsight/blob/main/src/pages${pathname}`;
+  }
+
 
     const headingColorLight = "#333";
     const headingColorDark = "#F5F5F5";
