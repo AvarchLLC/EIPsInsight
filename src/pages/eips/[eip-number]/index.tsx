@@ -408,7 +408,7 @@ const CustomTooltip = ({
   if (active && payload && payload.length) {
     const point = payload[0].payload;
     return (
-      <div style={{ background: "white", border: "1px solid #ccc", padding: 10 }}>
+      <div style={{ background: "white", color:"black", border: "1px solid #ccc", padding: 10 }}>
         <p><strong>Status:</strong> {point.statusLabel}</p>
         <p><strong>Date:</strong> {point.date}</p>
         {point.daysBetween != null && (
