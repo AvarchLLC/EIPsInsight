@@ -542,7 +542,7 @@ const Dashboard = () => {
                   className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-8"
                   bg="rgba(0, 0, 0, 0.5)"
                   borderRadius="md" // Rounded corners
-                  // padding={5}
+                  padding={5}
                   boxShadow="md"
                   marginTop={10}
                 >
@@ -627,10 +627,10 @@ const Dashboard = () => {
             </div>
             <Box id="dashboard" sx={{ scrollMarginTop: "100px" }}>
               <Box
-                bg="rgba(0, 0, 0, 0.5)"
+                // bg="rgba(0, 0, 0, 0.5)"
                 borderRadius="md" // Rounded corners
                 // padding={6} // Padding around the text
-                boxShadow="md"
+                // boxShadow="md"
                 // className="border border-red-700"
                 width="1400px"
                 maxWidth="100%"

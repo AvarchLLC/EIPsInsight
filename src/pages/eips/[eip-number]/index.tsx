@@ -223,7 +223,7 @@ const TestComponent = () => {
 
   const PectraData2: readonly UpgradeEntry[] = processedData;
 
-  const FusakaData: readonly UpgradeEntry[] = [
+const FusakaData: readonly UpgradeEntry[] = [
     { date: '2024-02-15', included: [], scheduled: [], declined: [], considered: ['EIP-4762', 'EIP-6800', 'EIP-6873', 'EIP-7545'] },
     { date: '2024-08-30', included: [], scheduled: [], declined: [], considered: ['EIP-4762', 'EIP-6800', 'EIP-6873', 'EIP-7545', 'EIP-7667'] },
     { date: '2025-03-27', included: [], scheduled: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7594', 'EIP-7620', 'EIP-7692', 'EIP-7698', 'EIP-7873'], declined: [], considered: ['EIP-5920', 'EIP-7692', 'EIP-7761', 'EIP-7834', 'EIP-7880', 'EIP-7883'] },
@@ -235,9 +235,10 @@ const TestComponent = () => {
     { date: '2025-05-09', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7892', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7762', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7907', 'EIP-7917', 'EIP-7918', 'EIP-7934'] },
     { date: '2025-05-13', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7892', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7762', 'EIP-7825', 'EIP-7907', 'EIP-7917', 'EIP-7918', 'EIP-7934'] },
     { date: '2025-05-21', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7883', 'EIP-7892', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7762', 'EIP-7825', 'EIP-7907', 'EIP-7917', 'EIP-7918', 'EIP-7934'] },
-    { date: '2025-05-22', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7918', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7762', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7907', 'EIP-7917', 'EIP-7934'] }
-  ] as const;
-
+    { date: '2025-05-22', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7918', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7762', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7907', 'EIP-7917', 'EIP-7934'] },
+    { date: '2025-06-02', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7917', 'EIP-7918', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7762', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-5920', 'EIP-7907', 'EIP-7934'] },
+    { date: '2025-06-05', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7917', 'EIP-7918', 'EIP-7935'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-5920', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7762', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: ['EIP-7907', 'EIP-7934'] }
+] as const;
 
   const getNetworkUpgrades = (eipNo: number) => {
     console.log("eip:", eipNo);
@@ -381,43 +382,44 @@ const TestComponent = () => {
   const dateColor = useColorModeValue("gray.600", "gray.300");
   const boxShadow = useColorModeValue("md", "dark-lg");
 
-  const processedData3 = data
-    .filter((item) => statusOrder.includes(item.status))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .map((item, index, array) => {
-      const currentDate = new Date(item.date);
-      const previousDate = index > 0 ? new Date(array[index - 1].date) : null;
-      const daysBetween = previousDate
-        ? Math.ceil((currentDate.getTime() - previousDate.getTime()) / (1000 * 3600 * 24))
-        : null;
+ const processedData3 = data
+  .filter((item) => statusOrder.includes(item.status))
+  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  .map((item, index, array) => {
+    const currentDate = new Date(item.date);
+    const previousDate = index > 0 ? new Date(array[index - 1].date) : null;
+    const daysBetween = previousDate
+      ? Math.ceil((currentDate.getTime() - previousDate.getTime()) / (1000 * 3600 * 24))
+      : null;
 
-      return {
-        date: currentDate.toISOString().split("T")[0],
-        status: statusOrder.indexOf(item.status),
-        statusLabel: item.status,
-        daysBetween,
-      };
-    });
+    return {
+      date: currentDate.toISOString().split("T")[0],
+      status: statusOrder.indexOf(item.status),
+      statusLabel: item.status,
+      daysBetween,
+    };
+  });
 
-  // ✅ Custom Tooltip content component with correct types
-  const CustomTooltip = ({
-    active,
-    payload,
-  }: TooltipProps<ValueType, NameType>): JSX.Element | null => {
-    if (active && payload && payload.length) {
-      const point = payload[0].payload;
-      return (
-        <div style={{ background: "white", border: "1px solid #ccc", padding: 10 }}>
-          <p><strong>Status:</strong> {point.statusLabel}</p>
-          <p><strong>Date:</strong> {point.date}</p>
-          {point.daysBetween != null && (
-            <p><strong>+{point.daysBetween} days</strong> since last status change</p>
-          )}
-        </div>
-      );
-    }
-    return null;
-  };
+// ✅ Custom Tooltip content component with correct types
+const CustomTooltip = ({
+  active,
+  payload,
+}: TooltipProps<ValueType, NameType>): JSX.Element | null => {
+  if (active && payload && payload.length) {
+    const point = payload[0].payload;
+    return (
+      <div style={{ background: "white", color:"black", border: "1px solid #ccc", padding: 10 }}>
+        <p><strong>Status:</strong> {point.statusLabel}</p>
+        <p><strong>Date:</strong> {point.date}</p>
+        {point.daysBetween != null && (
+          <p><strong>+{point.daysBetween} days</strong> since last status change</p>
+        )}
+      </div>
+    );
+  }
+  return null;
+};
+
 
 
   return (

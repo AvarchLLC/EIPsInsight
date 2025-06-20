@@ -397,13 +397,13 @@ const TypeGraphs = () => {
           </Box>
         </Box> */}
 
-        <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
+        {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
           Draft vs Final
         </Text>
 
-        <AreaC type={"EIPs"} />
+        <AreaC type={"EIPs"} /> */}
 
-        <NextLink href={"/core"}>
+        {/* <NextLink href={"/core"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
             Core - [{data?.filter((item) => item.category === "Core")?.length}]
           </Text>
@@ -563,9 +563,9 @@ const TypeGraphs = () => {
           <Box className={"w-full"}>
             <DateTime />
           </Box>
-        </Box>
+        </Box> */}
 
-        <NextLink href={"/informational"}>
+        {/* <NextLink href={"/informational"}>
           <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
             Informational - [
             {data?.filter((item) => item.type === "Informational")?.length}]
@@ -596,7 +596,7 @@ const TypeGraphs = () => {
           <Box className={"w-full"}>
             <DateTime />
           </Box>
-        </Box>
+        </Box> */}
       </Box>
     </>
   );

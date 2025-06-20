@@ -17,12 +17,17 @@ const LastUpdatedDateTime: React.FC<DateTimeProps> = ({ name }) => {
         }
         const data = await response.json();
         setLastUpdatedTime(data.lastUpdatedTime);
+        
       } catch (err:any) {
         setError(err.message);
       }
     };
 
     fetchLastUpdatedTime();
+
+    const intervalId = setInterval(fetchLastUpdatedTime, 5 * 60 * 1000);
+
+  return () => clearInterval(intervalId);
   }, [name]);
 
   if (error) {

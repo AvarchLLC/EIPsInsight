@@ -82,6 +82,10 @@ const ResourcesPage: React.FC = () => {
     link: string;
     tag?: string;
   }) => (
+    <Link
+        href={link}
+        _hover={{ textDecoration: "none" }}
+      >
     <Box
       bg={cardBg}
       p={5}
@@ -121,6 +125,7 @@ const ResourcesPage: React.FC = () => {
         Read more →
       </Link>
     </Box>
+    </Link>
   );
 
   const VideoCard = ({ url }: { url: string }) => {
@@ -243,12 +248,6 @@ const ResourcesPage: React.FC = () => {
   ];
 
   const NEWS = [
-    // {
-    //   image: "/EIP_blog1.png",
-    //   title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
-    //   content: "Bringing You the Latest in Ethereum Improvement Proposals",
-    //   link: "/Blogs/blog1",
-    // },
     {
       image: "/news1.jpg",
       title: "The EIP Proposal Builder: Simplify, Streamline, Succeed",
@@ -349,10 +348,24 @@ const ResourcesPage: React.FC = () => {
       tag: "Year in Review"
     },
     {
-      image: "/bpo-forks-eip-7892.jpg",
-      title: "The Need for BPO Forks in Ethereum’s Scaling Roadmap (EIP-7892 Explained)",
+      image: "/bpo-forks-eip-7892(2).jpg",
+      title: "Blob Parameter Only (BPO) Forks (EIP-7892)",
       content: "Ethereum scales blob capacity with Blob Parameter Only (BPO) forks to support Layer 2 growth before Fusaka and PeerDAS, preserving decentralization.",
       link: "/Blogs/bpo-forks-eip-7892",
+      tag: "Technical"
+    },
+    {
+      image: "/EIP_blog1.png",
+      title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
+      content: "Bringing You the Latest in Ethereum Improvement Proposals",
+      link: "/newsletter",
+    },
+
+   {
+      image: "/ePBS-eip-7732.jpg",
+      title: "Enshrined Proposer Builder Separation (ePBS) (EIP-7732)",
+      content: "Understand Ethereum’s EIP-7732 upgrade with a breakdown of what ePBS is, why it’s needed, key architectural changes, its advantages, challenges, and how it compares to PBS.",
+      link: "/Blogs/ePBS-eip-7732",
       tag: "Technical"
     },
   ];
