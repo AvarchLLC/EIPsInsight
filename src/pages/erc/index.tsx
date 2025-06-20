@@ -255,13 +255,7 @@ const ERC = () => {
             mb="2rem"
             px="1rem"
           >
-            <Flex
-              direction={{ base: "column", md: "row" }}
-              justify="space-between"
-              align="center"
-              wrap="wrap"
-              gap={4}
-            >
+            <Flex direction="column" gap={6}>
               {/* Header Section */}
               <Header
                 title={`Ethereum Request for Comment - [ ${data.length} ]`}
@@ -282,44 +276,55 @@ const ERC = () => {
                   </Flex>
                 }
               />
-              <div className="flex items-center mb-4">
-                <SubscriptionButton type="ercs" id="all" />
-              </div>
 
+              {/* Row: Subscription + Toggle Buttons */}
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                justify="space-between"
+                align="center"
+                wrap="wrap"
+                gap={4}
+              >
+                {/* Subscription Button (left) */}
+                <Box>
+                  <SubscriptionButton type="ercs" id="all" />
+                </Box>
 
-              {/* OtherBox Full Width */}
-              <Box id="githubstats">
+                {/* Toggle Buttons (right) */}
+                <ButtonGroup size="md" isAttached>
+                  <Button
+                    bg={selected === "category" ? "#40E0D0" : "white"}
+                    color={selected === "category" ? "white" : "#40E0D0"}
+                    borderColor="#40E0D0"
+                    variant="outline"
+                    onClick={() => {
+                      setSelected("category");
+                      router.push("?view=category", undefined, { shallow: true });
+                    }}
+                  >
+                    Category
+                  </Button>
+                  <Button
+                    bg={selected === "status" ? "#40E0D0" : "white"}
+                    color={selected === "status" ? "white" : "#40E0D0"}
+                    borderColor="#40E0D0"
+                    variant="outline"
+                    onClick={() => {
+                      setSelected("status");
+                      router.push("?view=status", undefined, { shallow: true });
+                    }}
+                  >
+                    Status
+                  </Button>
+                </ButtonGroup>
+              </Flex>
+
+              {/* Full-width OtherBox below */}
+              <Box id="githubstats" width="100%">
                 <OtherBox type="ERCs" />
               </Box>
-
-              {/* Toggle Buttons */}
-              <ButtonGroup size="md" isAttached>
-                <Button
-                  bg={selected === "category" ? "#40E0D0" : "white"}
-                  color={selected === "category" ? "white" : "#40E0D0"}
-                  borderColor="#40E0D0"
-                  variant="outline"
-                  onClick={() => {
-                    setSelected("category");
-                    router.push("?view=category", undefined, { shallow: true });
-                  }}
-                >
-                  category
-                </Button>
-                <Button
-                  bg={selected === "status" ? "#40E0D0" : "white"}
-                  color={selected === "status" ? "white" : "#40E0D0"}
-                  borderColor="#40E0D0"
-                  variant="outline"
-                  onClick={() => {
-                    setSelected("status");
-                    router.push("?view=status", undefined, { shallow: true });
-                  }}
-                >
-                  Status
-                </Button>
-              </ButtonGroup>
             </Flex>
+
 
             <Box display={{ base: "block", md: "block", lg: "none" }} className="w-full pt-4">
               <SearchBox />

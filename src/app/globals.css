@@ -32,3 +32,12 @@
   background-color: #F7FAFC !important;
   color: black !important;
 }
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

@@ -253,21 +253,15 @@ const RIP = () => {
             mb="2rem"
             px="1rem"
           >
-
-            <Flex
-              direction={{ base: "column", md: "row" }} // Stack on smaller screens, horizontal on larger screens
-              justify="space-between"
-              align="center"
-              wrap="wrap" // Enable wrapping for responsiveness
-              gap={4} // Add spacing between wrapped elements
-            >
+            <Flex direction="column" gap={6}>
               {/* Header Section */}
               <Header
                 title={`Rollup Improvement Proposal - [ ${data.length} ]`}
                 subtitle={
                   <Flex align="center" gap={2} flexWrap="wrap">
                     <Text>
-                      A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem.                    </Text>
+                      A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem.
+                    </Text>
                     <Button
                       size="sm"
                       colorScheme="blue"
@@ -280,45 +274,55 @@ const RIP = () => {
                   </Flex>
                 }
               />
-              <div className="flex items-center mb-4">
-                <SubscriptionButton type="rips" id="all" />
-              </div>
 
+              {/* Row: SubscriptionButton + Toggle Buttons */}
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                justify="space-between"
+                align="center"
+                wrap="wrap"
+                gap={4}
+              >
+                {/* Left: Subscription Button */}
+                <Box>
+                  <SubscriptionButton type="rips" id="all" />
+                </Box>
 
-              {/* OtherBox Full Width */}
-              <Box id="githubstats">
+                {/* Right: Category / Status Toggle Buttons */}
+                <ButtonGroup size="md" isAttached>
+                  <Button
+                    bg={selected === "category" ? "#40E0D0" : "white"}
+                    color={selected === "category" ? "white" : "#40E0D0"}
+                    borderColor="#40E0D0"
+                    variant="outline"
+                    onClick={() => {
+                      setSelected("category");
+                      router.push("?view=category", undefined, { shallow: true });
+                    }}
+                  >
+                    Category
+                  </Button>
+                  <Button
+                    bg={selected === "status" ? "#40E0D0" : "white"}
+                    color={selected === "status" ? "white" : "#40E0D0"}
+                    borderColor="#40E0D0"
+                    variant="outline"
+                    onClick={() => {
+                      setSelected("status");
+                      router.push("?view=status", undefined, { shallow: true });
+                    }}
+                  >
+                    Status
+                  </Button>
+                </ButtonGroup>
+              </Flex>
+
+              {/* Full-width OtherBox below */}
+              <Box id="githubstats" width="100%">
                 <OtherBox type="RIPs" />
               </Box>
-
-              {/* Toggle Buttons */}
-              <ButtonGroup size="md" isAttached>
-                <Button
-                  bg={selected === "category" ? "#40E0D0" : "white"}
-                  color={selected === "category" ? "white" : "#40E0D0"}
-                  borderColor="#40E0D0"
-                  variant="outline"
-                  onClick={() => {
-                    setSelected("category");
-                    router.push("?view=category", undefined, { shallow: true });
-                  }}
-                >
-                  Category
-                </Button>
-                <Button
-                  bg={selected === "status" ? "#40E0D0" : "white"}
-                  color={selected === "status" ? "white" : "#40E0D0"}
-                  borderColor="#40E0D0"
-                  variant="outline"
-                  onClick={() => {
-                    setSelected("status");
-                    router.push("?view=status", undefined, { shallow: true });
-                  }}
-                >
-                  Status
-                </Button>
-              </ButtonGroup>
-
             </Flex>
+
             <br />
             <Box
               pl={4}

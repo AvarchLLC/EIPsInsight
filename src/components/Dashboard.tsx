@@ -63,7 +63,7 @@ import { useSidebar } from "@/components/Sidebar/SideBarContext";
 
 import DashboardCards from "./DashboardCards";
 import FeedbackWidget from "./FeedbackWidget";
-
+import { Clients } from "./Clients";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 
@@ -227,13 +227,13 @@ const Dashboard = () => {
       });
     }
   };
-        useScrollSpy([
-  "all",
-  "ourtools",
-  "what",
-  "statuschanges",
-  "dashboard",
-]);
+  useScrollSpy([
+    "all",
+    "ourtools",
+    "what",
+    "statuschanges",
+    "dashboard",
+  ]);
   return (
     <>
       <FeedbackWidget />
@@ -481,6 +481,9 @@ const Dashboard = () => {
               </Box>
               <div>
                 <ToolsSection />
+              </div>
+              <div>
+                <Clients />
               </div>
 
               {/* <div className="py-8"> */}
