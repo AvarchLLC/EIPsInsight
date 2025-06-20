@@ -183,25 +183,29 @@ export const authOptions: NextAuthOptions = {
   },
 
   // Add this to your existing authOptions
-  callbacks: {
-    async jwt({ token, user, trigger, session }) {
-      // Initial sign in
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.image = user.image;
-        token.tier = user.tier || DEFAULT_USER_TIER;
-        token.walletAddress = user.walletAddress;
+callbacks: {
+  async jwt({ token, user }) {
+    if (user) {
+      token.id = user.id;
+      token.name = user.name;
+      token.email = user.email;
+      token.image = user.image;
+      token.tier = user.tier || DEFAULT_USER_TIER;
+      token.walletAddress = user.walletAddress;
+
+      // Fallback for OAuth: if no emailVerified, set it
+      if (!("emailVerified" in user) || user.emailVerified === null) {
+        const client = await connectToDatabase();
+        const db = client.db();
+        await db.collection("users").updateOne(
+          { email: user.email },
+          { $set: { emailVerified: new Date() } }
+        );
       }
-      
-      // Manual session update trigger
-      if (trigger === "update") {
-        return { ...token, ...session };
-      }
-      
-      return token;
-    },
+    }
+    return token;
+  },
+
     
     async session({ session, token }) {
       if (session.user) {
@@ -220,17 +224,20 @@ export const authOptions: NextAuthOptions = {
     async createUser({ user }: { user: CustomUser }) {
       const client = await connectToDatabase();
       const db = client.db();
+
       await db.collection("users").updateOne(
         { email: user.email },
-        { 
-          $set: { 
+        {
+          $set: {
             tier: DEFAULT_USER_TIER,
-            updatedAt: new Date()
-          } 
+            updatedAt: new Date(),
+            emailVerified: new Date() // <- Force emailVerified for OAuth users
+          }
         }
       );
     },
-  }
+  },
+
 };
 
 // Nonce management functions

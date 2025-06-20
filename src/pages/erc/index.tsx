@@ -31,6 +31,7 @@ import FeedbackWidget from "@/components/FeedbackWidget";
 import ErcTable from "@/components/ErcTable";
 import { useRouter } from "next/router";
 import ERCsPRChart from "@/components/Ercsprs";
+import SubscriptionButton from "@/components/SubscribtionButton";
 
 interface EIP {
   _id: string;
@@ -123,7 +124,7 @@ const ERC = () => {
   const [data2, setData2] = useState<APIResponse>({ eip: [], erc: [], rip: [] });
   const [data3, setData3] = useState<Data>({ eip: [], erc: [], rip: [] });
   const [isLoading, setIsLoading] = useState(true);
-  const [selected, setSelected] = useState<"status" | "type">("type");
+  const [selected, setSelected] = useState<"status" | "category">("category");
   const [selectedStatusInner, setSelectedStatusInner] = useState(Status_OPTIONS[0]);
   const router = useRouter();
   const basePath = typeof window !== "undefined" ? window.location.origin : "";
@@ -134,7 +135,7 @@ const ERC = () => {
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
-      description: `Shared view for ${selected === "status" ? "Status Chart" : "Type Chart"}`,
+      description: `Shared view for ${selected === "status" ? "Status Chart" : "category Chart"}`,
       status: "success",
       duration: 3000,
       isClosable: true,
@@ -142,7 +143,7 @@ const ERC = () => {
   };
 
   const handleCopyERCStatusGraph = () => {
-    const url = `${window.location.origin}/erc?view=type#erc-status-graph`;
+    const url = `${window.location.origin}/erc?view=category#erc-status-graph`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied!",
@@ -287,6 +288,10 @@ const ERC = () => {
                   </Text>
                 }
               />
+              <div className="flex items-center mb-4">
+                <SubscriptionButton type="ercs" id="all" />
+              </div>
+
 
               {/* OtherBox Full Width */}
               <Box id="githubstats">
@@ -296,13 +301,13 @@ const ERC = () => {
               {/* Toggle Buttons */}
               <ButtonGroup size="md" isAttached>
                 <Button
-                  bg={selected === "type" ? "#40E0D0" : "white"}
-                  color={selected === "type" ? "white" : "#40E0D0"}
+                  bg={selected === "category" ? "#40E0D0" : "white"}
+                  color={selected === "category" ? "white" : "#40E0D0"}
                   borderColor="#40E0D0"
                   variant="outline"
                   onClick={() => {
-                    setSelected("type");
-                    router.push("?view=type", undefined, { shallow: true });
+                    setSelected("category");
+                    router.push("?view=category", undefined, { shallow: true });
                   }}
                 >
                   category
@@ -457,38 +462,45 @@ const ERC = () => {
                     gap={6}
                     w="100%"
                     wrap="wrap"
+                    align="stretch" // ✅ Ensures children match in height
                   >
                     {/* Status Chart */}
                     <Box
                       flex={1}
                       bg="gray.50"
-                      p={{ base: 2, md: 4 }}
+                      p={0} // ✅ Remove padding
                       borderRadius="xl"
                       overflowX="auto"
+                      h="100%"
                     >
-                      <StackedColumnChart
-                        status={selectedStatusInner}
-                        type="ERCs"
-                        dataset={data2}
-                      />
+                      <Box h="100%">
+                        <StackedColumnChart
+                          status={selectedStatusInner}
+                          type="ERCs"
+                          dataset={data2}
+                        />
+                      </Box>
                     </Box>
 
                     {/* Status Table */}
                     <Box
                       flex={1}
                       bg="gray.50"
-                      p={{ base: 2, md: 4 }}
+                      p={0} // ✅ Remove padding
                       borderRadius="xl"
                       overflowX="auto"
+                      h="100%"
                     >
-       
-                      <CatTable
-                        dataset={data4}
-                        cat="All"
-                        status={selectedStatusInner}
-                      />
+                      <Box h="100%">
+                        <CatTable
+                          dataset={data4}
+                          cat="All"
+                          status={selectedStatusInner}
+                        />
+                      </Box>
                     </Box>
                   </Flex>
+
                 </Box>
               </Box>
             )}

@@ -3,6 +3,7 @@ import { Providers } from "@/app/providers";
 import React, { useEffect, useState } from "react";
 import LargeWithAppLinksAndSocial from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import SubscriptionFloater from "@/components/SubscriptionFloater";
 import {
   Box,
   ColorModeScript,
@@ -70,7 +71,6 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const sidebarWidth = sidebarVisible ? (isCollapsed ? "3rem" : "16rem") : "0";
 
   return (
-    <SessionWrapper>
       <motion.div
         key={router}
         initial="initialState"
@@ -143,23 +143,26 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
               <Navbar />
               <AuthLocalStorageInitializer />
               {children}
-              <Box position="fixed" bottom={4} right={4} zIndex={1000}>
-                <FloatingContributionIcon />
-              </Box>
               <Box
                 position="fixed"
-                bottom={{ base: 20, md: 4 }}
-                right={{ base: 4, md: 20 }}
-                zIndex={1000}
+                bottom={{ base: 4, md: 4 }}
+                right={{ base: 4, md: 4 }}
+                display="flex"
+                flexDirection="row"
+                gap={3}
+                zIndex={2000}
               >
+                <FloatingContributionIcon />
                 <BookmarkFloater />
+                <SubscriptionFloater />
               </Box>
+
+
               <LargeWithAppLinksAndSocial />
             </Box>
           </BookmarkProvider>
         </Providers>
       </motion.div>
-    </SessionWrapper>
   );
 };
 

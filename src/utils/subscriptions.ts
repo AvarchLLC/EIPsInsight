@@ -33,3 +33,10 @@ export async function getAllSubscriptions() {
 //     }
 //   ];
 // }
+
+// Add this new function to check for existing subscriptions
+export async function checkSubscriptionExists(email: string, type: string, id: string) {
+  const client = await connectToDatabase();
+  const db = client.db('eipsinsight');
+  return await db.collection('subscriptions').findOne({ email, type, id });
+}
