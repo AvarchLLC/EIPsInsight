@@ -33,6 +33,16 @@
   color: black !important;
 }
 
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -94,3 +104,4 @@ html {
     --chart-5: 340 75% 55%;
   }
 }
+
