@@ -39,7 +39,7 @@ const EipsLabelChart = () => {
   const [chartData, setChartData] = useState<LabelData[]>([]);
   const [prDetails, setPrDetails] = useState<PRDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRepo, setSelectedRepo] = useState('eips');
+  const [selectedRepo, setSelectedRepo] = useState('ercs');
   const [showLabels, setShowLabels] = useState<Record<string, boolean>>(
     availableLabels?.reduce((acc, label) => ({ ...acc, [label]: true }), {})
   );

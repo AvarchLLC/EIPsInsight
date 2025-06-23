@@ -39,6 +39,7 @@ import EipsLabelChart from "@/components/PrLabelsChart";
 import CopyLink from "@/components/CopyLink";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+import ERCsPRChart from "@/components/Ercsprs";
 
 // Dynamic import for Ant Design's Column chart
 // const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -1627,6 +1628,10 @@ const GitHubPRTracker: React.FC = () => {
         </Flex>
       )} */}
           </Box>
+          <br/>
+          {/* <Box>
+              <ERCsPRChart/>
+          </Box> */}
 
           <Flex justify="center" mb={4}>
             <Button

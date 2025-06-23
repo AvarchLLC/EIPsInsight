@@ -58,7 +58,7 @@ const StatTab2 = () => {
         >
           <Box className="ml-40 mr-40 pl-10 pr-10 mt-10 mb-20">
             <FlexBetween>
-              <Header title={getStatus(pathname[3])} subtitle="" />
+              <Header title={getStatus(pathname[3])} subtitle="" description="" />
             </FlexBetween>
             <TableStat type={pathname[2]} cat={getStatus(pathname[3])} />
           </Box>

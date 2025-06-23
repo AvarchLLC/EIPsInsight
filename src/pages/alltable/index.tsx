@@ -92,7 +92,7 @@ const AllTable = () => {
               <Header
                 title={`All EIPs,ERCs & RIPs - [ ${data?.length} ]`}
                 subtitle=""
-                
+                description=""
               />
               </div>
             </FlexBetween>

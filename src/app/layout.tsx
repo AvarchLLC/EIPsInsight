@@ -373,6 +373,7 @@
 'use client';
 
 import './globals.css';
+// import './blogs.css';
 import { Rajdhani } from 'next/font/google';
 import { Providers } from './providers';
 import { Box, ColorModeScript, Flex } from '@chakra-ui/react';
@@ -448,19 +449,19 @@ function ClientContent({ children }: { children: React.ReactNode }) {
 
   return (
     <Flex>
-      <AppSidebar />
+      {/* <AppSidebar /> */}
  <Box
         ml={isCollapsed ? "3rem" : "16rem"} // This creates space for the sidebar
         transition="margin-left 0.3s ease"
         p={4}
       >
-        <Navbar />
+        {/* <Navbar /> */}
         <Suspense fallback={<div>Loading...</div>}>
           {children}
         </Suspense>
-        <ConsentBanner />
-        <FloatingContributionIcon />
-        <Footer />
+        {/* <ConsentBanner />
+        <FloatingContributionIcon /> */}
+        {/* <Footer /> */}
       </Box>
     </Flex>
   );

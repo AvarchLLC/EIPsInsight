@@ -114,6 +114,7 @@ const Info = () => {
                   data?.filter((item) => item.type === "Informational")?.length
                 } ]`}
                 subtitle="Informational EIPs describe other changes to the Ethereum ecosystem."
+                description="Informational EIPs provide general guidelines or information to the Ethereum community but do not propose a new feature."
               />
             </FlexBetween>
             <TableStatus cat="Informational" />

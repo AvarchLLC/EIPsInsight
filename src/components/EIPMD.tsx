@@ -122,6 +122,7 @@ export default function EIPMD() {
         <Header
           title={`${repo.toUpperCase()} - ${data?.eip}`}
           subtitle={data?.title || ""}
+          description={data?.category || ""}
         />
         <Box className="grid grid-cols-2 pt-8">
           <Box

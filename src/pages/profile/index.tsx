@@ -31,8 +31,9 @@ import {
 import { FaEye, FaEyeSlash, FaSignOutAlt, FaUserEdit, FaArrowLeft } from 'react-icons/fa';
 import AllLayout from '@/components/LoginLayout';
 import { RepeatIcon } from '@chakra-ui/icons';
-import { signOut } from 'next-auth/react';
-
+import { useSession, signOut } from 'next-auth/react';
+import { useUserStore } from '@/stores/userStore';
+import SessionWrapper from '@/components/SessionWrapper';
 interface UserData {
   id: string;
   name: string;
@@ -43,12 +44,14 @@ interface UserData {
 }
 
 export default function ProfilePage() {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const { user, setUser, clearUser } = useUserStore();
 
   // Color mode values
   const bgColor = useColorModeValue("gray.50", "gray.800");
@@ -63,92 +66,48 @@ export default function ProfilePage() {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
-  // Load user data from localStorage on component mount
-  // useEffect(() => {
-  //   const loadUserData = () => {
-  //     try {
-  //       const storedUser = localStorage.getItem('user');
-  //       console.log("initial data:", storedUser);
-  //       if (storedUser) {
-  //         const parsedUser = JSON.parse(storedUser);
-  //         setName(parsedUser.name || '');
-  //         setEmail(parsedUser.email || '');
-  //         setUserData({
-  //           id: parsedUser.id || '',
-  //           name: parsedUser.name || '',
-  //           email: parsedUser.email || '',
-  //           image: parsedUser.image || '',
-  //           tier: parsedUser.tier || 'Free',
-  //           walletAddress: parsedUser.walletAddress || null
-  //         });
-  //       } else {
-          
-  //         router.push('/signin');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error loading user data:', error);
-  //       router.push('/signin');
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   loadUserData();
-  // }, [router]);
+  const [tier, setTier] = useState('Free');
 
   useEffect(() => {
-    const loadUserData = async () => {
-      setIsLoading(true);
-      try {
-        // 1. First check localStorage
-        const storedUser = localStorage.getItem('user');
-        console.log("stored user:", storedUser);
-        
-        if (!storedUser) {
-          router.push('/signin');
-          return;
-        }
+    if (status === 'loading') return;
 
-        const parsedUser = JSON.parse(storedUser);
-        
-        // 2. Verify with server to get fresh data
-        const response = await fetch('/api/user/verify', {
+    if (!session) {
+      router.push('/signin');
+      return;
+    }
+
+    const fetchUserData = async () => {
+      try {
+        const res = await fetch('/api/user/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: parsedUser.email }),
+          body: JSON.stringify({ email: session.user?.email }),
         });
 
-        if (!response.ok) {
-          throw new Error('Session verification failed');
-        }
+        if (!res.ok) throw new Error('User verification failed');
 
-        const serverUser = await response.json();
-        
-        // 3. Merge server data with local data
-        const mergedUser = {
-          ...parsedUser,
-          ...serverUser, // Server data takes precedence
-          tier: serverUser.tier || parsedUser.tier || 'Free'
-        };
-
-        // 4. Update both state and localStorage
-        setName(mergedUser.name || '');
-        setEmail(mergedUser.email || '');
-        setUserData(mergedUser);
-        localStorage.setItem('user', JSON.stringify(mergedUser));
-        
-      } catch (error) {
-        console.error('Error loading user data:', error);
-        localStorage.removeItem('user');
+        const user = await res.json();
+              setUser(user);
+        setUserData(user);
+        setName(user.name);
+        setEmail(user.email);
+        setTier(user.tier || 'Free');
+      } catch (err) {
+        toast({
+          title: 'Session error',
+          description: 'Redirecting to login...',
+          status: 'error',
+        });
+        signOut();
         router.push('/signin');
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadUserData();
-  }, [router]);
+    fetchUserData();
+  }, [session, status]);
+
 
   const handleRefresh = async () => {
     setIsLoading(true);
@@ -294,17 +253,7 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      // 1. Clear localStorage
-      localStorage.removeItem('user');
-      await signOut({ redirect: false });
-      
-      // fetch('/api/auth/logout', { method: 'POST' })
-      //   .catch(error => console.error('Logout API error:', error));
-      
-      // 3. Close the modal
-      onClose();
-      
-      // 4. Show success message
+  await signOut({ redirect: false });
       toast({
         title: 'Logged out successfully',
         status: 'success',
@@ -329,51 +278,52 @@ export default function ProfilePage() {
 
   const [isCancelling, setIsCancelling] = useState(false);
 
-  const handleCancel = async () => {
-    setIsCancelling(true);
-    try {
-      const response = await fetch('/api/stripe/cancel-subscription', {
-        method: 'POST'
-      });
-      const result = await response.json();
+const handleCancel = async () => {
+  setIsCancelling(true);
+  try {
+    const response = await fetch('/api/stripe/cancel-subscription', {
+      method: 'POST'
+    });
 
-      const storedUser = localStorage.getItem('user');
-      const parsedUser = storedUser?JSON.parse(storedUser):"";
+    const result = await response.json();
 
-
-
-      if (response.ok) {
-
-        const mergedUser = {
-          ...parsedUser,
-          tier: 'Free'
-        };
-
-        setUserData(mergedUser);
-        localStorage.setItem('user', JSON.stringify(mergedUser));
-
-        
-        toast({
-          title: 'Subscription cancelled',
-          description: `You'll retain premium access until ${new Date(result.endDate * 1000).toLocaleDateString()}`,
-          status: 'success',
-          duration: 8000,
-          isClosable: true,
-        });
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      toast({
-        title: 'Cancellation failed',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setIsCancelling(false);
+    if (!response.ok) {
+      throw new Error(result.error || 'Cancellation failed');
     }
-  };
+
+    // Refresh user info after cancellation
+    const verifyRes = await fetch('/api/user/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: session?.user?.email }),
+    });
+
+    const updatedUser = await verifyRes.json();
+    setUserData(updatedUser);
+    setTier(updatedUser.tier || 'Free');
+
+    toast({
+      title: 'Subscription cancelled',
+      description: `You'll retain premium access until ${new Date(result.endDate * 1000).toLocaleDateString()}`,
+      status: 'success',
+      duration: 8000,
+      isClosable: true,
+    });
+
+  } catch (error) {
+    console.error("Cancellation error:", error);
+    toast({
+      title: 'Cancellation failed',
+      description: error instanceof Error ? error.message : 'Unknown error',
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    });
+  } finally {
+    setIsCancelling(false);
+  }
+};
+
 
   if (isLoading || !userData) {
     return (
@@ -385,6 +335,7 @@ export default function ProfilePage() {
 
   return (
     <AllLayout>
+      <SessionWrapper>
     <Box minH="100vh" bg={bgColor} position="relative">
       {/* Absolute positioned navigation buttons */}
       <IconButton
@@ -658,6 +609,7 @@ export default function ProfilePage() {
         </Modal>
       </Box>
     </Box>
+      </SessionWrapper>
     </AllLayout>
   );
 }

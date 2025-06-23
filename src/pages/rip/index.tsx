@@ -25,6 +25,7 @@ import NextLink from "next/link";
 import RipTable from "@/components/RipTable";
 import { useRouter } from "next/router";
 import SubscriptionButton from "@/components/SubscribtionButton";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 interface EIP {
   _id: string;
@@ -218,6 +219,22 @@ const RIP = () => {
   }, []);
 
   const toggleCollapse = () => setShow(!show);
+  
+  useScrollSpy([
+  "Ethereum Improvement",
+  "GitHub Stats – RIPs",
+  "draft",
+  "final",
+  "living",
+  "meta",
+  "informational",
+  "core",
+  "networking",
+  "interface",
+  "rip",
+  "rrc",
+]);
+
 
 
   return (
@@ -272,6 +289,11 @@ const RIP = () => {
                       Learn More
                     </Button>
                   </Flex>
+                }
+                description={
+                  <Text>
+                    Explore the latest Rollup Improvement Proposals (RIPs) and their impact on the Ethereum rollup ecosystem.
+                  </Text>
                 }
               />
 

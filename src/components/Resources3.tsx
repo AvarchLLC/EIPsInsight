@@ -50,6 +50,8 @@ const ResourcesPage: React.FC = () => {
   const tabSize = useBreakpointValue({ base: "sm", md: "md" });
   const isMobile = useBreakpointValue({ base: true, md: false });
 
+  // const posts = await getAllPosts();
+
   const handleSelection = (hash: any) => {
     const upperHash = hash.toUpperCase();
     const tabs = ["FAQ", "BLOGS", "VIDEOS", "NEWS"];
@@ -80,6 +82,10 @@ const ResourcesPage: React.FC = () => {
     link: string;
     tag?: string;
   }) => (
+    <Link
+        href={link}
+        _hover={{ textDecoration: "none" }}
+      >
     <Box
       bg={cardBg}
       p={5}
@@ -119,6 +125,7 @@ const ResourcesPage: React.FC = () => {
         Read more →
       </Link>
     </Box>
+    </Link>
   );
 
   const VideoCard = ({ url }: { url: string }) => {
@@ -242,12 +249,6 @@ const ResourcesPage: React.FC = () => {
 
   const NEWS = [
     {
-      image: "/EIP_blog1.png",
-      title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
-      content: "Bringing You the Latest in Ethereum Improvement Proposals",
-      link: "/Blogs/blog1",
-    },
-    {
       image: "/news1.jpg",
       title: "The EIP Proposal Builder: Simplify, Streamline, Succeed",
       content:
@@ -288,9 +289,6 @@ const ResourcesPage: React.FC = () => {
       link: "https://etherworld.co/2024/11/26/search-by-author-eipsinsight/",
       tag: "Feature",
     },
-  ];
-
-  const BLOGS = [
     {
       image: "/blog3.jpg",
       title: "ICYMI: New Features on EIPsInsight",
@@ -338,6 +336,37 @@ const ResourcesPage: React.FC = () => {
         "EIP-7045 introduces a crucial Ethereum upgrade, extending attestation inclusion slots for improved security.",
       link: "https://etherworld.co/2024/01/09/eip-7045/",
       tag: "Technical",
+    },
+  ];
+
+  const BLOGS = [
+    {
+      image: "/EipsInsightRecap.jpg",
+      title: "Eipsinsight milestones 2024",
+      content: "This review highlights the pivotal role played by the Analytics Scheduler, Reviewers Tracker, EIP Board, and other utilities.",
+      link: "/milestones2024",
+      tag: "Year in Review"
+    },
+    {
+      image: "/bpo-forks-eip-7892(2).jpg",
+      title: "Blob Parameter Only (BPO) Forks (EIP-7892)",
+      content: "Ethereum scales blob capacity with Blob Parameter Only (BPO) forks to support Layer 2 growth before Fusaka and PeerDAS, preserving decentralization.",
+      link: "/Blogs/bpo-forks-eip-7892",
+      tag: "Technical"
+    },
+    {
+      image: "/EIP_blog1.png",
+      title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
+      content: "Bringing You the Latest in Ethereum Improvement Proposals",
+      link: "/newsletter",
+    },
+
+   {
+      image: "/ePBS-eip-7732.jpg",
+      title: "Enshrined Proposer Builder Separation (ePBS) (EIP-7732)",
+      content: "Understand Ethereum’s EIP-7732 upgrade with a breakdown of what ePBS is, why it’s needed, key architectural changes, its advantages, challenges, and how it compares to PBS.",
+      link: "/Blogs/ePBS-eip-7732",
+      tag: "Technical"
     },
   ];
 
@@ -610,6 +639,7 @@ const ResourcesPage: React.FC = () => {
           <Header
             title="Resources"
             subtitle="Learn, explore, and stay updated with Ethereum improvements"
+            description="Explore FAQs, blogs, videos, news, and tools to deepen your understanding of Ethereum Improvement Proposals."
           />
         </Box>
         <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} py={8}>

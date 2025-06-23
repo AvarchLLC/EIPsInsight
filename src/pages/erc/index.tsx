@@ -27,6 +27,7 @@ import { ButtonGroup, Flex } from "@chakra-ui/react";
 import TypeGraphs from "@/components/TypeGraphs4";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
+import FeedbackWidget from "@/components/FeedbackWidget";
 import ErcTable from "@/components/ErcTable";
 import { useRouter } from "next/router";
 import ERCsPRChart from "@/components/Ercsprs";
@@ -275,6 +276,11 @@ const ERC = () => {
                     </Button>
                   </Flex>
                 }
+                description={
+                  <Text>
+                    ERCs are standards for application-level interfaces and contract behaviors on Ethereum.
+                  </Text>
+                }
               />
 
               {/* Row: Subscription + Toggle Buttons */}
@@ -516,6 +522,10 @@ const ERC = () => {
             <Box className="w-full mt-6" id="tables">
               <ErcTable dataset={data4} cat="All" status="All" />
             </Box>
+
+  <Box>
+    <ERCsPRChart/>
+  </Box>
 
             <Box
               bg={useColorModeValue("blue.50", "gray.700")}

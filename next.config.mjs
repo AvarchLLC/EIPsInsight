@@ -33,6 +33,10 @@ const nextConfig = withMDX(
     reactStrictMode: false,
     trailingSlash: false,
 
+    images: {
+      domains: ['hackmd.io', 'etherworld.co'], 
+    },
+
     // Add the redirects method here
     async redirects() {
       return [

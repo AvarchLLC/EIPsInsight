@@ -1,6 +1,6 @@
 import React from "react";
 import AllLayout from "@/components/Layout";
-import Header from "@/components/Header";
+// import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
@@ -118,6 +118,9 @@ import FeedbackWidget from "@/components/FeedbackWidget";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import SubscriptionButton from '@/components/SubscribtionButton';
+import Header from "@/components/Header";
+import { SubscribeForm } from '@/components/SubscriptionForm';
+
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
 const Status_OPTIONS = ["Draft", "Review", "Last Call", "Living", "Final", "Stagnant", "Withdrawn"];
@@ -325,7 +328,8 @@ const Type = () => {
               {/* Header */}
               <Header
                 title={`Ethereum Improvement Proposal - [${data.length}]`}
-                subtitle={
+                subtitle={"Overview"}
+                description={
                   <Flex align="center" gap={2} flexWrap="wrap">
                     <Text>
                       EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature.
@@ -395,7 +399,7 @@ const Type = () => {
               <SearchBox />
             </Box>
 
-            <Box className="w-full flex flex-col gap-5 pt-8" id="graphs">
+            <Box className="w-full flex flex-col gap-5 pt-8" id="chart type">
               <Box id="charts" className="w-full overflow-hidden">
                 <Box display="flex" justifyContent="space-between" alignItems="center" px={0} pb={2}>
                   <Text fontSize={{ base: "32px", sm: "32px", md: "34px", lg: "36px" }} fontWeight="bold">

@@ -117,6 +117,7 @@ const Interface = () => {
                   )?.length
                 } ]`}
                 subtitle="Interface EIPs describe changes to the Ethereum client API."
+                description="Interface EIPs specify standards for client APIs and how Ethereum clients interact with external components."
               />
             </FlexBetween>
             <TableStatus cat="Interface" />

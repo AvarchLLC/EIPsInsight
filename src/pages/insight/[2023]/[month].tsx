@@ -201,7 +201,11 @@ const Month = () => {
                 marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
               >
                 <NextLink href={`/insight/${year}/${month}`}>
-                  <Header title={getMonthName(Number(month))} subtitle={year} />
+                  <Header
+                    title={getMonthName(Number(month))}
+                    subtitle={year}
+                    description={`EIPs Insight for ${getMonthName(Number(month))} ${year}`}
+                  />
                 </NextLink>
                 <br />
                 <Box

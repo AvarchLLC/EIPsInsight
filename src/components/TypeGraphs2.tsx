@@ -8,7 +8,6 @@ import NextLink from "next/link";
 import StatusChart from "@/components/StatusColumnChart";
 import DateTime from "./DateTime";
 
-
 interface EIP {
   _id: string;
   eip: string;
@@ -22,15 +21,15 @@ interface EIP {
   deadline: string;
   requires: string;
   unique_ID: number;
-  repo:string;
+  repo: string;
   __v: number;
 }
 
 interface APIResponse {
-    eip: EIP[];
-    erc: EIP[];
-    rip: EIP[];
-  }
+  eip: EIP[];
+  erc: EIP[];
+  rip: EIP[];
+}
 
 const TypeGraphs = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -59,36 +58,83 @@ const TypeGraphs = () => {
 
     fetchData();
   }, []);
-  
-  const allData: EIP[] = data2?.eip?.concat(data2?.erc?.concat(data2?.rip)) || [];
+
+  const allData: EIP[] =
+    data2?.eip?.concat(data2?.erc?.concat(data2?.rip)) || [];
 
   return (
     <>
-      <Box hideBelow={"lg"}>
-        <Grid templateColumns="1fr 1fr 1fr" gap={8}>
+      <Box
+        // className="border border-red-700"
+        width="1400px"
+        maxWidth="100%"
+        overflow="hidden"
+        mx="auto"
+        p="0.5rem"
+      >
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={8}>
           <NextLink href={"/core"}>
-            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Core - [{data?.filter(
-                    (item) =>
-                      item.type === "Standards Track" &&
-                      item.category === "Core"
-                  )?.length ||0}]
+            <Text
+              fontSize="3xl"
+              fontWeight="bold"
+              color="#30A0E0"
+              isTruncated // if using Chakra UI
+              maxWidth="100%"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
+              Core - [
+              {data?.filter(
+                (item) =>
+                  item.type === "Standards Track" && item.category === "Core"
+              )?.length || 0}
+              ]
             </Text>
           </NextLink>
           <NextLink href={"/networking"}>
-            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+            <Text
+              fontSize="3xl"
+              fontWeight="bold"
+              color="#30A0E0"
+              isTruncated // if using Chakra UI
+              maxWidth="100%"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
               Networking - [
-              {new Set(allData?.filter((item) => item.category === "Networking")?.map((item) => item.eip)).size}]
+              {
+                new Set(
+                  allData
+                    ?.filter((item) => item.category === "Networking")
+                    ?.map((item) => item.eip)
+                ).size
+              }
+              ]
             </Text>
           </NextLink>
           <NextLink href={"/interface"}>
-            <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
+            <Text
+              fontSize="3xl"
+              fontWeight="bold"
+              color="#30A0E0"
+              isTruncated // if using Chakra UI
+              maxWidth="100%"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
               Interface - [
-              {new Set(allData?.filter((item) => item.category === "Interface")?.map((item) => item.eip)).size}]
+              {
+                new Set(
+                  allData
+                    ?.filter((item) => item.category === "Interface")
+                    ?.map((item) => item.eip)
+                ).size
+              }
+              ]
             </Text>
           </NextLink>
         </Grid>
-        <Grid templateColumns="1fr 1fr 1fr" gap={8}>
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={8}>
           <Box
             marginTop={"2rem"}
             bg={bg}
@@ -117,7 +163,7 @@ const TypeGraphs = () => {
           <Box
             marginTop={"2rem"}
             bg={bg}
-            p="0.5rem"
+            // p="0.5rem"
             borderRadius="0.55rem"
             display="flex"
             flexDirection="column"
@@ -165,7 +211,7 @@ const TypeGraphs = () => {
             </Box>
           </Box>
         </Grid>
-        <Grid templateColumns="1fr 1fr 1fr" gap={8} paddingTop={8}>
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={8}>
           {/*<NextLink href={'/erc'}>*/}
           {/*    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">*/}
           {/*        ERC - [{data?.filter((item) => item.category === "ERC")?.length}]*/}
@@ -173,23 +219,45 @@ const TypeGraphs = () => {
           {/*</NextLink>*/}
           <NextLink href={"/meta"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
-              Meta - [{(new Set(allData?.filter((item) => item.type === "Meta")?.map((item) => item.eip)).size)}]
+              Meta - [
+              {
+                new Set(
+                  allData
+                    ?.filter((item) => item.type === "Meta")
+                    ?.map((item) => item.eip)
+                ).size
+              }
+              ]
             </Text>
           </NextLink>
           <NextLink href={"/informational"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               Informational - [
-              {new Set(allData?.filter((item) => item.type === "Informational")?.map((item) => item.eip)).size}]
+              {
+                new Set(
+                  allData
+                    ?.filter((item) => item.type === "Informational")
+                    ?.map((item) => item.eip)
+                ).size
+              }
+              ]
             </Text>
           </NextLink>
           <NextLink href={"/erc"}>
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
               ERC - [
-              {new Set(allData?.filter((item) => item.category === "ERC")?.map((item) => item.eip)).size}]
+              {
+                new Set(
+                  allData
+                    ?.filter((item) => item.category === "ERC")
+                    ?.map((item) => item.eip)
+                ).size
+              }
+              ]
             </Text>
           </NextLink>
         </Grid>
-        <Grid templateColumns="1fr 1fr 1fr" gap={8}>
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={8}>
           {/*<Box*/}
           {/*    marginTop={"2rem"}*/}
           {/*    bg={bg}*/}
@@ -296,7 +364,7 @@ const TypeGraphs = () => {
         </Grid>
       </Box>
 
-      <Box display={{ lg: "none", sm: "block" }}>
+      <Box>
         {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2">
           Draft
         </Text>
@@ -329,14 +397,14 @@ const TypeGraphs = () => {
           </Box>
         </Box> */}
 
-        <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
+        {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
           Draft vs Final
         </Text>
 
-        <AreaC type={"EIPs"} />
+        <AreaC type={"EIPs"} /> */}
 
-        <NextLink href={"/core"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+        {/* <NextLink href={"/core"}>
+          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
             Core - [{data?.filter((item) => item.category === "Core")?.length}]
           </Text>
         </NextLink>
@@ -368,7 +436,7 @@ const TypeGraphs = () => {
         </Box>
 
         <NextLink href={"/networking"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
             Networking - [
             {data?.filter((item) => item.category === "Networking")?.length}]
           </Text>
@@ -401,7 +469,7 @@ const TypeGraphs = () => {
         </Box>
 
         <NextLink href={"/interface"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
             Interface - [
             {data?.filter((item) => item.category === "Interface")?.length}]
           </Text>
@@ -434,7 +502,7 @@ const TypeGraphs = () => {
         </Box>
 
         <NextLink href={"/erc"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
             ERC - [{data?.filter((item) => item.category === "ERC")?.length}]
           </Text>
         </NextLink>
@@ -466,7 +534,7 @@ const TypeGraphs = () => {
         </Box>
 
         <NextLink href={"/meta"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
             Meta - [{data?.filter((item) => item.type === "Meta")?.length}]
           </Text>
         </NextLink>
@@ -495,10 +563,10 @@ const TypeGraphs = () => {
           <Box className={"w-full"}>
             <DateTime />
           </Box>
-        </Box>
+        </Box> */}
 
-        <NextLink href={"/informational"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0">
+        {/* <NextLink href={"/informational"}>
+          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
             Informational - [
             {data?.filter((item) => item.type === "Informational")?.length}]
           </Text>
@@ -528,7 +596,7 @@ const TypeGraphs = () => {
           <Box className={"w-full"}>
             <DateTime />
           </Box>
-        </Box>
+        </Box> */}
       </Box>
     </>
   );

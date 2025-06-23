@@ -84,6 +84,7 @@ const Core = () => {
                   data?.filter((item) => item.category === "Core")?.length
                 } ]`}
                 subtitle="Core EIPs describe changes to the Ethereum protocol."
+                description="These EIPs are essential for protocol upgrades and consensus changes."
               />
             </FlexBetween>
             <TableStatus cat="Core" />
