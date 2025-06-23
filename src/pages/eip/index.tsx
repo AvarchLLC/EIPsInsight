@@ -322,19 +322,17 @@ const Type = () => {
           >
 
             <Flex
-              direction={{ base: "column", md: "row" }}
-              justify="space-between"
-              align="center"
-              wrap="wrap"
-              gap={4}
+              direction="column"
+              gap={6}
             >
+              {/* Header */}
               <Header
                 title={`Ethereum Improvement Proposal - [${data.length}]`}
                 subtitle={"Overview"}
                 description={
                   <Flex align="center" gap={2} flexWrap="wrap">
                     <Text>
-                      EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature
+                      EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature.
                     </Text>
                     <Button
                       size="sm"
@@ -348,42 +346,52 @@ const Type = () => {
                   </Flex>
                 }
               />
-              <div className="flex items-center mb-4">
-                <SubscriptionButton type="eips" id="all" />
-              </div>
 
+              {/* Row with SubscriptionButton on left and Toggle Buttons on right */}
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                justify="space-between"
+                align="center"
+                gap={4}
+              >
+                {/* Left: Subscription Button */}
+                <div className="flex items-center">
+                  <SubscriptionButton type="eips" id="all" />
+                </div>
 
-              <Box id="githubstats">
+                {/* Right: Category/Status Buttons */}
+                <ButtonGroup size="md" isAttached>
+                  <Button
+                    bg={selected === "category" ? "#40E0D0" : "white"}
+                    color={selected === "category" ? "white" : "#40E0D0"}
+                    borderColor="#40E0D0"
+                    variant="outline"
+                    onClick={() => {
+                      setSelected("category");
+                      router.push("?view=category", undefined, { shallow: true });
+                    }}
+                  >
+                    Category
+                  </Button>
+                  <Button
+                    bg={selected === "status" ? "#40E0D0" : "white"}
+                    color={selected === "status" ? "white" : "#40E0D0"}
+                    borderColor="#40E0D0"
+                    variant="outline"
+                    onClick={() => {
+                      setSelected("status");
+                      router.push("?view=status", undefined, { shallow: true });
+                    }}
+                  >
+                    Status
+                  </Button>
+                </ButtonGroup>
+              </Flex>
+
+              {/* Full Width OtherBox below */}
+              <Box id="githubstats" width="100%">
                 <OtherBox type="EIPs" />
               </Box>
-              <br></br>
-
-              <ButtonGroup size="md" isAttached>
-                <Button
-                  bg={selected === "category" ? "#40E0D0" : "white"}
-                  color={selected === "category" ? "white" : "#40E0D0"}
-                  borderColor="#40E0D0"
-                  variant="outline"
-                  onClick={() => {
-                    setSelected("category");
-                    router.push("?view=category", undefined, { shallow: true });
-                  }}
-                >
-                  Category
-                </Button>
-                <Button
-                  bg={selected === "status" ? "#40E0D0" : "white"}
-                  color={selected === "status" ? "white" : "#40E0D0"}
-                  borderColor="#40E0D0"
-                  variant="outline"
-                  onClick={() => {
-                    setSelected("status");
-                    router.push("?view=status", undefined, { shallow: true });
-                  }}
-                >
-                  Status
-                </Button>
-              </ButtonGroup>
             </Flex>
 
 

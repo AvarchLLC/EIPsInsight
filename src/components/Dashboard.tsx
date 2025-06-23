@@ -63,7 +63,7 @@ import { useSidebar } from "@/components/Sidebar/SideBarContext";
 
 import DashboardCards from "./DashboardCards";
 import FeedbackWidget from "./FeedbackWidget";
-
+import { Clients } from "./Clients";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 interface EIP {
@@ -226,6 +226,15 @@ const Dashboard = () => {
     }
   };
 
+  useScrollSpy([
+    "all",
+    "ourtools",
+    "what",
+    "statuschanges",
+    "dashboard",
+  ]);
+
+
   useEffect(() => {
     if (window.location.hash) {
       const id = window.location.hash.replace("#", "");
@@ -238,7 +247,7 @@ const Dashboard = () => {
     }
   }, []);
 
-  useScrollSpy(["all", "ourtools", "what", "statuschanges", "dashboard"]);
+
   return (
     <>
       <FeedbackWidget />
@@ -519,6 +528,9 @@ const Dashboard = () => {
               </Box>
               <div>
                 <ToolsSection />
+              </div>
+              <div>
+                <Clients />
               </div>
 
               {/* <div className="py-8"> */}
