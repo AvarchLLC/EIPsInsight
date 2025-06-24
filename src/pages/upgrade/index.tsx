@@ -1499,6 +1499,7 @@ const All = () => {
     };
   }, [router]);
 
+
   const currentPosts = selectedOption === 'pectra' ? PectraPosts : FusakaPosts;
   const currentData = selectedOption === 'pectra' ? pectraData : fusakaData;
   const upgradeName = selectedOption === 'pectra' ? 'Pectra' : 'Fusaka';
@@ -1661,6 +1662,7 @@ const All = () => {
                 overflowY="auto"
                 width="100%"
                 padding="4"
+                id="upgrade-blogs"
               >
                 <Grid
                   // Responsive: 1 column on small screens, 3 columns on medium and up

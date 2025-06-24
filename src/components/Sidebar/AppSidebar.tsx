@@ -161,22 +161,27 @@ const sidebarStructure = [
     icon: LayoutDashboard,
     label: "Upgrade",
     href: "/upgrade",
-    id: 'upgrade-section',
+    id: "upgrade-section",
     children: [
       {
-        label: 'Upgrade Details',
+        label: "Upgrade Details",
         children: [
-          { label: 'PECTRA', id: 'pectra', href: '/upgrade#pectra' },
-          { label: 'FUSAKA', id: 'fusaka', href: '/upgrade#fusaka' },
-        ]
+          { label: "PECTRA", id: "pectra", href: "/upgrade?selected=pectra#pectra" },
+          { label: "FUSAKA", id: "fusaka", href: "/upgrade?selected=fusaka#fusaka" },
+        ],
       },
-      { label: 'Network Upgrades Graph', id: 'NetworkUpgrades', href: '/upgrade#NetworkUpgrades' },
-      { label: 'Upgrade Table', id: 'upgrade-table', href: '/upgrade#upgrade-table' },
-      { label: 'Network Upgrades and EIPs Relationship Graph', id: 'NetworkUpgradesChartp', href: '/upgrade#NetworkUpgradesChartp' },
-      { label: 'Network Upgrades chart', id: 'NetworkUpgradeschart', href: '/upgrade#NetworkUpgradeschart' },
-      { label: 'Author Contributions', id: 'AuthorContributions', href: '/upgrade#AuthorContributions' },
-    ],
+      { label: "Network Upgrades Graph", id: "NetworkUpgrades", href: "/upgrade#NetworkUpgrades" },
+      { label: "Upgrade Blogs", id: "upgrade-blogs", href: "/upgrade#upgrade-blogs" },
+      { label: "Upgrade Table", id: "upgrade-table", href: "/upgrade#upgrade-table" },
+      {
+        label: "Network Upgrades and EIPs Relationship Graph",
+        id: "NetworkUpgradesChartp",
+        href: "/upgrade#NetworkUpgradesChartp",
+      },
+      { label: "Network Upgrades Chart", id: "NetworkUpgradeschart", href: "/upgrade#NetworkUpgradeschart" },
+      { label: "Author Contributions", id: "AuthorContributions", href: "/upgrade#AuthorContributions" },
 
+    ],
   },
   {
     icon: Layers3,
@@ -191,91 +196,85 @@ const sidebarStructure = [
         label: "EIPs",
         href: "/eip?view=type",
         children: [
-          { label: "Ethereum Improvement", href: "/eip#Ethereum Improvement" },
-          { label: "chart type", href: "/eip#chart type" },
-          { label: "View EIP Stats", href: "/eip#View EIP Stats" },
-          { label: "Eip Table", href: "/eip#Eip Table" },
+          { label: "Overview", href: "/eip#ethereum-improvement" },
           { label: "GitHub Stats", href: "/eip#githubstats" },
-          { label: "Graphs", href: "/eip#charts" },
           {
-            label: "Categories",
-            children: [
-              { label: "Core", href: "/eip#core" },
-              { label: "Networking", href: "/eip#networking" },
-              { label: "Interface", href: "/eip#interface" },
-              { label: "Meta", href: "/eip#meta" },
-              { label: "Informational", href: "/eip#informational" },
-            ],
+            label: "Category View", href: "/eip?view=category", children: [
+              { label: "Category Graphs", href: "/eip?view=category#charts" },
+              { label: "Category View", href: "/eip?view=category#categories" }
+
+            ]
           },
           {
-            label: "Tables",
-            children: [
-              { label: "Core Table", href: "/eip#coretable" },
-              { label: "Networking Table", href: "/eip#networkingtable" },
-              { label: "Interface Table", href: "/eip#interfacetable" },
-              { label: "Meta Table", href: "/eip#metatable" },
-              { label: "Informational Table", href: "/eip#informationaltable" },
-            ],
+            label: "Status View", href: "/eip?view=status", children: [
+              { label: "Status Graphs", href: "/eip?view=status#charts" },
+              { label: "Draft vs Final", href: "/eip?view=status#draftvsfinal" },
+              { label: "Category View", href: "/eip?view=status#statuses" }
+
+            ]
           },
-        ],
+          { label: "All EIPs Table", href: "/eip#tables" }
+        ]
       },
       {
         label: "ERCs",
-        href: "/erc?view=type",
+        href: "/erc?view=category",
         children: [
-          { label: "Ethereum Request", href: "/erc#Ethereum Improvement" },
-          {
-            label: "ERC (Progress Over the Years)",
-            href: "/erc#ERC progress bar",
-          },
-          { label: "Draft", href: "/erc#draft" },
-          { label: "ERC Activity", href: "/erc#ERC Activity" },
-          { label: "Satus Activity", href: "/erc#Satus Activity" },
-          // { label: "Final", href: "/erc#final" },
-          // { label: "Stagnant", href: "/erc#stagnant" },
-          // { label: "Withdrawn", href: "/erc#withdrawn" },
-          // { label: "Living", href: "/erc#living" },
-          // { label: "Meta Table", href: "/erc#metatable" },
-          // { label: "ERC Table", href: "/erc#erctable" },
+          { label: "Overview", href: "/erc#ethereum-improvement" },
           { label: "GitHub Stats", href: "/erc#githubstats" },
-          { label: "Graphs", href: "/erc#graphs" },
-          { label: "ERC (Progress Over the Years)", href: "/erc#ercprogress" },
+
           {
-            label: "Tables",
+            label: "Category View",
+            href: "/erc?view=category",
             children: [
-              { label: "ERC Table", href: "/erc#erctable" },
-              { label: "Meta Table", href: "/erc#metatable" },
+              { label: "Category Graphs", href: "/erc?view=category#graphs" },
+              { label: "ERC Progress ", href: "/erc?view=category#progress" },
             ],
           },
+
+          {
+            label: "Status View",
+            href: "/erc?view=status",
+            children: [
+              { label: "Status Graphs", href: "/erc?view=status#graphs" },
+              { label: "Draft vs Final", href: "/erc?view=status#draftvsfinal" },
+              { label: "Category View", href: "/erc?view=status#statuses" },
+            ],
+          },
+
+          { label: "All ERCs Table", href: "/erc#tables" },
         ],
       },
       {
         label: "RIPs",
-        href: "/rip?view=type",
+        href: "/rip?view=category",
         children: [
-          {
-            label: "Rollup Improvement Proposal",
-            href: "/rip#Ethereum Improvement",
-          },
-          { label: "GitHub Stats – RIPs", href: "/rip#GitHub Stats – RIPs" },
-          { label: "Draft", href: "/rip#draft" },
-          { label: "Living", href: "/rip#living" },
-          { label: "Final", href: "/rip#final" },
-          { label: "Meta", href: "/rip#meta" },
-          { label: "Informational", href: "/rip#informational" },
-          { label: "Core", href: "/rip#core" },
-          { label: "Networking", href: "/rip#networking" },
-          { label: "Interface", href: "/rip#interface" },
-          { label: "RIP", href: "/rip#rip" },
-          { label: "RRC", href: "/rip#rrc" },
+          { label: "Overview", href: "/rip#ethereum-improvement" },
           { label: "GitHub Stats", href: "/rip#githubstats" },
-          { label: "Graphs", href: "/rip#charts" },
+
           {
-            label: "Table",
-            href: "/rip#type-tables"
-          }
+            label: "Category View",
+            href: "/rip?view=category",
+            children: [
+              { label: "Category Graphs", href: "/rip?view=category#charts" },
+              { label: "Category View", href: "/rip?view=category#rip-status-graph" }, // if you add id
+            ],
+          },
+
+          {
+            label: "Status View",
+            href: "/rip?view=status",
+            children: [
+              { label: "Status Graphs", href: "/rip?view=status#charts" },
+              { label: "Draft vs Final", href: "/rip?view=status#draftvsfinal" },
+              { label: "Status View", href: "/rip?view=status#statuses" }
+            ],
+          },
+
+          { label: "All RIPs Table", href: "/rip#status-tables" },
         ],
-      },
+      }
+
     ],
   },
   {
@@ -372,13 +371,13 @@ export default function AppSidebar() {
   const activeSection = useSidebarStore((s) => s.activeSection);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [userData, setUserData] = useState<UserData | null>(null);
-    const { user, setUser, clearUser } = useUserStore();
+  const { user, setUser, clearUser } = useUserStore();
 
-    const bottomItems = [
-  // { icon: Search, label: "Search", href: "/search" },
-  // { icon: UserCircle2, label: "Profile", href: "/profile" },
-  { icon: Settings, label: "Settings", href: "/" },
-];
+  const bottomItems = [
+    // { icon: Search, label: "Search", href: "/search" },
+    // { icon: UserCircle2, label: "Profile", href: "/profile" },
+    { icon: Settings, label: "Settings", href: "/" },
+  ];
 
   const bg = useColorModeValue("gray.100", "gray.900");
   const borderColor = useColorModeValue("gray.300", "gray.700");
@@ -388,43 +387,43 @@ export default function AppSidebar() {
   };
 
   useEffect(() => {
-  const expandParents = (items: any[], activeId: string, path: string[] = []): string[] | null => {
-    for (const item of items) {
-      const itemHash = item.href?.split("#")[1] || item.id;
-      if (itemHash === activeId) return path;
-      if (item.children) {
-        const result = expandParents(item.children, activeId, [...path, item.label]);
-        if (result) return result;
+    const expandParents = (items: any[], activeId: string, path: string[] = []): string[] | null => {
+      for (const item of items) {
+        const itemHash = item.href?.split("#")[1] || item.id;
+        if (itemHash === activeId) return path;
+        if (item.children) {
+          const result = expandParents(item.children, activeId, [...path, item.label]);
+          if (result) return result;
+        }
+      }
+      return null;
+    };
+
+    if (activeSection) {
+      const activePath = expandParents(sidebarStructure, activeSection);
+      if (activePath) {
+        setExpandedItems((prev) => {
+          const updated = { ...prev };
+          activePath.forEach((label) => {
+            updated[label] = true;
+          });
+          return updated;
+        });
       }
     }
-    return null;
-  };
+  }, [activeSection]);
 
-  if (activeSection) {
-    const activePath = expandParents(sidebarStructure, activeSection);
-    if (activePath) {
-      setExpandedItems((prev) => {
-        const updated = { ...prev };
-        activePath.forEach((label) => {
-          updated[label] = true;
-        });
-        return updated;
-      });
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUserData(JSON.parse(storedUser));
     }
-  }
-}, [activeSection]);
+  }, []);
 
-useEffect(() => {
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    setUserData(JSON.parse(storedUser));
-  }
-}, []);
-
-const toast = useToast();
+  const toast = useToast();
   const router = useRouter();
 
- const handleRefresh = async () => {
+  const handleRefresh = async () => {
     if (!user) return;
 
     try {
@@ -539,8 +538,8 @@ const toast = useToast();
             key={item.label}
             item={item}
             expanded={!isCollapsed}
-  expandedItems={expandedItems}
-  toggleExpand={toggleExpand}
+            expandedItems={expandedItems}
+            toggleExpand={toggleExpand}
             depth={0}
             isCollapsed={isCollapsed}
           />
@@ -548,43 +547,43 @@ const toast = useToast();
       </VStack>
 
       <Box mt={2} px={isCollapsed ? 0 : 4}>
-  <Menu placement="top" isLazy>
-    <MenuButton
-      as={HStack}
-      spacing={isCollapsed ? 0 : 3}
-      align="center"
-      px={isCollapsed ? 2 : 3}
-      py={2}
-      w="full"
-      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
-      borderRadius="md"
-      transition="background 0.2s"
-      justify={isCollapsed ? "center" : "flex-start"}
-      cursor="pointer"
-    >
-      <Avatar
-        size="sm"
-        name={userData?.name}
-        src={userData?.image || undefined}
-      />
-      {!isCollapsed && (
-        <>
-          <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
-            {userData?.name || "Profile"}
-          </Text>
-          <Box as={ChevronDown} size="16px" />
-        </>
-      )}
-    </MenuButton>
+        <Menu placement="top" isLazy>
+          <MenuButton
+            as={HStack}
+            spacing={isCollapsed ? 0 : 3}
+            align="center"
+            px={isCollapsed ? 2 : 3}
+            py={2}
+            w="full"
+            _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+            borderRadius="md"
+            transition="background 0.2s"
+            justify={isCollapsed ? "center" : "flex-start"}
+            cursor="pointer"
+          >
+            <Avatar
+              size="sm"
+              name={userData?.name}
+              src={userData?.image || undefined}
+            />
+            {!isCollapsed && (
+              <>
+                <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
+                  {userData?.name || "Profile"}
+                </Text>
+                <Box as={ChevronDown} size="16px" />
+              </>
+            )}
+          </MenuButton>
 
-    <MenuList zIndex={1000}>
-      <MenuItem onClick={() => router.push("/profile")}>👤 Profile</MenuItem>
-      <MenuItem onClick={handleRefresh}>🔄 Refresh Status</MenuItem>
-      <MenuDivider />
-      <MenuItem onClick={handleLogout}>🚪 Logout</MenuItem>
-    </MenuList>
-  </Menu>
-</Box>
+          <MenuList zIndex={1000}>
+            <MenuItem onClick={() => router.push("/profile")}>👤 Profile</MenuItem>
+            <MenuItem onClick={handleRefresh}>🔄 Refresh Status</MenuItem>
+            <MenuDivider />
+            <MenuItem onClick={handleLogout}>🚪 Logout</MenuItem>
+          </MenuList>
+        </Menu>
+      </Box>
 
     </Box>
 
@@ -615,16 +614,16 @@ export function SidebarItem({
   const hoverBg = useColorModeValue("gray.200", "gray.700");
   const borderColor = useColorModeValue("gray.300", "gray.700");
 
-const getHrefHash = (href: string) => {
-  const parts = href.split("#");
-  return parts.length > 1 ? parts[1] : null;
-};
+  const getHrefHash = (href: string) => {
+    const parts = href.split("#");
+    return parts.length > 1 ? parts[1] : null;
+  };
 
-const itemHash = item.href ? getHrefHash(item.href) : item.id || null;
-const isLeafNode = !item.children || item.children.length === 0;
-const isActive = isLeafNode && itemHash === activeSection;
+  const itemHash = item.href ? getHrefHash(item.href) : item.id || null;
+  const isLeafNode = !item.children || item.children.length === 0;
+  const isActive = isLeafNode && itemHash === activeSection;
 
-const router = useRouter();
+  const router = useRouter();
 
 
   const variants: Variants = {
@@ -689,38 +688,38 @@ const router = useRouter();
           {expanded && (
             <>
               {item.href ? (
-<Text
-  as="a"
-  onClick={(e) => {
-    e.preventDefault();
+                <Text
+                  as="a"
+                  onClick={(e) => {
+                    e.preventDefault();
 
-    if (!item.href) return;
+                    if (!item.href) return;
 
-    const [path, hash] = item.href.split("#");
+                    const [path, hash] = item.href.split("#");
 
-    const isSamePage = window.location.pathname === path;
+                    const isSamePage = window.location.pathname === path;
 
-    if (isSamePage && hash) {
-      const target = document.getElementById(hash);
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        history.pushState(null, "", item.href); // Update URL hash without reload
-      }
-    } else if (!hash) {
-      router.push(item.href); // Normal page change
-    } else {
-      // Different page + hash — use router.push with hash
-      router.push(item.href);
-    }
-  }}
-  cursor="pointer"
-  flex="1"
-  fontWeight="medium"
-  fontSize="sm"
-  _hover={{ textDecoration: "underline" }}
->
-  {item.label}
-</Text>
+                    if (isSamePage && hash) {
+                      const target = document.getElementById(hash);
+                      if (target) {
+                        target.scrollIntoView({ behavior: "smooth", block: "start" });
+                        history.pushState(null, "", item.href); // Update URL hash without reload
+                      }
+                    } else if (!hash) {
+                      router.push(item.href); // Normal page change
+                    } else {
+                      // Different page + hash — use router.push with hash
+                      router.push(item.href);
+                    }
+                  }}
+                  cursor="pointer"
+                  flex="1"
+                  fontWeight="medium"
+                  fontSize="sm"
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  {item.label}
+                </Text>
 
               ) : (
                 <Text flex="1" fontWeight="medium" fontSize="sm">

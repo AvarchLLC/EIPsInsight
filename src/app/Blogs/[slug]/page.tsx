@@ -1,7 +1,6 @@
 // src/app/Blogs/[slug]/page.tsx
 import Link from 'next/link';
 import { ArrowLeftIcon } from 'lucide-react';
-import Image from 'next/image';
 import { getPostBySlug, PostNotFoundError } from '@/lib/blog';
 import { notFound } from 'next/navigation';
 import MarkdownRenderer from '@/components/MarkdownRenderer';

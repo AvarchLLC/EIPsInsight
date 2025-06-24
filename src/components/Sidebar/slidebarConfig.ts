@@ -207,8 +207,7 @@ export const sidebarConfig: Record<
       label: "Ethereum Improvement",
       icon: LuWrench,
       id: "Ethereum Improvement",
-      
-
+    
     }
   ], 
   "/all": [
