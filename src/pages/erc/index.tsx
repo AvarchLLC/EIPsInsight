@@ -197,6 +197,13 @@ const ERC = () => {
 
     fetchData();
   }, []);
+  useEffect(() => {
+  const viewParam = router.query.view;
+  if (viewParam === "status" || viewParam === "category") {
+    setSelected(viewParam);
+  }
+}, [router.query.view]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -376,7 +383,7 @@ const ERC = () => {
             <Box paddingTop={8}>
               {selected !== "status" && (
                 <>
-                  <Flex justify="flex-end" mb={2}>
+                  <Flex justify="flex-end" mb={2} id="progress">
                     <Button
                       onClick={handleCopyERCStatusGraph}
                       size="sm"
@@ -522,10 +529,6 @@ const ERC = () => {
             <Box className="w-full mt-6" id="tables">
               <ErcTable dataset={data4} cat="All" status="All" />
             </Box>
-
-  <Box>
-    <ERCsPRChart/>
-  </Box>
 
             <Box
               bg={useColorModeValue("blue.50", "gray.700")}

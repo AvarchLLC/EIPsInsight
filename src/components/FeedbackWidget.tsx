@@ -1,9 +1,15 @@
-import React, { useState } from "react";
-import { Box, Tooltip, useToast } from "@chakra-ui/react";
+import React, { useRef, useState } from "react";
+import { Box, Tooltip, useToast, useOutsideClick } from "@chakra-ui/react";
 
 const FeedbackWidget = () => {
   const [showThumbs, setShowThumbs] = useState(false);
   const toast = useToast();
+  const thumbsRef = useRef(null); // 👈 for outside click detection
+
+  useOutsideClick({
+    ref: thumbsRef,
+    handler: () => setShowThumbs(false), // 👈 close on outside click
+  });
 
   const submitFeedback = async (type: "like" | "dislike") => {
     try {
@@ -26,6 +32,7 @@ const FeedbackWidget = () => {
           duration: 3000,
           isClosable: true,
         });
+        setShowThumbs(false); // ✅ hide after selection
       } else {
         throw new Error(data.message || "Something went wrong");
       }
@@ -41,19 +48,7 @@ const FeedbackWidget = () => {
   };
 
   return (
-    <Box
-      position="fixed"
-      right="0"
-      top="50%"
-      transform="translateY(-50%)"
-      zIndex="1000"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      gap="10px"
-      onMouseEnter={() => setShowThumbs(true)}
-      onMouseLeave={() => setShowThumbs(false)}
-    >
+    <Box position="fixed" right="0" top="50%" transform="translateY(-50%)" zIndex="1000">
       <Tooltip label="Give Feedback" aria-label="Feedback Tooltip">
         <Box
           bg="#48BB78"
@@ -67,19 +62,11 @@ const FeedbackWidget = () => {
           alignItems="center"
           fontSize="12px"
           cursor="pointer"
-          lineHeight="0.5"
           minWidth="140px"
           transition="translateY(-55%), transform 0.3s ease, box-shadow 0.3s ease"
           boxShadow="lg"
-          style={{
-            transform: "rotate(-90deg)",
-            transformOrigin: "center center",
-          }}
-          _hover={{
-            transform: "scale(1.05) rotate(-90deg)",
-            bg: "#2B6CB0",
-            boxShadow: "xl",
-          }}
+          style={{ transform: "rotate(-90deg)", transformOrigin: "center center" }}
+          _hover={{ transform: "scale(1.05) rotate(-90deg)", bg: "#2B6CB0", boxShadow: "xl" }}
           onClick={() => setShowThumbs((prev) => !prev)}
         >
           Is this page helpful?
@@ -88,6 +75,7 @@ const FeedbackWidget = () => {
 
       {showThumbs && (
         <Box
+          ref={thumbsRef} // 👈 reference for outside click
           bg="white"
           color="#3182CE"
           p="10px"
@@ -104,9 +92,7 @@ const FeedbackWidget = () => {
           boxShadow="lg"
           border="1px solid #E2E8F0"
           transition="transform 0.3s ease, box-shadow 0.3s ease"
-          _hover={{
-            transform: "scale(1.05)",
-          }}
+          _hover={{ transform: "scale(1.05)" }}
         >
           <Tooltip label="I like this!" aria-label="Thumbs-Up Tooltip">
             <Box
@@ -118,10 +104,7 @@ const FeedbackWidget = () => {
               fontSize="20px"
               boxShadow="md"
               transition="background 0.3s ease, transform 0.3s ease"
-              _hover={{
-                bg: "#B2F5EA",
-                transform: "scale(1.1)",
-              }}
+              _hover={{ bg: "#B2F5EA", transform: "scale(1.1)" }}
               onClick={() => submitFeedback("like")}
               aria-label="Thumbs up"
             >
@@ -139,10 +122,7 @@ const FeedbackWidget = () => {
               fontSize="20px"
               boxShadow="md"
               transition="background 0.3s ease, transform 0.3s ease"
-              _hover={{
-                bg: "#FEB2B2",
-                transform: "scale(1.1)",
-              }}
+              _hover={{ bg: "#FEB2B2", transform: "scale(1.1)" }}
               onClick={() => submitFeedback("dislike")}
               aria-label="Thumbs down"
             >
