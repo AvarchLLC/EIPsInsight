@@ -181,6 +181,12 @@ const RIP = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const viewParam = router.query.view;
+    if (viewParam === "status" || viewParam === "category") {
+      setSelected(viewParam);
+    }
+  }, [router.query.view]);
 
 
 
@@ -219,21 +225,21 @@ const RIP = () => {
   }, []);
 
   const toggleCollapse = () => setShow(!show);
-  
+
   useScrollSpy([
-  "Ethereum Improvement",
-  "GitHub Stats – RIPs",
-  "draft",
-  "final",
-  "living",
-  "meta",
-  "informational",
-  "core",
-  "networking",
-  "interface",
-  "rip",
-  "rrc",
-]);
+    "Ethereum Improvement",
+    "GitHub Stats – RIPs",
+    "draft",
+    "final",
+    "living",
+    "meta",
+    "informational",
+    "core",
+    "networking",
+    "interface",
+    "rip",
+    "rrc",
+  ]);
 
 
 
