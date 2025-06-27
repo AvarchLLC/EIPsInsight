@@ -30,6 +30,8 @@ import { useRouter } from "next/router";
 import CopyLink from "@/components/CopyLink";
 import FeedbackWidget from "@/components/FeedbackWidget";
 
+import AreaStatus from "@/components/AreaStatus3";
+
 interface StatusChange {
   _id: string;
   count: number;
@@ -277,6 +279,20 @@ const Month = () => {
                 <Box id="Summary">
                   <InsightsAllStats />
                 </Box>
+                <br/>
+
+                <Text
+                  fontSize="3xl" fontWeight="bold" color="#30A0E0"
+                >
+                  <div id="draft-vs-final"> 
+                    Draft vs Final{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#draft-vs-final`}
+                  />
+                  </div>
+                </Text>          
+                  <AreaStatus/>
+                <br/>
 
                 {/* Defining the stats table here */}
                 {/* <InsightStats/> */}
