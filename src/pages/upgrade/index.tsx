@@ -1141,6 +1141,12 @@ const All = () => {
 
   const FusakaPosts = [
     {
+      image: "fusakaimg6.jpg",
+      title: "A Closer Look at What’s Coming in Fusaka Devnet 2",
+      content: "Ethereum’s upcoming Fusaka upgrade is nearing its final testing phase with Devnet 2, a crucial pre-release environment that determines what features make it to mainnet. ",
+      link: "https://etherworld.co/2025/06/09/a-closer-look-at-whats-coming-in-fusaka-devnet-2/",
+    },
+    {
       image: "fusakaimg1.jpg",
       title: "Ethereum Targets June 1 for Sepolia History Expiry",
       content: "Ethereum developers have tentatively scheduled June 1, 2025, as the date to begin public testing of history expiry on the Sepolia testnet",
@@ -1171,7 +1177,21 @@ const All = () => {
       link: "https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/",
     },
   ];
+  const GlamsterdamPosts = [
+    {
+      image: "fusakaimg5.jpg",
+      title: "Glamsterdam: The Next Upgrade After Fusaka",
+      content: "Glamsterdam merges the star Gloas with Amsterdam for Ethereum’s next upgrade. Explore its origins, naming traditions, and why Devconnect cities might shape future upgrade names.",
+      link: "https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/",
+    },
+    {
 
+      image: "glamsterdamimg1.jpg",
+      title: "Ethereum Gears Up for Glamsterdam with these Proposals",
+      content: "As Ethereum moves closer to its next scheduled hard fork, Glamsterdam, the core developer community is actively evaluating a shortlist of high-impact Ethereum Improvement Proposals (EIPs) referred to as headliners. ",
+      link: "https://etherworld.co/2025/06/10/ethereum-gears-up-for-glamsterdam-with-these-proposals/",
+    },
+  ];
 
 
 
@@ -1279,63 +1299,6 @@ const All = () => {
       discussion:
         "https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390",
     },
-
-    {
-      eip: "2537",
-      title: "Precompile for BLS12-381 curve operations",
-      author: "Alex Vlasov (@shamatar), Kelly Olson (@ineffectualproperty), Alex Stokes (@ralexstokes), Antonio Sanso (@asanso)",
-      link: "https://eipsinsight.com/eips/eip-2537",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip2537-bls12-precompile-discussion-thread/4187"
-    },
-    {
-      eip: "2935",
-      title: "Serve historical block hashes from state",
-      author: "Vitalik Buterin (@vbuterin), Tomasz Stanczak (@tkstanczak), Guillaume Ballet (@gballet), Gajinder Singh (@g11tech), Tanishq Jasoria (@tanishqjasoria), Ignacio Hagopian (@jsign), Jochem Brouwer (@jochem-brouwer)",
-      link: "https://eipsinsight.com/eips/eip-2935",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-2935-save-historical-block-hashes-in-state/4565"
-    },
-    {
-      eip: "6110",
-      title: "Supply validator deposits on chain",
-      author: "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo), Peter Davies (@petertdavies)",
-      link: "https://eipsinsight.com/eips/eip-6110",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-6110-supply-validator-deposits-on-chain/12072"
-    },
-    {
-      eip: "7002",
-      title: "Execution layer triggerable withdrawals",
-      author: "Danny Ryan (@djrtwo), Mikhail Kalinin (@mkalinin), Ansgar Dietrichs (@adietrichs), Hsiao-Wei Wang (@hwwhww), lightclient (@lightclient)",
-      link: "https://eipsinsight.com/eips/eip-7002",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-7002-execution-layer-triggerable-exits/14195"
-    },
-    {
-      eip: "7251",
-      title: "Increase the MAX_EFFECTIVE_BALANCE",
-      author: "mike (@michaelneuder), Francesco (@fradamt), dapplion (@dapplion), Mikhail (@mkalinin), Aditya (@adiasg), Justin (@justindrake), lightclient (@lightclient)",
-      link: "https://eipsinsight.com/eips/eip-2251",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982"
-    },
-    {
-      eip: "7549",
-      title: "Move committee index outside Attestation",
-      author: "dapplion (@dapplion)",
-      link: "https://eipsinsight.com/eips/eip-7549",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
-    },
-
-
     {
       eip: "7685",
       title: "General purpose execution layer requests",
@@ -1536,6 +1499,7 @@ const All = () => {
     };
   }, [router]);
 
+
   const currentPosts = selectedOption === 'pectra' ? PectraPosts : FusakaPosts;
   const currentData = selectedOption === 'pectra' ? pectraData : fusakaData;
   const upgradeName = selectedOption === 'pectra' ? 'Pectra' : 'Fusaka';
@@ -1698,6 +1662,7 @@ const All = () => {
                 overflowY="auto"
                 width="100%"
                 padding="4"
+                id="upgrade-blogs"
               >
                 <Grid
                   // Responsive: 1 column on small screens, 3 columns on medium and up

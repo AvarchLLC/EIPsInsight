@@ -249,7 +249,7 @@ interface EIP {
 }
 
 
-const   TypeGraphs =  ({ selected }: { selected: string }) =>  {
+const TypeGraphs = ({ selected }: { selected: string }) => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
 
   const [data, setData] = useState<EIP[]>([]);
@@ -278,9 +278,10 @@ const   TypeGraphs =  ({ selected }: { selected: string }) =>  {
   }
 
   return (
-     <Box
+    <Box
       bg={bg}
-      w="full"
+      h="100%" w="100%"
+
       p={0}
       borderRadius="lg"
       boxShadow="md"
@@ -290,14 +291,15 @@ const   TypeGraphs =  ({ selected }: { selected: string }) =>  {
       animate={{ opacity: 1, y: 0 }}
       transition="all 0.5s ease-in-out"
     >
-      <Box w="full" h={{ base: "300px", md: "400px" }}>
+      <Box h="100%" w="100%">
         <StatusColumnChart category={selected} type="EIPs" />
+        <Box mt={8}>
+          <DateTime />
+        </Box>
       </Box>
-      <Box mt={8}>
-        <DateTime />
-      </Box>
+
     </Box>
-  
+
   );
 
 };
