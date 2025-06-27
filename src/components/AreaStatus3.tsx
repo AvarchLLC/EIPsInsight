@@ -8,11 +8,16 @@ import {
   useColorModeValue,
   Spinner,
   ButtonGroup,
+  Select,
+  HStack,
+  Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import DateTime from "@/components/DateTime";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { InfoOutlineIcon } from "@chakra-ui/icons";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -66,9 +71,16 @@ const StackedColumnChart: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<EIP[]>([]);
   const [viewMode, setViewMode] = useState<"status" | "category">("status");
+  const [startYear, setStartYear] = useState<number>(2015);
+  const [startMonth, setStartMonth] = useState<number>(1);
+  const [endYear, setEndYear] = useState<number>(new Date().getFullYear());
+  const [endMonth, setEndMonth] = useState<number>(new Date().getMonth() + 1);
+  const [allYears, setAllYears] = useState<number[]>([]);
 
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const headingColor = useColorModeValue("gray.800", "white");
 
   const status1 = "Draft";
   const status2 = "Final";
@@ -78,7 +90,25 @@ const StackedColumnChart: React.FC = () => {
       try {
         const response = await fetch(`/api/new/graphsv2`);
         const jsonData = await response.json();
-        setData(jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip)));
+        const combinedData = jsonData.eip?.concat(jsonData.erc?.concat(jsonData.rip));
+        setData(combinedData);
+        
+        // Extract all unique years from the data
+        const years = new Set<number>();
+        combinedData?.forEach((item: EIP) => {
+          item.eips?.forEach((eip) => {
+            years.add(eip.year);
+          });
+        });
+        const sortedYears = Array.from(years).sort((a, b) => a - b);
+        setAllYears(sortedYears);
+        
+        // Set default start and end years based on data
+        if (sortedYears.length > 0) {
+          setStartYear(sortedYears[0]);
+          setEndYear(sortedYears[sortedYears.length - 1]);
+        }
+        
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -102,12 +132,21 @@ const StackedColumnChart: React.FC = () => {
     const filteredData = data?.filter(
       (item) => item.status === status1 || item.status === status2
     );
+    
     return filteredData.flatMap((item) => {
-      return item.eips?.map((eip) => ({
+      return item.eips?.filter(eip => {
+        // Filter based on selected date range
+        const eipDate = new Date(eip.year, eip.month - 1);
+        const startDate = new Date(startYear, startMonth - 1);
+        const endDate = new Date(endYear, endMonth - 1);
+        return eipDate >= startDate && eipDate <= endDate;
+      }).map((eip) => ({
         status: item.status,
         category: getCat(eip.category),
         year: `${getMonthName(eip.month)} ${eip.year}`,
         value: removeDuplicatesFromEips(eip.eips)?.length,
+        rawMonth: eip.month,
+        rawYear: eip.year,
       }));
     });
   };
@@ -120,12 +159,10 @@ const StackedColumnChart: React.FC = () => {
   ];
 
   const sortedData = [...transformedData].sort((a, b) => {
-    const [aMonth, aYear] = a.year.split(" ");
-    const [bMonth, bYear] = b.year.split(" ");
-    return (
-      parseInt(aYear, 10) - parseInt(bYear, 10) ||
-      months.indexOf(aMonth) - months.indexOf(bMonth)
-    );
+    if (a.rawYear !== b.rawYear) {
+      return a.rawYear - b.rawYear;
+    }
+    return a.rawMonth - b.rawMonth;
   });
 
   const getChartData = () => {
@@ -157,62 +194,61 @@ const StackedColumnChart: React.FC = () => {
   const chartData = getChartData();
 
   const config = {
-  data: chartData,
-  xField: "year",
-  yField: "value",
-  seriesField: viewMode === "category" ? "category" : "status",
-  groupField: viewMode === "category" ? "status" : undefined,
-  isGroup: viewMode === "category",
-  isStack: viewMode === "category",
-  slider: { start: 0, end: 1 },
-  legend: { position: "top-right" as const },
-  tooltip:
-  viewMode === "category"
-    ? {
-        customContent: (title: string, items: any[]) => {
-          if (!items || items.length === 0) return "";
+    data: chartData,
+    xField: "year",
+    yField: "value",
+    seriesField: viewMode === "category" ? "category" : "status",
+    groupField: viewMode === "category" ? "status" : undefined,
+    isGroup: viewMode === "category",
+    isStack: viewMode === "category",
+    slider: { start: 0, end: 1 },
+    legend: { position: "top-right" as const },
+    tooltip:
+      viewMode === "category"
+        ? {
+            customContent: (title: string, items: any[]) => {
+              if (!items || items.length === 0) return "";
 
-          const statusCounts: Record<string, number> = {};
-          const categoryStatusCounts: Record<string, number> = {};
-          const colorMap: Record<string, string> = {};
+              const statusCounts: Record<string, number> = {};
+              const categoryStatusCounts: Record<string, number> = {};
+              const colorMap: Record<string, string> = {};
 
-          items.forEach((item: any) => {
-            const { status, category, value } = item.data;
-            statusCounts[status] = (statusCounts[status] || 0) + value;
-            const key = `${category} (${status})`;
-            categoryStatusCounts[key] = (categoryStatusCounts[key] || 0) + value;
-            colorMap[key] = item.color;
-          });
+              items.forEach((item: any) => {
+                const { status, category, value } = item.data;
+                statusCounts[status] = (statusCounts[status] || 0) + value;
+                const key = `${category} (${status})`;
+                categoryStatusCounts[key] = (categoryStatusCounts[key] || 0) + value;
+                colorMap[key] = item.color;
+              });
 
-          return `
-            <div style="padding: 8px 12px; font-size: 14px">
-              <div style="font-weight: 600; margin-bottom: 6px;">${title}</div>
-              <div style="margin-bottom: 8px;">
-                ${Object.entries(statusCounts)
-                  .map(([status, count]) => `<div><strong>${status}</strong>: ${count}</div>`)
-                  .join("")}
-              </div>
-              <div>
-                ${Object.entries(categoryStatusCounts)
-                  .map(
-                    ([key, count]) => `
-                  <div style="display:flex;align-items:center;margin-top:2px">
-                    <span style="width:8px;height:8px;border-radius:50%;background:${colorMap[key]};display:inline-block;margin-right:6px;"></span>
-                    ${key}: ${count}
+              return `
+                <div style="padding: 8px 12px; font-size: 14px">
+                  <div style="font-weight: 600; margin-bottom: 6px;">${title}</div>
+                  <div style="margin-bottom: 8px;">
+                    ${Object.entries(statusCounts)
+                      .map(([status, count]) => `<div><strong>${status}</strong>: ${count}</div>`)
+                      .join("")}
                   </div>
-                `
-                  )
-                  .join("")}
-              </div>
-            </div>
-          `;
+                  <div>
+                    ${Object.entries(categoryStatusCounts)
+                      .map(
+                        ([key, count]) => `
+                      <div style="display:flex;align-items:center;margin-top:2px">
+                        <span style="width:8px;height:8px;border-radius:50%;background:${colorMap[key]};display:inline-block;margin-right:6px;"></span>
+                        ${key}: ${count}
+                      </div>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `;
+            },
+          }
+        : {
+            shared: true,
         },
-      }
-    : {
-        shared: true,
-    },
-};
-
+  };
 
   const downloadData = () => {
     const filteredData = data?.filter(
@@ -256,8 +292,55 @@ const StackedColumnChart: React.FC = () => {
   const Column = dynamic(() => import("@ant-design/plots").then((item) => item.Column), { ssr: false });
   const Line = dynamic(() => import("@ant-design/plots").then((item) => item.Line), { ssr: false });
 
+  const handleStartYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const year = parseInt(e.target.value);
+    setStartYear(year);
+    
+    // If start year becomes greater than end year, update end year
+    if (year > endYear) {
+      setEndYear(year);
+    }
+    
+    // If same year and start month > end month, update end month
+    if (year === endYear && startMonth > endMonth) {
+      setEndMonth(startMonth);
+    }
+  };
 
-  const headingColor = useColorModeValue("black", "white");
+  const handleEndYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const year = parseInt(e.target.value);
+    setEndYear(year);
+    
+    // If end year becomes less than start year, update start year
+    if (year < startYear) {
+      setStartYear(year);
+    }
+    
+    // If same year and end month < start month, update start month
+    if (year === startYear && endMonth < startMonth) {
+      setStartMonth(endMonth);
+    }
+  };
+
+  const handleStartMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const month = parseInt(e.target.value);
+    setStartMonth(month);
+    
+    // If same year and start month > end month, update end month
+    if (startYear === endYear && month > endMonth) {
+      setEndMonth(month);
+    }
+  };
+
+  const handleEndMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const month = parseInt(e.target.value);
+    setEndMonth(month);
+    
+    // If same year and end month < start month, update start month
+    if (startYear === endYear && month < startMonth) {
+      setStartMonth(month);
+    }
+  };
 
   return (
     <>
@@ -272,38 +355,118 @@ const StackedColumnChart: React.FC = () => {
           </motion.div>
         </Box>
       ) : (
-        <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"}>
-          <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" wrap="wrap" gap="1rem">
-            <ButtonGroup size="sm" isAttached variant="outline">
+        <Box bgColor={bg} padding={"2rem"} borderRadius={"0.55rem"} border="1px solid" borderColor={borderColor}>
+          <Flex justifyContent="space-between" alignItems="center" marginBottom="1rem" wrap="wrap" gap="1rem">
+            <Box>
+              
+              <HStack spacing={4} mt={2} wrap="wrap">
+                <Box>
+                  <Text fontSize="sm" mb={1}>Start Date</Text>
+                  <HStack>
+                    <Select 
+                      value={startMonth} 
+                      onChange={handleStartMonthChange}
+                      size="sm"
+                      width="100px"
+                    >
+                      {months.map((_, index) => (
+                        <option key={index + 1} value={index + 1}>
+                          {months[index]}
+                        </option>
+                      ))}
+                    </Select>
+                    <Select 
+                      value={startYear} 
+                      onChange={handleStartYearChange}
+                      size="sm"
+                      width="90px"
+                    >
+                      {allYears.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </Select>
+                  </HStack>
+                </Box>
+                
+                <Box>
+                  <Text fontSize="sm" mb={1}>End Date</Text>
+                  <HStack>
+                    <Select 
+                      value={endMonth} 
+                      onChange={handleEndMonthChange}
+                      size="sm"
+                      width="100px"
+                    >
+                      {months.map((_, index) => (
+                        <option key={index + 1} value={index + 1}>
+                          {months[index]}
+                        </option>
+                      ))}
+                    </Select>
+                    <Select 
+                      value={endYear} 
+                      onChange={handleEndYearChange}
+                      size="sm"
+                      width="90px"
+                    >
+                      {allYears.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </Select>
+                  </HStack>
+                </Box>
+              </HStack>
+            </Box>
+            
+            <Flex direction="row" gap={2}>
+              <ButtonGroup size="sm" isAttached variant="outline">
+                <Button
+                  colorScheme="blue"
+                  variant={viewMode === "status" ? "solid" : "outline"}
+                  onClick={() => setViewMode("status")}
+                >
+                  Status View
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  variant={viewMode === "category" ? "solid" : "outline"}
+                  onClick={() => setViewMode("category")}
+                >
+                  Category View
+                </Button>
+              </ButtonGroup>
+
+              
               <Button
-                colorScheme={viewMode === "status" ? "blue" : undefined}
-                onClick={() => setViewMode("status")}
+                colorScheme="blue"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    downloadData();
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
               >
-                Status View
+                Download CSV
               </Button>
-              <Button
-                colorScheme={viewMode === "category" ? "blue" : undefined}
-                onClick={() => setViewMode("category")}
-              >
-                Category View
-              </Button>
-            </ButtonGroup>
-            <Button
-              colorScheme="blue"
-              onClick={async () => {
-                try {
-                  downloadData();
-                  await axios.post("/api/DownloadCounter");
-                } catch (error) {
-                  console.error("Error triggering download counter:", error);
-                }
-              }}
-            >
-              Download CSV
-            </Button>
+            </Flex>
           </Flex>
-          {viewMode === "status" ? <Line {...config} /> : <Column {...config} />}
-          <Box className="w-full">
+          
+          {chartData.length > 0 ? (
+            viewMode === "status" ? <Line {...config} /> : <Column {...config} />
+          ) : (
+            <Box textAlign="center" py={10}>
+              <Text>No data available for the selected date range.</Text>
+            </Box>
+          )}
+          
+          <Box className="w-full" mt={4}>
             <DateTime />
           </Box>
         </Box>

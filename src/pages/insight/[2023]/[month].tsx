@@ -279,11 +279,17 @@ const Month = () => {
                 <Box id="Summary">
                   <InsightsAllStats />
                 </Box>
+                <br/>
 
                 <Text
                   fontSize="3xl" fontWeight="bold" color="#30A0E0"
                 >
-                  <div id="draft-vs-final"> Draft vs Final </div>
+                  <div id="draft-vs-final"> 
+                    Draft vs Final{" "}
+                  <CopyLink
+                    link={`https://eipsinsight.com//insight/${year}/${month}#draft-vs-final`}
+                  />
+                  </div>
                 </Text>          
                   <AreaStatus/>
                 <br/>
