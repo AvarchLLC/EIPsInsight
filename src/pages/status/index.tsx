@@ -202,7 +202,7 @@ const Status = () => {
             <Text
               fontSize="3xl" fontWeight="bold" color="#30A0E0"
             >
-              <div id="draft-vs-final"> Draft vs Final </div>
+              <div id="draft-vs-final"> Draft vs Final {" "} </div>
             </Text>
 
             <AreaStatus/>
