@@ -547,42 +547,64 @@ export default function AppSidebar() {
       </VStack>
 
       <Box mt={2} px={isCollapsed ? 0 : 4}>
-        <Menu placement="top" isLazy>
-          <MenuButton
-            as={HStack}
-            spacing={isCollapsed ? 0 : 3}
-            align="center"
-            px={isCollapsed ? 2 : 3}
-            py={2}
-            w="full"
-            _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
-            borderRadius="md"
-            transition="background 0.2s"
-            justify={isCollapsed ? "center" : "flex-start"}
-            cursor="pointer"
-          >
-            <Avatar
-              size="sm"
-              name={userData?.name}
-              src={userData?.image || undefined}
-            />
-            {!isCollapsed && (
-              <>
-                <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
-                  {userData?.name || "Profile"}
-                </Text>
-                <Box as={ChevronDown} size="16px" />
-              </>
-            )}
-          </MenuButton>
+{!isCollapsed ? (
+  <Menu placement="top" isLazy>
+    <MenuButton
+      as={HStack}
+      spacing={3}
+      align="center"
+      px={3}
+      py={2}
+      w="full"
+      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+      borderRadius="md"
+      transition="background 0.2s"
+      justify="flex-start"
+      cursor="pointer"
+    >
+      <Avatar
+        size="sm"
+        name={userData?.name}
+        src={userData?.image || undefined}
+      />
+      <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
+        {userData?.name || "Profile"}
+      </Text>
+      <Box as={ChevronDown} size="16px" />
+    </MenuButton>
 
-          <MenuList zIndex={1000}>
-            <MenuItem onClick={() => router.push("/profile")}>👤 Profile</MenuItem>
-            <MenuItem onClick={handleRefresh}>🔄 Refresh Status</MenuItem>
-            <MenuDivider />
-            <MenuItem onClick={handleLogout}>🚪 Logout</MenuItem>
-          </MenuList>
-        </Menu>
+    <MenuList zIndex={1000}>
+      <MenuItem onClick={() => router.push("/profile")}>👤 Profile</MenuItem>
+      <MenuItem onClick={handleRefresh}>🔄 Refresh Status</MenuItem>
+      <MenuDivider />
+      <MenuItem onClick={handleLogout}>🚪 Logout</MenuItem>
+    </MenuList>
+  </Menu>
+) : (
+  <Tooltip label={userData?.name || "Profile"} placement="right" hasArrow>
+    <Box
+      px={2}
+      py={2}
+      w="full"
+      display="flex"
+      justifyContent="center"
+      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+      borderRadius="md"
+      transition="background 0.2s"
+      cursor="pointer"
+      onClick={() => router.push("/profile")}
+    >
+      <Avatar
+        size="sm"
+        name={userData?.name}
+        src={userData?.image || undefined}
+        _hover={{ transform: "scale(1.05)", boxShadow: "md" }}
+        transition="all 0.2s"
+      />
+    </Box>
+  </Tooltip>
+)}
+
       </Box>
 
     </Box>
