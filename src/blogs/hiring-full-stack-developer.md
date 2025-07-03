@@ -5,8 +5,6 @@ author: Yash Kamal Chaturvedi
 image: https://github.com/AvarchLLC/EIPsInsight/blob/main/public/hiring-full-stack-developer.png
 ---
 
-# 
-
 EIPsInsight.com is hiring a **Full-Stack Developer** to help build the next generation of open-access tools for the Ethereum ecosystem. This is a **remote full-time role**, ideal for developers who want to work at the intersection of web development, blockchain documentation, and data visualization.
 
 ## About the Role
