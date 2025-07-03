@@ -371,8 +371,8 @@ const ResourcesPage: React.FC = () => {
       image: "/hiring-full-stack-developer.png",
       title: "Join EIPsInsight.com as a Full-Stack Developer (Remote)",
       content: "Join EIPsInsight.com as a remote Full-Stack Developer to build open source Ethereum tools using Next.js, TypeScript, & MongoDB.",
-      link: "/Blogs/hiring-full-stack-developer.md",
-      tag: "Non-Technical"
+      link: "/Blogs/hiring-full-stack-developer",
+      tag: "Hiring"
     },
   ];
 
