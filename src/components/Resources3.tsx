@@ -364,7 +364,7 @@ const ResourcesPage: React.FC = () => {
       image: "/ePBS-eip-7732.jpg",
       title: "Enshrined Proposer Builder Separation (ePBS) (EIP-7732)",
       content: "Understand Ethereum’s EIP-7732 upgrade with a breakdown of what ePBS is, why it’s needed, key architectural changes, its advantages, challenges, and how it compares to PBS.",
-      link: "/Blogs/ePBS-eip-7732",
+      link: "/Blogs/ePBS-EIP-7732",
       tag: "Technical"
     },
      {

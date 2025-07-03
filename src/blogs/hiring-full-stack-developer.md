@@ -2,7 +2,7 @@
 title: "Join EIPsInsight.com as a Full-Stack Developer (Remote)"
 date: 2025-06-29
 author: Yash Kamal Chaturvedi
-image: https://github.com/AvarchLLC/EIPsInsight/blob/main/public/hiring-full-stack-developer.png
+image: https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/hiring-full-stack-developer.png
 ---
 
 # 
