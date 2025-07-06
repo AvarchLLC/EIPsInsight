@@ -374,6 +374,13 @@ const ResourcesPage: React.FC = () => {
       link: "/Blogs/hiring-full-stack-developer",
       tag: "Hiring"
     },
+      {
+      image: "/Gas-Limit-Cap.jpg",
+      title: "Importance of Transaction Gas Limit Cap (EIP-7825)",
+      content: "EIP-7825 enforces a 30 million gas cap per transaction to thwart DoS attacks, curb state bloat, and bring predictable fees and node performance.",
+      link: "/Blogs/gas_limit_cap_eip_7825.md",
+      tag: "Technical"
+    },
   ];
 
   const VIDEOS = [
