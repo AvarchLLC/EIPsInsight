@@ -9,7 +9,6 @@ As Ethereum scales, unchecked gas consumption threatens network health and user 
 
 In this blog, we will dive into why gas limits matter, how EIP-7825 works and what its rollout means for developers, node operators and the broader ecosystem.
 
-* [Importance of Transaction Gas Limit Cap (EIP-7825 Explained)](#importance-of-transaction-gas-limit-cap-eip-7825-explained)
 * [Why Transaction Gas Limits Matter?](#why-transaction-gas-limits-matter)
 * [What Is EIP-7825?](#what-is-eip-7825)
 * [How the 30 Million Gas Cap Works?](#how-the-30-million-gas-cap-works)
