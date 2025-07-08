@@ -381,6 +381,13 @@ const ResourcesPage: React.FC = () => {
       link: "/Blogs/gas-limit-cap-eip-7825",
       tag: "Technical"
     },
+      {
+      image: "/Importance of Block Size Limit (EIP-7934).jpg",
+      title: "Importance of Block Size Limit (EIP-7934)",
+      content: "Learn how EIP 7934’s 10 MiB RLP block size cap enhances Ethereum’s stability & security by preventing invisible forks, resource exhaustion, & denial of service attacks.",
+      link: "/Blogs/block-size-limit-eip-7934",
+      tag: "Technical"
+    },
   ];
 
   const VIDEOS = [
