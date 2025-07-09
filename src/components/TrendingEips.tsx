@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/router';
 
 type TopicItem = {
   number: string;
@@ -15,6 +16,7 @@ type TopicItem = {
 export default function TrendingEips(): JSX.Element {
   const [items, setItems] = useState<TopicItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchTopics() {
@@ -78,14 +80,57 @@ export default function TrendingEips(): JSX.Element {
   return (
     <div style={{ padding: '1rem' }}>
       <h2>Ethereum Magicians Topics</h2>
-      <ul>
-        {items.map(({ number, category, title, link }) => (
-          <li key={`${category}-${number}`} style={{ marginBottom: '0.5rem' }}>
-            <strong>{category}-{number}</strong>:&nbsp;
-            <a href={link} target="_blank" rel="noopener noreferrer">{title}</a>
-          </li>
-        ))}
-      </ul>
+      <div style={{ display: 'grid', gap: '1rem' }}>
+        {items.map(({ number, category, title, link }) => {
+          const isInternal = link.includes('eipsinsight.com');
+          const internalPath = `/${category.toLowerCase()}s/${category.toLowerCase()}-${number}`;
+
+          const cardStyles: React.CSSProperties = {
+            padding: '1rem',
+            border: '1px solid #ccc',
+            borderRadius: '8px',
+            background: isInternal ? '#f9f9f9' : '#fff',
+            transition: 'box-shadow 0.2s',
+            cursor: 'pointer'
+          };
+
+          const handleClick = () => {
+            if (isInternal) {
+              router.push(internalPath); // client-side route
+            }
+          };
+
+          const cardContent = (
+            <div
+              style={cardStyles}
+              onClick={isInternal ? handleClick : undefined}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+              }}
+            >
+              <strong>{category}-{number}</strong>: {title}
+            </div>
+          );
+
+          // If internal, wrap with div; if external, wrap with <a>
+          return isInternal ? (
+            <div key={`${category}-${number}`}>{cardContent}</div>
+          ) : (
+            <a
+              key={`${category}-${number}`}
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              {cardContent}
+            </a>
+          );
+        })}
+      </div>
     </div>
   );
 }
