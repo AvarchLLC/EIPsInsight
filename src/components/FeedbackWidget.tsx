@@ -82,7 +82,7 @@ const FeedbackWidget = () => {
           borderRadius="15px"
           position="fixed"
           right="25px"
-          top="-70px"
+          top="-63px"
           display="flex"
           flexDirection="column"
           alignItems="center"
