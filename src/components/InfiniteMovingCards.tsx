@@ -212,6 +212,10 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import "@fontsource/patrick-hand"; // Install via npm i @fontsource/patrick-hand
+// Add these new imports
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { IconButton } from "@chakra-ui/react";
+
 
 export const InfiniteMovingCards = ({
   items,
@@ -261,39 +265,131 @@ export const InfiniteMovingCards = ({
     }
   }, [items]);
 
-  return (
-    <Box
-      ref={containerRef}
-      position="relative"
-      overflow="hidden"
-      w="100%"
+  useEffect(() => {
+  if (containerRef.current && scrollerRef.current) {
+    const children = Array.from(scrollerRef.current.children);
+    children.forEach((child) => {
+      scrollerRef.current?.appendChild(child.cloneNode(true));
+    });
+    setStart(true);
+
+    // 🐭 Drag Scroll
+    const container = containerRef.current;
+    let isDown = false;
+    let startX: number;
+    let scrollLeft: number;
+
+    const onMouseDown = (e: MouseEvent) => {
+      isDown = true;
+      container.classList.add("dragging");
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    };
+    const onMouseLeave = () => {
+      isDown = false;
+      container.classList.remove("dragging");
+    };
+    const onMouseUp = () => {
+      isDown = false;
+      container.classList.remove("dragging");
+    };
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 2; // scroll-fast
+      container.scrollLeft = scrollLeft - walk;
+    };
+
+    container.addEventListener("mousedown", onMouseDown);
+    container.addEventListener("mouseleave", onMouseLeave);
+    container.addEventListener("mouseup", onMouseUp);
+    container.addEventListener("mousemove", onMouseMove);
+
+    return () => {
+      container.removeEventListener("mousedown", onMouseDown);
+      container.removeEventListener("mouseleave", onMouseLeave);
+      container.removeEventListener("mouseup", onMouseUp);
+      container.removeEventListener("mousemove", onMouseMove);
+    };
+  }
+}, [items]);
+
+
+return (
+  <Box
+    ref={containerRef}
+    position="relative"
+    overflow="hidden"
+    w="100%"
+    h="100%"
+    py={8}
+    backgroundImage="url('/paper-texture.png')"
+    backgroundSize="cover"
+    _hover={
+      pauseOnHover ? { "& .scroller": { animationPlayState: "paused" } } : {}
+    }
+  >
+    {/* Left Scroll Button */}
+    <IconButton
+      aria-label="Scroll Left"
+      icon={<ChevronLeftIcon boxSize={6} />}
+      position="absolute"
+      left={2}
+      top="50%"
+      transform="translateY(-50%)"
+      zIndex={10}
+onClick={() => {
+  if (scrollerRef.current) {
+    scrollerRef.current.scrollBy({ left: -300, behavior: "smooth" });
+  }
+}}
+
+      bg="pink"
+      display={{ base: "none", md: "flex" }}
+    />
+
+    {/* Right Scroll Button */}
+    <IconButton
+      aria-label="Scroll Right"
+      icon={<ChevronRightIcon color={"black"} boxSize={6} />}
+      position="absolute"
+      right={2}
+      top="50%"
+      transform="translateY(-50%)"
+      zIndex={10}
+onClick={() => {
+  if (scrollerRef.current) {
+    scrollerRef.current.scrollBy({ left: 300, behavior: "smooth" });
+  }
+}}
+
+      bg="pink"
+      _hover={{ bg: "pink.200" }}
+      style={{ outline: "black" }}
+      display={{ base: "none", md: "flex" }}
+    />
+
+    {/* Scrolling Cards */}
+    <Flex
+      ref={scrollerRef}
+      className="scroller"
+      position="absolute"
+      top={0}
+      left={0}
       h="100%"
-      py={8}
-      backgroundImage="url('/paper-texture.png')" // Add a pencil-paper texture
-      backgroundSize="cover"
-      _hover={
-        pauseOnHover ? { "& .scroller": { animationPlayState: "paused" } } : {}
+      w="max-content"
+      whiteSpace="nowrap"
+      alignItems="center"
+      animation={
+        start
+          ? `scroll ${animationDuration} linear infinite ${animationDirection}`
+          : "none"
       }
     >
-      <Flex
-        ref={scrollerRef}
-        className="scroller"
-        position="absolute"
-        top={0}
-        left={0}
-        h="100%"
-        w="max-content"
-        whiteSpace="nowrap"
-        alignItems="center"
-        animation={
-          start
-            ? `scroll ${animationDuration} linear infinite ${animationDirection}`
-            : "none"
-        }
-      >
-        {[...items, ...items].map((it, i) => (
+      {[...items, ...items].map((it, i) => {
+        const cardContent = (
           <Box
-            key={i}
             w={cardWidth}
             mx={4}
             p={6}
@@ -313,7 +409,7 @@ export const InfiniteMovingCards = ({
               boxShadow: `7px 7px 0 ${borderColor}`,
             }}
           >
-            {/* Hand-drawn SVG Corner */}
+            {/* SVG Corner */}
             <Box position="absolute" top={2} right={2} w="24px" h="24px" zIndex={1}>
               <svg
                 width="100%"
@@ -356,19 +452,37 @@ export const InfiniteMovingCards = ({
               </Box>
             </Flex>
           </Box>
-        ))}
-      </Flex>
+        );
 
-      <style jsx>{`
-        @keyframes scroll {
-          0% {
-            transform: translateX(0%);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
+        return it.link ? (
+          <a
+            key={i}
+            href={it.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            {cardContent}
+          </a>
+        ) : (
+          <Box key={i}>{cardContent}</Box>
+        );
+      })}
+    </Flex>
+
+    {/* CSS for animation */}
+    <style jsx>{`
+      @keyframes scroll {
+        0% {
+          transform: translateX(0%);
         }
-      `}</style>
-    </Box>
-  );
-};
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+    `}</style>
+  </Box>
+);
+
+
+}

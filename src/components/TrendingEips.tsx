@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 type TopicItem = {
   number: string;
@@ -119,7 +120,7 @@ export default function TrendingEips(): JSX.Element {
           return isInternal ? (
             <div key={`${category}-${number}`}>{cardContent}</div>
           ) : (
-            <a
+            <Link
               key={`${category}-${number}`}
               href={link}
               target="_blank"
@@ -127,7 +128,7 @@ export default function TrendingEips(): JSX.Element {
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
               {cardContent}
-            </a>
+            </Link>
           );
         })}
       </div>

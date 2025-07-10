@@ -98,13 +98,13 @@ export function Clients() {
                 initial="hidden"
                 animate="visible"
             >
-                <Text fontSize="lg" color="gray.300" mt={4} mb={10} textAlign="center">
+                <Text fontSize="lg" color="gray.300" mt={4} mb={5} textAlign="center">
                     Explore the most impactful proposals shaping Ethereum today.
                 </Text>
             </motion.div>
 
             <Flex justify="center">
-                <Box w="100%" maxW="7xl" h={{ base: '50vh', md: '30rem' }}>
+                <Box w="100%"  h={{  md: '30rem' }}>
                     {items.length > 0 && (
                         <InfiniteMovingCards
                             items={items}
