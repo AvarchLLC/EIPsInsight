@@ -87,30 +87,21 @@ function generateYearlyInsights() {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth(); // 0-based
+
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
 
   const sectionAnchors = [
-    { label: "Summary", id: "Summary" },
-    { label: "Draft", id: "draft" },
-    { label: "Review", id: "review" },
-    { label: "Last Call", id: "lastcall" },
-    { label: "Living", id: "living" },
-    { label: "Final", id: "final" },
-    { label: "Stagnant", id: "stagnant" },
-    { label: "Withdrawn", id: "withdrawn" },
+    { label: "Summary", id: "draft-vs-final" },
+    { label: "Draft", id: "Draft" },
+    { label: "Review", id: "Review" },
+    { label: "Last Call", id: "LastCall" },
+    { label: "Living", id: "Living" },
+    { label: "Final", id: "Final" },
+    { label: "Stagnant", id: "Stagnant" },
+    { label: "Withdrawn", id: "Withdrawn" },
   ];
 
   const years = [];
@@ -124,21 +115,25 @@ function generateYearlyInsights() {
       months.push({
         label: monthNames[m],
         href: `/insight/${y}/${m + 1}`,
+        id: `insight-${y}-${m + 1}`, // optional: consistent ID
         children: sectionAnchors.map((section) => ({
           label: section.label,
           href: `/insight/${y}/${m + 1}#${section.id}`,
+          id: section.id,
         })),
       });
     }
 
     years.push({
       label: String(y),
+      id: `year-${y}`,
       children: months,
     });
   }
 
   return years;
 }
+
 
 const sidebarStructure = [
   {

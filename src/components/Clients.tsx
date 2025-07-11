@@ -80,12 +80,14 @@ export function Clients() {
 
     return (
         <Box as="section" py={20} color={useColorModeValue("gray.800", "white")}>
+            <div className="py-16" id="trending">
             <motion.div
                 variants={slideInFromLeft(0.5)}
                 initial="hidden"
                 animate="visible"
             >
-                <Text fontSize="6xl" fontWeight="extrabold" textAlign="center" id='trending'>
+                
+                <Text fontSize="6xl" fontWeight="extrabold" textAlign="center">
                     Trending{' '}
                     <Box as="span" className="text-blue-400">
                         EIPS
@@ -105,6 +107,7 @@ export function Clients() {
                     <Box as="span" className="text-blue-400">Overview -</Box> Explore the most impactful proposals shaping Ethereum today.
                 </Text>
             </motion.div>
+            </div>
 
 <Flex justify="center">
   <Box w="100%"> {/* ✅ fix here */}
