@@ -34,7 +34,7 @@ export const InfiniteMovingCards = ({
 
   const [translateX, setTranslateX] = useState(0);
 
-
+  
 
   const animationDirection = direction === "left" ? "normal" : "reverse";
   const animationDuration =
@@ -47,11 +47,23 @@ export const InfiniteMovingCards = ({
     lg: "30vw",
   });
 
-  const cardBg = useColorModeValue("#fff", "#1a1a1a");
-  const hoverBg = useColorModeValue("#ffe7b2", "#292929");
-  const borderColor = useColorModeValue("black", "#f1f1f1");
-  const quoteColor = useColorModeValue("gray.800", "gray.100");
-  const titleColor = useColorModeValue("gray.600", "gray.400");
+const bg = useColorModeValue("#fff9ec", "#121212");
+const cardBg = useColorModeValue("#fff", "#1a1a1a");
+const hoverBg = useColorModeValue("#ffe7b2", "#292929");
+const borderColor = useColorModeValue("black", "#f1f1f1");
+const quoteColor = useColorModeValue("gray.800", "gray.100");
+const titleColor = useColorModeValue("gray.600", "gray.400");
+
+const buttonColors = {
+  left: useColorModeValue("#ffefb3", "#504300"),
+  leftHover: useColorModeValue("#ffe799", "#7c6402"),
+
+  pause: useColorModeValue("#c8f7dc", "#1e3c2f"),
+  pauseHover: useColorModeValue("#b3f1d0", "#2e5c48"),
+
+  right: useColorModeValue("#d5e4ff", "#1a2d4f"),
+  rightHover: useColorModeValue("#c1d6ff", "#254075"),
+};
 
   useEffect(() => {
     if (containerRef.current && scrollerRef.current) {
@@ -73,36 +85,34 @@ export const InfiniteMovingCards = ({
 }, [isPaused]);
 
 return (
-<Box
-  ref={containerRef}
-  position="relative"
-  overflow="hidden"
-  w="100%"
-  py={8}
-  backgroundImage="url('/paper-texture.png')"
-  backgroundSize="cover"
-  border="3px solid black"
-  borderRadius="xl"
-  fontFamily="'Patrick Hand', cursive"
-  backgroundColor="#fff9ec"
-  pb={10} // adds bottom space for buttons
->
-
+  <Box
+    ref={containerRef}
+    position="relative"
+    overflow="hidden"
+    w="100%"
+    py={8}
+    backgroundImage="url('/paper-texture.png')"
+    backgroundSize="cover"
+    border={`3px solid ${borderColor}`}
+    borderRadius="xl"
+    fontFamily="'Patrick Hand', cursive"
+    backgroundColor={bg}
+    pb={10}
+  >
     {/* Scroller */}
-<Flex
-  ref={scrollerRef}
-  className="scroller"
-  position="relative"
-  h="100%"
-  w="max-content"
-  whiteSpace="nowrap"
-  alignItems="center"
-  style={{
-    transform: `translateX(${translateX}px)`,
-    transition: isPaused ? "transform 0.3s ease" : "none",
-  }}
->
-
+    <Flex
+      ref={scrollerRef}
+      className="scroller"
+      position="relative"
+      h="100%"
+      w="max-content"
+      whiteSpace="nowrap"
+      alignItems="center"
+      style={{
+        transform: `translateX(${translateX}px)`,
+        transition: isPaused ? "transform 0.3s ease" : "none",
+      }}
+    >
       {[...items, ...items].map((it, i) => {
         const cardContent = (
           <Box
@@ -187,68 +197,57 @@ return (
 
     {/* Buttons Below */}
     <Flex justify="center" mt={10} gap={6}>
-<Box
-  as="button"
-  onClick={() => {
-    setIsPaused(true);
-    setTranslateX((prev) => prev + 300);
-  }}
+      <Box
+        as="button"
+        onClick={() => {
+          setIsPaused(true);
+          setTranslateX((prev) => prev + 300);
+        }}
         px={6}
         py={3}
-        border="3px solid black"
+        border={`3px solid ${borderColor}`}
         borderRadius="xl"
-        bg="#ffefb3"
-        _hover={{ bg: "#ffe799" }}
+        bg={buttonColors.left}
+        _hover={{ bg: buttonColors.leftHover }}
         fontSize="lg"
-        boxShadow="4px 4px 0 black"
+        boxShadow={`4px 4px 0 ${borderColor}`}
       >
         ⬅️ Left
       </Box>
 
-<Box
-  as="button"
-  onClick={() => setIsPaused((prev) => !prev)}
+      <Box
+        as="button"
+        onClick={() => setIsPaused((prev) => !prev)}
         px={6}
         py={3}
-        border="3px solid black"
+        border={`3px solid ${borderColor}`}
         borderRadius="xl"
-        bg="#c8f7dc"
-        _hover={{ bg: "#b3f1d0" }}
+        bg={buttonColors.pause}
+        _hover={{ bg: buttonColors.pauseHover }}
         fontSize="lg"
-        boxShadow="4px 4px 0 black"
+        boxShadow={`4px 4px 0 ${borderColor}`}
       >
         {isPaused ? "▶️ Resume" : "⏸️ Pause"}
       </Box>
 
-<Box
-  as="button"
-  onClick={() => {
-    setIsPaused(true);
-    setTranslateX((prev) => prev - 300);
-  }}
+      <Box
+        as="button"
+        onClick={() => {
+          setIsPaused(true);
+          setTranslateX((prev) => prev - 300);
+        }}
         px={6}
         py={3}
-        border="3px solid black"
+        border={`3px solid ${borderColor}`}
         borderRadius="xl"
-        bg="#d5e4ff"
-        _hover={{ bg: "#c1d6ff" }}
+        bg={buttonColors.right}
+        _hover={{ bg: buttonColors.rightHover }}
         fontSize="lg"
-        boxShadow="4px 4px 0 black"
+        boxShadow={`4px 4px 0 ${borderColor}`}
       >
         ➡️ Right
       </Box>
     </Flex>
-
-    <style jsx>{`
-      @keyframes scroll {
-        0% {
-          transform: translateX(0%);
-        }
-        100% {
-          transform: translateX(-50%);
-        }
-      }
-    `}</style>
   </Box>
 );
 }

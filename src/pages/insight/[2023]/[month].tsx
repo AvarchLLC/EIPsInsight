@@ -31,6 +31,7 @@ import CopyLink from "@/components/CopyLink";
 import FeedbackWidget from "@/components/FeedbackWidget";
 
 import AreaStatus from "@/components/AreaStatus3";
+import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 interface StatusChange {
   _id: string;
@@ -168,6 +169,23 @@ const Month = () => {
       router.events.off("routeChangeComplete", scrollToHash);
     };
   }, [router]);
+
+  const activeId = useScrollSpy([
+  "all",
+  "ourtools",
+  "what",
+  "statuschanges",
+  "dashboard",
+  "draft-vs-final",
+  "Draft",
+  "Review",
+  "LastCall",
+  "Living",
+  "Final",
+  "Stagnant",
+  "Withdrawn",
+]);
+
   return (
     <>
       <FeedbackWidget />
@@ -284,11 +302,13 @@ const Month = () => {
                 <Text
                   fontSize="3xl" fontWeight="bold" color="#30A0E0"
                 >
-                  <div id="draft-vs-final"> 
+                   <div className="py-16" id="draft-vs-final">
+                  <div > 
                     Draft vs Final{" "}
                   <CopyLink
                     link={`https://eipsinsight.com//insight/${year}/${month}#draft-vs-final`}
                   />
+                  </div>
                   </div>
                 </Text>          
                   <AreaStatus/>
@@ -309,9 +329,11 @@ const Month = () => {
                     link={`https://eipsinsight.com//insight/${year}/${month}#Draft`}
                   />
                 </Text>
-                <Box paddingTop={"8"} id="Draft">
+                <div className="py-16" id="Draft">
+                <Box paddingTop={"8"} >
                   <StackedColumnChart dataset={filteredData1} status="Draft" />
                 </Box>
+                </div>
 
                 <Text
                   id="review"

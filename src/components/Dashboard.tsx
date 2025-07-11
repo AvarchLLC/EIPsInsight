@@ -229,6 +229,7 @@ const Dashboard = () => {
   useScrollSpy([
     "all",
     "ourtools",
+    "trending",
     "what",
     "statuschanges",
     "dashboard",
