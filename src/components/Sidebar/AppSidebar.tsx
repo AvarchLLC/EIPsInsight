@@ -148,6 +148,7 @@ const sidebarStructure = [
     children: [
       { label: "All EIPs", href: "/#all", id: "all" },
       { label: "Our Tools", href: "/#ourtools", id: "ourtools" },
+      { label: "Trending EIPs", href: "/#trending", id: "trending" },
       { label: "What is EIPs Insights?", href: "/#what", id: "what" },
       {
         label: "EIP Status Changes by Year",
