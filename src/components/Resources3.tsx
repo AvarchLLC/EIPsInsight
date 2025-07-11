@@ -360,12 +360,32 @@ const ResourcesPage: React.FC = () => {
       content: "Bringing You the Latest in Ethereum Improvement Proposals",
       link: "/newsletter",
     },
-
    {
       image: "/ePBS-eip-7732.jpg",
       title: "Enshrined Proposer Builder Separation (ePBS) (EIP-7732)",
       content: "Understand Ethereum’s EIP-7732 upgrade with a breakdown of what ePBS is, why it’s needed, key architectural changes, its advantages, challenges, and how it compares to PBS.",
-      link: "/Blogs/ePBS-eip-7732",
+      link: "/Blogs/ePBS-EIP-7732",
+      tag: "Technical"
+    },
+     {
+      image: "/hiring-full-stack-developer.png",
+      title: "Join EIPsInsight.com as a Full-Stack Developer (Remote)",
+      content: "Join EIPsInsight.com as a remote Full-Stack Developer to build open source Ethereum tools using Next.js, TypeScript, & MongoDB.",
+      link: "/Blogs/hiring-full-stack-developer",
+      tag: "Hiring"
+    },
+      {
+      image: "/Gas Limit Cap.jpg",
+      title: "Importance of Transaction Gas Limit Cap (EIP-7825)",
+      content: "EIP-7825 enforces a 30 million gas cap per transaction to thwart DoS attacks, curb state bloat, & bring predictable fees and node performance.",
+      link: "/Blogs/gas-limit-cap-eip-7825",
+      tag: "Technical"
+    },
+      {
+      image: "/Importance of Block Size Limit (EIP-7934).jpg",
+      title: "Importance of Block Size Limit (EIP-7934)",
+      content: "Learn how EIP 7934’s 10 MiB RLP block size cap enhances Ethereum’s stability & security by preventing invisible forks, resource exhaustion, & denial of service attacks.",
+      link: "/Blogs/block-size-limit-eip-7934",
       tag: "Technical"
     },
   ];

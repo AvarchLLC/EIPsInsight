@@ -18,7 +18,7 @@ import {
   useColorModeValue,
   Badge,
 } from "@chakra-ui/react";
-import { FiBell } from "react-icons/fi";
+import { FiBell, FiAward } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
@@ -118,10 +118,10 @@ const SubscriptionFloater = () => {
           animation: 'float 3s ease-in-out infinite',
         }}
       >
-        <Tooltip label="View Bookmarks" placement="left">
+        <Tooltip label="View Subscription" placement="left">
           <IconButton
-            aria-label="Bookmarks"
-            icon={<FiBell />}
+            aria-label="Subscription"
+            icon={<FiAward />}
             size="lg"
             colorScheme="teal"
             borderRadius="50%"
@@ -157,7 +157,7 @@ const SubscriptionFloater = () => {
             color={useColorModeValue(headingColorLight, headingColorDark)}
           >
             <Flex align="center">
-              <FiBell style={{ marginRight: "10px" }} />
+              <FiAward style={{ marginRight: "10px" }} />
               Subscriptions
               <Badge ml={2} colorScheme="blue">
                 {subscriptions?.length || 0}

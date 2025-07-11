@@ -46,25 +46,35 @@ const normalizeId = (text: string) => {
 
 const createHeadingRenderer = (level: number) => {
   return ({ children }: HeadingProps) => {
-    const text = children
-      .map((child: any) => (typeof child === 'string' ? child : child.props?.children || ''))
+    const normalizedChildren = Array.isArray(children) ? children : [children];
+    const text = normalizedChildren
+      .map((child: any) =>
+        typeof child === 'string'
+          ? child
+          : Array.isArray(child?.props?.children)
+          ? child.props.children.join('')
+          : child?.props?.children || ''
+      )
       .join('');
-    
+
     const id = normalizeId(text);
+
+    const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
 
     return (
       <Heading
-        as={`h${level}` as any}
+        as={HeadingTag}
+        fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}
+        fontWeight="bold"
         id={id}
-        size={['2xl', 'xl', 'lg', 'md', 'sm', 'xs'][level - 1]}
         my={4}
-        scrollMarginTop="100px"
       >
         {children}
       </Heading>
     );
   };
 };
+
 
 
 

@@ -6,6 +6,7 @@ import { Box, Flex, Text, useColorModeValue, } from '@chakra-ui/react';
 import { InfiniteMovingCards } from './InfiniteMovingCards';
 import { slideInFromLeft, slideInFromRight } from "@/lib/utils";
 import { motion } from 'framer-motion';
+import CopyLink from './CopyLink';
 
 export function Clients() {
     const [items, setItems] = useState<
@@ -84,13 +85,15 @@ export function Clients() {
                 initial="hidden"
                 animate="visible"
             >
-                <Text fontSize="6xl" fontWeight="bold" textAlign="center">
+                <Text fontSize="6xl" fontWeight="extrabold" textAlign="center" id='trending'>
                     Trending{' '}
                     <Box as="span" className="text-blue-400">
                         EIPS
                     </Box>
-
+<CopyLink link='https://eipsinsight.com/#trending' />
                 </Text>
+
+                
             </motion.div>
 
             <motion.div
@@ -98,22 +101,23 @@ export function Clients() {
                 initial="hidden"
                 animate="visible"
             >
-                <Text fontSize="lg" color="gray.300" mt={4} mb={10} textAlign="center">
-                    Explore the most impactful proposals shaping Ethereum today.
+                <Text fontSize="lg" fontWeight="bold"  mb={5} textAlign="center">
+                    <Box as="span" className="text-blue-400">Overview -</Box> Explore the most impactful proposals shaping Ethereum today.
                 </Text>
             </motion.div>
 
-            <Flex justify="center">
-                <Box w="100%" maxW="7xl" h={{ base: '50vh', md: '30rem' }}>
-                    {items.length > 0 && (
-                        <InfiniteMovingCards
-                            items={items}
-                            direction="right"
-                            speed="slow"
-                        />
-                    )}
-                </Box>
-            </Flex>
+<Flex justify="center">
+  <Box w="100%"> {/* ✅ fix here */}
+    {items.length > 0 && (
+      <InfiniteMovingCards
+        items={items}
+        direction="right"
+        speed="slow"
+      />
+    )}
+  </Box>
+</Flex>
+
         </Box>
     );
 }
