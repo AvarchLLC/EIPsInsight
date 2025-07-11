@@ -103,17 +103,18 @@ export function Clients() {
                 </Text>
             </motion.div>
 
-            <Flex justify="center">
-                <Box w="100%"  h={{  md: '30rem' }}>
-                    {items.length > 0 && (
-                        <InfiniteMovingCards
-                            items={items}
-                            direction="right"
-                            speed="slow"
-                        />
-                    )}
-                </Box>
-            </Flex>
+<Flex justify="center">
+  <Box w="100%"> {/* ✅ fix here */}
+    {items.length > 0 && (
+      <InfiniteMovingCards
+        items={items}
+        direction="right"
+        speed="slow"
+      />
+    )}
+  </Box>
+</Flex>
+
         </Box>
     );
 }
