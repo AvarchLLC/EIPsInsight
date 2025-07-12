@@ -95,7 +95,7 @@ return (
     backgroundSize="cover"
     border={`3px solid ${borderColor}`}
     borderRadius="xl"
-    fontFamily="'Patrick Hand', cursive"
+    
     backgroundColor={bg}
     pb={10}
   >
@@ -108,6 +108,7 @@ return (
       w="max-content"
       whiteSpace="nowrap"
       alignItems="center"
+      fontFamily="'Patrick Hand', cursive"
       style={{
         transform: `translateX(${translateX}px)`,
         transition: isPaused ? "transform 0.3s ease" : "none",
