@@ -7,6 +7,7 @@ import { InfiniteMovingCards } from './InfiniteMovingCards';
 import { slideInFromLeft, slideInFromRight } from "@/lib/utils";
 import { motion } from 'framer-motion';
 import CopyLink from './CopyLink';
+import Header from './Header';
 
 export function Clients() {
     const [items, setItems] = useState<
@@ -77,36 +78,15 @@ export function Clients() {
         fetchTopics();
     }, []);
 
-
     return (
         <Box as="section" py={20} color={useColorModeValue("gray.800", "white")}>
             <div className="py-16" id="trending">
-            <motion.div
-                variants={slideInFromLeft(0.5)}
-                initial="hidden"
-                animate="visible"
-            >
-                
-                <Text fontSize="6xl" fontWeight="extrabold" textAlign="center">
-                    Trending{' '}
-                    <Box as="span" className="text-blue-400">
-                        EIPS
-                    </Box>
-<CopyLink link='https://eipsinsight.com/#trending' />
-                </Text>
-
-                
-            </motion.div>
-
-            <motion.div
-                variants={slideInFromRight(0.5)}
-                initial="hidden"
-                animate="visible"
-            >
-                <Text fontSize="lg" fontWeight="bold"  mb={5} textAlign="center">
-                    <Box as="span" className="text-blue-400">Overview -</Box> Explore the most impactful proposals shaping Ethereum today.
-                </Text>
-            </motion.div>
+         <Header
+        title="Trending EIPs"
+        subtitle="Overview"
+        description="Explore the most impactful proposals shaping Ethereum today."
+        sectionId="trending"
+      />
             </div>
 
 <Flex justify="center">

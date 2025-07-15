@@ -95,7 +95,6 @@ return (
     backgroundSize="cover"
     border={`3px solid ${borderColor}`}
     borderRadius="xl"
-    fontFamily="'Patrick Hand', cursive"
     backgroundColor={bg}
     pb={10}
   >
@@ -108,6 +107,7 @@ return (
       w="max-content"
       whiteSpace="nowrap"
       alignItems="center"
+      fontFamily="'Patrick Hand', cursive"
       style={{
         transform: `translateX(${translateX}px)`,
         transition: isPaused ? "transform 0.3s ease" : "none",
@@ -210,6 +210,7 @@ return (
         bg={buttonColors.left}
         _hover={{ bg: buttonColors.leftHover }}
         fontSize="lg"
+        fontWeight={"bold"}
         boxShadow={`4px 4px 0 ${borderColor}`}
       >
         ⬅️ Left
@@ -226,6 +227,7 @@ return (
         _hover={{ bg: buttonColors.pauseHover }}
         fontSize="lg"
         boxShadow={`4px 4px 0 ${borderColor}`}
+        fontWeight={"bold"}
       >
         {isPaused ? "▶️ Resume" : "⏸️ Pause"}
       </Box>
@@ -243,6 +245,7 @@ return (
         bg={buttonColors.right}
         _hover={{ bg: buttonColors.rightHover }}
         fontSize="lg"
+        fontWeight={"bold"}
         boxShadow={`4px 4px 0 ${borderColor}`}
       >
         ➡️ Right

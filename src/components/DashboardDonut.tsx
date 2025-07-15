@@ -212,7 +212,7 @@ const dat = [
       </div>
 
       {/* ✅ Responsive Pie Chart */}
-      <div className="w-full max-w-[530px] mt-4 overflow-x-auto">
+      <div className="w-full  mt-4 overflow-x-auto">
         <Area {...{ ...config, legend: false }} />
       </div>
     </div>
