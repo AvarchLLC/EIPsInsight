@@ -145,6 +145,8 @@ const Dashboard = () => {
   console.log("unique eip1:", uniqueeip);
   const uniqueeip2 = allData.filter((item) => item.status === " ");
   console.log("unique eip2:", uniqueeip2);
+const textColor = useColorModeValue("gray.800", "gray.200");
+const linkColor = useColorModeValue("blue.600", "blue.300");
 
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
@@ -408,16 +410,15 @@ const Dashboard = () => {
                   <br />
                   <br />
                   <Box
-                    bg="rgba(0, 0, 0, 0.5)"
+                    // bg="rgba(0, 0, 0, 0.5)"
                     borderRadius="md" // Rounded corners
                     padding={4} // Padding around the text
-                    boxShadow="md"
                     id="all"
                     py={5}
                   >
                     <div className="py-10">
                       <Header
-                        title="ALL CATEGORIES AND STATUS"
+                        title="All Categories and Status"
                         subtitle="Overview"
                         description="A high-level overview of Ethereum Standards by categories, and status."
                         sectionId="all"
@@ -544,91 +545,78 @@ const Dashboard = () => {
 
               {/* </Box> */}
               {/* </div> */}
-              <div className="py-16" id="what">
-                <Header
-                  title="WHAT IS EIPsInsight ?"
-                  subtitle="Overview "
-                  description="EIPsInsight visualizes Ethereum proposal activity to track progress and editor workloads."
-                  sectionId="what"
-                />
-                <Box
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-8"
-                  bg="rgba(0, 0, 0, 0.5)"
-                  borderRadius="md" // Rounded corners
-                  padding={5}
-                  boxShadow="md"
-                  marginTop={10}
-                >
-                  {/* Centered Heading */}
+<div className="py-10 lg:py-16" id="what">
+  <Header
+    title="What is EIPsInsight?"
+    subtitle="Overview"
+    description="EIPsInsight visualizes Ethereum proposal activity to track progress and editor workloads."
+    sectionId="what"
+  />
 
-                  <div className="col-span-full text-center">
-                    {/* <h1 className="text-5xl font-bold ">
-                    <span className="text-gray-200">What is</span>{" "}
-                    <span className="text-blue-400">EIPsInsight</span>
-                    <span className="text-gray-200">?</span>
-                  </h1> */}
+  <Box
+    className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mt-12"
+    borderRadius="md"
+  >
+    {/* Left Side - YouTube Video */}
+    <div className="w-full flex justify-center">
+      <iframe
+        width="100%"
+        height="315"
+        className="rounded-lg max-w-xl"
+        src="https://www.youtube.com/embed/AyidVR6X6J8?start=8"
+        title="EIPsInsight Overview"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </div>
 
-                    {/* <hr className="mt-4 border-gray-500" />  */}
-                  </div>
+    {/* Right Side - Text Content */}
+    <div className="flex justify-center items-start">
+      <div className="text-left max-w-xl space-y-6">
+<p className="text-xl leading-relaxed" style={{ color: textColor }}>
+  <span style={{ color: linkColor, fontWeight: "600" }}>EIPsInsight</span> is a
+  tooling platform designed to provide visual insights into the activity of
+  Ethereum Improvement Proposals (
+  <NextLink href="/eip">
+    <span  className="text-blue-400">EIPs</span>
+  </NextLink>
+  ), Ethereum Request for Comments (
+  <NextLink href="/erc">
+    <span className="text-blue-400">ERCs</span>
+  </NextLink>
+  ), and Rollup Improvement Proposals (
+  <NextLink href="/rip">
+    <span className="text-blue-400">RIPs</span>
+  </NextLink>
+  ). It helps track proposal progress and workload of
+  <NextLink href="/eips/eip-1">
+    <span className="text-blue-400"> EIP Editors</span>
+  </NextLink>
+  , enhancing transparency and efficiency in the review process.
+</p>
 
-                  {/* Left Side - YouTube Video */}
-                  <div className="flex justify-center items-center">
-                    <iframe
-                      width="560"
-                      height="315"
-                      src="https://www.youtube.com/embed/AyidVR6X6J8?start=8"
-                      title="YouTube video"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
+<NextLink href="/resources">
+  <span
+    className="text-xl flex items-center space-x-2 hover:underline"
+  >
+    Learn More <BsArrowUpRight className="pt-1" size={22} />
+  </span>
+</NextLink>
 
-                  {/* Right Side - EIPInsight Info */}
-                  <div className="flex justify-center items-center">
-                    <div className="text-center max-w-xl space-y-6">
-                      <p className="text-xl text-justify text-gray-200">
-                        EIPsInsight is specialized in toolings designed to
-                        provide clear, visual insights into the activity of
-                        Ethereum Improvement Proposal (
-                        <NextLink href="/eip">
-                          <span className="text-blue-400">EIP</span>
-                        </NextLink>
-                        ), Ethereum Request for Comments (
-                        <NextLink href="/erc">
-                          <span className="text-blue-400">ERCs</span>
-                        </NextLink>
-                        ), and Rollup Improvement Proposals (
-                        <NextLink href="/rip">
-                          <span className="text-blue-400">RIPs</span>
-                        </NextLink>
-                        ), over a specified period. Data provided is used for
-                        tracking the progress and workload distribution among
-                        <NextLink href="/eips/eip-1">
-                          <span className="text-blue-400"> EIP Editors</span>
-                        </NextLink>
-                        , ensuring transparency and efficiency in the proposal
-                        review process.
-                      </p>
+      </div>
+    </div>
+  </Box>
+</div>
 
-                      <NextLink href="/resources">
-                        <span className="text-blue-400 text-xl flex items-center space-x-2">
-                          Learn More{" "}
-                          <BsArrowUpRight className="pt-1" size={25} />
-                        </span>
-                      </NextLink>
-                    </div>
-                  </div>
-                </Box>
-              </div>
 
               <br />
             </motion.div>
             <br />
             <div className="py-16" id="statuschanges">
-              <Box color={"rgba(255, 255, 255, 0.7)"}>
+              <Box>
                 <Header
-                  title="EIP STATUS CHANGES BY YEAR"
+                  title="EIP Status Changes by Year"
                   subtitle="Overview"
                   description="Insights of EIPs"
                   sectionId="statuschanges"
@@ -645,16 +633,14 @@ const Dashboard = () => {
                 // padding={6} // Padding around the text
                 // boxShadow="md"
                 // className="border border-red-700"
-                width="1400px"
                 maxWidth="100%"
                 overflow="hidden"
                 mx="auto"
               >
-                <FlexBetween>
-                  <Box color={"rgba(255, 255, 255, 0.7)"}>
+                  <Box>
                     <Header
-                      title="DASHBOARD"
-                      subtitle="WELCOME TO DASHBOARD"
+                      title="Dashboard"
+                      subtitle="Welcome to Dashboard"
                       description="A high-level overview of Ethereum Standards by type, status, and lifecycle progress.
 "
                       sectionId="dashboard"
@@ -673,7 +659,7 @@ const Dashboard = () => {
                     {/*  Download Reports*/}
                     {/*</Button>*/}
                   </Box>
-                </FlexBetween>
+               
 
                 <Box
                   display="grid"

@@ -66,8 +66,6 @@ const TypeGraphs = () => {
     <>
       <Box
         // className="border border-red-700"
-        width="1400px"
-        maxWidth="100%"
         overflow="hidden"
         mx="auto"
         p="0.5rem"
@@ -144,11 +142,7 @@ const TypeGraphs = () => {
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            height={400}
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            height={500}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -169,11 +163,7 @@ const TypeGraphs = () => {
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            height={400}
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            height={500}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -194,11 +184,11 @@ const TypeGraphs = () => {
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            height={400}
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            height={500}
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -267,7 +257,7 @@ const TypeGraphs = () => {
           {/*    flexDirection="column"*/}
           {/*    justifyContent="center"*/}
           {/*    alignItems="center"*/}
-          {/*    height={400}*/}
+          {/*    height={500}*/}
           {/*    _hover={{*/}
           {/*        border: "1px",*/}
           {/*        borderColor: "#30A0E0",*/}
@@ -293,11 +283,11 @@ const TypeGraphs = () => {
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            height={400}
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            height={500}
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -319,11 +309,11 @@ const TypeGraphs = () => {
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            height={400}
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            height={500}
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -345,11 +335,11 @@ const TypeGraphs = () => {
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            height={400}
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
+            height={500}
+            // _hover={{
+            //   border: "1px",
+            //   borderColor: "#30A0E0",
+            // }}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -379,7 +369,7 @@ const TypeGraphs = () => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          height={400}
+          height={500}
           overflowX="auto"
           _hover={{
             border: "1px",
@@ -418,7 +408,7 @@ const TypeGraphs = () => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          height={400}
+          height={500}
           _hover={{
             border: "1px",
             borderColor: "#30A0E0",
@@ -451,7 +441,7 @@ const TypeGraphs = () => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          height={400}
+          height={500}
           _hover={{
             border: "1px",
             borderColor: "#30A0E0",
@@ -484,7 +474,7 @@ const TypeGraphs = () => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          height={400}
+          height={500}
           _hover={{
             border: "1px",
             borderColor: "#30A0E0",
@@ -516,7 +506,7 @@ const TypeGraphs = () => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          height={400}
+          height={500}
           _hover={{
             border: "1px",
             borderColor: "#30A0E0",
@@ -548,7 +538,7 @@ const TypeGraphs = () => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          height={400}
+          height={500}
           _hover={{
             border: "1px",
             borderColor: "#30A0E0",
@@ -581,7 +571,7 @@ const TypeGraphs = () => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          height={400}
+          height={500}
           _hover={{
             border: "1px",
             borderColor: "#30A0E0",

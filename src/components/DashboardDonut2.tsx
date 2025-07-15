@@ -245,7 +245,7 @@ const DashboardDonut2: React.FC<AreaCProps> = ({ dataset }) => {
         </div>
 
         {/* Responsive Pie Chart */}
-        <div className="w-full max-w-[530px] mt-6 overflow-x-auto">
+        <div className="w-full mt-6 overflow-x-auto">
           <Area {...{ ...config, legend: false }} />
         </div>
       </div>

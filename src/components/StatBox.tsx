@@ -1,11 +1,15 @@
-'use client'
-import { Box, Link, Text, useColorModeValue, useTheme } from "@chakra-ui/react";
+'use client';
+import {
+  Box,
+  Link,
+  Text,
+  useColorModeValue,
+  useTheme,
+} from "@chakra-ui/react";
 import React from "react";
 import FlexBetween from "./FlexBetween";
-import { motion } from 'framer-motion';
-
+import { motion } from "framer-motion";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
 
 interface StatBoxProps {
   title: string;
@@ -22,50 +26,65 @@ const StatBox: React.FC<StatBoxProps> = ({
   description,
   url,
 }) => {
-  const theme = useTheme();
-  const bg = useColorModeValue("#f6f6f7", "#171923");
-  const router = useRouter();
-
+  const bg = useColorModeValue("#f6f6f7", "#1a202c"); // light / dark
+  const borderColor = useColorModeValue("gray.300", "#2d3748");
+  const textColor = useColorModeValue("gray.800", "gray.200");
+  const descColor = useColorModeValue("gray.600", "gray.400");
+  const valueColor = useColorModeValue("#1e88e5", "#30A0E0"); // lighter blue for light mode
 
   return (
-
     <Box
-      gridColumn="span 1"
-      gridRow="span 1"
-      display="flex"
-      flexDirection="column"
-      justifyContent="space-between"
-      p="1.25rem 1rem"
-      flex="1 1 100%"
-      borderRadius="0.55rem"
-      bgColor={bg}
-      overflow="clip"
-      _hover={{
-        border: "1px",
-        borderColor: "#30A0E0",
-      }}
-      className="hover:cursor-pointer ease-in duration-200"
       as={motion.div}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 } as any}
+      transition={{ duration: 0.5 }}
+      borderRadius="lg"
+      bg={bg}
+      p={4}
+      boxShadow="md"
+      border="1px solid"
+      borderColor="transparent"
+      transition="all 0.3s ease"
+      _hover={{
+        borderColor: "#30A0E0",
+        boxShadow: "lg",
+        cursor: "pointer",
+      }}
     >
-      <Link href={url}       textDecoration="none" _hover={{ textDecoration: "none" }}>
-      <FlexBetween>
-        <Text fontWeight="bold" fontSize={{lg:'16px',base:'11px',md:'14px',sm:'12px'}}>{title}</Text>
-        {icon}
-      </FlexBetween>
+      <Link
+        href={url}
+        as={NextLink}
+        textDecoration="none"
+        _hover={{ textDecoration: "none" }}
+      >
+        <FlexBetween mb={2}>
+          <Text
+            fontWeight="bold"
+            fontSize={{ base: "sm", md: "md", lg: "lg" }}
+            color={textColor}
+          >
+            {title}
+          </Text>
+          {icon}
+        </FlexBetween>
 
-      <Text fontWeight="600" color="#30A0E0" fontSize={'16'}>
-        {value}
-      </Text>
-      <FlexBetween gap="1rem">
-        <Text fontSize={{md:'xs', base:'10px'}}>{description}</Text>
-      </FlexBetween>
+        <Text
+          fontWeight="bold"
+          fontSize={{ base: "xl", md: "2xl" }}
+          color={valueColor}
+        >
+          {value}
+        </Text>
+
+        <Text
+          fontSize={{ base: "xs", md: "sm" }}
+          color={descColor}
+          mt={2}
+        >
+          {description}
+        </Text>
       </Link>
     </Box>
-
-
   );
 };
 

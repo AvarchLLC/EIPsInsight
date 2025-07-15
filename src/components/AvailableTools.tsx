@@ -68,10 +68,7 @@ const ToolsSection: FC = () => {
      
       <Box
         textAlign="left"
-        bg="rgba(0, 0, 0, 0.5)"
-        borderRadius="md"
         padding={8}
-        boxShadow="md"
         py={4}
       >
         {/* <Heading
@@ -92,7 +89,7 @@ const ToolsSection: FC = () => {
           Our Tools
         </Heading> */}
          <Header
-        title="OUR TOOLS"
+        title="Our Tools"
         subtitle="Overview"
         description="A high-level overview of Ethereum Standards by Analytics, Editors Leaderboard, Boards,Search by Author,All EIPs, and More Resources.
 "

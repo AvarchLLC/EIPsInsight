@@ -245,108 +245,84 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     // } as any,
   };
 
-  return (
-    <>
-      {isLoading ? ( // Show loader while data is loading
+return (
+  <>
+    {isLoading ? (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="200px"
+      >
+        <Spinner />
+      </Box>
+    ) : (
+      <Box
+        bgColor={bg}
+        px={4}
+        py={3}
+        borderRadius="1rem"
+        border="3px solid black"
+        boxShadow="lg"
+        transition="all 0.3s"
+        _hover={{
+          borderColor: "#30A0E0",
+          boxShadow: "xl",
+        }}
+        width="100%"
+      >
         <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="200px"
+          as={motion.div}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          width="100%"
         >
-          <Spinner />
-        </Box>
-      ) : (
-        <>
-          <Box
-            bgColor={bg}
-            paddingX="0.5rem"
-            borderRadius="0.55rem"
-            _hover={{
-              border: "1px",
-              borderColor: "#30A0E0",
-            }}
-          >
-            <Box
-              width={"100%"} // Make the container full width
-              minWidth={"100px"} // Set a minimum width
-              height={400}
-              overflowX="auto" // Enable horizontal scrolling if necessary
-              overflowY="hidden"
-              as={motion.div}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              // id="all"
-              // transition={{ duration: 0.5 }}
-              marginTop={3}
+          <Flex justify="space-between" align="center" mb={3} flexWrap="wrap">
+            <Link href="/alltable">
+              <Text
+                fontSize="2xl"
+                fontWeight="bold"
+                color="#30A0E0"
+                cursor="pointer"
+                _hover={{ textDecoration: "underline" }}
+              >
+                {type === "Total"
+                  ? `All EIPs [${data.length}]`
+                  : `${type} - [${data.length}]`}
+              </Text>
+            </Link>
+
+            <Select
+              variant="outline"
+              value={chart}
+              mt={{ base: 2, md: 0 }}
+              size="md"
+              bg="#30A0E0"
+              color="black"
+              border="2px solid black"
+              borderRadius="0.5rem"
+              onChange={(e) => setchart(e.target.value)}
+              _hover={{ borderColor: "black" }}
+              width={{ base: "100%", md: "auto" }}
             >
-              <Flex justify="space-between" align="center">
-                {/* Label and Dropdown in the same row */}
-                <Box>
-                  <Link href="/alltable">
-                    <Text
-                      fontSize="2xl"
-                      fontWeight="bold"
-                      color="#30A0E0"
-                      cursor="pointer" // Optional: To indicate it's clickable
-                      _hover={{ textDecoration: "underline" }}
-                      // Optional: Adds hover effect
-                    >
-                      {type === "Total"
-                        ? `All EIPs [${data.length}]`
-                        : `${type} - [${data.length}]`}
-                    </Text>
-                  </Link>
-                </Box>
+              <option value="category">Category</option>
+              <option value="status">Status</option>
+            </Select>
+          </Flex>
 
-                {/* Dropdown aligned to the right */}
-                <Box>
-                  {/* <Select
-  value={chart}
-  onChange={(e) => setchart(e.target.value)}
-  mt={1}
-  mb={4}
-  width="auto"
-  backgroundColor="#30A0E0"
-  color="black"
-  _focus={{
-    borderColor: "#30A0E0",
-    outline: "none",
-  }}
-  border="1px solid #30A0E0"
-  icon={<ChevronDownIcon />}  // Explicitly using a Chevron icon for better visibility
-  // _icon={{
-  //   color: "white",  // Make sure the arrow color matches the theme
-  // }}
-> */}
-
-                  <Select
-                    variant="outline"
-                    // placeholder="Select Year"
-                    value={chart}
-                    mt={1}
-                    // mb={2}
-                    backgroundColor="#30A0E0"
-                    color="black"
-                    onChange={(e) => setchart(e.target.value)}
-                    className="border border-gray-300 rounded px-7 py-2 focus:outline-none focus:border-blue-500"
-                    size="md"
-                  >
-                    <option value="category">Category</option>
-                    <option value="status">Status</option>
-                  </Select>
-                </Box>
-              </Flex>
-              <Area {...config} />
-              <Box className={"w-full"}>
-                <DateTime />
-              </Box>
-            </Box>
+          <Box width="100%" pt={1}>
+            <Area {...config} />
           </Box>
-        </>
-      )}
-    </>
-  );
+
+          <Box mt={3}>
+            <DateTime />
+          </Box>
+        </Box>
+      </Box>
+    )}
+  </>
+);
+
 };
 
 export default AllChart;

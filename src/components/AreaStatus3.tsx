@@ -203,47 +203,56 @@ const StackedColumnChart: React.FC = () => {
     isStack: viewMode === "category",
     slider: { start: 0, end: 1 },
     legend: { position: "top-right" as const },
+//     label: {
+//   content: (data: any) => `${data.status}`,
+//   position: "top",
+//   style: {
+//     fill: "#000", // Use "#fff" if in dark mode
+//     fontWeight: 600,
+//     fontSize: 12,
+//   },
+// },
+
     tooltip:
       viewMode === "category"
         ? {
-            customContent: (title: string, items: any[]) => {
-              if (!items || items.length === 0) return "";
+          customContent: (title: string, items: any[]) => {
+  if (!items || items.length === 0) return "";
 
-              const statusCounts: Record<string, number> = {};
-              const categoryStatusCounts: Record<string, number> = {};
-              const colorMap: Record<string, string> = {};
+  const grouped: Record<string, { category: string; value: number; color: string }[]> = {};
 
-              items.forEach((item: any) => {
-                const { status, category, value } = item.data;
-                statusCounts[status] = (statusCounts[status] || 0) + value;
-                const key = `${category} (${status})`;
-                categoryStatusCounts[key] = (categoryStatusCounts[key] || 0) + value;
-                colorMap[key] = item.color;
-              });
+  items.forEach((item: any) => {
+    const { status, category, value } = item.data;
+    if (!grouped[status]) grouped[status] = [];
+    grouped[status].push({ category, value, color: item.color });
+  });
 
-              return `
-                <div style="padding: 8px 12px; font-size: 14px">
-                  <div style="font-weight: 600; margin-bottom: 6px;">${title}</div>
-                  <div style="margin-bottom: 8px;">
-                    ${Object.entries(statusCounts)
-                      .map(([status, count]) => `<div><strong>${status}</strong>: ${count}</div>`)
-                      .join("")}
-                  </div>
-                  <div>
-                    ${Object.entries(categoryStatusCounts)
-                      .map(
-                        ([key, count]) => `
-                      <div style="display:flex;align-items:center;margin-top:2px">
-                        <span style="width:8px;height:8px;border-radius:50%;background:${colorMap[key]};display:inline-block;margin-right:6px;"></span>
-                        ${key}: ${count}
-                      </div>
-                    `
-                      )
-                      .join("")}
-                  </div>
+  return `
+    <div style="padding: 8px 12px; font-size: 14px">
+      <div style="font-weight: 600; margin-bottom: 6px;">${title}</div>
+      ${Object.entries(grouped)
+        .map(([status, entries]) => {
+          const total = entries.reduce((sum, e) => sum + e.value, 0);
+          return `
+            <div style="margin-top: 8px;">
+              <div><strong>${status}</strong>: ${total}</div>
+              ${entries
+                .map(
+                  (e) => `
+                <div style="display:flex;align-items:center;margin-left:10px;margin-top:2px">
+                  <span style="width:8px;height:8px;border-radius:50%;background:${e.color};display:inline-block;margin-right:6px;"></span>
+                  ${e.category}: ${e.value}
                 </div>
-              `;
-            },
+              `
+                )
+                .join("")}
+            </div>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
           }
         : {
             shared: true,
