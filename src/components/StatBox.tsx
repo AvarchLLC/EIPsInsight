@@ -34,17 +34,12 @@ const StatBox: React.FC<StatBoxProps> = ({
 
   return (
     <Box
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
       borderRadius="lg"
       bg={bg}
       p={4}
       boxShadow="md"
       border="1px solid"
       borderColor="transparent"
-      transition="all 0.3s ease"
       _hover={{
         borderColor: "#30A0E0",
         boxShadow: "lg",
