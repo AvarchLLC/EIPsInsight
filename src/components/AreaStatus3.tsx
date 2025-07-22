@@ -76,6 +76,7 @@ const StackedColumnChart: React.FC = () => {
   const [endYear, setEndYear] = useState<number>(new Date().getFullYear());
   const [endMonth, setEndMonth] = useState<number>(new Date().getMonth() + 1);
   const [allYears, setAllYears] = useState<number[]>([]);
+  
 
   const windowSize = useWindowSize();
   const bg = useColorModeValue("#f6f6f7", "#171923");
@@ -192,26 +193,63 @@ const StackedColumnChart: React.FC = () => {
   };
 
   const chartData = getChartData();
+const total = sortedData.length;
 
-  const config = {
-    data: chartData,
-    xField: "year",
-    yField: "value",
-    seriesField: viewMode === "category" ? "category" : "status",
-    groupField: viewMode === "category" ? "status" : undefined,
-    isGroup: viewMode === "category",
-    isStack: viewMode === "category",
-    slider: { start: 0, end: 1 },
-    legend: { position: "top-right" as const },
-//     label: {
-//   content: (data: any) => `${data.status}`,
-//   position: "top",
-//   style: {
-//     fill: "#000", // Use "#fff" if in dark mode
-//     fontWeight: 600,
-//     fontSize: 12,
-//   },
-// },
+const startIndex = sortedData.findIndex(
+  (item) => item.rawYear === startYear && item.rawMonth === startMonth
+);
+const endIndex = sortedData.findIndex(
+  (item) => item.rawYear === endYear && item.rawMonth === endMonth
+);
+
+const getMonthNameFromIndex = (index: number): string => {
+  return months[index % 12]; // "Jan", "Feb", etc.
+};
+const baseStartYear = 2015; // whatever your slider's first year is
+const baseEndYear = 2025;
+
+const totalMonths = (baseEndYear - baseStartYear + 1) * 12;
+
+const getMonthFromIndex = (index: number): number => {
+  return (index % 12) + 1; // 1 to 12
+};
+
+const getYearFromIndex = (index: number): number => {
+  return baseStartYear + Math.floor(index / 12);
+};
+
+
+
+// Clamp values
+const sliderStart = startIndex !== -1 ? startIndex / total : 0;
+const sliderEnd = endIndex !== -1 ? (endIndex + 1) / total : 1;
+
+const config = {
+  data: chartData,
+  xField: "year",
+  yField: "value",
+  seriesField: viewMode === "category" ? "category" : "status",
+  groupField: viewMode === "category" ? "status" : undefined,
+  isGroup: viewMode === "category",
+  isStack: viewMode === "category",
+  legend: { position: "top-right" as const },
+
+  // ✅ Fully synced slider
+slider: {
+  start: sliderStart,
+  end: sliderEnd,
+  onChange: ([sliderStart, sliderEnd]: number[]) => {
+    const sliderStartIndex = Math.floor(sliderStart * totalMonths);
+    const sliderEndIndex = Math.floor(sliderEnd * totalMonths);
+
+    setStartMonth(getMonthFromIndex(sliderStartIndex)); // returns 1–12
+    setStartYear(getYearFromIndex(sliderStartIndex));
+
+    setEndMonth(getMonthFromIndex(sliderEndIndex));
+    setEndYear(getYearFromIndex(sliderEndIndex));
+  }
+},
+
 
     tooltip:
       viewMode === "category"
@@ -258,6 +296,8 @@ const StackedColumnChart: React.FC = () => {
             shared: true,
         },
   };
+
+  
 
   const downloadData = () => {
     const filteredData = data?.filter(
