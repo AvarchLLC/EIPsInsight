@@ -139,11 +139,17 @@ const ToolsSection: FC = () => {
             label="Feedback Form"
             link="/Feedback"
           />
+                    <ToolCard
+            imageSrc="/proposal_builder.png"
+            label= "Proposal Builder "
+            link="/proposalbuilder"
+          />
           <ToolCard
             imageSrc="/dashBoardCard8.png"
             label="More Resources"
             link="/resources"
           />
+
         </Grid>
       </Box>
     </div>

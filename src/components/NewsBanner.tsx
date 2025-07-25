@@ -20,7 +20,7 @@ const Banner = () => {
             <div className={isOpen ? 'block' : 'hidden'}>
 
                 <div className={isOpen ? 'bg-blue-200 flex justify-between lg:px-14 md:px-12 sm:px-10 px-8 py-2' : 'hidden'}>
-                    <NextLink target={'_blank'} href={'https://builder.gitcoin.co/#/chains/1/registry/0x03506eD3f57892C85DB20C36846e9c808aFe9ef4/projects/738'}>
+                    <NextLink target={'_blank'} href={'https://buy.stripe.com/test_7sI7sXdHu9SL8JG001'}>
                         <div className={'flex space-x-4'}>
                             <div className="text-black lg:text-xl md:text-lg sm:text-lg text-md flex pt-1">
                                 {/*&nbsp; <Image src={GitCoin} width={25} height={20} alt=""/>&nbsp;*/}
