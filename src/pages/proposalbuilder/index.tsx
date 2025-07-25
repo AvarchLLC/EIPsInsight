@@ -20,6 +20,7 @@ import NLink from "next/link";
 import EipTemplateEditor from "@/components/eiptemplate";
 import { motion } from "framer-motion";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+import ProposalEditor from "@/components/Edtor/ProposalEditor";
 
 
 const All = () => {
@@ -44,7 +45,7 @@ useScrollSpy([
         paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
         marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
-          <EipTemplateEditor/>
+          <ProposalEditor/>
         </Box>
         </motion.div>
       </AllLayout>
