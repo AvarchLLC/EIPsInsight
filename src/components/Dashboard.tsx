@@ -11,6 +11,7 @@ import {
   Link as LI,
   Stack,
   useToast,
+  Flex
 } from "@chakra-ui/react";
 // import React, { useEffect, useState } from "react";
 import React, { useEffect, useState, useLayoutEffect } from "react";
@@ -250,34 +251,21 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
     }
   }, []);
 
-
   return (
     <>
       <FeedbackWidget />
-      <Box
-        paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-        marginX={{ lg: "2", md: "2", sm: "2", base: "2" }}
-        paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-        marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
-      >
-        {isLoading ? ( // Check if the data is still loading
-          // Show loader if data is loading
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="100vh"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Your loader component */}
-              <LoaderComponent />
-            </motion.div>
-          </Box>
-        ) : (
+  <Box px={{ base: 4, md: 8, lg: 10 }} py={{ base: 6, md: 8, lg: 10 }}>
+    {isLoading ? (
+      <Flex justify="center" align="center" minH="70vh">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <LoaderComponent />
+        </motion.div>
+      </Flex>
+    ) : (
           // Show dashboard content if data is loaded
           <motion.div
             initial={{ opacity: 0 }}
@@ -291,8 +279,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
             >
               <Box
                 id={"hero"}
-                paddingTop={{ lg: "12", base: "6" }}
-                paddingBottom={{ lg: "6", base: "6" }}
+pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
               >
                 <div className="lg:block hidden">
                   <Box

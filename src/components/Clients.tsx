@@ -47,10 +47,9 @@ export function Clients() {
                             let link = '';
                             try {
                                 const headResponse = await axios.head(rawURL);
-                                link =
-                                    headResponse.status === 200
-                                        ? `https://eipsinsight.com/${category.toLowerCase()}s/${category.toLowerCase()}-${number}`
-                                        : `https://ethereum-magicians.org/t/${slug}/${post_id}`;
+                                console.log(`HEAD request for ${rawURL} returned status: ${headResponse.status}`);
+                                console.log(slug, post_id);
+                                link = `https://ethereum-magicians.org/t/${slug}/${post_id}`;
                             } catch {
                                 link = `https://ethereum-magicians.org/t/${slug}/${post_id}`;
                             }
