@@ -262,7 +262,8 @@ return (
         px={4}
         py={3}
         borderRadius="1rem"
-        border="3px solid black"
+        border="3px solid"
+        borderColor="#30A0E0"
         boxShadow="lg"
         transition="all 0.3s"
         _hover={{

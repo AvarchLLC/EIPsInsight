@@ -399,9 +399,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                   <Box
                     // bg="rgba(0, 0, 0, 0.5)"
                     borderRadius="md" // Rounded corners
-                    padding={4} // Padding around the text
                     id="all"
-                    py={5}
                   >
                     <div className="py-10">
                       <Header
