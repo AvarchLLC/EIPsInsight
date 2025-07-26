@@ -1071,7 +1071,6 @@ import FeedbackWidget from "@/components/FeedbackWidget";
 const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
 const All = () => {
-  const [selected, setSelected] = useState("Meta");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka'>('fusaka');
@@ -1089,6 +1088,23 @@ const All = () => {
   ];
   const [isLoading, setIsLoading] = useState(true);
   const [isMediumOrLarger, setIsMediumOrLarger] = useState(false);
+  const router = useRouter();
+const { selected } = router.query;
+
+
+// 🔄 Sync dropdown state with URL query param
+useEffect(() => {
+  if (selected === 'pectra' || selected === 'fusaka') {
+    setSelectedOption(selected);
+  }
+}, [selected]);
+
+// 🔼 Also update the URL when dropdown changes
+const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const value = e.target.value as 'pectra' | 'fusaka';
+  setSelectedOption(value);
+  router.push(`/upgrade?selected=${value}#${value}`, undefined, { shallow: true });
+};
 
 
   useEffect(() => {
@@ -1474,7 +1490,6 @@ const All = () => {
       discussion: "https://ethereum-magicians.org/t/eip-7934-add-bytesize-limit-to-blocks/23589"
     }
   ];
-  const router = useRouter();
 
   const scrollToHash = () => {
     const hash = window.location.hash;
@@ -1500,7 +1515,7 @@ const All = () => {
   }, [router]);
 
 
-  const currentPosts = selectedOption === 'pectra' ? PectraPosts : FusakaPosts;
+  const currentPosts = selectedOption === 'pectra' ? PectraPosts.reverse() : FusakaPosts.reverse();
   const currentData = selectedOption === 'pectra' ? pectraData : fusakaData;
   const upgradeName = selectedOption === 'pectra' ? 'Pectra' : 'Fusaka';
 
@@ -1551,20 +1566,20 @@ const All = () => {
 
               <br />
               <Box mt={4} mb={4}>
-                <select
-                  value={selectedOption}
-                  onChange={(e) => setSelectedOption(e.target.value as 'fusaka' | 'pectra')}
-                  style={{
-                    padding: '10px',
-                    fontSize: '20px',
-                    borderRadius: '6px',
-                    border: '1px solid gray',
-                  }}
-                >
-                  <option value="fusaka">Fusaka</option>
+<select
+  value={selectedOption}
+  onChange={handleSelectChange}
+  style={{
+    padding: '10px',
+    fontSize: '20px',
+    borderRadius: '6px',
+    border: '1px solid gray',
+  }}
+>
+  <option value="fusaka">Fusaka</option>
+  <option value="pectra">Pectra</option>
+</select>
 
-                  <option value="pectra">Pectra</option>
-                </select>
               </Box>
 
               <Box id="NetworkUpgrades" mt={2}>

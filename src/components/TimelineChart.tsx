@@ -43,7 +43,7 @@ interface Props {
 const cubeSize = 24; // instead of 20
 const blockHeight = cubeSize;
 const blockWidth = cubeSize * 2; // or adjust further
-const padding = 10;
+const padding = 2;
 const rowHeight = cubeSize + 12;
 
 const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
@@ -77,7 +77,9 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   });
 
   const chartWidth = xScale(maxItems) + 200;
-  const chartHeight = visibleData.length * rowHeight + 100;
+const chartPaddingBottom = 40; // or adjust
+const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
+
 
   const resetZoom = () => {
     setZoomLevel(1);
@@ -90,6 +92,22 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   };
 
   const handleMouseUp = () => setIsDragging(false);
+
+  const changeStatus = (status : string) => {
+    if (status.toLowerCase() === 'included') {
+      return 'INCLUDED'
+  }
+    if (status.toLowerCase() === 'scheduled') {
+      return 'SFI'
+    }
+    if (status.toLowerCase() === 'considered') {
+      return 'CFI'
+    }
+    if (status.toLowerCase() === 'declined') {
+      return 'DFI'
+    }
+    return status;
+}
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
@@ -134,7 +152,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
 
   return (
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
-      <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={3}>
+      <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
         <Heading size="md" color={headingColor}>
           Network Upgrade Inclusion Stages (
           <Link href={linkHref}>
@@ -170,7 +188,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
         <svg
           viewBox={`${offset.x} ${offset.y} ${chartWidth / zoomLevel} ${chartHeight / zoomLevel}`}
           preserveAspectRatio="xMinYMin meet"
-          style={{ width: '100%', height: 'auto', maxHeight: '80vh', borderRadius: '8px' }}
+          style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
 
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -195,7 +213,6 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
                     fontWeight="bold"
                     fill="gray"
                     vectorEffect="non-scaling-stroke"
-                    style={{ transform: `scale(${1 / zoomLevel})`, transformOrigin: 'left center' }}
                   >
                     {item.date}
                   </text>
@@ -228,7 +245,6 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
                               textAnchor="middle"
                               fill="white"
                               vectorEffect="non-scaling-stroke"
-                              style={{ transform: `scale(${1 / zoomLevel})`, transformOrigin: 'center' }}
                             >
                               {eipNum}
                             </text>
@@ -245,9 +261,6 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
 
         </svg>
       </Flex>
-
-
-
 
 
       {/* Tooltip */}
@@ -269,7 +282,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
           maxW="250px"
         >
           <Text fontSize="lg" fontWeight="bold">{hoveredEip.eip}</Text>
-          <Text>Status: {hoveredEip.type.toUpperCase()}</Text>
+          <Text>Status: {changeStatus(hoveredEip.type.toLowerCase())}</Text>
           {/* Find data item for this hovered EIP */}
           {(() => {
             const item = dataToRender.find(d =>
@@ -297,9 +310,9 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
           })()}
         </Box>
       )}
-      <Box overflowX={{ base: "auto", md: "visible" }} mt={2}>
+      
         <DateTime />
-      </Box>
+    
     </Box>
   );
 };
