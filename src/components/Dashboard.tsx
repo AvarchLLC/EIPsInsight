@@ -26,7 +26,7 @@ import {
   Radio,
   Link,
   Clipboard,
-  Briefcase,
+  Briefcase
 } from "react-feather";
 import { BsArrowUpRight, BsGraphUp } from "react-icons/bs";
 import StackedColumnChart from "@/components/StackedBarChart";
@@ -387,6 +387,39 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                             </Button>
                           </NextLink>
                         </Box>
+
+                                                <Box>
+                          <NextLink href={"/all"}>
+                            <Button
+                              color="#F5F5F5"
+                              variant={"outline"}
+                              fontSize={{
+                                lg: "14px",
+                                md: "12px",
+                                sm: "12px",
+                                base: "10px",
+                              }}
+                              fontWeight={"bold"}
+                              padding={{
+                                lg: "10px 20px",
+                                md: "5px 10px",
+                                sm: "5px 10px",
+                                base: "5px 10px",
+                              }}
+                              rightIcon={ <BookOpen/> }
+                              bgColor={"#30A0E0"}
+                              _hover={{
+                                bgColor: useColorModeValue(
+                                  "#2B6CB0",
+                                  "#4A5568"
+                                ),
+                                color: useColorModeValue("white", "#F5F5F5"),
+                              }}
+                            >
+                              Explore EIPs
+                            </Button>
+                          </NextLink>
+                        </Box>
                       </Stack>
                     </Stack>
                     {/* <BoyGirl2/> */}
@@ -466,7 +499,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
 
                     <Box>
                       <NextLink
-                        href={`/insight/${year}/${getMonth(monthName)}`}
+                        href={`/all`}
                       >
                         <Button
                           colorScheme="blue"
@@ -489,10 +522,11 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                             color: useColorModeValue("white", "#F5F5F5"),
                           }}
                         >
-                          {monthName} {year} Insight
+                            Explore EIPs
                         </Button>
                       </NextLink>
                     </Box>
+
                   </Stack>
                   <br />
                   <br />

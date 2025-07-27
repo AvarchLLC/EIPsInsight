@@ -166,16 +166,20 @@ const sidebarStructure = [
           { label: "FUSAKA", id: "fusaka", href: "/upgrade?selected=fusaka#fusaka" },
         ],
       },
+      {
+        label : "Upgrade Overview",
+        href: "/upgrade#pectrafusaka",
+      },
       { label: "Network Upgrades Graph", id: "NetworkUpgrades", href: "/upgrade#NetworkUpgrades" },
       { label: "Upgrade Blogs", id: "upgrade-blogs", href: "/upgrade#upgrade-blogs" },
       { label: "Upgrade Table", id: "upgrade-table", href: "/upgrade#upgrade-table" },
+            { label: "Network Upgrades Chart", id: "NetworkUpgradeschart", href: "/upgrade#NetworkUpgradeschart" },
+      { label: "Author Contributions", id: "AuthorContributions", href: "/upgrade#AuthorContributions" },
       {
         label: "Network Upgrades and EIPs Relationship Graph",
         id: "NetworkUpgradesChartp",
         href: "/upgrade#NetworkUpgradesChartp",
       },
-      { label: "Network Upgrades Chart", id: "NetworkUpgradeschart", href: "/upgrade#NetworkUpgradeschart" },
-      { label: "Author Contributions", id: "AuthorContributions", href: "/upgrade#AuthorContributions" },
 
     ],
   },
