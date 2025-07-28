@@ -130,7 +130,7 @@ const NetworkUpgradesChart: React.FC = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
-  const [hoveredData, setHoveredData] = useState(null);
+  const [hoveredData, setHoveredData] = useState<{ date: string; upgrade: string; eip: string } | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [dimensions, setDimensions] = useState({ width: 1200, height: 500 });
   const containerRef = useRef<HTMLDivElement>(null);
