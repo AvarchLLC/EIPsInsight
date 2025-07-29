@@ -1,3 +1,10 @@
+---
+title: "EIPs @10: A Decade of Standardizing Ethereum"
+author: "Ayush Shetty"
+date: "2025-07-29"
+image: "/nody.png"
+---
+
 # EIPs @10: A Decade of Standardizing Ethereum
 
 **A comprehensive look at how Ethereum Improvement Proposals have shaped Ethereum, world's most programmable blockchain**
