@@ -20,7 +20,8 @@ interface DeclinedEIPCardProps {
     id: string;
     title: string;
     description: string;
-    link?: string;
+    eipsLink?: string;
+    discussionLink?: string;
   };
 }
 
@@ -91,14 +92,14 @@ export default function DeclinedEIPCard({ eip }: DeclinedEIPCardProps) {
       </CardBody>
       <Box mt="auto">
         <Flex align="center" gap={2}>
-          <LinkOverlay href={eip.link} isExternal _hover={{ textDecor: "underline" }}>
+          <LinkOverlay href={eip.discussionLink} isExternal _hover={{ textDecor: "underline" }}>
             <chakra.span fontWeight="medium" color={accent}>
               Read Discussion
             </chakra.span>
           </LinkOverlay>
           <IconButton
             as="a"
-            href={eip.link}
+            href={eip.eipsLink}
             aria-label="Open EIP Spec"
             icon={<FiExternalLink />}
             target="_blank"
