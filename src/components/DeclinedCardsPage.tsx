@@ -104,20 +104,6 @@ const declinedEIPs: DeclinedEIP[] = [
     discussionLink: "https://ethereum-magicians.org/t/eip-7653-remove-bloom-filters/19447",
   },
   {
-    id: "EIP-7688",
-    title: "EIP-7688: Forward compatible consensus data structures",
-    description: "Transition consensus SSZ data structures to ProgressiveContainer",
-    eipsLink: "https://eips.ethereum.org/EIPS/eip-7688",
-    discussionLink: "https://ethereum-magicians.org/t/eip-7688-forward-compatible-consensus-data-structures/19673",
-  },
-  {
-    id: "EIP-7692",
-    title: "EIP-7692: EVM Object Format (EOFv1) Meta",
-    description: "Meta EIP listing the EIPs belonging to the EVM Object Format (EOF) proposal in its first version, enabling code versioning and paving the way for RISC-V execution environments.",
-    eipsLink: "https://eips.ethereum.org/EIPS/eip-7692",
-    discussionLink: "https://ethereum-magicians.org/t/glamsterdam-headliner-proposal-eof/21271",
-  },
-  {
     id: "EIP-7698",
     title: "EIP-7698: EOF - Creation transaction",
     description: "Deploy EOF contracts using creation transactions",
@@ -144,13 +130,6 @@ const declinedEIPs: DeclinedEIP[] = [
     description: "Adjust the MIN_BASE_FEE_PER_BLOB_GAS to speed up price discovery on blob space",
     eipsLink: "https://eips.ethereum.org/EIPS/eip-7762",
     discussionLink: "https://ethereum-magicians.org/t/eip-7762-increase-min-base-fee-per-blob-gas/20949",
-  },
-  {
-    id: "EIP-7783",
-    title: "EIP-7783: Add Controlled Gas Limit Increase Strategy",
-    description: "Adds a controlled gas limit increase strategy.",
-    eipsLink: "https://eips.ethereum.org/EIPS/eip-7783",
-    discussionLink: "https://ethereum-magicians.org/t/eip-7783-add-controlled-gas-limit-increase-strategy/21282",
   },
   {
     id: "EIP-7791",
@@ -256,7 +235,7 @@ export default function DeclinedEIPListPage() {
     <Box>
 
                        <Header
-                              title="Declined for Inclusion"
+                              title="Declined for Inclusion - [32]"
                               subtitle="Overview"
                               description="EIPs that were proposed, but ultimately declined for inclusion in the upgrade for various reasons. They may be reconsidered for future upgrades."
                               sectionId="dfi"

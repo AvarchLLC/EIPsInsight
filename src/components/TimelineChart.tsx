@@ -1,9 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Group } from '@visx/group';
 import { scaleLinear } from '@visx/scale';
-import { AxisBottom } from '@visx/axis';
 import {
-  Box, Button, Flex, HStack, Tooltip,
+  Box, Button, Flex, HStack,
   IconButton, Heading, useColorModeValue, Text
 } from '@chakra-ui/react';
 import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
@@ -40,9 +39,9 @@ interface Props {
   selectedOption: 'pectra' | 'fusaka';
 }
 
-const cubeSize = 24; // instead of 20
+const cubeSize = 24;
 const blockHeight = cubeSize;
-const blockWidth = cubeSize * 2; // or adjust further
+const blockWidth = cubeSize * 2;
 const padding = 2;
 const rowHeight = cubeSize + 12;
 
@@ -51,7 +50,19 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [hoveredEip, setHoveredEip] = useState<{ eip: string; type: StatusType } | null>(null);
+  // Add `date` to hoveredEip!
+  const [hoveredEip, setHoveredEip] = useState<{
+  eip: string;
+  type: StatusType;
+  date: string;
+  statusCounts: {
+    included: number;
+    scheduled: number;
+    considered: number;
+    declined: number;
+  };
+} | null>(null);
+
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const dragStart = useRef({ x: 0, y: 0 });
 
@@ -69,7 +80,6 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
     )
   );
 
-  const blockWidth = cubeSize * 2;
   const blockSpacing = 6;
   const xScale = scaleLinear({
     domain: [0, maxItems],
@@ -77,9 +87,8 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   });
 
   const chartWidth = xScale(maxItems) + 200;
-const chartPaddingBottom = 40; // or adjust
-const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
-
+  const chartPaddingBottom = 40; // or adjust
+  const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
 
   const resetZoom = () => {
     setZoomLevel(1);
@@ -93,21 +102,13 @@ const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
 
   const handleMouseUp = () => setIsDragging(false);
 
-  const changeStatus = (status : string) => {
-    if (status.toLowerCase() === 'included') {
-      return 'INCLUDED'
-  }
-    if (status.toLowerCase() === 'scheduled') {
-      return 'SFI'
-    }
-    if (status.toLowerCase() === 'considered') {
-      return 'CFI'
-    }
-    if (status.toLowerCase() === 'declined') {
-      return 'DFI'
-    }
+  const changeStatus = (status: string) => {
+    if (status.toLowerCase() === 'included') return 'INCLUDED'
+    if (status.toLowerCase() === 'scheduled') return 'SFI'
+    if (status.toLowerCase() === 'considered') return 'CFI'
+    if (status.toLowerCase() === 'declined') return 'DFI'
     return status;
-}
+  }
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
@@ -144,11 +145,11 @@ const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
   const headingColor = useColorModeValue('gray.700', 'gray.100');
 
   const linkHref =
-  selectedOption === "pectra"
-    ? "/eips/eip-7600"
-    : selectedOption === "fusaka"
-    ? "/eips/eip-7607"
-    : "#";
+    selectedOption === "pectra"
+      ? "/eips/eip-7600"
+      : selectedOption === "fusaka"
+        ? "/eips/eip-7607"
+        : "#";
 
   return (
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
@@ -182,7 +183,6 @@ const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
             </Box>
           </Flex>
         ))}
-
       </Flex>
       <Flex direction="row">
         <svg
@@ -223,10 +223,20 @@ const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
                       return (
                         <a key={i} href={`/eips/eip-${eipNum}`} target="_blank" rel="noopener noreferrer">
                           <g
-                            onMouseEnter={(e) => {
-                              setHoveredEip(d);
-                              setTooltipPos({ x: e.clientX, y: e.clientY });
-                            }}
+onMouseEnter={(e) => {
+  setHoveredEip({
+    ...d,
+    date: item.date,
+    statusCounts: {
+      included: item.included?.length || 0,
+      scheduled: item.scheduled?.length || 0,
+      considered: item.considered?.length || 0,
+      declined: item.declined?.length || 0,
+    },
+  });
+  setTooltipPos({ x: e.clientX, y: e.clientY });
+}}
+
                             onMouseLeave={() => setHoveredEip(null)}
                           >
                             <rect
@@ -248,7 +258,6 @@ const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
                             >
                               {eipNum}
                             </text>
-
                           </g>
                         </a>
                       );
@@ -258,61 +267,53 @@ const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
               );
             })}
           </Group>
-
         </svg>
       </Flex>
 
-
       {/* Tooltip */}
-      {hoveredEip && (
-        <Box
-          position="fixed"
-          left={tooltipPos.x + 10}
-          top={tooltipPos.y + 10}
-          zIndex={999}
-          bg="gray.800"
-          color="white"
-          px={4}
-          py={3}
-          borderRadius="md"
-          fontSize="md"
-          fontWeight="normal"
-          pointerEvents="none"
-          boxShadow="lg"
-          maxW="250px"
-        >
-          <Text fontSize="lg" fontWeight="bold">{hoveredEip.eip}</Text>
-          <Text>Status: {changeStatus(hoveredEip.type.toLowerCase())}</Text>
-          {/* Find data item for this hovered EIP */}
-          {(() => {
-            const item = dataToRender.find(d =>
-              [...d.included, ...d.scheduled, ...d.considered, ...d.declined].includes(hoveredEip.eip)
-            );
-            if (!item) return null;
+{hoveredEip && (
+  <Box
+    position="fixed"
+    left={tooltipPos.x + 10}
+    top={tooltipPos.y + 10}
+    zIndex={999}
+    bg="gray.800"
+    color="white"
+    px={4}
+    py={3}
+    borderRadius="md"
+    fontSize="md"
+    fontWeight="normal"
+    pointerEvents="none"
+    boxShadow="lg"
+    maxW="260px"
+    minW="185px"
+  >
+    <Text fontSize="lg" fontWeight="bold">{hoveredEip.eip}</Text>
+    <Text>
+      Status: <b>{changeStatus(hoveredEip.type)}</b>
+    </Text>
+    <Text>Date: {hoveredEip.date}</Text>
+    <Box mt={2}>
+      <Text fontWeight="bold" mb={1}>EIP Counts for this date:</Text>
+      <Text fontSize="sm" color="green.200">
+        INCLUDED: {hoveredEip.statusCounts.included}
+      </Text>
+      <Text fontSize="sm" color="blue.200">
+        SFI: {hoveredEip.statusCounts.scheduled}
+      </Text>
+      <Text fontSize="sm" color="orange.200">
+        CFI: {hoveredEip.statusCounts.considered}
+      </Text>
+      <Text fontSize="sm" color="red.200">
+        DFI: {hoveredEip.statusCounts.declined}
+      </Text>
+    </Box>
+  </Box>
+)}
 
-            const counts = {
-              included: item.included.length,
-              scheduled: item.scheduled.length,
-              considered: item.considered.length,
-              declined: item.declined.length,
-            };
 
-            return (
-              <>
-                <Text>Date: {item.date}</Text>
-                <Text mt={2} fontWeight="bold">Status Count:</Text>
-                <Text fontSize="sm">CFI (Considered): {counts.considered}</Text>
-                <Text fontSize="sm">SFI (Scheduled): {counts.scheduled}</Text>
-                <Text fontSize="sm">DFI (Declined): {counts.declined}</Text>
-                <Text fontSize="sm">Included: {counts.included}</Text>
-              </>
-            );
-          })()}
-        </Box>
-      )}
-      
-        <DateTime />
-    
+      <DateTime />
     </Box>
   );
 };

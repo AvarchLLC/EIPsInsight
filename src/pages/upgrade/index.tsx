@@ -956,7 +956,7 @@ return (
               />
             </Box>
 
-             <DeclinedEIPListPage/>
+            {selectedOption !== 'pectra' && <DeclinedEIPListPage />}
 
             {/* Charts */}
             <Box id="NetworkUpgradeschart" my={6}>
