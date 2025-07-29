@@ -431,7 +431,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
               clipPath: 'polygon(50% 0, 50% 0, 50% 100%, 50% 100%)',
             },
           }}
-          className="base-page-size"
+          style={{ width: '100%', height: '100%' }}
         >
           <Providers>
             <SidebarProvider>
