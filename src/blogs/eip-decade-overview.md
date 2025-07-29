@@ -2,7 +2,7 @@
 title: "EIPs @10: A Decade of Standardizing Ethereum"
 author: "Ayush Shetty"
 date: "2025-07-29"
-image: "/nody.png"
+image: "https://github.com/AvarchLLC/EIPsInsight/blob/main/public/nody.png?raw=true"
 ---
 
 # EIPs @10: A Decade of Standardizing Ethereum
