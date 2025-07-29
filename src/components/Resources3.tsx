@@ -344,7 +344,7 @@ const ResourcesPage: React.FC = () => {
       image: "/nody.png",
       title: "EIPs @10: A Decade of Standardizing Ethereum",
       content: "A decade-long review of Ethereum Improvement Proposals (EIPs), detailing their impact on protocol upgrades, token standards, consensus changes and the evolution of Ethereum into a $400+ billion ecosystem. Covers major eras, landmark EIPs, and the pivotal role of open governance in Ethereum's growth.",
-      link: "/A Decade of Standardizing Ethereum",
+      link: "Blogs/eip_decade_overview",
       tag: "Decade Overview"
     },
     {
