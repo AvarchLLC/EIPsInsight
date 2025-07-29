@@ -767,6 +767,7 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     "NetworkUpgradesChart",
     "upgrade-blogs",
     "NetworkUpgrades",
+    "dfi",
     "upgrade-table",
     "NetworkUpgradesChartp",
     "AuthorContributions",

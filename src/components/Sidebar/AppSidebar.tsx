@@ -173,6 +173,7 @@ const sidebarStructure = [
       { label: "Network Upgrades Graph", id: "NetworkUpgrades", href: "/upgrade#NetworkUpgrades" },
       { label: "Upgrade Blogs", id: "upgrade-blogs", href: "/upgrade#upgrade-blogs" },
       { label: "Upgrade Table", id: "upgrade-table", href: "/upgrade#upgrade-table" },
+      { label: "Upgrade DFI", id: "dfi", href: "/upgrade#dfi" },
             { label: "Network Upgrades Chart", id: "NetworkUpgradeschart", href: "/upgrade#NetworkUpgradeschart" },
       { label: "Author Contributions", id: "AuthorContributions", href: "/upgrade#AuthorContributions" },
       {
