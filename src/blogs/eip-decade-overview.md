@@ -146,16 +146,6 @@ The story of EIPs is the story of thousands of developers, researchers, and comm
 
 <font size="2" color=#a6a6a6>
 
-*Disclaimer: The information contained in this website is for general informational purposes only. The content provided on this website, including articles, blog posts, opinions, and analysis related to blockchain technology and cryptocurrencies, is not intended as financial or investment advice. The website and its content should not be relied upon for making financial decisions. Read full [disclaimer](https://etherworld.co/disclaimer/) and [privacy](https://etherworld.co/privacy-policy/) Policy.*
+*Disclaimer: The information contained in this website is for general informational purposes only. The content provided on this website, including articles, blog posts, opinions, and analysis related to blockchain technology and cryptocurrencies, is not intended as financial or investment advice. The website and its content should not be relied upon for making financial decisions.*
 
-For Press Releases, project updates and guest posts publishing with us, email to contact@etherworld.co.
-    
-Subscribe to EtherWorld [YouTube channel](https://www.youtube.com/channel/@etherworld.co) for ELI5 content.    
-    
-Share if you like the content. Donate at avarch.eth
-
-You've something to share with the blockchain community, join us on [Discord](https://discord.gg/CRsrpYfY9Q)!
-    
-Follow us at [Twitter](https://twitter.com/ether_world), [LinkedIn](https://www.linkedin.com/company/etherworld/),  and [Instagram](https://www.instagram.com/etherworld.co/).
-    
 </font>
