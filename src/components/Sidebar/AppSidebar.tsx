@@ -166,21 +166,16 @@ const sidebarStructure = [
           { label: "FUSAKA", id: "fusaka", href: "/upgrade?selected=fusaka#fusaka" },
         ],
       },
-      {
-        label : "Upgrade Overview",
-        href: "/upgrade#pectrafusaka",
-      },
       { label: "Network Upgrades Graph", id: "NetworkUpgrades", href: "/upgrade#NetworkUpgrades" },
       { label: "Upgrade Blogs", id: "upgrade-blogs", href: "/upgrade#upgrade-blogs" },
       { label: "Upgrade Table", id: "upgrade-table", href: "/upgrade#upgrade-table" },
-      { label: "Upgrade DFI", id: "dfi", href: "/upgrade#dfi" },
-            { label: "Network Upgrades Chart", id: "NetworkUpgradeschart", href: "/upgrade#NetworkUpgradeschart" },
-      { label: "Author Contributions", id: "AuthorContributions", href: "/upgrade#AuthorContributions" },
       {
         label: "Network Upgrades and EIPs Relationship Graph",
         id: "NetworkUpgradesChartp",
         href: "/upgrade#NetworkUpgradesChartp",
       },
+      { label: "Network Upgrades Chart", id: "NetworkUpgradeschart", href: "/upgrade#NetworkUpgradeschart" },
+      { label: "Author Contributions", id: "AuthorContributions", href: "/upgrade#AuthorContributions" },
 
     ],
   },
@@ -373,6 +368,8 @@ export default function AppSidebar() {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [userData, setUserData] = useState<UserData | null>(null);
   const { user, setUser, clearUser } = useUserStore();
+  const [isHovered, setIsHovered] = useState(false);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const bottomItems = [
     // { icon: Search, label: "Search", href: "/search" },
@@ -423,6 +420,31 @@ export default function AppSidebar() {
 
   const toast = useToast();
   const router = useRouter();
+
+  // Smooth hover handling with debouncing
+  const handleMouseEnter = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setIsHovered(false);
+    }, 300); // Small delay before collapsing
+    setHoverTimeout(timeout);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
 
   const handleRefresh = async () => {
     if (!user) return;
@@ -488,23 +510,42 @@ export default function AppSidebar() {
       display="flex"
       flexDir="column"
       justifyContent="space-between"
-      transition="width 0.3s"
-      w={isCollapsed ? "3rem" : "16rem"}
+      transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+      w={isCollapsed && !isHovered ? "3.5rem" : "17rem"}
       bg={bg}
       borderRight="1px solid"
       borderColor={borderColor}
       roundedRight="xl"
       overflowY="auto"
+      overflowX="hidden"
       py={4}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      boxShadow={isHovered && isCollapsed ? "xl" : "md"}
+      backdropFilter="blur(10px)"
       sx={{
         scrollbarWidth: "none",
         msOverflowStyle: "none",
         "&::-webkit-scrollbar": { display: "none" },
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: useColorModeValue(
+            "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.98) 100%)",
+            "linear-gradient(180deg, rgba(23,25,35,0.95) 0%, rgba(23,25,35,0.98) 100%)"
+          ),
+          zIndex: -1,
+          borderRadius: "inherit",
+        },
       }}
       className={`${mont.className} base-page-size`}
     >
       {/* Collapse/Expand Button */}
-      <Box px={2} mb={2}>
+      <Box px={2} mb={4}>
         <IconButton
           aria-label="Toggle Sidebar"
           icon={isCollapsed ? <ChevronRight /> : <ChevronLeft />}
@@ -512,73 +553,155 @@ export default function AppSidebar() {
           size="sm"
           variant="ghost"
           w="100%"
+          h="2.5rem"
+          borderRadius="lg"
+          transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+          _hover={{ 
+            bg: useColorModeValue("blue.50", "blue.900"),
+            transform: "scale(1.05)",
+            boxShadow: "md"
+          }}
+          _active={{ 
+            transform: "scale(0.95)",
+            bg: useColorModeValue("blue.100", "blue.800")
+          }}
+          color={useColorModeValue("blue.600", "blue.300")}
         />
       </Box>
 
       {/* Main Items */}
-      <VStack spacing={1} px={2} align="stretch" flex="1" overflowY="auto">
-        {sidebarStructure.map((item) => (
-          <SidebarItem
+      <VStack 
+        spacing={2} 
+        px={2} 
+        align="stretch" 
+        flex="1" 
+        overflowY="auto"
+        css={{
+          '&::-webkit-scrollbar': {
+            width: '4px',
+          },
+          '&::-webkit-scrollbar-track': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: useColorModeValue('rgba(0,0,0,0.1)', 'rgba(255,255,255,0.1)'),
+            borderRadius: '24px',
+          },
+        }}
+      >
+        {sidebarStructure.map((item, index) => (
+          <motion.div
             key={item.label}
-            item={item}
-            expanded={!isCollapsed}
-            expandedItems={expandedItems}
-            toggleExpand={toggleExpand}
-            depth={0}
-            isCollapsed={isCollapsed}
-          />
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ 
+              delay: index * 0.05,
+              duration: 0.3,
+              ease: [0.4, 0, 0.2, 1]
+            }}
+          >
+            <SidebarItem
+              item={item}
+              expanded={!isCollapsed || isHovered}
+              expandedItems={expandedItems}
+              toggleExpand={toggleExpand}
+              depth={0}
+              isCollapsed={isCollapsed && !isHovered}
+            />
+          </motion.div>
         ))}
       </VStack>
 
       <Divider borderColor={borderColor} my={2} />
 
       {/* Bottom Items */}
-      <VStack spacing={1} px={2} align="stretch">
-        {bottomItems.map((item) => (
-          <SidebarItem
+      <VStack spacing={2} px={2} align="stretch">
+        {bottomItems.map((item, index) => (
+          <motion.div
             key={item.label}
-            item={item}
-            expanded={!isCollapsed}
-            expandedItems={expandedItems}
-            toggleExpand={toggleExpand}
-            depth={0}
-            isCollapsed={isCollapsed}
-          />
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              delay: 0.3 + index * 0.1,
+              duration: 0.3,
+              ease: [0.4, 0, 0.2, 1]
+            }}
+          >
+            <SidebarItem
+              item={item}
+              expanded={!isCollapsed || isHovered}
+              expandedItems={expandedItems}
+              toggleExpand={toggleExpand}
+              depth={0}
+              isCollapsed={isCollapsed && !isHovered}
+            />
+          </motion.div>
         ))}
       </VStack>
 
-      <Box mt={2} px={isCollapsed ? 0 : 4}>
-{!isCollapsed ? (
+      <Box mt={4} px={isCollapsed && !isHovered ? 1 : 4} transition="all 0.3s ease">
+{!isCollapsed || isHovered ? (
   <Menu placement="top" isLazy>
     <MenuButton
       as={HStack}
       spacing={3}
       align="center"
       px={3}
-      py={2}
+      py={3}
       w="full"
-      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
-      borderRadius="md"
-      transition="background 0.2s"
+      _hover={{ 
+        bg: useColorModeValue("gray.100", "gray.700"),
+        transform: "translateY(-1px)",
+        boxShadow: "sm"
+      }}
+      borderRadius="xl"
+      transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
       justify="flex-start"
       cursor="pointer"
+      border="1px solid"
+      borderColor={useColorModeValue("gray.200", "gray.600")}
     >
       <Avatar
         size="sm"
         name={userData?.name}
         src={userData?.image || undefined}
+        transition="all 0.2s"
+        _hover={{ transform: "scale(1.1)" }}
       />
-      <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
-        {userData?.name || "Profile"}
-      </Text>
-      <Box as={ChevronDown} size="16px" />
+      <Box flex="1" textAlign="left">
+        <Text fontSize="sm" fontWeight="semibold" noOfLines={1}>
+          {userData?.name || "Profile"}
+        </Text>
+        <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")} noOfLines={1}>
+          {userData?.tier || "Free Tier"}
+        </Text>
+      </Box>
+      <Box as={ChevronDown} size="16px" opacity={0.7} />
     </MenuButton>
 
-    <MenuList zIndex={1000}>
-      <MenuItem onClick={() => router.push("/profile")}>👤 Profile</MenuItem>
-      <MenuItem onClick={handleRefresh}>🔄 Refresh Status</MenuItem>
+    <MenuList zIndex={1000} borderRadius="xl" border="1px solid" borderColor={useColorModeValue("gray.200", "gray.600")}>
+      <MenuItem 
+        onClick={() => router.push("/profile")}
+        borderRadius="lg"
+        _hover={{ bg: useColorModeValue("blue.50", "blue.900") }}
+      >
+        👤 Profile
+      </MenuItem>
+      <MenuItem 
+        onClick={handleRefresh}
+        borderRadius="lg"
+        _hover={{ bg: useColorModeValue("green.50", "green.900") }}
+      >
+        🔄 Refresh Status
+      </MenuItem>
       <MenuDivider />
-      <MenuItem onClick={handleLogout}>🚪 Logout</MenuItem>
+      <MenuItem 
+        onClick={handleLogout}
+        borderRadius="lg"
+        _hover={{ bg: useColorModeValue("red.50", "red.900") }}
+      >
+        🚪 Logout
+      </MenuItem>
     </MenuList>
   </Menu>
 ) : (
@@ -589,18 +712,23 @@ export default function AppSidebar() {
       w="full"
       display="flex"
       justifyContent="center"
-      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
-      borderRadius="md"
-      transition="background 0.2s"
+      _hover={{ 
+        bg: useColorModeValue("gray.100", "gray.700"),
+        transform: "scale(1.05)"
+      }}
+      borderRadius="xl"
+      transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
       cursor="pointer"
       onClick={() => router.push("/profile")}
+      border="1px solid transparent"
+      _active={{ transform: "scale(0.95)" }}
     >
       <Avatar
         size="sm"
         name={userData?.name}
         src={userData?.image || undefined}
-        _hover={{ transform: "scale(1.05)", boxShadow: "md" }}
         transition="all 0.2s"
+        _hover={{ boxShadow: "lg" }}
       />
     </Box>
   </Tooltip>
@@ -631,10 +759,13 @@ export function SidebarItem({
   const hasChildren = item.children && item.children.length > 0;
   const isExpanded = expandedItems[item.label];
   const activeSection = useSidebarStore((s) => s.activeSection);
+  const [isItemHovered, setIsItemHovered] = useState(false);
 
-  const textColor = useColorModeValue("gray.800", "whiteAlpha.900");
+  const textColor = useColorModeValue("gray.700", "whiteAlpha.900");
   const iconColor = useColorModeValue("gray.600", "gray.300");
-  const hoverBg = useColorModeValue("gray.200", "gray.700");
+  const hoverBg = useColorModeValue("gray.100", "gray.700");
+  const activeBg = useColorModeValue("blue.50", "blue.900");
+  const activeTextColor = useColorModeValue("blue.700", "blue.200");
   const borderColor = useColorModeValue("gray.300", "gray.700");
 
   const getHrefHash = (href: string) => {
@@ -654,14 +785,35 @@ export function SidebarItem({
       opacity: 1,
       height: "auto",
       pointerEvents: "auto",
-      transition: { duration: 0.3 },
+      transition: { 
+        duration: 0.4,
+        ease: [0.4, 0, 0.2, 1],
+        staggerChildren: 0.05,
+        delayChildren: 0.1
+      },
     },
     isCollapsed: {
       opacity: 0,
       height: 0,
       pointerEvents: "none",
-      transition: { duration: 0.2 },
+      transition: { 
+        duration: 0.3,
+        ease: [0.4, 0, 0.2, 1]
+      },
     },
+  };
+
+  const childVariants: Variants = {
+    open: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
+    },
+    isCollapsed: {
+      opacity: 0,
+      x: -10,
+      transition: { duration: 0.2 }
+    }
   };
 
   const handleNavigation = (e: React.MouseEvent, href: string) => {
@@ -682,30 +834,106 @@ export function SidebarItem({
       history.pushState(null, "", href);
     }
   };
+
+  // Navigation helper function
+  const navigateToItem = (item: any) => {
+    if (!item.href) return;
+
+    const [path, hash] = item.href.split("#");
+    const isSamePage = window.location.pathname === path;
+
+    if (isSamePage && hash) {
+      const target = document.getElementById(hash);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.pushState(null, "", item.href);
+      }
+    } else if (!hash) {
+      router.push(item.href);
+    } else {
+      router.push(item.href);
+    }
+  };
+
   const shouldShowChildren = expanded && isExpanded;
   return (
     <Box>
       {/* Main clickable row */}
-      <Tooltip label={isCollapsed ? item.label : ""} placement="right" hasArrow>
+      <Tooltip 
+        label={isCollapsed ? item.label : ""} 
+        placement="right" 
+        hasArrow
+        bg={useColorModeValue("gray.800", "gray.200")}
+        color={useColorModeValue("white", "gray.800")}
+        fontSize="sm"
+        borderRadius="md"
+        openDelay={300}
+      >
         <HStack
           spacing={3}
-          px={3}
-          py={2}
+          px={depth > 0 ? 2 : 3}
+          py={2.5}
+          mx={1}
           bg={
-            isActive ? useColorModeValue("blue.100", "blue.700") : "transparent"
+            isActive 
+              ? activeBg
+              : isItemHovered 
+                ? hoverBg 
+                : "transparent"
           }
-          fontWeight={isActive ? "bold" : "normal"}
-          borderRadius="md"
+          fontWeight={isActive ? "semibold" : "medium"}
+          borderRadius="xl"
           cursor={hasChildren || item.href ? "pointer" : "default"}
-          onClick={() => hasChildren ? toggleExpand(item.label) : {}}
-          _hover={{ bg: hoverBg }}
+          onClick={() => {
+            // If collapsed and has href, navigate directly
+            if (isCollapsed && item.href) {
+              navigateToItem(item);
+            } 
+            // If expanded and has children, toggle expansion
+            else if (hasChildren) {
+              toggleExpand(item.label);
+            }
+            // If expanded and has href but no children, navigate
+            else if (item.href) {
+              navigateToItem(item);
+            }
+          }}
+          onMouseEnter={() => setIsItemHovered(true)}
+          onMouseLeave={() => setIsItemHovered(false)}
+          _hover={{ 
+            transform: "translateX(2px)",
+            boxShadow: isActive ? "lg" : "sm"
+          }}
+          _active={{ 
+            transform: "scale(0.98)" 
+          }}
           justifyContent={expanded ? "flex-start" : "center"}
-          color={textColor}
+          color={isActive ? activeTextColor : textColor}
           userSelect="none"
-          transition="all 0.2s"
+          transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+          position="relative"
+          border="1px solid transparent"
+          _before={isActive ? {
+            content: '""',
+            position: "absolute",
+            left: "-4px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: "3px",
+            height: "60%",
+            bg: useColorModeValue("blue.500", "blue.300"),
+            borderRadius: "full",
+          } : {}}
         >
           {item.icon && (
-            <Icon as={item.icon} boxSize={5} color={iconColor} flexShrink={0} />
+            <Icon 
+              as={item.icon} 
+              boxSize={5} 
+              color={isActive ? activeTextColor : iconColor} 
+              flexShrink={0}
+              transition="all 0.2s"
+              transform={isItemHovered ? "scale(1.1)" : "scale(1)"}
+            />
           )}
 
           {expanded && (
@@ -714,26 +942,8 @@ export function SidebarItem({
                 <Text
                   as="a"
                   onClick={(e) => {
-                    e.preventDefault();
-
-                    if (!item.href) return;
-
-                    const [path, hash] = item.href.split("#");
-
-                    const isSamePage = window.location.pathname === path;
-
-                    if (isSamePage && hash) {
-                      const target = document.getElementById(hash);
-                      if (target) {
-                        target.scrollIntoView({ behavior: "smooth", block: "start" });
-                        history.pushState(null, "", item.href); // Update URL hash without reload
-                      }
-                    } else if (!hash) {
-                      router.push(item.href); // Normal page change
-                    } else {
-                      // Different page + hash — use router.push with hash
-                      router.push(item.href);
-                    }
+                    e.stopPropagation(); // Prevent parent click handler
+                    navigateToItem(item);
                   }}
                   cursor="pointer"
                   flex="1"
@@ -754,8 +964,17 @@ export function SidebarItem({
                 <Icon
                   as={isExpanded ? ChevronDown : ChevronRight}
                   boxSize={4}
-                  color={iconColor}
-                  onClick={() => toggleExpand(item.label)}
+                  color={isActive ? activeTextColor : iconColor}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent parent click handler
+                    toggleExpand(item.label);
+                  }}
+                  transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                  transform={`rotate(${isExpanded ? '0deg' : '0deg'})`}
+                  _hover={{ 
+                    transform: `scale(1.2) rotate(${isExpanded ? '0deg' : '0deg'})`,
+                    color: useColorModeValue("blue.600", "blue.300")
+                  }}
                 />
               )}
             </>
@@ -770,10 +989,10 @@ export function SidebarItem({
             <MotionDiv
               display="flex"
               flexDirection="column"
-              pl={`${depth * 1.5}rem`}
+              pl={`${depth * 1.5 + 1}rem`}
               alignItems="stretch"
-              gap={1.5}
-              mt={1}
+              gap={1}
+              mt={2}
               initial="isCollapsed"
               animate="open"
               exit="isCollapsed"
@@ -783,25 +1002,30 @@ export function SidebarItem({
             >
               <Box
                 position="absolute"
-                left="1rem"
+                left={`${depth * 1.5 + 0.8}rem`}
                 top="0"
                 bottom="0"
                 width="2px"
-                bg={useColorModeValue("blue.400", "blue.300")}
+                bg={useColorModeValue("blue.200", "blue.700")}
                 borderRadius="full"
-                opacity={0.1}
-                zIndex={-1}
+                opacity={0.6}
+                zIndex={0}
               />
-              {item.children.map((child: any) => (
-                <SidebarItem
+              {item.children.map((child: any, index: number) => (
+                <MotionDiv
                   key={child.label}
-                  item={child}
-                  expanded={expanded}
-                  expandedItems={expandedItems}
-                  toggleExpand={toggleExpand}
-                  depth={depth + 1}
-                  isCollapsed={isCollapsed}
-                />
+                  variants={childVariants}
+                  custom={index}
+                >
+                  <SidebarItem
+                    item={child}
+                    expanded={expanded}
+                    expandedItems={expandedItems}
+                    toggleExpand={toggleExpand}
+                    depth={depth + 1}
+                    isCollapsed={isCollapsed}
+                  />
+                </MotionDiv>
               ))}
             </MotionDiv>
           )}
