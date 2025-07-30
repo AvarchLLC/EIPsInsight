@@ -634,6 +634,7 @@ const All = () => {
                   fontWeight="bold"
                   color="#30A0E0"
                   mt={2}
+              
                 >
                   Network Upgrades and EIPs Relationship Graph
                 </Text>

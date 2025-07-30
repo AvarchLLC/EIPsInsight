@@ -180,13 +180,12 @@ const processedData = originalData.map((entry, index, arr) => {
   });
 
   return (
-    <Box p={4}>
+
       <TimelineChart
         data={selectedOption === 'fusaka' ? processedData2 : processedData}
         selectedOption={selectedOption}
       />
 
-    </Box>
   );
 };
 

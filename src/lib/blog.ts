@@ -12,7 +12,7 @@ const frontmatterSchema = z
     title: z.string(),
     author: z.string(),
     date: z.coerce.date(),
-    image: z.string().url().optional(),
+    image: z.string().optional(),
   })
   .passthrough(); // Allow additional properties
 
