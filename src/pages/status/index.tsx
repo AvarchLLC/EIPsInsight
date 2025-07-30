@@ -192,10 +192,10 @@ const Status = () => {
         >
           <Box
            display={{ lg: "block", md: "block", sm: "block", base: "block" }}
-            paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-            marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-            paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-            marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+            paddingBottom={{ lg: "6", sm: "6", base: "6" }}
+            marginX={{ lg: "20", md: "2", sm: "2", base: "2" }}
+            paddingX={{ lg: "8", md: "4", sm: "4", base: "4" }}
+            marginTop={{ lg: "6", md: "4", sm: "4", base: "4" }}
           >
             <Header title="Status" subtitle="Your Roadway to Status" description="" />
 
@@ -206,7 +206,7 @@ const Status = () => {
             </Text>
 
             <AreaStatus/>
-            <br/>
+            
             {/* <AreaC type={"EIPs"} /> */}
 
             <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">
