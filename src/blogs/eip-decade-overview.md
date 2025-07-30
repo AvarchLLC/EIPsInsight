@@ -5,10 +5,6 @@ date: "2025-07-29"
 image: "https://github.com/AvarchLLC/EIPsInsight/blob/main/public/nody.png?raw=true"
 ---
 
-# EIPs @10: A Decade of Standardizing Ethereum
-
-**A comprehensive look at how Ethereum Improvement Proposals have shaped Ethereum, world's most programmable blockchain**
-
 Ten years ago, on **July 30, 2015**, Ethereum's "Frontier" network went live, mining its genesis block and launching what would become the world's most programmable blockchain. Just months earlier, on **April 12, 2015**, a foundational document was published that would govern every significant upgrade to follow: **[EIP-1](https://eipsinsight.com/eips/eip-1)**, authored by Martin Becze and [Hudson Jameson](https://x.com/hudsonjameson). This simple proposal established the transparent improvement process that has driven every protocol upgrade, token standard, consensus change and layer-2 in Ethereum's history.
 
 From that foundational framework, over **1,000 EIPs** have been created, with **530 ERCs** (application standards), **337 Core EIPs** (protocol changes) and **22 Networking EIPs** transforming Ethereum from an [experimental "world computer"](https://etherworld.co/2024/11/15/vitalik-buterin-on-ethereum-as-the-world-computer/) into the backbone of a $400+ billion ecosystem. These proposals represent the democratic, transparent process by which one of humanity's most important technological platforms continues to evolve and improve.
@@ -150,16 +146,6 @@ The story of EIPs is the story of thousands of developers, researchers, and comm
 
 <font size="2" color=#a6a6a6>
 
-*Disclaimer: The information contained in this website is for general informational purposes only. The content provided on this website, including articles, blog posts, opinions, and analysis related to blockchain technology and cryptocurrencies, is not intended as financial or investment advice. The website and its content should not be relied upon for making financial decisions. Read full [disclaimer](https://etherworld.co/disclaimer/) and [privacy](https://etherworld.co/privacy-policy/) Policy.*
+*Disclaimer: The information contained in this website is for general informational purposes only. The content provided on this website, including articles, blog posts, opinions, and analysis related to blockchain technology and cryptocurrencies, is not intended as financial or investment advice. The website and its content should not be relied upon for making financial decisions.*
 
-For Press Releases, project updates and guest posts publishing with us, email to contact@etherworld.co.
-    
-Subscribe to EtherWorld [YouTube channel](https://www.youtube.com/channel/@etherworld.co) for ELI5 content.    
-    
-Share if you like the content. Donate at avarch.eth
-
-You've something to share with the blockchain community, join us on [Discord](https://discord.gg/CRsrpYfY9Q)!
-    
-Follow us at [Twitter](https://twitter.com/ether_world), [LinkedIn](https://www.linkedin.com/company/etherworld/),  and [Instagram](https://www.instagram.com/etherworld.co/).
-    
 </font>
