@@ -17,12 +17,10 @@ import dayjs from "dayjs";
 import CopyLink from "@/components/CopyLink";
 import { useRouter } from "next/router";
 import { DownloadIcon } from "@chakra-ui/icons";
-import TableOfContents from '@/components/TableOfContents';
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import FeedbackButton from "@/components/FeedbackButton";
 import { Tooltip } from "@chakra-ui/react";
 import Link from "next/link";
-import { useScrollSpy } from "@/hooks/useScrollSpy";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -1411,17 +1409,6 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
 
   }, [activeTab]);
   
-  useScrollSpy([
-  "editors",
-  "Reviewers",
-  "LeaderBoard",
-  "Leaderboard FAQ",
-  "ActivityTimeline",
-  "PRs Reviewed",
-  "active editors",
-  "comments",
-]);
-
 
   const renderTable = (year: string, month: string, reviewerFilter: any) => {
     // console.log(data);
@@ -2094,17 +2081,8 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         {/* Sidebar and other content */}
         {/* ... */}
       </Flex>
-         <Flex
-    direction={{ base: 'column', md: 'row' }}
-    gap={{ base: 4, md: 8 }}
-    p={{ base: 4, md: 8 }}
-  >
-    {/* Sidebar for Table of Contents */}
-    <Box flex="0 0 250px" display={{ base: 'none', md: 'block' }}>
-      <TableOfContents />
-      </Box>
       
-      <Box flex="1" p={4}>
+      <Box p={4}>
         <section id = "LeaderBoard">
           
       <Heading
@@ -3069,7 +3047,6 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
 
         
         </Box>
-  </Flex>
 </AllLayout>
 )
 ); };
