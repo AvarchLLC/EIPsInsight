@@ -36,7 +36,7 @@ const LEGEND_LABELS: Record<StatusType, string> = {
 
 interface Props {
   data: EIPData[];
-  selectedOption: 'pectra' | 'fusaka';
+  selectedOption: 'pectra' | 'fusaka' | 'glamsterdam'; // Updated to include glamsterdam
 }
 
 const cubeSize = 24;

@@ -304,7 +304,7 @@ const declinedEIPs: DeclinedEIP[] = [
 const All = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
-  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka'>('fusaka');
+  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam'>('fusaka');
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
   // const selectedOption = selectedUpgrade;       // just alias so rest of code works
   // const setSelectedOption = setSelectedUpgrade;
@@ -325,14 +325,14 @@ const { selected } = router.query;
 
 // 🔄 Sync dropdown state with URL query param
 useEffect(() => {
-  if (selected === 'pectra' || selected === 'fusaka') {
+  if (selected === 'pectra' || selected === 'fusaka' || selected === 'glamsterdam') {
     setSelectedOption(selected);
   }
 }, [selected]);
 
 // 🔼 Also update the URL when dropdown changes
 const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const value = e.target.value as 'pectra' | 'fusaka';
+  const value = e.target.value as 'pectra' | 'fusaka' | 'glamsterdam';
   setSelectedOption(value);
   router.push(`/upgrade?selected=${value}#${value}`, undefined, { shallow: true });
 };
@@ -602,6 +602,90 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     },
   ];
 
+  const glamsterdamData = [
+    {
+      eip: "7692",
+      title: "EVM Object Format (EOFv1) Meta",
+      author: "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz), Danno Ferrin (@shemnon)",
+      link: "https://eipsinsight.com/eips/eip-7692",
+      type: "Meta",
+      category: "",
+      discussion: "https://ethereum-magicians.org/t/eip-7692-evm-object-format-eof-meta/19686"
+    },
+        {
+      eip: "7886",
+      title: "Delayed execution",
+      author: "Francesco D'Amato (@fradamt), Toni Wahrstätter (@nerolation)",
+      link: "https://eipsinsight.com/eips/eip-7886",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7886-delayed-execution/22890"
+    },
+        {
+      eip: "7919",
+      title: "Pureth Meta",
+      author: "Etan Kissling (@etan-status), Gajinder Singh (@g11tech)",
+      link: "https://eipsinsight.com/eips/eip-7919",
+      type: "Meta",
+      category: "",
+      discussion: "https://ethereum-magicians.org/t/eip-7919-pureth-meta/23273"
+    },
+  {
+    eip: "7928",
+    title: "Block-Level Access Lists",
+    author: "Toni Wahrstätter (@nerolation), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Jochem Brouwer (@jochem-brouwer), Ignacio Hagopian (@jsign)",
+    link: "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7928.md",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7928-block-level-access-lists/23337"
+  },
+  {
+    eip: "7937",
+    title: "EVM64 - 64-bit mode EVM opcodes",
+    author: "Wei Tang (@sorpaas)",
+    link: "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7937.md",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-9687-64-bit-mode-evm-operations/23794"
+  },
+  {
+    eip: "7732",
+    title: "Enshrined Proposer-Builder Separation",
+    author: "Francesco D'Amato <francesco.damato@ethereum.org>, Barnabé Monnot <barnabe.monnot@ethereum.org>, Michael Neuder <michael.neuder@ethereum.org>, Potuz (@potuz), Terence Tsao <ttsao@offchainlabs.com>",
+    link: "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7732.md",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7732-enshrined-proposer-builder-separation-epbs/19634"
+  },
+  {
+    eip: "7782",
+    title: "Reduce Block Latency",
+    author: "Ben Adams (@benaadams), Dankrad Feist (@dankrad)",
+    link: "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7782.md",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7782-reduce-block-latency/21271"
+  },
+  {
+    eip: "7805",
+    title: "Fork-choice enforced Inclusion Lists (FOCIL)",
+    author: "Thomas Thiery (@soispoke) <thomas.thiery@ethereum.org>, Francesco D'Amato <francesco.damato@ethereum.org>, Julian Ma <julian.ma@ethereum.org>, Barnabé Monnot <barnabe.monnot@ethereum.org>, Terence Tsao <ttsao@offchainlabs.com>, Jacob Kaufmann <jacob.kaufmann@ethereum.org>, Jihoon Song <jihoonsong.dev@gmail.com>",
+    link: "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7805.md",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7805-committee-based-fork-choice-enforced-inclusion-lists-focil/21578"
+  },
+  {
+    eip: "7942",
+    title: "Available Attestation",
+    author: "Mingfei Zhang (@Mart1i1n) <mingfei.zh@outlook.com>, Rujia Li <rujia@tsinghua.edu.cn>, Xueqian Lu <xueqian.lu@bitheart.org>, Sisi Duan <duansisi@tsinghua.edu.cn>",
+    link: "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7942.md",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7942-available-attestation-a-reorg-resilient-solution-for-ethereum/23927"
+  }
+];
+
   const fusakaData = [
     {
       eip: "7723",
@@ -757,13 +841,14 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   }, [router]);
 
 
-  const currentPosts = selectedOption === 'pectra' ? PectraPosts.reverse() : FusakaPosts.reverse();
-  const currentData = selectedOption === 'pectra' ? pectraData : fusakaData;
-  const upgradeName = selectedOption === 'pectra' ? 'Pectra' : 'Fusaka';
+  const currentPosts = selectedOption === 'pectra' ? PectraPosts : selectedOption === 'fusaka' ? FusakaPosts : GlamsterdamPosts;
+  const currentData = selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : glamsterdamData;
+  const upgradeName = selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : "Glamsterdam";
 
   useScrollSpy([
     "pectra",
     "fusaka",
+    "glamsterdam",
     "NetworkUpgradesChart",
     "upgrade-blogs",
     "NetworkUpgrades",
@@ -815,11 +900,13 @@ return (
                   border: '1px solid gray',
                 }}
               >
+                <option value="glamsterdam">Glamsterdam</option>
                 <option value="fusaka">Fusaka</option>
                 <option value="pectra">Pectra</option>
+                
               </select>
             </Box>
-
+            {selectedOption !== 'glamsterdam' &&
             <Box id="NetworkUpgrades" my={6}>
               <UpgradesTimeline
                 selectedOption={selectedOption}
@@ -828,6 +915,7 @@ return (
                 fusakaData={fusakaData}
               />
             </Box>
+             }
 
             <Flex
               direction={{ base: "column", md: "row" }}
@@ -873,7 +961,7 @@ return (
                       </Text>
                     </NLink>.
                   </>
-                ) : (
+                ) : selectedOption === 'fusaka' ? (
                   <>
                     <NLink href="https://eipsinsight.com/eips/eip-7607">
                       <Text as="span" color="blue.500" textDecor="underline">
@@ -904,7 +992,51 @@ return (
                       </Text>
                     </NLink> upgrade.
                   </>
-                )}
+
+                ) : (
+                  <>
+  Ethereum developers are now preparing for the next major network upgrade, known as{" "}
+  <NLink href="https://ethereum-magicians.org/t/eip-7773-glamsterdam-network-upgrade-meta-thread/21195">
+    <Text as="span" color="blue.500" textDecor="underline">
+      Glamsterdam
+    </Text>
+  </NLink>. This upgrade will introduce key changes to both the{" "}
+  <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+    <Text as="span" color="blue.500" textDecor="underline">
+      Execution and Consensus layers
+    </Text>
+  </NLink>{" "}on mainnet. The name combines{" "}
+  <Text as="span" fontWeight="bold">
+    Amsterdam
+  </Text>{" "}(execution layer, from the previous Devconnect location) and{" "}
+  <Text as="span" fontWeight="bold">
+    Gloas
+  </Text>{" "}(consensus layer, named after a star), highlighting its focus on both core protocol areas. The headliner feature for Glamsterdam is still being decided, with several{" "}
+  <NLink href="https://github.com/ethereum/EIPs/pulls?q=is%3Apr+is%3Aopen+milestone%3A%22Glamsterdam%22">
+    <Text as="span" color="blue.500" textDecor="underline">
+      Ethereum Improvement Proposals (EIPs)
+    </Text>
+  </NLink>{" "}under review and active community discussions ongoing. Coordination and planning are being carried out through the{" "}
+  <NLink href="https://ethereum.foundation/forkcast">
+    <Text as="span" color="blue.500" textDecor="underline">
+      Forkcast
+    </Text>
+  </NLink>{" "}process. Feedback is welcome—reach out to{" "}
+  <NLink href="mailto:nixo@ethereum.org">
+    <Text as="span" color="blue.500" textDecor="underline">
+      nixo
+    </Text>
+  </NLink>{" "}or{" "}
+  <NLink href="https://x.com/wolovim">
+    <Text as="span" color="blue.500" textDecor="underline">
+      @wolovim
+    </Text>
+  </NLink>.
+</>
+
+                )
+                
+                }
               </Text>
             </Flex>
 
@@ -952,15 +1084,15 @@ return (
             {/* Upgrade Table */}
             <Box id="upgrade-table" mt={6} display={{ base: "none", md: "block" }}>
               <PectraTable
-                PectraData={selectedOption === 'pectra' ? pectraData : fusakaData}
-                title={selectedOption === 'pectra' ? 'Pectra' : 'Fusaka'}
+                PectraData={selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : glamsterdamData}
+                title={selectedOption === 'pectra' ? "Pectra EIPs" : selectedOption === 'fusaka' ? "Fusaka EIPs" : "Glamsterdam EIPs"}
               />
             </Box>
 
-            {selectedOption !== 'pectra' && <DeclinedEIPListPage />}
+            {selectedOption === 'fusaka' && <DeclinedEIPListPage /> }
 
             {/* Charts */}
-            <Box id="NetworkUpgradeschart" my={6}>
+            <Box id="NetworkUpgradeschart" my={6}>  
               <NetworkUpgradesChart />
             </Box>
 

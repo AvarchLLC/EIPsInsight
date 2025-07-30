@@ -166,7 +166,7 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
       setIsDarkMode(true);
     }
   });
-  const titlenew = title === "Pectra" ? "Pectra (Included)" : "Fusaka (CFI)";
+  const titlenew = title === "Pectra" ? "Pectra (Included)" : title === "Fusaka" ? "Fusaka (CFI)" : "Glamsterdam (Headliner Proposals)";
 
 
   const filteredData = PectraData

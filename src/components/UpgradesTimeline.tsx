@@ -2,7 +2,7 @@ import TimelineChart from '@/components/TimelineChart';
 import { Heading, Box } from '@chakra-ui/react';
 
 interface Props {
-  selectedOption: 'pectra' | 'fusaka';
+  selectedOption: 'pectra' | 'fusaka' | 'glamsterdam'; // Updated to include glamsterdam
   setSelectedOption?: (option: 'pectra' | 'fusaka') => void; // Only if needed for child toggling
   pectraData: any[];
   fusakaData: any[];
@@ -133,6 +133,7 @@ const originalData = [
   { date: '2025-07-10', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7907', 'EIP-7910', 'EIP-7917', 'EIP-7918', 'EIP-7934', 'EIP-7935', 'EIP-7939', 'EIP-7951'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-5920', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7762', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: [] },
   { date: '2025-07-17', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7910', 'EIP-7917', 'EIP-7918', 'EIP-7934', 'EIP-7935', 'EIP-7939', 'EIP-7951'], declined: ['EIP-663', 'EIP-3540', 'EIP-3670', 'EIP-4200', 'EIP-4750', 'EIP-5450', 'EIP-5920', 'EIP-6206', 'EIP-7069', 'EIP-7480', 'EIP-7620', 'EIP-7666', 'EIP-7668', 'EIP-7688', 'EIP-7692', 'EIP-7698', 'EIP-7732', 'EIP-7761', 'EIP-7762', 'EIP-7783', 'EIP-7791', 'EIP-7793', 'EIP-7805', 'EIP-7819', 'EIP-7834', 'EIP-7843', 'EIP-7873', 'EIP-7880', 'EIP-7889', 'EIP-7898', 'EIP-7903', 'EIP-7912', 'EIP-7919'], considered: [] },
 ];
+
   // Preprocess to add "declined" field based on removed EIPs
 const processedData = originalData.map((entry, index, arr) => {
   if (index === 0) return { ...entry, declined: [] };
