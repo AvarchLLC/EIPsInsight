@@ -5,10 +5,6 @@ date: "2025-07-29"
 image: "https://github.com/AvarchLLC/EIPsInsight/blob/main/public/nody.png?raw=true"
 ---
 
-# EIPs @10: A Decade of Standardizing Ethereum
-
-**A comprehensive look at how Ethereum Improvement Proposals have shaped Ethereum, world's most programmable blockchain**
-
 Ten years ago, on **July 30, 2015**, Ethereum's "Frontier" network went live, mining its genesis block and launching what would become the world's most programmable blockchain. Just months earlier, on **April 12, 2015**, a foundational document was published that would govern every significant upgrade to follow: **[EIP-1](https://eipsinsight.com/eips/eip-1)**, authored by Martin Becze and [Hudson Jameson](https://x.com/hudsonjameson). This simple proposal established the transparent improvement process that has driven every protocol upgrade, token standard, consensus change and layer-2 in Ethereum's history.
 
 From that foundational framework, over **1,000 EIPs** have been created, with **530 ERCs** (application standards), **337 Core EIPs** (protocol changes) and **22 Networking EIPs** transforming Ethereum from an [experimental "world computer"](https://etherworld.co/2024/11/15/vitalik-buterin-on-ethereum-as-the-world-computer/) into the backbone of a $400+ billion ecosystem. These proposals represent the democratic, transparent process by which one of humanity's most important technological platforms continues to evolve and improve.
