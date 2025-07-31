@@ -254,7 +254,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
   return (
     <>
       <FeedbackWidget />
-  <Box px={{ base: 4, md: 8, lg: 10 }} py={{ base: 6, md: 8, lg: 10 }}>
+  <Box px={{ base: 3, md: 6, lg: 8 }} py={{ base: 4, md: 6, lg: 8 }}>
     {isLoading ? (
       <Flex justify="center" align="center" minH="70vh">
         <motion.div
@@ -279,7 +279,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
             >
               <Box
                 id={"hero"}
-pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
+pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
               >
                 <div className="lg:block hidden">
                   <Box
@@ -288,38 +288,36 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                   >
                     <Stack direction={"column"}>
                       <Box
-                        // bg="rgba(0, 0, 0, 0.5)"
-                        borderRadius="md" // Rounded corners
-                        padding={4} // Padding around the text
-                        paddingLeft="6"
-                        // boxShadow="md"
-                        maxWidth="550px"
+                        borderRadius="md"
+                        padding={2}
+                        paddingLeft="4"
+                        maxWidth="500px"
                       >
                         <Text
                           color={useColorModeValue(
                             textColorLight,
                             textColorDark
-                          )} // Switch color based on mode
+                          )}
                           fontWeight={"bold"}
                           bgGradient={useColorModeValue(
                             bgGradientLight,
                             bgGradientDark
-                          )} // Optional: add a gradient background
-                          bgClip="text" // Optional: clip background to the text
+                          )}
+                          bgClip="text"
                           fontSize={{
-                            lg: "6xl",
-                            md: "5xl",
+                            lg: "5xl",
+                            md: "4xl",
                             sm: "3xl",
                             base: "xl",
                           }}
+                          lineHeight="1.1"
                         >
                           Ethereum <br /> Improvement <br /> Proposal <br />{" "}
                           Insight
                         </Text>
                       </Box>
-                      <br />
 
-                      <Stack direction={"row"} spacing={"6"}>
+                      <Stack direction={"row"} spacing={"4"} mt={4}>
                         <Box>
                           <NextLink href={"/home#1"}>
                             <Button
@@ -426,15 +424,13 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                     <BoyGirl3 />
                     {/* <AllChart type="Total" /> */}
                   </Box>
-                  <br />
-                  <br />
-                  <br />
+                  
                   <Box
-                    // bg="rgba(0, 0, 0, 0.5)"
-                    borderRadius="md" // Rounded corners
+                    borderRadius="md"
                     id="all"
+                    mt={{ base: 6, lg: 8 }}
                   >
-                    <div className="py-10">
+                    <div className="py-8">
                       <Header
                         title="All Categories and Status"
                         subtitle="Overview"
@@ -528,29 +524,28 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                     </Box>
 
                   </Stack>
-                  <br />
-                  <br />
-                  <div>
+                  
+                  <div className="mt-6">
                     <AllChart type="Total" dataset={data} />
                   </div>
                 </div>
               </Box>
 
               <Box
-                className="py-8"
+                className="py-6"
                 display={{ base: "block", md: "block", lg: "none" }}
               >
                 <Box
-                  className="w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
+                  className="w-full lg:px-48 md:px-32 sm:px-24 px-20 py-4 rounded-[0.55rem] hover:border border-blue-500"
                   bgColor={bg}
                 >
                   <SearchBox />
                 </Box>
               </Box>
-              <div>
+              <div className="mt-6">
                 <ToolsSection />
               </div>
-              <div>
+              <div className="mt-6">
                 <Clients />
               </div>
 
@@ -628,11 +623,9 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
   </Box>
 </div>
 
-
-              <br />
             </motion.div>
-            <br />
-            <div className="py-16" id="statuschanges">
+            
+            <div className="py-12" id="statuschanges">
               <Box>
                 <Header
                   title="EIP Status Changes by Year"
@@ -641,7 +634,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                   sectionId="statuschanges"
                 />
               </Box>
-              <Box paddingTop={8} paddingBottom={8}>
+              <Box paddingTop={6} paddingBottom={6}>
                 <TypeGraphs />
               </Box>
             </div>
@@ -684,7 +677,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                   display="grid"
                   gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
                   gap={"6"}
-                  marginTop={"20px"}
+                  marginTop={"12px"}
                 >
                   <div className="grid grid-cols-2 gap-6">
                     <div className="col-span-2">
@@ -847,7 +840,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                   display="grid"
                   gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
                   gap={"6"}
-                  marginTop={"20px"}
+                  marginTop={"12px"}
                 >
                   <Box
                     as={motion.div}
