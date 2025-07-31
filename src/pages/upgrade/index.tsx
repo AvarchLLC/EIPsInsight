@@ -44,7 +44,6 @@ import { Card } from "@/components/pectraCards";
 import StatusGraph from "@/components/Statuschangesgraph";
 import { useSidebar } from '@/components/Sidebar/SideBarContext';
 import { useScrollSpy } from "@/hooks/useScrollSpy";
-import FeedbackWidget from "@/components/FeedbackWidget";
 import DeclinedEIPListPage from "@/components/DeclinedCardsPage";
 
 const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
@@ -866,7 +865,6 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   }, [router]);
 return (
   <>
-    <FeedbackWidget />
     <AllLayout>
       <motion.div
         initial={{ opacity: 0, y: -20 }}

@@ -25,6 +25,7 @@ import SidebarConfigLoader from "./Sidebar/SideBarConfigLoader";
 import { sidebarConfig } from "./Sidebar/slidebarConfig";
 import { useSidebarStore } from "@/stores/useSidebarStore";
 import AppSidebar from "./Sidebar/AppSidebar";
+import UniversalFeedbackSystem from "./UniversalFeedbackSystem";
 
 const mont = Rajdhani({
   subsets: ["latin"],
@@ -90,7 +91,6 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
             clipPath: "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)",
           },
         }}
-        className={`${mont.className} base-page-size`}
       >
         <Head>
           <title>EIPs Insights</title>
@@ -143,6 +143,8 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
               <Navbar />
               <AuthLocalStorageInitializer />
               {children}
+              {/* Universal Feedback Widget - appears on all pages */}
+              <UniversalFeedbackSystem />
               <Box
                 position="fixed"
                 bottom={{ base: 4, md: 4 }}
