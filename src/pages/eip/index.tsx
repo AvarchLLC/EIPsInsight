@@ -114,7 +114,6 @@ interface Data {
 }
 
 import OtherBox from "@/components/OtherStats";
-import FeedbackWidget from "@/components/FeedbackWidget";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import SubscriptionButton from '@/components/SubscribtionButton';

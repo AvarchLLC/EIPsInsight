@@ -27,7 +27,6 @@ import { ButtonGroup, Flex } from "@chakra-ui/react";
 import TypeGraphs from "@/components/TypeGraphs4";
 import CatTable from "@/components/CatTable";
 import CatTable2 from "@/components/CatTable2";
-import FeedbackWidget from "@/components/FeedbackWidget";
 import ErcTable from "@/components/ErcTable";
 import { useRouter } from "next/router";
 import ERCsPRChart from "@/components/Ercsprs";
