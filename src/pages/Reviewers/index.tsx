@@ -18,7 +18,6 @@ import CopyLink from "@/components/CopyLink";
 import { useRouter } from "next/router";
 import { DownloadIcon } from "@chakra-ui/icons";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
-import FeedbackButton from "@/components/FeedbackButton";
 import { Tooltip } from "@chakra-ui/react";
 import Link from "next/link";
 // import { Bar } from "@ant-design/charts";
