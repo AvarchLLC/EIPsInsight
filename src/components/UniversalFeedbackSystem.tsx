@@ -10,7 +10,9 @@ import {
   useColorModeValue,
   Fade,
   IconButton,
-  Textarea
+  Textarea,
+  ScaleFade,
+  Slide
 } from "@chakra-ui/react";
 import { FiThumbsUp, FiThumbsDown, FiMeh, FiX, FiMessageSquare } from "react-icons/fi";
 import { useRouter } from "next/router";
@@ -25,7 +27,7 @@ const UniversalFeedbackSystem = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10); // 10 second timer
+  const [timeLeft, setTimeLeft] = useState(5); // 5 second timer
   
   const toast = useToast();
   const router = useRouter();
@@ -60,8 +62,11 @@ const UniversalFeedbackSystem = () => {
 
       if (scrollPercent >= 75) {
         scrolledTo75Ref.current = true;
-        setIsVisible(true); // Make visible when expanding
-        setIsExpanded(true);
+        // Smooth entrance with slight delay
+        setTimeout(() => {
+          setIsVisible(true);
+          setTimeout(() => setIsExpanded(true), 200); // Stagger the expansion
+        }, 100);
       }
     };
 
@@ -73,7 +78,7 @@ const UniversalFeedbackSystem = () => {
   const startTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
     
-    setTimeLeft(10);
+    setTimeLeft(5);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -134,7 +139,12 @@ const UniversalFeedbackSystem = () => {
   const handleTimeout = () => {
     const pageKey = getPageKey();
     sessionStorage.setItem(pageKey, 'true');
-    setIsVisible(false);
+    
+    // Smooth exit animation
+    setIsExpanded(false);
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 300); // Wait for collapse animation
     
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -191,31 +201,43 @@ const UniversalFeedbackSystem = () => {
   const handleDismiss = () => {
     const pageKey = getPageKey();
     sessionStorage.setItem(pageKey, 'true');
-    setIsVisible(false);
+    
+    // Smooth exit animation
+    setIsExpanded(false);
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 300);
   };
 
   if (!isVisible) return null;
 
   return (
-    <Box
-      position="fixed"
-      bottom="80px"
-      right="20px"
-      zIndex="1500"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <Fade in={isVisible}>
-        <Box
-          bg={bgColor}
-          border={`1px solid ${borderColor}`}
-          borderRadius="12px"
-          boxShadow="0 10px 40px rgba(0, 0, 0, 0.1)"
-          p="16px"
-          backdropFilter="blur(10px)"
-          minW={isVisible ? "320px" : "60px"}
-          transition="all 0.3s ease"
-        >
+    <Slide direction="bottom" in={isVisible} style={{ zIndex: 1500 }}>
+      <Box
+        position="fixed"
+        bottom="20px"
+        left="50%"
+        transform="translateX(-50%)"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <ScaleFade initialScale={0.8} in={isExpanded}>
+          <Box
+            bg={bgColor}
+            border={`1px solid ${borderColor}`}
+            borderRadius="16px"
+            boxShadow="0 20px 60px rgba(0, 0, 0, 0.15)"
+            p="20px"
+            backdropFilter="blur(10px)"
+            minW="320px"
+            transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+            transform={isExpanded ? "scale(1)" : "scale(0.95)"}
+            opacity={isExpanded ? 1 : 0}
+            _hover={{
+              transform: isExpanded ? "scale(1.02)" : "scale(0.95)",
+              boxShadow: "0 25px 70px rgba(0, 0, 0, 0.2)",
+            }}
+          >
           {!hasGivenRating ? (
             // Show rating options (no minimized state anymore)
             <VStack spacing={3}>
@@ -325,8 +347,9 @@ const UniversalFeedbackSystem = () => {
             </VStack>
           )}
         </Box>
-      </Fade>
+      </ScaleFade>
     </Box>
+  </Slide>
   );
 };
 
