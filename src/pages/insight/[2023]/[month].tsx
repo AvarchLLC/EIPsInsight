@@ -28,7 +28,6 @@ import InsightsAllStats from "@/components/InsitghtAllstats";
 import { useRouter } from "next/router";
 
 import CopyLink from "@/components/CopyLink";
-import FeedbackWidget from "@/components/FeedbackWidget";
 
 import AreaStatus from "@/components/AreaStatus3";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
@@ -188,7 +187,6 @@ const Month = () => {
 
   return (
     <>
-      <FeedbackWidget />
       <AllLayout>
         {isLoading ? ( // Check if the data is still loading
           // Show loader if data is loading
