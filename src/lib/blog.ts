@@ -6,15 +6,24 @@ import { z } from "zod";
 
 const POSTS_DIRECTORY = path.join(process.cwd(), "src", "blogs");
 
-// Frontmatter schema
 const frontmatterSchema = z
   .object({
     title: z.string(),
     author: z.string(),
     date: z.coerce.date(),
     image: z.string().optional(),
+
+    // Additional optional fields for advanced layout
+    authorAvatar: z.string().optional(),
+    authorTitle: z.string().optional(),
+    authorBio: z.string().optional(),
+    authorTwitter: z.string().optional(),
+    authorLinkedin: z.string().optional(),
+    authorGithub: z.string().optional(),
+    summaryPoints: z.array(z.string()).optional(),
   })
-  .passthrough(); // Allow additional properties
+  .passthrough();
+
 
 export type BlogPostFrontmatter = z.infer<typeof frontmatterSchema>;
 

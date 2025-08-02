@@ -1085,7 +1085,7 @@ return (
             <Box id="upgrade-table" mt={6} display={{ base: "none", md: "block" }}>
               <PectraTable
                 PectraData={selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : glamsterdamData}
-                title={selectedOption === 'pectra' ? "Pectra EIPs" : selectedOption === 'fusaka' ? "Fusaka EIPs" : "Glamsterdam EIPs"}
+                title={selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : "Glamsterdam"}
               />
             </Box>
 
