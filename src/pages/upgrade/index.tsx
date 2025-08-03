@@ -904,7 +904,6 @@ return (
                 
               </select>
             </Box>
-            {selectedOption !== 'glamsterdam' &&
             <Box id="NetworkUpgrades" my={6}>
               <UpgradesTimeline
                 selectedOption={selectedOption}
@@ -913,7 +912,6 @@ return (
                 fusakaData={fusakaData}
               />
             </Box>
-             }
 
             <Flex
               direction={{ base: "column", md: "row" }}

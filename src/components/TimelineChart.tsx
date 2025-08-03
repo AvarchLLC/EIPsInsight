@@ -10,7 +10,8 @@ import { saveAs } from 'file-saver';
 import Link from "next/link";
 import DateTime from './DateTime';
 
-type StatusType = 'included' | 'scheduled' | 'declined' | 'considered';
+// Add 'proposed' to StatusType
+type StatusType = 'included' | 'scheduled' | 'declined' | 'considered' | 'proposed';
 
 interface EIPData {
   date: string;
@@ -18,13 +19,16 @@ interface EIPData {
   scheduled: string[];
   declined: string[];
   considered: string[];
+  proposed: string[]; // Added field
 }
+
 
 const COLOR_SCHEME: Record<StatusType, string> = {
   included: '#48BB78',
   scheduled: '#4299E1',
   considered: '#F6AD55',
   declined: '#F56565',
+  proposed: '#9F7AEA', // Purple-ish for 'proposed'
 };
 
 const LEGEND_LABELS: Record<StatusType, string> = {
@@ -32,7 +36,9 @@ const LEGEND_LABELS: Record<StatusType, string> = {
   scheduled: 'SFI',
   considered: 'CFI',
   declined: 'DFI',
+  proposed: 'PFI', // Proposed-for-inclusion
 };
+
 
 interface Props {
   data: EIPData[];
@@ -60,6 +66,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
     scheduled: number;
     considered: number;
     declined: number;
+    proposed?: number; // Optional for proposed
   };
 } | null>(null);
 
@@ -70,23 +77,27 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const maxVisibleRows = 15;
   const visibleData = [...dataToRender].reverse().slice(scrollIndex, scrollIndex + maxVisibleRows);
 
-  const maxItems = Math.max(
-    ...dataToRender.map(
-      (d) =>
-        (d.included?.length || 0) +
-        (d.scheduled?.length || 0) +
-        (d.considered?.length || 0) +
-        (d.declined?.length || 0)
-    )
-  );
+const MIN_ITEMS_DISPLAYED = 7; // Tune this!
+const maxItems = Math.max(
+  MIN_ITEMS_DISPLAYED,
+  ...dataToRender.map(
+    (d) =>
+      (d.included?.length || 0) +
+      (d.scheduled?.length || 0) +
+      (d.considered?.length || 0) +
+      (d.declined?.length || 0) +
+      (d.proposed?.length || 0)
+  )
+);
+
 
   const blockSpacing = 6;
   const xScale = scaleLinear({
     domain: [0, maxItems],
     range: [0, maxItems * (blockWidth + blockSpacing)],
   });
-
   const chartWidth = xScale(maxItems) + 200;
+
   const chartPaddingBottom = 40; // or adjust
   const chartHeight = visibleData.length * rowHeight + chartPaddingBottom;
 
@@ -107,6 +118,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
     if (status.toLowerCase() === 'scheduled') return 'SFI'
     if (status.toLowerCase() === 'considered') return 'CFI'
     if (status.toLowerCase() === 'declined') return 'DFI'
+    if (status.toLowerCase() === 'proposed') return 'PFI' // For proposed
     return status;
   }
 
@@ -130,7 +142,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
       scheduled: d.scheduled?.join(', ') || '-',
     }));
 
-    const headers = ['ChangeDate', 'Included', 'Considered', 'Declined', 'Scheduled'];
+    const headers = ['ChangeDate', 'Included', 'Considered', 'Declined', 'Scheduled', 'Proposed'];
 
     const csv = [
       headers,
@@ -144,12 +156,15 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const bg = useColorModeValue('gray.100', 'gray.700');
   const headingColor = useColorModeValue('gray.700', 'gray.100');
 
-  const linkHref =
-    selectedOption === "pectra"
-      ? "/eips/eip-7600"
-      : selectedOption === "fusaka"
-        ? "/eips/eip-7607"
+const linkHref =
+  selectedOption === "pectra"
+    ? "/eips/eip-7600"
+    : selectedOption === "fusaka"
+      ? "/eips/eip-7607"
+      : selectedOption === "glamsterdam"
+        ? "/eips/eip-7773"
         : "#";
+
 
   return (
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
@@ -202,6 +217,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
                 ...(item.scheduled ?? []).map((eip) => ({ eip, type: 'scheduled' as const })),
                 ...(item.considered ?? []).map((eip) => ({ eip, type: 'considered' as const })),
                 ...(item.declined ?? []).map((eip) => ({ eip, type: 'declined' as const })),
+                ...(item.proposed ?? []).map((eip) => ({ eip, type: 'proposed' as const })),
               ];
 
               return (
@@ -232,6 +248,7 @@ onMouseEnter={(e) => {
       scheduled: item.scheduled?.length || 0,
       considered: item.considered?.length || 0,
       declined: item.declined?.length || 0,
+      proposed: item.proposed?.length || 0, // Optional for proposed
     },
   });
   setTooltipPos({ x: e.clientX, y: e.clientY });
@@ -308,6 +325,11 @@ onMouseEnter={(e) => {
       <Text fontSize="sm" color="red.200">
         DFI: {hoveredEip.statusCounts.declined}
       </Text>
+      {hoveredEip.statusCounts.proposed !== undefined && (
+        <Text fontSize="sm" color="purple.200">
+          PFI: {hoveredEip.statusCounts.proposed}
+        </Text>
+      )}
     </Box>
   </Box>
 )}
