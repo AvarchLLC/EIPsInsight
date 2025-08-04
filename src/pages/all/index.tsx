@@ -79,7 +79,7 @@ function filterDuplicateRipEntries(data: EIP[]): EIP[] {
   const filtered = [];
   const seenTitles = new Set();
   for (const item of data) {
-    const eip = item.eip || item.EIP; // support case difference just in case
+    const eip = item.eip; // support case difference just in case
     // skip missing or placeholder EIP/RIP values
     if (!eip || eip === "" || eip === "0000" || eip === "RIP-0000") continue;
     const title = (item.title || "").trim().toLowerCase();
