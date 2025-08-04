@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -38,6 +38,7 @@ import {
 import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
 import { DownloadIcon, CheckIcon, AddIcon } from "@chakra-ui/icons";
 import { ViewIcon, EditIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from "@chakra-ui/react";
 import { BiColumns } from "react-icons/bi";
 import {
   FaBold,
@@ -135,6 +136,11 @@ const EipTemplateEditor = () => {
   const [validated, setValidated] = useState<boolean>(false);
   const [searchNumber, setSearchNumber] = useState("");
   const [isLoading2, setIsLoading2] = useState(false);
+
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+const [detailedErrors, setDetailedErrors] = useState<string[]>([]);
+const cancelRef = React.useRef<HTMLButtonElement>(null);
+
 
   const toast = useToast();
 
@@ -578,26 +584,31 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       error?: string;
     }
 
-    const template = `---
-eip: ${templateData.eip}
-title: ${templateData.title}
-description: ${templateData.description}
-author: ${templateData.author}
-discussions-to: ${templateData.discussionsTo}
-status: ${templateData.status}
-${
-  templateData["last-call-deadline"]
-    ? `last-call-deadline: ${templateData["last-call-deadline"]}`
-    : ""
+    let preambleLines = [
+  `eip: ${templateData.eip}`,
+  `title: ${templateData.title}`,
+  `description: ${templateData.description}`,
+  `author: ${templateData.author}`,
+  `discussions-to: ${templateData.discussionsTo}`,
+  `status: ${templateData.status}`,
+];
+
+if (templateData['last-call-deadline'] && templateData.status === 'Last Call') {
+  preambleLines.push(`last-call-deadline: ${templateData['last-call-deadline']}`);
 }
-type: ${templateData.type}
-${
-  templateData.type === "Standards Track" && templateData.category
-    ? `category: ${templateData.category}`
-    : ""
+preambleLines.push(`type: ${templateData.type}`);
+if (templateData.type === 'Standards Track' && templateData.category) {
+  preambleLines.push(`category: ${templateData.category}`);
 }
-created: ${templateData.created}
-${templateData.requires ? `requires: ${templateData.requires}` : ""}
+preambleLines.push(`created: ${templateData.created}`);
+if (templateData.requires && templateData.requires.trim().length > 0) {
+  preambleLines.push(`requires: ${templateData.requires}`);
+}
+
+
+    const template = `
+---
+${preambleLines.join("\n")}
 ---
   
 ${templateData.abstract ? `## Abstract` : ""}
@@ -652,7 +663,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 
     // return cleanedContent2;
 
-    console.log(cleanedTemplate);
+    console.log(cleanedContent2);
 
     try {
       const response = await fetch("/api/ValidateEip", {
@@ -820,43 +831,35 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       unrecognizedHeaders.push("category");
     }
 
-    if (
-      missingHeaders?.length > 0 ||
-      unrecognizedHeaders?.length > 0 ||
-      errorMessages?.length > 0
-    ) {
-      // Compile error messages
-      const numberedErrors = [
-        ...missingHeaders?.map(
-          (header, index) => `${index + 1}. Missing Header: ${header}`
-        ),
-        ...unrecognizedHeaders?.map(
-          (header, index) =>
-            `${
-              missingHeaders?.length + index + 1
-            }. Unrecognized Header: ${header}`
-        ),
-        ...errorMessages?.map(
-          (message, index) =>
-            `${
-              missingHeaders?.length + unrecognizedHeaders?.length + index + 1
-            }. ${message}`
-        ),
-      ];
+if (
+  missingHeaders?.length > 0 ||
+  unrecognizedHeaders?.length > 0 ||
+  errorMessages?.length > 0
+) {
+  // Compile error messages
+  const numberedErrors = [
+    ...missingHeaders?.map(
+      (header, index) => `${index + 1}. Missing Header: ${header}`
+    ),
+    ...unrecognizedHeaders?.map(
+      (header, index) =>
+        `${missingHeaders?.length + index + 1}. Unrecognized Header: ${header}`
+    ),
+    ...errorMessages?.map(
+      (message, index) =>
+        `${missingHeaders?.length + unrecognizedHeaders?.length + index + 1}. ${message}`
+    ),
+  ];
 
-      // Display errors in a custom toast
-      toast({
-        title: "Error in Template",
-        description: <ErrorList errors={numberedErrors} />,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      setValidated(false);
+  // ------ REPLACE TOAST WITH POPUP -----
+  setDetailedErrors(numberedErrors);
+  setIsErrorDialogOpen(true);
 
-      setIsLoading(false); // Hide spinner
-      return; // Stop execution if errors are present
-    }
+  setValidated(false);
+  setIsLoading(false); // Hide spinner
+  return; // Stop execution if errors are present
+}
+
 
     setValidated(true);
 
@@ -961,6 +964,37 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 
   return (
     <>
+
+
+
+<AlertDialog
+  isOpen={isErrorDialogOpen}
+  leastDestructiveRef={cancelRef}
+  onClose={() => setIsErrorDialogOpen(false)}
+>
+  <AlertDialogOverlay>
+    <AlertDialogContent>
+      <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        Template Error Details
+      </AlertDialogHeader>
+      <AlertDialogBody>
+        <ul>
+          {detailedErrors.map((err, idx) => (
+            <li key={idx} style={{ marginBottom: 8, color: "#d53f8c" }}>
+              {err}
+            </li>
+          ))}
+        </ul>
+      </AlertDialogBody>
+      <AlertDialogFooter>
+        <Button ref={cancelRef} onClick={() => setIsErrorDialogOpen(false)}>
+          Close
+        </Button>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialogOverlay>
+</AlertDialog>
+
     <FeedbackWidget/>
     <Box
       p={5}
