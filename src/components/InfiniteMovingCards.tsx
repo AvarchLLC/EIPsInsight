@@ -50,7 +50,7 @@ export const InfiniteMovingCards = ({
 const bg = useColorModeValue("#fff9ec", "#121212");
 const cardBg = useColorModeValue("#fff", "#1a1a1a");
 const hoverBg = useColorModeValue("#ffe7b2", "#292929");
-const borderColor = "blue.400"
+const borderColor = "#30A0E0"
 const quoteColor = useColorModeValue("gray.800", "gray.100");
 const titleColor = useColorModeValue("gray.600", "gray.400");
 
