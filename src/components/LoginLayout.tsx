@@ -17,6 +17,7 @@ import { AuthLocalStorageInitializer } from "./AuthLocalStorageInitializer";
 const mont = Rajdhani({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
+  display: "swap",
 });const AllLayout = ({ children }: { children: React.ReactNode }) => {
   const router = usePathname();
   return (

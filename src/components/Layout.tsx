@@ -30,6 +30,7 @@ import UniversalFeedbackSystem from "./UniversalFeedbackSystem";
 const mont = Rajdhani({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 const AllLayout = ({ children }: { children: React.ReactNode }) => {
@@ -73,6 +74,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
       <motion.div
+        className={mont.className}
         key={router}
         initial="initialState"
         animate="animateState"

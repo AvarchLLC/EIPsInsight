@@ -20,6 +20,7 @@ const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
 const mont = Rajdhani({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
+  display: "swap",
 });
 
 

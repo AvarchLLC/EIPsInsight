@@ -70,6 +70,7 @@ const MotionDiv = chakra(motion.div, {
 const mont = Rajdhani({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 
