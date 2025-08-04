@@ -26,6 +26,7 @@ const mont = Rajdhani({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
+  
   return (
     <html lang="en" className={mont.className}>
       <body>
