@@ -164,6 +164,7 @@ const sidebarStructure = [
         children: [
           { label: "PECTRA", id: "pectra", href: "/upgrade?selected=pectra#pectra" },
           { label: "FUSAKA", id: "fusaka", href: "/upgrade?selected=fusaka#fusaka" },
+          { label: "GLAMSTERDAM", id: "glamsterdam", href: "/upgrade?selected=glamsterdam#glamsterdam" },
         ],
       },
       { label: "Network Upgrades Graph", id: "NetworkUpgrades", href: "/upgrade#NetworkUpgrades" },
