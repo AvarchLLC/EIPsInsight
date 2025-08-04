@@ -263,26 +263,40 @@ const processedData = originalData.map((entry, index, arr) => {
 });
 
 
-const processedData2 = data2?.map((entry, index, arr) => {
+const processedData2 = data2.map((entry, index, arr) => {
+  // Collect all scheduled/considered up to previous entry,
+  // remove anything that was already included or declined
   const allPrevEIPs = new Set<string>();
+  const excluded = new Set<string>();
   for (let i = 0; i < index; i++) {
-    arr[i].scheduled?.forEach((eip) => allPrevEIPs.add(eip));
-    arr[i].considered?.forEach((eip) => allPrevEIPs.add(eip));
+    arr[i].scheduled?.forEach((eip: string) => allPrevEIPs.add(eip));
+    arr[i].considered?.forEach((eip: string) => allPrevEIPs.add(eip));
+    arr[i].included?.forEach((eip: string) => excluded.add(eip));
+    arr[i].declined?.forEach((eip: string) => excluded.add(eip));
   }
 
-  const currentEIPs = new Set([
+  // Only keep EIPs that weren't already included/declined
+  excluded.forEach((eip: string) => allPrevEIPs.delete(eip));
+
+  // Current EIPs in consideration
+  const currentEIPs = new Set<string>([
     ...entry.scheduled,
     ...entry.considered,
+    ...entry.included,
+    ...entry.declined,
   ]);
 
-  const declined = [...allPrevEIPs]?.filter((eip) => !currentEIPs.has(eip));
+  // Anything that dropped off, and not in current statuses (other than proposed)
+  const declined = [...allPrevEIPs].filter((eip: string) => !currentEIPs.has(eip));
 
   return {
     ...entry,
-    declined,
+    // Use actual declined from input if present, else computed
+    declined: entry.declined.length ? entry.declined : declined,
     proposed: entry.proposed ?? [],
   };
 });
+
 
 const processedData3 = glamsterDamData.map((entry, index, arr) => {
   if (index === 0) return { ...entry, declined: [], proposed: entry.proposed ?? [] };

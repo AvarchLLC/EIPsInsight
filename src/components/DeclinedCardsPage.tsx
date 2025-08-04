@@ -235,7 +235,7 @@ export default function DeclinedEIPListPage() {
     <Box>
 
                        <Header
-                              title="Declined for Inclusion - [32]"
+                              title="Declined for Inclusion - [33]"
                               subtitle="Overview"
                               description="EIPs that were proposed, but ultimately declined for inclusion in the upgrade for various reasons. They may be reconsidered for future upgrades."
                               sectionId="dfi"
