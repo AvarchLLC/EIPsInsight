@@ -411,23 +411,42 @@ const handleMarkdownInsert = (key: TemplateDataKeys, syntax: string) => {
 };
 
 const generateMarkdownTemplate = (data: TemplateData): string => {
-  const headerLines = [
-    `eip: ${data.eip}`,
-    `title: ${data.title}`,
-    `description: ${data.description}`,
-    `author: ${data.author}`,
-    `discussions-to: ${data.discussionsTo}`,
-    `status: ${data.status}`,
-    data["last-call-deadline"]
-      ? `last-call-deadline: ${data["last-call-deadline"]}`
-      : null,
-    `type: ${data.type}`,
-    data.type === "Standards Track" && data.category
-      ? `category: ${data.category}`
-      : null,
-    `created: ${data.created}`,
-    data.requires ? `requires: ${data.requires}` : null,
-  ].filter(Boolean);
+const headerLines = [
+  `eip: ${data.eip}`,
+  `title: ${data.title}`,
+  `description: ${data.description}`,
+  `author: ${data.author}`,
+  `discussions-to: ${data.discussionsTo}`,
+  `status: ${data.status}`,
+  data["last-call-deadline"]
+    ? `last-call-deadline: ${data["last-call-deadline"]}`
+    : null,
+  `type: ${data.type}`,
+  data.type === "Standards Track" && data.category
+    ? `category: ${data.category}`
+    : null,
+  `created: ${data.created}`,
+  // requires block will be handled below
+].filter(Boolean);
+
+interface RequiresArray extends Array<string> {}
+
+let requiresArr: RequiresArray = [];
+if (typeof data.requires === "string") {
+  requiresArr = data.requires
+    .split(",")
+    .map((v) => v.trim())
+    .filter((v) => v);
+} else if (Array.isArray(data.requires)) {
+  requiresArr = (data.requires as string[]).filter((v) => v);
+}
+
+if (requiresArr.length > 0) {
+  headerLines.push('requires:');
+  requiresArr.forEach(req => {
+    headerLines.push(` - ${req}`);
+  });
+}
 
   const markdownSections = [
     { title: "Abstract", value: data.abstract },

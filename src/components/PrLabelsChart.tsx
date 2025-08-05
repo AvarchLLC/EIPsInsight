@@ -347,7 +347,7 @@ const EipsLabelChart = () => {
           mb={6}
         >
           {/* Title on the left */}
-          <Heading size="md" color="black" flexShrink={0}>EIPs Label Distribution
+          <Heading size="md" color="black" flexShrink={0}>PRs Label Distribution
             <CopyLink link={`https://eipsinsight.com//Analytics#EIPsLabelChart`} />
           </Heading>
           
