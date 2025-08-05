@@ -78,8 +78,8 @@ export function Clients() {
     }, []);
 
     return (
-        <Box as="section" py={20} color={useColorModeValue("gray.800", "white")}>
-            <div className="py-16" id="trending">
+        <Box as="section" py={3} color={useColorModeValue("gray.800", "white")}>
+            <div className="py-2" id="trending">
          <Header
         title="Trending EIPs"
         subtitle="Overview"
