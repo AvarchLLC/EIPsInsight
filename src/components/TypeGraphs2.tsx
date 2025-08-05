@@ -70,7 +70,7 @@ const TypeGraphs = () => {
         mx="auto"
         p="0.5rem"
       >
-        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={8}>
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={6}>
           <NextLink href={"/core"}>
             <Text
               fontSize="3xl"
@@ -132,9 +132,8 @@ const TypeGraphs = () => {
             </Text>
           </NextLink>
         </Grid>
-        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={8}>
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={6} mt={4}>
           <Box
-            marginTop={"2rem"}
             bg={bg}
             p="0.5rem"
             borderRadius="0.55rem"
@@ -155,9 +154,8 @@ const TypeGraphs = () => {
             </Box>
           </Box>
           <Box
-            marginTop={"2rem"}
             bg={bg}
-            // p="0.5rem"
+            p="0.5rem"
             borderRadius="0.55rem"
             display="flex"
             flexDirection="column"
@@ -176,7 +174,6 @@ const TypeGraphs = () => {
             </Box>
           </Box>
           <Box
-            marginTop={"2rem"}
             bg={bg}
             p="0.5rem"
             borderRadius="0.55rem"
@@ -185,10 +182,6 @@ const TypeGraphs = () => {
             justifyContent="center"
             alignItems="center"
             height={500}
-            // _hover={{
-            //   border: "1px",
-            //   borderColor: "#30A0E0",
-            // }}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -201,7 +194,7 @@ const TypeGraphs = () => {
             </Box>
           </Box>
         </Grid>
-        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={8}>
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={6} mt={8}>
           {/*<NextLink href={'/erc'}>*/}
           {/*    <Text fontSize="3xl" fontWeight="bold" color="#30A0E0">*/}
           {/*        ERC - [{data?.filter((item) => item.category === "ERC")?.length}]*/}
@@ -247,35 +240,8 @@ const TypeGraphs = () => {
             </Text>
           </NextLink>
         </Grid>
-        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={8}>
-          {/*<Box*/}
-          {/*    marginTop={"2rem"}*/}
-          {/*    bg={bg}*/}
-          {/*    p="0.5rem"*/}
-          {/*    borderRadius="0.55rem"*/}
-          {/*    display="flex"*/}
-          {/*    flexDirection="column"*/}
-          {/*    justifyContent="center"*/}
-          {/*    alignItems="center"*/}
-          {/*    height={500}*/}
-          {/*    _hover={{*/}
-          {/*        border: "1px",*/}
-          {/*        borderColor: "#30A0E0",*/}
-          {/*    }}*/}
-          {/*    as={motion.div}*/}
-          {/*    initial={{ opacity: 0, y: -20 }}*/}
-          {/*    animate={{ opacity: 1, y: 0 }}*/}
-          {/*    transition={{ duration: 0.5 } as any}*/}
-          {/*    className="hover: cursor-pointer ease-in duration-200"*/}
-          {/*>*/}
-          {/*    <StatusColumnChart category={'ERCs'} />*/}
-          {/*    <Box className={'w-full'}>*/}
-          {/*        <DateTime />*/}
-          {/*    </Box>*/}
-          {/*</Box>*/}
-
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={6} mt={6}>
           <Box
-            marginTop={"2rem"}
             bg={bg}
             p="0.5rem"
             borderRadius="0.55rem"
@@ -284,10 +250,6 @@ const TypeGraphs = () => {
             justifyContent="center"
             alignItems="center"
             height={500}
-            // _hover={{
-            //   border: "1px",
-            //   borderColor: "#30A0E0",
-            // }}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -301,7 +263,6 @@ const TypeGraphs = () => {
           </Box>
 
           <Box
-            marginTop={"2rem"}
             bg={bg}
             p="0.5rem"
             borderRadius="0.55rem"
@@ -310,10 +271,6 @@ const TypeGraphs = () => {
             justifyContent="center"
             alignItems="center"
             height={500}
-            // _hover={{
-            //   border: "1px",
-            //   borderColor: "#30A0E0",
-            // }}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -327,7 +284,6 @@ const TypeGraphs = () => {
           </Box>
 
           <Box
-            marginTop={"2rem"}
             bg={bg}
             p="0.5rem"
             borderRadius="0.55rem"
@@ -336,10 +292,6 @@ const TypeGraphs = () => {
             justifyContent="center"
             alignItems="center"
             height={500}
-            // _hover={{
-            //   border: "1px",
-            //   borderColor: "#30A0E0",
-            // }}
             as={motion.div}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -355,238 +307,6 @@ const TypeGraphs = () => {
       </Box>
 
       <Box>
-        {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2">
-          Draft
-        </Text>
-
-        <Box
-          marginTop={"2rem"}
-          paddingTop={"8"}
-          bg={bg}
-          p="0.5rem"
-          borderRadius="0.55rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={500}
-          overflowX="auto"
-          _hover={{
-            border: "1px",
-            borderColor: "#30A0E0",
-          }}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200"
-        >
-          <StackedColumnChart status="Draft" />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box> */}
-
-        {/* <Text fontSize="xl" fontWeight="bold" color="#4267B2" paddingTop={"8"}>
-          Draft vs Final
-        </Text>
-
-        <AreaC type={"EIPs"} /> */}
-
-        {/* <NextLink href={"/core"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
-            Core - [{data?.filter((item) => item.category === "Core")?.length}]
-          </Text>
-        </NextLink>
-
-        <Box
-          marginTop={"2rem"}
-          bg={bg}
-          p="0.5rem"
-          borderRadius="0.55rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={500}
-          _hover={{
-            border: "1px",
-            borderColor: "#30A0E0",
-          }}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200"
-        >
-          <StatusColumnChart category={"Core"} type={"EIPs"} />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box>
-
-        <NextLink href={"/networking"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
-            Networking - [
-            {data?.filter((item) => item.category === "Networking")?.length}]
-          </Text>
-        </NextLink>
-
-        <Box
-          marginTop={"2rem"}
-          bg={bg}
-          p="0.5rem"
-          borderRadius="0.55rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={500}
-          _hover={{
-            border: "1px",
-            borderColor: "#30A0E0",
-          }}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200"
-        >
-          <StatusColumnChart category={"Networking"} type={"EIPs"} />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box>
-
-        <NextLink href={"/interface"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
-            Interface - [
-            {data?.filter((item) => item.category === "Interface")?.length}]
-          </Text>
-        </NextLink>
-
-        <Box
-          marginTop={"2rem"}
-          bg={bg}
-          p="0.5rem"
-          borderRadius="0.55rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={500}
-          _hover={{
-            border: "1px",
-            borderColor: "#30A0E0",
-          }}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200"
-        >
-          <StatusColumnChart category={"Interface"} type={"EIPs"} />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box>
-
-        <NextLink href={"/erc"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
-            ERC - [{data?.filter((item) => item.category === "ERC")?.length}]
-          </Text>
-        </NextLink>
-
-        <Box
-          marginTop={"2rem"}
-          bg={bg}
-          p="0.5rem"
-          borderRadius="0.55rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={500}
-          _hover={{
-            border: "1px",
-            borderColor: "#30A0E0",
-          }}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200"
-        >
-          <StatusColumnChart category={"ERCs"} type={"EIPs"} />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box>
-
-        <NextLink href={"/meta"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
-            Meta - [{data?.filter((item) => item.type === "Meta")?.length}]
-          </Text>
-        </NextLink>
-
-        <Box
-          marginTop={"2rem"}
-          bg={bg}
-          p="0.5rem"
-          borderRadius="0.55rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={500}
-          _hover={{
-            border: "1px",
-            borderColor: "#30A0E0",
-          }}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200"
-        >
-          <StatusColumnChart category={"Meta"} type={"EIPs"} />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box> */}
-
-        {/* <NextLink href={"/informational"}>
-          <Text fontSize="xl" fontWeight="bold" color="#30A0E0" paddingTop={"3"}>
-            Informational - [
-            {data?.filter((item) => item.type === "Informational")?.length}]
-          </Text>
-        </NextLink>
-
-        <Box
-          marginTop={"2rem"}
-          bg={bg}
-          p="0.5rem"
-          borderRadius="0.55rem"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          height={500}
-          _hover={{
-            border: "1px",
-            borderColor: "#30A0E0",
-          }}
-          as={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 } as any}
-          className="hover: cursor-pointer ease-in duration-200"
-        >
-          <StatusColumnChart category={"Informational"} type={"EIPs"} />
-          <Box className={"w-full"}>
-            <DateTime />
-          </Box>
-        </Box> */}
       </Box>
     </>
   );

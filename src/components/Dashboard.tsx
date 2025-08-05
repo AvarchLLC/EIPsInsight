@@ -254,7 +254,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
   return (
     <>
       <FeedbackWidget />
-  <Box px={{ base: 3, md: 6, lg: 8 }} py={{ base: 4, md: 6, lg: 8 }}>
+  <Box px={{ base: 3, md: 5, lg: 8 }} py={{ base: 3, md: 4, lg: 6 }}>
     {isLoading ? (
       <Flex justify="center" align="center" minH="70vh">
         <motion.div
@@ -279,7 +279,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
             >
               <Box
                 id={"hero"}
-pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
+pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
               >
                 <div className="lg:block hidden">
                   <Box
@@ -428,9 +428,9 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
                   <Box
                     borderRadius="md"
                     id="all"
-                    mt={{ base: 6, lg: 8 }}
+                    mt={{ base: 3, lg: 4 }}
                   >
-                    <div className="py-8">
+                    <div className="py-3">
                       <Header
                         title="All Categories and Status"
                         subtitle="Overview"
@@ -446,7 +446,7 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
 
                 <div className="lg:hidden block">
                   <Text
-                    className="text-5xl text-center pb-5 sm:text-6xl md:text-7xl"
+                    className="text-5xl text-center pb-2 sm:text-6xl md:text-7xl"
                     fontWeight={"bold"}
                     color={useColorModeValue(textColorLight, textColorDark)}
                     bgGradient={useColorModeValue(
@@ -459,8 +459,8 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
                   </Text>
                   <Stack
                     direction={"row"}
-                    spacing={"6"}
-                    paddingTop={"20"}
+                    spacing={"3"}
+                    paddingTop={"10"}
                     justifyContent={"center"}
                   >
                     <Box>
@@ -532,34 +532,23 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
               </Box>
 
               <Box
-                className="py-6"
+                className="py-2"
                 display={{ base: "block", md: "block", lg: "none" }}
               >
                 <Box
-                  className="w-full lg:px-48 md:px-32 sm:px-24 px-20 py-4 rounded-[0.55rem] hover:border border-blue-500"
+                  className="w-full lg:px-48 md:px-32 sm:px-24 px-20 py-2 rounded-[0.55rem] hover:border border-blue-500"
                   bgColor={bg}
                 >
                   <SearchBox />
                 </Box>
               </Box>
-              <div className="mt-6">
+              <div className="mt-3">
                 <ToolsSection />
               </div>
-              <div className="mt-6">
+              <div className="mt-4">
                 <Clients />
               </div>
-
-              {/* <div className="py-8"> */}
-              {/* <Box
-                  className={
-                    "w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
-                  }
-                  bgColor={bg}
-                > */}
-
-              {/* </Box> */}
-              {/* </div> */}
-<div className="py-10 lg:py-16" id="what">
+<div className="py-6 lg:py-8" id="what">
   <Header
     title="What is EIPsInsight?"
     subtitle="Overview"
@@ -568,7 +557,7 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
   />
 
   <Box
-    className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mt-12"
+    className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center mt-4"
     borderRadius="md"
   >
     {/* Left Side - YouTube Video */}
@@ -625,7 +614,7 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
 
             </motion.div>
             
-            <div className="py-12" id="statuschanges">
+            <div className="py-6" id="statuschanges">
               <Box>
                 <Header
                   title="EIP Status Changes by Year"
@@ -634,7 +623,7 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
                   sectionId="statuschanges"
                 />
               </Box>
-              <Box paddingTop={6} paddingBottom={6}>
+              <Box paddingTop={3} paddingBottom={3}>
                 <TypeGraphs />
               </Box>
             </div>
@@ -676,10 +665,10 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
                 <Box
                   display="grid"
                   gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
-                  gap={"6"}
-                  marginTop={"12px"}
+                  gap={"4"}
+                  marginTop={"6px"}
                 >
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <StatBox
                         title="Meta EIPs"
@@ -810,8 +799,8 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 } as any}
                     bgColor={bg}
-                    paddingY={{ lg: "2rem", sm: "2rem" }}
-                    paddingX={{ lg: "2rem", sm: "0.5rem" }}
+                    paddingY={{ lg: "1rem", sm: "1rem" }}
+                    paddingX={{ lg: "1.5rem", sm: "0.5rem" }}
                     borderRadius="0.55rem"
                     _hover={{
                       border: "1px",
@@ -839,8 +828,8 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
                 <Box
                   display="grid"
                   gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
-                  gap={"6"}
-                  marginTop={"12px"}
+                  gap={"4"}
+                  marginTop={"6px"}
                 >
                   <Box
                     as={motion.div}
@@ -848,7 +837,7 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 } as any}
                     bgColor={bg}
-                    paddingY={{ lg: "2rem", sm: "2rem" }}
+                    paddingY={{ lg: "1rem", sm: "1rem" }}
                     paddingX={{ lg: "2rem", sm: "0.5rem" }}
                     borderRadius="0.55rem"
                     _hover={{
@@ -873,7 +862,7 @@ pt={{ base: 4, lg: 8 }} pb={{ base: 4, lg: 6 }}
                     <DashboardDonut dataset={data} />
                   </Box>
 
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <StatBox
                         title="Draft"
