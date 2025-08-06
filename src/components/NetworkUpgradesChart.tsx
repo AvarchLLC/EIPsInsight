@@ -21,37 +21,45 @@ interface UpgradeData {
 
 
 const pastelColorMap: Record<string, string> = {
-  "Arrow Glacier": "#ff4c4c",     // Bright Red
-  "Berlin": "#ff6f00",            // Deep Orange
-  "Byzantium": "#00b894",         // Emerald Green
-  "Constantinople": "#00cec9",    // Teal Cyan
-  "Dencun": "#0984e3",            // Vivid Blue
-  "Gray Glacier": "#6c5ce7",      // Bold Indigo
-  "Homestead": "#a29bfe",         // Soft Violet
-  "Istanbul": "#e84393",          // Pink Magenta
-  "London": "#fd79a8",            // Rose Pink
-  "Muir Glacier": "#d63031",      // Crimson Red
-  "Pectra": "#e17055",            // Coral Orange
-  "Petersburg": "#00e5ff"         // Electric Cyan
+  "Pectra": "#e17055",            // Coral Orange (2025-05-07)
+  "Dencun": "#0984e3",            // Vivid Blue (2024-03-13)
+  "Shanghai": "#00b894",          // Emerald Green (2023-04-12)
+  "Paris": "#e57373",             // Pastel Red (2022-09-15)
+  "Gray Glacier": "#6c5ce7",      // Bold Indigo (2022-06-30)
+  "Arrow Glacier": "#ff4c4c",     // Bright Red (2021-12-09)
+  "London": "#fd79a8",            // Rose Pink (2021-08-05)
+  "Berlin": "#ff6f00",            // Deep Orange (2021-04-15)
+  "Muir Glacier": "#d63031",      // Crimson Red (2020-01-02)
+  "Istanbul": "#e84393",          // Pink Magenta (2019-12-08)
+  "Constantinople": "#00cec9",    // Teal Cyan (2019-02-28)
+  "Petersburg": "#00e5ff",        // Electric Cyan (2019-02-28)
+  "Byzantium": "#00b894",         // Emerald Green (2017-10-16)
+  "Homestead": "#a29bfe",         // Soft Violet (2016-03-14)
+
+  // (There are no Frontier/Frontier Thawing/DAO Fork/Tangerine Whistle/Spurious Dragon/Altair/Bellatrix/Capella in your current rawData, so they are OMITTED.)
+
+  // If you want to always ensure future-proofing, you can add a fallback:
+  // "<upgrade name not in above>": "#b2bec3", // generic pastel gray as default
 };
+
 
 
 // Original data set
 const rawData = [
-  { date: "2021-12-09", upgrade: "Arrow Glacier", eip: "EIP-4345" },
-  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2565" },
-  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2929" },
-  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2718" },
-  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2930" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-100" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-140" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-196" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-197" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-198" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-211" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-214" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-649" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-658" },
+  // Pectra (Prague-Electra) — May 7, 2025
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-2537" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-2935" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-6110" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7002" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7251" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7549" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7623" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7685" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7691" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7702" },
+  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7840" },
+
+  // Dencun (Cancun-Deneb) — March 13, 2024
   { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-1153" },
   { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-4788" },
   { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-4844" },
@@ -61,47 +69,80 @@ const rawData = [
   { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7045" },
   { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7514" },
   { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7516" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-145" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1014" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1052" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1234" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1283" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-145" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1014" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1052" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1234" },
+
+  // Shanghai/Capella ("Shapella") — April 12, 2023
+  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3651" },
+  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3855" },
+  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3860" },
+  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-4895" },
+  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-6049" },
+
+  // Paris (The Merge) — September 15, 2022
+  { date: "2022-09-15", upgrade: "Paris", eip: "EIP-3675" },
+  { date: "2022-09-15", upgrade: "Paris", eip: "EIP-4399" },
+
+  // Bellatrix — September 6, 2022 [Consensus/Bellatrix]
+  // No EIPs directly, consensus-side upgrade.
+
+  // Gray Glacier — June 30, 2022
   { date: "2022-06-30", upgrade: "Gray Glacier", eip: "EIP-5133" },
-  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-2" },
-  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-7" },
-  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-8" },
-  { date: "2019-12-07", upgrade: "Istanbul", eip: "EIP-152" },
-  { date: "2019-12-07", upgrade: "Istanbul", eip: "EIP-1108" },
-  { date: "2019-12-07", upgrade: "Istanbul", eip: "EIP-1344" },
-  { date: "2019-12-07", upgrade: "Istanbul", eip: "EIP-1884" },
-  { date: "2019-12-07", upgrade: "Istanbul", eip: "EIP-2028" },
-  { date: "2019-12-07", upgrade: "Istanbul", eip: "EIP-2200" },
+
+  // Arrow Glacier — December 9, 2021
+  { date: "2021-12-09", upgrade: "Arrow Glacier", eip: "EIP-4345" },
+
+  // London — August 5, 2021
   { date: "2021-08-05", upgrade: "London", eip: "EIP-1559" },
   { date: "2021-08-05", upgrade: "London", eip: "EIP-3198" },
   { date: "2021-08-05", upgrade: "London", eip: "EIP-3529" },
   { date: "2021-08-05", upgrade: "London", eip: "EIP-3541" },
   { date: "2021-08-05", upgrade: "London", eip: "EIP-3554" },
+
+  // Berlin — April 15, 2021
+  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2565" },
+  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2929" },
+  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2718" },
+  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2930" },
+
+  // Muir Glacier — January 2, 2020
   { date: "2020-01-02", upgrade: "Muir Glacier", eip: "EIP-2384" },
-  // { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "" },
-  // { date: "2015-07-30", upgrade: "Frontier", eip: "" },
-  // { date: "2021-10-21", upgrade: "Altair", eip: "" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "2537" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "2935" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "6110" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "7002" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "7251" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "7549" },
-   { date: "2025-07-05", upgrade: "Pectra", eip: "7623" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "7642" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "7685" },
-    { date: "2025-07-05", upgrade: "Pectra", eip: "7691" },
-  { date: "2025-07-05", upgrade: "Pectra", eip: "7702" }, 
-  { date: "2025-07-05", upgrade: "Pectra", eip: "7840" },
+
+  // Istanbul — December 8, 2019
+  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-152" },
+  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-1108" },
+  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-1344" },
+  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-1884" },
+  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-2028" },
+  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-2200" },
+
+  // Constantinople — February 28, 2019
+  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-145" },
+  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1014" },
+  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1052" },
+  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1234" },
+  // (Petersburg hard fork was simultaneous; repeat EIPs where relevant)
+  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1283" },
+  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-145" },
+  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1014" },
+  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1052" },
+  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1234" },
+
+  // Byzantium — October 16, 2017
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-100" },
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-140" },
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-196" },
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-197" },
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-198" },
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-211" },
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-214" },
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-649" },
+  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-658" },
+
+  // Homestead — March 14, 2016
+  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-2" },
+  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-7" },
+  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-8" },
 ];
+
 // Group data by date-upgrade combination// Group data by date-upgrade combination (keeping duplicates)
 const upgradeMap: Record<string, { date: string, upgrade: string, eips: string[] }> = {};
 for (const { date, upgrade, eip } of rawData) {

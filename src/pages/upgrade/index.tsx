@@ -777,15 +777,6 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       discussion: "https://ethereum-magicians.org/t/eip-7212-precompiled-for-secp256r1-curve-support/14789"
     },
     {
-      eip: "5920",
-      title: "PAY opcode",
-      author: "Gavin John (@Pandapip1), Zainan Victor Zhou (@xinbenlv), Sam Wilson (@SamWilsn), Jochem Brouwer (@jochem-brouwer), Charles Cooper (@charles-cooper)",
-      link: "https://eipsinsight.com/eips/eip-5920",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-5920-pay-opcode/11717"
-    },
-    {
       eip: "7907",
       title: "Meter Contract Code Size And Increase Limit",
       author: "Charles Cooper (@charles-cooper), Qi Zhou (@qizhou)",
@@ -992,7 +983,7 @@ return (
                 ) : (
                   <>
   Ethereum developers are now preparing for the next major network upgrade, known as{" "}
-  <NLink href="https://ethereum-magicians.org/t/eip-7773-glamsterdam-network-upgrade-meta-thread/21195">
+  <NLink href="/eips/eip-7773">
     <Text as="span" color="blue.500" textDecor="underline">
       Glamsterdam
     </Text>

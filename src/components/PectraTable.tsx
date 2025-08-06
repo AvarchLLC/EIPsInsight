@@ -195,7 +195,7 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
             <>
               <div className="flex justify-between items-center">
                 <h2 className="text-blue-400 font-semibold text-4xl">
-                  {`${titlenew} - [${filteredData.length - 1}]`}
+                  {`${titlenew} - [${filteredData.length}]`}
                 </h2>
 
                 <Button

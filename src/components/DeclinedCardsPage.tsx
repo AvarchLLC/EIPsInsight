@@ -209,13 +209,6 @@ const declinedEIPs: DeclinedEIP[] = [
     discussionLink: "https://ethereum-magicians.org/t/remove-initcode-size-limit/23066",
   },
   {
-    id: "EIP-7907",
-    title: "EIP-7907: Meter Contract Code Size And Increase Limit",
-    description: "Increases the contract code size limit introduced in EIP-170 and adds a gas metering to code loading",
-    eipsLink: "/eips/eip-7907",
-    discussionLink: "https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156",
-  },
-  {
     id: "EIP-7912",
     title: "EIP-7912: Pragmatic stack manipulation tools",
     description: "Add additional SWAP and DUP operations for deeper stack access",
@@ -229,13 +222,28 @@ const declinedEIPs: DeclinedEIP[] = [
     eipsLink: "/eips/eip-7919",
     discussionLink: "https://ethereum-magicians.org/t/eip-7919-pureth-meta/23273",
   },
+  {
+  id: "EIP-7688",
+  title: "EIP-7688: Forward compatible consensus data structures",
+  description: "Transition consensus SSZ data structures to ProgressiveContainer for forward compatibility.",
+  eipsLink: "/eips/eip-7688",
+  discussionLink: "https://ethereum-magicians.org/t/eip-7688-forward-compatible-consensus-data-structures/19673",
+},
+{
+  id: "EIP-7783",
+  title: "EIP-7783: Add Controlled Gas Limit Increase Strategy",
+  description: "Adds a controlled gas limit increase strategy.",
+  eipsLink: "/eips/eip-7783",
+  discussionLink: "https://ethereum-magicians.org/t/eip-7783-add-controlled-gas-limit-increase-strategy/21282",
+},
+
 ];
 export default function DeclinedEIPListPage() {
   return (
     <Box>
 
                        <Header
-                              title="Declined for Inclusion - [33]"
+                              title={`Declined for Inclusion - [${declinedEIPs.length}]`}
                               subtitle="Overview"
                               description="EIPs that were proposed, but ultimately declined for inclusion in the upgrade for various reasons. They may be reconsidered for future upgrades."
                               sectionId="dfi"
