@@ -192,27 +192,60 @@ const cancelRef = useRef<HTMLButtonElement>(null);
   };
 
   const selectedURL = urls[activeTab];
-
-
-
   if (!selectedURL) {
-    console.error("Invalid tab selected");
     setIsLoading(false);
+    toast({
+      title: 'Invalid type',
+      description: 'Please select a correct type (EIP/ERC/RIP)',
+      status: 'error',
+      duration: 2500,
+      isClosable: true,
+    });
     return;
   }
 
   try {
     const response = await axios.get(selectedURL);
-
-    if (response.status === 200) {
+    if (response.status === 200 && response.data && typeof response.data === "string") {
       const markdownContent = response.data;
       const extractedData = extractEIPData(markdownContent) || {};
-
-      Object.assign(initialTemplateData, extractedData);
-      console.log("Updated initialTemplateData:", initialTemplateData);
+      setTemplateData({ ...initialTemplateData, ...extractedData }); // set NEW state here
+      toast({
+        title: 'Loaded!',
+        description: `Fetched ${activeTab.toUpperCase()}-${searchNumber}`,
+        duration: 2000,
+        status: "success",
+        isClosable: true,
+      });
+    } else {
+      // Show toast for not found
+      toast({
+        title: 'Not Found',
+        description: `${activeTab.toUpperCase()}-${searchNumber} does not exist.`,
+        status: 'error',
+        duration: 2500,
+        isClosable: true,
+      });
     }
-  } catch (error) {
-    console.error("Failed to fetch data:", error);
+  } catch (error: any) {
+    // If error is axios error with 404, show not found toast
+    if ((error as any)?.response?.status === 404) {
+      toast({
+        title: 'Not Found',
+        description: `${activeTab.toUpperCase()}-${searchNumber} does not exist.`,
+        status: 'error',
+        duration: 2500,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: 'Failed to fetch',
+        description: `${activeTab.toUpperCase()}-${searchNumber} could not be loaded.`,
+        status: 'error',
+        duration: 2500,
+        isClosable: true,
+      });
+    }
   } finally {
     setIsLoading(false);
   }
@@ -371,8 +404,15 @@ const inputRefs = useRef<Record<TemplateDataKeys, HTMLTextAreaElement | null>>({
 
 // Reset steps when tab changes
 useEffect(() => {
+  // Reset steps on tab switch
   setSteps(getInitialSteps(activeTab));
-}, [activeTab]);
+  // If switching to "new", reset all fields
+  if (activeTab2 === "new") {
+    setTemplateData({ ...initialTemplateData }); // NOT initialTemplateData, but a **new copy**
+    setValidated(false); // Also reset validation state if needed
+  }
+}, [activeTab, activeTab2]);
+
 
 // Update templateData for a given key
 const handleInputChange = (key: TemplateDataKeys, value: string) => {
