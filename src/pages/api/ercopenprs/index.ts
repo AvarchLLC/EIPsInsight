@@ -25,7 +25,7 @@ export default async function handler(
 ) {
   try {
     const { db } = await connectToDatabase();
-    const prs = await db.collection('prs').find({}).toArray();
+    const prs = await db.collection('erc_prs').find({}).toArray();
     console.log(prs)
     res.status(200).json(prs);
   } catch (error) {
