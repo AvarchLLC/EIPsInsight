@@ -214,6 +214,7 @@ tooltip: {
     URL.revokeObjectURL(url);
   };
 
+
   // Select/clear all helpers
   const selectAllCustom = () => setSelectedCustomLabels(customLabelsForRepo.map((l: LabelSpec) => l.value));
   const clearAllCustom = () => setSelectedCustomLabels([]);
@@ -225,7 +226,7 @@ tooltip: {
       <CardHeader>
         <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
           <Heading size="md" color={accentColor} mb={2}>
-            {REPOS.find(r => r.key === repoKey)?.label} PR Distribution
+            {REPOS.find(r => r.key === repoKey)?.label} Distribution
           </Heading>
           <Flex gap={3} align="center">
             <Menu>
