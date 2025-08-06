@@ -221,11 +221,11 @@ tooltip: {
   const clearAllWorkflow = () => setSelectedWorkflowLabels([]);
 
   return (
-    <Card bg={cardBg} color={textColor} boxShadow="2xl" maxW="1200px" mx="auto" mt={8} borderRadius="2xl" p={4}>
+    <Card bg={cardBg} color={textColor} mx="auto" mt={8} borderRadius="2xl" p={4}>
       <CardHeader>
         <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
           <Heading size="md" color={accentColor} mb={2}>
-            Ethereum {REPOS.find(r => r.key === repoKey)?.label} PR Analytics
+            {REPOS.find(r => r.key === repoKey)?.label} PR Distribution
           </Heading>
           <Flex gap={3} align="center">
             <Menu>
