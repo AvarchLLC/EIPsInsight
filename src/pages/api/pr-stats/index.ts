@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import mongoose, { Schema, model, models } from 'mongoose';
 
-// Define interface representing a PR document
+// Interface representing a PR document
 interface PrDocument {
   prId: number;
   number: number;
@@ -16,10 +16,10 @@ interface PrDocument {
   updatedAt: Date;
   closedAt?: Date | null;
   mergedAt?: Date | null;
-  specType: string; // "EIP" or "ERC"
+  specType: string;
 }
 
-// MongoDB schema and model
+// Mongoose schema and model
 const prSchema = new Schema<PrDocument>({
   prId: { type: Number, required: true },
   number: { type: Number, required: true },
@@ -37,10 +37,9 @@ const prSchema = new Schema<PrDocument>({
   specType: { type: String, required: true },
 });
 
-// Use existing model if registered, else define new (prevents recompilation errors)
-const PrModel = models.Pr || model<PrDocument>('Pr', prSchema, 'eipprs'); // Adjust collection name if necessary
+// Adjust collection name accordingly (e.g., 'ercprs' for ERC repo)
+const PrModel = models.Pr || model<PrDocument>('Pr', prSchema, 'eipprs');
 
-// Connect to MongoDB using env variables
 async function connectToDatabase() {
   if (mongoose.connection.readyState >= 1) {
     return;
@@ -59,7 +58,7 @@ async function connectToDatabase() {
   });
 }
 
-// API route handler
+// API handler function
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -67,67 +66,64 @@ export default async function handler(
   try {
     await connectToDatabase();
 
-    // Aggregate PR counts by month-year and label
-const stats = await PrModel.aggregate([
-  {
-    $project: {
-      monthYear: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-      customLabels: 1,
-      githubLabels: 1,
-    },
-  },
-  {
-    $facet: {
-      custom: [
-        { $unwind: "$customLabels" },
-        {
-          $group: {
-            _id: { monthYear: "$monthYear", label: "$customLabels" },
-            count: { $sum: 1 },
-          },
+    // Aggregate counts by month-year and label for both customLabels and githubLabels
+    const stats = await PrModel.aggregate([
+      {
+        $project: {
+          monthYear: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          customLabels: 1,
+          githubLabels: 1,
         },
-        {
-          $project: {
-            monthYear: "$_id.monthYear",
-            label: "$_id.label",
-            count: 1,
-            labelType: { $literal: "customLabels" },
-            _id: 0,
-          },
+      },
+      {
+        $facet: {
+          custom: [
+            { $unwind: "$customLabels" },
+            {
+              $group: {
+                _id: { monthYear: "$monthYear", label: "$customLabels" },
+                count: { $sum: 1 },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                monthYear: "$_id.monthYear",
+                label: "$_id.label",
+                count: 1,
+                labelType: { $literal: "customLabels" },
+              },
+            },
+          ],
+          github: [
+            { $unwind: "$githubLabels" },
+            {
+              $group: {
+                _id: { monthYear: "$monthYear", label: "$githubLabels" },
+                count: { $sum: 1 },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                monthYear: "$_id.monthYear",
+                label: "$_id.label",
+                count: 1,
+                labelType: { $literal: "githubLabels" },
+              },
+            },
+          ],
         },
-      ],
-      github: [
-        { $unwind: "$githubLabels" },
-        {
-          $group: {
-            _id: { monthYear: "$monthYear", label: "$githubLabels" },
-            count: { $sum: 1 },
-          },
+      },
+      {
+        $project: {
+          combinedLabels: { $concatArrays: ["$custom", "$github"] },
         },
-        {
-          $project: {
-            monthYear: "$_id.monthYear",
-            label: "$_id.label",
-            count: 1,
-            labelType: { $literal: "githubLabels" },
-            _id: 0,
-          },
-        },
-      ],
-    },
-  },
-  {
-    $project: {
-      combinedLabels: { $concatArrays: ["$custom", "$github"] },
-    },
-  },
-  { $unwind: "$combinedLabels" },
-  { $replaceRoot: { newRoot: "$combinedLabels" } },
-  { $sort: { monthYear: 1, labelType: 1, label: 1 } },
-]);
-
-
-
+      },
+      { $unwind: "$combinedLabels" },
+      { $replaceRoot: { newRoot: "$combinedLabels" } },
+      { $sort: { monthYear: 1, labelType: 1, label: 1 } },
+    ]);
 
     res.status(200).json(stats);
   } catch (error) {
