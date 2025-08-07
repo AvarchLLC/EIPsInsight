@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import mongoose, { Schema, model, models } from 'mongoose';
 
-// Interface representing a PR document
 interface PrDocument {
   prId: number;
   number: number;
@@ -19,7 +18,6 @@ interface PrDocument {
   specType: string;
 }
 
-// Mongoose schema and model
 const prSchema = new Schema<PrDocument>({
   prId: { type: Number, required: true },
   number: { type: Number, required: true },
@@ -37,36 +35,31 @@ const prSchema = new Schema<PrDocument>({
   specType: { type: String, required: true },
 });
 
-// Adjust collection name accordingly (e.g., 'ercprs' for ERC repo)
+// Use the right collection name!
 const PrModel = models.Pr || model<PrDocument>('Pr', prSchema, 'eipprs');
 
 async function connectToDatabase() {
   if (mongoose.connection.readyState >= 1) {
     return;
   }
-
   if (!process.env.OPENPRS_MONGODB_URI) {
     throw new Error('Please define the OPENPRS_MONGODB_URI environment variable');
   }
-
   if (!process.env.OPENPRS_DATABASE) {
     throw new Error('Please define the OPENPRS_DATABASE environment variable');
   }
-
   await mongoose.connect(process.env.OPENPRS_MONGODB_URI!, {
     dbName: process.env.OPENPRS_DATABASE,
   });
 }
 
-// API handler function
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
     await connectToDatabase();
-
-    // Aggregate counts by month-year and label for both customLabels and githubLabels
+    // Aggregate counts by month-year and label
     const stats = await PrModel.aggregate([
       {
         $project: {
@@ -115,16 +108,11 @@ export default async function handler(
           ],
         },
       },
-      {
-        $project: {
-          combinedLabels: { $concatArrays: ["$custom", "$github"] },
-        },
-      },
+      { $project: { combinedLabels: { $concatArrays: ["$custom", "$github"] } } },
       { $unwind: "$combinedLabels" },
       { $replaceRoot: { newRoot: "$combinedLabels" } },
       { $sort: { monthYear: 1, labelType: 1, label: 1 } },
     ]);
-
     res.status(200).json(stats);
   } catch (error) {
     console.error('Error in API handler:', error);

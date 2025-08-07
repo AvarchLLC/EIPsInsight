@@ -1,3 +1,5 @@
+// File: components/PRAnalyticsCard.tsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -7,7 +9,6 @@ import {
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
 import Papa from "papaparse";
 
-// ECharts only loads on client
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 type LabelSpec = { value: string; label: string; color: string };
@@ -40,11 +41,10 @@ const WORKFLOW_LABELS: LabelSpec[] = [
 ];
 
 const REPOS = [
-  { key: "eip", label: "EIP PRs", api: "/pr-stats" },
-  { key: "erc", label: "ERC PRs", api: "/ercpr-stats" },
+  { key: "eip", label: "EIP PRs", api: "/api/pr-stats" },
+  { key: "erc", label: "ERC PRs", api: "/api/ercpr-stats" },
 ];
 
-// Aggregated API data shape
 interface AggregatedLabelCount {
   monthYear: string;
   label: string;
@@ -62,30 +62,20 @@ export default function PRAnalyticsCard() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
 
-  const customLabelsForRepo = useMemo<LabelSpec[]>(
-    () => (repoKey === "eip" ? CUSTOM_LABELS_EIP : CUSTOM_LABELS_ERC),
-    [repoKey]
-  );
+  const customLabelsForRepo = useMemo(() => (repoKey === "eip" ? CUSTOM_LABELS_EIP : CUSTOM_LABELS_ERC), [repoKey]);
 
-  // Label selection for filtering
-  const [selectedCustomLabels, setSelectedCustomLabels] = useState<string[]>(
-    customLabelsForRepo.map((l) => l.value)
-  );
-  const [selectedWorkflowLabels, setSelectedWorkflowLabels] = useState<string[]>(
-    WORKFLOW_LABELS.map((l) => l.value)
-  );
+  const [selectedCustomLabels, setSelectedCustomLabels] = useState<string[]>(customLabelsForRepo.map(l => l.value));
+  const [selectedWorkflowLabels, setSelectedWorkflowLabels] = useState<string[]>(WORKFLOW_LABELS.map(l => l.value));
 
-  // Reset selected custom labels when repo changes
   useEffect(() => {
-    setSelectedCustomLabels(customLabelsForRepo.map((l) => l.value));
+    setSelectedCustomLabels(customLabelsForRepo.map(l => l.value));
   }, [customLabelsForRepo]);
 
-  // Fetch aggregated data from API
   useEffect(() => {
     setLoading(true);
-    const repoObj = REPOS.find((r) => r.key === repoKey)!;
+    const repoObj = REPOS.find(r => r.key === "erc")!;
     fetch(repoObj.api)
-      .then((res) => res.json())
+      .then(res => res.json())
       .then((raw: AggregatedLabelCount[]) => {
         setData(raw);
         setLoading(false);
@@ -93,27 +83,24 @@ export default function PRAnalyticsCard() {
       .catch(() => setLoading(false));
   }, [repoKey]);
 
-  // Filter data by selected labels (custom and workflow)
-  const filteredData = useMemo(() => 
-    data.filter((item) => 
-      (item.labelType === "customLabels"
-        ? selectedCustomLabels.includes(item.label)
-        : selectedWorkflowLabels.includes(item.label))
-    )
-  , [data, selectedCustomLabels, selectedWorkflowLabels]);
+  const filteredData = useMemo(() => data.filter(item =>
+    item.labelType === "customLabels"
+      ? selectedCustomLabels.includes(item.label)
+      : selectedWorkflowLabels.includes(item.label)
+  ), [data, selectedCustomLabels, selectedWorkflowLabels]);
 
-  // Extract months sorted ascending
+  console.log("Filtered Data:", filteredData);
+
+
   const months = useMemo(() => {
     const monthSet = new Set(filteredData.map(d => d.monthYear));
     return Array.from(monthSet).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }, [filteredData]);
 
-  // Aggregate data into chart series grouped by labels
   const chartData = useMemo(() => {
-    // Labels for series to include
     const allLabels = [
       ...customLabelsForRepo.map(l => ({ ...l, labelType: 'customLabels' })),
-      ...WORKFLOW_LABELS.map(l => ({ ...l, labelType: 'githubLabels' }))
+      ...WORKFLOW_LABELS.map(l => ({ ...l, labelType: 'githubLabels' })),
     ];
 
     return {
@@ -131,14 +118,15 @@ export default function PRAnalyticsCard() {
     };
   }, [months, filteredData, customLabelsForRepo]);
 
-  // Chart option for ECharts
+  console.log("Chart Data:", chartData);
+
   const option = useMemo(() => ({
     tooltip: {
       trigger: "axis",
       backgroundColor: "#fff",
       borderColor: "#cfd8dc",
       textStyle: { color: "#1a202c" },
-      formatter: function (params: any) {
+      formatter(params: any) {
         let total = 0;
         params.forEach((item: any) => { total += item.value; });
         let res = `<span style="font-weight:700">${params[0].name}</span><br/><span style="color:#718096;font-size:13px;">Total: <b>${total}</b></span><br/>`;
@@ -151,10 +139,10 @@ export default function PRAnalyticsCard() {
     legend: {
       data: chartData.series.map(s => s.name),
       textStyle: { color: textColor, fontWeight: 700, fontSize: 14 },
+      type: 'scroll',
       orient: 'horizontal',
       bottom: 20,
       scrollDataIndex: 0,
-      type: 'scroll'
     },
     backgroundColor: cardBg,
     xAxis: [{
@@ -188,15 +176,12 @@ export default function PRAnalyticsCard() {
     grid: { left: 60, right: 30, top: 60, bottom: 80 }
   }), [chartData, textColor, cardBg]);
 
-  console.log(chartData)
-
-  // CSV download helper (optional)
   const downloadCSV = () => {
     const csvData = filteredData.map(({ monthYear, label, count, labelType }) => ({
       Month: monthYear,
       Label: label,
       LabelType: labelType,
-      Count: count
+      Count: count,
     }));
     const csv = Papa.unparse(csvData);
     const blob = new Blob([csv], { type: "text/csv" });
@@ -208,7 +193,6 @@ export default function PRAnalyticsCard() {
     URL.revokeObjectURL(url);
   };
 
-  // Select / Clear All functions for filters
   const selectAllCustom = () => setSelectedCustomLabels(customLabelsForRepo.map(l => l.value));
   const clearAllCustom = () => setSelectedCustomLabels([]);
   const selectAllWorkflow = () => setSelectedWorkflowLabels(WORKFLOW_LABELS.map(l => l.value));
@@ -228,7 +212,7 @@ export default function PRAnalyticsCard() {
               </MenuButton>
               <MenuList minWidth="140px">
                 <Stack>
-                  {REPOS.map(repo =>
+                  {REPOS.map(repo => (
                     <Button
                       key={repo.key}
                       variant="ghost"
@@ -239,7 +223,7 @@ export default function PRAnalyticsCard() {
                     >
                       {repo.label}
                     </Button>
-                  )}
+                  ))}
                 </Stack>
               </MenuList>
             </Menu>
@@ -333,7 +317,6 @@ export default function PRAnalyticsCard() {
           Showing <b>{filteredData.length}</b> label counts / <b>{data.length}</b> total entries
         </Text>
       </CardBody>
-      {/* Add your DateTime component if needed */}
     </Card>
   );
 }
