@@ -28,7 +28,6 @@ import InsightsAllStats from "@/components/InsitghtAllstats";
 import { useRouter } from "next/router";
 
 import CopyLink from "@/components/CopyLink";
-import FeedbackWidget from "@/components/FeedbackWidget";
 
 import AreaStatus from "@/components/AreaStatus3";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
@@ -188,7 +187,6 @@ const Month = () => {
 
   return (
     <>
-      <FeedbackWidget />
       <AllLayout>
         {isLoading ? ( // Check if the data is still loading
           // Show loader if data is loading
@@ -215,10 +213,10 @@ const Month = () => {
               transition={{ duration: 0.5 }}
             >
               <Box
-                paddingBottom={{ lg: "5", sm: "5", base: "5" }}
-                marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-                paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-                marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
+                paddingBottom={{ lg: "3", sm: "3", base: "3" }}
+                marginX={{ lg: "20", md: "2", sm: "2", base: "2" }}
+                paddingX={{ lg: "8", md: "4", sm: "4", base: "4" }}
+                marginTop={{ lg: "6", md: "4", sm: "4", base: "4" }}
               >
                 <NextLink href={`/insight/${year}/${month}`}>
                   <Header
@@ -227,7 +225,7 @@ const Month = () => {
                     description={`EIPs Insight for ${getMonthName(Number(month))} ${year}`}
                   />
                 </NextLink>
-                <br />
+                
                 <Box
                   pl={4}
                   bg={useColorModeValue("blue.50", "gray.700")}
@@ -294,15 +292,14 @@ const Month = () => {
                     </Text>
                   </Collapse>
                 </Box>
-                <Box id="Summary">
+                <Box id="Summary" mt={6}>
                   <InsightsAllStats />
                 </Box>
-                <br/>
 
                 <Text
-                  fontSize="3xl" fontWeight="bold" color="#30A0E0"
+                  fontSize="3xl" fontWeight="bold" color="#30A0E0" mt={8}
                 >
-                   <div className="py-16" id="draft-vs-final">
+                   <div className="py-8" id="draft-vs-final">
                   <div > 
                     Draft vs Final{" "}
                   <CopyLink
@@ -312,7 +309,6 @@ const Month = () => {
                   </div>
                 </Text>          
                   <AreaStatus/>
-                <br/>
 
                 {/* Defining the stats table here */}
                 {/* <InsightStats/> */}
@@ -322,15 +318,15 @@ const Month = () => {
                   fontSize="3xl"
                   fontWeight="bold"
                   color="blue.400"
-                  paddingTop={8}
+                  paddingTop={6}
                 >
                   Draft{" "}
                   <CopyLink
                     link={`https://eipsinsight.com//insight/${year}/${month}#Draft`}
                   />
                 </Text>
-                <div className="py-16" id="Draft">
-                <Box paddingTop={"8"} >
+                <div className="py-8" id="Draft">
+                <Box paddingTop={"6"} >
                   <StackedColumnChart dataset={filteredData1} status="Draft" />
                 </Box>
                 </div>
@@ -340,14 +336,14 @@ const Month = () => {
                   fontSize="3xl"
                   fontWeight="bold"
                   color="blue.400"
-                  paddingTop={8}
+                  paddingTop={6}
                 >
                   Review{" "}
                   <CopyLink
                     link={`https://eipsinsight.com//insight/${year}/${month}#Review`}
                   />
                 </Text>
-                <Box paddingY={"8"} id="Review">
+                <Box paddingY={"6"} id="Review">
                   <StackedColumnChart dataset={filteredData2} status="Review" />
                 </Box>
 
@@ -356,7 +352,7 @@ const Month = () => {
                   fontSize="3xl"
                   fontWeight="bold"
                   color="blue.400"
-                  paddingTop={8}
+                  paddingTop={6}
                 >
                   Last Call{" "}
                   <CopyLink
@@ -368,7 +364,7 @@ const Month = () => {
        Note:  Due to some technical issues, a few of the Last Call deadlines are missing in the downloaded report. We are working on it and will get back to it ASAP.
       </Text> */}
 
-                <Box paddingY={"8"} id="LastCall">
+                <Box paddingY={"6"} id="LastCall">
                   <StackedColumnChart
                     dataset={filteredData3}
                     status="Last Call"
@@ -380,14 +376,14 @@ const Month = () => {
                   fontSize="3xl"
                   fontWeight="bold"
                   color="blue.400"
-                  paddingTop={8}
+                  paddingTop={6}
                 >
                   Living{" "}
                   <CopyLink
                     link={`https://eipsinsight.com//insight/${year}/${month}#Living`}
                   />
                 </Text>
-                <Box paddingY={"8"} id="Living">
+                <Box paddingY={"6"} id="Living">
                   <StackedColumnChart dataset={filteredData4} status="Living" />
                 </Box>
 
@@ -396,14 +392,14 @@ const Month = () => {
                   fontSize="3xl"
                   fontWeight="bold"
                   color="blue.400"
-                  paddingTop={8}
+                  paddingTop={6}
                 >
                   Final{" "}
                   <CopyLink
                     link={`https://eipsinsight.com//insight/${year}/${month}#Final`}
                   />
                 </Text>
-                <Box paddingY={"8"} id="Final">
+                <Box paddingY={"6"} id="Final">
                   <StackedColumnChart dataset={filteredData5} status="Final" />
                 </Box>
 
@@ -412,14 +408,14 @@ const Month = () => {
                   fontSize="3xl"
                   fontWeight="bold"
                   color="blue.400"
-                  paddingTop={8}
+                  paddingTop={6}
                 >
                   Stagnant{" "}
                   <CopyLink
                     link={`https://eipsinsight.com//insight/${year}/${month}#Stagnant`}
                   />
                 </Text>
-                <Box paddingY={"8"} id="Stagnant">
+                <Box paddingY={"6"} id="Stagnant">
                   <StackedColumnChart
                     dataset={filteredData6}
                     status="Stagnant"
@@ -431,14 +427,14 @@ const Month = () => {
                   fontSize="3xl"
                   fontWeight="bold"
                   color="blue.400"
-                  paddingTop={8}
+                  paddingTop={6}
                 >
                   Withdrawn{" "}
                   <CopyLink
                     link={`https://eipsinsight.com//insight/${year}/${month}#Withdrawn`}
                   />
                 </Text>
-                <Box paddingY={"8"} id="Withdrawn">
+                <Box paddingY={"6"} id="Withdrawn">
                   <StackedColumnChart
                     dataset={filteredData7}
                     status="Withdrawn"

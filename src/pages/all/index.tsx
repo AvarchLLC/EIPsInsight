@@ -74,21 +74,44 @@ const All = () => {
     return () => clearTimeout(timeout);
   }, [tableBg, textColor]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/all`);
-        const jsonData = await response.json();
-        const allData = [...jsonData.eip, ...jsonData.erc, ...jsonData.rip];
-        setData(allData);
-        setLoading(false);
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+
+function filterDuplicateRipEntries(data: EIP[]): EIP[] {
+  const filtered = [];
+  const seenTitles = new Set();
+  for (const item of data) {
+    const eip = item.eip; // support case difference just in case
+    // skip missing or placeholder EIP/RIP values
+    if (!eip || eip === "" || eip === "0000" || eip === "RIP-0000") continue;
+    const title = (item.title || "").trim().toLowerCase();
+    if (title && !seenTitles.has(title)) {
+      seenTitles.add(title);
+      filtered.push(item);
+    }
+  }
+  return filtered;
+}
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`/api/new/all`);
+      const jsonData = await response.json();
+      // Apply filter to RIPs only
+      const filteredRip = filterDuplicateRipEntries(jsonData.rip);
+
+      // Combine all data
+      const allData = [...jsonData.eip, ...jsonData.erc, ...filteredRip];
+      setData(allData);
+      setLoading(false);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, []);
+
 
   useEffect(() => {
     if (selected === "All") {
@@ -246,9 +269,6 @@ const All = () => {
             </select>
           </Box>
 
-          <Box flex={1}>
-            <SearchBox />
-          </Box>
         </Box>
 
         {/* Download Button */}

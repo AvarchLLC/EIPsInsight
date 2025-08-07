@@ -34,6 +34,10 @@ import {
     PopoverBody,
 } from "@chakra-ui/react";
 
+import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, 
+  AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react";
+import { CloseIcon } from "@chakra-ui/icons";
+
 
 var initialTemplateData = {
   eip: "<TBD>",
@@ -136,7 +140,9 @@ const ProposalEditor = () => {
   const [activeTab2, setActiveTab2] = useState<"new" | "import">("new");
   const [validated, setValidated] = useState<boolean>(false);
   const [searchNumber, setSearchNumber] = useState("");
-
+  const [showValidationAlert, setShowValidationAlert] = useState(false);
+const [validationErrors, setValidationErrors] = useState<string[]>([]);
+const cancelRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
 
     useEffect(() => {
@@ -186,27 +192,60 @@ const ProposalEditor = () => {
   };
 
   const selectedURL = urls[activeTab];
-
-
-
   if (!selectedURL) {
-    console.error("Invalid tab selected");
     setIsLoading(false);
+    toast({
+      title: 'Invalid type',
+      description: 'Please select a correct type (EIP/ERC/RIP)',
+      status: 'error',
+      duration: 2500,
+      isClosable: true,
+    });
     return;
   }
 
   try {
     const response = await axios.get(selectedURL);
-
-    if (response.status === 200) {
+    if (response.status === 200 && response.data && typeof response.data === "string") {
       const markdownContent = response.data;
       const extractedData = extractEIPData(markdownContent) || {};
-
-      Object.assign(initialTemplateData, extractedData);
-      console.log("Updated initialTemplateData:", initialTemplateData);
+      setTemplateData({ ...initialTemplateData, ...extractedData }); // set NEW state here
+      toast({
+        title: 'Loaded!',
+        description: `Fetched ${activeTab.toUpperCase()}-${searchNumber}`,
+        duration: 2000,
+        status: "success",
+        isClosable: true,
+      });
+    } else {
+      // Show toast for not found
+      toast({
+        title: 'Not Found',
+        description: `${activeTab.toUpperCase()}-${searchNumber} does not exist.`,
+        status: 'error',
+        duration: 2500,
+        isClosable: true,
+      });
     }
-  } catch (error) {
-    console.error("Failed to fetch data:", error);
+  } catch (error: any) {
+    // If error is axios error with 404, show not found toast
+    if ((error as any)?.response?.status === 404) {
+      toast({
+        title: 'Not Found',
+        description: `${activeTab.toUpperCase()}-${searchNumber} does not exist.`,
+        status: 'error',
+        duration: 2500,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: 'Failed to fetch',
+        description: `${activeTab.toUpperCase()}-${searchNumber} could not be loaded.`,
+        status: 'error',
+        duration: 2500,
+        isClosable: true,
+      });
+    }
   } finally {
     setIsLoading(false);
   }
@@ -365,8 +404,15 @@ const inputRefs = useRef<Record<TemplateDataKeys, HTMLTextAreaElement | null>>({
 
 // Reset steps when tab changes
 useEffect(() => {
+  // Reset steps on tab switch
   setSteps(getInitialSteps(activeTab));
-}, [activeTab]);
+  // If switching to "new", reset all fields
+  if (activeTab2 === "new") {
+    setTemplateData({ ...initialTemplateData }); // NOT initialTemplateData, but a **new copy**
+    setValidated(false); // Also reset validation state if needed
+  }
+}, [activeTab, activeTab2]);
+
 
 // Update templateData for a given key
 const handleInputChange = (key: TemplateDataKeys, value: string) => {
@@ -411,23 +457,42 @@ const handleMarkdownInsert = (key: TemplateDataKeys, syntax: string) => {
 };
 
 const generateMarkdownTemplate = (data: TemplateData): string => {
-  const headerLines = [
-    `eip: ${data.eip}`,
-    `title: ${data.title}`,
-    `description: ${data.description}`,
-    `author: ${data.author}`,
-    `discussions-to: ${data.discussionsTo}`,
-    `status: ${data.status}`,
-    data["last-call-deadline"]
-      ? `last-call-deadline: ${data["last-call-deadline"]}`
-      : null,
-    `type: ${data.type}`,
-    data.type === "Standards Track" && data.category
-      ? `category: ${data.category}`
-      : null,
-    `created: ${data.created}`,
-    data.requires ? `requires: ${data.requires}` : null,
-  ].filter(Boolean);
+const headerLines = [
+  `eip: ${data.eip}`,
+  `title: ${data.title}`,
+  `description: ${data.description}`,
+  `author: ${data.author}`,
+  `discussions-to: ${data.discussionsTo}`,
+  `status: ${data.status}`,
+  data["last-call-deadline"]
+    ? `last-call-deadline: ${data["last-call-deadline"]}`
+    : null,
+  `type: ${data.type}`,
+  data.type === "Standards Track" && data.category
+    ? `category: ${data.category}`
+    : null,
+  `created: ${data.created}`,
+  // requires block will be handled below
+].filter(Boolean);
+
+interface RequiresArray extends Array<string> {}
+
+let requiresArr: RequiresArray = [];
+if (typeof data.requires === "string") {
+  requiresArr = data.requires
+    .split(",")
+    .map((v) => v.trim())
+    .filter((v) => v);
+} else if (Array.isArray(data.requires)) {
+  requiresArr = (data.requires as string[]).filter((v) => v);
+}
+
+if (requiresArr.length > 0) {
+  headerLines.push('requires:');
+  requiresArr.forEach(req => {
+    headerLines.push(` - ${req}`);
+  });
+}
 
   const markdownSections = [
     { title: "Abstract", value: data.abstract },
@@ -468,7 +533,69 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
     .join("\n");
 };
 
-const markdownContent = generateMarkdownTemplate(templateData);
+const generateEipWlintMarkdown = (data: TemplateData): string => {
+  const headerLines = [
+    `eip: ${data.eip}`,
+    `title: ${data.title}`,
+    `description: ${data.description}`,
+    `author: ${data.author}`,
+    `discussions-to: ${data.discussionsTo ? data.discussionsTo : 'null'}`,
+    `status: ${data.status}`,
+    data["last-call-deadline"] ? `last-call-deadline: ${data["last-call-deadline"]}` : null,
+    `type: ${data.type}`,
+    data.type === "Standards Track" && data.category ? `category: ${data.category}` : null,
+    `created: ${data.created}`,
+  ].filter(Boolean);
+
+let requiresArr: string[] = [];
+if (typeof data.requires === "string") {
+  requiresArr = data.requires.split(",").map((v) => v.trim()).filter((v) => v);
+} else if (Array.isArray(data.requires)) {
+  requiresArr = (data.requires as string[]).filter((v) => v && typeof v === 'string');
+}
+if (requiresArr.length > 0) {
+  if (requiresArr.length === 1) {
+    headerLines.push(`requires: ${requiresArr[0]}`);
+  } else {
+    headerLines.push(`requires: ${requiresArr.join(', ')}`); // comma+space
+  }
+}
+
+
+  const markdownSections = [
+    { title: "Abstract", value: data.abstract },
+    { title: "Motivation", value: data.motivation },
+    { title: "Specification", value: data.specification },
+    { title: "Rationale", value: data.rationale },
+    { title: "Backwards Compatibility", value: data.backwardsCompatibility },
+    { title: "Test Cases", value: data.testCases },
+    { title: "Reference Implementation", value: data.referenceImplementation },
+    { title: "Security Considerations", value: data.securityConsiderations },
+  ];
+
+  const sections = markdownSections
+    .filter(section => section.value && section.value.trim())
+    .map(section => `## ${section.title}\n\n${section.value.trim()}`)
+    .join('\n\n');
+
+  return [
+    "---",
+    ...headerLines,
+    "---",
+    "",
+    sections,
+    "",
+    "## Copyright",
+    "",
+    "Copyright and related rights waived via [CC0](../LICENSE.md).",
+    ""
+  ].join('\n').replace(/\n{3,}/g, '\n\n');
+};
+
+
+
+const markdownContent = generateEipWlintMarkdown(templateData);
+// console.log(markdownContent);
 
 const splitContent = markdownContent.split(/---\n/);
 const tableContent = splitContent[1]?.trim() || "";
@@ -484,158 +611,63 @@ const markdownValue =
     return match ? [match[1].trim(), match[2].trim()] : [row.trim(), ""];
   });
 
-const handleValidate = async () => {
-  const requiredHeaders = [
-    "title",
-    "description",
-    "author",
-    "status",
-    "type",
-    "created",
-  ];
+  const handleValidate = async () => {
+    setIsLoading(true);
+    const errorMessages: string[] = [];
 
-  const missingHeaders: string[] = [];
-  const unrecognizedHeaders : string[] = [];
-  const errorMessages = [];
-  setIsLoading(true);
+    try {
+      const res = await fetch("/api/ValidateEip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markdownContent }),
+      });
 
-  requiredHeaders.forEach((header) => {
-    const key = header as TemplateDataKeys;
-    if (!templateData[key] || templateData[key].trim() === "") {
-      missingHeaders.push(header);
-    }
-  });
-
-  const buildTemplate = () => {
-    return `---
-${requiredHeaders
-      .map((header) => `${header}: ${templateData[header as TemplateDataKeys] || ""}`)
-      .join("\n")}
-${
-        templateData["last-call-deadline"]
-          ? `last-call-deadline: ${templateData["last-call-deadline"]}`
-          : ""
-      }
-${
-        templateData.type === "Standards Track" && templateData.category
-          ? `category: ${templateData.category}`
-          : ""
-      }
-${
-        templateData.requires ? `requires: ${templateData.requires}` : ""
-      }
----
-
-${([
-  "abstract",
-  "motivation",
-  "specification",
-  "rationale",
-  "backwardsCompatibility",
-  "testCases",
-  "referenceImplementation",
-  "securityConsiderations",
-] as TemplateDataKeys[])
-  .filter((key) => templateData[key])
-  .map(
-    (key) =>
-      `## ${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")}\n${templateData[key]}`
-  )
-  .join("\n\n")}
-
-## Copyright
-Copyright and related rights waived via [CC0](../LICENSE.md).
-    `;
-  };
-
-  const cleanedContent = buildTemplate()
-    .replace(/---\n([\s\S]*?)\n---/, (match, content) => {
-      return `---\n${content
-        .split("\n")
-        .filter((line: string) => line.trim())
-        .join("\n")}\n---`;
-    })
-    .split("\n")
-    .filter((line, i, arr) => !(line.trim() === "" && arr[i - 1]?.trim() === ""))
-    .join("\n");
-
-  try {
-    const res = await fetch("/api/ValidateEip", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ markdownContent: cleanedContent }),
-    });
-
-    const data = await res.json();
-    if (!data.success && data.messages) {
-      for (const msg of data.messages) {
-        if (msg.level === "Error" &&
-          !msg.message.includes("unable to read file") &&
-          !msg.message.includes("error[preamble-eip]") &&
-          !msg.message.includes("error[preamble-file-name]")
-        ) {
-          const clean = msg.message
-            .replace(/-->.*$/, "")
-            .replace(/C:\\.*\.md/, "")
-            .replace(/\s+/g, " ")
-            .trim();
-          errorMessages.push(clean);
+      const data = await res.json();
+      if (!data.success && data.messages) {
+        for (const msg of data.messages) {
+          // Only show actual format errors, downgrade link/filename refs to Warning or skip as needed
+          if (
+            msg.level === "Error" &&
+            !msg.message.includes("unable to read file") &&
+            !msg.message.includes("error[preamble-eip]") &&
+            !msg.message.includes("error[preamble-file-name]")
+          ) {
+            errorMessages.push(msg.message);
+          }
         }
       }
+    } catch (err) {
+      console.error("Validation error:", err);
+      errorMessages.push("Validation failed to run.");
     }
-  } catch (err) {
-    console.error("Validation error:", err);
-  }
+    setIsLoading(false);
 
-  // Additional validations (e.g., 'requires') ...
+if (errorMessages.length > 0) {
+  setValidated(false);
+  setValidationErrors(errorMessages); // Show as dialog
+  setShowValidationAlert(true);
+} else {
+  setValidated(true);
+  toast({ title: "Successfully Validated!", status: "success", duration: 2000 });
+}
 
-  const errors = [
-    ...missingHeaders.map((h, i) => `${i + 1}. Missing Header: ${h}`),
-    ...unrecognizedHeaders.map((h, i) => `${missingHeaders.length + i + 1}. Unrecognized Header: ${h}`),
-    ...errorMessages.map((msg, i) => `${missingHeaders.length + unrecognizedHeaders.length + i + 1}. ${msg}`),
-  ];
+  };
 
-  if (errors.length > 0) {
-    toast({
-      title: "Error in Template",
-      description: (
-        <ul style={{ margin: 0, paddingLeft: "1.2em" }}>
-          {errors.map((err, idx) => (
-            <li key={idx}>{err}</li>
-          ))}
-        </ul>
-      ),
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-    });
-    setValidated(false);
-  } else {
-    setValidated(true);
-    toast({ title: "Successfully Validated!", status: "success", duration: 2000 });
-  }
+  // 4. DOWNLOAD -- again, use only the canonical generator
+  const handleDownload = () => {
+    const markdown = generateEipWlintMarkdown(templateData)
+      .replace(/\n{3,}/g, '\n\n'); // (optional: squeeze triples to doubles)
+    const blob = new Blob([markdown], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `eip_template.md`; // you can use eip-${data.eip}.md if you want
+    link.click();
+    URL.revokeObjectURL(url);
 
-  setIsLoading(false);
-};
+    toast({ title: "Template Downloaded", status: "success", duration: 2000 });
+  };
 
-const handleDownload = () => {
-  const markdown = generateMarkdownTemplate(templateData)
-      .replace(/---\n([\s\S]*?)\n---/, (match, content) => `---\n${content.split("\n").filter(Boolean).join("\n")}\n---`)
-    .split("\n")
-    .filter((line, i, arr) => !(line.trim() === "" && arr[i - 1]?.trim() === ""))
-    .join("\n");
-
-
-  const blob = new Blob([markdown], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "eip_template.md";
-  link.click();
-  URL.revokeObjectURL(url);
-
-  toast({ title: "Template Downloaded", status: "success", duration: 2000 });
-};
 
   return (
     <>
@@ -1462,6 +1494,47 @@ const handleDownload = () => {
         </HStack>
       </Box>
     </Box>
+    <AlertDialog
+  isOpen={showValidationAlert}
+  leastDestructiveRef={cancelRef}
+  onClose={() => setShowValidationAlert(false)}
+  isCentered
+  size="lg"
+>
+  <AlertDialogOverlay>
+    <AlertDialogContent>
+      <AlertDialogHeader fontSize="2xl" fontWeight="bold" color="red.500" display="flex" alignItems="center">
+        <span style={{ display: "flex", alignItems: "center" }}>
+          <CloseIcon boxSize={5} color="red.500" mr={3}/>
+          Validation Error
+        </span>
+        <IconButton
+          icon={<CloseIcon />}
+          aria-label="Close Validation Errors"
+          onClick={() => setShowValidationAlert(false)}
+          variant="ghost"
+          size="sm"
+          position="absolute"
+          right="12px"
+          top="12px"
+        />
+      </AlertDialogHeader>
+      <AlertDialogBody>
+        <ul style={{ margin: 0, paddingLeft: "1.2em", color: "#d62d20", fontSize:"1.08em" }}>
+          {validationErrors.map((err, idx) => (
+            <li key={idx}>{err}</li>
+          ))}
+        </ul>
+      </AlertDialogBody>
+      <AlertDialogFooter>
+        <Button ref={cancelRef} onClick={() => setShowValidationAlert(false)} colorScheme="red">
+          Close
+        </Button>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialogOverlay>
+</AlertDialog>
+
     </>
   )
 }

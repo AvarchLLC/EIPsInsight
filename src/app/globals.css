@@ -45,6 +45,7 @@
 
 html {
   scroll-behavior: smooth;
+  font-family: var(--font-rajdhani), sans-serif;
 }
 
 

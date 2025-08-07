@@ -84,6 +84,7 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
   const [data, setData] = useState<EIP[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const pectraTitle = "Pectra (Accepted)"
   const [mergedData, setMergedData] = useState<
     { mergedYear: string; mergedMonth: string }[]
   >([]);
@@ -165,6 +166,7 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
       setIsDarkMode(true);
     }
   });
+  const titlenew = title === "Pectra" ? "Pectra (Included)" : title === "Fusaka" ? "Fusaka (CFI)" : "Glamsterdam (Headliner Proposals)";
 
 
   const filteredData = PectraData
@@ -193,7 +195,7 @@ const PectraTable: React.FC<TableProps> = ({ PectraData, title }) => {
             <>
               <div className="flex justify-between items-center">
                 <h2 className="text-blue-400 font-semibold text-4xl">
-                  {`${title} - [${filteredData.length}]`}
+                  {`${titlenew} - [${filteredData.length}]`}
                 </h2>
 
                 <Button

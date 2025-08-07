@@ -25,8 +25,8 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link }) => {
         border="2px solid"
         borderColor="#30A0E0"
         borderRadius="xl"
-        p={6}
-        height="250px"
+        p={5}
+        height="240px"
         width="100%"
         display="flex"
         flexDirection="column"
@@ -36,7 +36,7 @@ const ToolCard: FC<ToolCardProps> = ({ imageSrc, label, link }) => {
         transition="all 0.3s"
         _hover={{
           bg: "#E0F7FA",
-          transform: "scale(1.05)",
+          transform: "scale(1.02)",
           shadow: "lg",
         }}
         textAlign="center"
@@ -64,12 +64,12 @@ const ToolsSection: FC = () => {
   const headingBgGradientDark = "linear(to-r, #30A0E0, #F5F5F5)";
 
   return (
-    <div className="py-10" id="ourtools">
+    <div className="py-3" id="ourtools">
      
       <Box
         textAlign="left"
-        padding={8}
-        py={4}
+        padding={4}
+        py={3}
       >
         {/* <Heading
           color={useColorModeValue(headingColorLight, headingColorDark)}
@@ -98,11 +98,11 @@ const ToolsSection: FC = () => {
 
         <Grid
           templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
-          gap={6}
+          gap={5}
           justifyContent="center"
           alignItems="center"
           width="100%"
-          className="mt-3"
+          className="mt-2"
         >
           <ToolCard
             imageSrc="/DashboardCard1.png"

@@ -26,7 +26,7 @@ import {
   Radio,
   Link,
   Clipboard,
-  Briefcase,
+  Briefcase
 } from "react-feather";
 import { BsArrowUpRight, BsGraphUp } from "react-icons/bs";
 import StackedColumnChart from "@/components/StackedBarChart";
@@ -254,7 +254,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
   return (
     <>
       <FeedbackWidget />
-  <Box px={{ base: 4, md: 8, lg: 10 }} py={{ base: 6, md: 8, lg: 10 }}>
+  <Box px={{ base: 3, md: 5, lg: 8 }} py={{ base: 3, md: 4, lg: 6 }}>
     {isLoading ? (
       <Flex justify="center" align="center" minH="70vh">
         <motion.div
@@ -279,7 +279,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
             >
               <Box
                 id={"hero"}
-pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
+pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
               >
                 <div className="lg:block hidden">
                   <Box
@@ -288,38 +288,36 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                   >
                     <Stack direction={"column"}>
                       <Box
-                        // bg="rgba(0, 0, 0, 0.5)"
-                        borderRadius="md" // Rounded corners
-                        padding={4} // Padding around the text
-                        paddingLeft="6"
-                        // boxShadow="md"
-                        maxWidth="550px"
+                        borderRadius="md"
+                        padding={2}
+                        paddingLeft="4"
+                        maxWidth="500px"
                       >
                         <Text
                           color={useColorModeValue(
                             textColorLight,
                             textColorDark
-                          )} // Switch color based on mode
+                          )}
                           fontWeight={"bold"}
                           bgGradient={useColorModeValue(
                             bgGradientLight,
                             bgGradientDark
-                          )} // Optional: add a gradient background
-                          bgClip="text" // Optional: clip background to the text
+                          )}
+                          bgClip="text"
                           fontSize={{
-                            lg: "6xl",
-                            md: "5xl",
+                            lg: "5xl",
+                            md: "4xl",
                             sm: "3xl",
                             base: "xl",
                           }}
+                          lineHeight="1.1"
                         >
                           Ethereum <br /> Improvement <br /> Proposal <br />{" "}
                           Insight
                         </Text>
                       </Box>
-                      <br />
 
-                      <Stack direction={"row"} spacing={"6"}>
+                      <Stack direction={"row"} spacing={"4"} mt={4}>
                         <Box>
                           <NextLink href={"/home#1"}>
                             <Button
@@ -387,21 +385,52 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                             </Button>
                           </NextLink>
                         </Box>
+
+                                                <Box>
+                          <NextLink href={"/all"}>
+                            <Button
+                              color="#F5F5F5"
+                              variant={"outline"}
+                              fontSize={{
+                                lg: "14px",
+                                md: "12px",
+                                sm: "12px",
+                                base: "10px",
+                              }}
+                              fontWeight={"bold"}
+                              padding={{
+                                lg: "10px 20px",
+                                md: "5px 10px",
+                                sm: "5px 10px",
+                                base: "5px 10px",
+                              }}
+                              rightIcon={ <BookOpen/> }
+                              bgColor={"#30A0E0"}
+                              _hover={{
+                                bgColor: useColorModeValue(
+                                  "#2B6CB0",
+                                  "#4A5568"
+                                ),
+                                color: useColorModeValue("white", "#F5F5F5"),
+                              }}
+                            >
+                              Explore EIPs
+                            </Button>
+                          </NextLink>
+                        </Box>
                       </Stack>
                     </Stack>
                     {/* <BoyGirl2/> */}
                     <BoyGirl3 />
                     {/* <AllChart type="Total" /> */}
                   </Box>
-                  <br />
-                  <br />
-                  <br />
+                  
                   <Box
-                    // bg="rgba(0, 0, 0, 0.5)"
-                    borderRadius="md" // Rounded corners
+                    borderRadius="md"
                     id="all"
+                    mt={{ base: 3, lg: 4 }}
                   >
-                    <div className="py-10">
+                    <div className="py-3">
                       <Header
                         title="All Categories and Status"
                         subtitle="Overview"
@@ -417,7 +446,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
 
                 <div className="lg:hidden block">
                   <Text
-                    className="text-5xl text-center pb-5 sm:text-6xl md:text-7xl"
+                    className="text-5xl text-center pb-2 sm:text-6xl md:text-7xl"
                     fontWeight={"bold"}
                     color={useColorModeValue(textColorLight, textColorDark)}
                     bgGradient={useColorModeValue(
@@ -430,8 +459,8 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                   </Text>
                   <Stack
                     direction={"row"}
-                    spacing={"6"}
-                    paddingTop={"20"}
+                    spacing={"3"}
+                    paddingTop={"10"}
                     justifyContent={"center"}
                   >
                     <Box>
@@ -466,7 +495,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
 
                     <Box>
                       <NextLink
-                        href={`/insight/${year}/${getMonth(monthName)}`}
+                        href={`/all`}
                       >
                         <Button
                           colorScheme="blue"
@@ -489,48 +518,37 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                             color: useColorModeValue("white", "#F5F5F5"),
                           }}
                         >
-                          {monthName} {year} Insight
+                            Explore EIPs
                         </Button>
                       </NextLink>
                     </Box>
+
                   </Stack>
-                  <br />
-                  <br />
-                  <div>
+                  
+                  <div className="mt-6">
                     <AllChart type="Total" dataset={data} />
                   </div>
                 </div>
               </Box>
 
               <Box
-                className="py-8"
+                className="py-2"
                 display={{ base: "block", md: "block", lg: "none" }}
               >
                 <Box
-                  className="w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
+                  className="w-full lg:px-48 md:px-32 sm:px-24 px-20 py-2 rounded-[0.55rem] hover:border border-blue-500"
                   bgColor={bg}
                 >
                   <SearchBox />
                 </Box>
               </Box>
-              <div>
+              <div className="mt-3">
                 <ToolsSection />
               </div>
-              <div>
+              <div className="mt-4">
                 <Clients />
               </div>
-
-              {/* <div className="py-8"> */}
-              {/* <Box
-                  className={
-                    "w-full lg:px-48 md:px-32 sm:px-24 px-20 py-5 rounded-[0.55rem] hover:border border-blue-500"
-                  }
-                  bgColor={bg}
-                > */}
-
-              {/* </Box> */}
-              {/* </div> */}
-<div className="py-10 lg:py-16" id="what">
+<div className="py-6 lg:py-8" id="what">
   <Header
     title="What is EIPsInsight?"
     subtitle="Overview"
@@ -539,7 +557,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
   />
 
   <Box
-    className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mt-12"
+    className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center mt-4"
     borderRadius="md"
   >
     {/* Left Side - YouTube Video */}
@@ -594,11 +612,9 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
   </Box>
 </div>
 
-
-              <br />
             </motion.div>
-            <br />
-            <div className="py-16" id="statuschanges">
+            
+            <div className="py-6" id="statuschanges">
               <Box>
                 <Header
                   title="EIP Status Changes by Year"
@@ -607,7 +623,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                   sectionId="statuschanges"
                 />
               </Box>
-              <Box paddingTop={8} paddingBottom={8}>
+              <Box paddingTop={3} paddingBottom={3}>
                 <TypeGraphs />
               </Box>
             </div>
@@ -649,10 +665,10 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                 <Box
                   display="grid"
                   gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
-                  gap={"6"}
-                  marginTop={"20px"}
+                  gap={"4"}
+                  marginTop={"6px"}
                 >
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <StatBox
                         title="Meta EIPs"
@@ -783,8 +799,8 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 } as any}
                     bgColor={bg}
-                    paddingY={{ lg: "2rem", sm: "2rem" }}
-                    paddingX={{ lg: "2rem", sm: "0.5rem" }}
+                    paddingY={{ lg: "1rem", sm: "1rem" }}
+                    paddingX={{ lg: "1.5rem", sm: "0.5rem" }}
                     borderRadius="0.55rem"
                     _hover={{
                       border: "1px",
@@ -812,8 +828,8 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                 <Box
                   display="grid"
                   gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
-                  gap={"6"}
-                  marginTop={"20px"}
+                  gap={"4"}
+                  marginTop={"6px"}
                 >
                   <Box
                     as={motion.div}
@@ -821,7 +837,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 } as any}
                     bgColor={bg}
-                    paddingY={{ lg: "2rem", sm: "2rem" }}
+                    paddingY={{ lg: "1rem", sm: "1rem" }}
                     paddingX={{ lg: "2rem", sm: "0.5rem" }}
                     borderRadius="0.55rem"
                     _hover={{
@@ -846,7 +862,7 @@ pt={{ base: 6, lg: 12 }} pb={{ base: 6, lg: 10 }}
                     <DashboardDonut dataset={data} />
                   </Box>
 
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <StatBox
                         title="Draft"

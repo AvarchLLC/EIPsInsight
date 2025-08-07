@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-
 const { fontFamily } = require('tailwindcss/defaultTheme');
+
 module.exports = {
   darkMode: ["class"],
   content: [
@@ -11,11 +11,6 @@ module.exports = {
   ],
   theme: {
     container: {
-      extend: {
-        fontFamily: {
-          rajdhani: ['var(--font-rajdhani)', 'sans-serif'],
-        },
-      },
       center: true,
       padding: "2rem",
       screens: {
@@ -23,6 +18,9 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        rajdhani: ['var(--font-rajdhani)', ...fontFamily.sans],
+      },
       keyframes: {
         "accordion-down": {
           from: { height: 0 },
@@ -40,4 +38,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
