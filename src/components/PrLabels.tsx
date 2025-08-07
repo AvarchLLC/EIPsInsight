@@ -1,63 +1,55 @@
 import React, { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import Papa from "papaparse";
 import {
   Box, Card, CardHeader, CardBody, Heading, Text, Stack, Button, Checkbox,
   CheckboxGroup, Menu, MenuButton, MenuList, useColorModeValue, Flex, Badge, HStack, Divider
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
-import DateTime from "./DateTime";
+import Papa from "papaparse";
 
 // ECharts only loads on client
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
-// Label definitions (type-safe)
-type LabelSpec = { value: string; label: string; color: string; };
+type LabelSpec = { value: string; label: string; color: string };
 
 const CUSTOM_LABELS_EIP: LabelSpec[] = [
-  { value: "EIP Update", label: "EIP Update", color: "#2563eb" },        // blue-600
-  { value: "Typo Fix", label: "Typo Fix", color: "#16a34a" },            // green-600
-  { value: "Status Change", label: "Status Change", color: "#ea580c" },  // orange-600
-  { value: "Created By Bot", label: "Created By Bot", color: "#a21caf" },// purple-700
-  { value: "New EIP", label: "New EIP", color: "#facc15" },              // yellow-400
-  { value: "Misc", label: "Miscellaneous", color: "#64748b" },           // slate-500
+  { value: "EIP Update", label: "EIP Update", color: "#2563eb" },
+  { value: "Typo Fix", label: "Typo Fix", color: "#16a34a" },
+  { value: "Status Change", label: "Status Change", color: "#ea580c" },
+  { value: "Created By Bot", label: "Created By Bot", color: "#a21caf" },
+  { value: "New EIP", label: "New EIP", color: "#facc15" },
+  { value: "Misc", label: "Miscellaneous", color: "#64748b" },
 ];
 
 const CUSTOM_LABELS_ERC: LabelSpec[] = [
-  { value: "ERC Update", label: "ERC Update", color: "#0ea5e9" },        // sky-500
-  { value: "Typo Fix", label: "Typo Fix", color: "#22c55e" },            // green-500
-  { value: "Status Change", label: "Status Change", color: "#e11d48" },  // rose-600
-  { value: "Created By Bot", label: "Created By Bot", color: "#a16207" },// amber-700
-  { value: "New ERC", label: "New ERC", color: "#8b5cf6" },              // violet-500
-  { value: "Misc", label: "Miscellaneous", color: "#334155" },           // slate-700
+  { value: "ERC Update", label: "ERC Update", color: "#0ea5e9" },
+  { value: "Typo Fix", label: "Typo Fix", color: "#22c55e" },
+  { value: "Status Change", label: "Status Change", color: "#e11d48" },
+  { value: "Created By Bot", label: "Created By Bot", color: "#a16207" },
+  { value: "New ERC", label: "New ERC", color: "#8b5cf6" },
+  { value: "Misc", label: "Miscellaneous", color: "#334155" },
 ];
 
 const WORKFLOW_LABELS: LabelSpec[] = [
-  { value: "a-review", label: "Author Review", color: "#14b8a6" },       // teal-500
-  { value: "e-review", label: "Editor Review", color: "#f43f5e" },       // rose-500
-  { value: "discuss", label: "Discuss", color: "#fbbf24" },              // yellow-400
-  { value: "on-hold", label: "On Hold", color: "#0d9488" },              // teal-700
-  { value: "final-call", label: "Final Call", color: "#6366f1" },        // indigo-500
-  { value: "Other Labels", label: "Other Labels", color: "#9ca3af" },    // gray-400
+  { value: "a-review", label: "Author Review", color: "#14b8a6" },
+  { value: "e-review", label: "Editor Review", color: "#f43f5e" },
+  { value: "discuss", label: "Discuss", color: "#fbbf24" },
+  { value: "on-hold", label: "On Hold", color: "#0d9488" },
+  { value: "final-call", label: "Final Call", color: "#6366f1" },
+  { value: "Other Labels", label: "Other Labels", color: "#9ca3af" },
 ];
-
 
 const REPOS = [
-  { key: "eip", label: "EIP PRs", api: "/api/eipopenprs" },
-  { key: "erc", label: "ERC PRs", api: "/api/ercopenprs" }
+  { key: "eip", label: "EIP PRs", api: "/pr-stats" },
+  { key: "erc", label: "ERC PRs", api: "/ercpr-stats" },
 ];
 
-interface PRData {
-  customLabels: string[];
-  githubLabels: string[];
-  createdAt: string;
-  [key: string]: any;
-}
-
-function toMonthYear(dateStr: string | undefined) {
-  if (!dateStr) return "Unknown";
-  const date = new Date(dateStr);
-  return date.toLocaleString("default", { month: "short", year: "numeric" });
+// Aggregated API data shape
+interface AggregatedLabelCount {
+  monthYear: string;
+  label: string;
+  count: number;
+  labelType: string; // "customLabels" or "githubLabels"
 }
 
 export default function PRAnalyticsCard() {
@@ -66,109 +58,103 @@ export default function PRAnalyticsCard() {
   const accentColor = useColorModeValue("#4299e1", "#63b3ed");
   const badgeText = useColorModeValue("white", "#171923");
 
-  // Repo state and label arrays
   const [repoKey, setRepoKey] = useState<"eip" | "erc">("eip");
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<PRData[]>([]);
+  const [data, setData] = useState<AggregatedLabelCount[]>([]);
 
-  // Choose correct label spec per repo
   const customLabelsForRepo = useMemo<LabelSpec[]>(
     () => (repoKey === "eip" ? CUSTOM_LABELS_EIP : CUSTOM_LABELS_ERC),
     [repoKey]
   );
 
-  // Filter state for each label set
-  const [selectedCustomLabels, setSelectedCustomLabels] = useState<string[]>(customLabelsForRepo.map((l: LabelSpec) => l.value));
-  useEffect(() => {
-    setSelectedCustomLabels(customLabelsForRepo.map((l: LabelSpec) => l.value));
-  }, [customLabelsForRepo]);
-  const [selectedWorkflowLabels, setSelectedWorkflowLabels] = useState<string[]>(WORKFLOW_LABELS.map((l: LabelSpec) => l.value));
-
-  // Data fetch & "Other Labels" partition
-  useEffect(() => {
-    setLoading(true);
-    const repoObj = REPOS.find(r => r.key === repoKey)!;
-    fetch(repoObj.api)
-      .then(res => res.json())
-      .then((raw: any[]) => {
-        const workflowLabelSet = new Set(WORKFLOW_LABELS.map((l: LabelSpec) => l.value));
-        setData(raw.map((pr: any) => {
-          const customLabels: string[] = Array.isArray(pr.customLabels) ? pr.customLabels : [];
-          const githubLabels: string[] = Array.isArray(pr.githubLabels) ? pr.githubLabels : [];
-          const workflowKnown = githubLabels.filter((l: string) => workflowLabelSet.has(l));
-          const workflowOther = githubLabels.filter((l: string) => !workflowLabelSet.has(l));
-          const workflowLabelsForUi = [...workflowKnown, ...(workflowOther.length ? ["Other Labels"] : [])];
-          return {
-            ...pr,
-            customLabels,
-            githubLabels: workflowLabelsForUi,
-            _rawOtherWorkflowLabels: workflowOther,
-          };
-        }));
-        setLoading(false);
-      });
-  }, [repoKey]);
-
-  // Filter by both custom and workflow labels
-  const filteredData = useMemo<PRData[]>(
-    () =>
-      data.filter((pr: PRData) =>
-        pr.customLabels.some((l: string) => selectedCustomLabels.includes(l)) &&
-        pr.githubLabels.some((l: string) => selectedWorkflowLabels.includes(l))
-      ),
-    [data, selectedCustomLabels, selectedWorkflowLabels]
+  // Label selection for filtering
+  const [selectedCustomLabels, setSelectedCustomLabels] = useState<string[]>(
+    customLabelsForRepo.map((l) => l.value)
+  );
+  const [selectedWorkflowLabels, setSelectedWorkflowLabels] = useState<string[]>(
+    WORKFLOW_LABELS.map((l) => l.value)
   );
 
-  // Chart grouping by custom label, stacked
+  // Reset selected custom labels when repo changes
+  useEffect(() => {
+    setSelectedCustomLabels(customLabelsForRepo.map((l) => l.value));
+  }, [customLabelsForRepo]);
+
+  // Fetch aggregated data from API
+  useEffect(() => {
+    setLoading(true);
+    const repoObj = REPOS.find((r) => r.key === repoKey)!;
+    fetch(repoObj.api)
+      .then((res) => res.json())
+      .then((raw: AggregatedLabelCount[]) => {
+        setData(raw);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [repoKey]);
+
+  // Filter data by selected labels (custom and workflow)
+  const filteredData = useMemo(() => 
+    data.filter((item) => 
+      (item.labelType === "customLabels"
+        ? selectedCustomLabels.includes(item.label)
+        : selectedWorkflowLabels.includes(item.label))
+    )
+  , [data, selectedCustomLabels, selectedWorkflowLabels]);
+
+  // Extract months sorted ascending
+  const months = useMemo(() => {
+    const monthSet = new Set(filteredData.map(d => d.monthYear));
+    return Array.from(monthSet).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  }, [filteredData]);
+
+  // Aggregate data into chart series grouped by labels
   const chartData = useMemo(() => {
-    const results: Record<string, Record<string, number>> = {};
-    for (const pr of filteredData) {
-      const month = toMonthYear(pr.createdAt);
-      if (!results[month]) results[month] = {};
-      for (const label of pr.customLabels as string[]) {
-        if (selectedCustomLabels.includes(label)) {
-          results[month][label] = (results[month][label] || 0) + 1;
-        }
-      }
-    }
-    const months = Object.keys(results).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime()
-    );
+    // Labels for series to include
+    const allLabels = [
+      ...customLabelsForRepo.map(l => ({ ...l, labelType: 'customLabels' })),
+      ...WORKFLOW_LABELS.map(l => ({ ...l, labelType: 'githubLabels' }))
+    ];
+
     return {
       months,
-      series: customLabelsForRepo.map((l: LabelSpec) => ({
-        name: l.label,
+      series: allLabels.map(({ value, label, color, labelType }) => ({
+        name: label,
         type: "bar",
-        stack: "total",
-        data: months.map((m: string) => results[m]?.[l.value] ?? 0),
-        itemStyle: { color: l.color }
+        stack: labelType,
+        data: months.map(month => {
+          const found = filteredData.find(d => d.monthYear === month && d.label === value && d.labelType === labelType);
+          return found ? found.count : 0;
+        }),
+        itemStyle: { color }
       }))
     };
-  }, [filteredData, selectedCustomLabels, customLabelsForRepo]);
+  }, [months, filteredData, customLabelsForRepo]);
 
-  // ECharts options
+  // Chart option for ECharts
   const option = useMemo(() => ({
-tooltip: {
-  trigger: "axis",
-  backgroundColor: "#fff",
-  borderColor: "#cfd8dc",
-  textStyle: { color: "#1a202c" },
-  formatter: function (params: any) {
-    // params is an array, each with .seriesName, .value, .marker
-    // We'll show date, then total, then each stack
-    let total = 0;
-    params.forEach((item: any) => { total += item.value; });
-    let res = `<span style="font-weight:700">${params[0].name}</span><br/><span style="color:#718096;font-size:13px;">Total: <b>${total}</b></span><br/>`;
-    params.forEach((item: any) => {
-      res += `${item.marker} <span style="color:#1a202c">${item.seriesName}</span>: <b>${item.value}</b><br/>`;
-    });
-    return res;
-  }
-},
-
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "#fff",
+      borderColor: "#cfd8dc",
+      textStyle: { color: "#1a202c" },
+      formatter: function (params: any) {
+        let total = 0;
+        params.forEach((item: any) => { total += item.value; });
+        let res = `<span style="font-weight:700">${params[0].name}</span><br/><span style="color:#718096;font-size:13px;">Total: <b>${total}</b></span><br/>`;
+        params.forEach((item: any) => {
+          res += `${item.marker} <span style="color:#1a202c">${item.seriesName}</span>: <b>${item.value}</b><br/>`;
+        });
+        return res;
+      }
+    },
     legend: {
-      data: customLabelsForRepo.map((l: LabelSpec) => l.label),
-      textStyle: { color: textColor, fontWeight: 700, fontSize: 14 }
+      data: chartData.series.map(s => s.name),
+      textStyle: { color: textColor, fontWeight: 700, fontSize: 14 },
+      orient: 'horizontal',
+      bottom: 20,
+      scrollDataIndex: 0,
+      type: 'scroll'
     },
     backgroundColor: cardBg,
     xAxis: [{
@@ -200,25 +186,32 @@ tooltip: {
       }
     ],
     grid: { left: 60, right: 30, top: 60, bottom: 80 }
-  }), [chartData, textColor, cardBg, customLabelsForRepo]);
+  }), [chartData, textColor, cardBg]);
 
-  // CSV download
+  console.log(chartData)
+
+  // CSV download helper (optional)
   const downloadCSV = () => {
-    const csv = Papa.unparse(filteredData);
+    const csvData = filteredData.map(({ monthYear, label, count, labelType }) => ({
+      Month: monthYear,
+      Label: label,
+      LabelType: labelType,
+      Count: count
+    }));
+    const csv = Papa.unparse(csvData);
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${repoKey}_filtered_prs.csv`;
+    a.download = `${repoKey}_pr_label_counts.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
-
-  // Select/clear all helpers
-  const selectAllCustom = () => setSelectedCustomLabels(customLabelsForRepo.map((l: LabelSpec) => l.value));
+  // Select / Clear All functions for filters
+  const selectAllCustom = () => setSelectedCustomLabels(customLabelsForRepo.map(l => l.value));
   const clearAllCustom = () => setSelectedCustomLabels([]);
-  const selectAllWorkflow = () => setSelectedWorkflowLabels(WORKFLOW_LABELS.map((l: LabelSpec) => l.value));
+  const selectAllWorkflow = () => setSelectedWorkflowLabels(WORKFLOW_LABELS.map(l => l.value));
   const clearAllWorkflow = () => setSelectedWorkflowLabels([]);
 
   return (
@@ -268,9 +261,9 @@ tooltip: {
                 <Button size="xs" colorScheme="teal" onClick={selectAllCustom}>Select All</Button>
                 <Button size="xs" colorScheme="red" variant="outline" onClick={clearAllCustom}>Clear All</Button>
               </HStack>
-              <CheckboxGroup value={selectedCustomLabels} onChange={(v: string[] | any) => setSelectedCustomLabels(v)}>
+              <CheckboxGroup value={selectedCustomLabels} onChange={(v: string[]) => setSelectedCustomLabels(v)}>
                 <Stack pl={2} pr={2} gap={1}>
-                  {customLabelsForRepo.map((lbl: LabelSpec) => (
+                  {customLabelsForRepo.map(lbl => (
                     <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme="blue" iconColor={badgeText}>
                       <Badge
                         mr={2}
@@ -300,9 +293,9 @@ tooltip: {
                 <Button size="xs" colorScheme="purple" onClick={selectAllWorkflow}>Select All</Button>
                 <Button size="xs" colorScheme="red" variant="outline" onClick={clearAllWorkflow}>Clear All</Button>
               </HStack>
-              <CheckboxGroup value={selectedWorkflowLabels} onChange={(v: string[] | any) => setSelectedWorkflowLabels(v)}>
+              <CheckboxGroup value={selectedWorkflowLabels} onChange={(v: string[]) => setSelectedWorkflowLabels(v)}>
                 <Stack pl={2} pr={2} gap={1}>
-                  {WORKFLOW_LABELS.map((lbl: LabelSpec) => (
+                  {WORKFLOW_LABELS.map(lbl => (
                     <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme="purple" iconColor={badgeText}>
                       <Badge
                         mr={2}
@@ -337,10 +330,10 @@ tooltip: {
           }
         </Box>
         <Text color={textColor} fontSize="md" mt={4}>
-          Showing <b>{filteredData.length}</b> PRs / <b>{data.length}</b> total (open only)
+          Showing <b>{filteredData.length}</b> label counts / <b>{data.length}</b> total entries
         </Text>
       </CardBody>
-      <DateTime/>
+      {/* Add your DateTime component if needed */}
     </Card>
   );
 }

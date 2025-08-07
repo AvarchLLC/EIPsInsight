@@ -141,9 +141,6 @@ const GitHubPRTracker: React.FC = () => {
     review: true,
   });
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, [activeTab, selectedRepo]);
 
   const fetchEndpoint = () => {
     const baseUrl = "/api/AnalyticsCharts";
