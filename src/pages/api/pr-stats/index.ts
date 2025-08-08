@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import mongoose, { Document } from "mongoose";
+import mongoose from "mongoose";
 
 // -- Snapshot model setup
 
@@ -12,7 +12,7 @@ interface SnapshotPR {
   state?: string;
   createdAt?: Date;
   closedAt?: Date;
-  // ...add other fields as needed
+  // ...other fields as needed
 }
 
 interface SnapshotDoc {
@@ -48,40 +48,51 @@ export default async function handler(
     // ?labelType=customLabels  (or githubLabels)
     const { labelType = "customLabels" } = req.query;
 
-    // Pull all monthly snapshots, sorted chronologically
+    // Find all monthly snapshots, sorted
     const snapshots: SnapshotDoc[] = await Snap.find({}).sort({ month: 1 }).lean();
 
-    const rows: {
+    type Row = {
       monthYear: string;
       label: string;
       count: number;
       labelType: string;
-    }[] = [];
+      prNumbers: number[];
+    };
+
+    const rows: Row[] = [];
 
     for (const snap of snapshots) {
       const month = snap.month;
-      const labelCounts: Record<string, number> = {};
+
+      // Instead of just label -> count, use label -> array-of-pr-numbers
+      const labelToPrs: Record<string, number[]> = {};
 
       for (const pr of snap.prs ?? []) {
-        // Ensure type safety/defaults
         const labels: string[] = labelType === "customLabels"
           ? pr.customLabels ?? []
           : pr.githubLabels ?? [];
 
-        // Priority order
+        // Priority assignment (match backend and frontend)
         let assigned = "Misc";
         if (labels.includes("Typo Fix")) assigned = "Typo Fix";
         else if (labels.includes("Status Change")) assigned = "Status Change";
         else if (labels.includes("EIP Update")) assigned = "EIP Update";
         else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
         else if (labels.includes("New EIP")) assigned = "New EIP";
-        // ... add more if needed
+        // ...more if needed
 
-        labelCounts[assigned] = (labelCounts[assigned] || 0) + 1;
+        if (!labelToPrs[assigned]) labelToPrs[assigned] = [];
+        labelToPrs[assigned].push(pr.number); // or pr.prId if that is what you want!
       }
 
-      for (const [label, count] of Object.entries(labelCounts)) {
-        rows.push({ monthYear: month, label, count, labelType: labelType as string });
+      for (const [label, prNumbers] of Object.entries(labelToPrs)) {
+        rows.push({
+          monthYear: month,
+          label,
+          count: prNumbers.length,
+          labelType: labelType as string,
+          prNumbers,
+        });
       }
     }
 

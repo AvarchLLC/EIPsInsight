@@ -46,7 +46,9 @@ interface AggregatedLabelCount {
   label: string;
   count: number;
   labelType: string;
+  prNumbers: number[]; // <-- new
 }
+
 
 function formatMonthLabel(monthYear: string) {
   const [year, month] = monthYear.split("-");
@@ -179,17 +181,22 @@ export default function PRAnalyticsCard() {
       axisLabel: { color: textColor }
     }],
     series: chartData.series,
-    dataZoom: [
-      {
-        type: "slider",
-        show: true,
-        xAxisIndex: [0],
-        start: defaultZoomStart,
-        end: 100,
-        top: 60,
-        height: 30
-      }
-    ],
+dataZoom: [
+  {
+    type: "slider",
+    show: true,
+    xAxisIndex: [0],
+    // For default zoom, use start/end or startValue/endValue. These values are flexible.
+    start: chartData.displayMonths.length > 18
+      ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
+      : 0,
+    end: 100,
+    bottom: 12,    // <-- This keeps the slider below the x-axis, at the bottom
+    height: 30,
+    // Remove or comment out any 'top' property
+    // top: undefined,
+  },
+],
     grid: { left: 60, right: 30, top: 80, bottom: 60 }
   }), [chartData, textColor, cardBg, defaultZoomStart]);
 type CsvRow = {
@@ -199,11 +206,13 @@ type CsvRow = {
   LabelType: string;
   Count: number;
   Repo: string | undefined;
+  PRs: string; // PR numbers, e.g. "432;440;498;501"
 };
+
 
 const downloadCSV = () => {
   const csvData: CsvRow[] = [];
-  filteredData.forEach(({ monthYear, label, count, labelType }) => {
+  filteredData.forEach(({ monthYear, label, count, labelType, prNumbers }) => {
     csvData.push({
       Month: formatMonthLabel(monthYear),
       MonthKey: monthYear,
@@ -211,6 +220,7 @@ const downloadCSV = () => {
       LabelType: labelType,
       Count: count,
       Repo: REPOS.find(r => r.key === repoKey)?.label,
+      PRs: prNumbers ? prNumbers.join("; ") : "", // show as "432; 440; 498" etc
     });
   });
   const csv = Papa.unparse(csvData);
@@ -222,6 +232,7 @@ const downloadCSV = () => {
   a.click();
   URL.revokeObjectURL(url);
 };
+
 
 
   const selectAll = () => setSelectedLabels(labelSpecs.map(l => l.value));
