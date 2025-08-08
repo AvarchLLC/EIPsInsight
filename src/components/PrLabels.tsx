@@ -1,5 +1,3 @@
-// File: components/PRAnalyticsCard.tsx
-
 import React, { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -21,7 +19,6 @@ const CUSTOM_LABELS_EIP: LabelSpec[] = [
   { value: "New EIP", label: "New EIP", color: "#facc15" },
   { value: "Misc", label: "Miscellaneous", color: "#64748b" },
 ];
-
 const CUSTOM_LABELS_ERC: LabelSpec[] = [
   { value: "ERC Update", label: "ERC Update", color: "#0ea5e9" },
   { value: "Typo Fix", label: "Typo Fix", color: "#22c55e" },
@@ -30,7 +27,6 @@ const CUSTOM_LABELS_ERC: LabelSpec[] = [
   { value: "New ERC", label: "New ERC", color: "#8b5cf6" },
   { value: "Misc", label: "Miscellaneous", color: "#334155" },
 ];
-
 const WORKFLOW_LABELS: LabelSpec[] = [
   { value: "a-review", label: "Author Review", color: "#14b8a6" },
   { value: "e-review", label: "Editor Review", color: "#f43f5e" },
@@ -49,7 +45,15 @@ interface AggregatedLabelCount {
   monthYear: string;
   label: string;
   count: number;
-  labelType: string; // "customLabels" or "githubLabels"
+  labelType: string;
+  prNumbers: number[]; // <-- new
+}
+
+
+function formatMonthLabel(monthYear: string) {
+  const [year, month] = monthYear.split("-");
+  const date = new Date(Number(year), Number(month) - 1, 1);
+  return date.toLocaleString("default", { month: "short", year: "numeric" });
 }
 
 export default function PRAnalyticsCard() {
@@ -59,21 +63,27 @@ export default function PRAnalyticsCard() {
   const badgeText = useColorModeValue("white", "#171923");
 
   const [repoKey, setRepoKey] = useState<"eip" | "erc">("eip");
+  const [labelSet, setLabelSet] = useState<"customLabels" | "githubLabels">("customLabels");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
 
-  const customLabelsForRepo = useMemo(() => (repoKey === "eip" ? CUSTOM_LABELS_EIP : CUSTOM_LABELS_ERC), [repoKey]);
+  // Select correct label spec
+  const labelSpecs: LabelSpec[] = useMemo(() => {
+    if (labelSet === "customLabels") {
+      return repoKey === "eip" ? CUSTOM_LABELS_EIP : CUSTOM_LABELS_ERC;
+    } else {
+      return WORKFLOW_LABELS;
+    }
+  }, [repoKey, labelSet]);
 
-  const [selectedCustomLabels, setSelectedCustomLabels] = useState<string[]>(customLabelsForRepo.map(l => l.value));
-  const [selectedWorkflowLabels, setSelectedWorkflowLabels] = useState<string[]>(WORKFLOW_LABELS.map(l => l.value));
+  // Filter state setup
+  const [selectedLabels, setSelectedLabels] = useState<string[]>(labelSpecs.map(l => l.value));
+  useEffect(() => setSelectedLabels(labelSpecs.map(l => l.value)), [labelSpecs]);
 
-  useEffect(() => {
-    setSelectedCustomLabels(customLabelsForRepo.map(l => l.value));
-  }, [customLabelsForRepo]);
-
+  // Fetch API
   useEffect(() => {
     setLoading(true);
-    const repoObj = REPOS.find(r => r.key === "erc")!;
+    const repoObj = REPOS.find(r => r.key === repoKey)!;
     fetch(repoObj.api)
       .then(res => res.json())
       .then((raw: AggregatedLabelCount[]) => {
@@ -81,51 +91,60 @@ export default function PRAnalyticsCard() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [repoKey]);
+  }, [repoKey, labelSet]); // change if labelSet swaps repo (usually shouldn't)
 
-  const filteredData = useMemo(() => data.filter(item =>
-    item.labelType === "customLabels"
-      ? selectedCustomLabels.includes(item.label)
-      : selectedWorkflowLabels.includes(item.label)
-  ), [data, selectedCustomLabels, selectedWorkflowLabels]);
+  // Only show one labelType at a time – filter accordingly
+  const filteredData = useMemo(() =>
+    data.filter(item =>
+      item.labelType === labelSet && selectedLabels.includes(item.label)
+    ), [data, labelSet, selectedLabels]
+  );
 
-  console.log("Filtered Data:", filteredData);
-
-
+  // xAxis months, most recent 18 default
   const months = useMemo(() => {
     const monthSet = new Set(filteredData.map(d => d.monthYear));
     return Array.from(monthSet).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }, [filteredData]);
 
-  const chartData = useMemo(() => {
-    const allLabels = [
-      ...customLabelsForRepo.map(l => ({ ...l, labelType: 'customLabels' })),
-      ...WORKFLOW_LABELS.map(l => ({ ...l, labelType: 'githubLabels' })),
-    ];
+  // Chart data by series/label
+  const chartData = useMemo(() => ({
+    months,
+    displayMonths: months.map(formatMonthLabel),
+    series: labelSpecs.map(({ value, label, color }) => ({
+      name: label,
+      type: "bar",
+      stack: "total",
+      data: months.map(month => {
+        const found = filteredData.find(d => d.monthYear === month && d.label === value);
+        return found ? found.count : 0;
+      }),
+      itemStyle: { color }
+    }))
+  }), [months, filteredData, labelSpecs]);
 
-    return {
-      months,
-      series: allLabels.map(({ value, label, color, labelType }) => ({
-        name: label,
-        type: "bar",
-        stack: labelType,
-        data: months.map(month => {
-          const found = filteredData.find(d => d.monthYear === month && d.label === value && d.labelType === labelType);
-          return found ? found.count : 0;
-        }),
-        itemStyle: { color }
-      }))
-    };
-  }, [months, filteredData, customLabelsForRepo]);
+  // Find latest (last) month to focus on
+  const lastPeriodIdx = chartData.displayMonths.length ? chartData.displayMonths.length - 1 : 0;
+  const defaultZoomStart = chartData.displayMonths.length > 18
+    ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
+    : 0;
 
-  console.log("Chart Data:", chartData);
+  // PR count for the latest month (all filtered labels)
+  const latestMonth = months[lastPeriodIdx] || "";
+  const uniquePRsInLatest = useMemo(() => {
+    // Sum filteredData.count for latest month (labels are now deduped!)
+    return filteredData
+      .filter(d => d.monthYear === latestMonth)
+      .reduce((acc, d) => acc + d.count, 0);
+  }, [filteredData, latestMonth]);
 
+  // Chart option
   const option = useMemo(() => ({
     tooltip: {
       trigger: "axis",
       backgroundColor: "#fff",
       borderColor: "#cfd8dc",
       textStyle: { color: "#1a202c" },
+      confine: true,
       formatter(params: any) {
         let total = 0;
         params.forEach((item: any) => { total += item.value; });
@@ -141,69 +160,96 @@ export default function PRAnalyticsCard() {
       textStyle: { color: textColor, fontWeight: 700, fontSize: 14 },
       type: 'scroll',
       orient: 'horizontal',
-      bottom: 20,
+      top: 20,
       scrollDataIndex: 0,
     },
     backgroundColor: cardBg,
     xAxis: [{
       type: "category",
-      data: chartData.months,
+      data: chartData.displayMonths,
       axisLabel: {
         color: textColor,
         fontWeight: 600,
-        fontSize: 10,
+        fontSize: 11,
         interval: 0,
         rotate: 0
       }
     }],
     yAxis: [{
       type: "value",
-      name: "PR Count",
+      name: "Open PRs",
       axisLabel: { color: textColor }
     }],
     series: chartData.series,
-    dataZoom: [
-      {
-        type: "slider",
-        show: true,
-        xAxisIndex: [0],
-        start: Math.max(0, 100 - 10 * chartData.months.length),
-        end: 100,
-        bottom: 12,
-        height: 30
-      }
-    ],
-    grid: { left: 60, right: 30, top: 60, bottom: 80 }
-  }), [chartData, textColor, cardBg]);
+dataZoom: [
+  {
+    type: "slider",
+    show: true,
+    xAxisIndex: [0],
+    // For default zoom, use start/end or startValue/endValue. These values are flexible.
+    start: chartData.displayMonths.length > 18
+      ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
+      : 0,
+    end: 100,
+    bottom: 12,    // <-- This keeps the slider below the x-axis, at the bottom
+    height: 30,
+    // Remove or comment out any 'top' property
+    // top: undefined,
+  },
+],
+    grid: { left: 60, right: 30, top: 80, bottom: 60 }
+  }), [chartData, textColor, cardBg, defaultZoomStart]);
+type CsvRow = {
+  Month: string;
+  MonthKey: string;
+  Label: string;
+  LabelType: string;
+  Count: number;
+  Repo: string | undefined;
+  PRs: string; // PR numbers, e.g. "432;440;498;501"
+};
 
-  const downloadCSV = () => {
-    const csvData = filteredData.map(({ monthYear, label, count, labelType }) => ({
-      Month: monthYear,
+
+const downloadCSV = () => {
+  const csvData: CsvRow[] = [];
+  filteredData.forEach(({ monthYear, label, count, labelType, prNumbers }) => {
+    csvData.push({
+      Month: formatMonthLabel(monthYear),
+      MonthKey: monthYear,
       Label: label,
       LabelType: labelType,
       Count: count,
-    }));
-    const csv = Papa.unparse(csvData);
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${repoKey}_pr_label_counts.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+      Repo: REPOS.find(r => r.key === repoKey)?.label,
+      PRs: prNumbers ? prNumbers.join("; ") : "", // show as "432; 440; 498" etc
+    });
+  });
+  const csv = Papa.unparse(csvData);
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${repoKey}_${labelSet}_open_pr_label_counts.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
-  const selectAllCustom = () => setSelectedCustomLabels(customLabelsForRepo.map(l => l.value));
-  const clearAllCustom = () => setSelectedCustomLabels([]);
-  const selectAllWorkflow = () => setSelectedWorkflowLabels(WORKFLOW_LABELS.map(l => l.value));
-  const clearAllWorkflow = () => setSelectedWorkflowLabels([]);
+
+
+  const selectAll = () => setSelectedLabels(labelSpecs.map(l => l.value));
+  const clearAll = () => setSelectedLabels([]);
+
+  // Label set switch drop-down
+  const labelSetOptions = [
+    { key: "customLabels", label: "Custom Labels" },
+    { key: "githubLabels", label: "GitHub Labels" }
+  ];
 
   return (
     <Card bg={cardBg} color={textColor} mx="auto" mt={8} borderRadius="2xl" p={4}>
       <CardHeader>
         <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
           <Heading size="md" color={accentColor} mb={2}>
-            {REPOS.find(r => r.key === repoKey)?.label} Distribution
+            {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label} Distribution
           </Heading>
           <Flex gap={3} align="center">
             <Menu>
@@ -227,6 +273,27 @@ export default function PRAnalyticsCard() {
                 </Stack>
               </MenuList>
             </Menu>
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="teal" minW={160}>
+                {labelSetOptions.find(o => o.key === labelSet)?.label}
+              </MenuButton>
+              <MenuList minWidth="160px">
+                <Stack>
+                  {labelSetOptions.map(opt =>
+                    <Button
+                      key={opt.key}
+                      variant="ghost"
+                      size="sm"
+                      justifyContent="flex-start"
+                      colorScheme={labelSet === opt.key ? "teal" : undefined}
+                      onClick={() => setLabelSet(opt.key as "customLabels" | "githubLabels")}
+                    >
+                      {opt.label}
+                    </Button>
+                  )}
+                </Stack>
+              </MenuList>
+            </Menu>
             <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md">
               Download CSV
             </Button>
@@ -235,52 +302,19 @@ export default function PRAnalyticsCard() {
       </CardHeader>
       <CardBody>
         <Flex gap={4} wrap="wrap" mb={4} align="center">
-          {/* Custom Label Filters */}
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="blue" borderRadius="md" minW={180}>
-              Filter by Custom Labels
+              Filter by {labelSetOptions.find(o => o.key === labelSet)?.label}
             </MenuButton>
             <MenuList minWidth="280px" px={2} py={2}>
               <HStack mb={2} gap={2}>
-                <Button size="xs" colorScheme="teal" onClick={selectAllCustom}>Select All</Button>
-                <Button size="xs" colorScheme="red" variant="outline" onClick={clearAllCustom}>Clear All</Button>
+                <Button size="xs" colorScheme="teal" onClick={selectAll}>Select All</Button>
+                <Button size="xs" colorScheme="red" variant="outline" onClick={clearAll}>Clear All</Button>
               </HStack>
-              <CheckboxGroup value={selectedCustomLabels} onChange={(v: string[]) => setSelectedCustomLabels(v)}>
+              <CheckboxGroup value={selectedLabels} onChange={(v: string[]) => setSelectedLabels(v)}>
                 <Stack pl={2} pr={2} gap={1}>
-                  {customLabelsForRepo.map(lbl => (
-                    <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme="blue" iconColor={badgeText}>
-                      <Badge
-                        mr={2}
-                        fontSize="sm"
-                        bg={lbl.color}
-                        color={badgeText}
-                        borderRadius="base"
-                        px={2} py={1}
-                        fontWeight={600}
-                        variant="solid"
-                      >
-                        {lbl.label}
-                      </Badge>
-                    </Checkbox>
-                  ))}
-                </Stack>
-              </CheckboxGroup>
-            </MenuList>
-          </Menu>
-          {/* Workflow Label Filters */}
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="pink" borderRadius="md" minW={180}>
-              Filter by Workflow Labels
-            </MenuButton>
-            <MenuList minWidth="280px" px={2} py={2}>
-              <HStack mb={2} gap={2}>
-                <Button size="xs" colorScheme="purple" onClick={selectAllWorkflow}>Select All</Button>
-                <Button size="xs" colorScheme="red" variant="outline" onClick={clearAllWorkflow}>Clear All</Button>
-              </HStack>
-              <CheckboxGroup value={selectedWorkflowLabels} onChange={(v: string[]) => setSelectedWorkflowLabels(v)}>
-                <Stack pl={2} pr={2} gap={1}>
-                  {WORKFLOW_LABELS.map(lbl => (
-                    <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme="purple" iconColor={badgeText}>
+                  {labelSpecs.map(lbl => (
+                    <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme={labelSet === "customLabels" ? "blue" : "purple"} iconColor={badgeText}>
                       <Badge
                         mr={2}
                         fontSize="sm"
@@ -300,22 +334,24 @@ export default function PRAnalyticsCard() {
             </MenuList>
           </Menu>
         </Flex>
-        <Divider my={3} />
-        <Box>
-          {loading
-            ? <Text color={accentColor} fontWeight="bold" my={10} fontSize="xl">Loading...</Text>
-            : <ReactECharts
-                style={{ height: "460px", width: "100%" }}
-                option={option}
-                notMerge
-                lazyUpdate
-                theme={useColorModeValue("light", "dark")}
-              />
+        <Text color={accentColor} fontSize="sm" mb={2}>
+          {latestMonth
+            ? <>Open PRs in <b>{formatMonthLabel(latestMonth)}</b>: <b>{uniquePRsInLatest}</b> (across {selectedLabels.length} labels)</>
+            : <>No data for selected filter/period.</>
           }
-        </Box>
-        <Text color={textColor} fontSize="md" mt={4}>
-          Showing <b>{filteredData.length}</b> label counts / <b>{data.length}</b> total entries
         </Text>
+        <Divider my={3} />
+        <Box minH="350px">
+          {loading ? (
+            <Text color={accentColor} fontWeight="bold" my={10} fontSize="xl">Loading...</Text>
+          ) : chartData.months.length === 0 ? (
+            <Text color="gray.500" py={12} fontWeight="bold" fontSize="lg">
+              No PR label data found for this filter or period.
+            </Text>
+          ) : (
+            <ReactECharts style={{ height: "460px", width: "100%" }} option={option} notMerge lazyUpdate theme={useColorModeValue("light", "dark")} />
+          )}
+        </Box>
       </CardBody>
     </Card>
   );
