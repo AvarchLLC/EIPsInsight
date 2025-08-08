@@ -45,7 +45,13 @@ interface AggregatedLabelCount {
   monthYear: string;
   label: string;
   count: number;
-  labelType: string; // "customLabels" or "githubLabels"
+  labelType: string;
+}
+
+function formatMonthLabel(monthYear: string) {
+  const [year, month] = monthYear.split("-");
+  const date = new Date(Number(year), Number(month) - 1, 1);
+  return date.toLocaleString("default", { month: "short", year: "numeric" });
 }
 
 export default function PRAnalyticsCard() {
@@ -70,9 +76,7 @@ export default function PRAnalyticsCard() {
 
   // Filter state setup
   const [selectedLabels, setSelectedLabels] = useState<string[]>(labelSpecs.map(l => l.value));
-  useEffect(() => {
-    setSelectedLabels(labelSpecs.map(l => l.value));
-  }, [labelSpecs]);
+  useEffect(() => setSelectedLabels(labelSpecs.map(l => l.value)), [labelSpecs]);
 
   // Fetch API
   useEffect(() => {
@@ -85,7 +89,7 @@ export default function PRAnalyticsCard() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [repoKey]);
+  }, [repoKey, labelSet]); // change if labelSet swaps repo (usually shouldn't)
 
   // Only show one labelType at a time – filter accordingly
   const filteredData = useMemo(() =>
@@ -94,13 +98,16 @@ export default function PRAnalyticsCard() {
     ), [data, labelSet, selectedLabels]
   );
 
+  // xAxis months, most recent 18 default
   const months = useMemo(() => {
     const monthSet = new Set(filteredData.map(d => d.monthYear));
     return Array.from(monthSet).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }, [filteredData]);
 
+  // Chart data by series/label
   const chartData = useMemo(() => ({
     months,
+    displayMonths: months.map(formatMonthLabel),
     series: labelSpecs.map(({ value, label, color }) => ({
       name: label,
       type: "bar",
@@ -113,12 +120,29 @@ export default function PRAnalyticsCard() {
     }))
   }), [months, filteredData, labelSpecs]);
 
+  // Find latest (last) month to focus on
+  const lastPeriodIdx = chartData.displayMonths.length ? chartData.displayMonths.length - 1 : 0;
+  const defaultZoomStart = chartData.displayMonths.length > 18
+    ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
+    : 0;
+
+  // PR count for the latest month (all filtered labels)
+  const latestMonth = months[lastPeriodIdx] || "";
+  const uniquePRsInLatest = useMemo(() => {
+    // Sum filteredData.count for latest month (labels are now deduped!)
+    return filteredData
+      .filter(d => d.monthYear === latestMonth)
+      .reduce((acc, d) => acc + d.count, 0);
+  }, [filteredData, latestMonth]);
+
+  // Chart option
   const option = useMemo(() => ({
     tooltip: {
       trigger: "axis",
       backgroundColor: "#fff",
       borderColor: "#cfd8dc",
       textStyle: { color: "#1a202c" },
+      confine: true,
       formatter(params: any) {
         let total = 0;
         params.forEach((item: any) => { total += item.value; });
@@ -134,24 +158,24 @@ export default function PRAnalyticsCard() {
       textStyle: { color: textColor, fontWeight: 700, fontSize: 14 },
       type: 'scroll',
       orient: 'horizontal',
-      bottom: 20,
+      top: 20,
       scrollDataIndex: 0,
     },
     backgroundColor: cardBg,
     xAxis: [{
       type: "category",
-      data: chartData.months,
+      data: chartData.displayMonths,
       axisLabel: {
         color: textColor,
         fontWeight: 600,
-        fontSize: 10,
+        fontSize: 11,
         interval: 0,
         rotate: 0
       }
     }],
     yAxis: [{
       type: "value",
-      name: "PR Count",
+      name: "Open PRs",
       axisLabel: { color: textColor }
     }],
     series: chartData.series,
@@ -160,31 +184,45 @@ export default function PRAnalyticsCard() {
         type: "slider",
         show: true,
         xAxisIndex: [0],
-        start: Math.max(0, 100 - 10 * chartData.months.length),
+        start: defaultZoomStart,
         end: 100,
-        bottom: 12,
+        top: 60,
         height: 30
       }
     ],
-    grid: { left: 60, right: 30, top: 60, bottom: 80 }
-  }), [chartData, textColor, cardBg]);
+    grid: { left: 60, right: 30, top: 80, bottom: 60 }
+  }), [chartData, textColor, cardBg, defaultZoomStart]);
+type CsvRow = {
+  Month: string;
+  MonthKey: string;
+  Label: string;
+  LabelType: string;
+  Count: number;
+  Repo: string | undefined;
+};
 
-  const downloadCSV = () => {
-    const csvData = filteredData.map(({ monthYear, label, count }) => ({
-      Month: monthYear,
+const downloadCSV = () => {
+  const csvData: CsvRow[] = [];
+  filteredData.forEach(({ monthYear, label, count, labelType }) => {
+    csvData.push({
+      Month: formatMonthLabel(monthYear),
+      MonthKey: monthYear,
       Label: label,
+      LabelType: labelType,
       Count: count,
-      Set: labelSet,
-    }));
-    const csv = Papa.unparse(csvData);
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${repoKey}_${labelSet}_pr_label_counts.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+      Repo: REPOS.find(r => r.key === repoKey)?.label,
+    });
+  });
+  const csv = Papa.unparse(csvData);
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${repoKey}_${labelSet}_open_pr_label_counts.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 
   const selectAll = () => setSelectedLabels(labelSpecs.map(l => l.value));
   const clearAll = () => setSelectedLabels([]);
@@ -224,7 +262,6 @@ export default function PRAnalyticsCard() {
                 </Stack>
               </MenuList>
             </Menu>
-            {/* Label set switch */}
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="teal" minW={160}>
                 {labelSetOptions.find(o => o.key === labelSet)?.label}
@@ -287,8 +324,10 @@ export default function PRAnalyticsCard() {
           </Menu>
         </Flex>
         <Text color={accentColor} fontSize="sm" mb={2}>
-          Showing <b>{filteredData.length}</b> label count entries across <b>{months.length}</b> time periods with {` `}
-          <b>{selectedLabels.length}</b> {labelSet === "customLabels" ? "custom" : "workflow"} labels.
+          {latestMonth
+            ? <>Open PRs in <b>{formatMonthLabel(latestMonth)}</b>: <b>{uniquePRsInLatest}</b> (across {selectedLabels.length} labels)</>
+            : <>No data for selected filter/period.</>
+          }
         </Text>
         <Divider my={3} />
         <Box minH="350px">
@@ -302,9 +341,6 @@ export default function PRAnalyticsCard() {
             <ReactECharts style={{ height: "460px", width: "100%" }} option={option} notMerge lazyUpdate theme={useColorModeValue("light", "dark")} />
           )}
         </Box>
-        <Text color={textColor} fontSize="md" mt={4}>
-          Showing <b>{filteredData.length}</b> label counts / <b>{data.length}</b> total entries
-        </Text>
       </CardBody>
     </Card>
   );
