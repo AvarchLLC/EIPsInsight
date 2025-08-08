@@ -1,16 +1,33 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 // -- Snapshot model setup
 
-const snapshotSchema = new mongoose.Schema({
-  snapshotDate: String,        // "YYYY-MM-DD"
-  month: String,               // "YYYY-MM"
-  prs: [mongoose.Schema.Types.Mixed] // Array of PRs for this month-end
-}, { collection: "open_pr_snapshots", strict: false }); // strict: false for flexibility
+interface SnapshotPR {
+  prId: number;
+  number: number;
+  title: string;
+  githubLabels?: string[];
+  customLabels?: string[];
+  state?: string;
+  createdAt?: Date;
+  closedAt?: Date;
+  // ...add other fields as needed
+}
 
-const Snap =
-  mongoose.models.Snap || mongoose.model("Snap", snapshotSchema, "open_pr_snapshots");
+interface SnapshotDoc {
+  snapshotDate: string;
+  month: string;
+  prs: SnapshotPR[];
+}
+
+const snapshotSchema = new mongoose.Schema({
+  snapshotDate: String,
+  month: String,
+  prs: [{}] // or [mongoose.Schema.Types.Mixed]
+}, { collection: "open_pr_snapshots", strict: false });
+
+const Snap = mongoose.models.Snap || mongoose.model("Snap", snapshotSchema, "open_pr_snapshots");
 
 async function connectToDatabase() {
   if (mongoose.connection.readyState >= 1) return;
@@ -21,8 +38,6 @@ async function connectToDatabase() {
   });
 }
 
-// --- API handler ---
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -30,42 +45,45 @@ export default async function handler(
   try {
     await connectToDatabase();
 
-    // Optionally allow filtering by labelType (customLabels or githubLabels)
     // ?labelType=customLabels  (or githubLabels)
     const { labelType = "customLabels" } = req.query;
 
-    // Pull all monthly snapshots, sorted chronologically (fill gaps in frontend if needed)
-    const snapshots = await Snap.find({}).sort({ month: 1 }).lean();
+    // Pull all monthly snapshots, sorted chronologically
+    const snapshots: SnapshotDoc[] = await Snap.find({}).sort({ month: 1 }).lean();
 
-    // Aggregate across all snapshots/months:
-    // For each (month, label), count number of PRs with that label in their customLabels or githubLabels array.
+    const rows: {
+      monthYear: string;
+      label: string;
+      count: number;
+      labelType: string;
+    }[] = [];
 
-    const rows = [];
+    for (const snap of snapshots) {
+      const month = snap.month;
+      const labelCounts: Record<string, number> = {};
 
-// In your API handler, pseudocode...
-for (const snap of snapshots) {
-  const month = snap.month;
-  const labelCounts = {};
+      for (const pr of snap.prs ?? []) {
+        // Ensure type safety/defaults
+        const labels: string[] = labelType === "customLabels"
+          ? pr.customLabels ?? []
+          : pr.githubLabels ?? [];
 
-  for (const pr of snap.prs) {
-    const labels = pr.customLabels ?? [];
-    // Pick highest-priority label
-    let assigned = "Misc";
-    if (labels.includes("Typo Fix")) assigned = "Typo Fix";
-    else if (labels.includes("Status Change")) assigned = "Status Change";
-    else if (labels.includes("EIP Update")) assigned = "EIP Update";
-    else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
-    else if (labels.includes("New EIP")) assigned = "New EIP";
-    // ... priority order, then fallback to "Misc"
+        // Priority order
+        let assigned = "Misc";
+        if (labels.includes("Typo Fix")) assigned = "Typo Fix";
+        else if (labels.includes("Status Change")) assigned = "Status Change";
+        else if (labels.includes("EIP Update")) assigned = "EIP Update";
+        else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
+        else if (labels.includes("New EIP")) assigned = "New EIP";
+        // ... add more if needed
 
-    labelCounts[assigned] = (labelCounts[assigned] || 0) + 1;
-  }
+        labelCounts[assigned] = (labelCounts[assigned] || 0) + 1;
+      }
 
-  for (const [label, count] of Object.entries(labelCounts)) {
-    rows.push({ monthYear: month, label, count, labelType: "customLabels" });
-  }
-}
-
+      for (const [label, count] of Object.entries(labelCounts)) {
+        rows.push({ monthYear: month, label, count, labelType: labelType as string });
+      }
+    }
 
     res.status(200).json(rows);
   } catch (error) {
