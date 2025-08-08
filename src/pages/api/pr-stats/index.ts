@@ -42,36 +42,30 @@ export default async function handler(
 
     const rows = [];
 
-    for (const snap of snapshots) {
-      if (!snap.prs) continue;
-      const month = snap.month;
-      const prsArr = snap.prs;
+// In your API handler, pseudocode...
+for (const snap of snapshots) {
+  const month = snap.month;
+  const labelCounts = {};
 
-      const labelCounts: Record<string, number> = {};
+  for (const pr of snap.prs) {
+    const labels = pr.customLabels ?? [];
+    // Pick highest-priority label
+    let assigned = "Misc";
+    if (labels.includes("Typo Fix")) assigned = "Typo Fix";
+    else if (labels.includes("Status Change")) assigned = "Status Change";
+    else if (labels.includes("EIP Update")) assigned = "EIP Update";
+    else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
+    else if (labels.includes("New EIP")) assigned = "New EIP";
+    // ... priority order, then fallback to "Misc"
 
-      for (const pr of prsArr) {
-        // Defensive: skip PRs with no labels
-        const labelArr =
-          labelType === "customLabels"
-            ? pr.customLabels ?? []
-            : pr.githubLabels ?? [];
+    labelCounts[assigned] = (labelCounts[assigned] || 0) + 1;
+  }
 
-        for (const lbl of labelArr) {
-          if (!lbl) continue;
-          labelCounts[lbl] = (labelCounts[lbl] || 0) + 1;
-        }
-      }
+  for (const [label, count] of Object.entries(labelCounts)) {
+    rows.push({ monthYear: month, label, count, labelType: "customLabels" });
+  }
+}
 
-      // Build API response: { monthYear, label, count, labelType }
-      for (const [label, count] of Object.entries(labelCounts)) {
-        rows.push({
-          monthYear: month,
-          label,
-          count,
-          labelType,
-        });
-      }
-    }
 
     res.status(200).json(rows);
   } catch (error) {
