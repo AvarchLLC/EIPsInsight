@@ -1,57 +1,27 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import mongoose, { Schema, model, models } from 'mongoose';
+import type { NextApiRequest, NextApiResponse } from "next";
+import mongoose from "mongoose";
 
-interface PrDocument {
-  prId: number;
-  number: number;
-  title: string;
-  author: string;
-  prUrl: string;
-  customLabels: string[];
-  githubLabels: string[];
-  state: string;
-  mergeable_state?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  closedAt?: Date | null;
-  mergedAt?: Date | null;
-  specType: string;
-}
+// -- Snapshot model setup
 
-const prSchema = new Schema<PrDocument>({
-  prId: { type: Number, required: true },
-  number: { type: Number, required: true },
-  title: { type: String, required: true },
-  author: { type: String, required: true },
-  prUrl: { type: String, required: true },
-  customLabels: { type: [String], required: true },
-  githubLabels: { type: [String], required: true },
-  state: { type: String, required: true },
-  mergeable_state: { type: String, required: false, default: null },
-  createdAt: { type: Date, required: true },
-  updatedAt: { type: Date, required: true },
-  closedAt: { type: Date, required: false, default: null },
-  mergedAt: { type: Date, required: false, default: null },
-  specType: { type: String, required: true },
-});
+const snapshotSchema = new mongoose.Schema({
+  snapshotDate: String,        // "YYYY-MM-DD"
+  month: String,               // "YYYY-MM"
+  prs: [mongoose.Schema.Types.Mixed] // Array of PRs for this month-end
+}, { collection: "open_pr_snapshots", strict: false }); // strict: false for flexibility
 
-// Use the right collection name!
-const PrModel = models.Pr || model<PrDocument>('Pr', prSchema, 'eipprs');
+const Snap =
+  mongoose.models.Snap || mongoose.model("Snap", snapshotSchema, "open_pr_snapshots");
 
 async function connectToDatabase() {
-  if (mongoose.connection.readyState >= 1) {
-    return;
-  }
-  if (!process.env.OPENPRS_MONGODB_URI) {
-    throw new Error('Please define the OPENPRS_MONGODB_URI environment variable');
-  }
-  if (!process.env.OPENPRS_DATABASE) {
-    throw new Error('Please define the OPENPRS_DATABASE environment variable');
-  }
-  await mongoose.connect(process.env.OPENPRS_MONGODB_URI!, {
+  if (mongoose.connection.readyState >= 1) return;
+  if (!process.env.OPENPRS_MONGODB_URI) throw new Error("Define OPENPRS_MONGODB_URI");
+  if (!process.env.OPENPRS_DATABASE) throw new Error("Define OPENPRS_DATABASE");
+  await mongoose.connect(process.env.OPENPRS_MONGODB_URI, {
     dbName: process.env.OPENPRS_DATABASE,
   });
 }
+
+// --- API handler ---
 
 export default async function handler(
   req: NextApiRequest,
@@ -59,63 +29,53 @@ export default async function handler(
 ) {
   try {
     await connectToDatabase();
-    // Aggregate counts by month-year and label
-    const stats = await PrModel.aggregate([
-      {
-        $project: {
-          monthYear: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-          customLabels: 1,
-          githubLabels: 1,
-        },
-      },
-      {
-        $facet: {
-          custom: [
-            { $unwind: "$customLabels" },
-            {
-              $group: {
-                _id: { monthYear: "$monthYear", label: "$customLabels" },
-                count: { $sum: 1 },
-              },
-            },
-            {
-              $project: {
-                _id: 0,
-                monthYear: "$_id.monthYear",
-                label: "$_id.label",
-                count: 1,
-                labelType: { $literal: "customLabels" },
-              },
-            },
-          ],
-          github: [
-            { $unwind: "$githubLabels" },
-            {
-              $group: {
-                _id: { monthYear: "$monthYear", label: "$githubLabels" },
-                count: { $sum: 1 },
-              },
-            },
-            {
-              $project: {
-                _id: 0,
-                monthYear: "$_id.monthYear",
-                label: "$_id.label",
-                count: 1,
-                labelType: { $literal: "githubLabels" },
-              },
-            },
-          ],
-        },
-      },
-      { $project: { combinedLabels: { $concatArrays: ["$custom", "$github"] } } },
-      { $unwind: "$combinedLabels" },
-      { $replaceRoot: { newRoot: "$combinedLabels" } },
-      { $sort: { monthYear: 1, labelType: 1, label: 1 } },
-    ]);
-    res.status(200).json(stats);
+
+    // Optionally allow filtering by labelType (customLabels or githubLabels)
+    // ?labelType=customLabels  (or githubLabels)
+    const { labelType = "customLabels" } = req.query;
+
+    // Pull all monthly snapshots, sorted chronologically (fill gaps in frontend if needed)
+    const snapshots = await Snap.find({}).sort({ month: 1 }).lean();
+
+    // Aggregate across all snapshots/months:
+    // For each (month, label), count number of PRs with that label in their customLabels or githubLabels array.
+
+    const rows = [];
+
+    for (const snap of snapshots) {
+      if (!snap.prs) continue;
+      const month = snap.month;
+      const prsArr = snap.prs;
+
+      const labelCounts: Record<string, number> = {};
+
+      for (const pr of prsArr) {
+        // Defensive: skip PRs with no labels
+        const labelArr =
+          labelType === "customLabels"
+            ? pr.customLabels ?? []
+            : pr.githubLabels ?? [];
+
+        for (const lbl of labelArr) {
+          if (!lbl) continue;
+          labelCounts[lbl] = (labelCounts[lbl] || 0) + 1;
+        }
+      }
+
+      // Build API response: { monthYear, label, count, labelType }
+      for (const [label, count] of Object.entries(labelCounts)) {
+        rows.push({
+          monthYear: month,
+          label,
+          count,
+          labelType,
+        });
+      }
+    }
+
+    res.status(200).json(rows);
   } catch (error) {
-    console.error('Error in API handler:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("API error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 }
