@@ -411,6 +411,8 @@ useEffect(() => {
     setTemplateData({ ...initialTemplateData }); // NOT initialTemplateData, but a **new copy**
     setValidated(false); // Also reset validation state if needed
   }
+  // Always clear search bar when tab or mode changes
+  setSearchNumber("");
 }, [activeTab, activeTab2]);
 
 
@@ -594,8 +596,16 @@ if (requiresArr.length > 0) {
 
 
 
-const markdownContent = generateEipWlintMarkdown(templateData);
-// console.log(markdownContent);
+// Markdown editor state: allow editing raw markdown code
+const [markdownRaw, setMarkdownRaw] = useState<string>(() => generateEipWlintMarkdown(templateData));
+
+// Keep markdownRaw in sync with form fields unless user edits it directly
+useEffect(() => {
+  setMarkdownRaw(generateEipWlintMarkdown(templateData));
+  // eslint-disable-next-line
+}, [templateData]);
+
+const markdownContent = markdownRaw;
 
 const splitContent = markdownContent.split(/---\n/);
 const tableContent = splitContent[1]?.trim() || "";
@@ -673,26 +683,31 @@ if (errorMessages.length > 0) {
     <>
     <FeedbackWidget/>
     <Box
-      p={5}
+      p={[2, 4, 8]}
       mx="auto"
-      bg="gray.200"
+      bg="gray.100"
       _dark={{ bg: "gray.900", color: "gray.200" }}
       color="black"
-      borderRadius="lg"
+      borderRadius="2xl"
+      boxShadow="xl"
       id="EipTemplateEditor"
+      maxW="1200px"
+      minH="90vh"
     >
       <Box
-        p={4}
-        bg="gray.300"
+        p={[2, 4]}
+        bg="gray.200"
         _dark={{ bg: "gray.800" }}
-        borderRadius="md"
+        borderRadius="lg"
         display="flex"
         flexWrap="wrap"
         justifyContent="space-between"
         alignItems="center"
-        gap={4} // Adds spacing between rows when wrapped
+        gap={4}
+        boxShadow="md"
+        mb={2}
       >
-        <HStack spacing={4} flexWrap="wrap">
+  <HStack spacing={[2, 3, 4]} flexWrap="wrap" width="100%">
           <Flex align="center" justify="space-between">
             <ButtonGroup size="md" isAttached>
               <Button
@@ -729,7 +744,7 @@ if (errorMessages.length > 0) {
           <Flex align="center" justify="space-between">
             {activeTab2 === "import" && (
               <InputGroup
-                maxW="300px"
+                maxW={["100%", "260px", "320px"]}
                 // minW="200px"
                 colorScheme="green"
               >
@@ -856,43 +871,47 @@ if (errorMessages.length > 0) {
 
       <Box
         display="flex"
-        flexDirection={["column", "column", "row"]} // Stacks vertically on small screens
-        height="800px"
+        flexDirection={["column", null, "row"]}
+        height={viewMode === "split" ? { base: "auto", md: "75vh" } : "auto"}
+        minHeight={viewMode === "split" ? { base: "auto", md: "75vh" } : "600px"}
         mt={4}
-        gap={4} // Adds spacing between editor and output
+        gap={[2, 4, 8]}
         _dark={{
           bg: "gray.800",
           color: "gray.200",
         }}
+        width="100%"
       >
         {(viewMode === "edit" || viewMode === "split") && (
           <Box
             flex="1"
-            p={4}
+            p={[2, 4, 6]}
             minWidth={["100%", "50%"]}
+            height={viewMode === "split" ? { base: "auto", md: "100%" } : "auto"}
             overflowY="auto"
-            bg="gray.100"
+            bg="white"
             _dark={{ bg: "gray.700" }}
-            borderRadius="md"
-            boxShadow="sm"
-            fontSize={["sm", "md", "lg"]} // Adjust font size based on screen size
+            borderRadius="xl"
+            boxShadow="md"
+            fontSize={["sm", "md", "lg"]}
             sx={{
               "&::-webkit-scrollbar": {
-                width: "8px", // Width of the scrollbar
+                width: "8px",
               },
               "&::-webkit-scrollbar-thumb": {
-                background: "#3182ce", // Color of the scrollbar thumb
-                borderRadius: "4px", // Rounded edges for the thumb
+                background: "#3182ce",
+                borderRadius: "4px",
               },
               "&::-webkit-scrollbar-thumb:hover": {
-                background: "#2b6cb0", // Darker color on hover
+                background: "#2b6cb0",
               },
               "&::-webkit-scrollbar-track": {
-                background: "#edf2f7", // Light background for the track
+                background: "#edf2f7",
               },
             }}
+            mb={[2, 0]}
           >
-            <VStack spacing={5}>
+            <VStack spacing={[3, 4, 6]}>
               <Text fontSize={["sm", "md", "3xl"]} fontWeight="bold">
                 {activeTab === "eip"
                   ? "Document an EIP"
@@ -1265,7 +1284,7 @@ if (errorMessages.length > 0) {
                           } // Normal change handling
                           size="lg"
                           resize="vertical"
-                          height="300px"
+                          height={["200px", "260px", "320px"]}
                           width="100%"
                           borderWidth="2px"
                         />
@@ -1282,7 +1301,7 @@ if (errorMessages.length > 0) {
                           } // Normal change handling
                           size="lg"
                           resize="vertical"
-                          height="200px"
+                          height={["140px", "180px", "220px"]}
                           width="100%"
                           borderWidth="2px"
                         />
@@ -1318,41 +1337,46 @@ if (errorMessages.length > 0) {
         {(viewMode === "output" || viewMode === "split") && (
           <Box
             flex="1"
-            p={4}
-            minWidth={["100%", "50%"]}
-            bg="gray.100"
+            p={[2, 4, 6]}
+            minWidth={{ base: "100%", md: viewMode === "output" ? "100%" : "50%" }}
+            width={{ base: "100%", md: viewMode === "output" ? "100%" : "50%" }}
+            maxWidth={{ base: "100%", md: viewMode === "output" ? "100%" : "50%" }}
+            height={viewMode === "split" ? { base: "auto", md: "100%" } : "auto"}
+            bg="white"
             _dark={{ bg: "gray.700" }}
-            borderRadius="md"
-            boxShadow="sm"
+            borderRadius="xl"
+            boxShadow="md"
             overflowY="auto"
             whiteSpace="pre-wrap"
-            fontSize={["sm", "md", "lg"]} // Adjust font size based on screen size
+            fontSize={["sm", "md", "lg"]}
+            display="flex"
+            flexDirection="column"
             sx={{
               "&::-webkit-scrollbar": {
-                width: "8px", // Width of the scrollbar
+                width: "8px",
               },
               "&::-webkit-scrollbar-thumb": {
-                background: "#3182ce", // Color of the scrollbar thumb
-                borderRadius: "4px", // Rounded edges for the thumb
+                background: "#3182ce",
+                borderRadius: "4px",
               },
               "&::-webkit-scrollbar-thumb:hover": {
-                background: "#2b6cb0", // Darker color on hover
+                background: "#2b6cb0",
               },
               "&::-webkit-scrollbar-track": {
-                background: "#edf2f7", // Light background for the track
+                background: "#edf2f7",
               },
             }}
+            mb={[2, 0]}
           >
-            {/* <Text fontFamily="monospace">{renderTemplate()}</Text> */}
-            <Box p={6} maxW="900px" mx="auto">
-              <VStack spacing={4} align="start">
+            {/* Responsive and in sync with left editor */}
+            <Box flex="1" display="flex" flexDirection="column" justifyContent="flex-start" p={[2, 4, 6]} maxW={viewMode === "output" ? "100%" : "900px"} mx="auto" width="100%" minHeight={viewMode === "split" ? 0 : undefined}>
+              <VStack spacing={4} align="start" width="100%">
                 <Box display="flex" justifyContent="space-between" w="full">
                   <Text fontSize="lg" fontWeight="bold">
                     {preview ? "Markdown Preview" : "Markdown Code"}
                   </Text>
                   <HStack spacing={4} flexWrap="wrap">
                     <Button
-                      // leftIcon={<BiColumns />}
                       colorScheme="blue"
                       variant={preview === false ? "solid" : "outline"}
                       _hover={{
@@ -1367,9 +1391,7 @@ if (errorMessages.length > 0) {
                     >
                       Code
                     </Button>
-
                     <Button
-                      // leftIcon={<ViewIcon />}
                       colorScheme="blue"
                       variant={preview === true ? "solid" : "outline"}
                       _hover={{ bg: preview !== true ? "blue.700" : undefined }}
@@ -1395,7 +1417,10 @@ if (errorMessages.length > 0) {
                     color: preview ? "white" : "gray.300",
                   }}
                   overflow="auto"
-                  // maxH="600px"
+                  flex="1"
+                  minHeight={viewMode === "split" ? 0 : (viewMode === "output" ? ["320px", "480px", "640px"] : ["200px", "260px", "320px"])}
+                  display="flex"
+                  flexDirection="column"
                 >
                   {preview ? (
                     <Box
@@ -1437,9 +1462,41 @@ if (errorMessages.length > 0) {
                       />
                     </Box>
                   ) : (
-                    <Box as="pre" fontFamily="monospace" fontSize="sm">
-                      {generateMarkdownTemplate(templateData)}
-                    </Box>
+                    <Textarea
+                      fontFamily="Fira Mono, Menlo, Monaco, Consolas, monospace"
+                      fontSize={["sm", "md"]}
+                      width="100%"
+                      minHeight={viewMode === "output" ? ["420px", "560px", "720px"] : ["260px", "320px", "420px"]}
+                      value={markdownRaw}
+                      onChange={e => setMarkdownRaw(e.target.value)}
+                      resize="vertical"
+                      borderWidth="2px"
+                      borderColor="blue.400"
+                      bg="gray.900"
+                      color="white"
+                      _focus={{ borderColor: "blue.600", boxShadow: "0 0 0 2px #3182ce55" }}
+                      _dark={{ bg: "gray.800", color: "gray.300", borderColor: "blue.300" }}
+                      borderRadius="md"
+                      boxShadow="sm"
+                      transition="all 0.2s"
+                      sx={{
+                        "&::-webkit-scrollbar": {
+                          width: "8px",
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                          background: "#3182ce",
+                          borderRadius: "4px",
+                        },
+                        "&::-webkit-scrollbar-thumb:hover": {
+                          background: "#2b6cb0",
+                        },
+                        "&::-webkit-scrollbar-track": {
+                          background: "#222",
+                        },
+                      }}
+                      spellCheck={false}
+                      placeholder="Edit your Markdown code here..."
+                    />
                   )}
                 </Box>
               </VStack>
@@ -1449,15 +1506,17 @@ if (errorMessages.length > 0) {
       </Box>
       <br />
       <Box
-        p={4}
-        bg="gray.300"
+        p={[2, 4]}
+        bg="gray.200"
         _dark={{ bg: "gray.800" }}
-        borderRadius="md"
+        borderRadius="lg"
         display="flex"
         flexWrap="wrap"
         justifyContent="space-between"
         alignItems="center"
-        gap={4} // Adds spacing between rows when wrapped
+        gap={4}
+        boxShadow="md"
+        mt={4}
       >
         <HStack spacing={4} flexWrap="wrap">
           <Flex align="center" justify="space-between"></Flex>
