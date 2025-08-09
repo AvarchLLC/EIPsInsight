@@ -84,18 +84,36 @@ export default function PRAnalyticsCard() {
   useEffect(() => {
     setLoading(true);
     const repoObj = REPOS.find(r => r.key === repoKey)!;
-    fetch(repoObj.api)
-      .then(res => res.json())
-      .then((raw: AggregatedLabelCount[]) => {
-        setData(raw);
-        setLoading(false);
+    const controller = new AbortController();
+    const url = `${repoObj.api}?labelType=${labelSet}`;
+
+    fetch(url, { signal: controller.signal })
+      .then(async (res) => {
+        if (!res.ok) {
+          const body = await res.text().catch(() => "");
+          throw new Error(`Request failed: ${res.status} ${res.statusText} ${body}`);
+        }
+        return res.json();
       })
-      .catch(() => setLoading(false));
-  }, [repoKey, labelSet]); // change if labelSet swaps repo (usually shouldn't)
+      .then((raw: unknown) => {
+        const arr = Array.isArray(raw) ? raw : [];
+        setData(arr as AggregatedLabelCount[]);
+      })
+      .catch((err) => {
+        if ((err as Error).name !== "AbortError") {
+          // eslint-disable-next-line no-console
+          console.error("[PRAnalytics] fetch error", err);
+          setData([]);
+        }
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, [repoKey, labelSet]); // re-run when repo or label type changes
 
   // Only show one labelType at a time – filter accordingly
   const filteredData = useMemo(() =>
-    data.filter(item =>
+    (Array.isArray(data) ? data : []).filter(item =>
       item.labelType === labelSet && selectedLabels.includes(item.label)
     ), [data, labelSet, selectedLabels]
   );

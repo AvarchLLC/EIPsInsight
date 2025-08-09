@@ -20,21 +20,41 @@ interface SnapshotDoc {
   prs: SnapshotPR[];
 }
 
-const snapshotSchema = new mongoose.Schema({
+const snapshotSchema = new mongoose.Schema<SnapshotDoc>({
   snapshotDate: String,
   month: String,
   prs: [{}]
 }, { collection: "open_pr_snapshots", strict: false });
 
-const Snap = mongoose.models.Snap || mongoose.model("Snap", snapshotSchema, "open_pr_snapshots");
+const Snap: mongoose.Model<SnapshotDoc> = (mongoose.models.Snap as mongoose.Model<SnapshotDoc>) ||
+  mongoose.model<SnapshotDoc>("Snap", snapshotSchema, "open_pr_snapshots");
+
+// Cache the connection across hot reloads/serverless invocations
+type MongooseCache = {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const globalWithMongoose = global as typeof global & { mongoose: MongooseCache };
+
+if (!globalWithMongoose.mongoose) {
+  globalWithMongoose.mongoose = { conn: null, promise: null };
+}
 
 async function connectToDatabase() {
-  if (mongoose.connection.readyState >= 1) return;
-  if (!process.env.OPENPRS_MONGODB_URI) throw new Error("Define OPENPRS_MONGODB_URI");
-  if (!process.env.OPENPRS_DATABASE) throw new Error("Define OPENPRS_DATABASE");
-  await mongoose.connect(process.env.OPENPRS_MONGODB_URI, {
-    dbName: process.env.OPENPRS_DATABASE,
-  });
+  if (globalWithMongoose.mongoose.conn) return globalWithMongoose.mongoose.conn;
+
+  if (!globalWithMongoose.mongoose.promise) {
+    if (!process.env.OPENPRS_MONGODB_URI) throw new Error("Define OPENPRS_MONGODB_URI");
+    if (!process.env.OPENPRS_DATABASE) throw new Error("Define OPENPRS_DATABASE");
+    globalWithMongoose.mongoose.promise = mongoose
+      .connect(process.env.OPENPRS_MONGODB_URI, { dbName: process.env.OPENPRS_DATABASE })
+      .then((m) => m);
+  }
+
+  globalWithMongoose.mongoose.conn = await globalWithMongoose.mongoose.promise;
+  return globalWithMongoose.mongoose.conn;
 }
 
 export default async function handler(
@@ -46,17 +66,20 @@ export default async function handler(
     await connectToDatabase();
     console.log("[API] Connected to MongoDB. ReadyState:", mongoose.connection.readyState);
 
-    // ?labelType=customLabels  (or githubLabels)
-    const { labelType = "customLabels" } = req.query;
-    console.log("[API] labelType param is:", labelType);
+    // Sanitize labelType: default to customLabels; accept only known values
+    const rawLabelType = Array.isArray(req.query.labelType)
+      ? req.query.labelType[0]
+      : (req.query.labelType as string | undefined);
+    const effectiveLabelType = rawLabelType === "githubLabels" ? "githubLabels" : "customLabels";
+    console.log("[API] labelType param is:", rawLabelType, "-> using:", effectiveLabelType);
 
     // Count and quick peek at docs
     const collectionCount = await Snap.countDocuments();
     console.log(`[API] Snapshots in collection: ${collectionCount}`);
 
     // Find all monthly snapshots, sorted
-    const snapshots: SnapshotDoc[] = await Snap.find({}).sort({ month: 1 }).lean();
-    console.log(`[API] Fetched ${snapshots.length} snapshot docs`);
+  const snapshots = await Snap.find({}).sort({ month: 1 }).lean().exec();
+  console.log(`[API] Fetched ${snapshots.length} snapshot docs`);
 
     console.log("[API] DB Name:", mongoose.connection.name);
 
@@ -76,7 +99,7 @@ export default async function handler(
       const labelToPrs: Record<string, number[]> = {};
 
       for (const pr of snap.prs ?? []) {
-        const labels: string[] = labelType === "customLabels"
+        const labels: string[] = effectiveLabelType === "customLabels"
           ? pr.customLabels ?? []
           : pr.githubLabels ?? [];
 
@@ -97,7 +120,7 @@ export default async function handler(
           monthYear: month,
           label,
           count: prNumbers.length,
-          labelType: labelType as string,
+          labelType: effectiveLabelType,
           prNumbers,
         });
       }
