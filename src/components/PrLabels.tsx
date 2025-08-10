@@ -36,9 +36,18 @@ const WORKFLOW_LABELS: LabelSpec[] = [
   { value: "Other Labels", label: "Other Labels", color: "#9ca3af" },
 ];
 
+const CUSTOM_LABELS_RIP: LabelSpec[] = [
+  { value: "Update", label: "Update", color: "#3b82f6" },
+  { value: "Typo Fix", label: "Typo Fix", color: "#10b981" },
+  { value: "New RIP", label: "New RIP", color: "#f59e42" },
+  { value: "Created By Bot", label: "Created By Bot", color: "#a21caf" },
+  { value: "Misc", label: "Miscellaneous", color: "#6b7280" },
+];
+
 const REPOS = [
   { key: "eip", label: "EIP PRs", api: "/api/pr-stats" },
   { key: "erc", label: "ERC PRs", api: "/api/ercpr-stats" },
+  { key: "rip", label: "RIP PRs", api: "/api/rippr-stats" },
 ];
 
 interface AggregatedLabelCount {
@@ -70,7 +79,11 @@ export default function PRAnalyticsCard() {
   // Select correct label spec
   const labelSpecs: LabelSpec[] = useMemo(() => {
     if (labelSet === "customLabels") {
-      return repoKey === "eip" ? CUSTOM_LABELS_EIP : CUSTOM_LABELS_ERC;
+      return repoKey === "eip"
+        ? CUSTOM_LABELS_EIP
+        : repoKey === "erc"
+        ? CUSTOM_LABELS_ERC
+        : CUSTOM_LABELS_RIP;
     } else {
       return WORKFLOW_LABELS;
     }
@@ -324,7 +337,7 @@ const downloadCSV = async () => {
                 </Stack>
               </MenuList>
             </Menu>
-            <Menu>
+            {/* <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="teal" minW={160}>
                 {labelSetOptions.find(o => o.key === labelSet)?.label}
               </MenuButton>
@@ -344,7 +357,7 @@ const downloadCSV = async () => {
                   )}
                 </Stack>
               </MenuList>
-            </Menu>
+            </Menu> */}
             <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md">
               Download CSV
             </Button>
@@ -385,12 +398,12 @@ const downloadCSV = async () => {
             </MenuList>
           </Menu>
         </Flex>
-        <Text color={accentColor} fontSize="sm" mb={2}>
+        {/* <Text color={accentColor} fontSize="sm" mb={2}>
           {latestMonth
             ? <>Open PRs in <b>{formatMonthLabel(latestMonth)}</b>: <b>{uniquePRsInLatest}</b> (across {selectedLabels.length} labels)</>
             : <>No data for selected filter/period.</>
           }
-        </Text>
+        </Text> */}
         <Divider my={3} />
         <Box minH="350px">
           {loading ? (

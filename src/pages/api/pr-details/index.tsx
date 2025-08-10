@@ -1,5 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose, { Schema, Connection } from "mongoose";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 interface SnapshotPR {
   prId: number;
@@ -24,14 +24,12 @@ async function getDbConn({ uri, dbName }: { uri: string; dbName: string }): Prom
     dbName,
     readPreference: "primary",
     readConcern: { level: "majority" },
-    maxIdleTimeMS: 10000, // avoid holding connections open forever
+    maxIdleTimeMS: 10000,
   });
-
   await new Promise<void>((resolve, reject) => {
     conn.once("open", () => resolve());
     conn.once("error", (err) => reject(err));
   });
-
   return conn;
 }
 
@@ -47,10 +45,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ? req.query.db
     : process.env.OPENPRS_DATABASE || "test";
 
-  const repoKind = req.query.repo === "erc" ? "erc" : "eip";
-  const collection = repoKind === "erc" ? "open_erc_pr_snapshots" : "open_pr_snapshots";
-  const repoLabel = repoKind === "erc" ? "ERC PRs" : "EIP PRs";
-  const prGithubRepo = repoKind === "erc" ? "ethereum/ERCs" : "ethereum/EIPs";
+  // Determine repo type and config
+  const repoParam = (req.query.repo as string) || "eip";
+  let repoKind: "eip" | "erc" | "rip" = "eip";
+  if (repoParam === "erc") repoKind = "erc";
+  else if (repoParam === "rip") repoKind = "rip";
+
+  const collection =
+    repoKind === "erc" ? "open_erc_pr_snapshots" :
+    repoKind === "rip" ? "open_rip_pr_snapshots" :
+    "open_pr_snapshots";
+
+  const repoLabel =
+    repoKind === "erc" ? "ERC PRs" :
+    repoKind === "rip" ? "RIP PRs" :
+    "EIP PRs";
+
+  const prGithubRepo =
+    repoKind === "erc" ? "ethereum/ERCs" :
+    repoKind === "rip" ? "ethereum/RIPs" :
+    "ethereum/EIPs";
 
   const schema = new Schema<SnapshotDoc>({ snapshotDate: String, month: String, prs: [{}] }, { strict: false });
 
@@ -100,6 +114,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json(prRows);
     }
 
+    // --- Aggregation ---
     const rows = snapshots.flatMap((snap) => {
       const labelToPrs: Record<string, number[]> = {};
       for (const pr of snap.prs ?? []) {
@@ -111,6 +126,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           else if (labels.includes("ERC Update")) assigned = "ERC Update";
           else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
           else if (labels.includes("New ERC")) assigned = "New ERC";
+        } else if (repoKind === "rip") {
+          if (labels.includes("Typo Fix")) assigned = "Typo Fix";
+          else if (labels.includes("Update")) assigned = "Update";
+          else if (labels.includes("New RIP")) assigned = "New RIP";
+          else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
+          // Add/modify more label rules for RIPs as needed!
         } else {
           if (labels.includes("Typo Fix")) assigned = "Typo Fix";
           else if (labels.includes("Status Change")) assigned = "Status Change";
