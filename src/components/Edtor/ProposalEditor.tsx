@@ -420,6 +420,7 @@ useEffect(() => {
 const handleInputChange = (key: TemplateDataKeys, value: string) => {
   if (!key) return;
 
+  setLastEdited("form");
   setTemplateData((prev) => ({
     ...prev,
     [key]: value,
@@ -439,7 +440,8 @@ const handleMarkdownInsert = (key: TemplateDataKeys, syntax: string) => {
     const newValue =
       current.substring(0, start) + syntax + current.substring(end);
 
-    setTemplateData((prev) => ({
+  setLastEdited("form");
+  setTemplateData((prev) => ({
       ...prev,
       [key]: newValue,
     }));
@@ -451,7 +453,8 @@ const handleMarkdownInsert = (key: TemplateDataKeys, syntax: string) => {
     });
   } else {
     // Fallback if no ref found (append at end)
-    setTemplateData((prev) => ({
+  setLastEdited("form");
+  setTemplateData((prev) => ({
       ...prev,
       [key]: `${prev[key] || ""}${syntax}`,
     }));
@@ -598,12 +601,16 @@ if (requiresArr.length > 0) {
 
 // Markdown editor state: allow editing raw markdown code
 const [markdownRaw, setMarkdownRaw] = useState<string>(() => generateEipWlintMarkdown(templateData));
+// Track which side was edited last to avoid overwrite loops
+const [lastEdited, setLastEdited] = useState<"form" | "code">("form");
 
 // Keep markdownRaw in sync with form fields unless user edits it directly
 useEffect(() => {
-  setMarkdownRaw(generateEipWlintMarkdown(templateData));
+  if (lastEdited === "form") {
+    setMarkdownRaw(generateEipWlintMarkdown(templateData));
+  }
   // eslint-disable-next-line
-}, [templateData]);
+}, [templateData, lastEdited]);
 
 const markdownContent = markdownRaw;
 
@@ -620,6 +627,70 @@ const markdownValue =
     const match = row.match(/^([^:]+):\s*(.+)$/);
     return match ? [match[1].trim(), match[2].trim()] : [row.trim(), ""];
   });
+
+  // Parse the right-hand markdown back into form fields when user edits code
+  const parseMarkdownToTemplate = (md: string): Partial<TemplateData> => {
+    const result: Partial<TemplateData> = {};
+
+    // Extract front matter between --- and ---
+    const fmMatch = md.match(/---\s*([\s\S]*?)\s*---/);
+    const frontMatter = fmMatch ? fmMatch[1] : "";
+    if (frontMatter) {
+      const lines = frontMatter.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      for (const line of lines) {
+        const m = line.match(/^([a-zA-Z-]+):\s*(.*)$/);
+        if (!m) continue;
+        const key = m[1].toLowerCase();
+        const val = m[2];
+        switch (key) {
+          case "eip": result.eip = val; break;
+          case "title": result.title = val; break;
+          case "description": result.description = val; break;
+          case "author": result.author = val; break;
+          case "discussions-to": result.discussionsTo = val === "null" ? "" : val; break;
+          case "status": result.status = val; break;
+          case "last-call-deadline": result["last-call-deadline"] = val; break;
+          case "type": result.type = val; break;
+          case "category": result.category = val; break;
+          case "created": result.created = val; break;
+          case "requires": result.requires = val; break; // keep raw; generator handles formatting
+        }
+      }
+    }
+
+    // Extract body sections
+    const getSection = (title: string) => {
+      const r = new RegExp(`##\\s+${title}\\s*\n([\\s\\S]*?)(?=\n##\\s|$)`, "i");
+      const mm = md.match(r);
+      return mm ? mm[1].trim() : "";
+    };
+
+    result.abstract = getSection("Abstract");
+    result.motivation = getSection("Motivation");
+    result.specification = getSection("Specification");
+    result.rationale = getSection("Rationale");
+    result.backwardsCompatibility = getSection("Backwards Compatibility");
+    result.testCases = getSection("Test Cases");
+    result.referenceImplementation = getSection("Reference Implementation");
+    result.securityConsiderations = getSection("Security Considerations");
+
+    return result;
+  };
+
+  // Debounced sync: code -> form
+  const codeSyncTimer = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (lastEdited !== "code") return;
+    if (codeSyncTimer.current) window.clearTimeout(codeSyncTimer.current);
+    codeSyncTimer.current = window.setTimeout(() => {
+      const parsed = parseMarkdownToTemplate(markdownRaw);
+      setTemplateData(prev => ({ ...prev, ...parsed }));
+    }, 300);
+    return () => {
+      if (codeSyncTimer.current) window.clearTimeout(codeSyncTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markdownRaw, lastEdited]);
 
   const handleValidate = async () => {
     setIsLoading(true);
@@ -1468,7 +1539,7 @@ if (errorMessages.length > 0) {
                       width="100%"
                       minHeight={viewMode === "output" ? ["420px", "560px", "720px"] : ["260px", "320px", "420px"]}
                       value={markdownRaw}
-                      onChange={e => setMarkdownRaw(e.target.value)}
+                      onChange={e => { setLastEdited("code"); setMarkdownRaw(e.target.value); }}
                       resize="vertical"
                       borderWidth="2px"
                       borderColor="blue.400"
