@@ -228,28 +228,61 @@ type CsvRow = {
 };
 
 
-const downloadCSV = () => {
-  const csvData: CsvRow[] = [];
-  filteredData.forEach(({ monthYear, label, count, labelType, prNumbers }) => {
-    csvData.push({
-      Month: formatMonthLabel(monthYear),
-      MonthKey: monthYear,
-      Label: label,
-      LabelType: labelType,
-      Count: count,
-      Repo: REPOS.find(r => r.key === repoKey)?.label,
-      PRs: prNumbers ? prNumbers.join("; ") : "", // show as "432; 440; 498" etc
-    });
+const downloadCSV = async () => {
+  setLoading(true);
+
+  const repoObj = REPOS.find(r => r.key === repoKey)!;
+  // Adjust API params to match backend expectations
+  const params = new URLSearchParams({
+    repo: repoObj.key, // "erc" or "eip"
+    mode: "detail", // Force detail mode
+    labelType: labelSet, // "customLabels" or "githubLabels"
   });
-  const csv = Papa.unparse(csvData);
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${repoKey}_${labelSet}_open_pr_label_counts.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
+
+  const url = `/api/pr-details?${params.toString()}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch PR details: ${res.status}`);
+    const prRows = await res.json();
+
+    // Directly use API’s field names or remap if needed
+    const csvData = prRows.map((pr: any) => ({
+      Month: pr.Month || formatMonthLabel(pr.MonthKey),
+      MonthKey: pr.MonthKey,
+      Label: pr.Label,
+      LabelType: pr.LabelType,
+      Repo: pr.Repo || repoObj.key,
+      PRNumber: pr.PRNumber,
+      PRLink: pr.PRLink,
+      Author: pr.Author,
+      Title: pr.Title,
+      CreatedAt: pr.CreatedAt
+        ? new Date(pr.CreatedAt).toISOString()
+        : "",
+    }));
+
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const urlObj = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = urlObj;
+    a.download = `${repoKey}_${labelSet}_pr_details.csv`;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(urlObj);
+  } catch (err) {
+    console.error("Download CSV error", err);
+  } finally {
+    setLoading(false);
+  }
 };
+
+
 
 
 
