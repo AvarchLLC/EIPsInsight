@@ -83,13 +83,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             ? pr.customLabels ?? []
             : pr.githubLabels ?? [];
 
-        // RIP-specific label assignment (customize as needed)
-        let assigned: string = "Misc";
-        if (labels.includes("Typo Fix")) assigned = "Typo Fix";
-        else if (labels.includes("Update")) assigned = "Update";
-        else if (labels.includes("New RIP")) assigned = "New RIP";
-        else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
-        // Add/adjust more label priorities if desired!
+        let assigned: string;
+
+        if (effectiveLabelType === "customLabels") {
+          // RIP-specific custom mapping
+          assigned = "Misc";
+          if (labels.includes("Typo Fix")) assigned = "Typo Fix";
+          else if (labels.includes("Update")) assigned = "Update";
+          else if (labels.includes("New RIP")) assigned = "New RIP";
+          else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
+        } else {
+          // githubLabels: workflow mapping
+          const lower = new Set(labels.map((l) => l?.toLowerCase?.() ?? ""));
+          if (lower.has("a-review")) assigned = "Author Review";
+          else if (lower.has("e-review")) assigned = "Editor Review";
+          else if (lower.has("discuss")) assigned = "Discuss";
+          else if (lower.has("on-hold")) assigned = "On Hold";
+          else if (lower.has("final-call")) assigned = "Final Call";
+          else assigned = "Other Labels";
+        }
 
         if (!labelToPrs[assigned]) labelToPrs[assigned] = [];
         labelToPrs[assigned].push(pr.number);

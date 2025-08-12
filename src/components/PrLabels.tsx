@@ -28,11 +28,11 @@ const CUSTOM_LABELS_ERC: LabelSpec[] = [
   { value: "Misc", label: "Miscellaneous", color: "#334155" },
 ];
 const WORKFLOW_LABELS: LabelSpec[] = [
-  { value: "a-review", label: "Author Review", color: "#14b8a6" },
-  { value: "e-review", label: "Editor Review", color: "#f43f5e" },
-  { value: "discuss", label: "Discuss", color: "#fbbf24" },
-  { value: "on-hold", label: "On Hold", color: "#0d9488" },
-  { value: "final-call", label: "Final Call", color: "#6366f1" },
+  { value: "Author Review", label: "Author Review", color: "#14b8a6" },
+  { value: "Editor Review", label: "Editor Review", color: "#f43f5e" },
+  { value: "Discuss", label: "Discuss", color: "#fbbf24" },
+  { value: "On Hold", label: "On Hold", color: "#0d9488" },
+  { value: "Final Call", label: "Final Call", color: "#6366f1" },
   { value: "Other Labels", label: "Other Labels", color: "#9ca3af" },
 ];
 
@@ -117,6 +117,21 @@ export default function PRAnalyticsCard() {
     return "Misc";
   };
 
+  // Normalize GitHub workflow labels to grouped buckets (for 'all' view and CSV)
+  const normalizeGithubLabel = (label: string): string => {
+    const l = (label || "").toLowerCase();
+    if (l === "a-review") return "Author Review";
+    if (l === "e-review") return "Editor Review";
+    if (l === "discuss") return "Discuss";
+    if (l === "on-hold") return "On Hold";
+    if (l === "final-call") return "Final Call";
+    // If already friendly wording, keep it
+    if (["author review","editor review","discuss","on hold","final call"].includes(l)) {
+      return label;
+    }
+    return "Other Labels";
+  };
+
   // Fetch API
   useEffect(() => {
     setLoading(true);
@@ -137,13 +152,14 @@ export default function PRAnalyticsCard() {
       return Array.isArray(json) ? json : [];
     };
 
-    const aggregateDetails = (rows: any[]): AggregatedLabelCount[] => {
+  const aggregateDetails = (rows: any[]): AggregatedLabelCount[] => {
       const acc = new Map<string, AggregatedLabelCount>();
       for (const pr of rows) {
         const monthYear: string = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
         if (!monthYear) continue;
         let label: string = pr.Label || "";
-        label = labelSet === "customLabels" ? normalizeCustomLabel(pr.Repo || "", label) : label;
+    if (labelSet === "customLabels") label = normalizeCustomLabel(pr.Repo || "", label);
+    else label = normalizeGithubLabel(label);
         const key = `${monthYear}__${label}`;
         const curr = acc.get(key) || { monthYear, label, count: 0, labelType: labelSet, prNumbers: [] };
         curr.count += 1;
@@ -316,6 +332,15 @@ export default function PRAnalyticsCard() {
         combined = rows;
       }
 
+      // Normalize for selected label set to ensure filtering aligns
+      if (labelSet === "githubLabels") {
+        combined = combined.map((pr: any) => ({
+          ...pr,
+          Label: normalizeGithubLabel(pr.Label),
+          LabelType: "githubLabels",
+        }));
+      }
+
       // Filter rows by selected labels (value or display label)
       const allowedValues = new Set(selectedLabels);
       const valueToLabel = new Map(labelSpecs.map(spec => [spec.value, spec.label] as const));
@@ -403,7 +428,7 @@ export default function PRAnalyticsCard() {
                 </Stack>
               </MenuList>
             </Menu>
-            {/* <Menu>
+            <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="teal" minW={160}>
                 {labelSetOptions.find(o => o.key === labelSet)?.label}
               </MenuButton>
@@ -423,7 +448,7 @@ export default function PRAnalyticsCard() {
                   )}
                 </Stack>
               </MenuList>
-            </Menu> */}
+            </Menu>
             <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md">
               Download CSV
             </Button>

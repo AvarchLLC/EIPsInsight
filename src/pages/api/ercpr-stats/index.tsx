@@ -83,14 +83,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             ? pr.customLabels ?? []
             : pr.githubLabels ?? [];
 
-        let assigned: string = "Misc";
-        if (labels.includes("Typo Fix")) assigned = "Typo Fix";
-        else if (labels.includes("Status Change")) assigned = "Status Change";
-        else if (labels.includes("EIP Update")) assigned = "EIP Update";
-        else if (labels.includes("ERC Update")) assigned = "ERC Update";
-        else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
-        else if (labels.includes("New EIP")) assigned = "New EIP";
-        else if (labels.includes("New ERC")) assigned = "New ERC";
+        let assigned: string;
+
+        if (effectiveLabelType === "customLabels") {
+          assigned = "Misc";
+          if (labels.includes("Typo Fix")) assigned = "Typo Fix";
+          else if (labels.includes("Status Change")) assigned = "Status Change";
+          else if (labels.includes("EIP Update")) assigned = "EIP Update";
+          else if (labels.includes("ERC Update")) assigned = "ERC Update";
+          else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
+          else if (labels.includes("New EIP")) assigned = "New EIP";
+          else if (labels.includes("New ERC")) assigned = "New ERC";
+        } else {
+          // githubLabels: map workflow labels to grouped categories
+          const lower = new Set(labels.map((l) => l?.toLowerCase?.() ?? ""));
+          if (lower.has("a-review")) assigned = "Author Review";
+          else if (lower.has("e-review")) assigned = "Editor Review";
+          else if (lower.has("discuss")) assigned = "Discuss";
+          else if (lower.has("on-hold")) assigned = "On Hold";
+          else if (lower.has("final-call")) assigned = "Final Call";
+          else assigned = "Other Labels";
+        }
 
         if (!labelToPrs[assigned]) labelToPrs[assigned] = [];
         labelToPrs[assigned].push(pr.number);
