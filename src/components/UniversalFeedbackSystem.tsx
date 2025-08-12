@@ -39,20 +39,23 @@ const UniversalFeedbackSystem = () => {
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const textColor = useColorModeValue("gray.700", "gray.200");
 
-  // Get session storage key for current page
-  const getPageKey = () => `feedback-completed-${router.pathname}`;
+  // Get session storage key (now session-wide, not per-page)
+  const getSessionKey = () => `helpfulPopupShown`;
 
-  // Check if feedback already completed for this page
+  // Check if feedback popup has already been shown during this session
   useEffect(() => {
-    const pageKey = getPageKey();
-    const hasCompleted = sessionStorage.getItem(pageKey);
-    if (hasCompleted) {
+    const sessionKey = getSessionKey();
+    const hasBeenShown = sessionStorage.getItem(sessionKey);
+    if (hasBeenShown) {
       setIsVisible(false);
     }
-  }, [router.pathname]);
+  }, []);
 
-  // Scroll detection for 75% trigger
+  // Scroll detection for 70% trigger (changed from 75%)
   useEffect(() => {
+    const hasBeenShown = sessionStorage.getItem(getSessionKey());
+    if (hasBeenShown) return; // Don't set up scroll listener if already shown
+
     const handleScroll = () => {
       if (scrolledTo75Ref.current) return; // Already triggered
 
@@ -60,7 +63,7 @@ const UniversalFeedbackSystem = () => {
       const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = (scrollTop / documentHeight) * 100;
 
-      if (scrollPercent >= 75) {
+      if (scrollPercent >= 70) {
         scrolledTo75Ref.current = true;
         // Smooth entrance with slight delay
         setTimeout(() => {
@@ -137,8 +140,8 @@ const UniversalFeedbackSystem = () => {
   };
 
   const handleTimeout = () => {
-    const pageKey = getPageKey();
-    sessionStorage.setItem(pageKey, 'true');
+    const sessionKey = getSessionKey();
+    sessionStorage.setItem(sessionKey, 'true');
     
     // Smooth exit animation
     setIsExpanded(false);
@@ -199,8 +202,8 @@ const UniversalFeedbackSystem = () => {
   };
 
   const handleDismiss = () => {
-    const pageKey = getPageKey();
-    sessionStorage.setItem(pageKey, 'true');
+    const sessionKey = getSessionKey();
+    sessionStorage.setItem(sessionKey, 'true');
     
     // Smooth exit animation
     setIsExpanded(false);
