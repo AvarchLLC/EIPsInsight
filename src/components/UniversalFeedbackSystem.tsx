@@ -12,14 +12,15 @@ import {
   IconButton,
   Textarea,
   ScaleFade,
-  Slide
+  Slide,
+  Tooltip
 } from "@chakra-ui/react";
 import { FiThumbsUp, FiThumbsDown, FiMeh, FiX, FiMessageSquare } from "react-icons/fi";
 import { useRouter } from "next/router";
 
 const UniversalFeedbackSystem = () => {
-  const [isVisible, setIsVisible] = useState(false); // Hidden until 75% scroll
-  const [isExpanded, setIsExpanded] = useState(false); // Expands at 75% scroll
+  const [isVisible, setIsVisible] = useState(false); // Hidden until 70% scroll
+  const [isExpanded, setIsExpanded] = useState(false); // Expands at 70% scroll
   const [hasGivenRating, setHasGivenRating] = useState(false);
   const [selectedRating, setSelectedRating] = useState<'positive' | 'neutral' | 'negative' | null>(null);
   const [showCommentBox, setShowCommentBox] = useState(false);
@@ -28,6 +29,7 @@ const UniversalFeedbackSystem = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [timeLeft, setTimeLeft] = useState(5); // 5 second timer
+  const [showTriggerButton, setShowTriggerButton] = useState(false);
   
   const toast = useToast();
   const router = useRouter();
@@ -48,6 +50,8 @@ const UniversalFeedbackSystem = () => {
     const hasBeenShown = sessionStorage.getItem(sessionKey);
     if (hasBeenShown) {
       setIsVisible(false);
+      // Show trigger button if feedback was previously given
+      setTimeout(() => setShowTriggerButton(true), 2000);
     }
   }, []);
 
@@ -147,6 +151,8 @@ const UniversalFeedbackSystem = () => {
     setIsExpanded(false);
     setTimeout(() => {
       setIsVisible(false);
+      // Show trigger button after main popup is dismissed
+      setTimeout(() => setShowTriggerButton(true), 500);
     }, 300); // Wait for collapse animation
     
     if (timerRef.current) {
@@ -209,21 +215,45 @@ const UniversalFeedbackSystem = () => {
     setIsExpanded(false);
     setTimeout(() => {
       setIsVisible(false);
+      // Show trigger button after main popup is dismissed
+      setTimeout(() => setShowTriggerButton(true), 500);
     }, 300);
   };
 
-  if (!isVisible) return null;
+  // Handle trigger button click to reopen feedback widget
+  const handleTriggerClick = () => {
+    // Reset the widget state
+    setHasGivenRating(false);
+    setSelectedRating(null);
+    setShowCommentBox(false);
+    setComment("");
+    setTimeLeft(5);
+    setShowTriggerButton(false);
+    
+    // Clear session storage temporarily to allow re-showing
+    const sessionKey = getSessionKey();
+    sessionStorage.removeItem(sessionKey);
+    
+    // Show the widget
+    setIsVisible(true);
+    setTimeout(() => setIsExpanded(true), 100);
+  };
+
+  if (!isVisible && !showTriggerButton) return null;
 
   return (
-    <Slide direction="bottom" in={isVisible} style={{ zIndex: 1500 }}>
-      <Box
-        position="fixed"
-        bottom="20px"
-        left="50%"
-        transform="translateX(-50%)"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+    <>
+      {/* Main Feedback Widget */}
+      {isVisible && (
+        <Slide direction="bottom" in={isVisible} style={{ zIndex: 1500 }}>
+          <Box
+            position="fixed"
+            bottom="20px"
+            left="50%"
+            transform="translateX(-50%)"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
         <ScaleFade initialScale={0.8} in={isExpanded}>
           <Box
             bg={bgColor}
@@ -353,6 +383,61 @@ const UniversalFeedbackSystem = () => {
       </ScaleFade>
     </Box>
   </Slide>
+      )}
+      
+      {/* Small Trigger Button - appears after feedback is dismissed */}
+      {showTriggerButton && (
+        <Fade in={showTriggerButton}>
+          <Box
+            position="fixed"
+            right="20px"
+            bottom="100px"
+            zIndex="1400"
+          >
+            <Tooltip 
+              label="Give feedback about this page" 
+              placement="left" 
+              hasArrow
+              bg={useColorModeValue("gray.800", "gray.200")}
+              color={useColorModeValue("white", "gray.800")}
+            >
+              <IconButton
+                aria-label="Give feedback"
+                icon={<Icon as={FiMessageSquare} />}
+                size="md"
+                colorScheme="blue"
+                variant="solid"
+                borderRadius="full"
+                boxShadow="0 4px 12px rgba(0, 0, 0, 0.25)"
+                onClick={handleTriggerClick}
+                _hover={{ 
+                  transform: "scale(1.15)",
+                  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)"
+                }}
+                transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                bg={useColorModeValue("blue.500", "blue.400")}
+                color="white"
+                _active={{ transform: "scale(0.95)" }}
+                border={`2px solid ${useColorModeValue("white", "gray.700")}`}
+                w="48px"
+                h="48px"
+                animation="pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
+                css={{
+                  '@keyframes pulse': {
+                    '0%, 100%': {
+                      opacity: 1,
+                    },
+                    '50%': {
+                      opacity: .7,
+                    },
+                  },
+                }}
+              />
+            </Tooltip>
+          </Box>
+        </Fade>
+      )}
+    </>
   );
 };
 
