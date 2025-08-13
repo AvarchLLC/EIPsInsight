@@ -10,12 +10,34 @@ import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
 const networkUpgradesData = {
   networkUpgrades: [
     {
+      name: 'Frontier',
+      eips: [
+        // Original Ethereum launch - no formal EIPs
+      ],
+    },
+    {
+      name: 'Frontier Thawing',
+      eips: [
+        // Lifted gas limit - no formal EIPs
+      ],
+    },
+    {
       name: 'Homestead',
       eips: [
         { eip: 2, requires: [] },
         { eip: 7, requires: [] },
         { eip: 8, requires: [] },
       ],
+    },
+    {
+      name: 'DAO Fork',
+      eips: [
+        // Irregular state change - no formal EIPs
+      ],
+    },
+    {
+      name: 'Tangerine Whistle',
+      eips: [{ eip: 150, requires: [] }],
     },
     {
       name: 'Spurious Dragon',
@@ -25,10 +47,6 @@ const networkUpgradesData = {
         { eip: 161, requires: [] },
         { eip: 170, requires: [] },
       ],
-    },
-    {
-      name: 'Tangerine Whistle',
-      eips: [{ eip: 150, requires: [] }],
     },
     {
       name: 'Byzantium',
@@ -141,8 +159,20 @@ const networkUpgradesData = {
       eips: [{ eip: 4345, requires: [] }],
     },
     {
+      name: 'Altair',
+      eips: [
+        // Consensus layer upgrade - no execution EIPs
+      ],
+    },
+    {
       name: 'Gray Glacier',
       eips: [{ eip: 5133, requires: [] }],
+    },
+    {
+      name: 'Bellatrix',
+      eips: [
+        // Consensus layer upgrade - no execution EIPs
+      ],
     },
     {
       name: 'Paris',
@@ -182,7 +212,7 @@ const networkUpgradesData = {
 };
 
 const EIP3DGraph = () => {
-  const fgRef = useRef<ForceGraphMethods>();
+  const fgRef = React.useRef<ForceGraphMethods<any, any> | undefined>(undefined);
   const [showResetZoom, setShowResetZoom] = useState(true);
 
   const handleZoomIn = () => {
