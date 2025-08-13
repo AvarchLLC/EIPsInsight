@@ -25,6 +25,11 @@ import {
   Wrap,
   WrapItem,
   Spinner,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -62,7 +67,7 @@ var initialTemplateData = {
 };
 
 import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
-import { DownloadIcon, CheckIcon, AddIcon } from "@chakra-ui/icons";
+import { DownloadIcon, CheckIcon, AddIcon, CopyIcon } from "@chakra-ui/icons";
 import { ViewIcon, EditIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { BiColumns } from "react-icons/bi";
 import {
@@ -134,14 +139,16 @@ const ProposalEditor = () => {
   const [viewMode, setViewMode] = useState<"edit" | "output" | "split">(
     "split"
   );
-  const [preview, setPreview] = useState<boolean>(false);
+  // Right pane view toggle (Code or Preview)
+  const [preview, setPreview] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"eip" | "erc" | "rip">("eip");
   const [activeTab2, setActiveTab2] = useState<"new" | "import">("new");
   const [validated, setValidated] = useState<boolean>(false);
   const [searchNumber, setSearchNumber] = useState("");
   const [showValidationAlert, setShowValidationAlert] = useState(false);
-const [validationErrors, setValidationErrors] = useState<string[]>([]);
+type ValidationItem = { summary: string; detail?: string; code?: string };
+const [validationErrors, setValidationErrors] = useState<ValidationItem[]>([]);
 const cancelRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
 
@@ -410,6 +417,10 @@ useEffect(() => {
   if (activeTab2 === "new") {
     setTemplateData({ ...initialTemplateData }); // NOT initialTemplateData, but a **new copy**
     setValidated(false); // Also reset validation state if needed
+  } else if (activeTab2 === "import") {
+    // Clear EIP number when switching to Import mode
+    setTemplateData((prev) => ({ ...prev, eip: "" }));
+    setValidated(false);
   }
   // Always clear search bar when tab or mode changes
   setSearchNumber("");
@@ -694,7 +705,54 @@ const markdownValue =
 
   const handleValidate = async () => {
     setIsLoading(true);
-    const errorMessages: string[] = [];
+  const errorItems: ValidationItem[] = [];
+
+  const simplifyEipwMessage = (raw: string): string => {
+      const codeMatch = raw.match(/error\[([^\]]+)\]/i);
+      const code = codeMatch?.[1] || "";
+      const mainPart = raw.split("]:").slice(1).join("]:") || raw;
+      const trimmed = mainPart.split("-->")[0]?.trim() || mainPart.trim();
+
+      const friendlyByCode: Record<string, (text: string) => string> = {
+        "markdown-req-section": (text) => {
+          const m = text.match(/missing section\(s\):\s*`([^`]+)`/i);
+          const sections = m ? m[1] : "required sections";
+          return `Missing required sections: ${sections}. Use level-2 headings (##).`;
+        },
+        "preamble-author": (text) => {
+          if (/at least one GitHub username/i.test(raw)) {
+            return "Author must include at least one GitHub username (e.g., Random J. User (@username)).";
+          }
+          return "Author format invalid. Try: Name (@username) <email@example.com>.";
+        },
+        "preamble-date-created": () => "Created date must be in YYYY-MM-DD format.",
+        "preamble-discussions-to": () => "Discussions-to must be a valid URL.",
+        "preamble-re-discussions-to": () => "Discussions-to must link to an ethereum-magicians.org thread (topic/id).",
+        "preamble-enum-type": () => "Type must be one of: Standards Track, Meta, Informational.",
+        "preamble-len-description": () => "Description is too short (minimum 2 characters).",
+        "preamble-len-title": () => "Title is too short (minimum 2 characters).",
+      };
+
+      if (friendlyByCode[code]) return friendlyByCode[code](trimmed);
+
+      // Fallback: remove file paths and help/info decorations
+      let simple = trimmed
+        .replace(/\s*\|\s*\d+\s*\|[\s\S]*/g, "")
+        .replace(/=\s*help:[\s\S]*/gi, "")
+        .replace(/=\s*info:[\s\S]*/gi, "")
+        .trim();
+      if (!simple) simple = raw.replace(/=\s*(help|info):[\s\S]*/gi, "").trim();
+      return simple;
+    };
+
+    const parseEipwMessage = (raw: string): ValidationItem => {
+      const summary = simplifyEipwMessage(raw);
+      const codeMatch = raw.match(/error\[([^\]]+)\]/i);
+      const code = codeMatch?.[1];
+      // Keep raw as detail for maximum context; UI will show it collapsed
+      const detail = raw;
+      return { summary, detail, code };
+    };
 
     try {
       const res = await fetch("/api/ValidateEip", {
@@ -706,26 +764,30 @@ const markdownValue =
       const data = await res.json();
       if (!data.success && data.messages) {
         for (const msg of data.messages) {
-          // Only show actual format errors, downgrade link/filename refs to Warning or skip as needed
+          // Only show actual format errors, skip noisy file-read/preamble file-name items
           if (
             msg.level === "Error" &&
             !msg.message.includes("unable to read file") &&
             !msg.message.includes("error[preamble-eip]") &&
             !msg.message.includes("error[preamble-file-name]")
           ) {
-            errorMessages.push(msg.message);
+            const item = parseEipwMessage(msg.message || "");
+            if (item.summary) errorItems.push(item);
           }
         }
       }
     } catch (err) {
       console.error("Validation error:", err);
-      errorMessages.push("Validation failed to run.");
+      errorItems.push({
+        summary: "Validation failed to run.",
+        detail: String(err ?? "Unknown error"),
+      });
     }
     setIsLoading(false);
 
-if (errorMessages.length > 0) {
+if (errorItems.length > 0) {
   setValidated(false);
-  setValidationErrors(errorMessages); // Show as dialog
+  setValidationErrors(errorItems); // Show as dialog
   setShowValidationAlert(true);
 } else {
   setValidated(true);
@@ -754,7 +816,7 @@ if (errorMessages.length > 0) {
     <>
     <FeedbackWidget/>
     <Box
-      p={[2, 4, 8]}
+      p={[3, 4, 8]}
       mx="auto"
       bg="gray.100"
       _dark={{ bg: "gray.900", color: "gray.200" }}
@@ -946,7 +1008,7 @@ if (errorMessages.length > 0) {
         height={viewMode === "split" ? { base: "auto", md: "75vh" } : "auto"}
         minHeight={viewMode === "split" ? { base: "auto", md: "75vh" } : "600px"}
         mt={4}
-        gap={[2, 4, 8]}
+        gap={[3, 4, 8]}
         _dark={{
           bg: "gray.800",
           color: "gray.200",
@@ -956,7 +1018,7 @@ if (errorMessages.length > 0) {
         {(viewMode === "edit" || viewMode === "split") && (
           <Box
             flex="1"
-            p={[2, 4, 6]}
+            p={[3, 4, 6]}
             minWidth={["100%", "50%"]}
             height={viewMode === "split" ? { base: "auto", md: "100%" } : "auto"}
             overflowY="auto"
@@ -1405,13 +1467,13 @@ if (errorMessages.length > 0) {
             </VStack>
           </Box>
         )}
-        {(viewMode === "output" || viewMode === "split") && (
+    {(viewMode === "output" || viewMode === "split") && (
           <Box
             flex="1"
-            p={[2, 4, 6]}
+            p={[3, 4, 6]}
             minWidth={{ base: "100%", md: viewMode === "output" ? "100%" : "50%" }}
             width={{ base: "100%", md: viewMode === "output" ? "100%" : "50%" }}
-            maxWidth={{ base: "100%", md: viewMode === "output" ? "100%" : "50%" }}
+            maxWidth={{ base: "100%", md: viewMode === "output" ? "100%" : "100%" }}
             height={viewMode === "split" ? { base: "auto", md: "100%" } : "auto"}
             bg="white"
             _dark={{ bg: "gray.700" }}
@@ -1439,75 +1501,72 @@ if (errorMessages.length > 0) {
             }}
             mb={[2, 0]}
           >
-            {/* Responsive and in sync with left editor */}
-            <Box flex="1" display="flex" flexDirection="column" justifyContent="flex-start" p={[2, 4, 6]} maxW={viewMode === "output" ? "100%" : "900px"} mx="auto" width="100%" minHeight={viewMode === "split" ? 0 : undefined}>
-              <VStack spacing={4} align="start" width="100%">
-                <Box display="flex" justifyContent="space-between" w="full">
+            {/* Responsive and in sync with left editor: code/preview (read-only code) */}
+            <Box flex="1" display="flex" flexDirection="column" justifyContent="flex-start" p={[3, 4, 6]} mx="auto" width="100%" minHeight={viewMode === "split" ? 0 : undefined}>
+              <VStack spacing={[3, 4, 6]} align="start" width="100%">
+                <Box display="flex" justifyContent="space-between" alignItems="center" w="full">
                   <Text fontSize="lg" fontWeight="bold">
                     {preview ? "Markdown Preview" : "Markdown Code"}
                   </Text>
-                  <HStack spacing={4} flexWrap="wrap">
+                  <HStack spacing={3} flexWrap="wrap">
                     <Button
                       colorScheme="blue"
                       variant={preview === false ? "solid" : "outline"}
-                      _hover={{
-                        bg: preview !== false ? "blue.700" : undefined,
-                      }}
-                      _dark={{
-                        bg: preview === false ? "blue.500" : "transparent",
-                        color: preview === false ? "white" : "blue.300",
-                        borderColor: "blue.300",
-                      }}
                       onClick={() => setPreview(false)}
+                      size="sm"
                     >
                       Code
                     </Button>
                     <Button
                       colorScheme="blue"
                       variant={preview === true ? "solid" : "outline"}
-                      _hover={{ bg: preview !== true ? "blue.700" : undefined }}
-                      _dark={{
-                        bg: preview === true ? "blue.500" : "transparent",
-                        color: preview === true ? "white" : "blue.300",
-                        borderColor: "blue.300",
-                      }}
                       onClick={() => setPreview(true)}
+                      size="sm"
                     >
                       Preview
                     </Button>
+                    {preview && (
+                      <Button
+                        leftIcon={<CopyIcon />}
+                        colorScheme="teal"
+                        variant="solid"
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(markdownRaw);
+                            toast({ title: "Markdown copied", status: "success", duration: 1500 });
+                          } catch {
+                            // Fallback
+                            const ta = document.createElement('textarea');
+                            ta.value = markdownRaw;
+                            document.body.appendChild(ta);
+                            ta.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(ta);
+                            toast({ title: "Markdown copied", status: "success", duration: 1500 });
+                          }
+                        }}
+                      >
+                        Copy Markdown
+                      </Button>
+                    )}
                   </HStack>
                 </Box>
                 <Box
                   w="full"
-                  p={4}
+                  p={[3, 4]}
                   borderRadius="md"
-                  bg={preview ? "gray.100" : "gray.900"}
-                  color={preview ? "black" : "white"}
-                  _dark={{
-                    bg: preview ? "gray.700" : "gray.800",
-                    color: preview ? "white" : "gray.300",
-                  }}
+                  bg={preview ? "gray.900" : "gray.800"}
+                  color={"white"}
+                  _dark={{ bg: preview ? "gray.900" : "gray.800", color: "gray.200" }}
                   overflow="auto"
                   flex="1"
-                  minHeight={viewMode === "split" ? 0 : (viewMode === "output" ? ["320px", "480px", "640px"] : ["200px", "260px", "320px"])}
-                  display="flex"
-                  flexDirection="column"
+                  minHeight={viewMode === "split" ? 0 : ["320px", "480px", "640px"]}
                 >
                   {preview ? (
-                    <Box
-                      w="full"
-                      p={4}
-                      borderRadius="md"
-                      bg={"gray.900"}
-                      color={preview ? "black" : "white"}
-                      _dark={{
-                        bg: "gray.900",
-                        color: preview ? "white" : "gray.300",
-                      }}
-                      overflow="auto"
-                    >
+                    <>
                       {tableRows?.length > 0 && (
-                        <TableContainer mt={4}>
+                        <TableContainer mt={2}>
                           <Table variant="striped" colorScheme="blue">
                             <Thead>
                               <Tr>
@@ -1526,48 +1585,19 @@ if (errorMessages.length > 0) {
                           </Table>
                         </TableContainer>
                       )}
-                      <br />
-                      <MarkdownViewer
-                        value={markdownValue}
-                        isDarkTheme={preview}
-                      />
-                    </Box>
+                      <Box mt={4} />
+                      <MarkdownViewer value={markdownValue} isDarkTheme={true} />
+                    </>
                   ) : (
-                    <Textarea
+                    <Box
+                      as="pre"
                       fontFamily="Fira Mono, Menlo, Monaco, Consolas, monospace"
-                      fontSize={["sm", "md"]}
-                      width="100%"
-                      minHeight={viewMode === "output" ? ["420px", "560px", "720px"] : ["260px", "320px", "420px"]}
-                      value={markdownRaw}
-                      onChange={e => { setLastEdited("code"); setMarkdownRaw(e.target.value); }}
-                      resize="vertical"
-                      borderWidth="2px"
-                      borderColor="blue.400"
-                      bg="gray.900"
-                      color="white"
-                      _focus={{ borderColor: "blue.600", boxShadow: "0 0 0 2px #3182ce55" }}
-                      _dark={{ bg: "gray.800", color: "gray.300", borderColor: "blue.300" }}
-                      borderRadius="md"
-                      boxShadow="sm"
-                      transition="all 0.2s"
-                      sx={{
-                        "&::-webkit-scrollbar": {
-                          width: "8px",
-                        },
-                        "&::-webkit-scrollbar-thumb": {
-                          background: "#3182ce",
-                          borderRadius: "4px",
-                        },
-                        "&::-webkit-scrollbar-thumb:hover": {
-                          background: "#2b6cb0",
-                        },
-                        "&::-webkit-scrollbar-track": {
-                          background: "#222",
-                        },
-                      }}
-                      spellCheck={false}
-                      placeholder="Edit your Markdown code here..."
-                    />
+                      fontSize={["sm", "sm", "md"]}
+                      whiteSpace="pre-wrap"
+                      wordBreak="break-word"
+                    >
+                      {markdownRaw}
+                    </Box>
                   )}
                 </Box>
               </VStack>
@@ -1650,11 +1680,31 @@ if (errorMessages.length > 0) {
         />
       </AlertDialogHeader>
       <AlertDialogBody>
-        <ul style={{ margin: 0, paddingLeft: "1.2em", color: "#d62d20", fontSize:"1.08em" }}>
+        <Accordion allowMultiple>
           {validationErrors.map((err, idx) => (
-            <li key={idx}>{err}</li>
+            <AccordionItem key={idx} border="none">
+              <h2>
+                <AccordionButton
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  _expanded={{ bg: "red.50", _dark: { bg: "whiteAlpha.100" } }}
+                  _hover={{ bg: "blackAlpha.50", _dark: { bg: "whiteAlpha.50" } }}
+                >
+                  <Box as="span" flex="1" textAlign="left" color="red.500" fontWeight="semibold">
+                    {err.summary}
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h2>
+              {err.detail && (
+                <AccordionPanel pb={4} fontSize="sm" color="gray.700" _dark={{ color: "gray.300" }}>
+                  {err.detail}
+                </AccordionPanel>
+              )}
+            </AccordionItem>
           ))}
-        </ul>
+        </Accordion>
       </AlertDialogBody>
       <AlertDialogFooter>
         <Button ref={cancelRef} onClick={() => setShowValidationAlert(false)} colorScheme="red">

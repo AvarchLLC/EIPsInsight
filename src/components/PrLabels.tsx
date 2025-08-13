@@ -28,11 +28,11 @@ const CUSTOM_LABELS_ERC: LabelSpec[] = [
   { value: "Misc", label: "Miscellaneous", color: "#334155" },
 ];
 const WORKFLOW_LABELS: LabelSpec[] = [
-  { value: "a-review", label: "Author Review", color: "#14b8a6" },
-  { value: "e-review", label: "Editor Review", color: "#f43f5e" },
-  { value: "discuss", label: "Discuss", color: "#fbbf24" },
-  { value: "on-hold", label: "On Hold", color: "#0d9488" },
-  { value: "final-call", label: "Final Call", color: "#6366f1" },
+  { value: "Author Review", label: "Author Review", color: "#14b8a6" },
+  { value: "Editor Review", label: "Editor Review", color: "#f43f5e" },
+  { value: "Discuss", label: "Discuss", color: "#fbbf24" },
+  { value: "On Hold", label: "On Hold", color: "#0d9488" },
+  { value: "Final Call", label: "Final Call", color: "#6366f1" },
   { value: "Other Labels", label: "Other Labels", color: "#9ca3af" },
 ];
 
@@ -44,7 +44,18 @@ const CUSTOM_LABELS_RIP: LabelSpec[] = [
   { value: "Misc", label: "Miscellaneous", color: "#6b7280" },
 ];
 
+// Unified labels for the 'All' view (overlapping labels grouped)
+const CUSTOM_LABELS_ALL: LabelSpec[] = [
+  { value: "Update", label: "Update", color: "#3b82f6" },
+  { value: "Typo Fix", label: "Typo Fix", color: "#22c55e" },
+  { value: "Status Change", label: "Status Change", color: "#ea580c" },
+  { value: "Created By Bot", label: "Created By Bot", color: "#a21caf" },
+  { value: "New", label: "New", color: "#f59e42" },
+  { value: "Misc", label: "Miscellaneous", color: "#64748b" },
+];
+
 const REPOS = [
+  { key: "all", label: "All PRs", api: "" },
   { key: "eip", label: "EIP PRs", api: "/api/pr-stats" },
   { key: "erc", label: "ERC PRs", api: "/api/ercpr-stats" },
   { key: "rip", label: "RIP PRs", api: "/api/rippr-stats" },
@@ -71,7 +82,7 @@ export default function PRAnalyticsCard() {
   const accentColor = useColorModeValue("#4299e1", "#63b3ed");
   const badgeText = useColorModeValue("white", "#171923");
 
-  const [repoKey, setRepoKey] = useState<"eip" | "erc">("eip");
+  const [repoKey, setRepoKey] = useState<"all" | "eip" | "erc" | "rip">("eip");
   const [labelSet, setLabelSet] = useState<"customLabels" | "githubLabels">("customLabels");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
@@ -79,6 +90,7 @@ export default function PRAnalyticsCard() {
   // Select correct label spec
   const labelSpecs: LabelSpec[] = useMemo(() => {
     if (labelSet === "customLabels") {
+      if (repoKey === "all") return CUSTOM_LABELS_ALL;
       return repoKey === "eip"
         ? CUSTOM_LABELS_EIP
         : repoKey === "erc"
@@ -93,51 +105,114 @@ export default function PRAnalyticsCard() {
   const [selectedLabels, setSelectedLabels] = useState<string[]>(labelSpecs.map(l => l.value));
   useEffect(() => setSelectedLabels(labelSpecs.map(l => l.value)), [labelSpecs]);
 
+  // Normalize custom labels for 'all' view
+  const normalizeCustomLabel = (repo: string, label: string): string => {
+    // Map to overlapping categories
+    const l = label.toLowerCase();
+    if (/(^|\s)typo(\s|$)/.test(l)) return "Typo Fix";
+    if (/status\s*change/i.test(label)) return "Status Change";
+    if (/created\s*by\s*bot/i.test(label)) return "Created By Bot";
+    if (/new\s*(eip|erc|rip)/i.test(label)) return "New";
+    if (/update/i.test(label)) return "Update";
+    return "Misc";
+  };
+
+  // Normalize GitHub workflow labels to grouped buckets (for 'all' view and CSV)
+  const normalizeGithubLabel = (label: string): string => {
+    const l = (label || "").toLowerCase();
+    if (l === "a-review") return "Author Review";
+    if (l === "e-review") return "Editor Review";
+    if (l === "discuss") return "Discuss";
+    if (l === "on-hold") return "On Hold";
+    if (l === "final-call") return "Final Call";
+    // If already friendly wording, keep it
+    if (["author review","editor review","discuss","on hold","final call"].includes(l)) {
+      return label;
+    }
+    return "Other Labels";
+  };
+
   // Fetch API
   useEffect(() => {
     setLoading(true);
-    const repoObj = REPOS.find(r => r.key === repoKey)!;
     const controller = new AbortController();
-    const url = `${repoObj.api}?labelType=${labelSet}`;
 
-    fetch(url, { signal: controller.signal })
-      .then(async (res) => {
-        if (!res.ok) {
-          const body = await res.text().catch(() => "");
-          throw new Error(`Request failed: ${res.status} ${res.statusText} ${body}`);
+    const fetchSingle = async (api: string) => {
+      const res = await fetch(`${api}?labelType=${labelSet}`, { signal: controller.signal });
+      if (!res.ok) throw new Error(`${api} -> ${res.status}`);
+      const json = await res.json();
+      return Array.isArray(json) ? (json as AggregatedLabelCount[]) : [];
+    };
+
+    const fetchDetails = async (repo: string) => {
+      const qs = new URLSearchParams({ repo, mode: "detail", labelType: labelSet }).toString();
+      const res = await fetch(`/api/pr-details?${qs}`, { signal: controller.signal });
+      if (!res.ok) throw new Error(`/api/pr-details (${repo}) -> ${res.status}`);
+      const json = await res.json();
+      return Array.isArray(json) ? json : [];
+    };
+
+  const aggregateDetails = (rows: any[]): AggregatedLabelCount[] => {
+      const acc = new Map<string, AggregatedLabelCount>();
+      for (const pr of rows) {
+        const monthYear: string = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
+        if (!monthYear) continue;
+        let label: string = pr.Label || "";
+    if (labelSet === "customLabels") label = normalizeCustomLabel(pr.Repo || "", label);
+    else label = normalizeGithubLabel(label);
+        const key = `${monthYear}__${label}`;
+        const curr = acc.get(key) || { monthYear, label, count: 0, labelType: labelSet, prNumbers: [] };
+        curr.count += 1;
+        if (pr.PRNumber) curr.prNumbers = [...curr.prNumbers, pr.PRNumber];
+        acc.set(key, curr);
+      }
+      return Array.from(acc.values());
+    };
+
+    const run = async () => {
+      try {
+        if (repoKey !== "all") {
+          const repoObj = REPOS.find(r => r.key === repoKey)!;
+          const arr = await fetchSingle(repoObj.api);
+          setData(arr);
+        } else {
+          // Fetch detailed rows for all repos and aggregate client-side
+          const [eipD, ercD, ripD] = await Promise.allSettled([
+            fetchDetails("eip"),
+            fetchDetails("erc"),
+            fetchDetails("rip"),
+          ]);
+          const toRows = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
+          const combinedRows = [...toRows(eipD), ...toRows(ercD), ...toRows(ripD)];
+          const aggregated = aggregateDetails(combinedRows);
+          setData(aggregated);
         }
-        return res.json();
-      })
-      .then((raw: unknown) => {
-        const arr = Array.isArray(raw) ? raw : [];
-        setData(arr as AggregatedLabelCount[]);
-      })
-      .catch((err) => {
+      } catch (err) {
         if ((err as Error).name !== "AbortError") {
           // eslint-disable-next-line no-console
           console.error("[PRAnalytics] fetch error", err);
           setData([]);
         }
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    run();
     return () => controller.abort();
-  }, [repoKey, labelSet]); // re-run when repo or label type changes
+  }, [repoKey, labelSet]);
 
-  // Only show one labelType at a time – filter accordingly
-  const filteredData = useMemo(() =>
-    (Array.isArray(data) ? data : []).filter(item =>
-      item.labelType === labelSet && selectedLabels.includes(item.label)
-    ), [data, labelSet, selectedLabels]
-  );
+  // Build filtered dataset and chart options
+  const filteredData = useMemo(() => {
+    const arr = Array.isArray(data) ? data : [];
+    return arr.filter(item => selectedLabels.includes(item.label));
+  }, [data, selectedLabels]);
 
-  // xAxis months, most recent 18 default
   const months = useMemo(() => {
     const monthSet = new Set(filteredData.map(d => d.monthYear));
     return Array.from(monthSet).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }, [filteredData]);
 
-  // Chart data by series/label
   const chartData = useMemo(() => ({
     months,
     displayMonths: months.map(formatMonthLabel),
@@ -153,22 +228,10 @@ export default function PRAnalyticsCard() {
     }))
   }), [months, filteredData, labelSpecs]);
 
-  // Find latest (last) month to focus on
-  const lastPeriodIdx = chartData.displayMonths.length ? chartData.displayMonths.length - 1 : 0;
   const defaultZoomStart = chartData.displayMonths.length > 18
     ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
     : 0;
 
-  // PR count for the latest month (all filtered labels)
-  const latestMonth = months[lastPeriodIdx] || "";
-  const uniquePRsInLatest = useMemo(() => {
-    // Sum filteredData.count for latest month (labels are now deduped!)
-    return filteredData
-      .filter(d => d.monthYear === latestMonth)
-      .reduce((acc, d) => acc + d.count, 0);
-  }, [filteredData, latestMonth]);
-
-  // Chart option
   const option = useMemo(() => ({
     tooltip: {
       trigger: "axis",
@@ -187,7 +250,7 @@ export default function PRAnalyticsCard() {
       }
     },
     legend: {
-      data: chartData.series.map(s => s.name),
+      data: chartData.series.map((s: any) => s.name),
       textStyle: { color: textColor, fontWeight: 700, fontSize: 14 },
       type: 'scroll',
       orient: 'horizontal',
@@ -212,88 +275,116 @@ export default function PRAnalyticsCard() {
       axisLabel: { color: textColor }
     }],
     series: chartData.series,
-dataZoom: [
-  {
-    type: "slider",
-    show: true,
-    xAxisIndex: [0],
-    // For default zoom, use start/end or startValue/endValue. These values are flexible.
-    start: chartData.displayMonths.length > 18
-      ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
-      : 0,
-    end: 100,
-    bottom: 12,    // <-- This keeps the slider below the x-axis, at the bottom
-    height: 30,
-    // Remove or comment out any 'top' property
-    // top: undefined,
-  },
-],
+    dataZoom: [
+      {
+        type: "slider",
+        show: true,
+        xAxisIndex: [0],
+        start: defaultZoomStart,
+        end: 100,
+        bottom: 12,
+        height: 30,
+      },
+    ],
     grid: { left: 60, right: 30, top: 80, bottom: 60 }
   }), [chartData, textColor, cardBg, defaultZoomStart]);
-type CsvRow = {
-  Month: string;
-  MonthKey: string;
-  Label: string;
-  LabelType: string;
-  Count: number;
-  Repo: string | undefined;
-  PRs: string; // PR numbers, e.g. "432;440;498;501"
-};
 
+  // CSV download
+  const downloadCSV = async () => {
+    setLoading(true);
 
-const downloadCSV = async () => {
-  setLoading(true);
+    const buildParams = (repo: string) => new URLSearchParams({
+      repo,
+      mode: "detail",
+      labelType: labelSet,
+    }).toString();
 
-  const repoObj = REPOS.find(r => r.key === repoKey)!;
-  // Adjust API params to match backend expectations
-  const params = new URLSearchParams({
-    repo: repoObj.key, // "erc" or "eip"
-    mode: "detail", // Force detail mode
-    labelType: labelSet, // "customLabels" or "githubLabels"
-  });
+    const fetchRows = async (repo: string) => {
+      const url = `/api/pr-details?${buildParams(repo)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed to fetch PR details (${repo}): ${res.status}`);
+      const rows = await res.json();
+      return Array.isArray(rows) ? rows : [];
+    };
 
-  const url = `/api/pr-details?${params.toString()}`;
+    try {
+      let combined: any[] = [];
+      if (repoKey === "all") {
+        const [eip, erc, rip] = await Promise.allSettled([
+          fetchRows("eip"),
+          fetchRows("erc"),
+          fetchRows("rip"),
+        ]);
+        const toArr = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
+        combined = [...toArr(eip), ...toArr(erc), ...toArr(rip)];
 
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Failed to fetch PR details: ${res.status}`);
-    const prRows = await res.json();
+        // Normalize overlapping custom labels for 'all'
+        if (labelSet === "customLabels") {
+          combined = combined.map((pr: any) => ({
+            ...pr,
+            Label: normalizeCustomLabel(pr.Repo || "", pr.Label),
+            LabelType: "customLabels",
+          }));
+        }
+      } else {
+        const repo = repoKey; // "eip" | "erc" | "rip"
+        const rows = await fetchRows(repo);
+        combined = rows;
+      }
 
-    // Directly use API’s field names or remap if needed
-    const csvData = prRows.map((pr: any) => ({
-      Month: pr.Month || formatMonthLabel(pr.MonthKey),
-      MonthKey: pr.MonthKey,
-      Label: pr.Label,
-      LabelType: pr.LabelType,
-      Repo: pr.Repo || repoObj.key,
-      PRNumber: pr.PRNumber,
-      PRLink: pr.PRLink,
-      Author: pr.Author,
-      Title: pr.Title,
-      CreatedAt: pr.CreatedAt
-        ? new Date(pr.CreatedAt).toISOString()
-        : "",
-    }));
+      // Normalize for selected label set to ensure filtering aligns
+      if (labelSet === "githubLabels") {
+        combined = combined.map((pr: any) => ({
+          ...pr,
+          Label: normalizeGithubLabel(pr.Label),
+          LabelType: "githubLabels",
+        }));
+      }
 
-    const csv = Papa.unparse(csvData);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const urlObj = URL.createObjectURL(blob);
+      // Filter rows by selected labels (value or display label)
+      const allowedValues = new Set(selectedLabels);
+      const valueToLabel = new Map(labelSpecs.map(spec => [spec.value, spec.label] as const));
+      const allowedDisplay = new Set(selectedLabels.map(v => valueToLabel.get(v) ?? v));
 
-    const a = document.createElement("a");
-    a.href = urlObj;
-    a.download = `${repoKey}_${labelSet}_pr_details.csv`;
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+      const filteredRows = combined.filter((pr: any) => {
+        const lbl = (pr.Label ?? "").toString();
+        return allowedValues.has(lbl) || allowedDisplay.has(lbl);
+      });
 
-    URL.revokeObjectURL(urlObj);
-  } catch (err) {
-    console.error("Download CSV error", err);
-  } finally {
-    setLoading(false);
-  }
-};
+      const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
+
+      const csvData = filteredRows.map((pr: any) => ({
+        Month: pr.Month || formatMonthLabel(pr.MonthKey),
+        MonthKey: pr.MonthKey,
+        Label: pr.Label,
+        LabelType: pr.LabelType,
+        Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
+        PRNumber: pr.PRNumber,
+        PRLink: pr.PRLink,
+        Author: pr.Author,
+        Title: pr.Title,
+        CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
+      }));
+
+      const csv = Papa.unparse(csvData);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const urlObj = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = urlObj;
+      a.download = `${repoKey}_${labelSet}_pr_details.csv`;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(urlObj);
+    } catch (err) {
+      console.error("Download CSV error", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -329,7 +420,7 @@ const downloadCSV = async () => {
                       size="sm"
                       justifyContent="flex-start"
                       colorScheme={repoKey === repo.key ? "blue" : undefined}
-                      onClick={() => setRepoKey(repo.key as "eip" | "erc")}
+                      onClick={() => setRepoKey(repo.key as "all" | "eip" | "erc" | "rip")}
                     >
                       {repo.label}
                     </Button>
@@ -337,7 +428,7 @@ const downloadCSV = async () => {
                 </Stack>
               </MenuList>
             </Menu>
-            {/* <Menu>
+            <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="teal" minW={160}>
                 {labelSetOptions.find(o => o.key === labelSet)?.label}
               </MenuButton>
@@ -357,7 +448,7 @@ const downloadCSV = async () => {
                   )}
                 </Stack>
               </MenuList>
-            </Menu> */}
+            </Menu>
             <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md">
               Download CSV
             </Button>
