@@ -74,7 +74,12 @@ const rawData = [
   { upgrade: "Spurious Dragon", eip: "EIP-160", authors: ["Vitalik Buterin"] },
   { upgrade: "Spurious Dragon", eip: "EIP-161", authors: ["Gavin Wood"] },
   { upgrade: "Spurious Dragon", eip: "EIP-170", authors: ["Vitalik Buterin"] },
-  { upgrade: "Tangerine Whistle", eip: "EIP-150", authors: ["Vitalik Buterin"] }
+  { upgrade: "Tangerine Whistle", eip: "EIP-150", authors: ["Vitalik Buterin"] },
+  // DAO Fork - No specific EIPs, was an irregular state change
+  // Frontier Thawing - No specific EIPs, operational change
+  // Frontier - No EIPs, original launch
+  // Altair - Consensus layer upgrade, no execution EIPs
+  // Bellatrix - Consensus layer upgrade, no execution EIPs
 ];
 
 const authorContributions: Record<string, AuthorData> = {};
