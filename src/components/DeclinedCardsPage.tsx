@@ -1,4 +1,4 @@
-import { SimpleGrid, Heading, Text, Box } from "@chakra-ui/react";
+import { SimpleGrid, Box } from "@chakra-ui/react";
 import DeclinedEIPCard from "./DeclinedForInclusion";
 import Header from "@/components/Header";
 
@@ -10,8 +10,14 @@ interface DeclinedEIP {
   discussionLink: string;
 }
 
-// Data
-const declinedEIPs: DeclinedEIP[] = [
+interface DeclinedEIPListPageProps {
+  selectedUpgrade: 'fusaka' | 'glamsterdam';
+  fusaka?: DeclinedEIP[];
+  glamsterdam?: DeclinedEIP[];
+}
+
+// Default (fallback) data – kept in case props not supplied
+const defaultFusaka: DeclinedEIP[] = [
   {
     id: "EIP-663",
     title: "EIP-663: SWAPN, DUPN and EXCHANGE instructions",
@@ -238,18 +244,38 @@ const declinedEIPs: DeclinedEIP[] = [
 },
 
 ];
-export default function DeclinedEIPListPage() {
-  return (
-    <Box>
 
-                       <Header
-                              title={`Declined for Inclusion - [${declinedEIPs.length}]`}
-                              subtitle="Overview"
-                              description="EIPs that were proposed, but ultimately declined for inclusion in the upgrade for various reasons. They may be reconsidered for future upgrades."
-                              sectionId="dfi"
-                            />
+const defaultGlamsterdam: DeclinedEIP[] = [
+  {
+  id: "EIP-7782",
+  title: "EIP-7782: Reduce Block Latency",
+  description: "Reduce Ethereum's slot time from 12s to 6s to decrease latency by 50%, distribute bandwidth usage, and improve UX.",
+  eipsLink: "/eips/eip-7782",
+  discussionLink: "https://ethereum-magicians.org/t/eip-7782-reduce-block-latency/21271",
+},
+]
+
+export default function DeclinedEIPListPage({
+  selectedUpgrade,
+  fusaka = defaultFusaka,
+  glamsterdam = defaultGlamsterdam
+}: DeclinedEIPListPageProps) {
+
+  const data = selectedUpgrade === 'fusaka' ? fusaka : glamsterdam;
+  const upgradeLabel = selectedUpgrade === 'fusaka' ? 'Fusaka' : 'Glamsterdam';
+
+  if (!data.length) return null;
+
+  return (
+    <Box id="dfi" mt={12}>
+      <Header
+        title={`Declined for Inclusion (${upgradeLabel}) - [${data.length}]`}
+        subtitle="Overview"
+        description={`EIPs considered for ${upgradeLabel} but not included. They may be reconsidered in later upgrades.`}
+        sectionId="dfi"
+      />
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} spacing={4}>
-        {declinedEIPs.map(eip => (
+        {data.map(eip => (
           <DeclinedEIPCard key={eip.id} eip={eip} />
         ))}
       </SimpleGrid>
