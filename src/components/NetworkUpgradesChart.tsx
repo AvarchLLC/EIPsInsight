@@ -25,8 +25,10 @@ const pastelColorMap: Record<string, string> = {
   "Dencun": "#0984e3",            // Vivid Blue (2024-03-13)
   "Shanghai": "#00b894",          // Emerald Green (2023-04-12)
   "Paris": "#e57373",             // Pastel Red (2022-09-15)
+  "Bellatrix": "#ff7675",         // Light Red (2022-09-06)
   "Gray Glacier": "#6c5ce7",      // Bold Indigo (2022-06-30)
   "Arrow Glacier": "#ff4c4c",     // Bright Red (2021-12-09)
+  "Altair": "#74b9ff",            // Sky Blue (2021-10-27)
   "London": "#fd79a8",            // Rose Pink (2021-08-05)
   "Berlin": "#ff6f00",            // Deep Orange (2021-04-15)
   "Muir Glacier": "#d63031",      // Crimson Red (2020-01-02)
@@ -34,12 +36,12 @@ const pastelColorMap: Record<string, string> = {
   "Constantinople": "#00cec9",    // Teal Cyan (2019-02-28)
   "Petersburg": "#00e5ff",        // Electric Cyan (2019-02-28)
   "Byzantium": "#00b894",         // Emerald Green (2017-10-16)
+  "Spurious Dragon": "#81ecec",   // Light Teal (2016-11-23)
+  "Tangerine Whistle": "#fdcb6e", // Light Orange (2016-10-18)
+  "DAO Fork": "#fab1a0",          // Light Peach (2016-07-20)
   "Homestead": "#a29bfe",         // Soft Violet (2016-03-14)
-
-  // (There are no Frontier/Frontier Thawing/DAO Fork/Tangerine Whistle/Spurious Dragon/Altair/Bellatrix/Capella in your current rawData, so they are OMITTED.)
-
-  // If you want to always ensure future-proofing, you can add a fallback:
-  // "<upgrade name not in above>": "#b2bec3", // generic pastel gray as default
+  "Frontier Thawing": "#55a3ff",  // Light Blue (2015-09-07)
+  "Frontier": "#6c5ce7",          // Bold Indigo (2015-07-30)
 };
 
 
@@ -81,14 +83,17 @@ const rawData = [
   { date: "2022-09-15", upgrade: "Paris", eip: "EIP-3675" },
   { date: "2022-09-15", upgrade: "Paris", eip: "EIP-4399" },
 
-  // Bellatrix — September 6, 2022 [Consensus/Bellatrix]
-  // No EIPs directly, consensus-side upgrade.
+  // Bellatrix — September 6, 2022 [Consensus layer upgrade]
+  // No EIPs directly, consensus-side upgrade for The Merge preparation
 
   // Gray Glacier — June 30, 2022
   { date: "2022-06-30", upgrade: "Gray Glacier", eip: "EIP-5133" },
 
   // Arrow Glacier — December 9, 2021
   { date: "2021-12-09", upgrade: "Arrow Glacier", eip: "EIP-4345" },
+
+  // Altair — October 27, 2021 [Consensus layer upgrade]
+  // No EIPs directly, consensus-side upgrade for Beacon Chain
 
   // London — August 5, 2021
   { date: "2021-08-05", upgrade: "London", eip: "EIP-1559" },
@@ -141,6 +146,24 @@ const rawData = [
   { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-2" },
   { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-7" },
   { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-8" },
+
+  // DAO Fork — July 20, 2016
+  // No specific EIP, was an irregular state change to recover DAO funds
+
+  // Tangerine Whistle — October 18, 2016
+  { date: "2016-10-18", upgrade: "Tangerine Whistle", eip: "EIP-150" },
+
+  // Spurious Dragon — November 23, 2016
+  { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-155" },
+  { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-160" },
+  { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-161" },
+  { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-170" },
+
+  // Frontier Thawing — September 7, 2015
+  // No specific EIP, lifted the 5,000 gas limit
+
+  // Frontier — July 30, 2015
+  // No EIPs, original Ethereum launch
 ];
 
 // Group data by date-upgrade combination// Group data by date-upgrade combination (keeping duplicates)
@@ -244,16 +267,22 @@ const NetworkUpgradesChart: React.FC = () => {
         </HStack>
       </Flex>
 
-      <Wrap spacing={3} justify="center" mb={4}>
-        {uniqueUpgrades.map(upgrade => (
-          <WrapItem key={upgrade}>
-            <Flex align="center" gap={2}>
-              <Box w="10px" h="10px" bg={colorMap[upgrade]} borderRadius="sm" />
-              <Text fontSize="sm">{upgrade}</Text>
-            </Flex>
-          </WrapItem>
+      <VStack spacing={2} mb={-10}>
+        {[0, 1].map(rowIndex => (
+          <Wrap key={rowIndex} spacing={3} justify="center">
+            {uniqueUpgrades
+              .slice(rowIndex * Math.ceil(uniqueUpgrades.length / 2), (rowIndex + 1) * Math.ceil(uniqueUpgrades.length / 2))
+              .map(upgrade => (
+                <WrapItem key={upgrade}>
+                  <Flex align="baseline" gap={2}>
+                    <Box w="10px" h="10px" bg={colorMap[upgrade]} borderRadius="sm" flexShrink={0} />
+                    <Text fontSize="sm">{upgrade}</Text>
+                  </Flex>
+                </WrapItem>
+              ))}
+          </Wrap>
         ))}
-      </Wrap>
+      </VStack>
 
       <svg
         width="100%"
@@ -281,6 +310,10 @@ const NetworkUpgradesChart: React.FC = () => {
             if (x == null) return null;
             return eips.map((eip, j) => {
               const y = yScale(j + 1);
+              const hoverHandlers = {
+                onMouseEnter: () => setHoveredData({ date, upgrade, eip }),
+                onMouseLeave: () => setHoveredData(null)
+              };
               return (
                 <Group key={`${date}-${upgrade}-${eip}`}>
                   <rect
@@ -290,8 +323,7 @@ const NetworkUpgradesChart: React.FC = () => {
                     height={20}
                     fill={colorMap[upgrade]}
                     rx={4}
-                    onMouseEnter={() => setHoveredData({ date, upgrade, eip })}
-                    onMouseLeave={() => setHoveredData(null)}
+                    {...hoverHandlers}
                   />
                   <text
                     x={x + xScale.bandwidth() / 2}
@@ -300,6 +332,7 @@ const NetworkUpgradesChart: React.FC = () => {
                     fill="white"
                     fontSize={10}
                     fontWeight="bold"
+                    style={{ pointerEvents: 'none' }}
                   >
                     {eip}
                   </text>
@@ -313,8 +346,8 @@ const NetworkUpgradesChart: React.FC = () => {
       {hoveredData && (
         <Box
           position="absolute"
-          top={`${mousePos.y + 10}px`}
-          left={`${mousePos.x + 10}px`}
+          top={`${mousePos.y + 5}px`}
+          left={`${mousePos.x + 5}px`}
           bg={tooltipBg}
           color={useColorModeValue('gray.800', 'white')}
           px={3}
