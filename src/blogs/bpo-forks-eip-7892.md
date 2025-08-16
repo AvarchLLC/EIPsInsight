@@ -1,10 +1,20 @@
 ---
 title: "Blob Parameter Only (BPO) Forks (EIP-7892)"
-date: 2025-06-07
-author: Yash Kamal Chaturvedi
-image: https://etherworld.co/content/images/2025/06/Your-paragraph-text--1-.jpg
+date: "2025-06-07"
+author: "Yash Kamal Chaturvedi"
+image: "https://etherworld.co/content/images/2025/06/Your-paragraph-text--1-.jpg"
+authorAvatar : "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
+authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
+authorTwitter: "https://x.com/YashKamalChatu1"
+authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
+authorGithub: "https://github.com/yashkamalchaturvedi"
+summaryPoints:
+  - "BPO forks offer rapid scaling for Ethereum data availability, ideal for blob congestion."
+  - "Upgrades affect only blob target and limit: simpler, safer, more responsive than traditional hard forks."
+  - "Keeps pace with L2 network growth while protecting decentralization and home validators."
+  - "Real-world bandwidth constraints and solo staker diversity remain a critical consideration."
+  - "Proposed options for the next upgrade: maintain, modestly increase, or aggressively expand blob capacity."
 ---
-
 
 Ethereum is at a critical inflection point. With [Layer 2](https://etherworld.co/2021/09/20/ethereum-layer-2-projects-an-overview/) networks growing rapidly and blob capacity already saturated, the network must scale its data availability infrastructure urgently. Traditional hard forks are too slow and heavyweight to keep pace with real-time demand. 
 
@@ -17,6 +27,8 @@ That’s where Blob Parameter Only (BPO) Forks come in. By modifying only the bl
 * [Bandwidth Constraints & the Role of Solo Stakers in Blob Growth](#bandwidth-constraints-&-the-role-of-solo-stakers-in-blob-growth)
 * [Why BPO Forks Are Needed Before Fusaka?](#why-bpo-forks-are-needed-before-fusaka?)
 * [Proposed Upgrade Paths to BPO Forks](#proposed-upgrade-paths-to-bpo-forks)
+
+---
 
 ## Overview of BPO Forks
 
@@ -31,6 +43,8 @@ The primary purpose of BPO forks is to increase the flexibility and responsivene
 
 A [blob](https://etherworld.co/2024/01/22/understanding-the-blob-gas/) in Ethereum is a temporary, large data container introduced to help scale the network, especially for [Layer 2 rollups](https://etherworld.co/2023/11/02/vitalik-buterin-unveils-comprehensive-analysis-of-ethereums-diverse-layer-2-landscape-in-recent-blog-post/). Unlike regular transaction data (calldata), blobs are not executed by the Ethereum Virtual Machine and are pruned after about two weeks. They provide a cheaper and more efficient way to store data for rollups, enabling higher throughput without burdening the network's long-term storage.
 
+---
+
 ## Why do we need BPO Forks? 
 
 The need for BPO forks arises from a pressing demand to scale Ethereum's data availability layer in response to L2 growth trends. Several key factors highlight this urgency:
@@ -40,7 +54,6 @@ The need for BPO forks arises from a pressing demand to scale Ethereum's data av
 In 2024, data posted to Ethereum L1 by L2s [increased](https://dune.com/hildobby/blobs) by **183 percent**, with a significant spike in Q4. During the same period, Celestia, an alternative DA network, grew its daily posted data from **approximately 0.05 GB to over 8 GB**. This discrepancy signals that Ethereum L1 DA capacity is not keeping pace with market demand.
 
 ![g1](https://etherworld.co/content/images/2025/06/Screenshot-2025-06-04-at-9.35.04-PM.png)
-
 ![g2](https://etherworld.co/content/images/2025/06/Screenshot-2025-06-04-at-9.35.21-PM.png)
 
 ### b. Risk of Ecosystem Fragmentation
@@ -53,9 +66,11 @@ Vitalik Buterin and others have emphasized that delaying further [blob](https://
 
 Thus, BPO forks offer a practical mechanism to match Ethereum’s capacity with its usage needs in a timely and adaptive fashion.
 
+---
+
 ## Limitations of Traditional Ethereum Hard Forks
 
-Ethereum’s traditional approach to network upgrades is based on large, multi-feature hard forks such as [Dencun](https://etherworld.co/2024/01/18/ethereums-dencun-upgrade-successfully-deployed-2/) and [Pectra](https://etherworld.co/2025/03/05/pectra-upgrade-is-live-on-sepolia/). These major protocol changes typically occur on a cycle of 6 to 12 months and require extensive planning and coordination. 
+Ethereum’s traditional approach to network upgrades is based on large, multi-feature hard forks such as [Dencun](https://etherworld.co/2024/01/18/ethereums-dencun-upgrade-successfully-deployed-2/) and [Pectra](https://etherworld.co/2025/03/05/pectra-upgrade-is-live-on-sepolia/). These major protocol changes typically occur on a cycle of 6 to 12 months and require extensive planning and coordination.
 - Every upgrade involves rigorous testing across both the consensus and execution layers, careful alignment between client teams, Layer 2 developers, node operators, and the broader ecosystem, as well as the integration of multiple features into a single release. 
 
 _This bundling often leads to delays, scope creep, and compromises in prioritization._
@@ -70,6 +85,8 @@ Blob Parameter Only (BPO) forks offer a sharp contrast to this model.
 _Their limited scope also makes them easier to simulate on testnets and validate through devnets._
 
 Because of these characteristics, BPO forks present an efficient and low-overhead solution for safe, iterative scaling. They enable Ethereum to remain responsive without disrupting the stability and momentum of the broader protocol roadmap.
+
+---
 
 ## BPO Forks Design
 
@@ -102,6 +119,8 @@ A BPO fork is only justified when blobs are persistently congested, meaning dema
 
 Historical congestion analysis is typically conducted using metrics like average blob count per block. For instance, since November 2024, the network has regularly hit the 6 blob per block ceiling, indicating sustained congestion and justifying parameter increases.
 
+---
+
 ## Bandwidth Constraints & the Role of Solo Stakers in Blob Growth
 
 Solo stakers are independent Ethereum validators who typically operate their nodes from home setups. They play a foundational role in preserving Ethereum’s decentralization by ensuring that consensus power is not concentrated among institutional players. 
@@ -127,6 +146,8 @@ However, real-world measurements from Ookla’s Speedtest Global Index show that
 Montreal leads the listed cities with a median upload speed of 51.18 Mbps, followed closely by Dublin at 47.30 Mbps. New York City records a median upload speed of 36.14 Mbps, while Brussels and Berlin report lower speeds at 27.77 Mbps and 22.65 Mbps respectively. This comparison highlights significant differences in internet upload performance across major global cities.
 
 This data suggests that relying on a 50 Mbps baseline could marginalize a significant number of solo stakers worldwide, especially in bandwidth-constrained geographies.
+
+---
 
 ## Why BPO Forks Are Needed Before Fusaka?
 
@@ -160,6 +181,8 @@ The ideal path forward is a two-stage scaling strategy:
 
 This approach offers several benefits. It keeps blob fees low and rollup activity high, buys developers time to refine PeerDAS, and establishes a scalable governance model where Ethereum can respond to demand without waiting a full year between hard forks. 
 
+---
+
 ## Proposed Upgrade Paths to BPO Forks
 
 As Ethereum pushes forward with its rollup-centric roadmap, scaling the network’s data availability (DA) layer is no longer optional, it’s urgent. Blobs introduced via [EIP-4844 (proto-danksharding)](https://etherworld.co/2023/04/14/eip-4844-ready-for-multi-client-devnets/) are already hitting usage limits. 
@@ -189,6 +212,8 @@ Each upgrade path must be evaluated based on the following:
 
 Current evidence from devnets and analysis suggests **Option 1** as the most effective, while **Option 2** is a cautious alternative. **Option 3** is considered a missed opportunity.
 
+---
+
 ## Conclusion
 
-Ethereum's long-term vision depends on its ability to act swiftly without compromising its values. Blobs have become essential infrastructure for rollups, yet current capacity is lagging behind real-world usage. Waiting for Fusaka alone is no longer an option. By aligning technical safeguards with community coordination and offering upgrade paths tailored to risk tolerance, Ethereum can meet immediate needs and stay future-ready. 
+Ethereum's long-term vision depends on its ability to act swiftly without compromising its values. Blobs have become essential infrastructure for rollups, yet current capacity is lagging behind real-world usage. Waiting for Fusaka alone is no longer an option. By aligning technical safeguards with community coordination and offering upgrade paths tailored to risk tolerance, Ethereum can meet immediate needs and stay future-ready.

@@ -9,10 +9,10 @@ authorTwitter: "https://x.com/YashKamalChatu1"
 authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
 authorGithub: "https://github.com/yashkamalchaturvedi"
 summaryPoints:
-  - Remote. Full-time. Help shape Ethereum’s documentation future!
-  - Use Next.js, TypeScript, Chakra UI, MongoDB & more.
-  - Work on open-access tools for the Ethereum ecosystem.
-  - Great for devs passionate about web3, standards, or blockchain data.
+  - "Remote. Full-time. Help shape Ethereum’s documentation future!"
+  - "Use Next.js, TypeScript, Chakra UI, MongoDB & more."
+  - "Work on open-access tools for the Ethereum ecosystem."
+  - "Great for devs passionate about web3, standards, or blockchain data."
 ---
 
 #
