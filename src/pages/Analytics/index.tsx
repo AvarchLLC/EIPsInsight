@@ -1471,6 +1471,7 @@ const GitHubPRTracker: React.FC = () => {
 
   useScrollSpy([
   "GithubAnalytics",
+  "PrLabelsChart",
   "EIPsLabelChart",
 ]);
 

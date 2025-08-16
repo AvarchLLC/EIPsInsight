@@ -284,6 +284,7 @@ const sidebarStructure = [
         href: "/Analytics",
         children: [
           { label: "Github PR Analytics", href: "/Analytics#GithubAnalytics" },
+          { label: "PR Labels Distribution", href: "/Analytics#PrLabelsChart" },
           { label: "EIPs Label Chart", href: "/Analytics#EIPsLabelChart" },
         ],
       },

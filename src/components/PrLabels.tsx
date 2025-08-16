@@ -6,6 +6,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
 import Papa from "papaparse";
+import CopyLink from "./CopyLink";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -403,8 +404,9 @@ export default function PRAnalyticsCard() {
     <Card bg={cardBg} color={textColor} mx="auto" mt={8} borderRadius="2xl" p={4}>
       <CardHeader>
         <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
-          <Heading size="md" color={accentColor} mb={2}>
+          <Heading size="md" color={accentColor} mb={2} id="PrLabelsChart">
             {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label} Distribution
+            <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
           </Heading>
           <Flex gap={3} align="center">
             <Menu>
