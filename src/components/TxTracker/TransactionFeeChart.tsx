@@ -1,309 +1,358 @@
-import { Box, Text, useColorModeValue, Flex, Button, Heading, Collapse, IconButton } from "@chakra-ui/react";
-import { useState } from "react";
+import {
+  Box,
+  Flex,
+  Text,
+  Button,
+  useColorModeValue,
+  Collapse,
+  IconButton,
+  Heading,
+  Tooltip as ChakraTooltip,
+  Divider,
+} from "@chakra-ui/react";
+import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { convertGweiToUSD } from "./ethereumService";
 import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { convertGweiToUSD } from "./ethereumService";
+import { MdTimeline } from "react-icons/md";
 
-// Dynamically import the Line chart to avoid SSR issues
-const Line = dynamic(() => import("@ant-design/plots").then((mod) => mod.Line), { ssr: false });
+// Lazy load plot
+const Line = dynamic(() => import("@ant-design/plots").then(m => m.Line), { ssr: false });
 
-// Define the data types
 type DataType = "fee" | "priorityFee" | "gasUsed" | "gasBurnt";
 
-const TransactionFeeChart = ({ data, data1, data2, data3, ethPriceInUSD }: { data: any[], data1: any[], data2: any[], data3: any[], ethPriceInUSD: number }) => {
-  if (!data || data?.length === 0) return null;
+interface TxMetricPoint {
+  time: string;         // time label (HH:MM:SS or similar)
+  block?: number;       // optional block number
+  fee?: number;         // base fee gwei
+  priorityFee?: number; // priority fee gwei
+  gasUsed?: number;     // gas units
+  gasBurnt?: number;    // ETH or gwei? (Assuming gwei-like; adapt if needed)
+}
 
-  const textColor = useColorModeValue("white", "white");
-  const buttonBg = useColorModeValue("rgba(159, 122, 234, 0.2)", "rgba(159, 122, 234, 0.1)");
-  const activeButtonBg = useColorModeValue("rgba(159, 122, 234, 0.5)", "rgba(159, 122, 234, 0.3)");
-  const buttonHoverBg = useColorModeValue("rgba(159, 122, 234, 0.3)", "rgba(159, 122, 234, 0.2)");
-  const [sliderValue, setSliderValue] = useState(0.98); 
+interface TransactionFeeChartProps {
+  data: TxMetricPoint[];   // base fee
+  data1: TxMetricPoint[];  // priority fee
+  data2: TxMetricPoint[];  // gas used
+  data3: TxMetricPoint[];  // gas burnt (gwei or convert outside if different)
+  ethPriceInUSD: number;
+}
 
-  // State for controlling the selected data type
-  const [dataType, setDataType] = useState<DataType>("fee");
+const METRIC_META: Record<DataType, { label: string; color: string; unit: string; usd: boolean }> = {
+  fee:         { label: "Base Fee",      color: "#6366F1", unit: "gwei", usd: true },
+  priorityFee: { label: "Priority Fee",  color: "#10B981", unit: "gwei", usd: true },
+  gasUsed:     { label: "Gas Used",      color: "#F59E0B", unit: "gas",  usd: false },
+  gasBurnt:    { label: "Gas Burnt",     color: "#EF4444", unit: "gwei", usd: true }, // adjust if already ETH
+};
 
-  // State for controlling the collapse of the FAQ section
-  const [show, setShow] = useState(false);
+const numberFmt = (n: any, max = 4) =>
+  isFinite(Number(n))
+    ? Intl.NumberFormat("en-US", { maximumFractionDigits: max }).format(Number(n))
+    : n;
 
-  const toggleCollapse = () => setShow(!show);
-
-  // Get the selected data based on the data type
-  const getSelectedData = () => {
-    switch (dataType) {
-      case "fee":
-        return data;
-      case "priorityFee":
-        return data1;
-      case "gasUsed":
-        return data2;
-      case "gasBurnt":
-        return data3;
-      default:
-        return data;
+/**
+ * Normalizes and merges metric arrays by time+block (so slider works uniformly).
+ * Assumes each dataset may have overlapping or distinct time stamps.
+ */
+function mergeSeries(a: TxMetricPoint[], b: TxMetricPoint[], c: TxMetricPoint[], d: TxMetricPoint[]) {
+  const map = new Map<string, TxMetricPoint>();
+  const add = (arr: TxMetricPoint[], keyField: keyof TxMetricPoint) => {
+    for (const p of arr || []) {
+      const key = `${p.time}|${p.block ?? ""}`;
+      if (!map.has(key)) {
+        map.set(key, { time: p.time, block: p.block });
+      }
+      const existing = map.get(key)!;
+      if (keyField === "fee") existing.fee = p.fee;
+      else if (keyField === "priorityFee") existing.priorityFee = p.priorityFee;
+      else if (keyField === "gasUsed") existing.gasUsed = p.gasUsed;
+      else if (keyField === "gasBurnt") existing.gasBurnt = p.gasBurnt;
+      // Copy other known numeric fields if present
+      if (p.fee !== undefined) existing.fee = p.fee;
+      if (p.priorityFee !== undefined) existing.priorityFee = p.priorityFee;
+      if (p.gasUsed !== undefined) existing.gasUsed = p.gasUsed;
+      if (p.gasBurnt !== undefined) existing.gasBurnt = p.gasBurnt;
     }
   };
+  add(a, "fee");
+  add(b, "priorityFee");
+  add(c, "gasUsed");
+  add(d, "gasBurnt");
+  return Array.from(map.values());
+}
 
-  // Sort data in increasing timestamp order
-  const sortedData = [...getSelectedData()].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()).reverse();
+const TransactionFeeChart = ({
+  data,
+  data1,
+  data2,
+  data3,
+  ethPriceInUSD
+}: TransactionFeeChartProps) => {
+  // Guard
+  if (!data?.length && !data1?.length && !data2?.length && !data3?.length) return null;
 
-  // Get the display name for the selected data type
-  const getDisplayName = (type: DataType) => {
-    switch (type) {
-      case "fee":
-        return "Base Fee";
-      case "priorityFee":
-        return "Priority Fee";
-      case "gasUsed":
-        return "Gas Used";
-      case "gasBurnt":
-        return "Gas Burnt";
-      default:
-        return "Base Fee";
-    }
-  };
+  const [metric, setMetric] = useState<DataType>("fee");
+  const [sliderStart, setSliderStart] = useState(0.9);
+  const [showFAQ, setShowFAQ] = useState(false);
 
-  const generateHeatmapData = () => {
-    const now = new Date();
-    const heatmapData = [];
+  const cardBg = useColorModeValue(
+    "linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(245,247,250,0.55) 100%)",
+    "linear-gradient(135deg, rgba(31,36,46,0.85) 0%, rgba(21,26,36,0.78) 100%)"
+  );
+  const headerGradient = useColorModeValue(
+    "linear-gradient(90deg,#4f46e5,#6366f1)",
+    "linear-gradient(90deg,#4338ca,#6366f1)"
+  );
+  const borderColor = useColorModeValue("blackAlpha.200", "whiteAlpha.200");
+  const btnBg = useColorModeValue("whiteAlpha.600", "whiteAlpha.200");
+  const btnHover = useColorModeValue("whiteAlpha.700", "whiteAlpha.300");
+  const btnActive = useColorModeValue("purple.600", "purple.500");
+  const textPrimary = useColorModeValue("gray.800", "gray.100");
+  const subColor = useColorModeValue("gray.600", "gray.400");
 
-    // Function to convert 12-hour format to 24-hour format
-    const convertTo24Hour = (timeStr: string) => {
-        const [time, modifier] = timeStr.split(" ");
-        let [hours, minutes, seconds] = time.split(":")?.map(Number);
+  // Merge and sort (oldest→newest)
+  const merged = useMemo(
+    () =>
+      mergeSeries(data || [], data1 || [], data2 || [], data3 || [])
+        .filter(p => p.time) // ensure valid
+        .sort((a, b) => {
+          // Try to parse time to Date (fallback lexical)
+            // We rely on lexicographic fallback (HH:MM:SS)
+          return a.time.localeCompare(b.time);
+        }),
+    [data, data1, data2, data3]
+  );
 
-        if (modifier.toLowerCase() === "pm" && hours !== 12) {
-            hours += 12;
-        } else if (modifier.toLowerCase() === "am" && hours === 12) {
-            hours = 0;
-        }
+  const meta = METRIC_META[metric];
 
-        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    };
-
-    // Normalize sortedData timestamps to Date objects
-    const normalizedData = sortedData?.map((d) => {
-        const formattedTime = convertTo24Hour(d.time); // Convert 12-hour to 24-hour
-        const dateObj = new Date(`${now.toISOString().split("T")[0]}T${formattedTime}`); // Parse correctly
-        return {
-            ...d,
-            time: dateObj.getTime(), // Convert to timestamp
-        };
-    });
-
-    for (let i = 0; i < 20; i++) {
-        const hour = new Date(now.getTime() - i * 60 * 60 * 1000); // Current hour minus i hours
-        const hourStart = new Date(hour).setMinutes(0, 0, 0); // Start of the hour
-        const hourEnd = hourStart + 60 * 60 * 1000; // End of the hour
-
-        // Filter data for the current hour
-        const hourData = normalizedData?.filter((d) => d.time >= hourStart && d.time < hourEnd);
-
-        // Calculate the average for the selected dataType
-        const avgValue =
-            hourData?.length > 0
-                ? hourData?.reduce((acc, curr) => acc + curr[dataType], 0) / hourData?.length
-                : 0; // Default to 0 if no data for the hour
-
-        heatmapData.push({
-            date: new Date(hourStart).toISOString().split('T')[0], // Use date for calendar heatmap
-            count: avgValue,
-        });
-    }
-
-    return heatmapData.reverse();
-  };
-
-  const heatmapData = generateHeatmapData();
-
-  // Chart configuration for @ant-design/plots
-  const chartConfig = {
-    data: sortedData,
+  // Chart config
+  const chartConfig: any = {
+    // Filter out rows where current metric is missing / not numeric (avoids invalid shapes)
+    data: merged.filter(p => typeof (p as any)[metric] === 'number' && isFinite((p as any)[metric])),
     xField: "time",
-    yField: dataType, // Dynamically set the yField based on the selected data type
-    color: "#8884d8",
-    lineStyle: {
-      stroke: "#8884d8",
-      lineWidth: 2,
-    },
-    slider: {
-      start: sliderValue, // Set the start value from the state
-      end: 1, // End of the slider
-      step: 0.01, // Define the step value for the slider
-      min: 0, // Minimum value for the slider
-      max: 1, // Maximum value for the slider
-      onChange: (value: number) => {
-        setSliderValue(value); // Update state when slider value changes
-      },
-      onAfterChange: (value: number) => {
-        console.log('Slider moved to:', value); // Optional: Perform actions after sliding stops
-      },
-    },
+    yField: metric,
+    color: meta.color,
     smooth: true,
-    tooltip: {
-      customContent: (title: string, items: any[]) => {
-        const item = items?.[0];
-        return (
-          <Box bg="white" p={3} borderRadius="md" border="1px solid" borderColor="gray.200">
-            <Text color="black">Time: {title}</Text>
-            <Text color="black">Block: {item?.data?.block}</Text>
-            <Text color="black">{getDisplayName(dataType)}: {item?.value} Gwei ({convertGweiToUSD(item?.value, ethPriceInUSD)}$)</Text>
-          </Box>
-        );
-      },
+    connectNulls: false,
+    // The previous custom appear animation 'path-in' caused getTotalLength errors in G2
+    // Disable complex animation (or switch to a simple fade if you prefer)
+    animation: false,
+    // If you want a subtle intro instead, uncomment:
+    // animation: { appear: { animation: 'fade-in', duration: 300 } },
+    lineStyle: {
+      stroke: meta.color,
+      lineWidth: 2.2,
+      shadowColor: meta.color,
+      shadowBlur: 6,
+      opacity: 0.95
     },
+    point: {
+      size: 0,
+      shape: "circle",
+      style: { fill: meta.color }
+    },
+    slider: merged.length > 30 ? {
+      start: sliderStart,
+      end: 1,
+      height: 18,
+      trendCfg: { isArea: true },
+      handlerStyle: { fill: meta.color, stroke: meta.color },
+      onChange: (cfg: any) => setSliderStart(cfg.start)
+    } : undefined,
+    tooltip: {
+      showTitle: true,
+      shared: false,
+      customContent: (title: string, items: any[]) => {
+        if (!items?.length) return "";
+        const d = items[0].data;
+        const val = d?.[metric];
+        const usdVal =
+          meta.usd && typeof val === "number"
+            ? convertGweiToUSD(val, ethPriceInUSD)
+            : undefined;
+        return `
+          <div style="padding:10px 12px;font-size:12px;">
+            <div style="font-weight:600;margin-bottom:4px;">${meta.label}</div>
+            <div style="opacity:0.7;margin-bottom:4px;">Time: ${title}</div>
+            ${
+              d?.block
+                ? `<div style="margin-bottom:4px;">Block: <strong>${d.block}</strong></div>`
+                : ""
+            }
+            <div>
+              Value: <strong>${numberFmt(val)}</strong> ${meta.unit}${
+                usdVal ? ` <span style="color:#6366F1;">(~$${numberFmt(usdVal, 2)})</span>` : ""
+              }
+            </div>
+          </div>
+        `;
+      }
+    },
+    yAxis: {
+      label: {
+        style: { fill: useColorModeValue("#374151", "#cbd5e1"), fontSize: 11 }
+      },
+      grid: { line: { style: { stroke: "rgba(100,116,139,0.15)", lineDash: [4,4] } } }
+    },
+    xAxis: {
+      label: {
+        autoHide: true,
+        style: { fill: useColorModeValue("#374151", "#cbd5e1"), fontSize: 11 }
+      },
+      line: { style: { stroke: "rgba(100,116,139,0.35)" } }
+    }
   };
+
+  const FAQ = (
+    <Collapse in={showFAQ} animateOpacity>
+      <Box
+        mt={4}
+        border="1px solid"
+        borderColor={borderColor}
+        borderRadius="lg"
+        p={5}
+        bg={useColorModeValue("whiteAlpha.800", "whiteAlpha.100")}
+        backdropFilter="blur(6px)"
+      >
+        <Heading as="h4" size="sm" mb={3} color={textPrimary}>
+          How is total gas cost calculated?
+        </Heading>
+        <Text fontSize="sm" color={subColor} mb={4}>
+          Total Gas Cost = (Base Fee + Priority Fee) * Gas Limit.
+          Example: (10 gwei + 2 gwei) * 21,000 = 252,000 gwei = 0.000252 ETH.
+        </Text>
+
+        <Heading as="h4" size="sm" mb={3} color={textPrimary}>
+          Why do some transactions cost more?
+        </Heading>
+        <Text fontSize="sm" color={subColor}>
+          Higher complexity (contract calls), congestion (base fee spikes), and larger tips for
+          faster inclusion raise total cost.
+        </Text>
+      </Box>
+    </Collapse>
+  );
 
   return (
-    <Box p={5} shadow="md" borderWidth="1px" borderRadius="md" m={20}>
-      <Box
-            pl={4}
-            bg={"white"}
-            borderRadius="5"
-            pr="8px"
-            paddingLeft="20px"
-            marginBottom={2}
-            pb="15px"
-          >
-            <Flex justify="space-between" align="center">
-              <Heading
-                as="h3"
-                size="lg"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              > Transaction fee Chart FAQ
-              </Heading>
-              <Box
-        bg="blue" // Gray background
-        borderRadius="md" // Rounded corners
-        padding={2} // Padding inside the box
+    <Box
+      mt={10}
+      border="1px solid"
+      borderColor={borderColor}
+      borderRadius="2xl"
+      bg={cardBg}
+      backdropFilter="blur(14px)"
+      boxShadow={useColorModeValue(
+        "0 4px 18px -2px rgba(99,102,241,0.25)",
+        "0 4px 22px -4px rgba(99,102,241,0.35)"
+      )}
+      overflow="hidden"
+      w="100%"
+      maxW="1300px"
+      mx="auto"
+    >
+      {/* Header */}
+      <Flex
+        px={{ base: 5, md: 8 }}
+        py={5}
+        bg={headerGradient}
+        color="white"
+        align="center"
+        gap={4}
+        flexWrap="wrap"
       >
-        <IconButton
-          onClick={toggleCollapse}
-          icon={show ? <ChevronUpIcon boxSize={8} color="white" /> : <ChevronDownIcon boxSize={8} color="white" />}
-          variant="ghost"
-          h="24px" // Smaller height
-           w="20px"
-          aria-label="Toggle Instructions"
-         bg="blue"
-        />
-      </Box>
-            </Flex>
-      
-            <Collapse in={show}>
-  <Heading
-    as="h4"
-    size="md"
-    marginBottom={4}
-    color={useColorModeValue("#3182CE", "blue.300")}
-  >
-    How to calculate the gas for a transaction?
-  </Heading>
-  <Text
-    fontSize="md"
-    marginBottom={2}
-    color={useColorModeValue("gray.800", "gray.200")}
-    className="text-justify"
-  >
-    The total gas cost for a transaction depends on three factors:
-    <br />
-    1. <strong>Gas Limit</strong>: The maximum amount of gas you're willing to spend. Simple ETH transfers use 21,000 gas, while smart contract interactions can use 100,000–500,000 gas or more.
-    <br />
-    2. <strong>Base Fee</strong>: The minimum gas price required to include your transaction in a block. This fluctuates based on network demand.
-    <br />
-    3. <strong>Priority Fee (Tip)</strong>: An additional amount paid to miners to prioritize your transaction.
-    <br />
-    <br />
-    The total gas cost is calculated as:
-    <br />
-    <strong>Total Gas Cost = (Base Fee + Priority Fee) * Gas Limit</strong>
-    <br />
-    <br />
-    For example, if the base fee is 10 Gwei, the priority fee is 2 Gwei, and the gas limit is 21,000, the total gas cost would be:
-    <br />
-    <strong>(10 + 2) * 21,000 = 252,000 Gwei = 0.000252 ETH</strong>
-    <br />
-    At an ETH price of $3,000, this would be <strong>$0.756</strong>.
-  </Text>
-
-  <Heading
-    as="h4"
-    size="md"
-    marginBottom={4}
-    color={useColorModeValue("#3182CE", "blue.300")}
-  >
-    Why do transactions often cost $3–$4 or more?
-  </Heading>
-  <Text
-    fontSize="md"
-    marginBottom={2}
-    color={useColorModeValue("gray.800", "gray.200")}
-    className="text-justify"
-  >
-    Transactions often cost $3–$4 or more because:
-    <br />
-    1. <strong>Complex Transactions</strong>: Interacting with smart contracts (e.g., swapping tokens or minting NFTs) requires more gas (e.g., 100,000–500,000 gas units).
-    <br />
-    2. <strong>Network Congestion</strong>: During high demand, the base fee can spike (e.g., 50–100 Gwei or more).
-    <br />
-    3. <strong>Priority Fees</strong>: To ensure fast processing, you may need to pay a higher priority fee (e.g., 5–10 Gwei).
-    <br />
-    <br />
-    For example, a transaction with a base fee of 50 Gwei, a priority fee of 5 Gwei, and a gas limit of 100,000 would cost:
-    <br />
-    <strong>(50 + 5) * 100,000 = 5,500,000 Gwei = 0.0055 ETH</strong>
-    <br />
-    At an ETH price of $3,000, this would be <strong>$16.50</strong>.
-  </Text>
-</Collapse>
-      
-           
-          </Box>
-      
-
-      <Text
-        fontSize={20}
-        fontWeight="bold"
-        mb={4}
-        color={textColor}
-        textShadow="0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8)"
-      >
-        {getDisplayName(dataType)} Trend
-      </Text>
-
-      {/* Tabs for selecting data type */}
-      <Flex mb={4} gap={2} wrap="wrap">
-        <Flex mb={4} gap={4} wrap="wrap">
-          {(["fee", "priorityFee", "gasUsed", "gasBurnt"] as DataType[])?.map((type) => (
-            <Button
-              key={type}
-              onClick={() => setDataType(type)}
-              bg={dataType === type ? activeButtonBg : buttonBg}
-              color={textColor}
-              borderRadius="full" // Fully rounded corners for a pill-like shape
-              _hover={{
-                bg: buttonHoverBg,
-                transform: "scale(1.05)",
-                transition: "transform 0.2s ease-in-out",
-              }}
-              _active={{
-                bg: activeButtonBg,
-              }}
-              textShadow="0 0 10px rgba(159, 122, 234, 0.8)"
-              boxShadow="0 0 10px rgba(159, 122, 234, 0.5)"
-              fontSize={15} // Increased font size
-              px={6} // Horizontal padding for better spacing
-              py={3} // Vertical padding for better spacing
-            >
-              {getDisplayName(type)}
-            </Button>
-          ))}
+        <Flex
+          w="50px"
+          h="50px"
+          borderRadius="xl"
+          bg="whiteAlpha.300"
+          align="center"
+          justify="center"
+        >
+          <MdTimeline size={28} />
+        </Flex>
+        <Box flex="1 1 auto" minW="220px">
+          <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
+            Transaction Fee Metrics
+          </Text>
+          <Text fontSize="xs" opacity={0.85}>
+            Live trends: base, priority, gas used & burnt
+          </Text>
+        </Box>
+        <Flex gap={2} flexWrap="wrap">
+          {(Object.keys(METRIC_META) as DataType[]).map(t => {
+            const m = METRIC_META[t];
+            const active = metric === t;
+            return (
+              <ChakraTooltip key={t} label={m.label} hasArrow>
+                <Button
+                  size="sm"
+                  onClick={() => setMetric(t)}
+                  bg={active ? btnActive : btnBg}
+                  color={active ? "white" : textPrimary}
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  px={4}
+                  borderRadius="full"
+                  _hover={{ bg: active ? btnActive : btnHover }}
+                  transition="0.18s"
+                  boxShadow={
+                    active
+                      ? "0 0 0 1px rgba(255,255,255,0.25), 0 0 0 3px rgba(99,102,241,0.35)"
+                      : "none"
+                  }
+                >
+                  {m.label}
+                </Button>
+              </ChakraTooltip>
+            );
+          })}
+          <IconButton
+            aria-label="Toggle FAQ"
+            size="sm"
+            onClick={() => setShowFAQ(s => !s)}
+            bg="whiteAlpha.300"
+            _hover={{ bg: "whiteAlpha.400" }}
+            icon={showFAQ ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            borderRadius="full"
+          />
         </Flex>
       </Flex>
-      <br />
 
-      {/* Render the Line chart with the provided config */}
-      <Box width="100%" height={300}>
+      {/* Metric Title */}
+      <Box px={{ base: 5, md: 8 }} pt={6} pb={2}>
+        <Text
+          fontSize="md"
+          fontWeight="semibold"
+          color={textPrimary}
+          display="inline-flex"
+          alignItems="center"
+          gap={2}
+        >
+          {METRIC_META[metric].label} Trend
+          <Box
+            as="span"
+            w="10px"
+            h="10px"
+            borderRadius="md"
+            bg={METRIC_META[metric].color}
+            boxShadow={`0 0 0 2px ${METRIC_META[metric].color}55`}
+          />
+        </Text>
+        <Text fontSize="xs" color={subColor} mt={1}>
+          Values plotted oldest → newest (adjust with slider if available).
+        </Text>
+      </Box>
+
+      {/* Chart */}
+      <Box px={{ base: 5, md: 8 }} py={4} w="100%" h={{ base: 320, md: 360 }}>
         <Line {...chartConfig} />
+      </Box>
+
+      <Divider opacity={0.4} />
+
+      {/* FAQ */}
+      <Box px={{ base: 5, md: 8 }} pb={8} pt={2}>
+        {FAQ}
       </Box>
     </Box>
   );

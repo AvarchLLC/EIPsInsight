@@ -1,5 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Flex, Box, Text, useColorMode, Spinner } from '@chakra-ui/react';
+import {
+  Flex,
+  Box,
+  Text,
+  useColorMode,
+  Button,
+  HStack,
+  Select,
+  Icon,
+  useToast,
+  Skeleton,
+  SkeletonText,
+  Divider,
+  Badge
+} from '@chakra-ui/react';
+import { RepeatIcon } from '@chakra-ui/icons';
+import { MdNetworkCheck } from 'react-icons/md';
 import BlockInfo from '@/components/TxTracker/BlockInfo';
 import TransactionFeeChart from '@/components/TxTracker/TransactionFeeChart';
 import RecentTransactions from '@/components/TxTracker/RecentTransactions';
@@ -7,149 +23,236 @@ import RecentBlocks from '@/components/TxTracker/RecentBlocks';
 import { getBlockDetails, fetchLast10Blocks, fetchEthPriceInUSD } from '@/components/TxTracker/ethereumService';
 import { RingLoader } from 'react-spinners';
 import TransactionCountChart from '@/components/TxTracker/TransactionCountChart';
+import AllLayout from '@/components/Layout';
+import FeedbackWidget from '@/components/FeedbackWidget';
+
+
+const REFRESH_INTERVAL_MS = 30_000;
 
 const EthereumV2 = () => {
   const { colorMode } = useColorMode();
+  const toast = useToast();
   const [network, setNetwork] = useState<'mainnet' | 'sepolia'>('mainnet');
   const [currentBlock, setCurrentBlock] = useState<any>(null);
   const [last10Blocks, setLast10Blocks] = useState<any[]>([]);
   const [transactionFees, setTransactionFees] = useState<any[]>([]);
-  const [allBlocks, setallBlocks] = useState<any[]>([]);
+  const [allBlocks, setAllBlocks] = useState<any[]>([]);
   const [priorityFee, setPriorityFee] = useState<any[]>([]);
   const [gasUsed, setGasUsed] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [loading1, setLoading1] = useState<boolean>(true);
-  const [loading2, setLoading2] = useState<boolean>(true);
-  const [loading3, setLoading3] = useState<boolean>(true);
-  const [loading4, setLoading4] = useState<boolean>(true);
-  const [loading5, setLoading5] = useState<boolean>(true);
-  const [loading6, setLoading6] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [ethPriceInUSD, setEthPriceInUSD] = useState<number>(0);
   const [gasBurntData, setGasBurntData] = useState<any[]>([]);
+  const [ethPriceInUSD, setEthPriceInUSD] = useState<number>(0);
 
-  // Function to calculate total gas burnt in the last hour
-  const calculateTotalBurntLastHour = (gasBurntData: any[]) => {
-    const lastHourData = gasBurntData.slice(0, 7200); // Assuming 5 blocks per minute (300 blocks in 1 hour)
-    const totalBurnt = lastHourData?.reduce((sum, data) => sum + data.gasBurnt / 1e18, 0); // Convert wei to ether
-    return totalBurnt.toFixed(4); // Format to 4 decimal places
+  // Unified loading flags
+  const [loadingBlock, setLoadingBlock] = useState(true);
+  const [loadingMetrics, setLoadingMetrics] = useState(true);
+  const [loadingCounts, setLoadingCounts] = useState(true);
+  const [loadingTxs, setLoadingTxs] = useState(true);
+  const [loadingBlocksTable, setLoadingBlocksTable] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const safeFetchJson = async (url: string, key: string) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`${key} fetch failed`);
+    return res.json();
   };
 
-  // Fetch data from the API route and fetchLast10Blocks
-  const fetchData = async () => {
-    setLoading(true);
-    setLoading1(true);
-    setLoading2(true);
-    setLoading3(true);
-    setLoading4(true);
-    setLoading5(true);
-    setLoading6(true);
+  const fetchData = async (showToast = false) => {
     setError(null);
-
+    setLoadingBlock(true);
+    setLoadingMetrics(true);
+    setLoadingCounts(true);
+    setLoadingTxs(true);
+    setLoadingBlocksTable(true);
     try {
-      // Fetch Ethereum price in USD
       const price = await fetchEthPriceInUSD();
       setEthPriceInUSD(price);
 
-      // Fetch current block details (optional, if needed)
       const block = await getBlockDetails('latest', network === 'sepolia');
       setCurrentBlock(block);
+      setLoadingBlock(false);
 
-      setLoading(false);
-
-      // Fetch last 10 blocks
       const blocks = await fetchLast10Blocks(network === 'sepolia');
       setLast10Blocks(blocks);
-      setRecentTransactions(blocks[0].transactions.slice(0,10));
-      setLoading6(false);
+      setRecentTransactions(blocks[0]?.transactions?.slice(0, 16) || []);
+      setLoadingTxs(false);
+      setLoadingBlocksTable(false);
 
-      // Fetch data from the API route
-      const response = await fetch('/api/txtracker/fetchData');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      const { fees } = await response.json();
+      const [{ fees }, { gasBurnt }, { gasUsed }, { priorityFee }, { allBlocks }] = await Promise.all([
+        safeFetchJson('/api/txtracker/fetchData', 'fees'),
+        safeFetchJson('/api/txtracker/fetchData1', 'gasBurnt'),
+        safeFetchJson('/api/txtracker/fetchData2', 'gasUsed'),
+        safeFetchJson('/api/txtracker/fetchData3', 'priorityFee'),
+        safeFetchJson('/api/txtracker/fetchData4', 'allBlocks')
+      ]);
 
       setTransactionFees(fees);
-
-      setLoading1(false);
-
-      const response1 = await fetch('/api/txtracker/fetchData1');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      const { gasBurnt } = await response1.json();
-
       setGasBurntData(gasBurnt);
-
-      setLoading2(false);
-
-      const response2 = await fetch('/api/txtracker/fetchData2');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      const { gasUsed} = await response2.json();
-
       setGasUsed(gasUsed);
-
-      setLoading3(false);
-
-      const response3 = await fetch('/api/txtracker/fetchData3');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      const { priorityFee} = await response3.json();
-
       setPriorityFee(priorityFee);
+      setAllBlocks(allBlocks);
 
-      setLoading4(false);
+      setLoadingMetrics(false);
+      setLoadingCounts(false);
+      setLastUpdated(new Date());
 
-      const response4 = await fetch('/api/txtracker/fetchData4');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
+      if (showToast) {
+        toast({
+          title: 'Refreshed',
+          status: 'success',
+          duration: 1400,
+          isClosable: true,
+          position: 'bottom-right'
+        });
       }
-      const { allBlocks } = await response4.json();
-      
-      setallBlocks(allBlocks);
-      setLoading5(false);
-
-      // setRecentTransactions(transactions);
-
-      
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      setError('Failed to fetch data. Please try again later.');
-    } finally {
-      setLoading4(false);
+    } catch (err: any) {
+      console.error('Fetch error:', err);
+      setError('Failed to load data. Retry shortly.');
+      setLoadingBlock(false);
+      setLoadingMetrics(false);
+      setLoadingCounts(false);
+      setLoadingTxs(false);
+      setLoadingBlocksTable(false);
+      toast({
+        title: 'Error',
+        description: err?.message || 'Fetch failed',
+        status: 'error',
+        duration: 2500,
+        isClosable: true,
+        position: 'bottom-right'
+      });
     }
   };
 
+  // Initial + network change
   useEffect(() => {
     fetchData();
   }, [network]);
 
+  // Auto refresh
+  useEffect(() => {
+    const id = setInterval(() => fetchData(), REFRESH_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [network]);
+
+  const headerBar = (
+    <Flex
+      direction={{ base: 'column', md: 'row' }}
+      align="stretch"
+      gap={4}
+      mb={6}
+      mt={4}
+      px={{ base: 2, md: 0 }}
+    >
+      <Flex
+        flex="1"
+        p={5}
+        borderRadius="2xl"
+      >
+        <Flex direction="column" w="100%" gap={3}>
+          <Flex align="center" gap={3} flexWrap="wrap">
+            <Icon as={MdNetworkCheck} boxSize={6} color="purple.400" />
+            <Text fontSize="xl" fontWeight="bold">
+              Ethereum Transaction Tracker
+            </Text>
+            <Badge colorScheme="purple" variant="subtle" fontSize=".65rem" px={2}>
+              Live
+            </Badge>
+            {lastUpdated && (
+              <Text fontSize="xs" opacity={0.65}>
+                Updated {lastUpdated.toLocaleTimeString()}
+              </Text>
+            )}
+          </Flex>
+          <Text fontSize="sm" color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
+            Real‑time execution metrics: fees, usage, transaction mix, recent blocks & txs.
+          </Text>
+          <HStack spacing={3} flexWrap="wrap">
+            <Select
+              size="sm"
+              w="140px"
+              value={network}
+              onChange={e => setNetwork(e.target.value as any)}
+              bg={colorMode === 'light' ? 'whiteAlpha.700' : 'whiteAlpha.200'}
+              backdropFilter="blur(6px)"
+            >
+              <option value="mainnet">Mainnet</option>
+              <option value="sepolia">Sepolia</option>
+            </Select>
+            <Button
+              size="sm"
+              leftIcon={<RepeatIcon />}
+              onClick={() => fetchData(true)}
+              bg="purple.600"
+              _hover={{ bg: 'purple.500' }}
+              color="white"
+              borderRadius="full"
+            >
+              Refresh
+            </Button>
+            <Badge
+              variant="solid"
+              colorScheme="pink"
+              fontSize="0.6rem"
+              borderRadius="full"
+              px={3}
+            >
+              ETH ${ethPriceInUSD ? ethPriceInUSD.toFixed(2) : '—'}
+            </Badge>
+          </HStack>
+        </Flex>
+      </Flex>
+    </Flex>
+  );
+
+  const blockSkeleton = (
+    <Box>
+      <Skeleton height="220px" borderRadius="2xl" mb={6} />
+      <Skeleton height="360px" borderRadius="2xl" mb={6} />
+      <Skeleton height="360px" borderRadius="2xl" mb={6} />
+      <Skeleton height="320px" borderRadius="2xl" mb={6} />
+      <Skeleton height="320px" borderRadius="2xl" />
+    </Box>
+  );
+
   return (
     <>
-      <Box bg="black">
-        <Flex>
-          <Box flex="1" p={5}>
-            {loading ? (
-              <Flex justify="center" align="center" height="100vh">
-                <RingLoader size={150} color="#be93d4" />
-              </Flex>
-            ) : error ? (
-              <Text color="red.500" textAlign="center">
-                {error}
-              </Text>
-            ) : (
-              <>
-                <BlockInfo title="Current Block" data={currentBlock} ethPriceInUSD={ethPriceInUSD} />
-               {loading4?(
-                <Flex justify="center" align="center" height="100vh">
-                  <RingLoader size={30} color="#be93d4" />
-                </Flex>
-               ):(
+      <FeedbackWidget />
+      <AllLayout>
+        <Box
+          minH="100vh"
+          px={{ base: 3, md: 8 }}
+          pb={14}
+        >
+          {headerBar}
+
+          {error && (
+            <Box
+              mb={6}
+              border="1px solid"
+              borderColor="red.400"
+              bg="red.50"
+              color="red.700"
+              p={4}
+              borderRadius="lg"
+            >
+              <Text fontWeight="semibold">Error</Text>
+              <Text fontSize="sm">{error}</Text>
+            </Box>
+          )}
+
+          {(loadingBlock && loadingMetrics && loadingCounts && loadingTxs && loadingBlocksTable)
+            ? blockSkeleton
+            : (
+              <Box>
+                <BlockInfo
+                  title="Current Block"
+                  data={currentBlock}
+                  ethPriceInUSD={ethPriceInUSD}
+                  isLoading={loadingBlock}
+                />
+
                 <TransactionFeeChart
                   data={transactionFees}
                   data1={priorityFee}
@@ -158,33 +261,22 @@ const EthereumV2 = () => {
                   // totalBurntLastHour={calculateTotalBurntLastHour(gasBurntData)}
                   ethPriceInUSD={ethPriceInUSD}
                 />
-               )}
-               {loading5?(
-                <Flex justify="center" align="center" height="100vh">
-                  <RingLoader size={30} color="#be93d4" />
-                </Flex>
-               ):(
                 <TransactionCountChart blocks={allBlocks}/>
-               )}
-               {loading6?(
-                <Flex justify="center" align="center" height="100vh">
-                  <RingLoader size={30} color="#be93d4" />
-                </Flex>
-               ):(
-                <RecentTransactions transactions={recentTransactions} timestamp={last10Blocks[0].timestamp} ethPriceInUSD={ethPriceInUSD} />
-               )}
-               {loading6?(
-                <Flex justify="center" align="center" height="100vh">
-                  <RingLoader size={30} color="#be93d4" />
-                </Flex>
-               ):(
-                <RecentBlocks blocks={last10Blocks} ethPriceInUSD={ethPriceInUSD} />
-               )}
-              </>
+                <RecentTransactions
+                  transactions={recentTransactions}
+                  timestamp={last10Blocks[0]?.timestamp ?? currentBlock?.timestamp ?? 0}
+                  ethPriceInUSD={ethPriceInUSD}
+                  isLoading={loadingTxs}
+                />
+                <RecentBlocks
+                  blocks={last10Blocks}
+                  ethPriceInUSD={ethPriceInUSD}
+                  isLoading={loadingBlocksTable}
+                />
+              </Box>
             )}
-          </Box>
-        </Flex>
-      </Box>
+        </Box>
+      </AllLayout>
     </>
   );
 };

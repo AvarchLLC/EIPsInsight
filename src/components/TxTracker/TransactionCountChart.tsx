@@ -1,144 +1,237 @@
-import { useState } from 'react';
-import { Box, Text, Button, Flex, useColorModeValue } from '@chakra-ui/react';
+import { useState, useMemo } from 'react';
+import {
+  Box,
+  Text,
+  Button,
+  Flex,
+  useColorModeValue,
+  HStack,
+  Icon,
+  Tooltip,
+  Divider,
+} from '@chakra-ui/react';
+import { MdTimeline } from 'react-icons/md';
 import dynamic from 'next/dynamic';
 
-// Dynamically import the Column chart to avoid SSR issues
-const Column = dynamic(() => import('@ant-design/plots').then((mod) => mod.Column), { ssr: false });
+const Column = dynamic(() => import('@ant-design/plots').then(m => m.Column), { ssr: false });
 
-// Add 'type0' to the TransactionType type
 type TransactionType = 'overall' | 'type0' | 'type1' | 'type2' | 'type3' | 'type4' | 'all';
 
-const TransactionCountChart = ({ blocks }: { blocks: any[] }) => {
+interface TransactionCountChartProps {
+  blocks: any[];
+}
+
+const TYPE_COLORS: Record<string, string> = {
+  type0: '#6366F1',
+  type1: '#10B981',
+  type2: '#F59E0B',
+  type3: '#EF4444',
+  type4: '#8B5CF6',
+};
+
+const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
   const [transactionType, setTransactionType] = useState<TransactionType>('all');
-  const [sliderValue, setSliderValue] = useState(0.98); // State for controlling the slider value
-  const textColor = useColorModeValue('white', 'white');
-  const buttonBg = useColorModeValue('rgba(159, 122, 234, 0.2)', 'rgba(159, 122, 234, 0.1)'); // Button background
-  const activeButtonBg = useColorModeValue('rgba(159, 122, 234, 0.5)', 'rgba(159, 122, 234, 0.3)'); // Active button background
-  const buttonHoverBg = useColorModeValue('rgba(159, 122, 234, 0.3)', 'rgba(159, 122, 234, 0.2)'); // Button hover background
+  const [sliderValue, setSliderValue] = useState(0.9);
 
-  // Process data to count transactions per block
-  const processData = () => {
-    console.log("block:", blocks[0]);
+  const cardBg = useColorModeValue(
+    'linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(245,247,250,0.55) 100%)',
+    'linear-gradient(135deg, rgba(31,36,46,0.85) 0%, rgba(21,26,36,0.78) 100%)'
+  );
+  const headerGradient = useColorModeValue(
+    'linear-gradient(90deg,#4f46e5,#6366f1)',
+    'linear-gradient(90deg,#4338ca,#6366f1)'
+  );
+  const borderColor = useColorModeValue('blackAlpha.200', 'whiteAlpha.200');
+  const textColor = useColorModeValue('gray.800', 'gray.100');
+  const subColor = useColorModeValue('gray.500', 'gray.400');
+  const btnBg = useColorModeValue('whiteAlpha.600', 'whiteAlpha.200');
+  const btnActive = useColorModeValue('purple.600', 'purple.500');
+
+  // Normalize & prepare data
+  const processed = useMemo(() => {
+    if (!Array.isArray(blocks)) return [];
     return blocks
-      ?.map((block) => ({
-        time: new Date(block.timestamp).toLocaleTimeString(), // Convert timestamp to readable time
-        blockNumber: block.blockNumber,
-        overall: block.total, // Use the total field for overall transactions
-        type0: block.type0, // Include type0
-        type1: block.type1,
-        type2: block.type2,
-        type3: block.type3,
-        type4: block.type4,
-      }))
-      .reverse(); // Reverse to show latest data first
-  };
+      .map(b => {
+        // Defensive timestamp handling (seconds vs ms)
+        const ts = Number(b.timestamp);
+        const date = new Date(ts < 10_000_000_000 ? ts * 1000 : ts);
+        return {
+          time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+            // Support different field naming: blockNumber OR number
+          blockNumber: b.blockNumber ?? b.number,
+          overall: b.total ?? (b.type0 ?? 0) + (b.type1 ?? 0) + (b.type2 ?? 0) + (b.type3 ?? 0) + (b.type4 ?? 0),
+          type0: b.type0 ?? 0,
+          type1: b.type1 ?? 0,
+          type2: b.type2 ?? 0,
+          type3: b.type3 ?? 0,
+          type4: b.type4 ?? 0,
+        };
+      })
+      .reverse(); // oldest→newest for slider
+  }, [blocks]);
 
-  const sortedData = processData();
+  const stackedData = useMemo(
+    () =>
+      processed.flatMap(p => [
+        { time: p.time, blockNumber: p.blockNumber, type: 'type0', value: p.type0 },
+        { time: p.time, blockNumber: p.blockNumber, type: 'type1', value: p.type1 },
+        { time: p.time, blockNumber: p.blockNumber, type: 'type2', value: p.type2 },
+        { time: p.time, blockNumber: p.blockNumber, type: 'type3', value: p.type3 },
+        { time: p.time, blockNumber: p.blockNumber, type: 'type4', value: p.type4 },
+      ]),
+    [processed]
+  );
 
-  // Prepare data for stacked column chart when 'all' is selected
-  const stackedData = sortedData.flatMap((block) => [
-    { time: block.time, blockNumber: block.blockNumber, type: 'type0', value: block.type0 },
-    { time: block.time, blockNumber: block.blockNumber, type: 'type1', value: block.type1 },
-    { time: block.time, blockNumber: block.blockNumber, type: 'type2', value: block.type2 },
-    { time: block.time, blockNumber: block.blockNumber, type: 'type3', value: block.type3 },
-    { time: block.time, blockNumber: block.blockNumber, type: 'type4', value: block.type4 }
-  ]);
+  const palette = transactionType === 'all'
+    ? Object.values(TYPE_COLORS)
+    : ['#6366F1'];
 
-  // Chart configuration for @ant-design/plots
-  const chartConfig = {
-    data: transactionType === 'all' ? stackedData : sortedData,
+  const chartConfig: any = {
+    data: transactionType === 'all' ? stackedData : processed,
     xField: 'time',
     yField: transactionType === 'all' ? 'value' : transactionType,
     seriesField: transactionType === 'all' ? 'type' : undefined,
-    isStack: transactionType === 'all', // Enable stacking for the 'all' tab
-    color: transactionType === 'all' ? ['#FFD700', '#82ca9d', '#ff7300', '#ff0000','green'] : ['#8884d8'],
-    columnStyle: {
-      radius: [4, 4, 0, 0], // Rounded corners for columns
+    isStack: transactionType === 'all',
+    color: (item: any) => {
+      if (transactionType !== 'all') return '#6366F1';
+      return TYPE_COLORS[item.type] || '#6366F1';
     },
-    legend: { position: "top-right" as const },
-    slider: {
-      start: sliderValue, // Set the start value from the state
-      end: 1, // End of the slider
-      step: 0.01, // Define the step value for the slider
-      min: 0, // Minimum value for the slider
-      max: 1, // Maximum value for the slider
-      onChange: (value: number) => {
-        setSliderValue(value); // Update state when slider value changes
-      },
-      onAfterChange: (value: number) => {
-        console.log('Slider moved to:', value); // Optional: Perform actions after sliding stops
-      },
+    columnStyle: { radius: [4, 4, 0, 0] },
+    legend: {
+      position: 'top',
+      itemName: { style: { fill: useColorModeValue('#1f2937', '#e2e8f0') } }
     },
+    animation: { appear: { animation: 'scale-in-y', duration: 400 } },
+    slider: processed.length > 12 ? {
+      start: sliderValue,
+      end: 1,
+      height: 16,
+      trendCfg: { isArea: true },
+      onChange: (val: number) => setSliderValue(val)
+    } : undefined,
     tooltip: {
+      shared: true,
+      enterable: true,
       customContent: (title: string, items: any[]) => {
-        const item = items?.[0];
-        const blockNumber = item?.data?.blockNumber; // Get block number from data
-        return (
-          <Box bg="white" p={3} borderRadius="md" border="1px solid" borderColor="gray.200">
-            <Text color="black">Time: {title}</Text>
-            <Text color="black">Block: {blockNumber}</Text>
-            {items?.map((item, index) => (
-              <Text key={index} color="black">
-                {item.name}: {item.value}
-              </Text>
-            ))}
-          </Box>
-        );
-      },
+        if (!items?.length) return '';
+        const blockNumber = items[0]?.data?.blockNumber ?? '-';
+        return `<div style="padding:10px 12px;font-size:12px;">
+          <div style="font-weight:600;margin-bottom:4px;">Block ${blockNumber}</div>
+          <div style="opacity:.75;margin-bottom:6px;">${title}</div>
+          ${items
+            .map(
+              it =>
+                `<div style="display:flex;align-items:center;gap:6px;">
+                   <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${it.color};"></span>
+                   <span>${it.name || it.data?.type}</span>
+                   <span style="margin-left:auto;font-weight:600;">${it.value}</span>
+                 </div>`
+            )
+            .join('')}
+        </div>`;
+      }
     },
+    interactions: [{ type: 'active-region' }]
   };
+
+  const TYPES: TransactionType[] = ['all', 'overall', 'type0', 'type1', 'type2', 'type3', 'type4'];
 
   return (
     <Box
-      p={5}
-      shadow="xl"
-      borderWidth="1px"
-      borderRadius="lg"
-      borderColor={useColorModeValue('whiteAlpha.300', 'whiteAlpha.300')} // Visible border
-      bg="blackAlpha.800" // Dark background to make the border stand out
-      backdropFilter="blur(10px)"
-      m={20}
+      mt={10}
+      border="1px solid"
+      borderColor={borderColor}
+      borderRadius="2xl"
+      bg={cardBg}
+      backdropFilter="blur(14px)"
+      boxShadow={useColorModeValue(
+        '0 4px 18px -2px rgba(99,102,241,0.25)',
+        '0 4px 22px -4px rgba(99,102,241,0.35)'
+      )}
+      overflow="hidden"
+      w="100%"
+      maxW="1300px"
+      mx="auto"
     >
-      <Text
-        fontSize={20}
-        fontWeight="bold"
-        mb={4}
-        color={textColor}
-        textShadow="0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8)"
+      <Flex
+        px={{ base: 5, md: 8 }}
+        py={5}
+        bg={headerGradient}
+        color="white"
+        align="center"
+        gap={4}
+        flexWrap="wrap"
       >
-        Transactions Trend
-      </Text>
-      <br />
-      <Flex mb={4} gap={2} wrap="wrap">
-        <Flex mb={4} gap={4} wrap="wrap">
-          {(['all', 'type0', 'type1', 'type2', 'type3', 'type4', 'overall'] as TransactionType[])?.map((type) => (
-            <Button
-              key={type}
-              onClick={() => setTransactionType(type)}
-              bg={transactionType === type ? activeButtonBg : buttonBg}
-              color={textColor}
-              borderRadius="full" // Fully rounded corners for a pill-like shape
-              _hover={{
-                bg: buttonHoverBg,
-                transform: 'scale(1.05)',
-                transition: 'transform 0.2s ease-in-out',
-              }}
-              _active={{
-                bg: activeButtonBg,
-              }}
-              textShadow="0 0 10px rgba(159, 122, 234, 0.8)"
-              boxShadow="0 0 10px rgba(159, 122, 234, 0.5)"
-              fontSize={15} // Increased font size
-              px={6} // Horizontal padding for better spacing
-              py={3} // Vertical padding for better spacing
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </Button>
-          ))}
+        <Flex
+          w="50px"
+          h="50px"
+          borderRadius="xl"
+          bg="whiteAlpha.300"
+          align="center"
+          justify="center"
+        >
+          <Icon as={MdTimeline} boxSize={7} />
         </Flex>
+        <Box flex="1 1 auto" minW="220px">
+          <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="bold">
+            Transactions Trend
+          </Text>
+          <Text fontSize="xs" opacity={0.85}>
+            Per block distribution by EIP‑2718 / EIP‑1559 types
+          </Text>
+        </Box>
+        <HStack spacing={2} flexWrap="wrap">
+          {TYPES.map(t => (
+            <Tooltip
+              key={t}
+              label={t === 'all'
+                ? 'Stacked view of all types'
+                : t === 'overall'
+                  ? 'Total transactions per block'
+                  : `Only ${t}`}
+              hasArrow
+            >
+              <Button
+                size="sm"
+                onClick={() => setTransactionType(t)}
+                bg={transactionType === t ? btnActive : btnBg}
+                color={transactionType === t ? 'white' : textColor}
+                _hover={{ bg: transactionType === t ? btnActive : useColorModeValue('whiteAlpha.700','whiteAlpha.300') }}
+                fontWeight="semibold"
+                px={4}
+                borderRadius="full"
+                boxShadow={transactionType === t ? '0 0 0 1px rgba(255,255,255,0.25)' : 'none'}
+                transition="0.18s"
+              >
+                {t === 'all'
+                  ? 'Stacked'
+                  : t === 'overall'
+                    ? 'Total'
+                    : t.toUpperCase()}
+              </Button>
+            </Tooltip>
+          ))}
+        </HStack>
       </Flex>
-      <Box width="100%" height={300}>
-        <Column {...chartConfig} />
+
+      <Box px={{ base: 4, md: 6 }} pt={5} pb={6}>
+        <Flex align="center" justify="space-between" mb={3}>
+          <Text fontSize="sm" color={subColor}>
+            Blocks: {processed.length}
+          </Text>
+          {processed.length > 12 && (
+            <Text fontSize="xs" color={subColor}>
+              Drag slider below chart to browse history
+            </Text>
+          )}
+        </Flex>
+        <Box w="100%" h={{ base: 320, md: 360 }}>
+          <Column {...chartConfig} />
+        </Box>
+        <Divider mt={5} mb={3} opacity={0.5} />
+        <Text fontSize="xs" color={subColor}>
+          Type0: Legacy | Type1: (Reserved / None) | Type2: EIP‑1559 | Type3/4: Other emerging types (if present)
+        </Text>
       </Box>
     </Box>
   );

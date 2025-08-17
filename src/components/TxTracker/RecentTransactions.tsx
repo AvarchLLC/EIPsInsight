@@ -1,169 +1,323 @@
-import { Box, Text, Table, Thead, Tbody, Tr, Th, Td, useColorModeValue, Icon, Tooltip, useToast } from '@chakra-ui/react';
-import { convertEthToUSD, convertGweiToUSD } from "./ethereumService";
+import {
+  Box,
+  Text,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useColorModeValue,
+  Icon,
+  Tooltip,
+  useToast,
+  Flex,
+  HStack,
+  Skeleton,
+  Badge
+} from '@chakra-ui/react';
 import { FaList, FaCopy } from 'react-icons/fa';
+import { convertEthToUSD, convertGweiToUSD } from './ethereumService';
 
-const RecentTransactions = ({ transactions, ethPriceInUSD, timestamp }: { transactions: any[]; ethPriceInUSD: number; timestamp: number }) => {
-  if (!transactions || transactions?.length === 0) return null;
+interface RecentTransactionsProps {
+  transactions: any[];
+  ethPriceInUSD: number;
+  timestamp: number;          // block timestamp (seconds)
+  isLoading?: boolean;
+  limit?: number;
+}
 
-  const toast = useToast(); // For showing toast notifications
+const nf = (n: number | string, max = 6) =>
+  isFinite(Number(n))
+    ? Intl.NumberFormat('en-US', {
+        maximumFractionDigits: max
+      }).format(Number(n))
+    : n;
 
-  const hexToDecimal = (hex: any) => {
-    return parseInt(hex, 16);
+const shorten = (v: string, len = 10) =>
+  !v ? '-' : v.length <= len ? v : `${v.slice(0, len)}…`;
+
+const RecentTransactions = ({
+  transactions,
+  ethPriceInUSD,
+  timestamp,
+  isLoading = false,
+  limit = 18
+}: RecentTransactionsProps) => {
+  const toast = useToast();
+
+  const data = (transactions || []).slice(0, limit);
+  if (!isLoading && (!data || data.length === 0)) return null;
+
+  const cardBg = useColorModeValue(
+    'linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(245,247,250,0.55) 100%)',
+    'linear-gradient(135deg, rgba(30,34,43,0.85) 0%, rgba(20,25,35,0.75) 100%)'
+  );
+  const headerGradient = useColorModeValue(
+    'linear-gradient(90deg,#4f46e5,#6366f1)',
+    'linear-gradient(90deg,#4338ca,#6366f1)'
+  );
+  const borderColor = useColorModeValue('blackAlpha.200', 'whiteAlpha.200');
+  const headBg = useColorModeValue('whiteAlpha.600', 'whiteAlpha.200');
+  const rowBg = useColorModeValue('whiteAlpha.500', 'whiteAlpha.100');
+  const rowHover = useColorModeValue('whiteAlpha.700', 'whiteAlpha.200');
+  const textPrimary = useColorModeValue('gray.800', 'gray.100');
+  const textSecondary = useColorModeValue('gray.600', 'gray.400');
+
+  const copy = (text: string, label: string) =>
+    navigator.clipboard
+      .writeText(text)
+      .then(() =>
+        toast({
+          title: 'Copied',
+            description: label,
+          status: 'success',
+          duration: 1600,
+          isClosable: true,
+          position: 'bottom-right'
+        })
+      )
+      .catch(() =>
+        toast({
+          title: 'Copy failed',
+          status: 'error',
+          duration: 1800,
+          isClosable: true,
+          position: 'bottom-right'
+        })
+      );
+
+  const ageFromBlock = (blockTsSec: number) => {
+    const now = Math.floor(Date.now() / 1000);
+    const diff = now - blockTsSec;
+    if (diff < 60) return `${diff}s`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+    return `${Math.floor(diff / 86400)}d`;
   };
 
-  const weiToEth = (weiValue: any) => {
-    return weiValue / 1e18; // 1 ETH = 10^18 wei
-  };
-
-  // const copyToClipboard = (text: string) => {
-  //   navigator.clipboard.writeText(text);
-  //   toast({
-  //     title: 'Copied to clipboard',
-  //     status: 'success',
-  //     duration: 2000,
-  //     isClosable: true,
-  //   });
-  // };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)?.then(() => {
-      toast({
-        title: "copied!",
-        description: "The hash has been copied to your clipboard.",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-    }).catch(() => {
-      toast({
-        title: "Failed to copy!",
-        description: "There was an issue copying the hash.",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
-    });
-  };
-
-  // Calculate age based on timestamp
-  const calculateAge = (timestamp: number) => {
-    const now = Math.floor(Date.now() / 1000); // Current time in seconds
-    const diff = now - timestamp; // Difference in seconds
-
-    if (diff < 60) {
-      return `${diff} seconds ago`;
-    } else if (diff < 3600) {
-      return `${Math.floor(diff / 60)} minutes ago`;
-    } else if (diff < 86400) {
-      return `${Math.floor(diff / 3600)} hours ago`;
-    } else {
-      return `${Math.floor(diff / 86400)} days ago`;
-    }
-  };
-
-  // Colors and shadows
-  const textColor = useColorModeValue('white', 'white');
-  const borderColor = useColorModeValue('whiteAlpha.300', 'whiteAlpha.300'); // Visible border color
-  const tableHeaderBg = useColorModeValue('rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)');
-  const tableRowBg = useColorModeValue('rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.02)');
-  const valueBg = 'green.500'; // Green background for value
-  const gasBg = 'yellow.500'; // Yellow background for gas
+  const skeletonRows = Array.from({ length: 8 });
 
   return (
     <Box
-      p={5}
-      shadow="xl"
-      borderWidth="1px"
-      borderRadius="lg"
-      borderColor={borderColor} // Visible border
-      backdropFilter="blur(10px)"
-      width="100%" // Take full width
-      m={5} // Adjusted margin
+      mt={10}
+      border="1px solid"
+      borderColor={borderColor}
+      borderRadius="2xl"
+      overflow="hidden"
+      bg={cardBg}
+      backdropFilter="blur(14px)"
+      boxShadow={useColorModeValue(
+        '0 4px 18px -2px rgba(99,102,241,0.25)',
+        '0 4px 22px -4px rgba(99,102,241,0.35)'
+      )}
+      w="100%"
     >
-      <Text
-        fontSize={25}
-        fontWeight="bold"
-        mb={6}
-        color={textColor}
-        textShadow="0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8)"
+      <Flex
+        px={{ base: 5, md: 7 }}
+        py={4}
+        bg={headerGradient}
+        align="center"
+        gap={4}
+        color="white"
       >
-        <Icon as={FaList} color={"white"} mr={2} /> Recent Transactions
-      </Text>
-      <br />
+        <Flex
+          w="46px"
+          h="46px"
+          borderRadius="lg"
+          bg="whiteAlpha.300"
+          align="center"
+          justify="center"
+        >
+          <Icon as={FaList} boxSize={6} />
+        </Flex>
+        <Box>
+          <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="bold">
+            Recent Transactions
+          </Text>
+          <Text fontSize="xs" opacity={0.85}>
+            Latest {isLoading ? '' : data.length} (age vs block time)
+          </Text>
+        </Box>
+      </Flex>
 
-      <Table variant="simple" colorScheme="whiteAlpha" width="100%">
-        <Thead bg={tableHeaderBg}>
-          <Tr>
-            <Th color={textColor} textAlign="center">Hash</Th>
-            <Th color={textColor} textAlign="center">From</Th>
-            <Th color={textColor} textAlign="center">To</Th>
-            <Th color={textColor} textAlign="center">Age</Th>
-            <Th color={textColor} textAlign="center">Value</Th>
-            <Th color={textColor} textAlign="center">Gas</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {transactions?.map((tx, index) => {
-            const valueInWei = hexToDecimal(tx.value); // Convert hex to decimal wei
-            const valueInEth = weiToEth(valueInWei); // Convert wei to ETH
-            const age = calculateAge(timestamp); // Calculate age using the provided timestamp
+      <Box px={{ base: 3, md: 5 }} py={{ base: 4, md: 5 }} overflowX="auto">
+        <Table
+          size="sm"
+          variant="unstyled"
+          minW="1000px"
+          sx={{ 'th, td': { whiteSpace: 'nowrap' } }}
+        >
+          <Thead>
+            <Tr bg={headBg}>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary}>
+                Hash
+              </Th>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary}>
+                From
+              </Th>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary}>
+                To
+              </Th>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary}>
+                Age
+              </Th>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary} textAlign="right">
+                Value (ETH)
+              </Th>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary} textAlign="right">
+                Value (USD)
+              </Th>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary} textAlign="right">
+                Gas Limit
+              </Th>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary} textAlign="right">
+                Gas Price (Gwei)
+              </Th>
+              <Th fontSize="xs" textTransform="uppercase" color={textSecondary} textAlign="right">
+                Est. Fee (USD)
+              </Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {isLoading &&
+              skeletonRows.map((_, r) => (
+                <Tr key={r}>
+                  {Array.from({ length: 9 }).map((__, c) => (
+                    <Td key={c} py={3}>
+                      <Skeleton h="14px" w={c === 0 ? '80px' : '60px'} borderRadius="md" />
+                    </Td>
+                  ))}
+                </Tr>
+              ))}
 
-            return (
-              <Tr key={index} bg={tableRowBg} _hover={{ bg: 'rgba(255, 255, 255, 0.1)' }}>
-                <Td color={textColor} textAlign="center" textShadow="0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8)">
-                  <Tooltip label="Copy to clipboard" aria-label="Copy to clipboard">
-                    <Box display="flex" alignItems="center" justifyContent="center">
-                      <Text>{tx.hash.slice(0, 10)}...</Text>
-                      <Icon as={FaCopy} ml={2} cursor="pointer" onClick={()=>copyToClipboard(tx.hash)} />
-                    </Box>
-                  </Tooltip>
-                </Td>
-                <Td color={textColor} textAlign="center">
-                  <Tooltip label="Copy to clipboard" aria-label="Copy to clipboard">
-                    <Box display="flex" alignItems="center" justifyContent="center">
-                      <Text>{tx.from.slice(0, 10)}...</Text>
-                      <Icon as={FaCopy} ml={2} cursor="pointer" onClick={() => copyToClipboard(tx.from)} />
-                    </Box>
-                  </Tooltip>
-                </Td>
-                <Td color={textColor} textAlign="center">
-                  <Tooltip label="Copy to clipboard" aria-label="Copy to clipboard">
-                    <Box display="flex" alignItems="center" justifyContent="center">
-                      <Text>{tx.to.slice(0, 10)}...</Text>
-                      <Icon as={FaCopy} ml={2} cursor="pointer" onClick={() => copyToClipboard(tx.to)} />
-                    </Box>
-                  </Tooltip>
-                </Td>
-                <Td color={textColor} textAlign="center">{age}</Td>
-                <Td textAlign="center">
-                  <Box
-                    bg={valueBg}
-                    borderRadius="md"
-                    p={2}
-                    display="inline-block"
+            {!isLoading &&
+              data.map((tx) => {
+                // Values may be hex strings
+                const hexToDec = (h: any) => {
+                  if (!h) return 0;
+                  try {
+                    return Number(BigInt(h));
+                  } catch {
+                    return parseInt(h, 16) || 0;
+                  }
+                };
+
+                const valueWei = hexToDec(tx.value);
+                const valueEth = valueWei / 1e18;
+
+                const gasLimit = hexToDec(tx.gas);
+                const gasPriceWei = tx.gasPrice ? hexToDec(tx.gasPrice) : 0;
+                const gasPriceGwei = gasPriceWei / 1e9;
+
+                // Fee estimation (gasLimit * gasPrice); if actual gasUsed not available
+                const estFeeEth = gasLimit && gasPriceWei ? (gasLimit * gasPriceWei) / 1e18 : 0;
+                const estFeeUsd = convertEthToUSD(estFeeEth, ethPriceInUSD);
+
+                const age = ageFromBlock(timestamp);
+
+                const usdValue = convertEthToUSD(valueEth, ethPriceInUSD);
+
+                return (
+                  <Tr
+                    key={tx.hash}
+                    bg={rowBg}
+                    _hover={{ bg: rowHover }}
+                    transition="0.18s"
                   >
-                    <Text color="white" textShadow="0 0 30px rgba(122, 234, 208, 0.8), 0 0 30px rgba(122, 234, 208, 0.8), 0 0 30px rgba(122, 234, 208, 0.8)">
-                      {valueInEth.toFixed(6)} ETH (${convertEthToUSD(valueInEth, ethPriceInUSD)})
-                    </Text>
-                  </Box>
-                </Td>
-                <Td textAlign="center">
-                  <Box
-                    bg={gasBg}
-                    borderRadius="md"
-                    p={2}
-                    display="inline-block"
-                  >
-                    <Text color="white" textShadow="0 0 30px rgba(255, 179, 72, 0.8), 0 0 30px rgba(255, 179, 72, 0.8), 0 0 30px rgba(255, 179, 72, 0.8)">
-                      {hexToDecimal(tx.gas)} Gwei (${convertGweiToUSD(hexToDecimal(tx.gas), ethPriceInUSD)})
-                    </Text>
-                  </Box>
-                </Td>
-              </Tr>
-            );
-          })}
-        </Tbody>
-      </Table>
+                    <Td>
+                      <HStack spacing={2}>
+                        <Tooltip label={tx.hash}>
+                          <Text
+                            fontWeight="semibold"
+                            color="purple.400"
+                            cursor="pointer"
+                            onClick={() => copy(tx.hash, 'Hash')}
+                          >
+                            {shorten(tx.hash, 12)}
+                          </Text>
+                        </Tooltip>
+                        <Icon
+                          as={FaCopy}
+                          boxSize={3.5}
+                          color="purple.300"
+                          cursor="pointer"
+                          onClick={() => copy(tx.hash, 'Hash')}
+                        />
+                      </HStack>
+                    </Td>
+                    <Td>
+                      <HStack spacing={2}>
+                        <Tooltip label={tx.from}>
+                          <Text
+                            fontSize="sm"
+                            color={textPrimary}
+                            cursor="pointer"
+                            onClick={() => copy(tx.from, 'From')}
+                          >
+                            {shorten(tx.from, 10)}
+                          </Text>
+                        </Tooltip>
+                        <Icon
+                          as={FaCopy}
+                          boxSize={3}
+                          color="gray.400"
+                          cursor="pointer"
+                          onClick={() => copy(tx.from, 'From')}
+                        />
+                      </HStack>
+                    </Td>
+                    <Td>
+                      {tx.to ? (
+                        <HStack spacing={2}>
+                          <Tooltip label={tx.to}>
+                            <Text
+                              fontSize="sm"
+                              color={textPrimary}
+                              cursor="pointer"
+                              onClick={() => copy(tx.to, 'To')}
+                            >
+                              {shorten(tx.to, 10)}
+                            </Text>
+                          </Tooltip>
+                          <Icon
+                            as={FaCopy}
+                            boxSize={3}
+                            color="gray.400"
+                            cursor="pointer"
+                            onClick={() => copy(tx.to, 'To')}
+                          />
+                        </HStack>
+                      ) : (
+                        <Badge colorScheme="gray" variant="subtle">
+                          Contract Creation
+                        </Badge>
+                      )}
+                    </Td>
+                    <Td color={textSecondary} fontSize="sm">
+                      {age}
+                    </Td>
+                    <Td textAlign="right" fontWeight="medium" color={textPrimary}>
+                      {nf(valueEth, 6)}
+                    </Td>
+                    <Td textAlign="right" fontSize="sm" color="green.400" fontWeight="semibold">
+                      ${nf(usdValue, 2)}
+                    </Td>
+                    <Td textAlign="right" color={textPrimary}>
+                      {gasLimit ? nf(gasLimit, 0) : '-'}
+                    </Td>
+                    <Td textAlign="right" color="orange.400" fontWeight="medium">
+                      {gasPriceGwei ? nf(gasPriceGwei, 2) : '-'}
+                    </Td>
+                    <Td textAlign="right" fontSize="sm" color="pink.400" fontWeight="semibold">
+                      {estFeeUsd ? `$${nf(estFeeUsd, 2)}` : '-'}
+                    </Td>
+                  </Tr>
+                );
+              })}
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   );
 };

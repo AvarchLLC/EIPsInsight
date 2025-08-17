@@ -1,101 +1,268 @@
-import { Box, Text, Table, Thead, Tbody, Tr, Th, Td, useColorModeValue, Icon } from '@chakra-ui/react';
-import { convertEthToUSD, convertGweiToUSD } from './ethereumService';
-import { FaCube } from 'react-icons/fa';
+import {
+  Box,
+  Text,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useColorModeValue,
+  Icon,
+  Tooltip,
+  Skeleton,
+  Flex,
+  HStack,
+  Badge
+} from '@chakra-ui/react';
+import { FaCube, FaGasPump, FaFire, FaCoins } from 'react-icons/fa';
 import Web3 from 'web3';
+import { convertEthToUSD, convertGweiToUSD } from './ethereumService';
 
-const RecentBlocks = ({ blocks, ethPriceInUSD }: { blocks: any[]; ethPriceInUSD: number }) => {
-  if (!blocks || blocks?.length === 0) return null;
+interface RecentBlocksProps {
+  blocks: any[];
+  ethPriceInUSD: number;
+  isLoading?: boolean;
+  limit?: number;
+}
 
-  // Colors and shadows
-  const textColor = useColorModeValue('white', 'white');
-  const borderColor = useColorModeValue('whiteAlpha.300', 'whiteAlpha.300'); // Visible border color
-  const tableHeaderBg = useColorModeValue('rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)');
-  const tableRowBg = useColorModeValue('rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.02)');
-  const baseFeeBg = 'yellow.500'; // Yellow background for base fee
-  const burnedEthBg = 'red.500'; // Red background for burned ETH
+const nf = (n: any, max = 2) =>
+  isFinite(Number(n))
+    ? Intl.NumberFormat('en-US', { maximumFractionDigits: max }).format(Number(n))
+    : n;
+
+const RecentBlocks = ({
+  blocks,
+  ethPriceInUSD,
+  isLoading = false,
+  limit = 12
+}: RecentBlocksProps) => {
+  const data = (blocks || []).slice(0, limit);
+  if ((!data || data.length === 0) && !isLoading) return null;
+
+  const cardBorder = useColorModeValue('blackAlpha.200', 'whiteAlpha.200');
+  const headerGradient = useColorModeValue(
+    'linear-gradient(90deg,#4f46e5,#6366f1)',
+    'linear-gradient(90deg,#4338ca,#6366f1)'
+  );
+  const cardBg = useColorModeValue(
+    'linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(245,247,250,0.55) 100%)',
+    'linear-gradient(135deg, rgba(30,34,43,0.85) 0%, rgba(20,25,35,0.75) 100%)'
+  );
+  const tableHeaderBg = useColorModeValue('whiteAlpha.600', 'whiteAlpha.200');
+  const rowBg = useColorModeValue('whiteAlpha.500', 'whiteAlpha.100');
+  const rowHover = useColorModeValue('whiteAlpha.700', 'whiteAlpha.200');
+  const textPrimary = useColorModeValue('gray.800', 'gray.100');
+  const textSecondary = useColorModeValue('gray.600', 'gray.400');
+
+  const colStyles = {
+    fontSize: 'xs',
+    letterSpacing: '.5px',
+    textTransform: 'uppercase',
+    fontWeight: 600,
+    color: textSecondary,
+    py: 2
+  } as const;
+
+  const skeletonRows = Array.from({ length: 6 });
 
   return (
     <Box
-      p={5}
-      shadow="xl"
-      borderWidth="1px"
-      borderRadius="lg"
-      borderColor={borderColor} // Visible border
-      backdropFilter="blur(10px)"
-      width="100%" // Take full width
-      m={20} // Margin of 5
+      mt={10}
+      border="1px solid"
+      borderColor={cardBorder}
+      borderRadius="2xl"
+      overflow="hidden"
+      bg={cardBg}
+      backdropFilter="blur(14px)"
+      boxShadow={useColorModeValue(
+        '0 4px 18px -2px rgba(99,102,241,0.25)',
+        '0 4px 22px -4px rgba(99,102,241,0.35)'
+      )}
     >
-      <Text
-        fontSize={25}
-        fontWeight="bold"
-        mb={6}
-        color={textColor}
-        textShadow="0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8), 0 0 30px rgba(159, 122, 234, 0.8)"
+      <Flex
+        px={{ base: 5, md: 7 }}
+        py={4}
+        bg={headerGradient}
+        align="center"
+        gap={4}
+        color="white"
       >
-          <Icon as={FaCube} color={"white"} mr={2} /> Recent Blocks
-      </Text>
-      <br/>
+        <Flex
+          w="46px"
+          h="46px"
+            borderRadius="lg"
+          bg="whiteAlpha.300"
+          align="center"
+          justify="center"
+        >
+          <Icon as={FaCube} boxSize={6} />
+        </Flex>
+        <Box>
+          <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="bold">
+            Recent Blocks
+          </Text>
+          <Text fontSize="xs" opacity={0.85}>
+            Live execution layer snapshot (last {data.length || 0})
+          </Text>
+        </Box>
+      </Flex>
 
-      <Table variant="simple" colorScheme="whiteAlpha" width="100%">
-        <Thead bg={tableHeaderBg}>
-          <Tr>
-            <Th color={textColor} textAlign="center">Number</Th>
-            <Th color={textColor} textAlign="center">Gas Target</Th>
-            <Th color={textColor} textAlign="center">Gas Used</Th>
-            {/* <Th color={textColor} textAlign="center">Reward</Th> */}
-            <Th color={textColor} textAlign="center">Txs</Th>
-            <Th color={textColor} textAlign="center">Time</Th>
-            <Th color={textColor} textAlign="center">Base Fee</Th>
-            <Th color={textColor} textAlign="center">Burned ETH</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {blocks?.map((block, index) => {
-            const gasTarget = Number(block?.gasLimit);
-            const gasUsed = Number(block?.gasUsed);
-            const reward = block?.rewards ? block?.rewards : 'N/A'; // Rewards are not directly available in block data
-            const txs = block.transactions?.length;
-            const age = new Date(Number(block?.timestamp) * 1000).toLocaleTimeString();
-            const baseFee = block?.baseFeePerGas ? `${Number(Web3.utils?.fromWei(block.baseFeePerGas, 'gwei')).toFixed(2)} Gwei` : 'N/A';
-            const burnedETH = block?.baseFeePerGas ? `${Web3.utils?.fromWei((BigInt(block.gasUsed) * BigInt(block.baseFeePerGas))?.toString(), 'ether')} ETH` : 'N/A';
+      <Box px={{ base: 3, md: 5 }} py={{ base: 4, md: 5 }} overflowX="auto">
+        <Table
+          size="sm"
+          variant="unstyled"
+          minW="900px"
+          sx={{
+            'th, td': { whiteSpace: 'nowrap' }
+          }}
+        >
+          <Thead>
+            <Tr bg={tableHeaderBg}>
+              <Th {...colStyles} textAlign="left">Block</Th>
+              <Th {...colStyles} textAlign="right">
+                <HStack spacing={1} justify="flex-end">
+                  <Icon as={FaGasPump} /> Gas Target
+                </HStack>
+              </Th>
+              <Th {...colStyles} textAlign="right">Gas Used</Th>
+              <Th {...colStyles} textAlign="right">Txs</Th>
+              <Th {...colStyles} textAlign="right">Time</Th>
+              <Th {...colStyles} textAlign="right">
+                <HStack spacing={1} justify="flex-end">
+                  <Icon as={FaCoins} /> Base Fee
+                </HStack>
+              </Th>
+              <Th {...colStyles} textAlign="right">
+                <HStack spacing={1} justify="flex-end">
+                  <Icon as={FaFire} /> Burned
+                </HStack>
+              </Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {isLoading &&
+              skeletonRows.map((_, i) => (
+                <Tr key={i}>
+                  {Array.from({ length: 7 }).map((__, c) => (
+                    <Td key={c} py={3}>
+                      <Skeleton h="14px" w={c === 0 ? '60px' : '48px'} borderRadius="md" />
+                    </Td>
+                  ))}
+                </Tr>
+              ))}
+            {!isLoading &&
+              data.map((block) => {
+                const number = Number(block.number);
+                const gasTarget = Number(block.gasLimit);
+                const gasUsed = Number(block.gasUsed);
+                const txCount = block.transactions?.length || 0;
+                const time = new Date(Number(block.timestamp) * 1000);
+                const baseFeeGwei = block?.baseFeePerGas
+                  ? Number(Web3.utils?.fromWei(block.baseFeePerGas, 'gwei'))
+                  : null;
+                const burnedEth = block?.baseFeePerGas
+                  ? Number(
+                      Web3.utils?.fromWei(
+                        (BigInt(block.gasUsed) * BigInt(block.baseFeePerGas)).toString(),
+                        'ether'
+                      )
+                    )
+                  : null;
 
-            return (
-              <Tr key={index} bg={tableRowBg} _hover={{ bg: 'rgba(255, 255, 255, 0.1)' }}>
-                <Td color={textColor} textAlign="center">{Number(block.number)}</Td>
-                <Td color={textColor} textAlign="center">{gasTarget}</Td>
-                <Td color={textColor} textAlign="center">{gasUsed}</Td>
-                {/* <Td color={textColor} textAlign="center">{reward}</Td> */}
-                <Td color={textColor} textAlign="center">{txs}</Td>
-                <Td color={textColor} textAlign="center">{age}</Td>
-                <Td textAlign="center">
-                  <Box
-                    bg={baseFeeBg}
-                    borderRadius="md"
-                    p={2}
-                    display="inline-block"
+                const gasPct = gasTarget
+                  ? ((gasUsed / gasTarget) * 100).toFixed(1) + '%'
+                  : '-';
+
+                return (
+                  <Tr
+                    key={number}
+                    bg={rowBg}
+                    _hover={{ bg: rowHover }}
+                    transition="0.2s"
                   >
-                    <Text color="white" textShadow="0 0 30px rgba(68, 54, 228, 0.8), 0 0 30px rgba(68, 54, 228, 0.8), 0 0 30px rgba(68, 54, 228, 0.8)">
-                      {baseFee} (${convertGweiToUSD(Number(baseFee.split(' ')[0]), ethPriceInUSD)})
-                    </Text>
-                  </Box>
-                </Td>
-                <Td textAlign="center">
-                  <Box
-                    bg={burnedEthBg}
-                    borderRadius="md"
-                    p={2}
-                    display="inline-block"
-                  >
-                    <Text color="white" textShadow="0 0 30px rgba(233, 19, 168, 0.8), 0 0 30px rgba(233, 19, 168, 0.8), 0 0 30px rgba(233, 19, 168, 0.8)">
-                      {burnedETH} (${convertEthToUSD(Number(burnedETH.split(' ')[0]), ethPriceInUSD)})
-                    </Text>
-                  </Box>
-                </Td>
-              </Tr>
-            );
-          })}
-        </Tbody>
-      </Table>
+                    <Td fontWeight="semibold" color={textPrimary}>
+                      {nf(number, 0)}
+                    </Td>
+                    <Td textAlign="right" color={textPrimary}>
+                      {nf(gasTarget, 0)}
+                    </Td>
+                    <Td textAlign="right">
+                      <HStack spacing={1} justify="flex-end">
+                        <Text color={textPrimary}>{nf(gasUsed, 0)}</Text>
+                        <Badge
+                          fontSize="0.6rem"
+                          colorScheme={
+                            gasUsed / gasTarget > 0.95
+                              ? 'red'
+                              : gasUsed / gasTarget > 0.8
+                              ? 'orange'
+                              : 'purple'
+                          }
+                          variant="subtle"
+                          borderRadius="md"
+                          px={1.5}
+                        >
+                          {gasPct}
+                        </Badge>
+                      </HStack>
+                    </Td>
+                    <Td textAlign="right" color={textPrimary}>
+                      {nf(txCount, 0)}
+                    </Td>
+                    <Td textAlign="right" color={textSecondary} fontSize="sm">
+                      {time.toLocaleTimeString(undefined, {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </Td>
+                    <Td textAlign="right">
+                      {baseFeeGwei !== null ? (
+                        <Tooltip
+                          hasArrow
+                          label={`≈ $${nf(
+                            convertGweiToUSD(baseFeeGwei, ethPriceInUSD),
+                            4
+                          )} USD`}
+                          bg="purple.600"
+                          color="white"
+                        >
+                          <HStack spacing={1} justify="flex-end">
+                            <Text color="purple.400" fontWeight="medium">
+                              {nf(baseFeeGwei, 2)} gwei
+                            </Text>
+                          </HStack>
+                        </Tooltip>
+                      ) : (
+                        <Text>-</Text>
+                      )}
+                    </Td>
+                    <Td textAlign="right">
+                      {burnedEth !== null ? (
+                        <Tooltip
+                          hasArrow
+                          label={`≈ $${nf(
+                            convertEthToUSD(burnedEth, ethPriceInUSD),
+                            2
+                          )} USD`}
+                          bg="pink.500"
+                          color="white"
+                        >
+                          <Text color="pink.400" fontWeight="medium">
+                            {nf(burnedEth, 5)} ETH
+                          </Text>
+                        </Tooltip>
+                      ) : (
+                        <Text>-</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                );
+              })}
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   );
 };
