@@ -247,7 +247,6 @@ const TransactionFeeChart = ({
       )}
       overflow="hidden"
       w="100%"
-      maxW="1300px"
       mx="auto"
     >
       {/* Header */}

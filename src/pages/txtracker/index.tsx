@@ -165,7 +165,7 @@ const EthereumV2 = () => {
               </Text>
             )}
           </Flex>
-          <Text fontSize="sm" color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
+          <Text fontSize="sm">
             Real‑time execution metrics: fees, usage, transaction mix, recent blocks & txs.
           </Text>
           <HStack spacing={3} flexWrap="wrap">
@@ -194,7 +194,7 @@ const EthereumV2 = () => {
             <Badge
               variant="solid"
               colorScheme="pink"
-              fontSize="0.6rem"
+              fontSize="1rem"
               borderRadius="full"
               px={3}
             >

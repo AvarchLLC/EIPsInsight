@@ -142,7 +142,6 @@ const BlockInfo = ({
       boxShadow={shadow}
       mx="auto"
       w="100%"
-      maxW="1200px"
       mt={10}
     >
       <Box

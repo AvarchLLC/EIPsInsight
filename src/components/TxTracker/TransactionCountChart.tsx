@@ -150,7 +150,6 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
       )}
       overflow="hidden"
       w="100%"
-      maxW="1300px"
       mx="auto"
     >
       <Flex
