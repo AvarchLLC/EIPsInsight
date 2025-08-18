@@ -242,8 +242,8 @@ const glamsterDamData = [
   },
       {
     date: '2025-08-14',
-    included: ['EIP-7732',  'EIP-7928'],
-    scheduled: [],
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
     declined: ['EIP-7782'],
     considered: [ 'EIP-7805'],
 proposed: [
