@@ -20,6 +20,39 @@ interface Row {
   prNumbers: number[];
 }
 
+const labelGroupMap: { [key: string]: string } = {
+  "a-review":      "Author Review",
+  "e-review":      "Editor Review",
+  "discuss":       "Discuss",
+  "on-hold":       "On Hold",
+  "final-call":    "Final Call",
+  "s-draft":       "Draft",
+  "s-final":       "Final",
+  "s-review":      "Review",
+  "s-stagnant":    "Stagnant",
+  "s-withdrawn":   "Withdrawn",
+  "s-lastcall":    "Last Call",
+  "c-new":         "New",
+  "c-update":      "Update",
+  "c-status":      "Status Change",
+  "bug":           "Bug",
+  "enhancement":   "Enhancement",
+  "question":      "Question",
+  "dependencies":  "Dependencies",
+  "r-website":     "Website",
+  "r-process":     "Process",
+  "r-other":       "Other Resource",
+  "r-eips":        "EIPs Resource",
+  "r-ci":          "CI Resource",
+  "created-by-bot":"Bot",
+  "1272989785":    "Bot",
+  "javascript":    "JavaScript",
+  "ruby":          "Ruby",
+  "discussions-to":"Discussions"
+  // Add more as needed
+};
+
+
 async function getDbConn({ uri, dbName }: { uri: string; dbName: string }): Promise<Connection> {
   const conn = mongoose.createConnection(uri, {
     dbName,
@@ -78,35 +111,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const labelToPrs: Record<string, number[]> = {};
 
       for (const pr of snap.prs ?? []) {
-        const labels: string[] =
-          effectiveLabelType === "customLabels"
-            ? pr.customLabels ?? []
-            : pr.githubLabels ?? [];
+const labels: string[] =
+  effectiveLabelType === "customLabels"
+    ? pr.customLabels ?? []
+    : pr.githubLabels ?? [];
 
-        let assigned: string;
+let assigned: string;
 
-        if (effectiveLabelType === "customLabels") {
-          assigned = "Misc";
-          if (labels.includes("Typo Fix")) assigned = "Typo Fix";
-          else if (labels.includes("Status Change")) assigned = "Status Change";
-          else if (labels.includes("EIP Update")) assigned = "EIP Update";
-          else if (labels.includes("ERC Update")) assigned = "ERC Update";
-          else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
-          else if (labels.includes("New EIP")) assigned = "New EIP";
-          else if (labels.includes("New ERC")) assigned = "New ERC";
-        } else {
-          // githubLabels: map workflow labels to grouped categories
-          const lower = new Set(labels.map((l) => l?.toLowerCase?.() ?? ""));
-          if (lower.has("a-review")) assigned = "Author Review";
-          else if (lower.has("e-review")) assigned = "Editor Review";
-          else if (lower.has("discuss")) assigned = "Discuss";
-          else if (lower.has("on-hold")) assigned = "On Hold";
-          else if (lower.has("final-call")) assigned = "Final Call";
-          else assigned = "Other Labels";
-        }
+if (effectiveLabelType === "customLabels") {
+  assigned = "Misc";
+  if (labels.includes("Typo Fix")) assigned = "Typo Fix";
+  else if (labels.includes("Status Change")) assigned = "Status Change";
+  else if (labels.includes("EIP Update")) assigned = "EIP Update";
+  else if (labels.includes("ERC Update")) assigned = "ERC Update";
+  else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
+  else if (labels.includes("New EIP")) assigned = "New EIP";
+  else if (labels.includes("New ERC")) assigned = "New ERC";
+} else {
+  // githubLabels: map workflow labels to grouped categories
+  const lowerLabels = labels.map((l) => l?.toLowerCase?.() ?? "");
+  assigned = "Other Labels";
+  for (const lbl of lowerLabels) {
+      assigned = lbl;
+      break; // Pick the first matching group, or continue if you want multi-group
+  }
+  // assigned is the group/category, e.g., "Editor Review", "Bug", etc.
+}
 
-        if (!labelToPrs[assigned]) labelToPrs[assigned] = [];
-        labelToPrs[assigned].push(pr.number);
+if (!labelToPrs[assigned]) labelToPrs[assigned] = [];
+labelToPrs[assigned].push(pr.number);
       }
 
       for (const [label, prNumbers] of Object.entries(labelToPrs)) {

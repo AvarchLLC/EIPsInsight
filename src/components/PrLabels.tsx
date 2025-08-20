@@ -2,7 +2,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import {
   Box, Card, CardHeader, CardBody, Heading, Text, Stack, Button, Checkbox,
-  CheckboxGroup, Menu, MenuButton, MenuList, useColorModeValue, Flex, Badge, HStack, Divider
+  CheckboxGroup, Menu, MenuButton, MenuList, MenuItem, useColorModeValue,
+  Flex, Badge, HStack, Divider
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
 import Papa from "papaparse";
@@ -29,13 +30,36 @@ const CUSTOM_LABELS_ERC: LabelSpec[] = [
   { value: "Misc", label: "Miscellaneous", color: "#334155" },
 ];
 const WORKFLOW_LABELS: LabelSpec[] = [
-  { value: "Author Review", label: "Author Review", color: "#14b8a6" },
-  { value: "Editor Review", label: "Editor Review", color: "#f43f5e" },
-  { value: "Discuss", label: "Discuss", color: "#fbbf24" },
-  { value: "On Hold", label: "On Hold", color: "#0d9488" },
-  { value: "Final Call", label: "Final Call", color: "#6366f1" },
-  { value: "Other Labels", label: "Other Labels", color: "#9ca3af" },
+  { value: "a-review", label: "Author Review", color: "#14b8a6" },
+  { value: "e-review", label: "Editor Review", color: "#f43f5e" },
+  { value: "discuss", label: "Discuss", color: "#fbbf24" },
+  { value: "on-hold", label: "On Hold", color: "#0d9488" },
+  { value: "final-call", label: "Final Call", color: "#6366f1" },
+  { value: "s-draft", label: "Draft", color: "#60a5fa" },
+  { value: "s-final", label: "Final", color: "#a3e635" },
+  { value: "s-review", label: "Review", color: "#c026d3" },
+  { value: "s-stagnant", label: "Stagnant", color: "#a8a29e" },
+  { value: "s-withdrawn", label: "Withdrawn", color: "#dc2626" },
+  { value: "s-lastcall", label: "Last Call", color: "#ca8a04" },
+  { value: "c-new", label: "New", color: "#f59e42" },
+  { value: "c-update", label: "Update", color: "#3b82f6" },
+  { value: "c-status", label: "Status Change", color: "#ea580c" },
+  { value: "bug", label: "Bug", color: "#f87171" },
+  { value: "enhancement", label: "Enhancement", color: "#22c55e" },
+  { value: "question", label: "Question", color: "#06b6d4" },
+  { value: "dependencies", label: "Dependencies", color: "#64748b" },
+  { value: "r-website", label: "Website", color: "#0284c7" },
+  { value: "r-process", label: "Process", color: "#fbbf24" },
+  { value: "r-other", label: "Other Resource", color: "#9ca3af" },
+  { value: "r-eips", label: "EIPs Resource", color: "#f87171" },
+  { value: "r-ci", label: "CI Resource", color: "#a21caf" },
+  { value: "created-by-bot", label: "Bot", color: "#a3a3a3" },
+  { value: "javascript", label: "JavaScript", color: "#facc15" },
+  { value: "ruby", label: "Ruby", color: "#8b5cf6" },
+  { value: "discussions-to", label: "Discussions", color: "#0ea5e9" },
+  { value: "Other Labels", label: "Other Labels", color: "#9ca3af" } // fallback
 ];
+
 
 const CUSTOM_LABELS_RIP: LabelSpec[] = [
   { value: "Update", label: "Update", color: "#3b82f6" },
@@ -87,6 +111,7 @@ export default function PRAnalyticsCard() {
   const [labelSet, setLabelSet] = useState<"customLabels" | "githubLabels">("customLabels");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
+  const [zoomRange, setZoomRange] = useState<{ start: number; end: number }>({ start: 0, end: 100 }); // percent (0-100)
 
   // Select correct label spec
   const labelSpecs: LabelSpec[] = useMemo(() => {
@@ -119,19 +144,59 @@ export default function PRAnalyticsCard() {
   };
 
   // Normalize GitHub workflow labels to grouped buckets (for 'all' view and CSV)
-  const normalizeGithubLabel = (label: string): string => {
-    const l = (label || "").toLowerCase();
-    if (l === "a-review") return "Author Review";
-    if (l === "e-review") return "Editor Review";
-    if (l === "discuss") return "Discuss";
-    if (l === "on-hold") return "On Hold";
-    if (l === "final-call") return "Final Call";
-    // If already friendly wording, keep it
-    if (["author review","editor review","discuss","on hold","final call"].includes(l)) {
-      return label;
-    }
-    return "Other Labels";
-  };
+const labelFriendlyMap: Record<string, string> = {
+  "a-review":      "Author Review",
+  "e-review":      "Editor Review",
+  "discuss":       "Discuss",
+  "on-hold":       "On Hold",
+  "final-call":    "Final Call",
+  "s-draft":       "Draft",
+  "s-final":       "Final",
+  "s-review":      "Review",
+  "s-stagnant":    "Stagnant",
+  "s-withdrawn":   "Withdrawn",
+  "s-lastcall":    "Last Call",
+  "c-new":         "New",
+  "c-update":      "Update",
+  "c-status":      "Status Change",
+  "bug":           "Bug",
+  "enhancement":   "Enhancement",
+  "question":      "Question",
+  "dependencies":  "Dependencies",
+  "r-website":     "Website",
+  "r-process":     "Process",
+  "r-other":       "Other Resource",
+  "r-eips":        "EIPs Resource",
+  "r-ci":          "CI Resource",
+  "created-by-bot":"Bot",
+  "1272989785":    "Bot",
+  "javascript":    "JavaScript",
+  "ruby":          "Ruby",
+  "discussions-to":"Discussions"
+  // Add more as needed!
+};
+
+const knownFriendlyLabels = new Set([
+  "author review","editor review","discuss","on hold","final call",
+  "draft","final","review","stagnant","withdrawn","last call",
+  "new","update","status change","bug","enhancement","question",
+  "dependencies","website","process","other resource","eips resource",
+  "ci resource","bot","javascript","ruby","discussions"
+]);
+
+const normalizeGithubLabel = (label: string): string => {
+  const l = (label || "").toLowerCase();
+  // Direct mapping for known codes
+  if (labelFriendlyMap[l]) return labelFriendlyMap[l];
+
+  // If already friendly, use as-is but Title Case
+  if (knownFriendlyLabels.has(l)) {
+    return l.replace(/\b\w/g, c => c.toUpperCase()); // Title Case
+  }
+  // Fallback raw, Title Case, or always "Other Labels"
+  return "Other Labels";
+};
+
 
   // Fetch API
   useEffect(() => {
@@ -160,7 +225,7 @@ export default function PRAnalyticsCard() {
         if (!monthYear) continue;
         let label: string = pr.Label || "";
     if (labelSet === "customLabels") label = normalizeCustomLabel(pr.Repo || "", label);
-    else label = normalizeGithubLabel(label);
+    
         const key = `${monthYear}__${label}`;
         const curr = acc.get(key) || { monthYear, label, count: 0, labelType: labelSet, prNumbers: [] };
         curr.count += 1;
@@ -214,6 +279,7 @@ export default function PRAnalyticsCard() {
     return Array.from(monthSet).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }, [filteredData]);
 
+  // ---- Derive chart data (unchanged) ----
   const chartData = useMemo(() => ({
     months,
     displayMonths: months.map(formatMonthLabel),
@@ -233,6 +299,27 @@ export default function PRAnalyticsCard() {
     ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
     : 0;
 
+  // Reset zoom when dataset changes
+  useEffect(() => {
+    setZoomRange({ start: defaultZoomStart, end: 100 });
+  }, [defaultZoomStart, chartData.displayMonths.length]);
+
+  // Helper to compute visible months from zoom %
+  const getVisibleMonths = () => {
+    if (!chartData.months.length) return [];
+    const total = chartData.months.length - 1;
+    const startIdx = Math.min(
+      chartData.months.length - 1,
+      Math.max(0, Math.floor((zoomRange.start / 100) * total))
+    );
+    const endIdx = Math.min(
+      chartData.months.length - 1,
+      Math.max(0, Math.floor((zoomRange.end / 100) * total))
+    );
+    return chartData.months.slice(startIdx, endIdx + 1);
+  };
+
+  // ECharts option (add dataZoom event hook via onEvents prop below)
   const option = useMemo(() => ({
     tooltip: {
       trigger: "axis",
@@ -266,8 +353,7 @@ export default function PRAnalyticsCard() {
         color: textColor,
         fontWeight: 600,
         fontSize: 11,
-        interval: 0,
-        rotate: 0
+        interval: 0
       }
     }],
     yAxis: [{
@@ -281,18 +367,46 @@ export default function PRAnalyticsCard() {
         type: "slider",
         show: true,
         xAxisIndex: [0],
-        start: defaultZoomStart,
-        end: 100,
+        start: zoomRange.start,
+        end: zoomRange.end,
         bottom: 12,
         height: 30,
+        // Keep handles visible
       },
     ],
     grid: { left: 60, right: 30, top: 80, bottom: 60 }
-  }), [chartData, textColor, cardBg, defaultZoomStart]);
+  }), [chartData, textColor, cardBg, zoomRange]);
 
-  // CSV download
-  const downloadCSV = async () => {
+  // Capture zoom changes
+  const onEvents = {
+    datazoom: (e: any, chart: any) => {
+      const opt = chart?.getOption?.();
+      const dz = opt?.dataZoom?.[0];
+      if (dz && typeof dz.start === 'number' && typeof dz.end === 'number') {
+        setZoomRange({ start: dz.start, end: dz.end });
+      }
+    }
+  };
+
+  // ---- Enhanced CSV download ----
+  type DownloadScope = 'zoom' | 'all' | 'latestMonth';
+
+  const downloadCSV = async (scope: DownloadScope) => {
     setLoading(true);
+
+    // Determine allowed months based on scope
+    const allMonths = chartData.months;
+    let allowedMonths: string[] = [];
+    if (scope === 'all') {
+      allowedMonths = allMonths;
+    } else if (scope === 'latestMonth') {
+      allowedMonths = allMonths.slice(-1);
+    } else { // zoom
+      allowedMonths = getVisibleMonths();
+      if (!allowedMonths.length) allowedMonths = allMonths;
+    }
+
+    const allowedSet = new Set(allowedMonths);
 
     const buildParams = (repo: string) => new URLSearchParams({
       repo,
@@ -308,6 +422,10 @@ export default function PRAnalyticsCard() {
       return Array.isArray(rows) ? rows : [];
     };
 
+    const monthKeyOf = (row: any) =>
+      row.MonthKey ||
+      (row.CreatedAt ? new Date(row.CreatedAt).toISOString().slice(0, 7) : "");
+
     try {
       let combined: any[] = [];
       if (repoKey === "all") {
@@ -318,67 +436,76 @@ export default function PRAnalyticsCard() {
         ]);
         const toArr = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
         combined = [...toArr(eip), ...toArr(erc), ...toArr(rip)];
-
-        // Normalize overlapping custom labels for 'all'
         if (labelSet === "customLabels") {
-          combined = combined.map((pr: any) => ({
+          combined = combined.map(pr => ({
             ...pr,
             Label: normalizeCustomLabel(pr.Repo || "", pr.Label),
             LabelType: "customLabels",
           }));
         }
       } else {
-        const repo = repoKey; // "eip" | "erc" | "rip"
-        const rows = await fetchRows(repo);
-        combined = rows;
+        combined = await fetchRows(repoKey);
       }
 
-      // Normalize for selected label set to ensure filtering aligns
       if (labelSet === "githubLabels") {
-        combined = combined.map((pr: any) => ({
+        combined = combined.map(pr => ({
           ...pr,
-          Label: normalizeGithubLabel(pr.Label),
+          Label: pr.Label,
           LabelType: "githubLabels",
         }));
       }
 
-      // Filter rows by selected labels (value or display label)
+      // Filter by label selection
       const allowedValues = new Set(selectedLabels);
       const valueToLabel = new Map(labelSpecs.map(spec => [spec.value, spec.label] as const));
       const allowedDisplay = new Set(selectedLabels.map(v => valueToLabel.get(v) ?? v));
 
-      const filteredRows = combined.filter((pr: any) => {
+      let filteredRows = combined.filter(pr => {
         const lbl = (pr.Label ?? "").toString();
-        return allowedValues.has(lbl) || allowedDisplay.has(lbl);
+        if (!allowedValues.has(lbl) && !allowedDisplay.has(lbl)) return false;
+        const mk = monthKeyOf(pr);
+        return mk && allowedSet.has(mk);
       });
 
-      const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
+      if (!filteredRows.length) {
+        // If nothing due to missing MonthKey, allow all (fallback)
+        filteredRows = combined.filter(pr => {
+          const lbl = (pr.Label ?? "").toString();
+          return allowedValues.has(lbl) || allowedDisplay.has(lbl);
+        });
+      }
 
-      const csvData = filteredRows.map((pr: any) => ({
-        Month: pr.Month || formatMonthLabel(pr.MonthKey),
-        MonthKey: pr.MonthKey,
-        Label: pr.Label,
-        LabelType: pr.LabelType,
-        Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
-        PRNumber: pr.PRNumber,
-        PRLink: pr.PRLink,
-        Author: pr.Author,
-        Title: pr.Title,
-        CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
-      }));
+      const repoLabel = (rk: typeof repoKey) =>
+        (REPOS.find(r => r.key === rk)?.label || rk);
+
+      const csvData = filteredRows.map(pr => {
+        const mk = monthKeyOf(pr);
+        return {
+          Month: formatMonthLabel(mk),
+          MonthKey: mk,
+          Label: pr.Label,
+          LabelType: pr.LabelType,
+          Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
+            PRNumber: pr.PRNumber,
+          PRLink: pr.PRLink,
+          Author: pr.Author,
+          Title: pr.Title,
+          CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
+          UpdatedAt: pr.UpdatedAt ? new Date(pr.UpdatedAt).toISOString() : "",
+          RepoLabel: repoLabel(repoKey),
+          Scope: scope
+        };
+      });
 
       const csv = Papa.unparse(csvData);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
       const urlObj = URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = urlObj;
-      a.download = `${repoKey}_${labelSet}_pr_details.csv`;
-      a.style.display = "none";
+      a.download = `${repoKey}_${labelSet}_${scope}_pr_details.csv`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-
+      a.remove();
       URL.revokeObjectURL(urlObj);
     } catch (err) {
       console.error("Download CSV error", err);
@@ -386,10 +513,6 @@ export default function PRAnalyticsCard() {
       setLoading(false);
     }
   };
-
-
-
-
 
   const selectAll = () => setSelectedLabels(labelSpecs.map(l => l.value));
   const clearAll = () => setSelectedLabels([]);
@@ -408,7 +531,7 @@ export default function PRAnalyticsCard() {
             {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label} Distribution
             <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
           </Heading>
-          <Flex gap={3} align="center">
+          <Flex gap={3} align="center" wrap="wrap">
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="solid" colorScheme="purple" minW={140}>
                 {REPOS.find(r => r.key === repoKey)?.label}
@@ -451,9 +574,29 @@ export default function PRAnalyticsCard() {
                 </Stack>
               </MenuList>
             </Menu>
-            <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md">
-              Download CSV
-            </Button>
+            <Menu>
+              <MenuButton
+                as={Button}
+                leftIcon={<DownloadIcon />}
+                colorScheme="blue"
+                variant="solid"
+                size="sm"
+                borderRadius="md"
+              >
+                Download CSV
+              </MenuButton>
+              <MenuList>
+                <MenuItem onClick={() => downloadCSV('zoom')}>
+                  Zoomed Timeline ({getVisibleMonths().length} months)
+                </MenuItem>
+                <MenuItem onClick={() => downloadCSV('all')}>
+                  All Filtered Months ({chartData.months.length})
+                </MenuItem>
+                <MenuItem onClick={() => downloadCSV('latestMonth')}>
+                  Latest Month Only
+                </MenuItem>
+              </MenuList>
+            </Menu>
           </Flex>
         </Flex>
       </CardHeader>
@@ -506,7 +649,14 @@ export default function PRAnalyticsCard() {
               No PR label data found for this filter or period.
             </Text>
           ) : (
-            <ReactECharts style={{ height: "460px", width: "100%" }} option={option} notMerge lazyUpdate theme={useColorModeValue("light", "dark")} />
+            <ReactECharts
+              style={{ height: "460px", width: "100%" }}
+              option={option}
+              notMerge
+              lazyUpdate
+              theme={useColorModeValue("light", "dark")}
+              onEvents={onEvents}
+            />
           )}
         </Box>
       </CardBody>

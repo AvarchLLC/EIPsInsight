@@ -12,6 +12,38 @@ interface SnapDoc extends Document {
   prs?: Pr[];
 }
 
+const labelGroupMap: { [key: string]: string } = {
+  "a-review":      "Author Review",
+  "e-review":      "Editor Review",
+  "discuss":       "Discuss",
+  "on-hold":       "On Hold",
+  "final-call":    "Final Call",
+  "s-draft":       "Draft",
+  "s-final":       "Final",
+  "s-review":      "Review",
+  "s-stagnant":    "Stagnant",
+  "s-withdrawn":   "Withdrawn",
+  "s-lastcall":    "Last Call",
+  "c-new":         "New",
+  "c-update":      "Update",
+  "c-status":      "Status Change",
+  "bug":           "Bug",
+  "enhancement":   "Enhancement",
+  "question":      "Question",
+  "dependencies":  "Dependencies",
+  "r-website":     "Website",
+  "r-process":     "Process",
+  "r-other":       "Other Resource",
+  "r-eips":        "EIPs Resource",
+  "r-ci":          "CI Resource",
+  "created-by-bot":"Bot",
+  "1272989785":    "Bot",
+  "javascript":    "JavaScript",
+  "ruby":          "Ruby",
+  "discussions-to":"Discussions"
+  // Add more as needed
+};
+
 interface Row {
   monthYear: string;
   label: string;
@@ -92,16 +124,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           else if (labels.includes("Update")) assigned = "Update";
           else if (labels.includes("New RIP")) assigned = "New RIP";
           else if (labels.includes("Created By Bot")) assigned = "Created By Bot";
-        } else {
-          // githubLabels: workflow mapping
-          const lower = new Set(labels.map((l) => l?.toLowerCase?.() ?? ""));
-          if (lower.has("a-review")) assigned = "Author Review";
-          else if (lower.has("e-review")) assigned = "Editor Review";
-          else if (lower.has("discuss")) assigned = "Discuss";
-          else if (lower.has("on-hold")) assigned = "On Hold";
-          else if (lower.has("final-call")) assigned = "Final Call";
-          else assigned = "Other Labels";
-        }
+} else {
+  // githubLabels: map workflow labels to grouped categories
+  const lowerLabels = labels.map((l) => l?.toLowerCase?.() ?? "");
+  assigned = "Other Labels";
+  for (const lbl of lowerLabels) {
+      assigned = lbl;
+      break; // Pick the first matching group, or continue if you want multi-group
+  }
+  // assigned is the group/category, e.g., "Editor Review", "Bug", etc.
+}
 
         if (!labelToPrs[assigned]) labelToPrs[assigned] = [];
         labelToPrs[assigned].push(pr.number);
