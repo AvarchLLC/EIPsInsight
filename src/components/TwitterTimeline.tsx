@@ -112,8 +112,8 @@ const TwitterTimeline: React.FC = () => {
   }, []);
 
   return (
-    <Container maxW="7xl" py={12}>
-      <VStack spacing={8} align="stretch">
+    <Container maxW="100vw" px={0} pt={6}>
+      <VStack spacing={8} align="stretch" w="100%">
         {/* Standard Header with Link */}
         <Header
           title="Latest Updates"
@@ -123,10 +123,11 @@ const TwitterTimeline: React.FC = () => {
         />
 
         {/* Enhanced Two-column layout */}
-        <Grid 
-          templateColumns={{ base: "1fr", lg: "2fr 1fr" }} 
+        <Grid
+          templateColumns={{ base: "1fr", lg: "2fr 1fr" }}
           gap={{ base: 8, lg: 12 }}
           alignItems="start"
+          w="100%"
         >
           {/* Left Column: Twitter Timeline */}
           <Box>
