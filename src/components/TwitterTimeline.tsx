@@ -169,7 +169,26 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: Protocol PBS */}
+        {/* Tweet 1: EIP-7934 RLP Execution Block Size Limit */}
+        <Box mb={6} position="relative">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+          >
+            <p lang="en" dir="ltr">
+              🚧 EIP‑7934 (Fusaka): RLP Execution Block Size Limit<br /><br />
+              As Ethereum raises capacity, 7934 adds a byte‑size ceiling for the whole block (with margin) so bigger blocks still propagate fast and stay DoS‑resistant.<br />
+              It's the guardrail that complements EIP‑7935's higher gas limit and… 
+              <a href="https://t.co/dz49AK7pnN">pic.twitter.com/dz49AK7pnN</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1958553227118686225?ref_src=twsrc%5Etfw">
+              August 21, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: Protocol PBS */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -185,7 +204,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: This Week's EIP/ERC Activity */}
+        {/* Tweet 3: This Week's EIP/ERC Activity */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -210,7 +229,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: Why EIP‑7951 */}
+        {/* Tweet 4: Why EIP‑7951 */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -230,7 +249,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: EIPs Insight August 2025 */}
+        {/* Tweet 5: EIPs Insight August 2025 */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -255,26 +274,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1956324851784065507?ref_src=twsrc%5Etfw">
               August 15, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: EIP-7935 Gas Limit */}
-        <Box mb={6} position="relative">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-          >
-            <p lang="en" dir="ltr">
-              EIP-7935 (Fusaka): Raise Ethereum's default block gas limit so blocks fit more txs 
-              and boost L1 throughput, coordinated via client defaults after testing a safe target.<br /><br />
-              The image shows: current baseline 36M gas/block → testing performance → 
-              devs coordinate on a higher "XX0M"… 
-              <a href="https://t.co/oJ6mnK3Xsg">pic.twitter.com/oJ6mnK3Xsg</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1955999141785690119?ref_src=twsrc%5Etfw">
-              August 14, 2025
             </a>
           </blockquote>
         </Box>
