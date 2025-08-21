@@ -69,6 +69,7 @@ export const sidebarConfig: Record<
       id: "statuschanges",
     },
     { label: "Dashboard", icon: LuDatabase, id: "dashboard" },
+    { label: "Latest Updates", icon: LuRocket, id: "latest-updates" },
   ],
   "/About": [{ label: "What is EIPs Insights", icon: LuInfo, id: "what" }],
   "/resources": [{ label: "What is EIPs Insights", icon: LuInfo, id: "what" }],
@@ -81,7 +82,8 @@ export const sidebarConfig: Record<
   //   { label: "Draft", icon: LuFileText, id: "draft" },
   //   { label: "Withdrawn", icon: LuBan, id: "withdrawn" },
   //   { label: "Stagnant", icon: LuPauseCircle, id: "stagnant" },
-  // ],
+  // ],now?
+  
   "/milestones2024": [
     {
       label: "Analytics Scheduler",

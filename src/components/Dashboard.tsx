@@ -237,6 +237,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
     "what",
     "statuschanges",
     "dashboard",
+    "latest-updates",
   ]);
 
 
@@ -970,7 +971,9 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
             </Box>
             
             {/* Latest Tweets Section */}
-            <TwitterTimeline />
+            <Box id="latest-updates">
+              <TwitterTimeline />
+            </Box>
             
           </motion.div>
         )}
