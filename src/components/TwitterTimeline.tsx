@@ -13,12 +13,15 @@ import {
   Badge,
   Heading,
   Container,
-  Divider,
-  HStack
+  HStack,
+  IconButton,
+  useToast
 } from '@chakra-ui/react';
 import { FaTwitter, FaLinkedin, FaGlobe, FaExternalLinkAlt } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
+import { CopyIcon } from '@chakra-ui/icons';
 import Header from './Header';
+import NextLink from 'next/link';
 
 const TwitterTimeline: React.FC = () => {
   const scrollbarBg = useColorModeValue('gray.100', 'gray.700');
@@ -27,6 +30,27 @@ const TwitterTimeline: React.FC = () => {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const textColor = useColorModeValue('gray.600', 'gray.300');
   const headingColor = useColorModeValue('gray.800', 'white');
+  const toast = useToast();
+
+  const handleCopyLink = (url: string) => {
+    navigator.clipboard.writeText(url).then(() => {
+      toast({
+        title: "Link copied!",
+        description: "Link has been copied to clipboard",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }).catch(() => {
+      toast({
+        title: "Copy failed",
+        description: "Failed to copy link to clipboard",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    });
+  };
 
   const socialLinks = [
     {
@@ -90,22 +114,13 @@ const TwitterTimeline: React.FC = () => {
   return (
     <Container maxW="7xl" py={12}>
       <VStack spacing={8} align="stretch">
-        {/* Enhanced Header */}
-        <Box textAlign="center">
-          <Heading
-            size="xl"
-            color={headingColor}
-            mb={3}
-            bgGradient="linear(to-r, blue.400, purple.500)"
-            bgClip="text"
-          >
-            Latest Updates
-          </Heading>
-          <Text fontSize="lg" color={textColor} maxW="2xl" mx="auto">
-            Stay connected with our latest insights on EIPs, ERCs, and Ethereum development
-          </Text>
-          <Divider mt={6} />
-        </Box>
+        {/* Standard Header with Link */}
+        <Header
+          title="Latest Updates"
+          subtitle="Stay Connected"
+          description="Stay connected with our latest insights on EIPs, ERCs and Ethereum development"
+          sectionId="latest-updates"
+        />
 
         {/* Enhanced Two-column layout */}
         <Grid 
@@ -117,7 +132,7 @@ const TwitterTimeline: React.FC = () => {
           <Box>
             <Flex align="center" mb={6}>
               <Icon as={FaXTwitter} color="gray.600" mr={3} />
-              <Heading size="md" color={headingColor}>
+              <Heading size="md" color={headingColor} textAlign="left">
                 Latest Tweets
               </Heading>
               <Badge ml={2} colorScheme="blue" variant="subtle">
@@ -154,7 +169,26 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: Protocol PBS */}
+        {/* Tweet 1: EIP-7934 RLP Execution Block Size Limit */}
+        <Box mb={6} position="relative">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+          >
+            <p lang="en" dir="ltr">
+              🚧 EIP‑7934 (Fusaka): RLP Execution Block Size Limit<br /><br />
+              As Ethereum raises capacity, 7934 adds a byte‑size ceiling for the whole block (with margin) so bigger blocks still propagate fast and stay DoS‑resistant.<br />
+              It's the guardrail that complements EIP‑7935's higher gas limit and… 
+              <a href="https://t.co/dz49AK7pnN">pic.twitter.com/dz49AK7pnN</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1958553227118686225?ref_src=twsrc%5Etfw">
+              August 21, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: Protocol PBS */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -170,7 +204,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: This Week's EIP/ERC Activity */}
+        {/* Tweet 3: This Week's EIP/ERC Activity */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -195,7 +229,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: Why EIP‑7951 */}
+        {/* Tweet 4: Why EIP‑7951 */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -215,7 +249,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: EIPs Insight August 2025 */}
+        {/* Tweet 5: EIPs Insight August 2025 */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -243,26 +277,6 @@ const TwitterTimeline: React.FC = () => {
             </a>
           </blockquote>
         </Box>
-
-        {/* Tweet 5: EIP-7935 Gas Limit */}
-        <Box mb={6} position="relative">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-          >
-            <p lang="en" dir="ltr">
-              EIP-7935 (Fusaka): Raise Ethereum's default block gas limit so blocks fit more txs 
-              and boost L1 throughput, coordinated via client defaults after testing a safe target.<br /><br />
-              The image shows: current baseline 36M gas/block → testing performance → 
-              devs coordinate on a higher "XX0M"… 
-              <a href="https://t.co/oJ6mnK3Xsg">pic.twitter.com/oJ6mnK3Xsg</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1955999141785690119?ref_src=twsrc%5Etfw">
-              August 14, 2025
-            </a>
-          </blockquote>
-        </Box>
               </Box>
             </Box>
           </Box>
@@ -271,7 +285,7 @@ const TwitterTimeline: React.FC = () => {
         <Box>
           <Flex align="center" mb={6}>
             <Icon as={FaGlobe} color="gray.600" mr={3} />
-            <Heading size="md" color={headingColor}>
+            <Heading size="md" color={headingColor} textAlign="left">
               Connect With Us
             </Heading>
             <Badge ml={2} colorScheme="green" variant="subtle">
@@ -281,84 +295,99 @@ const TwitterTimeline: React.FC = () => {
           
           <VStack spacing={4} align="stretch">
             {socialLinks.map((social, index) => (
-              <Link
-                key={index}
-                href={social.url}
-                isExternal
-                textDecoration="none"
-                _hover={{ transform: 'translateY(-2px)', textDecoration: 'none' }}
-                transition="all 0.3s ease"
-              >
-                <Box
-                  p={5}
-                  bg={cardBg}
-                  border="2px solid"
-                  borderColor={borderColor}
-                  borderRadius="xl"
-                  shadow="md"
-                  _hover={{ 
-                    shadow: 'xl', 
-                    borderColor: social.color,
-                    bg: useColorModeValue('gray.50', 'gray.750')
-                  }}
-                  transition="all 0.3s ease"
-                  position="relative"
-                  overflow="hidden"
+              <Box key={index}>
+                <Link
+                  href={social.url}
+                  isExternal
+                  textDecoration="none"
+                  _hover={{ textDecoration: 'none' }}
                 >
-                  {/* Background gradient accent */}
                   <Box
-                    position="absolute"
-                    top="0"
-                    right="0"
-                    w="60px"
-                    h="60px"
-                    bg={`linear-gradient(135deg, ${social.color}20, transparent)`}
-                    borderRadius="0 0 0 60px"
-                  />
-                  
-                  <Flex justify="space-between" align="center">
-                    <Box flex="1">
-                      <HStack spacing={3} mb={2}>
-                        <Icon 
-                          as={social.icon} 
-                          color={social.color} 
-                          fontSize="xl"
-                        />
-                        <Box>
-                          <Text 
-                            fontSize="md" 
-                            fontWeight="bold" 
-                            color={headingColor}
-                            lineHeight="1.2"
-                          >
-                            {social.name}
-                          </Text>
-                          <Text 
-                            fontSize="sm" 
-                            color={textColor}
-                            fontWeight="medium"
-                          >
-                            {social.platform}
-                          </Text>
-                        </Box>
-                      </HStack>
-                      <Text 
-                        fontSize="xs" 
-                        color={textColor}
-                        fontStyle="italic"
-                      >
-                        {social.description}
-                      </Text>
-                    </Box>
-                    <Icon 
-                      as={FaExternalLinkAlt} 
-                      color={textColor} 
-                      fontSize="sm"
-                      opacity={0.6}
+                    p={5}
+                    bg={cardBg}
+                    border="2px solid"
+                    borderColor={borderColor}
+                    borderRadius="xl"
+                    shadow="md"
+                    _hover={{ 
+                      shadow: 'xl', 
+                      borderColor: social.color,
+                      bg: useColorModeValue('gray.50', 'gray.750')
+                    }}
+                    transition="all 0.3s ease"
+                    position="relative"
+                    overflow="hidden"
+                  >
+                    {/* Background gradient accent */}
+                    <Box
+                      position="absolute"
+                      top="0"
+                      right="0"
+                      w="60px"
+                      h="60px"
+                      bg={`linear-gradient(135deg, ${social.color}20, transparent)`}
+                      borderRadius="0 0 0 60px"
                     />
-                  </Flex>
-                </Box>
-              </Link>
+                    
+                    <Flex justify="space-between" align="center">
+                      <Box flex="1">
+                        <HStack spacing={3} mb={2}>
+                          <Icon 
+                            as={social.icon} 
+                            color={social.color} 
+                            fontSize="xl"
+                          />
+                          <Box>
+                            <Text 
+                              fontSize="md" 
+                              fontWeight="bold" 
+                              color={headingColor}
+                              lineHeight="1.2"
+                              textAlign="left"
+                            >
+                              {social.name}
+                            </Text>
+                            <Text 
+                              fontSize="sm" 
+                              color={textColor}
+                              fontWeight="medium"
+                              textAlign="left"
+                            >
+                              {social.platform}
+                            </Text>
+                          </Box>
+                        </HStack>
+                        <Text 
+                          fontSize="xs" 
+                          color={textColor}
+                          fontStyle="italic"
+                          textAlign="left"
+                        >
+                          {social.description}
+                        </Text>
+                      </Box>
+                      <VStack spacing={2}>
+                        <IconButton
+                          size="sm"
+                          colorScheme="teal"
+                          aria-label="Copy link"
+                          icon={<CopyIcon />}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleCopyLink(social.url);
+                          }}
+                        />
+                        <Icon 
+                          as={FaExternalLinkAlt} 
+                          color={textColor} 
+                          fontSize="sm"
+                          opacity={0.6}
+                        />
+                      </VStack>
+                    </Flex>
+                  </Box>
+                </Link>
+              </Box>
             ))}
           </VStack>
           
@@ -370,12 +399,12 @@ const TwitterTimeline: React.FC = () => {
             borderRadius="lg"
             border="1px solid"
             borderColor={useColorModeValue('blue.200', 'blue.700')}
-            textAlign="center"
+            textAlign="left"
           >
-            <Text fontSize="sm" color={textColor} mb={2}>
+            <Text fontSize="sm" color={textColor} mb={2} textAlign="left">
               📢 Stay updated with the latest in Ethereum development
             </Text>
-            <Text fontSize="xs" color={textColor} opacity={0.8}>
+            <Text fontSize="xs" color={textColor} opacity={0.8} textAlign="left">
               Follow us for EIP updates, technical insights, and community news
             </Text>
           </Box>

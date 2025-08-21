@@ -152,6 +152,7 @@ const sidebarStructure = [
         id: "statuschanges",
       },
       { label: "Dashboard", href: "/#dashboard", id: "dashboard" },
+      { label: "Latest Updates", href: "/#latest-updates", id: "latest-updates" },
     ],
   },
   {
