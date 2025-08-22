@@ -169,7 +169,27 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: EIP-7934 RLP Execution Block Size Limit */}
+        {/* Tweet 1: Nody Observability */}
+        <Box mb={6} position="relative">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+          >
+            <p lang="en" dir="ltr">
+              Blame is easy. Observability is better. Nody picks the right button. 
+              <a href="https://twitter.com/hashtag/EIPsInsight?src=hash&amp;ref_src=twsrc%5Etfw">#EIPsInsight</a> 
+              <a href="https://twitter.com/hashtag/Monitoring?src=hash&amp;ref_src=twsrc%5Etfw">#Monitoring</a> 
+              <a href="https://twitter.com/hashtag/Web3?src=hash&amp;ref_src=twsrc%5Etfw">#Web3</a> 
+              <a href="https://t.co/8XAxhnznN7">pic.twitter.com/8XAxhnznN7</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1958753245855457626?ref_src=twsrc%5Etfw">
+              August 22, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: EIP-7934 RLP Execution Block Size Limit */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -188,7 +208,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: Protocol PBS */}
+        {/* Tweet 3: Protocol PBS */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -204,7 +224,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: This Week's EIP/ERC Activity */}
+        {/* Tweet 4: This Week's EIP/ERC Activity */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -229,7 +249,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: Why EIP‑7951 */}
+        {/* Tweet 5: Why EIP‑7951 */}
         <Box mb={6} position="relative">
           <blockquote 
             className="twitter-tweet" 
@@ -245,35 +265,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1957518120870113470?ref_src=twsrc%5Etfw">
               August 18, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: EIPs Insight August 2025 */}
-        <Box mb={6} position="relative">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-          >
-            <p lang="en" dir="ltr">
-              EIPs Insight (August 2025 – p1)<br /><br />
-              35 PRs merged<br /><br />
-              ▫️EIPs merged: 24<br />
-              ▫️ERCs merged: 10<br />
-              ▫️RIPs merged: 1<br /><br />
-              Ethereum devs continue to push with steady throughput on standards. 
-              Great momentum this August!!! 
-              <a href="https://twitter.com/hashtag/EIPsInsight?src=hash&amp;ref_src=twsrc%5Etfw">#EIPsInsight</a> 
-              <a href="https://twitter.com/hashtag/Ethereum?src=hash&amp;ref_src=twsrc%5Etfw">#Ethereum</a> 
-              <a href="https://twitter.com/hashtag/Report?src=hash&amp;ref_src=twsrc%5Etfw">#Report</a> 
-              <a href="https://twitter.com/hashtag/EIPs?src=hash&amp;ref_src=twsrc%5Etfw">#EIPs</a> 
-              <a href="https://twitter.com/hashtag/ERCs?src=hash&amp;ref_src=twsrc%5Etfw">#ERCs</a> 
-              <a href="https://twitter.com/hashtag/RIPs?src=hash&amp;ref_src=twsrc%5Etfw">#RIPs</a> 
-              <a href="https://t.co/xQ6b9QN1GI">pic.twitter.com/xQ6b9QN1GI</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1956324851784065507?ref_src=twsrc%5Etfw">
-              August 15, 2025
             </a>
           </blockquote>
         </Box>
