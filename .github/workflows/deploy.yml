@@ -43,7 +43,7 @@ jobs:
             git reset --hard
             git pull
             npm install --force
-            npm run dev || echo "Dev server failed, continuing..."
+            npm run build || echo "Build failed, check manually"
             pm2 reload 39 || echo "PM2 reload failed, check manually."
 
       # Step 6: Notify Discord on success
