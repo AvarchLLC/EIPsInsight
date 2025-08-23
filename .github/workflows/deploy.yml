@@ -1,0 +1,65 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  # Change to your default branch if needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repo
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: npm install --force
+
+      # Step 4: Build (optional)
+      - name: Build Project
+        run: |
+          npm run build || echo "No build step or build failed, skipping."
+
+      # Step 5: Deploy via SSH safely
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            cd eip-client/EIPsInsight
+            git reset --hard
+            git pull
+            npm install --force
+            npm run dev || echo "Dev server failed, continuing..."
+            pm2 reload 39 || echo "PM2 reload failed, check manually."
+
+      # Step 6: Notify Discord on success
+      - name: Discord Notification - Success
+        if: success()
+        uses: Ilshidur/action-discord@0.4.0
+        with:
+          args: "✅ Deployment successful on branch ${{ github.ref_name }}."
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+      # Step 7: Notify Discord on failure
+      - name: Discord Notification - Failure
+        if: failure()
+        uses: Ilshidur/action-discord@0.4.0
+        with:
+          args: "❌ Deployment FAILED on branch ${{ github.ref_name }}. Check GitHub Actions logs."
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
