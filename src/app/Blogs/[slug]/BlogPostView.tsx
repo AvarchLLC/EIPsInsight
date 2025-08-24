@@ -117,8 +117,12 @@ export default function BlogPostView({
 }) {
   const borderColor = useColorModeValue('teal.400', 'teal.600');
   const bg = useColorModeValue('gray.50', 'gray.900');
+  const mainTextColor = useColorModeValue('gray.800', 'gray.200');
+  const headingTextColor = useColorModeValue('gray.900', 'gray.100');
+  const subTextColor = useColorModeValue('gray.500', 'gray.400');
 
   return (
+
     <Box minH="100vh" bg={bg} width="100vw" overflowX="hidden">
       <Flex
         width="100vw"
@@ -135,7 +139,6 @@ export default function BlogPostView({
           w="260px"
           flexShrink={0}
           height="100vh"
-          // Optional: sticky sidebar
           position="sticky"
           top="0"
         >
@@ -145,7 +148,7 @@ export default function BlogPostView({
 
         {/* Main content */}
         <Box as="main" flex="1" minW={0} maxW="900px" mx="auto" py={8}>
-          <Link href="/resources" className="text-teal-600 hover:underline flex items-center gap-1 font-medium mb-4">
+          <Link href="/resources" className="flex items-center gap-1 font-medium mb-4" style={{ color: useColorModeValue('#319795', '#81e6d9') }}>
             <ArrowLeftIcon className="w-4 h-4" />
             <span className="text-sm">Back to all blogs</span>
           </Link>
@@ -154,15 +157,43 @@ export default function BlogPostView({
           )}
           <article>
             <header>
-              <h1 className="text-3xl sm:text-5xl font-semibold mb-1 text-neutral-900 dark:text-neutral-100">{frontmatter.title}</h1>
-              <div className="flex flex-row gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">
-                <span>By <span className="font-medium text-gray-800 dark:text-gray-200">{frontmatter.author}</span></span>
+              <h1
+                style={{
+                  color: headingTextColor,
+                  fontSize: '2rem',
+                  fontWeight: 600,
+                  marginBottom: '0.25rem'
+                }}
+              >
+                {frontmatter.title}
+              </h1>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '0.5rem',
+                  fontSize: '0.95rem',
+                  color: subTextColor,
+                  marginTop: '0.25rem',
+                  marginBottom: '1.5rem'
+                }}
+              >
+                <span>
+                  By <span style={{ fontWeight: 500, color: mainTextColor }}>{frontmatter.author}</span>
+                </span>
                 <span>&#8226;</span>
                 <span>{frontmatter.date?.toLocaleDateString?.() ?? frontmatter.date}</span>
               </div>
             </header>
             <ScrollToHashOnLoad />
-            <section className={`prose prose-lg dark:prose-invert max-w-none text-neutral-800 dark:text-gray-200 leading-relaxed mb-8`}>
+            <section
+              style={{
+                color: mainTextColor,
+                fontSize: '1.15rem',
+                lineHeight: '1.8',
+                marginBottom: '2rem'
+              }}
+            >
               <MarkdownRenderer markdown={content} />
             </section>
           </article>
