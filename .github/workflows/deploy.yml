@@ -14,6 +14,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Notify Deployment Start
+        uses: tsickert/discord-webhook
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "🚀 Deployment Started"
+          embed-description: "Heads up: Deployment is now automated. No manual steps needed — the system will handle it."
+          embed-color: 16776960
+
       # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -46,20 +54,34 @@ jobs:
             npm run build || echo "Build failed, check manually"
             pm2 reload 39 || echo "PM2 reload failed, check manually."
 
-      # Step 6: Notify Discord on success
+      # Step 6: Notify Discord on success with embeds
       - name: Discord Notification - Success
         if: success()
-        uses: Ilshidur/action-discord@0.4.0
+        uses: tsickert/discord-webhook
         with:
-          args: "✅ Deployment successful on branch ${{ github.ref_name }}."
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "✅ Deployment Successful"
+          embed-description: |
+            **Branch:** ${{ github.ref_name }}
+            **Repository:** ${{ github.repository }}
+            **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+          embed-color: 3066993
+          embed-footer-text: "GitHub Actions • Deployment Bot"
+          embed-timestamp: ${{ github.event.head_commit.timestamp }}
 
-      # Step 7: Notify Discord on failure
+      # Step 7: Notify Discord on failure with embeds
       - name: Discord Notification - Failure
         if: failure()
-        uses: Ilshidur/action-discord@0.4.0
+        uses: tsickert/discord-webhook
         with:
-          args: "❌ Deployment FAILED on branch ${{ github.ref_name }}. Check GitHub Actions logs."
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "❌ Deployment Failed"
+          embed-description: |
+            **Branch:** ${{ github.ref_name }}
+            **Repository:** ${{ github.repository }}
+            **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            ⚠️ Check GitHub Actions logs for details.
+          embed-color: 15158332
+          embed-footer-text: "GitHub Actions • Deployment Bot"
+          embed-timestamp: ${{ github.event.head_commit.timestamp }}
+
