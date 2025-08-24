@@ -319,6 +319,10 @@ const sidebarStructure = [
         ],
       },
       {
+        label: "Transaction Tracker",
+        href: "/txtracker",
+      },
+      {
         label: "Search By",
         children: [
           {

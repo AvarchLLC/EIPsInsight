@@ -80,6 +80,10 @@ const Navbar: React.FC = () => {
           label: "EIP Proposal Builder",
           href: `/proposalbuilder`,
         },
+        {
+          label: "Transaction Tracker",
+          href: `/txtracker`,
+        },
         // {
         //   label: "Search by author",
         //   href: `/authors`,

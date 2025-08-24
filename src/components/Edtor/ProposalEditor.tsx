@@ -37,10 +37,12 @@ import {
     PopoverCloseButton,
     PopoverHeader,
     PopoverBody,
+    useColorModeValue
 } from "@chakra-ui/react";
 
 import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, 
   AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react";
+
 import { CloseIcon } from "@chakra-ui/icons";
 
 
@@ -1567,18 +1569,23 @@ if (errorItems.length > 0) {
                     <>
                       {tableRows?.length > 0 && (
                         <TableContainer mt={2}>
-                          <Table variant="striped" colorScheme="blue">
-                            <Thead>
+                          <Table
+                            variant="striped"
+                            colorScheme={useColorModeValue("gray", "blue")}
+                            bg={useColorModeValue("white", "gray.700")}
+                            borderRadius="md"
+                          >
+                            <Thead bg={useColorModeValue("gray.100", "gray.800")}>
                               <Tr>
-                                <Th color="white">Field</Th>
-                                <Th color="white">Value</Th>
+                                <Th color={useColorModeValue("gray.700", "gray.200")}>Field</Th>
+                                <Th color={useColorModeValue("gray.700", "gray.200")}>Value</Th>
                               </Tr>
                             </Thead>
                             <Tbody>
                               {tableRows?.map((row, index) => (
                                 <Tr key={index}>
-                                  <Td color="white">{row[0]}</Td>
-                                  <Td color="white">{row[1]}</Td>
+                                  <Td color={useColorModeValue("gray.700", "gray.200")}>{row[0]}</Td>
+                                  <Td color={useColorModeValue("gray.700", "gray.200")}>{row[1]}</Td>
                                 </Tr>
                               ))}
                             </Tbody>
@@ -1586,7 +1593,15 @@ if (errorItems.length > 0) {
                         </TableContainer>
                       )}
                       <Box mt={4} />
-                      <MarkdownViewer value={markdownValue} isDarkTheme={true} />
+                      <Box
+                        bg={useColorModeValue("white", "gray.900")}
+                        color={useColorModeValue("gray.800", "gray.200")}
+                        borderRadius="md"
+                        p={4}
+                        minHeight="320px"
+                      >
+                        <MarkdownViewer value={markdownValue} isDarkTheme={useColorModeValue(false, true)} />
+                      </Box>
                     </>
                   ) : (
                     <Box
