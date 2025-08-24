@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Notify Deployment Start
-        uses: tsickert/discord-webhook
+        uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
           embed-title: "🚀 Deployment Started"
@@ -57,7 +57,7 @@ jobs:
       # Step 6: Notify Discord on success with embeds
       - name: Discord Notification - Success
         if: success()
-        uses: tsickert/discord-webhook
+        uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
           embed-title: "✅ Deployment Successful"
@@ -72,7 +72,7 @@ jobs:
       # Step 7: Notify Discord on failure with embeds
       - name: Discord Notification - Failure
         if: failure()
-        uses: tsickert/discord-webhook
+        uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
           embed-title: "❌ Deployment Failed"
