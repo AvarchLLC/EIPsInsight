@@ -154,27 +154,59 @@ const TwitterTimeline: React.FC = () => {
                 maxH="700px"
                 overflowY="auto"
                 p={6}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
                 css={{
                   '&::-webkit-scrollbar': {
-                    width: '6px',
+                    width: '8px',
                   },
                   '&::-webkit-scrollbar-track': {
-                    background: 'transparent',
+                    background: useColorModeValue('rgba(0,0,0,0.05)', 'rgba(255,255,255,0.05)'),
+                    borderRadius: '4px',
                   },
                   '&::-webkit-scrollbar-thumb': {
                     background: scrollbarColor,
-                    borderRadius: '3px',
-                  },
-                  '&::-webkit-scrollbar-thumb:hover': {
-                    background: useColorModeValue('gray.400', 'gray.400'),
+                    borderRadius: '4px',
+                    '&:hover': {
+                      background: useColorModeValue('gray.400', 'gray.400'),
+                    }
                   },
                 }}
               >
-        {/* Tweet 1: Nody Observability */}
-        <Box mb={6} position="relative">
+        {/* Tweet 1: This Week's EIP/ERC Activity (Aug 26) */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
             data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              This Week's EIP/ERC Activity (Aug 19, 2025) <br /><br />
+              Last Call:<br />
+              ☞ EIP-7786: Cross-Chain Messaging Gateway<br />
+              Last Call Deadline: 2025-08-19
+              <a href="https://t.co/3QGiTeW4BH">https://t.co/3QGiTeW4BH</a><br />
+              ☞ EIP-7858: Expirable NFTs and SBTs<br />
+              Last Call Deadline: 2025-08-31
+              <a href="https://t.co/ht3SEOuLky">https://t.co/ht3SEOuLky</a><br /><br />
+              Drafts:<br />
+              ☞ EIP-7997:… 
+              <a href="https://t.co/5N1BkfU3O2">pic.twitter.com/5N1BkfU3O2</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1960340209725235302?ref_src=twsrc%5Etfw">
+              August 26, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: Nody Observability */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
           >
             <p lang="en" dir="ltr">
               Blame is easy. Observability is better. Nody picks the right button. 
@@ -190,11 +222,12 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: EIP-7934 RLP Execution Block Size Limit */}
-        <Box mb={6} position="relative">
+        {/* Tweet 3: EIP-7934 RLP Execution Block Size Limit */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
             data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
           >
             <p lang="en" dir="ltr">
               🚧 EIP‑7934 (Fusaka): RLP Execution Block Size Limit<br /><br />
@@ -209,11 +242,12 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: Protocol PBS */}
-        <Box mb={6} position="relative">
+        {/* Tweet 4: Protocol PBS */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
             data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
           >
             <p lang="en" dir="ltr">
               Protocol PBS (e.g., EIP-7732 direction) should be…
@@ -225,11 +259,12 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: This Week's EIP/ERC Activity */}
-        <Box mb={6} position="relative">
+        {/* Tweet 5: This Week's EIP/ERC Activity (Aug 19) */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
             data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
           >
             <p lang="en" dir="ltr">
               This Week's EIP/ERC Activity (Aug 19, 2025)<br /><br />
@@ -246,26 +281,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1957806815523000816?ref_src=twsrc%5Etfw">
               August 19, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: Why EIP‑7951 */}
-        <Box mb={6} position="relative">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-          >
-            <p lang="en" dir="ltr">
-              Why EIP‑7951 (secp256r1 precompile) from Fusaka:<br /><br />
-              EIP‑7951: adding a precompile for the secp256r1 (aka P‑256) elliptic curve. 
-              It meaningfully improves interoperability with Web2 security, unlocks new wallet UX, 
-              and reduces gas costs for a very common signature scheme that's… 
-              <a href="https://t.co/wCjeVJzvHJ">pic.twitter.com/wCjeVJzvHJ</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1957518120870113470?ref_src=twsrc%5Etfw">
-              August 18, 2025
             </a>
           </blockquote>
         </Box>
