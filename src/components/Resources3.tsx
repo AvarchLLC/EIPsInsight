@@ -341,6 +341,13 @@ const ResourcesPage: React.FC = () => {
 
   const BLOGS = [
     {
+      image: "/Nody2.png",
+      title: "EIP Proposal Builder and Validation Issues with Legacy EIPs",
+      content: "The Proposal Builder simulates EIPW Lint to let authors import drafts and validate them against the latest linting rules before submission.",
+      link: "Blogs/eip-proposal-builder-validation-legacy",
+      tag: "Technical"
+    },
+    {
       image: "/nody.png",
       title: "EIPs @10: A Decade of Standardizing Ethereum",
       content: "A decade-long review of Ethereum Improvement Proposals (EIPs), detailing their impact on protocol upgrades, token standards, consensus changes and the evolution of Ethereum into a $400+ billion ecosystem. Covers major eras, landmark EIPs, and the pivotal role of open governance in Ethereum's growth.",
