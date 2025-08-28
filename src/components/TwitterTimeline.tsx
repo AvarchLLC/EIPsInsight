@@ -174,7 +174,26 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: EIP-7702 UX Features */}
+        {/* Tweet 1: EIP-7702 Set Code for EOAs */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              🚧 EIP‑7702 (Fusaka): Set Code for EOAs<br /><br />
+              - Fusaka focuses on scaling and efficiency; adding 7702 would bring tangible UX wins (batching, sponsorship, recovery) that everyday users and apps feel immediately, complementing throughput upgrades; It upgrades existing EOAs in place and… 
+              <a href="https://t.co/0DqjxSU3eB">pic.twitter.com/0DqjxSU3eB</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1961039221676003365?ref_src=twsrc%5Etfw">
+              August 28, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: EIP-7702 UX Features */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -191,7 +210,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: This Week's EIP/ERC Activity (Aug 26) */}
+        {/* Tweet 3: This Week's EIP/ERC Activity (Aug 26) */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -218,7 +237,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: Nody Observability */}
+        {/* Tweet 4: Nody Observability */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -239,7 +258,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: EIP-7934 RLP Execution Block Size Limit */}
+        {/* Tweet 5: EIP-7934 RLP Execution Block Size Limit */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -255,23 +274,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1958553227118686225?ref_src=twsrc%5Etfw">
               August 21, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: Protocol PBS */}
-        <Box mb={6} position="relative" width="100%" maxW="550px">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-            style={{ margin: '0 auto' }}
-          >
-            <p lang="en" dir="ltr">
-              Protocol PBS (e.g., EIP-7732 direction) should be…
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1958176494360183210?ref_src=twsrc%5Etfw">
-              August 20, 2025
             </a>
           </blockquote>
         </Box>
