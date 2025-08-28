@@ -174,7 +174,24 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: This Week's EIP/ERC Activity (Aug 26) */}
+        {/* Tweet 1: EIP-7702 UX Features */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              After recent incidents, should EIP-7702 UX features ship sooner or wait for more hardening?
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1960763160333529494?ref_src=twsrc%5Etfw">
+              August 27, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: This Week's EIP/ERC Activity (Aug 26) */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -201,7 +218,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: Nody Observability */}
+        {/* Tweet 3: Nody Observability */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -222,7 +239,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: EIP-7934 RLP Execution Block Size Limit */}
+        {/* Tweet 4: EIP-7934 RLP Execution Block Size Limit */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -242,7 +259,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: Protocol PBS */}
+        {/* Tweet 5: Protocol PBS */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -255,32 +272,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1958176494360183210?ref_src=twsrc%5Etfw">
               August 20, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: This Week's EIP/ERC Activity (Aug 19) */}
-        <Box mb={6} position="relative" width="100%" maxW="550px">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-            style={{ margin: '0 auto' }}
-          >
-            <p lang="en" dir="ltr">
-              This Week's EIP/ERC Activity (Aug 19, 2025)<br /><br />
-              Drafts:<br />
-              ☞ EIP-7999: Unified Multidimensional Fee Market
-              <a href="https://t.co/wZ3Pr2nhwy">https://t.co/wZ3Pr2nhwy</a><br />
-              ☞ EIP-7979: Call and Return Opcodes for the EVM
-              <a href="https://t.co/RMhowKwGu5">https://t.co/RMhowKwGu5</a><br />
-              ☞ ERC-8004: Trustless Agents
-              <a href="https://t.co/f4NmLMdZ4f">https://t.co/f4NmLMdZ4f</a><br />
-              ☞ ERC-7955: Permissionless… 
-              <a href="https://t.co/DZXwE8pyDd">pic.twitter.com/DZXwE8pyDd</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1957806815523000816?ref_src=twsrc%5Etfw">
-              August 19, 2025
             </a>
           </blockquote>
         </Box>
