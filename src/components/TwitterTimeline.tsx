@@ -174,7 +174,29 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: New Blog: EIP Proposal Builder and Validation Issues */}
+        {/* Tweet 1: Scheduled Insights - Don't let old habits hold you back */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              Don't let old habits hold you back. Switch to scheduled insights and see your workflow soar. <br /><br />
+              Visit <a href="https://t.co/mXCeU990gC">https://t.co/mXCeU990gC</a>
+              <a href="https://twitter.com/hashtag/EIPsInsight?src=hash&amp;ref_src=twsrc%5Etfw">#EIPsInsight</a> 
+              <a href="https://twitter.com/hashtag/Efficiency?src=hash&amp;ref_src=twsrc%5Etfw">#Efficiency</a> 
+              <a href="https://twitter.com/hashtag/MemeFriday?src=hash&amp;ref_src=twsrc%5Etfw">#MemeFriday</a> 
+              <a href="https://t.co/AIHhJXqTge">pic.twitter.com/AIHhJXqTge</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1961405069284270189?ref_src=twsrc%5Etfw">
+              August 29, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: New Blog: EIP Proposal Builder and Validation Issues */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -193,7 +215,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: EIP-7702 Programmable EOAs */}
+        {/* Tweet 3: EIP-7702 Programmable EOAs */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -214,7 +236,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: EIP-7702 UX Features */}
+        {/* Tweet 4: EIP-7702 UX Features */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -231,7 +253,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: This Week's EIP/ERC Activity (Aug 26) */}
+        {/* Tweet 5: This Week's EIP/ERC Activity (Aug 26) */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -254,27 +276,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1960340209725235302?ref_src=twsrc%5Etfw">
               August 26, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: Nody Observability */}
-        <Box mb={6} position="relative" width="100%" maxW="550px">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-            style={{ margin: '0 auto' }}
-          >
-            <p lang="en" dir="ltr">
-              Blame is easy. Observability is better. Nody picks the right button. 
-              <a href="https://twitter.com/hashtag/EIPsInsight?src=hash&amp;ref_src=twsrc%5Etfw">#EIPsInsight</a> 
-              <a href="https://twitter.com/hashtag/Monitoring?src=hash&amp;ref_src=twsrc%5Etfw">#Monitoring</a> 
-              <a href="https://twitter.com/hashtag/Web3?src=hash&amp;ref_src=twsrc%5Etfw">#Web3</a> 
-              <a href="https://t.co/8XAxhnznN7">pic.twitter.com/8XAxhnznN7</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1958753245855457626?ref_src=twsrc%5Etfw">
-              August 22, 2025
             </a>
           </blockquote>
         </Box>
