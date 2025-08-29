@@ -174,7 +174,7 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: EIP-7702 Set Code for EOAs */}
+        {/* Tweet 1: New Blog: EIP Proposal Builder and Validation Issues */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -182,18 +182,39 @@ const TwitterTimeline: React.FC = () => {
             style={{ margin: '0 auto' }}
           >
             <p lang="en" dir="ltr">
-              🚧 EIP‑7702 (Fusaka): Set Code for EOAs<br /><br />
-              - Fusaka focuses on scaling and efficiency; adding 7702 would bring tangible UX wins (batching, sponsorship, recovery) that everyday users and apps feel immediately, complementing throughput upgrades; It upgrades existing EOAs in place and… 
-              <a href="https://t.co/0DqjxSU3eB">pic.twitter.com/0DqjxSU3eB</a>
+              New on the blog: EIP Proposal Builder and Validation Issues with Legacy EIPs
+              <a href="https://t.co/bk3ooSCZ6u">https://t.co/bk3ooSCZ6u</a> 
+              <a href="https://t.co/1jdFJVbv7c">pic.twitter.com/1jdFJVbv7c</a>
             </p>
             &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1961039221676003365?ref_src=twsrc%5Etfw">
+            <a href="https://twitter.com/TeamAvarch/status/1961139312080392361?ref_src=twsrc%5Etfw">
               August 28, 2025
             </a>
           </blockquote>
         </Box>
 
-        {/* Tweet 2: EIP-7702 UX Features */}
+        {/* Tweet 2: EIP-7702 Programmable EOAs */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              EIP‑7702: Programmable EOAs<br /><br />
+              It lets a regular EOA temporarily act like a smart account via a special transaction, so the same address can batch actions, use sponsored gas, and apply scoped permissions without migrating wallets.
+              <a href="https://t.co/V5ME7RgfP1">https://t.co/V5ME7RgfP1</a><br /><br />
+              Unlocks: batch actions… 
+              <a href="https://t.co/7un7ejdCKq">pic.twitter.com/7un7ejdCKq</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1961136200544391362?ref_src=twsrc%5Etfw">
+              August 28, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 3: EIP-7702 UX Features */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -210,7 +231,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: This Week's EIP/ERC Activity (Aug 26) */}
+        {/* Tweet 4: This Week's EIP/ERC Activity (Aug 26) */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -237,7 +258,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: Nody Observability */}
+        {/* Tweet 5: Nody Observability */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -254,26 +275,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1958753245855457626?ref_src=twsrc%5Etfw">
               August 22, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: EIP-7934 RLP Execution Block Size Limit */}
-        <Box mb={6} position="relative" width="100%" maxW="550px">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-            style={{ margin: '0 auto' }}
-          >
-            <p lang="en" dir="ltr">
-              🚧 EIP‑7934 (Fusaka): RLP Execution Block Size Limit<br /><br />
-              As Ethereum raises capacity, 7934 adds a byte‑size ceiling for the whole block (with margin) so bigger blocks still propagate fast and stay DoS‑resistant.<br />
-              It's the guardrail that complements EIP‑7935's higher gas limit and… 
-              <a href="https://t.co/dz49AK7pnN">pic.twitter.com/dz49AK7pnN</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1958553227118686225?ref_src=twsrc%5Etfw">
-              August 21, 2025
             </a>
           </blockquote>
         </Box>
