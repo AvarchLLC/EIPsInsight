@@ -1,19 +1,8 @@
 ---
 title: "EIPs @10: A Decade of Standardizing Ethereum"
-author: "Ayush Shetty"
 date: "2025-07-29"
+author: "Ayush Shetty"
 image: "https://github.com/AvarchLLC/EIPsInsight/blob/main/public/nody.png?raw=true"
-authorAvatar: "https://pbs.twimg.com/profile_images/1908207914554216448/qjvXzvvz_400x400.jpg"
-authorBio: "Intern at Avarch | Web3 | Software Engineer Aspirant | Senior year student at NMAMIT | Information Science Engineering"
-authorTwitter: "https://x.com/_AyushShetty_"
-authorLinkedin: "https://www.linkedin.com/in/ayush-shetty-88aa43247/"
-authorGithub: "https://github.com/AyuShetty"
-summaryPoints:
-  - "Celebrates Ethereum’s 10-year milestone and its foundational EIP process launched with EIP-1."
-  - "Highlights four pivotal eras: inception, tokenization, consensus, and future scaling."
-  - "Landmark EIPs include ERC-20, ERC-721, EIP-1559, and EIP-4844—each catalyzing major advances."
-  - "Reflects on governance philosophies, major upgrades (The Merge, Pectra), and leap in decentralization."
-  - "Spotlights next-gen proposals: FOCIL, ePBS, BPO hardforks, Danksharding, and RWAs, setting the stage for mass adoption."
 ---
 
 Ten years ago, on **July 30, 2015**, Ethereum's "Frontier" network went live, mining its genesis block and launching what would become the world's most programmable blockchain. Just months earlier, on **April 12, 2015**, a foundational document was published that would govern every significant upgrade to follow: **[EIP-1](https://eipsinsight.com/eips/eip-1)**, authored by Martin Becze and [Hudson Jameson](https://x.com/hudsonjameson). This simple proposal established the transparent improvement process that has driven every protocol upgrade, token standard, consensus change and layer-2 in Ethereum's history.
