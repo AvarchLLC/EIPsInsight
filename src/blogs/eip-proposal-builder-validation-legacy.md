@@ -1,21 +1,8 @@
 ---
 title: "EIP Proposal Builder and Validation Issues with Legacy EIPs"
-author: "Ayush Shetty"
+author: "Dhanush Naik"
 date: "2025-08-28"
 image: "https://github.com/AvarchLLC/EIPsInsight/blob/main/public/Nody2.png?raw=true"
-authorAvatar: "https://pbs.twimg.com/profile_images/1908207914554216448/qjvXzvvz_400x400.jpg"
-authorBio: "Intern at Avarch | Web3 | Software Engineer Aspirant | Senior year student at NMAMIT | Information Science Engineering"
-authorTwitter: "https://x.com/ayushetty"
-authorLinkedin: "https://www.linkedin.com/in/ayush-shetty-88aa43247/"
-authorGithub: "https://github.com/AyuShetty"
-summaryPoints:
-  - "Purpose: The Proposal Builder simulates EIPW Lint to let authors import drafts and validate them against the latest linting rules before submission.
-  - Rules covered: Full EIPW rule set — markdown formatting, required sections, preamble validation (authors, title, discussions-to, description), link policies, etc.
-  - Test case: Importing ERC-20 produced multiple lint errors (extra/missing sections, invalid/external links, preamble problems such as missing GitHub handles and forbidden words in the title).
-  - Cause of errors: The flagged problems reflect that many lint rules were added after early EIPs were finalized; legacy EIPs were not retroactively updated to match modern formatting rules.
-  - Conclusion: The Builder is working correctly — it enforces current policy. Legacy EIPs remain valid historically but do not conform to today’s lint; new proposals must comply.
-  - Example fix: A lint-compliant ERC-20 preamble and reorganized sections were provided showing how to modernize the document (title, description, authors with GitHub handles, discussions-to, added Rationale & Security Considerations, relative links)."
-
 ---
 
 ## 1. Introduction
