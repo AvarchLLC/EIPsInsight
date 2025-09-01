@@ -174,7 +174,28 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: Editors Leaderboard */}
+        {/* Tweet 1: EIP-7918 stabilizing blob fees for rollups */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              EIP-7918: stabilizing blob fees for rollups.<br /><br />
+              By setting a fee floor tied to L1 gas, it prevents "too-cheap" blobspace, reduces volatility, and makes L2 costs more predictable.
+              <a href="https://t.co/PX9cnZTPxm">https://t.co/PX9cnZTPxm</a><br /><br />
+              Part of the Fusaka upgrade, it aligns blob pricing with execution demand,… 
+              <a href="https://t.co/D289Hjpq2Y">pic.twitter.com/D289Hjpq2Y</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1962569184459792435?ref_src=twsrc%5Etfw">
+              September 1, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: Editors Leaderboard */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -202,7 +223,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: Scheduled Insights - Don't let old habits hold you back */}
+        {/* Tweet 3: Scheduled Insights - Don't let old habits hold you back */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -224,7 +245,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: New Blog: EIP Proposal Builder and Validation Issues */}
+        {/* Tweet 4: New Blog: EIP Proposal Builder and Validation Issues */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -243,7 +264,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: EIP-7702 Programmable EOAs */}
+        {/* Tweet 5: EIP-7702 Programmable EOAs */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -260,23 +281,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1961136200544391362?ref_src=twsrc%5Etfw">
               August 28, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: EIP-7702 UX Features */}
-        <Box mb={6} position="relative" width="100%" maxW="550px">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-            style={{ margin: '0 auto' }}
-          >
-            <p lang="en" dir="ltr">
-              After recent incidents, should EIP-7702 UX features ship sooner or wait for more hardening?
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1960763160333529494?ref_src=twsrc%5Etfw">
-              August 27, 2025
             </a>
           </blockquote>
         </Box>
