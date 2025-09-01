@@ -28,7 +28,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSidebarStore } from "@/stores/useSidebarStore";
@@ -152,6 +152,7 @@ const sidebarStructure = [
         id: "statuschanges",
       },
       { label: "Dashboard", href: "/#dashboard", id: "dashboard" },
+      { label: "Latest Updates", href: "/#latest-updates", id: "latest-updates" },
     ],
   },
   {
@@ -284,6 +285,7 @@ const sidebarStructure = [
         href: "/Analytics",
         children: [
           { label: "Github PR Analytics", href: "/Analytics#GithubAnalytics" },
+          { label: "PR Labels Distribution", href: "/Analytics#PrLabelsChart" },
           { label: "EIPs Label Chart", href: "/Analytics#EIPsLabelChart" },
         ],
       },
@@ -315,6 +317,10 @@ const sidebarStructure = [
             href: "/proposalbuilder#split#eip#new#EipTemplateEditor",
           },
         ],
+      },
+      {
+        label: "Transaction Tracker",
+        href: "/txtracker",
       },
       {
         label: "Search By",
@@ -370,8 +376,13 @@ export default function AppSidebar() {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [userData, setUserData] = useState<UserData | null>(null);
   const { user, setUser, clearUser } = useUserStore();
-  const [isHovered, setIsHovered] = useState(false);
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [flyoutMenu, setFlyoutMenu] = useState<{
+    isOpen: boolean;
+    item: any;
+    position: { x: number; y: number };
+  }>({ isOpen: false, item: null, position: { x: 0, y: 0 } });
+  const flyoutRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const bottomItems = [
     // { icon: Search, label: "Search", href: "/search" },
@@ -423,30 +434,57 @@ export default function AppSidebar() {
   const toast = useToast();
   const router = useRouter();
 
-  // Smooth hover handling with debouncing
-  const handleMouseEnter = () => {
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
+  // Add click handler for sidebar expansion/collapse toggle
+  const handleSidebarClick = (e: React.MouseEvent) => {
+    // Don't toggle if clicking on an interactive element
+    const target = e.target as HTMLElement;
+    const isInteractiveElement = target.closest('button, a, [role="button"], [tabindex]');
+    
+    if (!isInteractiveElement) {
+      // Toggle between collapsed and expanded states
+      toggleCollapse();
     }
-    setIsHovered(true);
   };
 
-  const handleMouseLeave = () => {
-    const timeout = setTimeout(() => {
-      setIsHovered(false);
-    }, 300); // Small delay before collapsing
-    setHoverTimeout(timeout);
+  // Handle flyout menu
+  const handleFlyoutClick = (item: any, event: React.MouseEvent) => {
+    if (!isCollapsed || !item.children?.length) return;
+    
+    event.stopPropagation();
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    
+    setFlyoutMenu({
+      isOpen: !flyoutMenu.isOpen || flyoutMenu.item?.label !== item.label,
+      item: item,
+      position: { x: rect.right + 8, y: rect.top }
+    });
   };
 
-  // Cleanup timeout on unmount
+  // Close flyout when clicking outside
   useEffect(() => {
-    return () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        flyoutRef.current && 
+        !flyoutRef.current.contains(event.target as Node) &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setFlyoutMenu({ isOpen: false, item: null, position: { x: 0, y: 0 } });
       }
     };
-  }, [hoverTimeout]);
+
+    if (flyoutMenu.isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [flyoutMenu.isOpen]);
+
+  // Close flyout when sidebar expands
+  useEffect(() => {
+    if (!isCollapsed) {
+      setFlyoutMenu({ isOpen: false, item: null, position: { x: 0, y: 0 } });
+    }
+  }, [isCollapsed]);
 
   const handleRefresh = async () => {
     if (!user) return;
@@ -503,27 +541,29 @@ export default function AppSidebar() {
 
 
   return (
-    <Box
-      pos="fixed"
-      top="0"
-      left="0"
-      h="100vh"
-      zIndex="50"
-      display="flex"
-      flexDir="column"
-      justifyContent="space-between"
-      transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-      w={isCollapsed && !isHovered ? "3.5rem" : "17rem"}
-      bg={bg}
-      borderRight="1px solid"
-      borderColor={borderColor}
-      roundedRight="xl"
-      overflowY="auto"
-      overflowX="hidden"
-      py={4}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      boxShadow={isHovered && isCollapsed ? "xl" : "md"}
+    <>
+      <Box
+        ref={sidebarRef}
+        pos="fixed"
+        top="0"
+        left="0"
+        h="100vh"
+        zIndex="50"
+        display="flex"
+        flexDir="column"
+        justifyContent="space-between"
+        transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+        w={isCollapsed ? "3.5rem" : "17rem"}
+        bg={bg}
+        borderRight="1px solid"
+        borderColor={borderColor}
+        roundedRight="xl"
+        overflowY="auto"
+        overflowX="hidden"
+        py={4}
+        onClick={handleSidebarClick}
+        cursor={isCollapsed ? "pointer" : "default"}
+        boxShadow="md"
       backdropFilter="blur(10px)"
       sx={{
         scrollbarWidth: "none",
@@ -551,7 +591,10 @@ export default function AppSidebar() {
         <IconButton
           aria-label="Toggle Sidebar"
           icon={isCollapsed ? <ChevronRight /> : <ChevronLeft />}
-          onClick={toggleCollapse}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent sidebar click handler
+            toggleCollapse();
+          }}
           size="sm"
           variant="ghost"
           w="100%"
@@ -604,11 +647,12 @@ export default function AppSidebar() {
           >
             <SidebarItem
               item={item}
-              expanded={!isCollapsed || isHovered}
+              expanded={!isCollapsed}
               expandedItems={expandedItems}
               toggleExpand={toggleExpand}
               depth={0}
-              isCollapsed={isCollapsed && !isHovered}
+              isCollapsed={isCollapsed}
+              onFlyoutClick={handleFlyoutClick}
             />
           </motion.div>
         ))}
@@ -631,18 +675,19 @@ export default function AppSidebar() {
           >
             <SidebarItem
               item={item}
-              expanded={!isCollapsed || isHovered}
+              expanded={!isCollapsed}
               expandedItems={expandedItems}
               toggleExpand={toggleExpand}
               depth={0}
-              isCollapsed={isCollapsed && !isHovered}
+              isCollapsed={isCollapsed}
+              onFlyoutClick={handleFlyoutClick}
             />
           </motion.div>
         ))}
       </VStack>
 
-      <Box mt={4} px={isCollapsed && !isHovered ? 1 : 4} transition="all 0.3s ease">
-{!isCollapsed || isHovered ? (
+      <Box mt={4} px={isCollapsed ? 1 : 4} transition="all 0.3s ease">
+        {!isCollapsed ? (
   <Menu placement="top" isLazy>
     <MenuButton
       as={HStack}
@@ -734,11 +779,34 @@ export default function AppSidebar() {
       />
     </Box>
   </Tooltip>
-)}
-
+        )}
       </Box>
 
     </Box>
+
+    {/* Flyout Menu */}
+    <AnimatePresence>
+      {flyoutMenu.isOpen && flyoutMenu.item && (
+        <Box
+          ref={flyoutRef}
+          position="fixed"
+          left={`${flyoutMenu.position.x}px`}
+          top={`${flyoutMenu.position.y}px`}
+          zIndex="60"
+          as={motion.div}
+          initial={{ opacity: 0, scale: 0.95, x: -10 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          exit={{ opacity: 0, scale: 0.95, x: -10 }}
+          transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] } as any}
+        >
+          <FlyoutMenu 
+            item={flyoutMenu.item} 
+            onClose={() => setFlyoutMenu({ isOpen: false, item: null, position: { x: 0, y: 0 } })}
+          />
+        </Box>
+      )}
+    </AnimatePresence>
+  </>
 
   );
 }
@@ -750,6 +818,7 @@ export function SidebarItem({
   toggleExpand,
   depth = 0,
   isCollapsed,
+  onFlyoutClick,
 }: {
   item: any;
   expanded: boolean;
@@ -757,11 +826,15 @@ export function SidebarItem({
   toggleExpand: (label: string) => void;
   depth?: number;
   isCollapsed?: boolean;
+  onFlyoutClick?: (item: any, event: React.MouseEvent) => void;
 }) {
   const hasChildren = item.children && item.children.length > 0;
   const isExpanded = expandedItems[item.label];
   const activeSection = useSidebarStore((s) => s.activeSection);
   const [isItemHovered, setIsItemHovered] = useState(false);
+  const [showFlyout, setShowFlyout] = useState(false);
+  const flyoutRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
 
   const textColor = useColorModeValue("gray.700", "whiteAlpha.900");
   const iconColor = useColorModeValue("gray.600", "gray.300");
@@ -886,9 +959,15 @@ export function SidebarItem({
           fontWeight={isActive ? "semibold" : "medium"}
           borderRadius="xl"
           cursor={hasChildren || item.href ? "pointer" : "default"}
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent sidebar expansion on item click
+            
+            // If collapsed and has children, show flyout menu
+            if (isCollapsed && hasChildren && onFlyoutClick) {
+              onFlyoutClick(item, e);
+            }
             // If collapsed and has href, navigate directly
-            if (isCollapsed && item.href) {
+            else if (isCollapsed && item.href) {
               navigateToItem(item);
             } 
             // If expanded and has children, toggle expansion
@@ -900,6 +979,24 @@ export function SidebarItem({
               navigateToItem(item);
             }
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              // Same logic as onClick for keyboard accessibility
+              if (isCollapsed && hasChildren && onFlyoutClick) {
+                onFlyoutClick(item, e as any);
+              } else if (isCollapsed && item.href) {
+                navigateToItem(item);
+              } else if (hasChildren) {
+                toggleExpand(item.label);
+              } else if (item.href) {
+                navigateToItem(item);
+              }
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label={isCollapsed ? `${item.label}${hasChildren ? ' (has submenu)' : ''}` : undefined}
           onMouseEnter={() => setIsItemHovered(true)}
           onMouseLeave={() => setIsItemHovered(false)}
           _hover={{ 
@@ -1026,6 +1123,7 @@ export function SidebarItem({
                     toggleExpand={toggleExpand}
                     depth={depth + 1}
                     isCollapsed={isCollapsed}
+                    onFlyoutClick={onFlyoutClick}
                   />
                 </MotionDiv>
               ))}
@@ -1033,6 +1131,113 @@ export function SidebarItem({
           )}
         </AnimatePresence>
       )}
+    </Box>
+  );
+}
+
+// Flyout Menu Component
+function FlyoutMenu({ item, onClose }: { item: any; onClose: () => void }) {
+  const bg = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const hoverBg = useColorModeValue("gray.50", "gray.700");
+  
+  const router = useRouter();
+
+  const navigateToItem = (item: any) => {
+    if (!item.href) return;
+    onClose(); // Close flyout when navigating
+
+    const [path, hash] = item.href.split("#");
+    const isSamePage = window.location.pathname === path;
+
+    if (isSamePage && hash) {
+      const target = document.getElementById(hash);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.pushState(null, "", item.href);
+      }
+    } else {
+      router.push(item.href);
+    }
+  };
+
+  const renderFlyoutItem = (child: any, depth = 0) => (
+    <Box
+      key={child.label}
+      pl={depth * 4}
+      py={2}
+      px={3}
+      cursor="pointer"
+      borderRadius="md"
+      transition="all 0.2s"
+      _hover={{ bg: hoverBg }}
+      onClick={() => {
+        if (child.href) {
+          navigateToItem(child);
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (child.href) {
+            navigateToItem(child);
+          }
+        }
+      }}
+      tabIndex={0}
+      role="menuitem"
+    >
+      <HStack spacing={2}>
+        {child.icon && <Icon as={child.icon} boxSize={4} />}
+        <Text fontSize="sm" fontWeight={child.children?.length ? "semibold" : "normal"}>
+          {child.label}
+        </Text>
+      </HStack>
+      
+      {child.children?.map((grandchild: any) => (
+        <Box key={grandchild.label} ml={4} mt={1}>
+          {renderFlyoutItem(grandchild, depth + 1)}
+        </Box>
+      ))}
+    </Box>
+  );
+
+  return (
+    <Box
+      bg={bg}
+      border="1px solid"
+      borderColor={borderColor}
+      borderRadius="xl"
+      boxShadow="xl"
+      py={2}
+      minW="200px"
+      maxW="300px"
+      maxH="400px"
+      overflowY="auto"
+      css={{
+        '&::-webkit-scrollbar': {
+          width: '4px',
+        },
+        '&::-webkit-scrollbar-track': {
+          width: '6px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: useColorModeValue('rgba(0,0,0,0.1)', 'rgba(255,255,255,0.1)'),
+          borderRadius: '24px',
+        },
+      }}
+      role="menu"
+      aria-label={`${item.label} submenu`}
+    >
+      <Box px={3} py={2} borderBottom="1px solid" borderColor={borderColor}>
+        <Text fontSize="sm" fontWeight="bold" color={useColorModeValue("gray.700", "gray.300")}>
+          {item.label}
+        </Text>
+      </Box>
+      
+      <Box py={1}>
+        {item.children?.map((child: any) => renderFlyoutItem(child))}
+      </Box>
     </Box>
   );
 }

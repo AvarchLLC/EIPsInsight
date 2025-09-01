@@ -6,14 +6,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Allow', 'GET');
     return res.status(405).end('Method Not Allowed');
   }
-
   const token = req.query.token;
-  const secret = process.env.CRON_SECRET;
-
-  if (token !== secret) {
-    return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  if (token !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
-
   try {
     await syncEipChanges();
     return res.status(200).json({ ok: true });

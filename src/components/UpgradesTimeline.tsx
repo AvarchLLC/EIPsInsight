@@ -232,8 +232,65 @@ const glamsterDamData = [
     considered: ['EIP-7732', 'EIP-7782', 'EIP-7805', 'EIP-7928'],
     proposed: ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7819', 'EIP-7843', 'EIP-7919']  
   },
-];
+    {
+    date: '2025-08-11',
+    included: [],
+    scheduled: [],
+    declined: [],
+    considered: ['EIP-7732', 'EIP-7782', 'EIP-7805', 'EIP-7928'],
+    proposed: ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7819', 'EIP-7843', 'EIP-7919', 'EIP-5920', 'EIP-7791', 'EIP-7903', 'EIP-7907', 'EIP-7923' ]  
+  },
+      {
+    date: '2025-08-14',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+proposed: [
+  'EIP-2926',
+  'EIP-6873',
+  'EIP-7667',
+  'EIP-7793',
+  'EIP-7819',
+  'EIP-7843',
+  'EIP-7919',
+  'EIP-5920',
+  'EIP-7791',
+  'EIP-7903',
+  'EIP-7907',
+  'EIP-7923',
+  'EIP-7997'
+]
 
+  },
+      {
+    date: '2025-08-27',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+proposed: [
+  'EIP-2926',
+  'EIP-6873',
+  'EIP-7667',
+  'EIP-7793',
+  'EIP-7819',
+  'EIP-7843',
+  'EIP-7919',
+  'EIP-5920',
+  'EIP-7791',
+  'EIP-7903',
+  'EIP-7907',
+  'EIP-7923',
+  'EIP-7932',
+  'EIP-7980',
+  'EIP-7981',
+  'EIP-7997',
+  'EIP-7999'
+]
+
+  },
+];
 
   // Preprocess to add "declined" field based on removed EIPs
 const processedData = originalData.map((entry, index, arr) => {

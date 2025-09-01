@@ -1,7 +1,7 @@
 ---
 title: "EIPs @10: A Decade of Standardizing Ethereum"
-author: "Ayush Shetty"
 date: "2025-07-29"
+author: "Ayush Shetty"
 image: "https://github.com/AvarchLLC/EIPsInsight/blob/main/public/nody.png?raw=true"
 ---
 
@@ -20,7 +20,7 @@ The foundational era began with establishing the very process by which improveme
 | EIP | Date | Core Contribution |
 |-----|------|------------------|
 | **[EIP-1](https://eipsinsight.com/eips/eip-1)** | April 12, 2015 | Established the proposal process that governs Ethereum development, defining status states from Draft to Final |
-| **[EIP-20](https://eipsinsight.com/eips/eip-20) (ERC-20)** | November 19, 2015 | [Fabian Vogelsteller](https://x.com/feindura)'s fungible token standard that enabled the ICO boom and became foundation for 30,000+ tokens 
+| **[EIP-20](https://eipsinsight.com/eips/eip-20) (ERC-20)** | November 19, 2015 | [Fabian Vogelsteller](https://x.com/feindura)'s fungible token standard that enabled the ICO boom and became foundation for 30,000+ tokens |
 | **[EIP-721](https://eipsinsight.com/eips/eip-721) (ERC-721)** | January 24, 2018 | [William Entriken](https://x.com/fulldecent) and team's Non-Fungible Token standard that created the foundation for the multi-billion dollar NFT ecosystem |
 
 ### **DevCon I Retrospective**
@@ -41,7 +41,7 @@ As Ethereum matured beyond its experimental phase, the focus shifted to optimizi
 
 | EIP | Date | Impact & Innovation |
 |-----|------|-------------------|
-| **[EIP-1884](https://eipsinsight.com/eips/eip-1884)** | March 28, 2019 | [Martin Holst Swende](https://swende.se/)'s gas cost adjustments as state grew, increasing SLOAD from 200 to 800 gas to address DoS vectors 
+| **[EIP-1884](https://eipsinsight.com/eips/eip-1884)** | March 28, 2019 | [Martin Holst Swende](https://swende.se/)'s gas cost adjustments as state grew, increasing SLOAD from 200 to 800 gas to address DoS vectors |
 | **[EIP-2535](https://eipsinsight.com/eips/eip-2535) (Diamonds)** | February 22, 2020 | [Nick Mudge](https://x.com/mudgen)'s modular smart contract standard enabling unlimited upgradeability through faceted proxy architecture|
 | **[EIP-1559](https://eipsinsight.com/eips/eip-1559)** | Specified 2019, Activated August 5, 2021 | Revolutionary base fee + tip mechanism with ETH burning that transformed fee predictability |
 
@@ -72,9 +72,8 @@ This transformative period saw Ethereum complete its most ambitious upgrade ever
 | EIP | Date | Network Impact |
 |-----|------|---------------|
 | **[EIP-2982](https://eipsinsight.com/eips/eip-2982)** | September 15, 2020 | The Beacon Chain Blueprint: Danny Ryan and Vitalik Buterin's specification for "Serenity Phase 0" that launched the beacon chain as the foundation for Ethereum's transition to Proof-of-Stake |
-| **[EIP-3675](https://eipsinsight.com/eips/eip-3675)**| July 22, 2021 | The Merge Specification: Completed the transition from PoW to PoS, reducing energy consumption by 99.95%|
+| **[EIP-3675](https://eipsinsight.com/eips/eip-3675)** | July 22, 2021 | The Merge Specification: Completed the transition from PoW to PoS, reducing energy consumption by 99.95%|
 | **[EIP-4844](https://eipsinsight.com/eips/eip-4844)** | February 10, 2022 spec, March 13, 2024 mainnet | Proto-danksharding introducing "blobs" that reduced L2 data costs by **10-100×** |
-
 
 ### Vitalik Buterin on EIP-3675
 
@@ -106,9 +105,7 @@ The current era focuses on scaling Ethereum to serve billions of users while mai
 | **[EIP-4361](https://eipsinsight.com/eips/eip-4361)** | October 11, 2021 | **Sign-In with Ethereum:** Wayne Chang and team's standard for decentralized authentication, enabling users to control their digital identity using Ethereum accounts instead of centralized providers like Google or Faceboo |
 | **[EIP-5069](https://eipsinsight.com/eips/eip-5069)** | May 2, 2022| The Editor's Handbook Story: Born from Pooja Ranjan's EIP Editor "apprentice" handbook on HackMD, this proposal formalized the long-needed documentation of EIP Editor roles and responsibilities, addressing the growing complexity of the standardization process|
 | **[EIP-7587](https://eipsinsight.com/eips/eip-7587)** | December 21, 2023 | **RIP Address Reservation:** Carl Beekhuizen and team reserved precompile address range 0x0100-0x01ff for Rollup Improvement Proposals (RIPs), ensuring no conflicts between L1 and L2 precompiles | 
-|**[EIP-7623](https://eipsinsight.com/eips/eip-7623)** | February 13, 2024 |	Network Upgrade Process Formalization: This proposal stemmed from Pooja Ranjan's Medium article "Shedding light on the Ethereum Network Upgrade Process," which documented the need to formalize and improve the network upgrade process after years of evolution|
-
-
+|**[EIP-7623](https://eipsinsight.com/eips/eip-7623)** | February 13, 2024 |  Network Upgrade Process Formalization: This proposal stemmed from Pooja Ranjan's Medium article "Shedding light on the Ethereum Network Upgrade Process," which documented the need to formalize and improve the network upgrade process after years of evolution|
 
 ### **The Pectra Revolution**
 
@@ -141,11 +138,6 @@ The story of EIPs is the story of thousands of developers, researchers, and comm
 
 **Share your favorite EIP memory** or the proposal that most impacted your Ethereum journey in the comments below on [***EIPsInsight***](https://x.com/TeamAvarch). Your stories help document the human side of this technological revolution and every contribution matters in building the next decade of Ethereum standards. Together, we're building a better internet.
 
-
 ---
 
-<font size="2" color=#a6a6a6>
-
 *Disclaimer: The information contained in this website is for general informational purposes only. The content provided on this website, including articles, blog posts, opinions, and analysis related to blockchain technology and cryptocurrencies, is not intended as financial or investment advice. The website and its content should not be relied upon for making financial decisions.*
-
-</font>

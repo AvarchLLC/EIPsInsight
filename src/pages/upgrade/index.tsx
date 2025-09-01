@@ -683,6 +683,7 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-7942-available-attestation-a-reorg-resilient-solution-for-ethereum/23927"
   }
+  
 ];
 
   const fusakaData = [
@@ -1076,7 +1077,11 @@ return (
               />
             </Box>
 
-            {selectedOption === 'fusaka' && <DeclinedEIPListPage /> }
+            {(selectedOption === 'fusaka' || selectedOption === 'glamsterdam') && (
+  <DeclinedEIPListPage
+    selectedUpgrade={selectedOption}
+  />
+)}
 
             {/* Charts */}
             <Box id="NetworkUpgradeschart" my={6}>  

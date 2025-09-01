@@ -1,5 +1,6 @@
 import { connectToDatabase } from '@/lib/mongodb';
-interface SubscriptionInput {
+
+export interface SubscriptionInput {
   email: string;
   type: 'eips' | 'ercs' | 'rips';
   id: string | number;
@@ -9,34 +10,39 @@ interface SubscriptionInput {
 export async function addSubscription({ email, type, id, filter }: SubscriptionInput) {
   const client = await connectToDatabase();
   const db = client.db('eipsinsight');
-  console.log('📬 Writing to DB:', { email, type, id, filter }); // ✅ THIS LOG
   await db.collection('subscriptions').updateOne(
     { email, type, id, filter },
     { $setOnInsert: { email, type, id, filter, createdAt: new Date() } },
     { upsert: true }
   );
 }
+
 export async function getAllSubscriptions() {
   const client = await connectToDatabase();
   const db = client.db('eipsinsight');
-  const subs = await db.collection('subscriptions').find({}).toArray();
-  return subs;
+  return db.collection('subscriptions').find({}).toArray();
 }
 
-// export async function getAllSubscriptions() {
-//   return [
-//     {
-//       email: 'test@example.com',
-//       type: 'eips',
-//       id: '721',
-//       filter: 'status'
-//     }
-//   ];
-// }
-
-// Add this new function to check for existing subscriptions
 export async function checkSubscriptionExists(email: string, type: string, id: string) {
   const client = await connectToDatabase();
   const db = client.db('eipsinsight');
   return await db.collection('subscriptions').findOne({ email, type, id });
+}
+
+// State tracking (last processed commit per (type,id))
+export async function getLastProcessedSha(type: string, id: string | number): Promise<string | null> {
+  const client = await connectToDatabase();
+  const db = client.db('eipsinsight');
+  const doc = await db.collection('change_state').findOne({ type, id: String(id) });
+  return doc?.lastSha ?? null;
+}
+
+export async function setLastProcessedSha(type: string, id: string | number, lastSha: string) {
+  const client = await connectToDatabase();
+  const db = client.db('eipsinsight');
+  await db.collection('change_state').updateOne(
+    { type, id: String(id) },
+    { $set: { lastSha, updatedAt: new Date() } },
+    { upsert: true }
+  );
 }

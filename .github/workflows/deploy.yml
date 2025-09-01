@@ -1,0 +1,87 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  # Change to your default branch if needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repo
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Notify Deployment Start
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "🚀 Deployment Started"
+          embed-description: "Heads up: Deployment is now automated. No manual steps needed — the system will handle it."
+          embed-color: 16776960
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: npm install --force
+
+      # Step 4: Build (optional)
+      - name: Build Project
+        run: |
+          npm run build || echo "No build step or build failed, skipping."
+
+      # Step 5: Deploy via SSH safely
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            cd eip-client/EIPsInsight
+            git reset --hard
+            git pull
+            npm install --force
+            npm run build || echo "Build failed, check manually"
+            pm2 reload 39 || echo "PM2 reload failed, check manually."
+
+      # Step 6: Notify Discord on success with embeds
+      - name: Discord Notification - Success
+        if: success()
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "✅ Deployment Successful"
+          embed-description: |
+            **Branch:** ${{ github.ref_name }}
+            **Repository:** ${{ github.repository }}
+            **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+          embed-color: 3066993
+          embed-footer-text: "GitHub Actions • Deployment Bot"
+          embed-timestamp: ${{ github.event.head_commit.timestamp }}
+
+      # Step 7: Notify Discord on failure with embeds
+      - name: Discord Notification - Failure
+        if: failure()
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "❌ Deployment Failed"
+          embed-description: |
+            **Branch:** ${{ github.ref_name }}
+            **Repository:** ${{ github.repository }}
+            **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            ⚠️ Check GitHub Actions logs for details.
+          embed-color: 15158332
+          embed-footer-text: "GitHub Actions • Deployment Bot"
+          embed-timestamp: ${{ github.event.head_commit.timestamp }}
+

@@ -1471,6 +1471,7 @@ const GitHubPRTracker: React.FC = () => {
 
   useScrollSpy([
   "GithubAnalytics",
+  "PrLabelsChart",
   "EIPsLabelChart",
 ]);
 
@@ -1814,6 +1815,12 @@ const GitHubPRTracker: React.FC = () => {
 
           <br />
 
+          
+          <Box mt={2} id="EIPsLabelChart">
+            <PRAnalyticsCard/>
+          </Box>
+
+  <br />
           <Flex justify="center" mb={8}>
             <Button colorScheme="blue" onClick={toggleDropdown}>
               {showDropdown ? "Hide" : "View More"}
@@ -1915,9 +1922,6 @@ const GitHubPRTracker: React.FC = () => {
             <EipsLabelChart />
           </Box>
 
-          <Box mt={2} id="EIPsLabelChart">
-            <PRAnalyticsCard/>
-          </Box>
 
           <Box>
             <br />

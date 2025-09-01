@@ -298,9 +298,6 @@ const DashboardPage = () => {
   };
 
   const convertToCSV = (filteredData: any, type: string) => {
-    const csvRows = [];
-
-    // Define the headers for the CSV
     const headers = [
       "Serial Number",
       "PR Number",
@@ -310,24 +307,28 @@ const DashboardPage = () => {
       "URL",
     ];
 
-    // Add headers to CSV rows
-    csvRows.push(headers.join(","));
+    const escapeField = (val: any) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
 
-    // Iterate over the filtered data and extract necessary fields
+    const csvRows: string[] = [];
+    csvRows.push(headers.map(escapeField).join(","));
+
     filteredData?.forEach((item: any, index: number) => {
-      const row = [
-        index + 1, // Serial Number
-        item.prNumber, // PR Number
-        item.prTitle, // PR Title
-        item.labels.join("; "), // Labels (joined with semicolon)
-        new Date(item.prCreatedDate).toLocaleDateString(), // Created Date
-        item.prLink, // URL
-      ].join(",");
-
-      csvRows.push(row);
+      const rowValues = [
+        index + 1,
+        item.prNumber,
+        item.prTitle,                // May contain commas → escaped
+        (item.labels || []).join("; "), // Use semicolons inside field
+        new Date(item.prCreatedDate).toLocaleDateString(),
+        item.prLink,
+      ];
+      csvRows.push(rowValues.map(escapeField).join(","));
     });
 
-    return csvRows.join("\n");
+    return csvRows.join("\r\n");
   };
 
   if (isLoading) {

@@ -66,6 +66,7 @@ import DashboardCards from "./DashboardCards";
 import FeedbackWidget from "./FeedbackWidget";
 import { Clients } from "./Clients";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
+import TwitterTimeline from "./TwitterTimeline";
 
 interface EIP {
   _id: string;
@@ -236,6 +237,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
     "what",
     "statuschanges",
     "dashboard",
+    "latest-updates",
   ]);
 
 
@@ -967,6 +969,12 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
                 </Box>
               </Box>
             </Box>
+            
+            {/* Latest Tweets Section */}
+            <Box id="latest-updates">
+              <TwitterTimeline />
+            </Box>
+            
           </motion.div>
         )}
       </Box>
