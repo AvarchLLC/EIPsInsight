@@ -174,7 +174,35 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: Scheduled Insights - Don't let old habits hold you back */}
+        {/* Tweet 1: Editors Leaderboard */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              🏆 Editors Leaderboard<br /><br />
+              1. <a href="https://twitter.com/g11tech?ref_src=twsrc%5Etfw">@g11tech</a> – 51<br />
+              2. <a href="https://twitter.com/_SamWilsn_?ref_src=twsrc%5Etfw">@_SamWilsn_</a> – 21<br />
+              3. <a href="https://twitter.com/lightclients?ref_src=twsrc%5Etfw">@lightclients</a> – 8<br />
+              4. <a href="https://twitter.com/xinbenlv?ref_src=twsrc%5Etfw">@xinbenlv</a> - 4<br />
+              5. <a href="https://twitter.com/nconsigny?ref_src=twsrc%5Etfw">@nconsigny</a> – 1<br /><br />
+              🔍 Reviewers Leaderboard <br /><br />
+              1. <a href="https://twitter.com/JochemBrouwer96?ref_src=twsrc%5Etfw">@JochemBrouwer96</a> - 4<br />
+              2. <a href="https://twitter.com/naps_thelma?ref_src=twsrc%5Etfw">@naps_thelma</a> - 2<br />
+              3. Marchhill - 1<br /><br />
+              📎 Source: <a href="https://t.co/7c6gFdamO1">https://t.co/7c6gFdamO1</a> 
+              <a href="https://t.co/j7RrHkI5UK">pic.twitter.com/j7RrHkI5UK</a>
+            </p>
+            &mdash; EIPsInsight (@TeamAvarch) 
+            <a href="https://twitter.com/TeamAvarch/status/1962382873572598064?ref_src=twsrc%5Etfw">
+              September 1, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: Scheduled Insights - Don't let old habits hold you back */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -196,7 +224,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: New Blog: EIP Proposal Builder and Validation Issues */}
+        {/* Tweet 3: New Blog: EIP Proposal Builder and Validation Issues */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -215,7 +243,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: EIP-7702 Programmable EOAs */}
+        {/* Tweet 4: EIP-7702 Programmable EOAs */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -236,7 +264,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: EIP-7702 UX Features */}
+        {/* Tweet 5: EIP-7702 UX Features */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -249,33 +277,6 @@ const TwitterTimeline: React.FC = () => {
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1960763160333529494?ref_src=twsrc%5Etfw">
               August 27, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 5: This Week's EIP/ERC Activity (Aug 26) */}
-        <Box mb={6} position="relative" width="100%" maxW="550px">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-            style={{ margin: '0 auto' }}
-          >
-            <p lang="en" dir="ltr">
-              This Week's EIP/ERC Activity (Aug 19, 2025) <br /><br />
-              Last Call:<br />
-              ☞ EIP-7786: Cross-Chain Messaging Gateway<br />
-              Last Call Deadline: 2025-08-19
-              <a href="https://t.co/3QGiTeW4BH">https://t.co/3QGiTeW4BH</a><br />
-              ☞ EIP-7858: Expirable NFTs and SBTs<br />
-              Last Call Deadline: 2025-08-31
-              <a href="https://t.co/ht3SEOuLky">https://t.co/ht3SEOuLky</a><br /><br />
-              Drafts:<br />
-              ☞ EIP-7997:… 
-              <a href="https://t.co/5N1BkfU3O2">pic.twitter.com/5N1BkfU3O2</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1960340209725235302?ref_src=twsrc%5Etfw">
-              August 26, 2025
             </a>
           </blockquote>
         </Box>
