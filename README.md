@@ -1,71 +1,36 @@
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-# EIPs Insights
+## Getting Started
 
-Welcome to the Ethereum Insight Proposals (EIPs) Insights! This project aims to provide a user-friendly website that offers insights into Ethereum Improvement Proposals (EIPs) while also covering the contents of the official [ethereum/EIPs](https://github.com/ethereum/EIPs) repository. EIPs are design documents that provide information about new features, standards, and protocols for the Ethereum platform.
-
-# Project Overview
-
-The Ethereum Insight Proposals Insights serves as a central hub for browsing and exploring the various EIPs that have been proposed for Ethereum. The website offers features such as:
-
-- A searchable and filterable list of EIPs.
-- Detailed information about each EIP, including its status, author, and description.
-- Categorized view of EIPs based on their types and status.
-- Links to the official repository and EIP discussions for further engagement.
-
-
-# How to Contribute
-
-We welcome contributions from the community to enhance and improve the Ethereum Insight Proposals Explorer. If you're interested in contributing, here's how you can get started:
-
-## 1. Clone the Repository
-First, clone this repository to your local machine using the following command:
-
+First, run the development server:
 
 ```bash
-git clone https://github.com/Avarch-org/EIPUI
-```
-
-## 2. Set Up the Development Environment
-Navigate to the project directory and install the required dependencies:
-
-```bash
-cd EIPUI
-npm install
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
-## 3. Make Your Contributions
-You can contribute in various ways, such as:
 
-- Adding new features to the website.
-- Enhancing the user interface and user experience.
-- Improving the EIP data fetching and processing.
-- Fixing bugs and issues.
-Feel free to explore the codebase and open a pull request with your changes. Make sure to provide a clear description of your changes and their purpose.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 4. Submitting Pull Requests
-When you're ready to submit your changes, follow these steps:
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-1) Fork the main repository to your GitHub account.
-2) Commit your changes to your forked repository.
-3) Open a pull request from your fork to the main repository.
-4) Provide a detailed description of your changes in the pull request.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-# Deployment with Vercel
+## Learn More
 
-The Ethereum Insight Proposals Insights is deployed using Vercel for seamless hosting and continuous deployment. The deployment process is automated through GitHub integration. When changes are pushed to the main branch, Vercel automatically builds and deploys the updated website.
+To learn more about Next.js, take a look at the following resources:
 
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Contributors
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-- Dhanush Naik [(@dhanushlnaik)](https://www.github.com/dhanushlnaik)
-- Nandan R Pai [(@nandanpi)](https://github.com/nandanpi)
-- Viwin [(@viwinkumarpadala)](https://github.com/viwinkumarpadala)
-- Arjun [(@Arjundotadex)](https://github.com/Arjundotadex)
-- Priti Tiwari [(@prititi)](https://github.com/prititi)
+## Deploy on Vercel
 
----
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Thank you for your interest in the Ethereum Insight Proposals Insights. Let's work together to make Ethereum even better through collaborative development and insightful proposals. If you have any questions or need assistance, feel free to open an issue or reach out to us.
-
-Happy build! 🚀🌐
-
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
