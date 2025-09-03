@@ -174,7 +174,32 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: EIP-7918 stabilizing blob fees for rollups */}
+        {/* Tweet 1: EIP-7928 Block Access List (BAL) - Glamsterdam */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote 
+            className="twitter-tweet" 
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              Block Access List (EIP‑7928) is being actively worked on for Glamsterdam. What's the biggest win if BAL ships? <br /><br />
+              1. Lower MEV risk <br />
+              2. Faster block building <br />
+              3. Cheaper access checks <br />
+              4. Not sure/need info
+              <a href="https://twitter.com/hashtag/Glamsterdam?src=hash&amp;ref_src=twsrc%5Etfw">#Glamsterdam</a> 
+              <a href="https://twitter.com/hashtag/EIP7928?src=hash&amp;ref_src=twsrc%5Etfw">#EIP7928</a> 
+              <a href="https://twitter.com/hashtag/BAL?src=hash&amp;ref_src=twsrc%5Etfw">#BAL</a> 
+              <a href="https://t.co/rbIYi7pEsg">pic.twitter.com/rbIYi7pEsg</a>
+            </p>
+            &mdash; EIPsInsight (@EIPsInsight) 
+            <a href="https://twitter.com/EIPsInsight/status/1963145344453075155?ref_src=twsrc%5Etfw">
+              September 3, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: EIP-7918 stabilizing blob fees for rollups */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -195,7 +220,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: Editors Leaderboard */}
+        {/* Tweet 3: Editors Leaderboard */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -223,7 +248,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 3: Scheduled Insights - Don't let old habits hold you back */}
+        {/* Tweet 4: Scheduled Insights - Don't let old habits hold you back */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -245,7 +270,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 4: New Blog: EIP Proposal Builder and Validation Issues */}
+        {/* Tweet 5: New Blog: EIP Proposal Builder and Validation Issues */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -264,7 +289,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 5: EIP-7702 Programmable EOAs */}
+        {/* Tweet 6: EIP-7702 Programmable EOAs */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
