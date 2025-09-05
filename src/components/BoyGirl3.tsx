@@ -4,13 +4,13 @@ import BlockchainFuture from '/public/Blockchain_Future.png'; // Adjust the path
 
 function BoyGirl() {
     return (
-        <div style={{ width: '500px', height: '500px', marginTop: '-20px' }}>
+        <div style={{ width: '400px', height: '400px', marginTop: '-20px' }}>
             <Image
                 src={BlockchainFuture}
                 alt="Blockchain Future"
                 layout="responsive"
-                width={500}
-                height={500}
+                width={400}
+                height={400}
             />
         </div>
     );
