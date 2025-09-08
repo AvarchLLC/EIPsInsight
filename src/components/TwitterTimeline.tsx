@@ -174,7 +174,32 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: EIP-7892 Blob-Parameter-Only Hardforks - Latest */}
+        {/* Tweet 1: Milestone 2 completed - Latest */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote
+            className="twitter-tweet"
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              Milestone 2 completed!✅<br /><br />
+              EIPsInsight, supported by a grant from <a href="https://twitter.com/EF_ESP?ref_src=twsrc%5Etfw">@EF_ESP</a>, now delivers:<br /><br />
+              ☞ EIP Submission Trends Dashboard <br />
+              ☞ Trending EIPs Module<br />
+              ☞ Proposal Builder Enhancements <br />
+              ☞ EIP Status Notification Bot <br /><br />
+              🔗<a href="https://t.co/DeoJ5ILGQJ">https://t.co/DeoJ5ILGQJ</a><br /><br />
+              Building open tools for transparent… 
+              <a href="https://t.co/Huo0jzE0w8">pic.twitter.com/Huo0jzE0w8</a>
+            </p>
+            &mdash; EIPsInsight (@EIPsInsight)
+            <a href="https://twitter.com/EIPsInsight/status/1965126348252250180?ref_src=twsrc%5Etfw">
+              September 8, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: EIP-7892 Blob-Parameter-Only Hardforks */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote
             className="twitter-tweet"
@@ -195,7 +220,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: EIP-7939 Count Leading Zeros */}
+        {/* Tweet 3: EIP-7939 Count Leading Zeros */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -216,7 +241,7 @@ const TwitterTimeline: React.FC = () => {
           </blockquote>
         </Box>
 
-        {/* Tweet 2: EIP-7928 Block Access List (BAL) - Glamsterdam */}
+        {/* Tweet 4: EIP-7928 Block Access List (BAL) - Glamsterdam */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
@@ -326,27 +351,6 @@ const TwitterTimeline: React.FC = () => {
             </p>
             &mdash; EIPsInsight (@TeamAvarch) 
             <a href="https://twitter.com/TeamAvarch/status/1961139312080392361?ref_src=twsrc%5Etfw">
-              August 28, 2025
-            </a>
-          </blockquote>
-        </Box>
-
-        {/* Tweet 7: EIP-7702 Programmable EOAs */}
-        <Box mb={6} position="relative" width="100%" maxW="550px">
-          <blockquote 
-            className="twitter-tweet" 
-            data-theme={useColorModeValue('light', 'dark')}
-            style={{ margin: '0 auto' }}
-          >
-            <p lang="en" dir="ltr">
-              EIP‑7702: Programmable EOAs<br /><br />
-              It lets a regular EOA temporarily act like a smart account via a special transaction, so the same address can batch actions, use sponsored gas, and apply scoped permissions without migrating wallets.
-              <a href="https://t.co/V5ME7RgfP1">https://t.co/V5ME7RgfP1</a><br /><br />
-              Unlocks: batch actions… 
-              <a href="https://t.co/7un7ejdCKq">pic.twitter.com/7un7ejdCKq</a>
-            </p>
-            &mdash; EIPsInsight (@TeamAvarch) 
-            <a href="https://twitter.com/TeamAvarch/status/1961136200544391362?ref_src=twsrc%5Etfw">
               August 28, 2025
             </a>
           </blockquote>
