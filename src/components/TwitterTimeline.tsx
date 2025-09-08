@@ -174,7 +174,28 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 1: EIP-7939 Count Leading Zeros - Latest */}
+        {/* Tweet 1: EIP-7892 Blob-Parameter-Only Hardforks - Latest */}
+        <Box mb={6} position="relative" width="100%" maxW="550px">
+          <blockquote
+            className="twitter-tweet"
+            data-theme={useColorModeValue('light', 'dark')}
+            style={{ margin: '0 auto' }}
+          >
+            <p lang="en" dir="ltr">
+              EIP‑7892: Blob‑Parameter‑Only Hardforks (Included for Fusaka)<br /><br />
+              It’s timely, operationally important and pairs well with recent blob/fee topics by enabling quick, low‑risk tweaks to blob capacity without a full feature fork.<br /><br />
+              Why EIP‑7892<br />
+              ☞ Creates a special "parameter‑only" fork… 
+              <a href="https://t.co/LXlgiBnF3F">pic.twitter.com/LXlgiBnF3F</a>
+            </p>
+            &mdash; EIPsInsight (@EIPsInsight)
+            <a href="https://twitter.com/EIPsInsight/status/1965068884291342713?ref_src=twsrc%5Etfw">
+              September 8, 2025
+            </a>
+          </blockquote>
+        </Box>
+
+        {/* Tweet 2: EIP-7939 Count Leading Zeros */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
           <blockquote 
             className="twitter-tweet" 
