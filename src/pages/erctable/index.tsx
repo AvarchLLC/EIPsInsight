@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import Table from "@/components/Table";
 import { Box } from "@chakra-ui/react";
 import Header from "@/components/Header";
@@ -28,6 +29,12 @@ const ERCTable = () => {
           marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
           <Header title={`ERC - [${data?.length}]`} subtitle="" description="" />
+          
+          {/* EtherWorld Advertisement */}
+          <Box my={6}>
+            <EtherWorldAdCard />
+          </Box>
+          
           <Table type="ERC" />
         </Box>
       </AllLayout>

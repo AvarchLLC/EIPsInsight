@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -438,6 +439,11 @@ const All = () => {
               >
                 Ethereum Network Upgrades
               </Text>
+
+              {/* EtherWorld Advertisement */}
+              <Box my={6}>
+                <EtherWorldAdCard />
+              </Box>
 
               <br />
               {/* <br/> */}

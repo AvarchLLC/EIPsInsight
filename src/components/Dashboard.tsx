@@ -257,6 +257,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
   return (
     <>
       <FeedbackWidget />
+      
   <Box px={{ base: 3, md: 5, lg: 8 }} py={{ base: 3, md: 4, lg: 6 }}>
     {isLoading ? (
       <Flex justify="center" align="center" minH="70vh">

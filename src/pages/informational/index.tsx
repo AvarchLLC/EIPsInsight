@@ -1,4 +1,5 @@
 import React from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import AllLayout from "@/components/Layout";
 import { Box, Tabs, useColorModeValue  } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
@@ -117,6 +118,12 @@ const Info = () => {
                 description="Informational EIPs provide general guidelines or information to the Ethereum community but do not propose a new feature."
               />
             </FlexBetween>
+            
+            {/* EtherWorld Advertisement */}
+            <Box my={6}>
+              <EtherWorldAdCard />
+            </Box>
+            
             <TableStatus cat="Informational" />
             <Box
                         marginTop={"2rem"}
