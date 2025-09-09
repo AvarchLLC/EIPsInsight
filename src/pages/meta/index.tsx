@@ -152,6 +152,7 @@
 // export default Meta;
 
 import React, { useEffect, useState } from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -270,6 +271,11 @@ const Meta = () => {
               <p className="text-gray-500 italic">
                 * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can vary by 1.
               </p>
+            </Box>
+
+            {/* EtherWorld Advertisement */}
+            <Box my={6}>
+              <EtherWorldAdCard />
             </Box>
 
             <TableStatus cat="Meta" />

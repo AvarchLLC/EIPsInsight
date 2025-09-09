@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import dynamic from "next/dynamic";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
@@ -1491,6 +1492,11 @@ const GitHubPRTracker: React.FC = () => {
           >
             Analytics
           </Heading>
+
+          {/* EtherWorld Advertisement */}
+          <Box my={6}>
+            <EtherWorldAdCard />
+          </Box>
 
           <Box
             pl={4}

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Box, Button, Spinner } from "@chakra-ui/react";
 import { DownloadIcon } from "@chakra-ui/icons";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 
 import AllLayout from "@/components/Layout";
 import FlexBetween from "@/components/FlexBetween";
@@ -96,6 +97,12 @@ const AllTable = () => {
               />
               </div>
             </FlexBetween>
+            
+            {/* EtherWorld Advertisement */}
+            <Box my={6}>
+              <EtherWorldAdCard />
+            </Box>
+            
             <Table type="Total" />
             {/* <AreaC type={"EIPs"} /> */}
           </Box>

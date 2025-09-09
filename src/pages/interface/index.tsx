@@ -1,4 +1,5 @@
 import React from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import AllLayout from "@/components/Layout";
 import { Box, Button } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
@@ -120,6 +121,12 @@ const Interface = () => {
                 description="Interface EIPs specify standards for client APIs and how Ethereum clients interact with external components."
               />
             </FlexBetween>
+            
+            {/* EtherWorld Advertisement */}
+            <Box my={6}>
+              <EtherWorldAdCard />
+            </Box>
+            
             <TableStatus cat="Interface" />
             {/* <AreaStatus type={"EIPs"} /> */}
           </Box>

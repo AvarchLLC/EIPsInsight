@@ -1,4 +1,5 @@
 import React from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import AllLayout from "@/components/Layout";
 import Header from "@/components/Header";
 import {
@@ -198,6 +199,11 @@ const Status = () => {
             marginTop={{ lg: "6", md: "4", sm: "4", base: "4" }}
           >
             <Header title="Status" subtitle="Your Roadway to Status" description="" />
+
+            {/* EtherWorld Advertisement */}
+            <Box my={6}>
+              <EtherWorldAdCard />
+            </Box>
 
             <Text
               fontSize="3xl" fontWeight="bold" color="#30A0E0"

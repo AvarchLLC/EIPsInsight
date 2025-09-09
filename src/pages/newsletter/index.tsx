@@ -1,5 +1,6 @@
 import { VStack } from "@chakra-ui/react";
 import React, { useState, useEffect, useLayoutEffect } from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -57,6 +58,11 @@ const EIPsInsightRecap = () => {
           >
           Bringing You the Latest in Ethereum Improvement Proposals
         </Text>
+
+        {/* EtherWorld Advertisement */}
+        <Box w="100%" my={6}>
+          <EtherWorldAdCard />
+        </Box>
 
         <Stack 
             direction={{ base: "column", lg: "row" }} // Stack vertically on small screens, horizontally on large screens

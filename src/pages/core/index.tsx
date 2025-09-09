@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import AllLayout from "@/components/Layout";
 import { Box, Tabs, TabList, Tab, useColorModeValue } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
@@ -87,6 +88,12 @@ const Core = () => {
                 description="These EIPs are essential for protocol upgrades and consensus changes."
               />
             </FlexBetween>
+            
+            {/* EtherWorld Advertisement */}
+            <Box my={6}>
+              <EtherWorldAdCard />
+            </Box>
+            
             <TableStatus cat="Core" />
                       <Box
                         marginTop={"2rem"}
