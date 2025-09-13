@@ -16,8 +16,8 @@ const Index = () => {
       <Box my={6} mx={{ lg: "40", md: "2", sm: "2", base: "2" }} px={{ lg: "10", md: "5", sm: "5", base: "5" }}>
         <EtherWorldAdCard />
       </Box>
-      {/* Advertise With Us (subtle placement) */}
-      <Box my={6} mx={{ lg: "40", md: "2", sm: "2", base: "2" }} px={{ lg: "10", md: "5", sm: "5", base: "5" }}>
+      {/* Advertise With Us (more spacing, below content) */}
+      <Box my={12} mx={{ lg: "40", md: "2", sm: "2", base: "2" }} px={{ lg: "10", md: "5", sm: "5", base: "5" }}>
         <PlaceYourAdCard />
       </Box>
     </AllLayout>

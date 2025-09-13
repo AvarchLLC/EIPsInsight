@@ -34,12 +34,11 @@ const Dasboard = () => {
       <Box my={6} width="100%">
         <EtherWorldAdCard />
       </Box>
-      {/* Advertise With Us (subtle placement) */}
-      <Box my={6} width="100%">
+      <Dashboard />
+      {/* Advertise With Us (moved lower for spacing) */}
+      <Box my={12} width="100%">
         <PlaceYourAdCard />
       </Box>
-      
-      <Dashboard />
       <ViewsShare path={'/home'} />
     </AllLayout>
   );

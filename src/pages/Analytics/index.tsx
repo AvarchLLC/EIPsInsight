@@ -1498,10 +1498,7 @@ const GitHubPRTracker: React.FC = () => {
           <Box my={6}>
             <EtherWorldAdCard />
           </Box>
-          {/* Advertise With Us (subtle placement) */}
-          <Box my={6}>
-            <PlaceYourAdCard />
-          </Box>
+          
 
           <Box
             pl={4}
@@ -1639,6 +1636,10 @@ const GitHubPRTracker: React.FC = () => {
       )} */}
           </Box>
           <br/>
+          {/* Advertise With Us (moved below FAQ for spacing) */}
+          <Box my={12}>
+            <PlaceYourAdCard />
+          </Box>
           {/* <Box>
               <ERCsPRChart/>
           </Box> */}
