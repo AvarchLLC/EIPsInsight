@@ -2,6 +2,8 @@ import React from 'react';
 import { useRouter } from 'next/router'; // Import useRouter hook
 import AllLayout from '@/components/Layout';
 import Author from '@/components/Author';
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import { Box } from "@chakra-ui/react";
 
 const Authors: React.FC = () => {
     const router = useRouter();
@@ -13,6 +15,11 @@ const Authors: React.FC = () => {
     return (
         <>
             <AllLayout>
+                {/* EtherWorld Advertisement */}
+                <Box my={6} width="100%">
+                  <EtherWorldAdCard />
+                </Box>
+                
                 <Author defaultQuery={authorName} />
             </AllLayout>
         </>

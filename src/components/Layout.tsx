@@ -1,12 +1,10 @@
 "use client";
-import { Providers } from "@/app/providers";
 import React, { useEffect, useState } from "react";
 import LargeWithAppLinksAndSocial from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import SubscriptionFloater from "@/components/SubscriptionFloater";
 import {
   Box,
-  ColorModeScript,
   useBreakpointValue,
   Portal,
 } from "@chakra-ui/react";
@@ -112,9 +110,6 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
           `}
         </Script>
 
-        <ColorModeScript initialColorMode="dark" />
-
-        <Providers>
           <BookmarkProvider>
             <SidebarConfigLoader />
 
@@ -165,7 +160,6 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
               <LargeWithAppLinksAndSocial />
             </Box>
           </BookmarkProvider>
-        </Providers>
       </motion.div>
   );
 };

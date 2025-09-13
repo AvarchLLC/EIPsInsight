@@ -18,7 +18,6 @@ const EtherWorldAdCompact: React.FC = () => {
   const borderColor = useColorModeValue('blue.200', 'blue.600');
   const textColor = useColorModeValue('blue.800', 'blue.100');
   const accentColor = useColorModeValue('blue.600', 'blue.300');
-  const badgeColor = useColorModeValue('blue.500', 'blue.400');
 
   return (
     <MotionBox
@@ -30,6 +29,7 @@ const EtherWorldAdCompact: React.FC = () => {
         href="https://etherworld.co"
         isExternal
         _hover={{ textDecoration: 'none' }}
+        display="block"
       >
         <Box
           bg={bgColor}
@@ -47,6 +47,8 @@ const EtherWorldAdCompact: React.FC = () => {
           maxW="300px"
           position="relative"
           overflow="hidden"
+          role="banner"
+          aria-label="EtherWorld Partnership Advertisement"
         >
           {/* Background Pattern */}
           <Box
@@ -58,13 +60,19 @@ const EtherWorldAdCompact: React.FC = () => {
             opacity={0.1}
             background={`radial-gradient(circle, ${accentColor} 20%, transparent 20%)`}
             backgroundSize="8px 8px"
+            pointerEvents="none"
           />
           
           <Flex direction="column" gap={2} position="relative" zIndex={1}>
             {/* Header with badge */}
             <Flex align="center" justify="space-between">
               <Flex align="center" gap={2}>
-                <Icon as={FaGlobe} color={accentColor} boxSize={4} />
+                <Icon 
+                  as={FaGlobe} 
+                  color={accentColor} 
+                  boxSize={4}
+                  aria-hidden="true"
+                />
                 <Text
                   fontSize="sm"
                   fontWeight="bold"
@@ -73,7 +81,12 @@ const EtherWorldAdCompact: React.FC = () => {
                   EtherWorld
                 </Text>
               </Flex>
-              <Badge colorScheme="blue" size="sm" fontSize="xs">
+              <Badge 
+                colorScheme="blue" 
+                size="sm" 
+                fontSize="xs"
+                variant={useColorModeValue('solid', 'outline')}
+              >
                 Partner
               </Badge>
             </Flex>
@@ -101,6 +114,7 @@ const EtherWorldAdCompact: React.FC = () => {
                 as={FaExternalLinkAlt}
                 color={accentColor}
                 boxSize={3}
+                aria-hidden="true"
               />
             </Flex>
           </Flex>

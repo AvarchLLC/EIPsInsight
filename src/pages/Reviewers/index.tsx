@@ -20,6 +20,7 @@ import { DownloadIcon } from "@chakra-ui/icons";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import { Tooltip } from "@chakra-ui/react";
 import Link from "next/link";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 // import { Bar } from "@ant-design/charts";
 // import { Line } from '@ant-design/charts';  // Import the Line chart component
 
@@ -1971,6 +1972,12 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       >
         Editors & Reviewers Leaderboard
       </Heading>
+      
+      {/* EtherWorld Advertisement */}
+      <Box my={6} width="100%">
+        <EtherWorldAdCard />
+      </Box>
+      
       </section>
 
 

@@ -1,8 +1,7 @@
-import { Providers } from "@/app/providers";
 import React from "react";
 import LargeWithAppLinksAndSocial from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { Box, ColorModeScript, Text, Link } from "@chakra-ui/react";
+import { Box, Text, Link } from "@chakra-ui/react";
 import { Rajdhani } from 'next/font/google';
 import "../app/globals.css";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,17 +51,12 @@ const mont = Rajdhani({
         <link rel="icon" href="/eipFavicon.png" />
       </Head>
 
-
-      <ColorModeScript initialColorMode="light" />
-      <Providers>
-     
-        <AuthLocalStorageInitializer/>
-        {children}
-        {/* Universal Feedback Widget - appears on all pages */}
-        <UniversalFeedbackSystem />
-        <FloatingContributionIcon/>
-        <LargeWithAppLinksAndSocial />
-      </Providers>
+  <AuthLocalStorageInitializer/>
+  {children}
+  {/* Universal Feedback Widget - appears on all pages */}
+  <UniversalFeedbackSystem />
+  <FloatingContributionIcon/>
+  <LargeWithAppLinksAndSocial />
     </motion.div>
     </SessionWrapper> 
   );

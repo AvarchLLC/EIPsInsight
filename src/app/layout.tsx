@@ -3,7 +3,7 @@
 import './globals.css';
 import { Rajdhani } from 'next/font/google';
 import { Providers } from './providers';
-import { Box, ColorModeScript, Flex } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,7 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={mont.className}>
       <body>
-        <ColorModeScript initialColorMode="dark" />
         <SessionWrapper>
           <AnimatePresence>
             <motion.div

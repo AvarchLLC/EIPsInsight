@@ -38,7 +38,7 @@ import {
 export const sidebarGroupIcons: Record<string, React.ElementType> = {
   "/": LuHome,
   "/home": LuHome,
-  "/About": LuInfo,
+  "/about": LuInfo,
   "/all": LuSearch,
   "/milestones2024": LuClipboardList,
   "/trivia": LuSparkles,
@@ -71,7 +71,7 @@ export const sidebarConfig: Record<
     { label: "Dashboard", icon: LuDatabase, id: "dashboard" },
     { label: "Latest Updates", icon: LuRocket, id: "latest-updates" },
   ],
-  "/About": [{ label: "What is EIPs Insights", icon: LuInfo, id: "what" }],
+  "/about": [{ label: "What is EIPs Insights", icon: LuInfo, id: "what" }],
   "/resources": [{ label: "What is EIPs Insights", icon: LuInfo, id: "what" }],
   // "/all": [
   //   { label: "Search EIP", icon: LuSearch, id: "searchEIP" },
