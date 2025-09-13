@@ -68,10 +68,8 @@ const EIPsInsightRecap = () => {
         <Box w="100%" my={6}>
           <EtherWorldAdCard />
         </Box>
-        {/* Advertise With Us (subtle placement) */}
-        <Box w="100%" my={6}>
-          <PlaceYourAdCard />
-        </Box>
+        {/* Advertise With Us (moved lower for spacing) */}
+        
 
         <Stack 
             direction={{ base: "column", lg: "row" }} // Stack vertically on small screens, horizontally on large screens
@@ -117,6 +115,11 @@ const EIPsInsightRecap = () => {
            
             </Box>
             </Stack>
+
+        {/* Advertise With Us (placed after hero section) */}
+        <Box w="100%" my={12}>
+          <PlaceYourAdCard />
+        </Box>
 
 
 
