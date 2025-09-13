@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import {
   Flex,
   Box,
@@ -225,6 +226,12 @@ const EthereumV2 = () => {
           px={{ base: 3, md: 8 }}
           pb={14}
         >
+        
+          {/* EtherWorld Advertisement */}
+          <Box my={4} width="100%">
+            <EtherWorldAdCard />
+          </Box>
+          
           {headerBar}
 
           {error && (

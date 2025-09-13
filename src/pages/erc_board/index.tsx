@@ -15,6 +15,7 @@ import {
   import React, { useEffect, useState } from "react";
   import AllLayout from "@/components/Layout";
   import axios from "axios";
+  import EtherWorldAdCard from "@/components/EtherWorldAdCard";
   
   // Helper function to extract PR number from URL
   const extractPrNumber = (url: string) => {
@@ -80,6 +81,11 @@ import {
           <Heading as="h2" size="lg" mt={4}mb={4} textAlign="center" color={"#fff"}>
             ERC BOARD
           </Heading>
+          
+          {/* EtherWorld Advertisement */}
+          <Box my={6} width="100%">
+            <EtherWorldAdCard />
+          </Box>
   
           {/* Scrollable Table */}
           <TableContainer
