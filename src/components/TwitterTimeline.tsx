@@ -174,30 +174,47 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
-        {/* Tweet 0: Data > Drama - Latest */}
-        <Box mb={6} position="relative" width="100%" maxW="550px">
-          <blockquote
-            className="twitter-tweet"
-            data-theme={useColorModeValue('light', 'dark')}
-            style={{ margin: '0 auto' }}
-          >
-            <p lang="en" dir="ltr">
-              From “more repos” to “better correlations.” Exit to EIPsInsight. Data &gt; drama.
-              <a href="https://t.co/mXCeU99y6a">https://t.co/mXCeU99y6a</a>
-              <a href="https://twitter.com/hashtag/EIPsInsight?src=hash&amp;ref_src=twsrc%5Etfw">#EIPsInsight</a> 
-              <a href="https://twitter.com/hashtag/Ethereum?src=hash&amp;ref_src=twsrc%5Etfw">#Ethereum</a> 
-              <a href="https://twitter.com/hashtag/DevTools?src=hash&amp;ref_src=twsrc%5Etfw">#DevTools</a> 
-              <a href="https://twitter.com/hashtag/DataOps?src=hash&amp;ref_src=twsrc%5Etfw">#DataOps</a> 
-              <a href="https://twitter.com/hashtag/Observability?src=hash&amp;ref_src=twsrc%5Etfw">#Observability</a> 
-              <a href="https://twitter.com/hashtag/meme?src=hash&amp;ref_src=twsrc%5Etfw">#meme</a> 
-              <a href="https://t.co/2WNK3QoIty">pic.twitter.com/2WNK3QoIty</a>
-            </p>
-            &mdash; EIPsInsight (@EIPsInsight)
-            <a href="https://twitter.com/EIPsInsight/status/1966577788900856045?ref_src=twsrc%5Etfw">
-              September 12, 2025
-            </a>
-          </blockquote>
-        </Box>
+              {/* Tweet 0: Glamsterdam headliners - Latest */}
+              <Box mb={6} position="relative" width="100%" maxW="550px">
+                <blockquote
+                  className="twitter-tweet"
+                  data-theme={useColorModeValue('light', 'dark')}
+                  style={{ margin: '0 auto' }}
+                >
+                  <p lang="en" dir="ltr">
+                    Glamsterdam&apos;s confirmed headliners: which will impact Ethereum more?
+                  </p>
+                  &mdash; EIPsInsight (@EIPsInsight)
+                  <a href="https://twitter.com/EIPsInsight/status/1968322991407935945?ref_src=twsrc%5Etfw">
+                    September 17, 2025
+                  </a>
+                </blockquote>
+              </Box>
+
+              {/* Tweet 1: Data > Drama - Latest */}
+              <Box mb={6} position="relative" width="100%" maxW="550px">
+                <blockquote
+                  className="twitter-tweet"
+                  data-theme={useColorModeValue('light', 'dark')}
+                  style={{ margin: '0 auto' }}
+                >
+                  <p lang="en" dir="ltr">
+                    From “more repos” to “better correlations.” Exit to EIPsInsight. Data &gt; drama.
+                    <a href="https://t.co/mXCeU99y6a">https://t.co/mXCeU99y6a</a>
+                    <a href="https://twitter.com/hashtag/EIPsInsight?src=hash&amp;ref_src=twsrc%5Etfw">#EIPsInsight</a> 
+                    <a href="https://twitter.com/hashtag/Ethereum?src=hash&amp;ref_src=twsrc%5Etfw">#Ethereum</a> 
+                    <a href="https://twitter.com/hashtag/DevTools?src=hash&amp;ref_src=twsrc%5Etfw">#DevTools</a> 
+                    <a href="https://twitter.com/hashtag/DataOps?src=hash&amp;ref_src=twsrc%5Etfw">#DataOps</a> 
+                    <a href="https://twitter.com/hashtag/Observability?src=hash&amp;ref_src=twsrc%5Etfw">#Observability</a> 
+                    <a href="https://twitter.com/hashtag/meme?src=hash&amp;ref_src=twsrc%5Etfw">#meme</a> 
+                    <a href="https://t.co/2WNK3QoIty">pic.twitter.com/2WNK3QoIty</a>
+                  </p>
+                  &mdash; EIPsInsight (@EIPsInsight)
+                  <a href="https://twitter.com/EIPsInsight/status/1966577788900856045?ref_src=twsrc%5Etfw">
+                    September 12, 2025
+                  </a>
+                </blockquote>
+              </Box>
 
         {/* Tweet 1: Milestone 2 completed - Latest */}
         <Box mb={6} position="relative" width="100%" maxW="550px">
