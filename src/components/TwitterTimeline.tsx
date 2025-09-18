@@ -174,6 +174,26 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
+            {/* Tweet 0: EIP‑7918 Blob Base Fee Bound - Latest */}
+            <Box mb={6} position="relative" width="100%" maxW="550px">
+              <blockquote
+                className="twitter-tweet"
+                data-theme={useColorModeValue('light', 'dark')}
+                style={{ margin: '0 auto' }}
+              >
+                <p lang="en" dir="ltr">
+                  Why EIP‑7918?: Blob Base Fee Bound (FUSAKA -SFI)<br /><br />
+                  👉It sets a fair, predictable range for data “blob” fees relative to execution gas, protecting L2 rollups and regular users from fee spikes and manipulation.
+                  <a href="https://t.co/PX9cnZTPxm">https://t.co/PX9cnZTPxm</a><br /><br />
+                  👉It fits well after prior visual explainers… <a href="https://t.co/qHGqImCv9U">pic.twitter.com/qHGqImCv9U</a>
+                </p>
+                &mdash; EIPsInsight (@EIPsInsight)
+                <a href="https://twitter.com/EIPsInsight/status/1968715808537985210?ref_src=twsrc%5Etfw">
+                  September 18, 2025
+                </a>
+              </blockquote>
+            </Box>
+
               {/* Tweet 0: Glamsterdam headliners - Latest */}
               <Box mb={6} position="relative" width="100%" maxW="550px">
                 <blockquote
