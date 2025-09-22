@@ -18,6 +18,12 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
 
+    EMAIL_HOST: z.string().min(1),
+    EMAIL_PORT: z.string().min(1).transform((val) => parseInt(val, 10)),
+    EMAIL_USERNAME: z.string().min(1),
+    EMAIL_PASSWORD: z.string().min(1),
+    EMAIL_FROM: z.string(),
+
     RESEND_API_KEY: z.string(),
   },
   experimental__runtimeEnv: {
