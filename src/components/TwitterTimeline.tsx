@@ -174,6 +174,42 @@ const TwitterTimeline: React.FC = () => {
                   },
                 }}
               >
+            {/* Tweet: EIP-7934 Block Size Cap - Sept 22, 2025 */}
+            <Box mb={6} position="relative" width="100%" maxW="550px">
+              <blockquote
+                className="twitter-tweet"
+                data-theme={useColorModeValue('light', 'dark')}
+                style={{ margin: '0 auto' }}
+              >
+                <p lang="en" dir="ltr">
+                  EIP-7934: Why it matters<br /><br />
+                  By putting a hard cap on the byte size of Ethereum blocks, EIP-7934 protects the network against oversized blocks that could slow down propagation, cause invisible forks, or open denial-of-service risks. As Ethereum raises gas limits and scales… <a href="https://t.co/IzWHbn1l1V">pic.twitter.com/IzWHbn1l1V</a>
+                </p>
+                &mdash; EIPsInsight (@EIPsInsight)
+                <a href="https://twitter.com/EIPsInsight/status/1970181819040776675?ref_src=twsrc%5Etfw">
+                  September 22, 2025
+                </a>
+              </blockquote>
+            </Box>
+
+            {/* Tweet: Data Clarity with Nody - Sept 19, 2025 */}
+            <Box mb={6} position="relative" width="100%" maxW="550px">
+              <blockquote
+                className="twitter-tweet"
+                data-theme={useColorModeValue('light', 'dark')}
+                style={{ margin: '0 auto' }}
+              >
+                <p lang="en" dir="ltr">
+                  The secret to stress-free reviews? Data clarity with <a href="https://t.co/mXCeU990gC">https://t.co/mXCeU990gC</a>. Chill like Nody, track every move.
+                  <a href="https://twitter.com/hashtag/EIPsInsight?src=hash&amp;ref_src=twsrc%5Etfw">#EIPsInsight</a> <a href="https://twitter.com/hashtag/Ethereum?src=hash&amp;ref_src=twsrc%5Etfw">#Ethereum</a> <a href="https://twitter.com/hashtag/DevTools?src=hash&amp;ref_src=twsrc%5Etfw">#DevTools</a> <a href="https://twitter.com/hashtag/Dashboard?src=hash&amp;ref_src=twsrc%5Etfw">#Dashboard</a> <a href="https://twitter.com/hashtag/DataClarity?src=hash&amp;ref_src=twsrc%5Etfw">#DataClarity</a> <a href="https://t.co/PXXCRVqnMw">pic.twitter.com/PXXCRVqnMw</a>
+                </p>
+                &mdash; EIPsInsight (@EIPsInsight)
+                <a href="https://twitter.com/EIPsInsight/status/1969025204090237361?ref_src=twsrc%5Etfw">
+                  September 19, 2025
+                </a>
+              </blockquote>
+            </Box>
+
             {/* Tweet 0: EIP‑7918 Blob Base Fee Bound - Latest */}
             <Box mb={6} position="relative" width="100%" maxW="550px">
               <blockquote
