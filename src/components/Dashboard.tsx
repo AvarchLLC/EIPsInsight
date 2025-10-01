@@ -458,6 +458,15 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                     </Box>
                   </Box>
                   
+                  {/* EtherWorld Advertisement */}
+                  <Box
+                    mt={{ base: 6, lg: 8 }}
+                    mb={{ base: 4, lg: 6 }}
+                    px={{ base: 4, md: 6, lg: 8 }}
+                  >
+                    <EtherWorldAdCard />
+                  </Box>
+                  
                   <Box
                     borderRadius="md"
                     id="all"
