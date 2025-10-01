@@ -181,7 +181,9 @@ const originalData = [
   'EIP-7912',
   'EIP-7919'
 ], considered: [] , proposed: []},
-  { date: '2025-09-16', included: [], scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7910', 'EIP-7917', 'EIP-7918', 'EIP-7934', 'EIP-7935', 'EIP-7939', 'EIP-7951'], 
+  { date: '2025-09-16', 
+    included: [], 
+    scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7910', 'EIP-7917', 'EIP-7918', 'EIP-7934', 'EIP-7935', 'EIP-7939', 'EIP-7951'], 
     declined: [], considered: [] , proposed: []},
     
 ];
