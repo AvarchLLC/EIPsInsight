@@ -28,7 +28,9 @@ import AllLayout from '@/components/Layout';
 import FeedbackWidget from '@/components/FeedbackWidget';
 
 
-const REFRESH_INTERVAL_MS = 30_000;
+const REFRESH_INTERVAL_MS = 60_000; // Increased to 1 minute
+const MAX_CHART_DATA_POINTS = 50; // Limit chart data points
+const MAX_TRANSACTION_HISTORY = 20; // Limit transaction history
 
 const EthereumV2 = () => {
   const { colorMode } = useColorMode();
@@ -52,6 +54,7 @@ const EthereumV2 = () => {
   const [loadingBlocksTable, setLoadingBlocksTable] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const safeFetchJson = async (url: string, key: string) => {
     const res = await fetch(url);
@@ -59,40 +62,76 @@ const EthereumV2 = () => {
     return res.json();
   };
 
-  const fetchData = async (showToast = false) => {
-    setError(null);
-    setLoadingBlock(true);
-    setLoadingMetrics(true);
-    setLoadingCounts(true);
-    setLoadingTxs(true);
-    setLoadingBlocksTable(true);
-    try {
-      const price = await fetchEthPriceInUSD();
-      setEthPriceInUSD(price);
+  // Utility to limit array size and prevent memory issues
+  const limitArraySize = (arr: any[], maxSize: number) => {
+    return arr.slice(-maxSize); // Keep only the latest entries
+  };
 
-      const block = await getBlockDetails('latest', network === 'sepolia');
+  const fetchData = async (showToast = false) => {
+    if (isRefreshing) return; // Prevent concurrent fetches
+    setIsRefreshing(true);
+    setError(null);
+    
+    // Only show loading on initial load
+    if (!currentBlock) {
+      setLoadingBlock(true);
+      setLoadingMetrics(true);
+      setLoadingCounts(true);
+      setLoadingTxs(true);
+      setLoadingBlocksTable(true);
+    }
+    
+    try {
+      // Fetch price and current block first (lightweight)
+      const [price, block] = await Promise.all([
+        fetchEthPriceInUSD(),
+        getBlockDetails('latest', network === 'sepolia')
+      ]);
+      
+      setEthPriceInUSD(price);
       setCurrentBlock(block);
       setLoadingBlock(false);
 
+      // Fetch blocks with limited size
       const blocks = await fetchLast10Blocks(network === 'sepolia');
-      setLast10Blocks(blocks);
-      setRecentTransactions(blocks[0]?.transactions?.slice(0, 16) || []);
+      const limitedBlocks = limitArraySize(blocks, 10);
+      setLast10Blocks(limitedBlocks);
+      
+      // Process transactions from the latest block only to reduce memory usage
+      const latestBlockTxs = limitedBlocks[0]?.transactions || [];
+      setRecentTransactions(limitArraySize(latestBlockTxs, MAX_TRANSACTION_HISTORY));
       setLoadingTxs(false);
       setLoadingBlocksTable(false);
 
-      const [{ fees }, { gasBurnt }, { gasUsed }, { priorityFee }, { allBlocks }] = await Promise.all([
+      // Fetch chart data with timeout and size limits
+      const chartDataPromises = [
         safeFetchJson('/api/txtracker/fetchData', 'fees'),
         safeFetchJson('/api/txtracker/fetchData1', 'gasBurnt'),
         safeFetchJson('/api/txtracker/fetchData2', 'gasUsed'),
         safeFetchJson('/api/txtracker/fetchData3', 'priorityFee'),
         safeFetchJson('/api/txtracker/fetchData4', 'allBlocks')
-      ]);
+      ];
 
-      setTransactionFees(fees);
-      setGasBurntData(gasBurnt);
-      setGasUsed(gasUsed);
-      setPriorityFee(priorityFee);
-      setAllBlocks(allBlocks);
+      const results = await Promise.allSettled(chartDataPromises);
+      
+      // Process results safely
+      const [feesResult, gasBurntResult, gasUsedResult, priorityFeeResult, allBlocksResult] = results;
+      
+      if (feesResult.status === 'fulfilled') {
+        setTransactionFees(limitArraySize(feesResult.value.fees || [], MAX_CHART_DATA_POINTS));
+      }
+      if (gasBurntResult.status === 'fulfilled') {
+        setGasBurntData(limitArraySize(gasBurntResult.value.gasBurnt || [], MAX_CHART_DATA_POINTS));
+      }
+      if (gasUsedResult.status === 'fulfilled') {
+        setGasUsed(limitArraySize(gasUsedResult.value.gasUsed || [], MAX_CHART_DATA_POINTS));
+      }
+      if (priorityFeeResult.status === 'fulfilled') {
+        setPriorityFee(limitArraySize(priorityFeeResult.value.priorityFee || [], MAX_CHART_DATA_POINTS));
+      }
+      if (allBlocksResult.status === 'fulfilled') {
+        setAllBlocks(limitArraySize(allBlocksResult.value.allBlocks || [], MAX_CHART_DATA_POINTS));
+      }
 
       setLoadingMetrics(false);
       setLoadingCounts(false);
@@ -123,6 +162,8 @@ const EthereumV2 = () => {
         isClosable: true,
         position: 'bottom-right'
       });
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -131,11 +172,16 @@ const EthereumV2 = () => {
     fetchData();
   }, [network]);
 
-  // Auto refresh
+  // Auto refresh with better cleanup
   useEffect(() => {
-    const id = setInterval(() => fetchData(), REFRESH_INTERVAL_MS);
+    const id = setInterval(() => {
+      if (!isRefreshing) {
+        fetchData();
+      }
+    }, REFRESH_INTERVAL_MS);
+    
     return () => clearInterval(id);
-  }, [network]);
+  }, [network, isRefreshing]);
 
   const headerBar = (
     <Flex
@@ -185,10 +231,13 @@ const EthereumV2 = () => {
               size="sm"
               leftIcon={<RepeatIcon />}
               onClick={() => fetchData(true)}
+              isLoading={isRefreshing}
+              loadingText="Refreshing"
               bg="purple.600"
               _hover={{ bg: 'purple.500' }}
               color="white"
               borderRadius="full"
+              isDisabled={isRefreshing}
             >
               Refresh
             </Button>
@@ -201,6 +250,16 @@ const EthereumV2 = () => {
             >
               ETH ${ethPriceInUSD ? ethPriceInUSD.toFixed(2) : '—'}
             </Badge>
+            {isRefreshing && (
+              <Badge
+                variant="subtle"
+                colorScheme="blue"
+                fontSize="0.65rem"
+                px={2}
+              >
+                Updating...
+              </Badge>
+            )}
           </HStack>
         </Flex>
       </Flex>

@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import {
   Box,
   Text,
@@ -42,11 +43,16 @@ const RecentTransactions = ({
   ethPriceInUSD,
   timestamp,
   isLoading = false,
-  limit = 18
+  limit = 15 // Reduced default limit
 }: RecentTransactionsProps) => {
   const toast = useToast();
 
-  const data = (transactions || []).slice(0, limit);
+  // Memoize data processing to prevent unnecessary recalculations
+  const data = useMemo(() => {
+    if (!transactions || !Array.isArray(transactions)) return [];
+    return transactions.slice(0, limit).filter(tx => tx && tx.hash);
+  }, [transactions, limit]);
+  
   if (!isLoading && (!data || data.length === 0)) return null;
 
   const cardBg = useColorModeValue(
@@ -322,4 +328,4 @@ const RecentTransactions = ({
   );
 };
 
-export default RecentTransactions;
+export default React.memo(RecentTransactions);

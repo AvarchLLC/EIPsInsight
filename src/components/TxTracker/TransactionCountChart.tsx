@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Text,
@@ -47,17 +47,28 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
   const btnBg = useColorModeValue('whiteAlpha.600', 'whiteAlpha.200');
   const btnActive = useColorModeValue('purple.600', 'purple.500');
 
-  // Normalize & prepare data
+  // Normalize & prepare data with performance optimization
   const processed = useMemo(() => {
-    if (!Array.isArray(blocks)) return [];
-    return blocks
+    if (!Array.isArray(blocks) || blocks.length === 0) return [];
+    
+    // Limit data points to prevent performance issues
+    const maxPoints = 50;
+    let processedBlocks = blocks;
+    
+    if (blocks.length > maxPoints) {
+      const step = Math.ceil(blocks.length / maxPoints);
+      processedBlocks = blocks.filter((_, index) => index % step === 0);
+    }
+    
+    return processedBlocks
       .map(b => {
         // Defensive timestamp handling (seconds vs ms)
         const ts = Number(b.timestamp);
+        if (isNaN(ts)) return null;
+        
         const date = new Date(ts < 10_000_000_000 ? ts * 1000 : ts);
         return {
           time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            // Support different field naming: blockNumber OR number
           blockNumber: b.blockNumber ?? b.number,
           overall: b.total ?? (b.type0 ?? 0) + (b.type1 ?? 0) + (b.type2 ?? 0) + (b.type3 ?? 0) + (b.type4 ?? 0),
           type0: b.type0 ?? 0,
@@ -67,18 +78,23 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
           type4: b.type4 ?? 0,
         };
       })
+      .filter(Boolean) // Remove null entries
       .reverse(); // oldest→newest for slider
   }, [blocks]);
 
   const stackedData = useMemo(
     () =>
-      processed.flatMap(p => [
-        { time: p.time, blockNumber: p.blockNumber, type: 'type0', value: p.type0 },
-        { time: p.time, blockNumber: p.blockNumber, type: 'type1', value: p.type1 },
-        { time: p.time, blockNumber: p.blockNumber, type: 'type2', value: p.type2 },
-        { time: p.time, blockNumber: p.blockNumber, type: 'type3', value: p.type3 },
-        { time: p.time, blockNumber: p.blockNumber, type: 'type4', value: p.type4 },
-      ]),
+      processed.flatMap(p =>
+        p
+          ? [
+              { time: p.time, blockNumber: p.blockNumber, type: 'type0', value: p.type0 },
+              { time: p.time, blockNumber: p.blockNumber, type: 'type1', value: p.type1 },
+              { time: p.time, blockNumber: p.blockNumber, type: 'type2', value: p.type2 },
+              { time: p.time, blockNumber: p.blockNumber, type: 'type3', value: p.type3 },
+              { time: p.time, blockNumber: p.blockNumber, type: 'type4', value: p.type4 },
+            ]
+          : []
+      ),
     [processed]
   );
 
@@ -86,7 +102,7 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
     ? Object.values(TYPE_COLORS)
     : ['#6366F1'];
 
-  const chartConfig: any = {
+  const chartConfig: any = useMemo(() => ({
     data: transactionType === 'all' ? stackedData : processed,
     xField: 'time',
     yField: transactionType === 'all' ? 'value' : transactionType,
@@ -96,12 +112,12 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
       if (transactionType !== 'all') return '#6366F1';
       return TYPE_COLORS[item.type] || '#6366F1';
     },
-    columnStyle: { radius: [4, 4, 0, 0] },
+    columnStyle: { radius: [2, 2, 0, 0] }, // Reduced radius for better performance
     legend: {
       position: 'top',
       itemName: { style: { fill: useColorModeValue('#1f2937', '#e2e8f0') } }
     },
-    animation: { appear: { animation: 'scale-in-y', duration: 400 } },
+    animation: false, // Disable animation for better performance
     slider: processed.length > 12 ? {
       start: sliderValue,
       end: 1,
@@ -131,8 +147,8 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
         </div>`;
       }
     },
-    interactions: [{ type: 'active-region' }]
-  };
+    interactions: [] // Disable interactions for better performance
+  }), [transactionType, stackedData, processed, sliderValue]);
 
   const TYPES: TransactionType[] = ['all', 'overall', 'type0', 'type1', 'type2', 'type3', 'type4'];
 
@@ -236,4 +252,4 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
   );
 };
 
-export default TransactionCountChart;
+export default React.memo(TransactionCountChart);

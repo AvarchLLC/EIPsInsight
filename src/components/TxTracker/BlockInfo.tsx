@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import {
   Box,
   Text,
@@ -259,4 +260,4 @@ const BlockInfo = ({
   );
 };
 
-export default BlockInfo;
+export default React.memo(BlockInfo);
