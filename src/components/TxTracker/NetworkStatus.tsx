@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Text,
@@ -23,22 +23,14 @@ import {
   FaInfoCircle,
   FaSignal
 } from 'react-icons/fa';
+import { unifiedDataService, type LiveDataStore } from './UnifiedDataService';
 
 interface NetworkStatusProps {
-  currentBlock: any;
-  ethPriceInUSD: number;
-  averageGasPrice?: number;
-  networkUtilization?: number;
-  isConnected: boolean;
+  network?: 'mainnet' | 'sepolia';
 }
 
-const NetworkStatus = ({ 
-  currentBlock, 
-  ethPriceInUSD, 
-  averageGasPrice = 0,
-  networkUtilization = 0,
-  isConnected 
-}: NetworkStatusProps) => {
+const NetworkStatus = ({ network = 'mainnet' }: NetworkStatusProps) => {
+  const [liveData, setLiveData] = useState<LiveDataStore | null>(null);
   const cardBg = useColorModeValue(
     'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.8) 100%)',
     'linear-gradient(135deg, rgba(26,32,44,0.9) 0%, rgba(45,55,72,0.8) 100%)'
@@ -47,12 +39,19 @@ const NetworkStatus = ({
   const textColor = useColorModeValue('gray.800', 'gray.100');
   const subColor = useColorModeValue('gray.600', 'gray.400');
 
+  // Subscribe to unified data service
+  useEffect(() => {
+    const unsubscribe = unifiedDataService.subscribe((data) => {
+      setLiveData(data);
+    });
+    return unsubscribe;
+  }, []);
+
   // Calculate network congestion level
   const getNetworkStatus = () => {
-    if (!currentBlock) return { level: 'Unknown', color: 'gray', description: 'Loading...' };
+    if (!liveData?.latestBlock) return { level: 'Unknown', color: 'gray', description: 'Loading...' };
     
-    const gasUsed = Number(currentBlock.gasUsed || 0);
-    const gasLimit = Number(currentBlock.gasLimit || 1);
+    const { gasUsed, gasLimit } = liveData.latestBlock;
     const utilization = (gasUsed / gasLimit) * 100;
     
     if (utilization > 95) {
@@ -82,13 +81,18 @@ const NetworkStatus = ({
     }
   };
 
-  const networkStatus = getNetworkStatus();
-  const gasUsedPercent = currentBlock ? 
-    ((Number(currentBlock.gasUsed || 0) / Number(currentBlock.gasLimit || 1)) * 100).toFixed(1) : '0';
+  if (!liveData) return null;
 
-  // Estimate transaction cost in USD for a simple transfer
-  const estimatedTxCost = currentBlock && ethPriceInUSD ? 
-    ((Number(currentBlock.baseFeePerGas || 0) / 1e9) * 21000 * ethPriceInUSD / 1e9).toFixed(2) : '0';
+  const { latestBlock, ethPrice } = liveData;
+  const isConnected = !liveData.isLoading && latestBlock !== null;
+  const networkStatus = getNetworkStatus();
+  
+  const gasUsedPercent = latestBlock ? 
+    ((latestBlock.gasUsed / latestBlock.gasLimit) * 100).toFixed(1) : '0';
+
+  // Estimate transaction cost in USD for a simple transfer (21,000 gas)
+  const estimatedTxCost = latestBlock && ethPrice ? 
+    ((latestBlock.baseFeeGwei * 21000 / 1e9) * ethPrice).toFixed(2) : '0';
 
   return (
     <Box
@@ -188,7 +192,7 @@ const NetworkStatus = ({
             </Tooltip>
           </HStack>
           <StatNumber fontSize="lg" color={textColor}>
-            ${ethPriceInUSD.toLocaleString()}
+            ${ethPrice.toLocaleString()}
           </StatNumber>
           <StatHelpText fontSize="xs">
             Live market price
@@ -211,7 +215,7 @@ const NetworkStatus = ({
             </Tooltip>
           </HStack>
           <StatNumber fontSize="lg" color={textColor}>
-            {currentBlock ? (Number(currentBlock.baseFeePerGas || 0) / 1e9).toFixed(1) : '0'} gwei
+            {latestBlock ? latestBlock.baseFeeGwei.toFixed(1) : '0'} gwei
           </StatNumber>
           <StatHelpText fontSize="xs">
             Current base fee

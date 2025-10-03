@@ -12,7 +12,7 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { FaCube, FaClock, FaSignal } from 'react-icons/fa';
-import { getBlockDetails } from './ethereumService';
+import { unifiedDataService, type LiveDataStore } from './UnifiedDataService';
 
 interface LiveBlockIndicatorProps {
   network: 'mainnet' | 'sepolia';
@@ -20,9 +20,7 @@ interface LiveBlockIndicatorProps {
 }
 
 const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps) => {
-  const [currentBlock, setCurrentBlock] = useState<number | null>(null);
-  const [blockTime, setBlockTime] = useState<Date | null>(null);
-  const [isConnected, setIsConnected] = useState(true);
+  const [liveData, setLiveData] = useState<LiveDataStore | null>(null);
   const [timeAgo, setTimeAgo] = useState<string>('');
 
   const cardBg = useColorModeValue(
@@ -33,29 +31,11 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
   const textColor = useColorModeValue('gray.800', 'gray.100');
   const subColor = useColorModeValue('gray.600', 'gray.400');
 
-  // Fetch latest block number
-  const fetchLatestBlock = async () => {
-    try {
-      const blockData = await getBlockDetails('latest', network === 'sepolia');
-      const blockNumber = Number(blockData.blockNumber);
-      
-      if (blockNumber && blockNumber !== currentBlock) {
-        setCurrentBlock(blockNumber);
-        setBlockTime(new Date());
-        onBlockUpdate?.(blockNumber);
-      }
-      setIsConnected(true);
-    } catch (error) {
-      console.error('Failed to fetch latest block:', error);
-      setIsConnected(false);
-    }
-  };
-
   // Update time ago display
   const updateTimeAgo = () => {
-    if (blockTime) {
+    if (liveData?.lastUpdated) {
       const now = new Date();
-      const diff = Math.floor((now.getTime() - blockTime.getTime()) / 1000);
+      const diff = Math.floor((now.getTime() - liveData.lastUpdated.getTime()) / 1000);
       
       if (diff < 60) {
         setTimeAgo(`${diff}s ago`);
@@ -67,28 +47,35 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
     }
   };
 
-  // Initial fetch and setup intervals
+  // Subscribe to unified data service
   useEffect(() => {
-    fetchLatestBlock();
-    
-    // Check for new blocks every 12 seconds (Ethereum block time)
-    const blockInterval = setInterval(fetchLatestBlock, 12000);
-    
-    // Update time display every second
-    const timeInterval = setInterval(updateTimeAgo, 1000);
-    
-    return () => {
-      clearInterval(blockInterval);
-      clearInterval(timeInterval);
-    };
-  }, [network]);
+    const unsubscribe = unifiedDataService.subscribe((data) => {
+      setLiveData(data);
+      
+      // Notify parent component of block updates
+      if (data.latestBlock?.blockNumber) {
+        onBlockUpdate?.(data.latestBlock.blockNumber);
+      }
+    });
 
-  // Update time ago when block time changes
+    // Start auto-updating (this will also trigger initial fetch)
+    unifiedDataService.startAutoUpdate(network, 12000); // 12 seconds
+
+    return unsubscribe;
+  }, [network, onBlockUpdate]);
+
+  // Update time display every second
+  useEffect(() => {
+    const timeInterval = setInterval(updateTimeAgo, 1000);
+    return () => clearInterval(timeInterval);
+  }, [liveData?.lastUpdated]);
+
+  // Update time ago when data changes
   useEffect(() => {
     updateTimeAgo();
-  }, [blockTime]);
+  }, [liveData?.lastUpdated]);
 
-  if (currentBlock === null) {
+  if (!liveData?.latestBlock) {
     return (
       <Skeleton 
         height="80px" 
@@ -98,6 +85,9 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
       />
     );
   }
+
+  const { latestBlock } = liveData;
+  const isConnected = !liveData.isLoading && latestBlock !== null;
 
   return (
     <Box
@@ -145,7 +135,7 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
               LATEST BLOCK
             </Text>
             <Text fontSize="2xl" fontWeight="bold" color={textColor} lineHeight="1">
-              #{currentBlock?.toLocaleString()}
+              #{latestBlock.blockNumber.toLocaleString()}
             </Text>
             <HStack spacing={2}>
               <Badge 
@@ -159,7 +149,7 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
               </Badge>
               {timeAgo && (
                 <Tooltip 
-                  label={`Block mined at ${blockTime?.toLocaleTimeString()}`}
+                  label={`Last updated: ${liveData.lastUpdated?.toLocaleTimeString()}`}
                   hasArrow
                 >
                   <HStack spacing={1}>
