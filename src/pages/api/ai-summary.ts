@@ -32,8 +32,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         body: JSON.stringify({
           model,
-          message: `Summarize EIP ${eipNo} in 40–50 words:\n\n${content}`,
-          temperature: 0.3,
+          message: `You are an expert Ethereum developer and technical writer. Analyze EIP ${eipNo} and create a comprehensive, well-structured summary.
+
+**Instructions:**
+- Write 100-150 words in a clear, professional tone
+- Structure your response with clear sections
+- Use technical terms accurately but explain complex concepts
+- Focus on practical implications for the Ethereum ecosystem
+
+**Please cover:**
+1. **Purpose**: What specific problem or limitation does this EIP address?
+2. **Technical Approach**: What are the key mechanisms, changes, or implementations proposed?
+3. **Benefits & Impact**: How will this improve Ethereum for developers, users, or the network?
+4. **Significance**: Why is this EIP important for Ethereum's development?
+
+Use proper formatting with section headers. Be informative and precise.
+
+---
+EIP ${eipNo} Content:
+${content}`,
+          temperature: 0.4,
           chat_history: [],
           connectors: [],
         }),
@@ -42,7 +60,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const data = await response.json();
 
       if (response.ok) {
-        const summary = data.text || "No summary available.";
+        let summary = data.text || "No summary available.";
+        
+        // Clean up and format the summary
+        summary = summary
+          .trim()
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convert **text** to <strong>text</strong>
+          .replace(/\n\n/g, '</p><p>') // Convert double newlines to paragraphs
+          .replace(/^\d+\.\s+\*\*(.*?)\*\*:\s*/gm, '<strong>$1:</strong> ') // Format numbered sections
+          .replace(/^(Purpose|Key Changes|Impact):\s*/gm, '<strong>$1:</strong> '); // Format section headers
+        
+        // Wrap in paragraph tags if not already formatted
+        if (!summary.includes('<p>') && !summary.includes('<strong>')) {
+          summary = `<p>${summary}</p>`;
+        } else if (!summary.startsWith('<p>') && !summary.startsWith('<strong>')) {
+          summary = `<p>${summary}</p>`;
+        }
+        
         return res.status(200).json({ summary });
       } else {
         lastError = data;
