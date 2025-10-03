@@ -354,12 +354,12 @@ const EthereumV2 = () => {
                 {/* Network Status Overview */}
                 <NetworkStatus 
                   network={network}
+                  ethPriceInUSD={ethPriceInUSD}
                 />
 
                 {/* Current Block Info */}
                 <BlockInfo
-                  title="📦 Current Block Details"
-                  data={currentBlock}
+                  title="📦 Current Block Details (MongoDB Data)"
                   ethPriceInUSD={ethPriceInUSD}
                   isLoading={loadingBlock}
                 />

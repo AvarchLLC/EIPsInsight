@@ -12,7 +12,7 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { FaCube, FaClock, FaSignal } from 'react-icons/fa';
-import { unifiedDataService, type LiveDataStore } from './UnifiedDataService';
+import MongoDataService, { type LatestValues } from '@/services/MongoDataService';
 
 interface LiveBlockIndicatorProps {
   network: 'mainnet' | 'sepolia';
@@ -20,7 +20,7 @@ interface LiveBlockIndicatorProps {
 }
 
 const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps) => {
-  const [liveData, setLiveData] = useState<LiveDataStore | null>(null);
+  const [mongoData, setMongoData] = useState<LatestValues | null>(null);
   const [timeAgo, setTimeAgo] = useState<string>('');
 
   const cardBg = useColorModeValue(
@@ -33,9 +33,9 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
 
   // Update time ago display
   const updateTimeAgo = () => {
-    if (liveData?.lastUpdated) {
+    if (mongoData?.timestamp) {
       const now = new Date();
-      const diff = Math.floor((now.getTime() - liveData.lastUpdated.getTime()) / 1000);
+      const diff = Math.floor((now.getTime() - mongoData.timestamp.getTime()) / 1000);
       
       if (diff < 60) {
         setTimeAgo(`${diff}s ago`);
@@ -47,19 +47,22 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
     }
   };
 
-  // Subscribe to unified data service
+  // Subscribe to MongoDB data service
   useEffect(() => {
-    const unsubscribe = unifiedDataService.subscribe((data) => {
-      setLiveData(data);
+    const mongoService = MongoDataService.getInstance();
+    
+    const unsubscribe = mongoService.subscribe((data: LatestValues) => {
+      console.log('🔴 LiveBlockIndicator received MongoDB data:', data);
+      setMongoData(data);
       
       // Notify parent component of block updates
-      if (data.latestBlock?.blockNumber) {
-        onBlockUpdate?.(data.latestBlock.blockNumber);
+      if (data.blockNumber) {
+        onBlockUpdate?.(data.blockNumber);
       }
     });
 
     // Start auto-updating (this will also trigger initial fetch)
-    unifiedDataService.startAutoUpdate(network, 12000); // 12 seconds
+    mongoService.startAutoRefresh(12000); // 12 seconds
 
     return unsubscribe;
   }, [network, onBlockUpdate]);
@@ -68,14 +71,14 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
   useEffect(() => {
     const timeInterval = setInterval(updateTimeAgo, 1000);
     return () => clearInterval(timeInterval);
-  }, [liveData?.lastUpdated]);
+  }, [mongoData?.timestamp]);
 
   // Update time ago when data changes
   useEffect(() => {
     updateTimeAgo();
-  }, [liveData?.lastUpdated]);
+  }, [mongoData?.timestamp]);
 
-  if (!liveData?.latestBlock) {
+  if (!mongoData) {
     return (
       <Skeleton 
         height="80px" 
@@ -86,8 +89,7 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
     );
   }
 
-  const { latestBlock } = liveData;
-  const isConnected = !liveData.isLoading && latestBlock !== null;
+  const isConnected = !mongoData.isLoading && mongoData.blockNumber > 0;
 
   return (
     <Box
@@ -135,7 +137,7 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
               LATEST BLOCK
             </Text>
             <Text fontSize="2xl" fontWeight="bold" color={textColor} lineHeight="1">
-              #{latestBlock.blockNumber.toLocaleString()}
+              #{mongoData.blockNumber.toLocaleString()}
             </Text>
             <HStack spacing={2}>
               <Badge 
@@ -149,7 +151,7 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
               </Badge>
               {timeAgo && (
                 <Tooltip 
-                  label={`Last updated: ${liveData.lastUpdated?.toLocaleTimeString()}`}
+                  label={`Last updated: ${mongoData.timestamp?.toLocaleTimeString()}`}
                   hasArrow
                 >
                   <HStack spacing={1}>

@@ -23,14 +23,15 @@ import {
   FaInfoCircle,
   FaSignal
 } from 'react-icons/fa';
-import { unifiedDataService, type LiveDataStore } from './UnifiedDataService';
+import MongoDataService, { type LatestValues } from '@/services/MongoDataService';
 
 interface NetworkStatusProps {
   network?: 'mainnet' | 'sepolia';
+  ethPriceInUSD?: number;
 }
 
-const NetworkStatus = ({ network = 'mainnet' }: NetworkStatusProps) => {
-  const [liveData, setLiveData] = useState<LiveDataStore | null>(null);
+const NetworkStatus = ({ network = 'mainnet', ethPriceInUSD = 2500 }: NetworkStatusProps) => {
+  const [mongoData, setMongoData] = useState<LatestValues | null>(null);
   const cardBg = useColorModeValue(
     'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.8) 100%)',
     'linear-gradient(135deg, rgba(26,32,44,0.9) 0%, rgba(45,55,72,0.8) 100%)'
@@ -39,20 +40,23 @@ const NetworkStatus = ({ network = 'mainnet' }: NetworkStatusProps) => {
   const textColor = useColorModeValue('gray.800', 'gray.100');
   const subColor = useColorModeValue('gray.600', 'gray.400');
 
-  // Subscribe to unified data service
+  // Subscribe to MongoDB data service
   useEffect(() => {
-    const unsubscribe = unifiedDataService.subscribe((data) => {
-      setLiveData(data);
+    const mongoService = MongoDataService.getInstance();
+    
+    const unsubscribe = mongoService.subscribe((data: LatestValues) => {
+      console.log('🟢 NetworkStatus received MongoDB data:', data);
+      setMongoData(data);
     });
+
     return unsubscribe;
   }, []);
 
   // Calculate network congestion level
   const getNetworkStatus = () => {
-    if (!liveData?.latestBlock) return { level: 'Unknown', color: 'gray', description: 'Loading...' };
+    if (!mongoData) return { level: 'Unknown', color: 'gray', description: 'Loading...' };
     
-    const { gasUsed, gasLimit } = liveData.latestBlock;
-    const utilization = (gasUsed / gasLimit) * 100;
+    const utilization = mongoData.gasUsedPercentage;
     
     if (utilization > 95) {
       return { 
@@ -81,18 +85,16 @@ const NetworkStatus = ({ network = 'mainnet' }: NetworkStatusProps) => {
     }
   };
 
-  if (!liveData) return null;
+  if (!mongoData) return null;
 
-  const { latestBlock, ethPrice } = liveData;
-  const isConnected = !liveData.isLoading && latestBlock !== null;
+  const isConnected = !mongoData.isLoading && mongoData.blockNumber > 0;
   const networkStatus = getNetworkStatus();
   
-  const gasUsedPercent = latestBlock ? 
-    ((latestBlock.gasUsed / latestBlock.gasLimit) * 100).toFixed(1) : '0';
+  const gasUsedPercent = mongoData.gasUsedPercentage.toString();
 
   // Estimate transaction cost in USD for a simple transfer (21,000 gas)
-  const estimatedTxCost = latestBlock && ethPrice ? 
-    ((latestBlock.baseFeeGwei * 21000 / 1e9) * ethPrice).toFixed(2) : '0';
+  const estimatedTxCost = mongoData && ethPriceInUSD ? 
+    ((mongoData.baseFeeGwei * 21000 / 1e9) * ethPriceInUSD).toFixed(2) : '0';
 
   return (
     <Box
@@ -192,7 +194,7 @@ const NetworkStatus = ({ network = 'mainnet' }: NetworkStatusProps) => {
             </Tooltip>
           </HStack>
           <StatNumber fontSize="lg" color={textColor}>
-            ${ethPrice.toLocaleString()}
+            ${ethPriceInUSD.toLocaleString()}
           </StatNumber>
           <StatHelpText fontSize="xs">
             Live market price
@@ -215,7 +217,7 @@ const NetworkStatus = ({ network = 'mainnet' }: NetworkStatusProps) => {
             </Tooltip>
           </HStack>
           <StatNumber fontSize="lg" color={textColor}>
-            {latestBlock ? latestBlock.baseFeeGwei.toFixed(1) : '0'} gwei
+            {mongoData ? mongoData.baseFeeGwei.toFixed(1) : '0'} gwei
           </StatNumber>
           <StatHelpText fontSize="xs">
             Current base fee
