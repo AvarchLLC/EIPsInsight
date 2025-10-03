@@ -27,6 +27,7 @@ import LiveBlockIndicator from '@/components/TxTracker/LiveBlockIndicator';
 import NetworkStatus from '@/components/TxTracker/NetworkStatus';
 import ExplainerPanel from '@/components/TxTracker/ExplainerPanel';
 import DataDebugPanel from '@/components/TxTracker/DataDebugPanel';
+import MongoDataDebug from '@/components/TxTracker/MongoDataDebug';
 import { getBlockDetails, fetchLast10Blocks, fetchEthPriceInUSD } from '@/components/TxTracker/ethereumService';
 import { RingLoader } from 'react-spinners';
 import TransactionCountChart from '@/components/TxTracker/TransactionCountChart';
@@ -346,6 +347,9 @@ const EthereumV2 = () => {
           
           {/* Debug Panel - Remove this in production */}
           <DataDebugPanel />
+          
+          {/* MongoDB Debug Panel - Remove this in production */}
+          <MongoDataDebug />
 
           {(loadingBlock && loadingMetrics && loadingCounts && loadingTxs && loadingBlocksTable)
             ? blockSkeleton

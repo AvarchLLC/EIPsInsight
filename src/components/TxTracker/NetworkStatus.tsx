@@ -42,12 +42,27 @@ const NetworkStatus = ({ network = 'mainnet', ethPriceInUSD = 2500 }: NetworkSta
 
   // Subscribe to MongoDB data service
   useEffect(() => {
+    console.log('🔄 NetworkStatus initializing MongoDB service...');
     const mongoService = MongoDataService.getInstance();
+    
+    // Test direct API call first
+    fetch('/api/txtracker/fetchData')
+      .then(res => res.json())
+      .then(data => {
+        console.log('🧪 Direct API test result:', data);
+      })
+      .catch(err => {
+        console.error('❌ Direct API test failed:', err);
+      });
     
     const unsubscribe = mongoService.subscribe((data: LatestValues) => {
       console.log('🟢 NetworkStatus received MongoDB data:', data);
       setMongoData(data);
     });
+
+    // Start auto-refresh to ensure data is fetched
+    console.log('🚀 Starting MongoDB service...');
+    mongoService.startAutoRefresh(30000);
 
     return unsubscribe;
   }, []);
@@ -85,7 +100,59 @@ const NetworkStatus = ({ network = 'mainnet', ethPriceInUSD = 2500 }: NetworkSta
     }
   };
 
-  if (!mongoData) return null;
+  // Show loading state instead of null
+  if (!mongoData) {
+    console.log('⏳ NetworkStatus: No MongoDB data yet, showing loading state');
+    return (
+      <Box
+        bg={cardBg}
+        backdropFilter="blur(10px)"
+        border="2px solid"
+        borderColor={borderColor}
+        borderRadius="2xl"
+        p={6}
+        boxShadow={useColorModeValue(
+          '0 4px 20px rgba(34, 197, 94, 0.15)',
+          '0 4px 20px rgba(34, 197, 94, 0.25)'
+        )}
+        mb={6}
+      >
+        <Flex align="center" justify="space-between" mb={6}>
+          <HStack spacing={3}>
+            <Flex
+              w="50px"
+              h="50px"
+              bg="gray.400"
+              borderRadius="lg"
+              align="center"
+              justify="center"
+            >
+              <Icon as={FaNetworkWired} color="white" boxSize={6} />
+            </Flex>
+            <VStack align="start" spacing={0}>
+              <Text fontSize="xl" fontWeight="bold" color={textColor}>
+                🔄 Loading Network Status...
+              </Text>
+              <Text fontSize="sm" color={subColor}>
+                Fetching data from MongoDB API routes
+              </Text>
+            </VStack>
+          </HStack>
+          
+          <HStack spacing={2}>
+            <Icon as={FaSignal} boxSize={4} color="yellow.400" />
+            <Badge colorScheme="yellow" variant="solid" fontSize="sm" px={3} py={1} borderRadius="full">
+              CONNECTING...
+            </Badge>
+          </HStack>
+        </Flex>
+        
+        <Text fontSize="sm" color={subColor} textAlign="center">
+          📡 Connecting to MongoDB data sources...
+        </Text>
+      </Box>
+    );
+  }
 
   const isConnected = !mongoData.isLoading && mongoData.blockNumber > 0;
   const networkStatus = getNetworkStatus();

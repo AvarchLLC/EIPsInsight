@@ -58,10 +58,10 @@ class MongoDataService {
       
       const [feesRes, gasBurntRes, gasUsedRes, priorityFeeRes, allBlocksRes] = await Promise.allSettled([
         fetch('/api/txtracker/fetchData'),
-        fetch('/api/fetchData1'),
-        fetch('/api/fetchData2'),
-        fetch('/api/fetchData3'),
-        fetch('/api/fetchData4')
+        fetch('/api/txtracker/fetchData1'),
+        fetch('/api/txtracker/fetchData2'),
+        fetch('/api/txtracker/fetchData3'),
+        fetch('/api/txtracker/fetchData4')
       ]);
 
       if (feesRes.status === 'fulfilled' && feesRes.value.ok) {
