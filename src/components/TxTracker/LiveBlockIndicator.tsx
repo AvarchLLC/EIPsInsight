@@ -37,7 +37,7 @@ const LiveBlockIndicator = ({ network, onBlockUpdate }: LiveBlockIndicatorProps)
   const fetchLatestBlock = async () => {
     try {
       const blockData = await getBlockDetails('latest', network === 'sepolia');
-      const blockNumber = Number(blockData.number || blockData.blockNumber);
+      const blockNumber = Number(blockData.blockNumber);
       
       if (blockNumber && blockNumber !== currentBlock) {
         setCurrentBlock(blockNumber);
