@@ -32,23 +32,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         body: JSON.stringify({
           model,
-          message: `You are an expert Ethereum developer and technical writer. Analyze EIP ${eipNo} and create a comprehensive, well-structured summary.
+          message: `Analyze EIP ${eipNo} and create a concise, well-structured summary in 80-120 words.
 
-**Instructions:**
-- Write 100-150 words in a clear, professional tone
-- Structure your response with clear sections
-- Use technical terms accurately but explain complex concepts
-- Focus on practical implications for the Ethereum ecosystem
+**Format your response with these sections:**
 
-**Please cover:**
-1. **Purpose**: What specific problem or limitation does this EIP address?
-2. **Technical Approach**: What are the key mechanisms, changes, or implementations proposed?
-3. **Benefits & Impact**: How will this improve Ethereum for developers, users, or the network?
-4. **Significance**: Why is this EIP important for Ethereum's development?
+**Purpose**
+What problem does this EIP solve? (1-2 sentences)
 
-Use proper formatting with section headers. Be informative and precise.
+**Technical Approach** 
+Key changes or mechanisms introduced (2-3 key points)
 
----
+**Impact**
+How it benefits developers, users, or the network (1-2 sentences)
+
+**Significance**
+Why this EIP matters for Ethereum (1 sentence)
+
+Keep it concise, technical but accessible. Use bullet points for multiple items.
+
 EIP ${eipNo} Content:
 ${content}`,
           temperature: 0.4,
@@ -62,20 +63,30 @@ ${content}`,
       if (response.ok) {
         let summary = data.text || "No summary available.";
         
-        // Clean up and format the summary
+        // Clean up and format the summary for better presentation
         summary = summary
           .trim()
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convert **text** to <strong>text</strong>
-          .replace(/\n\n/g, '</p><p>') // Convert double newlines to paragraphs
-          .replace(/^\d+\.\s+\*\*(.*?)\*\*:\s*/gm, '<strong>$1:</strong> ') // Format numbered sections
-          .replace(/^(Purpose|Key Changes|Impact):\s*/gm, '<strong>$1:</strong> '); // Format section headers
+          // Remove redundant headers and markdown-style formatting
+          .replace(/^###\s*/gm, '') // Remove ### headers
+          .replace(/^\*\*(.+?)\*\*$/gm, '<h4 class="font-semibold text-blue-400 mt-4 mb-2">$1</h4>') // Convert **Header** to styled headers
+          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-blue-300">$1</strong>') // Convert **text** to colored strong
+          .replace(/^\d+\.\s+\*\*(.*?)\*\*:\s*/gm, '<div class="ml-4 mb-2"><strong class="text-green-400">$1:</strong> ') // Format numbered sections
+          .replace(/^-\s+\*\*(.*?)\*\*:\s*/gm, '<div class="ml-4 mb-1"><strong class="text-purple-400">$1:</strong> ') // Format bullet points
+          .replace(/\n\n/g, '</div></p><p class="mb-3">') // Convert double newlines to paragraphs with spacing
+          .replace(/\n/g, ' ') // Convert single newlines to spaces
+          .replace(/^(Purpose|Technical Approach|Benefits & Impact|Significance):\s*/gm, '<h4 class="font-semibold text-blue-400 mt-4 mb-2">$1</h4><p class="mb-3">'); // Format main section headers
         
-        // Wrap in paragraph tags if not already formatted
-        if (!summary.includes('<p>') && !summary.includes('<strong>')) {
-          summary = `<p>${summary}</p>`;
-        } else if (!summary.startsWith('<p>') && !summary.startsWith('<strong>')) {
-          summary = `<p>${summary}</p>`;
+        // Ensure proper structure
+        if (!summary.startsWith('<h4>') && !summary.startsWith('<p>')) {
+          summary = `<p class="mb-3">${summary}</p>`;
         }
+        
+        // Clean up any malformed tags
+        summary = summary
+          .replace(/<\/div><\/p>/g, '</div>')
+          .replace(/<p class="mb-3"><\/p>/g, '')
+          .replace(/\s+/g, ' ') // Clean up multiple spaces
+          .trim();
         
         return res.status(200).json({ summary });
       } else {

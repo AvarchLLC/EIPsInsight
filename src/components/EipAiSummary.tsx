@@ -59,9 +59,17 @@ export function EipAiSummary({ eipNo, content }: { eipNo: string; content: strin
         >
           <CardContent className="text-sm text-gray-200">
             {loading ? (
-              <p className="italic text-gray-400">Generating summary...</p>
+              <div className="flex items-center gap-2 text-gray-400">
+                <div className="animate-spin w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full"></div>
+                <span>Generating AI summary...</span>
+              </div>
+            ) : summary ? (
+              <div 
+                className="prose prose-invert prose-sm max-w-none [&>h4]:text-blue-400 [&>h4]:font-semibold [&>h4]:mt-4 [&>h4]:mb-2 [&>p]:mb-3 [&>div]:mb-2 [&_strong]:text-blue-300"
+                dangerouslySetInnerHTML={{ __html: summary }}
+              />
             ) : (
-              <p className="whitespace-pre-line">{summary}</p>
+              <p className="text-gray-400">❌ No summary available.</p>
             )}
           </CardContent>
         </motion.div>
