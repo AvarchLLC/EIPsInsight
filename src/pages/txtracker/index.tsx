@@ -26,8 +26,6 @@ import RecentBlocks from '@/components/TxTracker/RecentBlocks';
 import LiveBlockIndicator from '@/components/TxTracker/LiveBlockIndicator';
 import NetworkStatus from '@/components/TxTracker/NetworkStatus';
 import ExplainerPanel from '@/components/TxTracker/ExplainerPanel';
-import DataDebugPanel from '@/components/TxTracker/DataDebugPanel';
-import MongoDataDebug from '@/components/TxTracker/MongoDataDebug';
 import { getBlockDetails, fetchLast10Blocks, fetchEthPriceInUSD } from '@/components/TxTracker/ethereumService';
 import { RingLoader } from 'react-spinners';
 import TransactionCountChart from '@/components/TxTracker/TransactionCountChart';
@@ -344,12 +342,6 @@ const EthereumV2 = () => {
 
           {/* Beginner-Friendly Explanation Panel */}
           <ExplainerPanel />
-          
-          {/* Debug Panel - Remove this in production */}
-          <DataDebugPanel />
-          
-          {/* MongoDB Debug Panel - Remove this in production */}
-          <MongoDataDebug />
 
           {(loadingBlock && loadingMetrics && loadingCounts && loadingTxs && loadingBlocksTable)
             ? blockSkeleton
@@ -359,13 +351,6 @@ const EthereumV2 = () => {
                 <NetworkStatus 
                   network={network}
                   ethPriceInUSD={ethPriceInUSD}
-                />
-
-                {/* Current Block Info */}
-                <BlockInfo
-                  title="📦 Current Block Details (MongoDB Data)"
-                  ethPriceInUSD={ethPriceInUSD}
-                  isLoading={loadingBlock}
                 />
 
                 {/* Transaction Fee Trends */}

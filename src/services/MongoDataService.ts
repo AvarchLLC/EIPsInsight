@@ -54,8 +54,6 @@ class MongoDataService {
     this.isRefreshing = true;
     
     try {
-      console.log('🔄 Fetching MongoDB data from API routes...');
-      
       const [feesRes, gasBurntRes, gasUsedRes, priorityFeeRes, allBlocksRes] = await Promise.allSettled([
         fetch('/api/txtracker/fetchData'),
         fetch('/api/txtracker/fetchData1'),
@@ -67,37 +65,29 @@ class MongoDataService {
       if (feesRes.status === 'fulfilled' && feesRes.value.ok) {
         const feesData = await feesRes.value.json();
         this.data.fees = feesData.fees || [];
-        console.log('📊 Fees data:', this.data.fees.length, 'points');
       }
 
       if (gasBurntRes.status === 'fulfilled' && gasBurntRes.value.ok) {
         const gasBurntData = await gasBurntRes.value.json();
         this.data.gasBurnt = gasBurntData.gasBurnt || [];
-        console.log('🔥 Gas burnt data:', this.data.gasBurnt.length, 'points');
       }
 
       if (gasUsedRes.status === 'fulfilled' && gasUsedRes.value.ok) {
         const gasUsedData = await gasUsedRes.value.json();
         this.data.gasUsed = gasUsedData.gasUsed || [];
-        console.log('⛽ Gas used data:', this.data.gasUsed.length, 'points');
       }
 
       if (priorityFeeRes.status === 'fulfilled' && priorityFeeRes.value.ok) {
         const priorityFeeData = await priorityFeeRes.value.json();
         this.data.priorityFee = priorityFeeData.priorityFee || [];
-        console.log('💰 Priority fee data:', this.data.priorityFee.length, 'points');
       }
 
       if (allBlocksRes.status === 'fulfilled' && allBlocksRes.value.ok) {
         const allBlocksData = await allBlocksRes.value.json();
         this.data.allBlocks = allBlocksData.allBlocks || [];
-        console.log('📦 All blocks data:', this.data.allBlocks.length, 'blocks');
       }
 
       this.data.lastUpdated = Date.now();
-      const latestValues = this.getLatestValues();
-      console.log('✅ Latest values calculated:', latestValues);
-      
       this.notifySubscribers();
       
     } catch (error) {
@@ -191,8 +181,6 @@ class MongoDataService {
 
   // Start auto-refresh
   startAutoRefresh(intervalMs = 30000) {
-    console.log('🚀 Starting MongoDB data auto-refresh every', intervalMs/1000, 'seconds');
-    
     // Initial fetch
     this.fetchAllData();
     

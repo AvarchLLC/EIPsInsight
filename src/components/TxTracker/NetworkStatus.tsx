@@ -40,28 +40,15 @@ const NetworkStatus = ({ network = 'mainnet', ethPriceInUSD = 2500 }: NetworkSta
   const textColor = useColorModeValue('gray.800', 'gray.100');
   const subColor = useColorModeValue('gray.600', 'gray.400');
 
-  // Subscribe to MongoDB data service
+  // Subscribe to data service
   useEffect(() => {
-    console.log('🔄 NetworkStatus initializing MongoDB service...');
     const mongoService = MongoDataService.getInstance();
     
-    // Test direct API call first
-    fetch('/api/txtracker/fetchData')
-      .then(res => res.json())
-      .then(data => {
-        console.log('🧪 Direct API test result:', data);
-      })
-      .catch(err => {
-        console.error('❌ Direct API test failed:', err);
-      });
-    
     const unsubscribe = mongoService.subscribe((data: LatestValues) => {
-      console.log('🟢 NetworkStatus received MongoDB data:', data);
       setMongoData(data);
     });
 
-    // Start auto-refresh to ensure data is fetched
-    console.log('🚀 Starting MongoDB service...');
+    // Start auto-refresh
     mongoService.startAutoRefresh(30000);
 
     return unsubscribe;

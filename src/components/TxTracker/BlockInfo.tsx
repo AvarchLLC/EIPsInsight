@@ -69,7 +69,6 @@ const BlockInfo = ({
     const mongoService = MongoDataService.getInstance();
     
     const unsubscribe = mongoService.subscribe((data: LatestValues) => {
-      console.log('📦 BlockInfo received MongoDB data:', data);
       setMongoData(data);
     });
 
