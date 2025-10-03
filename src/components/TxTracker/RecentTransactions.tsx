@@ -139,10 +139,10 @@ const RecentTransactions = ({
         </Flex>
         <Box>
           <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="bold">
-            Recent Transactions
+            🔄 Live Transaction Feed
           </Text>
           <Text fontSize="xs" opacity={0.85}>
-            Latest {isLoading ? '' : data.length} (age vs block time)
+            See money moving on Ethereum right now - Latest {isLoading ? '' : data.length} transactions
           </Text>
         </Box>
       </Flex>

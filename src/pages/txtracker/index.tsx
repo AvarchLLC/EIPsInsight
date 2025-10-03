@@ -5,8 +5,10 @@ import {
   Box,
   Text,
   useColorMode,
+  useColorModeValue,
   Button,
   HStack,
+  VStack,
   Select,
   Icon,
   useToast,
@@ -21,6 +23,9 @@ import BlockInfo from '@/components/TxTracker/BlockInfo';
 import TransactionFeeChart from '@/components/TxTracker/TransactionFeeChart';
 import RecentTransactions from '@/components/TxTracker/RecentTransactions';
 import RecentBlocks from '@/components/TxTracker/RecentBlocks';
+import LiveBlockIndicator from '@/components/TxTracker/LiveBlockIndicator';
+import NetworkStatus from '@/components/TxTracker/NetworkStatus';
+import ExplainerPanel from '@/components/TxTracker/ExplainerPanel';
 import { getBlockDetails, fetchLast10Blocks, fetchEthPriceInUSD } from '@/components/TxTracker/ethereumService';
 import { RingLoader } from 'react-spinners';
 import TransactionCountChart from '@/components/TxTracker/TransactionCountChart';
@@ -184,86 +189,113 @@ const EthereumV2 = () => {
   }, [network, isRefreshing]);
 
   const headerBar = (
-    <Flex
-      direction={{ base: 'column', md: 'row' }}
-      align="stretch"
-      gap={4}
-      mb={6}
-      mt={4}
-      px={{ base: 2, md: 0 }}
-    >
+    <Box mb={6} mt={4} px={{ base: 2, md: 0 }}>
+      {/* Main Title Section */}
       <Flex
-        flex="1"
-        p={5}
-        borderRadius="2xl"
+        direction={{ base: 'column', lg: 'row' }}
+        gap={6}
+        align="stretch"
       >
-        <Flex direction="column" w="100%" gap={3}>
-          <Flex align="center" gap={3} flexWrap="wrap">
-            <Icon as={MdNetworkCheck} boxSize={6} color="purple.400" />
-            <Text fontSize="xl" fontWeight="bold">
-              Ethereum Transaction Tracker
-            </Text>
-            <Badge colorScheme="purple" variant="subtle" fontSize=".65rem" px={2}>
-              Live
-            </Badge>
-            {lastUpdated && (
-              <Text fontSize="xs" opacity={0.65}>
-                Updated {lastUpdated.toLocaleTimeString()}
-              </Text>
-            )}
-          </Flex>
-          <Text fontSize="sm">
-            Real‑time execution metrics: fees, usage, transaction mix, recent blocks & txs.
-          </Text>
-          <HStack spacing={3} flexWrap="wrap">
-            <Select
-              size="sm"
-              w="140px"
-              value={network}
-              onChange={e => setNetwork(e.target.value as any)}
-              bg={colorMode === 'light' ? 'whiteAlpha.700' : 'whiteAlpha.200'}
-              backdropFilter="blur(6px)"
-            >
-              <option value="mainnet">Mainnet</option>
-              <option value="sepolia">Sepolia</option>
-            </Select>
-            <Button
-              size="sm"
-              leftIcon={<RepeatIcon />}
-              onClick={() => fetchData(true)}
-              isLoading={isRefreshing}
-              loadingText="Refreshing"
-              bg="purple.600"
-              _hover={{ bg: 'purple.500' }}
-              color="white"
-              borderRadius="full"
-              isDisabled={isRefreshing}
-            >
-              Refresh
-            </Button>
-            <Badge
-              variant="solid"
-              colorScheme="pink"
-              fontSize="1rem"
-              borderRadius="full"
-              px={3}
-            >
-              ETH ${ethPriceInUSD ? ethPriceInUSD.toFixed(2) : '—'}
-            </Badge>
-            {isRefreshing && (
-              <Badge
-                variant="subtle"
-                colorScheme="blue"
-                fontSize="0.65rem"
-                px={2}
-              >
-                Updating...
+        {/* Title and Description */}
+        <Box
+          flex="2"
+          p={6}
+          bg={useColorModeValue(
+            'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.05) 100%)',
+            'linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(139,92,246,0.1) 100%)'
+          )}
+          borderRadius="2xl"
+          border="1px solid"
+          borderColor={useColorModeValue('purple.200', 'purple.700')}
+        >
+          <Flex direction="column" gap={4}>
+            <Flex align="center" gap={3} flexWrap="wrap">
+              <Icon as={MdNetworkCheck} boxSize={8} color="purple.500" />
+              <VStack align="start" spacing={1}>
+                <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold" color={useColorModeValue('gray.800', 'gray.100')}>
+                  🔍 Ethereum Live Monitor
+                </Text>
+                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
+                  Track real-time blockchain activity, costs, and network health
+                </Text>
+              </VStack>
+              <Badge colorScheme="green" variant="solid" fontSize=".7rem" px={3} py={1} borderRadius="full">
+                ⚡ LIVE DATA
               </Badge>
-            )}
-          </HStack>
-        </Flex>
+            </Flex>
+            
+            <Text fontSize="sm" color={useColorModeValue('gray.700', 'gray.300')} lineHeight="1.6">
+              📊 This dashboard shows you <strong>what's happening on Ethereum right now</strong> - 
+              how much transactions cost, how busy the network is, and what types of activities are happening. 
+              Perfect for understanding blockchain activity in simple terms!
+            </Text>
+
+            <HStack spacing={3} flexWrap="wrap">
+              <Select
+                size="sm"
+                w="140px"
+                value={network}
+                onChange={e => setNetwork(e.target.value as any)}
+                bg={colorMode === 'light' ? 'whiteAlpha.700' : 'whiteAlpha.200'}
+                backdropFilter="blur(6px)"
+                borderRadius="lg"
+              >
+                <option value="mainnet">Mainnet</option>
+                <option value="sepolia">Sepolia</option>
+              </Select>
+              <Button
+                size="sm"
+                leftIcon={<RepeatIcon />}
+                onClick={() => fetchData(true)}
+                isLoading={isRefreshing}
+                loadingText="Refreshing"
+                bg="purple.600"
+                _hover={{ bg: 'purple.500' }}
+                color="white"
+                borderRadius="full"
+                isDisabled={isRefreshing}
+              >
+                Refresh Data
+              </Button>
+              <Badge
+                variant="solid"
+                colorScheme="pink"
+                fontSize="1rem"
+                borderRadius="full"
+                px={3}
+              >
+                ETH ${ethPriceInUSD ? ethPriceInUSD.toFixed(2) : '—'}
+              </Badge>
+              {lastUpdated && (
+                <Badge variant="outline" colorScheme="gray" fontSize="xs" px={2} py={1} borderRadius="md">
+                  Updated: {lastUpdated.toLocaleTimeString()}
+                </Badge>
+              )}
+              {isRefreshing && (
+                <Badge
+                  variant="subtle"
+                  colorScheme="blue"
+                  fontSize="0.65rem"
+                  px={2}
+                >
+                  🔄 Updating...
+                </Badge>
+              )}
+            </HStack>
+          </Flex>
+        </Box>
+
+        {/* Live Block Indicator */}
+        <Box flex="1" minW="300px">
+          <LiveBlockIndicator 
+            network={network} 
+            onBlockUpdate={(blockNumber) => {
+              // Optional: Could trigger a refresh when new block arrives
+            }}
+          />
+        </Box>
       </Flex>
-    </Flex>
+    </Box>
   );
 
   const blockSkeleton = (
@@ -308,32 +340,49 @@ const EthereumV2 = () => {
             </Box>
           )}
 
+          {/* Beginner-Friendly Explanation Panel */}
+          <ExplainerPanel />
+
           {(loadingBlock && loadingMetrics && loadingCounts && loadingTxs && loadingBlocksTable)
             ? blockSkeleton
             : (
               <Box>
+                {/* Network Status Overview */}
+                <NetworkStatus 
+                  currentBlock={currentBlock}
+                  ethPriceInUSD={ethPriceInUSD}
+                  isConnected={!error}
+                />
+
+                {/* Current Block Info */}
                 <BlockInfo
-                  title="Current Block"
+                  title="📦 Current Block Details"
                   data={currentBlock}
                   ethPriceInUSD={ethPriceInUSD}
                   isLoading={loadingBlock}
                 />
 
+                {/* Transaction Fee Trends */}
                 <TransactionFeeChart
                   data={transactionFees}
                   data1={priorityFee}
                   data2={gasUsed}
                   data3={gasBurntData}
-                  // totalBurntLastHour={calculateTotalBurntLastHour(gasBurntData)}
                   ethPriceInUSD={ethPriceInUSD}
                 />
+
+                {/* Network Activity Monitor */}
                 <TransactionCountChart blocks={allBlocks}/>
+
+                {/* Live Transaction Feed */}
                 <RecentTransactions
                   transactions={recentTransactions}
                   timestamp={last10Blocks[0]?.timestamp ?? currentBlock?.timestamp ?? 0}
                   ethPriceInUSD={ethPriceInUSD}
                   isLoading={loadingTxs}
                 />
+
+                {/* Recent Blocks Table */}
                 <RecentBlocks
                   blocks={last10Blocks}
                   ethPriceInUSD={ethPriceInUSD}

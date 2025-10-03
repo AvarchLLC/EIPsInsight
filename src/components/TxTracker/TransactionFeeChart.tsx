@@ -277,10 +277,10 @@ const TransactionFeeChart = ({
         </Flex>
         <Box flex="1 1 auto" minW="220px">
           <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
-            Transaction Fee Metrics
+            💰 Transaction Cost Monitor
           </Text>
           <Text fontSize="xs" opacity={0.85}>
-            Live trends: base, priority, gas used & burnt
+            How much does it cost to use Ethereum? Track fees and gas usage over time
           </Text>
         </Box>
         <Flex gap={2} flexWrap="wrap">

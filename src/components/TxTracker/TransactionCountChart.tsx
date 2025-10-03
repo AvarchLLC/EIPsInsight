@@ -189,10 +189,10 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
         </Flex>
         <Box flex="1 1 auto" minW="220px">
           <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="bold">
-            Transactions Trend
+            📈 Network Activity Monitor
           </Text>
           <Text fontSize="xs" opacity={0.85}>
-            Per block distribution by EIP‑2718 / EIP‑1559 types
+            How busy is Ethereum? Track transaction volume and types in real-time
           </Text>
         </Box>
         <HStack spacing={2} flexWrap="wrap">
@@ -245,7 +245,7 @@ const TransactionCountChart = ({ blocks }: TransactionCountChartProps) => {
         </Box>
         <Divider mt={5} mb={3} opacity={0.5} />
         <Text fontSize="xs" color={subColor}>
-          Type0: Legacy | Type1: (Reserved / None) | Type2: EIP‑1559 | Type3/4: Other emerging types (if present)
+          💡 <strong>Transaction Types Explained:</strong> Type0 = Old-style transactions | Type2 = Modern flexible-fee transactions (most common) | Type1 = Special access lists | Type3/4 = Newer experimental types
         </Text>
       </Box>
     </Box>

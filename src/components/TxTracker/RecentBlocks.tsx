@@ -106,10 +106,10 @@ const RecentBlocks = ({
         </Flex>
         <Box>
           <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="bold">
-            Recent Blocks
+            📚 Recent Block History
           </Text>
           <Text fontSize="xs" opacity={0.85}>
-            Live execution layer snapshot (last {data.length || 0})
+            Each block = a new "page" in Ethereum's ledger (last {data.length || 0} blocks)
           </Text>
         </Box>
       </Flex>
