@@ -49,10 +49,10 @@ import AllLayout from '@/components/Layout';
 interface Feedback {
   _id: string;
   type: 'like' | 'dislike';
-  page: string;
+  page?: string; // Optional since older entries may not have this
   comment?: string;
-  userAgent: string;
-  ip: string;
+  userAgent?: string; // Optional since older entries may not have this
+  ip?: string; // Optional since older entries may not have this
   createdAt: string;
 }
 
@@ -118,7 +118,7 @@ const FeedbackDashboard = () => {
     const csvContent = [
       'Type,Page,Comment,User Agent,IP,Created At',
       ...data.feedbacks.map(f => 
-        `${f.type},"${f.page || 'N/A'}","${f.comment || 'N/A'}","${f.userAgent}","${f.ip}","${f.createdAt}"`
+        `${f.type},"${f.page || 'N/A'}","${f.comment || 'N/A'}","${f.userAgent || 'N/A'}","${f.ip || 'N/A'}","${f.createdAt}"`
       )
     ].join('\n');
     
@@ -135,13 +135,15 @@ const FeedbackDashboard = () => {
     return new Date(dateString).toLocaleString();
   };
 
-  const getPageName = (url: string) => {
-    if (!url || url === 'Unknown') return 'Unknown';
+  const getPageName = (url: string | undefined | null) => {
+    if (!url || url === 'Unknown' || url === 'undefined') return 'Unknown Page';
     try {
       const pathname = new URL(url).pathname;
-      return pathname.split('/').pop() || pathname;
+      const pageName = pathname.split('/').pop() || pathname;
+      return pageName === '/' || pageName === '' ? 'Home' : pageName;
     } catch {
-      return url.substring(0, 50) + (url.length > 50 ? '...' : '');
+      // If URL parsing fails, return a shortened version of the string
+      return url.length > 50 ? url.substring(0, 50) + '...' : url;
     }
   };
 
@@ -356,7 +358,7 @@ const FeedbackDashboard = () => {
                           </Badge>
                         </Td>
                         <Td>
-                          <Tooltip label={feedback.page}>
+                          <Tooltip label={feedback.page || 'Unknown Page'}>
                             <Text fontSize="sm" noOfLines={1} maxW="200px">
                               {getPageName(feedback.page)}
                             </Text>
@@ -368,13 +370,15 @@ const FeedbackDashboard = () => {
                           </Text>
                         </Td>
                         <Td>
-                          <Tooltip label={feedback.userAgent}>
+                          <Tooltip label={feedback.userAgent || 'Unknown Browser'}>
                             <Text fontSize="xs" noOfLines={1} maxW="150px">
-                              {feedback.userAgent.substring(0, 30)}...
+                              {feedback.userAgent ? 
+                                feedback.userAgent.substring(0, 30) + '...' : 
+                                'Unknown Browser'}
                             </Text>
                           </Tooltip>
                         </Td>
-                        <Td fontSize="sm">{feedback.ip}</Td>
+                        <Td fontSize="sm">{feedback.ip || 'Unknown IP'}</Td>
                         <Td fontSize="sm">{formatDate(feedback.createdAt)}</Td>
                       </Tr>
                     ))}
