@@ -20,12 +20,14 @@ import {
   useDisclosure,
   VStack,
   Portal,
+  HStack,
 } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import { GitHub } from "react-feather";
 import Logo from "@/components/Logo";
 import SearchBox from "./SearchBox";
+import UserAvatarMenu from "@/components/UserAvatarMenu";
 import { useSidebarStore } from "@/stores/useSidebarStore";
 interface NavItem {
   label: string;
@@ -477,25 +479,41 @@ const Navbar: React.FC = () => {
             </Box>
 
             <Flex ml={10}>
-              <Stack
-                flex={{ base: 1, md: 0 }}
-                justify={"flex-end"}
-                direction={"row"}
-                spacing={6}
-                mr={6}
-                pr={4}
-              >
-                {/* <SearchBox/> */}
+              <HStack spacing={4} align="center">
+                {/* GitHub Link */}
+                <NextLink href="https://github.com/Avarch-org/EIPUI" passHref>
+                  <IconButton
+                    aria-label="GitHub Repository"
+                    variant="outline"
+                    colorScheme="blue"
+                    size="md"
+                    rounded="full"
+                    icon={<GitHub />}
+                    _hover={{ transform: "scale(1.05)" }}
+                    transition="all 0.2s"
+                  />
+                </NextLink>
+
+                {/* Color Mode Toggle */}
                 <IconButton
-                  aria-label="Mode Change"
+                  aria-label="Toggle Color Mode"
                   variant="outline"
                   colorScheme="blue"
-                  size="lg"
+                  size="md"
                   rounded="full"
                   icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
                   onClick={toggleColorMode}
+                  _hover={{ transform: "scale(1.05)" }}
+                  transition="all 0.2s"
                 />
-              </Stack>
+
+                {/* User Avatar Menu */}
+                <UserAvatarMenu 
+                  size="md" 
+                  showLabel={true}
+                  variant="expanded"
+                />
+              </HStack>
             </Flex>
           </Flex>
         </Box>
@@ -542,32 +560,32 @@ const Navbar: React.FC = () => {
             </Box>
 
             <Box>
-              <Flex ml={10}>
-                <Stack
-                  flex={{ base: 1, md: 0 }}
-                  justify={"flex-end"}
-                  direction={"row"}
-                  spacing={3}
-                >
-                  <NextLink href="https://github.com/Avarch-org/EIPUI" passHref>
-                    <IconButton
-                      aria-label="github"
-                      variant={"outline"}
-                      colorScheme="blue"
-                      size="md"
-                      icon={<GitHub />}
-                    />
-                  </NextLink>
+              <HStack spacing={2}>
+                {/* User Avatar Menu - Mobile Compact */}
+                <UserAvatarMenu 
+                  size="sm" 
+                  showLabel={false}
+                  variant="compact"
+                />
+
+                <NextLink href="https://github.com/Avarch-org/EIPUI" passHref>
                   <IconButton
-                    aria-label="Mode Change"
-                    variant="outline"
+                    aria-label="github"
+                    variant={"outline"}
                     colorScheme="blue"
                     size="md"
-                    icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
-                    onClick={toggleColorMode}
+                    icon={<GitHub />}
                   />
-                </Stack>
-              </Flex>
+                </NextLink>
+                <IconButton
+                  aria-label="Mode Change"
+                  variant="outline"
+                  colorScheme="blue"
+                  size="md"
+                  icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
+                  onClick={toggleColorMode}
+                />
+              </HStack>
             </Box>
           </Flex>
           <div className="lg:hidden md:block sm:block block">

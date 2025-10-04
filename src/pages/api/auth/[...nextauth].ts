@@ -14,8 +14,33 @@ import type { Session } from "next-auth";
 interface CustomUser extends User {
   password?: string;
   tier?: string;
+  role?: string;
   image?: string | null;
   walletAddress?: string | null;
+  isVerified?: boolean;
+  isActive?: boolean;
+  profile?: {
+    bio?: string;
+    website?: string;
+    twitter?: string;
+    github?: string;
+    linkedin?: string;
+    location?: string;
+    company?: string;
+    isPublic: boolean;
+    joinedAt: Date;
+    lastActive: Date;
+  };
+  stats?: {
+    blogsCreated: number;
+    feedbackGiven: number;
+    lastLogin: Date;
+  };
+  settings?: {
+    emailNotifications: boolean;
+    theme: 'light' | 'dark' | 'system';
+    language: string;
+  };
 }
 
 interface NonceDocument {
@@ -174,49 +199,137 @@ export const authOptions: NextAuthOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
 
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+
+  debug: process.env.NODE_ENV === 'development',
+
   pages: {
     signIn: "/signin",
     signOut: "/",
-    error: "/auth/error",
+    error: "/auth/error?error=JWTSessionError", // Redirect to error with JWT flag
     verifyRequest: "/auth/verify-request",
     newUser: "/",
   },
 
-  // Add this to your existing authOptions
-callbacks: {
-  async jwt({ token, user }) {
-    if (user) {
-      token.id = user.id;
-      token.name = user.name;
-      token.email = user.email;
-      token.image = user.image;
-      token.tier = user.tier || DEFAULT_USER_TIER;
-      token.walletAddress = user.walletAddress;
+  callbacks: {
+    async jwt({ token, user, account }) {
+      try {
+        if (user) {
+          const client = await connectToDatabase();
+          const db = client.db();
+          const usersCollection = db.collection("users");
 
-      // Fallback for OAuth: if no emailVerified, set it
-      if (!("emailVerified" in user) || user.emailVerified === null) {
-        const client = await connectToDatabase();
-        const db = client.db();
-        await db.collection("users").updateOne(
-          { email: user.email },
-          { $set: { emailVerified: new Date() } }
-        );
+          // Find or create user with enhanced schema
+          let dbUser = await usersCollection.findOne({ 
+            $or: [
+              { email: user.email },
+              { walletAddress: user.walletAddress }
+            ]
+          });
+
+        if (!dbUser) {
+          // Create new user with complete schema
+          const newUser = {
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            walletAddress: user.walletAddress || null,
+            role: 'user',
+            tier: DEFAULT_USER_TIER,
+            isVerified: !!user.email,
+            isActive: true,
+            profile: {
+              bio: '',
+              website: '',
+              twitter: '',
+              github: account?.provider === 'github' ? user.email : '',
+              linkedin: '',
+              location: '',
+              company: '',
+              isPublic: false,
+              joinedAt: new Date(),
+              lastActive: new Date()
+            },
+            stats: {
+              blogsCreated: 0,
+              feedbackGiven: 0,
+              lastLogin: new Date()
+            },
+            settings: {
+              emailNotifications: true,
+              theme: 'system' as const,
+              language: 'en'
+            },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            emailVerified: user.email ? new Date() : null
+          };
+
+          const result = await usersCollection.insertOne(newUser);
+          dbUser = { ...newUser, _id: result.insertedId };
+        } else {
+          // Update last login
+          await usersCollection.updateOne(
+            { _id: dbUser._id },
+            { 
+              $set: { 
+                'stats.lastLogin': new Date(),
+                'profile.lastActive': new Date(),
+                updatedAt: new Date()
+              }
+            }
+          );
+        }
+
+        // Populate token with enhanced user data
+        token.id = dbUser._id.toString();
+        token.name = dbUser.name;
+        token.email = dbUser.email;
+        token.image = dbUser.image;
+        token.role = dbUser.role || 'user';
+        token.tier = dbUser.tier || DEFAULT_USER_TIER;
+        token.walletAddress = dbUser.walletAddress;
+        token.isVerified = dbUser.isVerified || false;
+        token.isActive = dbUser.isActive !== false;
+        token.profile = dbUser.profile || {};
+        token.stats = dbUser.stats || {};
+        token.settings = dbUser.settings || {};
       }
-    }
-    return token;
-  },
+      return token;
+      } catch (error) {
+        console.error('JWT callback error:', error);
+        // Return token as-is if there's an error to prevent session loss
+        return token;
+      }
+    },
 
-    
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.name = token.name as string;
-        session.user.email = token.email as string;
-        session.user.image = token.image as string | null | undefined;
-        session.user.tier = token.tier as string || DEFAULT_USER_TIER;
-        session.user.walletAddress = token.walletAddress as string | undefined;
+      try {
+        if (session.user && token) {
+          session.user = {
+            ...session.user,
+            id: token.id as string,
+            name: token.name as string,
+            email: token.email as string,
+            image: token.image as string | null,
+            role: token.role as string || 'user',
+            tier: token.tier as string || DEFAULT_USER_TIER,
+            walletAddress: token.walletAddress as string | null,
+            isVerified: token.isVerified as boolean || false,
+            isActive: token.isActive as boolean !== false,
+            profile: token.profile as any || {},
+            stats: token.stats as any || {},
+            settings: token.settings as any || {}
+          };
+        }
+        return session;
+      } catch (error) {
+        console.error('Session callback error:', error);
+        return session;
       }
-      return session;
     },
   },
 

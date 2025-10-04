@@ -8,13 +8,11 @@ import {
   BookOpen,
   Search,
   Settings,
-  UserCircle2,
   ChevronRight,
   ChevronLeft,
   ChevronDown,
 } from "lucide-react";
-import { signOut } from 'next-auth/react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IconButton, Tooltip } from "@chakra-ui/react";
 import { Variants } from "framer-motion";
 import {
@@ -41,22 +39,16 @@ import {
   FiTool,
 } from "react-icons/fi";
 import {
-  Avatar,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuDivider,
-  useToast,
+
 } from "@chakra-ui/react";
-import { useRouter } from "next/router";
+
 
 
 
 import { chakra, shouldForwardProp } from "@chakra-ui/react";
 import { isValidMotionProp } from "framer-motion";
 import { Rajdhani } from "next/font/google";
-import { useUserStore } from "@/stores/userStore";
+
 
 // Extend chakra with motion.div
 const MotionDiv = chakra(motion.div, {
@@ -74,14 +66,7 @@ const mont = Rajdhani({
 });
 
 
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  image: string;
-  tier: string;
-  walletAddress?: string;
-}
+
 
 
 function generateYearlyInsights() {
@@ -374,8 +359,7 @@ export default function AppSidebar() {
   const { isCollapsed, toggleCollapse } = useSidebarStore();
   const activeSection = useSidebarStore((s) => s.activeSection);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const { user, setUser, clearUser } = useUserStore();
+
   const [flyoutMenu, setFlyoutMenu] = useState<{
     isOpen: boolean;
     item: any;
@@ -385,9 +369,7 @@ export default function AppSidebar() {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const bottomItems = [
-    // { icon: Search, label: "Search", href: "/search" },
-    // { icon: UserCircle2, label: "Profile", href: "/profile" },
-    { icon: Settings, label: "Settings", href: "/" },
+    { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
   const bg = useColorModeValue("gray.100", "gray.900");
@@ -424,15 +406,9 @@ export default function AppSidebar() {
     }
   }, [activeSection]);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUserData(JSON.parse(storedUser));
-    }
-  }, []);
 
-  const toast = useToast();
-  const router = useRouter();
+
+
 
   // Add click handler for sidebar expansion/collapse toggle
   const handleSidebarClick = (e: React.MouseEvent) => {
@@ -486,58 +462,7 @@ export default function AppSidebar() {
     }
   }, [isCollapsed]);
 
-  const handleRefresh = async () => {
-    if (!user) return;
 
-    try {
-      const response = await fetch('/api/GetUserStatus');
-      const data = await response.json();
-
-      const updatedUser = {
-        ...user,
-        tier: data.tier || user.tier || 'Free',
-      };
-
-      setUser(updatedUser);
-      toast({
-        title: 'Status refreshed',
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-      });
-    } catch (error) {
-      toast({
-        title: 'Refresh failed',
-        description: 'Could not fetch latest status',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      clearUser();
-      await signOut({ redirect: false });
-
-      toast({
-        title: 'Logged out successfully',
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-      });
-
-      setTimeout(() => router.push('/signin'), 500);
-    } catch (error) {
-      toast({
-        title: 'Logout failed',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
 
 
   return (
@@ -686,103 +611,58 @@ export default function AppSidebar() {
         ))}
       </VStack>
 
+      {/* Bottom Items - Settings */}
       <Box mt={4} px={isCollapsed ? 1 : 4} transition="all 0.3s ease">
-        {!isCollapsed ? (
-  <Menu placement="top" isLazy>
-    <MenuButton
-      as={HStack}
-      spacing={3}
-      align="center"
-      px={3}
-      py={3}
-      w="full"
-      _hover={{ 
-        bg: useColorModeValue("gray.100", "gray.700"),
-        transform: "translateY(-1px)",
-        boxShadow: "sm"
-      }}
-      borderRadius="xl"
-      transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-      justify="flex-start"
-      cursor="pointer"
-      border="1px solid"
-      borderColor={useColorModeValue("gray.200", "gray.600")}
-    >
-      <Avatar
-        size="sm"
-        name={userData?.name}
-        src={userData?.image || undefined}
-        transition="all 0.2s"
-        _hover={{ transform: "scale(1.1)" }}
-      />
-      <Box flex="1" textAlign="left">
-        <Text fontSize="sm" fontWeight="semibold" noOfLines={1}>
-          {userData?.name || "Profile"}
-        </Text>
-        <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")} noOfLines={1}>
-          {userData?.tier || "Free Tier"}
-        </Text>
-      </Box>
-      <Box as={ChevronDown} size="16px" opacity={0.7} />
-    </MenuButton>
-
-    <MenuList zIndex={1000} borderRadius="xl" border="1px solid" borderColor={useColorModeValue("gray.200", "gray.600")}>
-      <MenuItem 
-        onClick={() => router.push("/profile")}
-        borderRadius="lg"
-        _hover={{ bg: useColorModeValue("blue.50", "blue.900") }}
-      >
-        👤 Profile
-      </MenuItem>
-      <MenuItem 
-        onClick={handleRefresh}
-        borderRadius="lg"
-        _hover={{ bg: useColorModeValue("green.50", "green.900") }}
-      >
-        🔄 Refresh Status
-      </MenuItem>
-      <MenuDivider />
-      <MenuItem 
-        onClick={handleLogout}
-        borderRadius="lg"
-        _hover={{ bg: useColorModeValue("red.50", "red.900") }}
-      >
-        🚪 Logout
-      </MenuItem>
-    </MenuList>
-  </Menu>
-) : (
-  <Tooltip label={userData?.name || "Profile"} placement="right" hasArrow>
-    <Box
-      px={2}
-      py={2}
-      w="full"
-      display="flex"
-      justifyContent="center"
-      _hover={{ 
-        bg: useColorModeValue("gray.100", "gray.700"),
-        transform: "scale(1.05)"
-      }}
-      borderRadius="xl"
-      transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-      cursor="pointer"
-      onClick={() => router.push("/profile")}
-      border="1px solid transparent"
-      _active={{ transform: "scale(0.95)" }}
-    >
-      <Avatar
-        size="sm"
-        name={userData?.name}
-        src={userData?.image || undefined}
-        transition="all 0.2s"
-        _hover={{ boxShadow: "lg" }}
-      />
-    </Box>
-  </Tooltip>
-        )}
-      </Box>
-
-    </Box>
+        {bottomItems.map((item, index) => (
+          <motion.div
+            key={item.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0,
+              transition: { 
+                delay: 0.1 * index + 0.5,
+                duration: 0.3,
+                ease: [0.4, 0, 0.2, 1]
+              }
+            }}
+          >
+            <Tooltip 
+              label={item.label} 
+              placement="right" 
+              isDisabled={!isCollapsed}
+              hasArrow
+            >
+              <Box
+                as="a"
+                href={item.href}
+                display="flex"
+                alignItems="center"
+                px={isCollapsed ? 2 : 3}
+                py={2}
+                mb={1}
+                borderRadius="lg"
+                textDecoration="none"
+                color={useColorModeValue("gray.700", "gray.200")}
+                _hover={{
+                  bg: useColorModeValue("gray.100", "gray.700"),
+                  color: useColorModeValue("blue.600", "blue.300"),
+                  transform: "translateX(2px)"
+                }}
+                transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                cursor="pointer"
+              >
+                <Box as={item.icon} size="20px" />
+                {!isCollapsed && (
+                  <Text ml={3} fontSize="sm" fontWeight="medium">
+                    {item.label}
+                  </Text>
+                )}
+              </Box>
+            </Tooltip>
+          </motion.div>
+        ))}
+      </Box>    </Box>
 
     {/* Flyout Menu */}
     <AnimatePresence>
@@ -851,7 +731,6 @@ export function SidebarItem({
   const itemHash = item.href ? getHrefHash(item.href) : item.id || null;
   const isLeafNode = !item.children || item.children.length === 0;
   const isActive = isLeafNode && itemHash === activeSection;
-
   const router = useRouter();
 
 
