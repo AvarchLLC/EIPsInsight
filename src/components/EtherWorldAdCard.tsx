@@ -25,7 +25,6 @@ const EtherWorldAdCard: React.FC = () => {
       boxShadow="sm"
       p={3}
       w="100%"
-      maxW="800px"
       mx="auto"
       cursor="pointer"
       onClick={handleClick}

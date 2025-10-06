@@ -4,7 +4,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import ForceGraph3D, { ForceGraphMethods } from 'react-force-graph-3d';
 import * as THREE from 'three';
 import SpriteText from 'three-spritetext';
-import { Button, IconButton, VStack } from '@chakra-ui/react';
+import { Button, IconButton, HStack, Box, useColorModeValue, Text } from '@chakra-ui/react';
 import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
 
 const networkUpgradesData = {
@@ -214,6 +214,12 @@ const networkUpgradesData = {
 const EIP3DGraph = () => {
   const fgRef = React.useRef<ForceGraphMethods<any, any> | undefined>(undefined);
   const [showResetZoom, setShowResetZoom] = useState(true);
+  const [hoveredNetwork, setHoveredNetwork] = useState<string | null>(null);
+  
+  // Theme-aware colors
+  const legendBg = useColorModeValue('rgba(255, 255, 255, 0.95)', 'rgba(26, 32, 44, 0.95)');
+  const legendText = useColorModeValue('black', 'white');
+  const legendShadow = useColorModeValue('0 2px 10px rgba(0,0,0,0.2)', '0 2px 10px rgba(0,0,0,0.5)');
 
   const handleZoomIn = () => {
     if (fgRef.current) {
@@ -280,7 +286,7 @@ const EIP3DGraph = () => {
   const colorScale = useMemo(() => {
     const scale = new Map<string, string>();
     const palette = [
-      '#FF6B6B', '#4ECDC4', '#FFD93D', '#6A0572', '#1B9CFC',
+      '#FF6B6B', '#4ECDC4', '#FFD93D', '#6A0572', '#1B9C  FC',
       '#FF9F1C', '#2EC4B6', '#E71D36', '#A8DADC', '#457B9D',
     ];
     uniqueGroups.forEach((group, index) => {
@@ -290,50 +296,61 @@ const EIP3DGraph = () => {
   }, [uniqueGroups]);
 
   return (
-    <div style={{ height: '100vh', position: 'relative' }}>
+    <div style={{ position: 'relative', height: '550px' }}>
       {/* Legend */}
-      <div style={{
-        position: 'absolute',
-        top: 20,
-        right: 20,
-        background: 'rgba(255, 255, 255, 0.9)',
-        padding: '12px',
-        borderRadius: '10px',
-        fontSize: '0.9rem',
-        boxShadow: '0 0 10px rgba(0,0,0,0.3)',
-        zIndex: 10,
-        maxWidth: '200px',
-        color: 'black' // Added this line to set all text to black
-      }}>
-        <strong style={{ color: 'black' }}>Network Upgrades</strong>
-        <ul style={{
-          listStyle: 'none',
-          padding: 0,
-          marginTop: 10,
-          color: 'black' // Ensures list items inherit black color
-        }}>
+      <Box
+        position="absolute"
+        top="20px"
+        right="20px"
+        bg={legendBg}
+        p="12px"
+        borderRadius="10px"
+        fontSize="0.9rem"
+        boxShadow={legendShadow}
+        zIndex={10}
+        maxW="200px"
+      >
+        <Text fontWeight="bold" color={legendText}>Network Upgrades</Text>
+        <Box as="ul" listStyleType="none" p={0} mt={2}>
           {uniqueGroups.map((group) => (
-            <li key={group} style={{
-              marginBottom: 6,
-              color: 'black' // Explicit black for list items
-            }}>
-              <span style={{
-                display: 'inline-block',
-                width: 12,
-                height: 12,
-                borderRadius: '50%',
-                backgroundColor: colorScale.get(group),
-                marginRight: 8,
-              }} />
+            <Box 
+              as="li" 
+              key={group} 
+              mb={1.5} 
+              color={legendText}
+              cursor="pointer"
+              p={2}
+              borderRadius="md"
+              bg={hoveredNetwork === group ? useColorModeValue('gray.100', 'gray.700') : 'transparent'}
+              transition="all 0.2s ease"
+              _hover={{
+                bg: useColorModeValue('gray.100', 'gray.700'),
+                transform: 'scale(1.02)'
+              }}
+              onMouseEnter={() => setHoveredNetwork(group)}
+              onMouseLeave={() => setHoveredNetwork(null)}
+            >
+              <Box
+                as="span"
+                display="inline-block"
+                w="12px"
+                h="12px"
+                borderRadius="50%"
+                bg={colorScale.get(group)}
+                mr={2}
+                boxShadow={hoveredNetwork === group ? `0 0 8px ${colorScale.get(group)}` : 'none'}
+                transform={hoveredNetwork === group ? 'scale(1.2)' : 'scale(1)'}
+                transition="all 0.2s ease"
+              />
               {group}
-            </li>
+            </Box>
           ))}
-        </ul>
-      </div>
+        </Box>
+      </Box>
 
 
       {/* Zoom Controls */}
-      <VStack position="absolute" bottom={4} right={4} zIndex={10} spacing={2}>
+      <HStack position="absolute" bottom={4} right={4} zIndex={10} spacing={2}>
         {
           <>
             <IconButton
@@ -362,15 +379,14 @@ const EIP3DGraph = () => {
             </Button>
           </>
         }
-      </VStack>
-
+      </HStack>
 
       <div
         style={{
           margin: '0 auto',
           width: '90%',
           maxWidth: '900px',
-          height: '450px', // 2:1 ratio (width:height)
+          height: '450px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -380,18 +396,41 @@ const EIP3DGraph = () => {
           ref={fgRef}
           graphData={graphData}
           nodeThreeObject={(node: any) => {
-            const color = colorScale.get(node.group) || '#999';
+            const baseColor = colorScale.get(node.group) || '#999';
+            const isHighlighted = hoveredNetwork === node.group;
+            const isOtherNetwork = hoveredNetwork && hoveredNetwork !== node.group;
+            
+            // Adjust sphere properties based on hover state
+            const sphereRadius = isHighlighted ? 8 : 6;
+            const sphereColor = isOtherNetwork ? '#666' : baseColor;
+            const sphereOpacity = isOtherNetwork ? 0.3 : 1;
 
             // Create sphere mesh
-            const geometry = new THREE.SphereGeometry(6, 16, 16);
-            const material = new THREE.MeshBasicMaterial({ color });
+            const geometry = new THREE.SphereGeometry(sphereRadius, 16, 16);
+            const material = new THREE.MeshBasicMaterial({ 
+              color: sphereColor, 
+              transparent: true, 
+              opacity: sphereOpacity 
+            });
             const sphere = new THREE.Mesh(geometry, material);
+
+            // Add glow effect for highlighted nodes
+            if (isHighlighted) {
+              const glowGeometry = new THREE.SphereGeometry(sphereRadius * 1.3, 16, 16);
+              const glowMaterial = new THREE.MeshBasicMaterial({
+                color: baseColor,
+                transparent: true,
+                opacity: 0.3
+              });
+              const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+              sphere.add(glow);
+            }
 
             // Create sprite label
             const sprite = new SpriteText(node.label);
-            sprite.color = '#ffffff';
+            sprite.color = isOtherNetwork ? '#888' : '#ffffff';
             sprite.backgroundColor = 'transparent';
-            sprite.textHeight = 4;
+            sprite.textHeight = isHighlighted ? 5 : 4;
             sprite.position.set(0, 10, 0);
 
             // Combine into a group
@@ -402,10 +441,34 @@ const EIP3DGraph = () => {
             return group;
           }}
 
-          nodeLabel={(node) => `${node.label} (Upgrade: ${node.upgradeName || 'N/A'})`}
-          linkColor={() => '#999'}
-          linkWidth={2}
-          linkDirectionalParticles={2}
+          nodeLabel={(node) => `EIP-${node.label} (Network: ${node.upgradeName || 'N/A'})`}
+          linkColor={(link) => {
+            const sourceNode = graphData.nodes.find(n => n.id === link.source);
+            const targetNode = graphData.nodes.find(n => n.id === link.target);
+            const isRelatedToHovered = hoveredNetwork && (
+              sourceNode?.group === hoveredNetwork || 
+              targetNode?.group === hoveredNetwork
+            );
+            return isRelatedToHovered ? (colorScale.get(hoveredNetwork) || '#999') : '#999';
+          }}
+          linkWidth={(link) => {
+            const sourceNode = graphData.nodes.find(n => n.id === link.source);
+            const targetNode = graphData.nodes.find(n => n.id === link.target);
+            const isRelatedToHovered = hoveredNetwork && (
+              sourceNode?.group === hoveredNetwork || 
+              targetNode?.group === hoveredNetwork
+            );
+            return isRelatedToHovered ? 4 : 2;
+          }}
+          linkDirectionalParticles={(link) => {
+            const sourceNode = graphData.nodes.find(n => n.id === link.source);
+            const targetNode = graphData.nodes.find(n => n.id === link.target);
+            const isRelatedToHovered = hoveredNetwork && (
+              sourceNode?.group === hoveredNetwork || 
+              targetNode?.group === hoveredNetwork
+            );
+            return isRelatedToHovered ? 4 : 2;
+          }}
           linkDirectionalParticleWidth={2}
           linkOpacity={0.6}
           linkDirectionalArrowLength={3}
