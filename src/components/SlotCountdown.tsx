@@ -191,272 +191,286 @@ const SlotCountdown: React.FC = () => {
   const epochsRemaining = networks[network].targetepoch - currentEpoch;
 
   const renderSlotsView = () => (
-    <>
-      {/* First Row: 18 Boxes */}
-      <HStack spacing={1} wrap="wrap" justify="center" mb={2}>
-        {firstRowSlots?.map((slot) => {
-          const isProcessed = slot < currentSlot;
-          const isCurrent = slot === currentSlot;
-          const epochOfSlot = Math.floor(slot / 32);
-          const blockOfSlot = currentBlock - (currentSlot - slot);
-  
-          return (
-            <Tooltip
-              key={slot}
-              label={isProcessed ? `Epoch: ${epochOfSlot}, Block: ${blockOfSlot}` : undefined}
-              hasArrow
-              placement="top"
-              bg="gray.700"
-              color="white"
-            >
-              <Box
-                w={{ base: "45px", md: "55px" }}
-                h={{ base: "45px", md: "55px" }}
-                borderRadius="md"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                bg={
-                  isCurrent
-                    ? "teal.500"
-                    : isProcessed
-                    ? "purple.500"
-                    : "blue.500"
-                }
-                color="white"
-                fontSize={{ base: "10px", md: "9px" }}
-                fontWeight="bold"
-                animation={isCurrent ? "blink 1s infinite" : "none"}
-                _hover={{
-                  transform: "scale(1.1)",
-                  transition: "transform 0.2s",
-                }}
-              >
-                {slot}
-              </Box>
-            </Tooltip>
-          );
-        })}
-      </HStack>
-  
-      {/* Second Row: 14 Boxes + Text + Golden Box */}
-      <HStack spacing={1} wrap="wrap" justify="center">
-        {secondRowSlots?.map((slot) => {
-          const isProcessed = slot < currentSlot;
-          const isCurrent = slot === currentSlot;
-          const epochOfSlot = Math.floor(slot / 32);
-          const blockOfSlot = currentBlock - (currentSlot - slot);
-  
-          return (
-            <Tooltip
-              key={slot}
-              label={isProcessed ? `Epoch: ${epochOfSlot}, Block: ${blockOfSlot}` : undefined}
-              hasArrow
-              placement="top"
-              bg="gray.700"
-              color="white"
-            >
-              <Box
-                w={{ base: "45px", md: "55px" }}
-                h={{ base: "45px", md: "55px" }}
-                borderRadius="md"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                bg={
-                  isCurrent
-                    ? "green.500"
-                    : isProcessed
-                    ? "purple.500"
-                    : "blue.500"
-                }
-                color="white"
-                fontSize={{ base: "10px", md: "9px" }}
-                fontWeight="bold"
-                animation={isCurrent ? "blink 1s infinite" : "none"}
-                _hover={{
-                  transform: "scale(1.1)",
-                  transition: "transform 0.2s",
-                }}
-              >
-                {slot}
-              </Box>
-            </Tooltip>
-          );
-        })}
-  
-        {/* Vertical Stacked Text */}
-        <VStack spacing={0} align="center" justify="center" ml={2} pt={2} pb={2}>
-          {networks[network].target !== 999999999 ? (
-            <>
-              <Text fontSize="xs" fontWeight="bold" color="white">
-                {slotsRemaining} slots away
-              </Text>
-              <Text fontSize="xs" color="white">
-                .................
-              </Text>
-              <Text fontSize="s" fontWeight="bold" color="white">
-                {countdown}
-              </Text>
-            </>
-          ) : (
-            <Text fontSize="xs" fontWeight="bold" color="white">
-              Not announced yet!
+    <VStack spacing={4}>
+      {/* Simplified Progress Bar */}
+      <Box width="100%">
+        <Flex justify="space-between" mb={2}>
+          <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
+            Current Slot
+          </Text>
+          {networks[network].target !== Number.MAX_SAFE_INTEGER && (
+            <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
+              Target Slot
             </Text>
           )}
-        </VStack>
-  
-        {/* Golden Box */}
-        <Tooltip
-        label={`Target Slot: ${networks[network].target}, Date: May 07, 2025 (10:05:11 UTC)`}
-        hasArrow
-        placement="top"
-        bg="gray.700"
-        color="white"
-      >
+        </Flex>
+        
         <Box
-          w={{ base: "45px", md: "55px" }}
-          h={{ base: "45px", md: "55px" }}
-          borderRadius="md"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          bg="gold"
-          color="black"
-          fontSize={{ base: "10px", md: "9px" }}
-          fontWeight="bold"
-          _hover={{
-            transform: "scale(1.1)",
-            transition: "transform 0.2s",
-          }}
+          bg={useColorModeValue("gray.200", "gray.600")}
+          borderRadius="full"
+          height="6px"
+          position="relative"
         >
-          FUSAKA
+          {networks[network].target !== Number.MAX_SAFE_INTEGER && (
+            <Box
+              bg="linear-gradient(90deg, #3182CE, #00CED1)"
+              height="100%"
+              borderRadius="full"
+              width={`${Math.min(95, (currentSlot / networks[network].target) * 100)}%`}
+              transition="width 0.5s ease"
+            />
+          )}
         </Box>
-        </Tooltip>
+      </Box>
+
+      {/* Current Epoch Slots - Simplified Grid */}
+      <Box>
+        <Text fontSize="sm" fontWeight="semibold" mb={3} textAlign="center" color={useColorModeValue("gray.700", "gray.300")}>
+          Current Epoch {currentEpoch} Progress
+        </Text>
+        
+        <Flex wrap="wrap" justify="center" gap={1}>
+          {slotsInEpoch.slice(0, 16).map((slot) => {
+            const isProcessed = slot < currentSlot;
+            const isCurrent = slot === currentSlot;
+            
+            return (
+              <Tooltip key={slot} label={`Slot ${slot} ${isCurrent ? '(Current)' : isProcessed ? '(Processed)' : '(Pending)'}`}>
+                <Box
+                  w="24px"
+                  h="24px"
+                  borderRadius="md"
+                  bg={
+                    isCurrent
+                      ? useColorModeValue("green.400", "green.500")
+                      : isProcessed
+                      ? useColorModeValue("blue.400", "blue.500")
+                      : useColorModeValue("gray.300", "gray.600")
+                  }
+                  transition="all 0.2s"
+                  _hover={{ transform: "scale(1.1)" }}
+                  position="relative"
+                  sx={isCurrent ? {
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: '-2px',
+                      left: '-2px',
+                      right: '-2px',
+                      bottom: '-2px',
+                      borderRadius: 'md',
+                      border: '2px solid',
+                      borderColor: 'green.300',
+                      animation: 'pulse 2s infinite'
+                    }
+                  } : {}}
+                />
+              </Tooltip>
+            );
+          })}
+        </Flex>
+        
+        <Flex wrap="wrap" justify="center" gap={1} mt={2}>
+          {slotsInEpoch.slice(16).map((slot) => {
+            const isProcessed = slot < currentSlot;
+            const isCurrent = slot === currentSlot;
+            
+            return (
+              <Tooltip key={slot} label={`Slot ${slot} ${isCurrent ? '(Current)' : isProcessed ? '(Processed)' : '(Pending)'}`}>
+                <Box
+                  w="24px"
+                  h="24px"
+                  borderRadius="md"
+                  bg={
+                    isCurrent
+                      ? useColorModeValue("green.400", "green.500")
+                      : isProcessed
+                      ? useColorModeValue("blue.400", "blue.500")
+                      : useColorModeValue("gray.300", "gray.600")
+                  }
+                  transition="all 0.2s"
+                  _hover={{ transform: "scale(1.1)" }}
+                  position="relative"
+                  sx={isCurrent ? {
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: '-2px',
+                      left: '-2px',
+                      right: '-2px',
+                      bottom: '-2px',
+                      borderRadius: 'md',
+                      border: '2px solid',
+                      borderColor: 'green.300',
+                      animation: 'pulse 2s infinite'
+                    }
+                  } : {}}
+                />
+              </Tooltip>
+            );
+          })}
+        </Flex>
+      </Box>
+
+      {/* Legend */}
+      <HStack spacing={4} justify="center" fontSize="xs">
+        <HStack>
+          <Box w="12px" h="12px" bg={useColorModeValue("blue.400", "blue.500")} borderRadius="sm" />
+          <Text color={useColorModeValue("gray.600", "gray.400")}>Processed</Text>
+        </HStack>
+        <HStack>
+          <Box w="12px" h="12px" bg={useColorModeValue("green.400", "green.500")} borderRadius="sm" />
+          <Text color={useColorModeValue("gray.600", "gray.400")}>Current</Text>
+        </HStack>
+        <HStack>
+          <Box w="12px" h="12px" bg={useColorModeValue("gray.300", "gray.600")} borderRadius="sm" />
+          <Text color={useColorModeValue("gray.600", "gray.400")}>Pending</Text>
+        </HStack>
       </HStack>
-    </>
+    </VStack>
   );
 
   const renderEpochsView = () => (
-    <HStack spacing={1} wrap="wrap" justify="center">
-      {/* Current Epoch */}
-      <Tooltip
-        label={`Epoch: ${currentEpoch}, Current Slot: ${currentSlot}`}
-        hasArrow
-        placement="top"
-        bg="gray.700"
-        color="white"
-      >
-        <Box
-          w={{ base: "45px", md: "55px" }}
-          h={{ base: "45px", md: "55px" }}
-          borderRadius="md"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          bg="teal.500"
-          color="white"
-          fontSize={{ base: "10px", md: "9px" }}
-          fontWeight="bold"
-          animation="blink 1s infinite"
-        >
-          {currentEpoch}
-        </Box>
-      </Tooltip>
-
-      {/* Future Epochs */}
-      {Array.from({ length: 17 }, (_, i) => currentEpoch + i + 1)?.map((epoch) => {
-        const isTarget = epoch === networks[network].targetepoch;
-        const isFuture = epoch > currentEpoch;
-        const isCurrent = epoch === currentEpoch;
-
-        return (
-          <Tooltip
-          key={epoch}
-          label={isCurrent ? `Epoch: ${currentEpoch}, Current Slot: ${currentSlot}` : undefined}
-          hasArrow
-          placement="top"
-          bg="gray.700"
-          color="white"
-        >
-          <Box
-            key={epoch}
-            w={{ base: "45px", md: "55px" }}
-            h={{ base: "45px", md: "55px" }}
-            borderRadius="md"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            bg={
-              isTarget
-                ? "gold"
-                : isFuture
-                ? "blue.500"
-                : "purple.500"
-            }
-            color="white"
-            fontSize={{ base: "10px", md: "9px" }}
-            fontWeight="bold"
-            _hover={{
-              transform: "scale(1.1)",
-              transition: "transform 0.2s",
-            }}
-          >
-            {epoch}
-          </Box>
-          </Tooltip>
-        );
-      })}
-
-      {/* Countdown Text */}
-      <VStack spacing={0} align="center" justify="center" ml={2} pt={2} pb={2}>
-        {networks[network].targetepoch !== 999999999 ? (
-          <>
-            <Text fontSize="xs" fontWeight="bold" color="white">
-              {epochsRemaining} epochs away
-            </Text>
-            <Text fontSize="xs" color="white">
-              ........................
-            </Text>
-            <Text fontSize="s" fontWeight="bold" color="white">
-              {countdown}
-            </Text>
-          </>
-        ) : (
-          <Text fontSize="xs" fontWeight="bold" color="white">
-            Not announced yet!
+    <VStack spacing={4}>
+      {/* Epoch Progress Bar */}
+      <Box width="100%">
+        <Flex justify="space-between" mb={2}>
+          <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
+            Current Epoch
           </Text>
-        )}
-      </VStack>
-
-      {/* Target Epoch Box */}
-      <Tooltip
-        label={`Target epoch: ${networks[network].targetepoch}, Date: May 07, 2025 (10:05:11 UTC)`}
-        hasArrow
-        placement="top"
-        bg="gray.700"
-        color="white"
-      >
-      <Box
-        w={{ base: "45px", md: "55px" }}
-        h={{ base: "45px", md: "55px" }}
-        borderRadius="md"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        bg="gold"
-        color="black"
-        fontSize={{ base: "10px", md: "9px" }}
-        fontWeight="bold"
-        _hover={{
-          transform: "scale(1.1)",
-          transition: "transform 0.2s",
-        }}
-      >
-        FUSAKA
+          {networks[network].targetepoch !== Number.MAX_SAFE_INTEGER && (
+            <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
+              Target Epoch
+            </Text>
+          )}
+        </Flex>
+        
+        <Box
+          bg={useColorModeValue("gray.200", "gray.600")}
+          borderRadius="full"
+          height="6px"
+          position="relative"
+        >
+          {networks[network].targetepoch !== Number.MAX_SAFE_INTEGER && (
+            <Box
+              bg="linear-gradient(90deg, #3182CE, #00CED1)"
+              height="100%"
+              borderRadius="full"
+              width={`${Math.min(95, (currentEpoch / networks[network].targetepoch) * 100)}%`}
+              transition="width 0.5s ease"
+            />
+          )}
+        </Box>
       </Box>
-      </Tooltip>
-    </HStack>
+
+      {/* Epoch Timeline */}
+      <Box>
+        <Text fontSize="sm" fontWeight="semibold" mb={3} textAlign="center" color={useColorModeValue("gray.700", "gray.300")}>
+          Epoch Timeline
+        </Text>
+        
+        <Flex justify="center" align="center" gap={3} wrap="wrap">
+          {/* Current Epoch */}
+          <Tooltip label={`Current Epoch: ${currentEpoch}`}>
+            <Box
+              w="50px"
+              h="40px"
+              borderRadius="lg"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              bg={useColorModeValue("green.400", "green.500")}
+              color="white"
+              fontSize="xs"
+              fontWeight="bold"
+              position="relative"
+              sx={{
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  top: '-2px',
+                  left: '-2px',
+                  right: '-2px',
+                  bottom: '-2px',
+                  borderRadius: 'lg',
+                  border: '2px solid',
+                  borderColor: 'green.300',
+                  animation: 'pulse 2s infinite'
+                }
+              }}
+            >
+              <Text fontSize="9px">NOW</Text>
+              <Text fontSize="sm">{currentEpoch}</Text>
+            </Box>
+          </Tooltip>
+
+          {/* Arrow */}
+          <Text color={useColorModeValue("gray.400", "gray.500")} fontSize="lg">→</Text>
+
+          {/* Next few epochs */}
+          {Array.from({ length: 5 }, (_, i) => currentEpoch + i + 1)?.map((epoch) => {
+            const isTarget = epoch === networks[network].targetepoch;
+
+            return (
+              <Tooltip
+                key={epoch}
+                label={isTarget ? `FUSAKA Target Epoch: ${epoch}` : `Future Epoch: ${epoch}`}
+              >
+                <Box
+                  w={isTarget ? "60px" : "50px"}
+                  h="40px"
+                  borderRadius="lg"
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  justifyContent="center"
+                  bg={
+                    isTarget
+                      ? "linear-gradient(135deg, #FFD700, #FFA500)"
+                      : useColorModeValue("blue.400", "blue.500")
+                  }
+                  color={isTarget ? "black" : "white"}
+                  fontSize="xs"
+                  fontWeight="bold"
+                  transition="all 0.2s"
+                  _hover={{ transform: "scale(1.05)" }}
+                  sx={isTarget ? {
+                    boxShadow: "0 0 15px rgba(255, 215, 0, 0.6)",
+                    animation: "glow 2s infinite alternate"
+                  } : {}}
+                >
+                  {isTarget ? (
+                    <>
+                      <Text fontSize="9px">TARGET</Text>
+                      <Text fontSize="sm">{epoch}</Text>
+                    </>
+                  ) : (
+                    <Text fontSize="sm">{epoch}</Text>
+                  )}
+                </Box>
+              </Tooltip>
+            );
+          })}
+        </Flex>
+      </Box>
+
+      {/* Legend */}
+      <HStack spacing={4} justify="center" fontSize="xs">
+        <HStack>
+          <Box w="12px" h="12px" bg={useColorModeValue("green.400", "green.500")} borderRadius="sm" />
+          <Text color={useColorModeValue("gray.600", "gray.400")}>Current</Text>
+        </HStack>
+        <HStack>
+          <Box w="12px" h="12px" bg={useColorModeValue("blue.400", "blue.500")} borderRadius="sm" />
+          <Text color={useColorModeValue("gray.600", "gray.400")}>Future</Text>
+        </HStack>
+        <HStack>
+          <Box w="12px" h="12px" bg="linear-gradient(135deg, #FFD700, #FFA500)" borderRadius="sm" />
+          <Text color={useColorModeValue("gray.600", "gray.400")}>Target</Text>
+        </HStack>
+      </HStack>
+    </VStack>
   );
 
   return (
@@ -464,142 +478,252 @@ const SlotCountdown: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.6 }}
       >
         <Box
-          textAlign="center"
+          bg={useColorModeValue("white", "gray.800")}
+          borderRadius="xl"
+          border="1px solid"
+          borderColor={useColorModeValue("gray.200", "gray.700")}
           p={6}
-          maxWidth="1370px"
-          mx="auto"
-          mt={1}
-          borderRadius="lg"
-          boxShadow="xl"
-          bg={useColorModeValue("white","gray.800")}
-          color="white"
+          position="relative"
+          overflow="hidden"
         >
-         <Flex
-  position="relative"
-  width="full"
-  mb={4}
-  alignItems="center"
-  flexDirection={{ base: "column", md: "row" }} // Stack on mobile
-  gap={{ base: 3, md: 0 }} // Add gap when stacked
->
-  {/* Centered Heading - full width when stacked */}
-  <Box
-    position={{ base: "static", md: "absolute" }} // Normal flow on mobile
-    left={{ md: "50%" }}
-    transform={{ md: "translateX(-50%)" }}
-    width={{ base: "100%", md: "auto" }}
-    textAlign={{ base: "center", md: "left" }}
-  >
-    <Text
-      as={motion.div}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      fontSize={{ base: "xl", md: "2xl", lg: "2xl" }} // Smaller on mobile
-      fontWeight="bold"
-      color={useColorModeValue("black", "white")}
-      whiteSpace="nowrap"
-    >
-      FUSAKA Upgrade ({networks[network].name})
-    </Text>
-  </Box>
-
-  {/* Right-aligned Dropdown - full width when stacked */}
-  <Box 
-    ml={{ md: "auto" }} // Only auto margin on desktop
-    width={{ base: "100%", md: "auto" }} // Full width on mobile
-    textAlign={{ base: "center", md: "right" }} // Center on mobile
-  >
-    <Select
-      value={viewMode}
-      onChange={(e) => setViewMode(e.target.value as "slots" | "epochs")}
-      width={{ base: "100%", md: "150px" }} // Full width on mobile
-      maxWidth={{ base: "200px", md: "150px" }} // Constrain width
-      bg={useColorModeValue("white", "gray.700")}
-      color={useColorModeValue("black", "white")}
-      mx="auto" // Center on mobile
-    >
-      <option value="epochs">Epoch</option>
-      <option value="slots">Slot</option>
-    </Select>
-  </Box>
-</Flex>
-
-          {/* Network Toggle Buttons */}
-          <HStack spacing={4} justify="center" mb={4}>
-            <Button
-              colorScheme={network === "holesky" ? "blue" : "gray"}
-              onClick={() => handleNetworkChange("holesky")}
-            >
-              Holesky
-            </Button>
-            <Button
-              colorScheme={network === "sepolia" ? "blue" : "gray"}
-              onClick={() => handleNetworkChange("sepolia")}
-            >
-              Sepolia
-            </Button>
-            <Button
-              colorScheme={network === "mainnet" ? "blue" : "gray"}
-              onClick={() => handleNetworkChange("mainnet")}
-            >
-              Mainnet
-            </Button>
-          </HStack>
-
-
-          {(loading) ? (
-            <Spinner size="xl" color="blue.500" />
-          ) : (isUpgradeLive || slotsRemaining<=0) ? (
+          {/* Header Section */}
+          <VStack spacing={4} mb={6}>
+            <HStack justify="space-between" width="100%" align="center">
+              <Text
+                fontSize={{ base: "lg", md: "xl" }}
+                fontWeight="bold"
+                color="#00CED1"
+                textAlign="left"
+              >
+                🚀 FUSAKA Upgrade Countdown
+              </Text>
+              
+              <HStack spacing={2}>
+                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                  View:
+                </Text>
+                <Select
+                  value={viewMode}
+                  onChange={(e) => setViewMode(e.target.value as "slots" | "epochs")}
+                  size="sm"
+                  width="100px"
+                  bg={useColorModeValue("white", "gray.700")}
+                  borderColor={useColorModeValue("gray.300", "gray.600")}
+                >
+                  <option value="epochs">Epochs</option>
+                  <option value="slots">Slots</option>
+                </Select>
+              </HStack>
+            </HStack>
+            
             <Text
-              fontSize="2xl"
-              fontWeight="bold"
-              color={useColorModeValue("black","white")}
-              animation={`${celebrateAnimation} 1s infinite`}
+              fontSize="sm"
+              color={useColorModeValue("gray.600", "gray.400")}
+              textAlign="center"
             >
-              🎉 🎉 The upgrade is now live on the Ethereum {networks[network].name} testnet! 🎉 🎉
+              Track progress to Ethereum's next upgrade on {networks[network].name}
             </Text>
+          </VStack>
+
+          {/* Network Selection */}
+          <Box
+            bg={useColorModeValue("gray.50", "gray.700")}
+            borderRadius="lg"
+            p={4}
+            mb={6}
+          >
+            <Text
+              fontSize="sm"
+              fontWeight="semibold"
+              color={useColorModeValue("gray.700", "gray.300")}
+              mb={3}
+              textAlign="center"
+            >
+              Select Network
+            </Text>
+            <HStack spacing={2} justify="center" wrap="wrap">
+              <Button
+                size="sm"
+                variant={network === "holesky" ? "solid" : "outline"}
+                colorScheme="blue"
+                onClick={() => handleNetworkChange("holesky")}
+                minW="80px"
+              >
+                Holesky
+              </Button>
+              <Button
+                size="sm"
+                variant={network === "sepolia" ? "solid" : "outline"}
+                colorScheme="blue"
+                onClick={() => handleNetworkChange("sepolia")}
+                minW="80px"
+              >
+                Sepolia
+              </Button>
+              <Button
+                size="sm"
+                variant={network === "mainnet" ? "solid" : "outline"}
+                colorScheme="blue"
+                onClick={() => handleNetworkChange("mainnet")}
+                minW="80px"
+              >
+                Mainnet
+              </Button>
+            </HStack>
+          </Box>
+
+
+          {loading ? (
+            <Box textAlign="center" py={8}>
+              <Spinner size="lg" color="blue.500" />
+              <Text mt={4} color={useColorModeValue("gray.600", "gray.400")}>
+                Loading network data...
+              </Text>
+            </Box>
+          ) : (isUpgradeLive || slotsRemaining <= 0) ? (
+            <Box
+              bg={useColorModeValue("green.50", "green.900")}
+              borderRadius="lg"
+              border="2px solid"
+              borderColor="green.400"
+              p={6}
+              textAlign="center"
+            >
+              <Text
+                fontSize="xl"
+                fontWeight="bold"
+                color="green.500"
+              >
+                🎉 FUSAKA is live on {networks[network].name}! 🎉
+              </Text>
+            </Box>
           ) : (
-            <>
+            <VStack spacing={6}>
+              {/* Countdown Stats */}
+              {countdown && networks[network].target !== Number.MAX_SAFE_INTEGER && (
+                <Box
+                  bg={useColorModeValue("blue.50", "blue.900")}
+                  borderRadius="lg"
+                  border="1px solid"
+                  borderColor={useColorModeValue("blue.200", "blue.700")}
+                  p={4}
+                  textAlign="center"
+                  width="100%"
+                >
+                  <Text
+                    fontSize="xs"
+                    color={useColorModeValue("blue.600", "blue.300")}
+                    mb={2}
+                    fontWeight="semibold"
+                    textTransform="uppercase"
+                    letterSpacing="wide"
+                  >
+                    Time Remaining
+                  </Text>
+                  <Text
+                    fontSize="2xl"
+                    fontWeight="bold"
+                    color={useColorModeValue("blue.700", "blue.400")}
+                    fontFamily="mono"
+                  >
+                    {countdown}
+                  </Text>
+                  <Text
+                    fontSize="sm"
+                    color={useColorModeValue("blue.600", "blue.300")}
+                    mt={2}
+                  >
+                    {viewMode === "slots" 
+                      ? `${slotsRemaining.toLocaleString()} slots remaining`
+                      : `${epochsRemaining.toLocaleString()} epochs remaining`}
+                  </Text>
+                </Box>
+              )}
+
+              {/* Current Status */}
+              <Box
+                bg={useColorModeValue("gray.50", "gray.700")}
+                borderRadius="lg"
+                p={4}
+                width="100%"
+                textAlign="center"
+              >
+                <Text
+                  fontSize="sm"
+                  color={useColorModeValue("gray.600", "gray.400")}
+                  mb={2}
+                >
+                  Current Progress
+                </Text>
+                <Text
+                  fontSize="lg"
+                  fontWeight="semibold"
+                  color={useColorModeValue("gray.800", "gray.200")}
+                >
+                  {viewMode === "slots" 
+                    ? `Slot ${currentSlot.toLocaleString()} • Epoch ${currentEpoch.toLocaleString()}`
+                    : `Epoch ${currentEpoch.toLocaleString()} • Slot ${currentSlot.toLocaleString()}`}
+                </Text>
+              </Box>
+
               {/* Progress Visualization */}
               <Box
-                as={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                bg="gray.700"
-                color="white"
-                borderRadius="md"
+                bg={useColorModeValue("white", "gray.800")}
+                borderRadius="lg"
+                border="1px solid"
+                borderColor={useColorModeValue("gray.200", "gray.600")}
                 p={4}
-                mb={4}
-                fontSize="xs"
-                fontWeight="normal"
+                width="100%"
               >
                 {viewMode === "slots" ? renderSlotsView() : renderEpochsView()}
               </Box>
 
-              {/* Additional Info */}
-              <Text fontSize="sm" color={useColorModeValue("black","white")} mb={4}>
-                Refreshes in {timer} seconds
-              </Text>
-              <Text fontSize="sm" color={useColorModeValue("black","white")}>
-                {viewMode === "slots" 
-                  ? "* The slot numbers are updated every 12 seconds."
-                  : "* The epoch numbers are updated every 6.4 minutes (1 epoch)."}
-              </Text>
-            </>
+              {/* Footer Info */}
+              <Box
+                textAlign="center"
+                color={useColorModeValue("gray.500", "gray.400")}
+              >
+                <Text fontSize="xs" mb={1}>
+                  🔄 Updates in {timer} seconds
+                </Text>
+                <Text fontSize="xs">
+                  {viewMode === "slots" 
+                    ? "Slots update every 12 seconds"
+                    : "Epochs update every 6.4 minutes"}
+                </Text>
+              </Box>
+            </VStack>
           )}
         </Box>
       </motion.div>
 
-      {/* Blinking Animation */}
+      {/* Animations */}
       <style>
         {`
-          @keyframes blink {
+          @keyframes pulse {
             0% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.7; }
             100% { opacity: 1; }
+          }
+
+          @keyframes glow {
+            0% { 
+              box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            }
+            50% { 
+              box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+            }
+            100% { 
+              box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            }
+          }
+
+          @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
           }
         `}
       </style>
