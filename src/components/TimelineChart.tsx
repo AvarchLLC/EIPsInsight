@@ -39,6 +39,37 @@ const LEGEND_LABELS: Record<StatusType, string> = {
   proposed: 'PFI', // Proposed-for-inclusion
 };
 
+// Map dates to upgrade names based on Ethereum upgrade timeline
+const getUpgradeNameForDate = (date: string): string => {
+  const dateObj = new Date(date);
+  // Homestead: 2016-03-14
+  if (dateObj <= new Date('2016-09-01')) return 'Homestead';
+  // Tangerine Whistle & Spurious Dragon: 2016
+  if (dateObj <= new Date('2017-09-01')) return 'Spurious Dragon';
+  // Byzantium: 2017-10-16
+  if (dateObj <= new Date('2019-01-01')) return 'Byzantium';
+  // Petersburg: 2019-02-28
+  if (dateObj <= new Date('2019-11-01')) return 'Petersburg';
+  // Istanbul: 2019-12-08
+  if (dateObj <= new Date('2020-07-01')) return 'Istanbul';
+  // Muir Glacier & Berlin: 2020-2021
+  if (dateObj <= new Date('2021-07-01')) return 'Berlin';
+  // London: 2021-08-05
+  if (dateObj <= new Date('2021-11-01')) return 'London';
+  // Arrow Glacier & Gray Glacier: 2021-2022
+  if (dateObj <= new Date('2022-08-01')) return 'Gray Glacier';
+  // Paris (The Merge): 2022-09-15
+  if (dateObj <= new Date('2023-03-01')) return 'Paris';
+  // Shanghai: 2023-04-12
+  if (dateObj <= new Date('2024-02-01')) return 'Shanghai';
+  // Dencun: 2024-03-13
+  if (dateObj <= new Date('2025-01-01')) return 'Dencun';
+  // Pectra: 2024-2025
+  if (dateObj <= new Date('2025-08-01')) return 'Pectra';
+  // Fusaka: 2025+
+  return 'Fusaka';
+};
+
 
 interface Props {
   data: EIPData[];
@@ -222,18 +253,7 @@ const linkHref =
 
               return (
                 <Group key={rowIndex} top={rowIndex * rowHeight}>
-                  <text
-                    x={0}
-                    y={blockHeight / 1.5}
-                    fontSize={16}
-                    fontWeight="bold"
-                    fill="gray"
-                    vectorEffect="non-scaling-stroke"
-                  >
-                    {item.date}
-                  </text>
-
-                  <Group left={80}>
+                  <Group left={0}>
                     {allEips.map((d, i) => {
                       const eipNum = d.eip.replace(/EIP-/, '');
                       return (
@@ -283,6 +303,40 @@ onMouseEnter={(e) => {
                 </Group>
               );
             })}
+            {/* X-Axis Labels: Upgrade Names */}
+            {visibleData.map((item, rowIndex) => {
+              const upgradeName = getUpgradeNameForDate(item.date);
+              const yPos = (rowIndex * rowHeight) + blockHeight + 30;
+              return (
+                <g key={`xlabel-${rowIndex}`}>
+                  <text
+                    x={-10}
+                    y={yPos}
+                    fontSize={10}
+                    fontWeight="600"
+                    fill="#40E0D0"
+                    textAnchor="end"
+                    vectorEffect="non-scaling-stroke"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {upgradeName}
+                  </text>
+                  <title>{item.date}</title>
+                </g>
+              );
+            })}
+            {/* Upgrade Name at Bottom */}
+            <text
+              x={chartWidth / 2}
+              y={chartHeight - 10}
+              fontSize={20}
+              fontWeight="bold"
+              fill="#40E0D0"
+              textAnchor="middle"
+              vectorEffect="non-scaling-stroke"
+            >
+              {selectedOption.toUpperCase()}
+            </text>
           </Group>
         </svg>
       </Flex>
@@ -334,6 +388,12 @@ onMouseEnter={(e) => {
   </Box>
 )}
 
+      {/* Upgrade Name Display */}
+      <Box mt={4} mb={2} textAlign="center">
+        <Text fontSize="2xl" fontWeight="bold" color="#40E0D0">
+          {selectedOption.toUpperCase()}
+        </Text>
+      </Box>
 
       <DateTime />
     </Box>

@@ -9,6 +9,7 @@ import { AxisBottom, AxisLeft } from '@visx/axis';
 import { scaleBand, scaleLinear } from '@visx/scale';
 import { Group } from '@visx/group';
 import { saveAs } from 'file-saver';
+import { useRouter } from 'next/router';
 import CopyLink from './CopyLink'; // Ensure this component exists
 import DateTime from "@/components/DateTime";
 
@@ -20,28 +21,28 @@ interface UpgradeData {
 }
 
 
-const pastelColorMap: Record<string, string> = {
-  "Pectra": "#e17055",            // Coral Orange (2025-05-07)
-  "Dencun": "#0984e3",            // Vivid Blue (2024-03-13)
-  "Shanghai": "#00b894",          // Emerald Green (2023-04-12)
-  "Paris": "#e57373",             // Pastel Red (2022-09-15)
-  "Bellatrix": "#ff7675",         // Light Red (2022-09-06)
-  "Gray Glacier": "#6c5ce7",      // Bold Indigo (2022-06-30)
-  "Arrow Glacier": "#ff4c4c",     // Bright Red (2021-12-09)
-  "Altair": "#74b9ff",            // Sky Blue (2021-10-27)
-  "London": "#fd79a8",            // Rose Pink (2021-08-05)
-  "Berlin": "#ff6f00",            // Deep Orange (2021-04-15)
-  "Muir Glacier": "#d63031",      // Crimson Red (2020-01-02)
-  "Istanbul": "#e84393",          // Pink Magenta (2019-12-08)
-  "Constantinople": "#00cec9",    // Teal Cyan (2019-02-28)
-  "Petersburg": "#00e5ff",        // Electric Cyan (2019-02-28)
-  "Byzantium": "#00b894",         // Emerald Green (2017-10-16)
-  "Spurious Dragon": "#81ecec",   // Light Teal (2016-11-23)
-  "Tangerine Whistle": "#fdcb6e", // Light Orange (2016-10-18)
-  "DAO Fork": "#fab1a0",          // Light Peach (2016-07-20)
-  "Homestead": "#a29bfe",         // Soft Violet (2016-03-14)
-  "Frontier Thawing": "#55a3ff",  // Light Blue (2015-09-07)
-  "Frontier": "#6c5ce7",          // Bold Indigo (2015-07-30)
+const professionalColorMap: Record<string, string> = {
+  "Pectra": "#DC2626",            // Red 600 (2025-05-07)
+  "Dencun": "#2563EB",            // Blue 600 (2024-03-13)
+  "Shanghai": "#059669",          // Emerald 600 (2023-04-12)
+  "Paris": "#7C3AED",             // Violet 600 (2022-09-15)
+  "Bellatrix": "#EA580C",         // Orange 600 (2022-09-06)
+  "Gray Glacier": "#4F46E5",      // Indigo 600 (2022-06-30)
+  "Arrow Glacier": "#BE123C",     // Rose 700 (2021-12-09)
+  "Altair": "#0284C7",            // Sky 600 (2021-10-27)
+  "London": "#C026D3",            // Fuchsia 600 (2021-08-05)
+  "Berlin": "#D97706",            // Amber 600 (2021-04-15)
+  "Muir Glacier": "#B91C1C",      // Red 700 (2020-01-02)
+  "Istanbul": "#BE185D",          // Pink 700 (2019-12-08)
+  "Constantinople": "#0891B2",    // Cyan 600 (2019-02-28)
+  "Petersburg": "#0D9487",        // Teal 600 (2019-02-28)
+  "Byzantium": "#047857",         // Emerald 700 (2017-10-16)
+  "Spurious Dragon": "#0F766E",   // Teal 700 (2016-11-23)
+  "Tangerine Whistle": "#CA8A04", // Yellow 600 (2016-10-18)
+  "DAO Fork": "#C2410C",          // Orange 700 (2016-07-20)
+  "Homestead": "#7C2D12",         // Orange 800 (2016-03-14)
+  "Frontier Thawing": "#1E40AF",  // Blue 800 (2015-09-07)
+  "Frontier": "#1E3A8A",          // Blue 900 (2015-07-30)
 };
 
 
@@ -160,10 +161,19 @@ const rawData = [
   { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-170" },
 
   // Frontier Thawing — September 7, 2015
-  // No specific EIP, lifted the 5,000 gas limit
+  { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "Gas Limit" },
 
   // Frontier — July 30, 2015
-  // No EIPs, original Ethereum launch
+  { date: "2015-07-30", upgrade: "Frontier", eip: "Genesis" },
+  
+  // DAO Fork — July 20, 2016 (adding this properly)
+  { date: "2016-07-20", upgrade: "DAO Fork", eip: "State Change" },
+  
+  // Bellatrix — September 6, 2022 (Consensus layer)
+  { date: "2022-09-06", upgrade: "Bellatrix", eip: "Consensus" },
+  
+  // Altair — October 27, 2021 (Consensus layer)
+  { date: "2021-10-27", upgrade: "Altair", eip: "Beacon Chain" },
 ];
 
 // Group data by date-upgrade combination// Group data by date-upgrade combination (keeping duplicates)
@@ -185,18 +195,20 @@ const upgradeRows = Object.values(upgradeMap).sort(
 
 const uniqueUpgrades = [...new Set(upgradeRows.map(r => r.upgrade))];
 const colorMap = uniqueUpgrades.reduce((map, upgrade) => {
-  map[upgrade] = pastelColorMap[upgrade] || '#ccc';
+  map[upgrade] = professionalColorMap[upgrade] || '#6B7280';
   return map;
 }, {} as Record<string, string>);
 
 const NetworkUpgradesChart: React.FC = () => {
+  const router = useRouter();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const [hoveredData, setHoveredData] = useState<{ date: string; upgrade: string; eip: string } | null>(null);
+  const [hoveredNetwork, setHoveredNetwork] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [dimensions, setDimensions] = useState({ width: 1200, height: 500 });
+  const [dimensions, setDimensions] = useState({ width: 1400, height: 500 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   const bg = useColorModeValue('gray.50', 'gray.800');
@@ -206,7 +218,10 @@ const NetworkUpgradesChart: React.FC = () => {
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
-        const width = containerRef.current.clientWidth;
+        // Ensure minimum width to accommodate all dates - increased spacing
+        const minWidth = Math.max(2800, allDates.length * 140);
+        const width = Math.max(containerRef.current.clientWidth, minWidth);
+        console.log('Chart dimensions:', { minWidth, width, totalDates: allDates.length });
         const maxEips = Math.max(...upgradeRows.map(r => r.eips.length || 1));
         const height = Math.max(400, maxEips * 35 + 150);
         setDimensions({ width, height });
@@ -219,10 +234,22 @@ const NetworkUpgradesChart: React.FC = () => {
 
   const allDates = Array.from(new Set(upgradeRows.map(r => r.date))).sort();
   const maxEips = Math.max(...upgradeRows.map(r => r.eips.length || 1));
-  const margin = { top: 60, right: 20, bottom: 60, left: 100 };
+  const margin = { top: 60, right: 40, bottom: 140, left: 100 };
   const { width, height } = dimensions;
 
-  const xScale = scaleBand({ domain: allDates, range: [margin.left, width - margin.right], padding: 0.3 });
+  // Create mapping from dates to upgrade names for x-axis labels
+  // Handle multiple upgrades on same date by combining them
+  const dateToUpgradeMap = upgradeRows.reduce((acc, row) => {
+    if (!acc[row.date]) {
+      acc[row.date] = row.upgrade;
+    } else if (!acc[row.date].includes(row.upgrade)) {
+      // If multiple upgrades on same date, combine them
+      acc[row.date] = `${acc[row.date]} / ${row.upgrade}`;
+    }
+    return acc;
+  }, {} as Record<string, string>);
+
+  const xScale = scaleBand({ domain: allDates, range: [margin.left, width - margin.right], padding: 0.1 });
   const yScale = scaleLinear({ domain: [0, maxEips + 1], range: [height - margin.bottom, margin.top] });
 
   const resetZoom = () => {
@@ -239,7 +266,9 @@ const NetworkUpgradesChart: React.FC = () => {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    const newMousePos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    setMousePos(newMousePos);
+    
     if (!isDragging) return;
     const dx = e.clientX - dragStart.current.x;
     const dy = e.clientY - dragStart.current.y;
@@ -255,50 +284,149 @@ const NetworkUpgradesChart: React.FC = () => {
     saveAs(blob, 'network_upgrade_timeline.csv');
   };
 
+  const handleEipClick = (eip: string) => {
+    // Extract the EIP number from the EIP string (e.g., "EIP-1559" -> "1559", "3554" -> "3554")
+    const eipNumber = eip.replace('EIP-', '').replace('EIP', '');
+    // Navigate to the EIP detail page
+    router.push(`/eips/eip-${eipNumber}`);
+  };
+
   return (
-    <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg" ref={containerRef} position="relative">
-      <Flex justify="space-between" align="center" mb={4} wrap="wrap" gap={3}>
-        <Heading size="md">Network Upgrade Timeline <CopyLink link="https://eipsinsight.com/upgrade#NetworkUpgrades" /></Heading>
-        <HStack>
-          <IconButton aria-label="Zoom In" icon={<AddIcon />} size="sm" onClick={() => setZoomLevel(z => Math.min(z * 1.2, 3))} />
-          <IconButton aria-label="Zoom Out" icon={<MinusIcon />} size="sm" onClick={() => setZoomLevel(z => Math.max(z / 1.2, 0.5))} />
-          <IconButton aria-label="Reset Zoom" icon={<RepeatIcon />} size="sm" onClick={resetZoom} />
-          <Button size="sm" bg="teal.400" color="white" _hover={{ bg: 'teal.500' }} onClick={downloadReport}>Download CSV</Button>
-        </HStack>
-      </Flex>
+    <Box 
+      bg={useColorModeValue('white', 'gray.900')} 
+      borderRadius="2xl" 
+      boxShadow={useColorModeValue('0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', '0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1)')}
+      ref={containerRef} 
+      position="relative" 
+      overflowX="auto" 
+      overflowY="hidden" 
+      minWidth="100%" 
+      width="100%"
+      border="1px solid"
+      borderColor={useColorModeValue('gray.200', 'gray.700')}
+    >
+      {/* Outer Container */}
+      <Box p={8}>
+        {/* Header Section */}
+        <Box 
+          mb={8} 
+          pb={6} 
+          borderBottom="1px solid" 
+          borderColor={useColorModeValue('gray.200', 'gray.700')}
+        >
+          <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
+            <Box>
+              <Heading size="xl" color={useColorModeValue('gray.900', 'white')} mb={3} fontWeight="600" letterSpacing="-0.025em">
+                Ethereum Network Upgrade Timeline <CopyLink link="https://eipsinsight.com/upgrade#NetworkUpgrades" />
+              </Heading>
+              <Text fontSize="lg" color={useColorModeValue('gray.600', 'gray.400')} fontWeight="400" lineHeight="1.6">
+                Comprehensive timeline of Ethereum network upgrades and their associated EIP implementations
+              </Text>
+            </Box>
+            <HStack spacing={4}>
+              <Box bg={useColorModeValue('white', 'gray.700')} p={2} borderRadius="lg" boxShadow="sm" border="1px solid" borderColor={useColorModeValue('gray.200', 'gray.600')}>
+                <HStack spacing={2}>
+                  <IconButton aria-label="Zoom In" icon={<AddIcon />} size="sm" onClick={() => setZoomLevel(z => Math.min(z * 1.2, 3))} variant="ghost" colorScheme="gray" />
+                  <IconButton aria-label="Zoom Out" icon={<MinusIcon />} size="sm" onClick={() => setZoomLevel(z => Math.max(z / 1.2, 0.5))} variant="ghost" colorScheme="gray" />
+                  <IconButton aria-label="Reset Zoom" icon={<RepeatIcon />} size="sm" onClick={resetZoom} variant="ghost" colorScheme="gray" />
+                </HStack>
+              </Box>
+              <Button 
+                size="md" 
+                bg={useColorModeValue('blue.600', 'blue.500')}
+                color="white"
+                onClick={downloadReport}
+                fontWeight="500"
+                px={6}
+                _hover={{ bg: useColorModeValue('blue.700', 'blue.600'), transform: 'translateY(-1px)' }}
+                _active={{ transform: 'translateY(0)' }}
+                boxShadow="sm"
+              >
+                Export Data
+              </Button>
+            </HStack>
+          </Flex>
+        </Box>
 
-      <VStack spacing={2} mb={-10}>
-        {[0, 1].map(rowIndex => (
-          <Wrap key={rowIndex} spacing={3} justify="center">
-            {uniqueUpgrades
-              .slice(rowIndex * Math.ceil(uniqueUpgrades.length / 2), (rowIndex + 1) * Math.ceil(uniqueUpgrades.length / 2))
-              .map(upgrade => (
-                <WrapItem key={upgrade}>
-                  <Flex align="baseline" gap={2}>
-                    <Box w="10px" h="10px" bg={colorMap[upgrade]} borderRadius="sm" flexShrink={0} />
-                    <Text fontSize="sm">{upgrade}</Text>
-                  </Flex>
-                </WrapItem>
-              ))}
-          </Wrap>
-        ))}
-      </VStack>
-
-      <svg
-        width="100%"
+        {/* Main Content Area */}
+        <Flex gap={8} align="flex-start">
+          {/* Chart Container */}
+          <Box 
+            bg={useColorModeValue('gray.50', 'gray.800')} 
+            borderRadius="xl" 
+            p={6} 
+            position="relative"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.600')}
+            boxShadow={useColorModeValue('inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)', 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.2)')}
+            flex="1"
+          >
+          <svg
+        width={width}
         height={height}
         viewBox={`${offset.x} ${offset.y} ${width / zoomLevel} ${height / zoomLevel}`}
+        style={{ width: `${width}px`, height: `${height}px` }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseLeave={(e) => {
+          handleMouseUp();
+          setHoveredData(null);
+        }}
       >
         <Group>
           <AxisBottom
-            top={height - margin.bottom}
+            top={height - margin.bottom + 20}
             scale={xScale}
-            tickLabelProps={() => ({ fontSize: 10, textAnchor: 'middle', fill: axisColor })}
+            tickFormat={(date) => {
+              const upgradeName = dateToUpgradeMap[date as string];
+              return upgradeName || date as string;
+            }}
+            tickLabelProps={(value, index) => ({ 
+              fontSize: 12, 
+              textAnchor: 'middle', 
+              fill: useColorModeValue('#374151', '#9CA3AF'), 
+              fontWeight: '600',
+              dy: '0.33em',
+              fontFamily: 'system-ui, -apple-system, sans-serif'
+            })}
+            numTicks={allDates.length}
           />
+          
+          {/* Add floating date badges for each upgrade */}
+          {allDates.map((date) => {
+            const x = xScale(date);
+            const upgradeName = dateToUpgradeMap[date];
+            if (x == null) return null;
+            
+            return (
+              <g key={`date-badge-${date}`}>
+                <rect
+                  x={x + xScale.bandwidth() / 2 - 35}
+                  y={height - margin.bottom + 75}
+                  width={70}
+                  height={16}
+                  fill={useColorModeValue('white', '#1A202C')}
+                  stroke={useColorModeValue('#E2E8F0', '#4A5568')}
+                  strokeWidth={0.5}
+                  rx={4}
+                  opacity={0.95}
+                  style={{ cursor: 'pointer' }}
+                />
+                <text
+                  x={x + xScale.bandwidth() / 2}
+                  y={height - margin.bottom + 85}
+                  textAnchor="middle"
+                  fontSize="8"
+                  fill={useColorModeValue('#4A5568', '#CBD5E0')}
+                  fontWeight="600"
+                  style={{ cursor: 'pointer' }}
+                >
+                  {new Date(date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                </text>
+              </g>
+            );
+          })}
           <AxisLeft
             left={margin.left}
             scale={yScale}
@@ -311,28 +439,50 @@ const NetworkUpgradesChart: React.FC = () => {
             return eips.map((eip, j) => {
               const y = yScale(j + 1);
               const hoverHandlers = {
-                onMouseEnter: () => setHoveredData({ date, upgrade, eip }),
-                onMouseLeave: () => setHoveredData(null)
+                onMouseEnter: (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setHoveredData({ date, upgrade, eip });
+                },
+                onMouseLeave: (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setHoveredData(null);
+                },
+                onClick: (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  handleEipClick(eip);
+                }
               };
               return (
-                <Group key={`${date}-${upgrade}-${eip}`}>
+                <Group key={`${date}-${upgrade}-${eip}-${j}`}>
                   <rect
                     x={x}
                     y={y}
                     width={xScale.bandwidth()}
-                    height={20}
-                    fill={colorMap[upgrade]}
-                    rx={4}
+                    height={18}
+                    fill={hoveredNetwork === upgrade ? colorMap[upgrade] : `${colorMap[upgrade]}E6`}
+                    rx={2}
+                    style={{ 
+                      cursor: 'pointer',
+                      filter: hoveredNetwork === upgrade ? `drop-shadow(0px 2px 8px ${colorMap[upgrade]}40)` : 'none',
+                      transition: 'all 0.3s ease-out',
+                      stroke: hoveredNetwork === upgrade ? colorMap[upgrade] : 'none',
+                      strokeWidth: hoveredNetwork === upgrade ? 1 : 0
+                    }}
                     {...hoverHandlers}
                   />
                   <text
                     x={x + xScale.bandwidth() / 2}
-                    y={y + 14}
+                    y={y + 13}
                     textAnchor="middle"
-                    fill="white"
-                    fontSize={10}
-                    fontWeight="bold"
-                    style={{ pointerEvents: 'none' }}
+                    fill={hoveredNetwork === upgrade ? "white" : "#FFFFFF"}
+                    fontSize={9}
+                    fontWeight="600"
+                    style={{ 
+                      pointerEvents: 'none',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      textShadow: hoveredNetwork === upgrade ? '0 1px 2px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.2)',
+                      transition: 'all 0.3s ease-out'
+                    }}
                   >
                     {eip}
                   </text>
@@ -346,25 +496,176 @@ const NetworkUpgradesChart: React.FC = () => {
       {hoveredData && (
         <Box
           position="absolute"
-          top={`${mousePos.y + 5}px`}
-          left={`${mousePos.x + 5}px`}
+          top={`${Math.min(mousePos.y + 10, height - 160)}px`}
+          left={`${Math.min(mousePos.x + 10, width - 200)}px`}
           bg={tooltipBg}
           color={useColorModeValue('gray.800', 'white')}
-          px={3}
-          py={2}
-          borderRadius="md"
+          px={4}
+          py={3}
+          borderRadius="lg"
           boxShadow="lg"
           fontSize="sm"
-          zIndex={10}
+          zIndex={20}
+          border="1px solid"
+          borderColor={useColorModeValue('gray.200', 'gray.600')}
+          width="180px"
+          pointerEvents="none"
         >
-          <VStack align="start" spacing={0}>
-            <Text fontWeight="bold">EIP: {hoveredData.eip}</Text>
-            <Text>Upgrade: {hoveredData.upgrade}</Text>
-            <Text>Date: {hoveredData.date}</Text>
+          <VStack align="start" spacing={2} width="100%">
+            <Box>
+              <Text fontSize="sm" fontWeight="bold" color="teal.400">
+                EIP: {hoveredData.eip}
+              </Text>
+              <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} fontStyle="italic">
+                Click to view details →
+              </Text>
+            </Box>
+            <Text fontSize="sm" fontWeight="semibold" color={useColorModeValue('gray.700', 'gray.200')}>
+              {hoveredData.upgrade}
+            </Text>
+            
+            <Box 
+              width="100%" 
+              p={2} 
+              bg={useColorModeValue('blue.50', 'blue.900')} 
+              borderRadius="md" 
+              border="1px solid" 
+              borderColor={useColorModeValue('blue.200', 'blue.600')}
+            >
+              <Text fontSize="xs" fontWeight="bold" color={useColorModeValue('blue.600', 'blue.300')} mb={1}>
+                📅 LAUNCH DATE
+              </Text>
+              <Text fontSize="xs" fontWeight="bold" color={useColorModeValue('blue.800', 'blue.100')} mb={1}>
+                {new Date(hoveredData.date).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </Text>
+              <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')}>
+                {Math.floor((new Date().getTime() - new Date(hoveredData.date).getTime()) / (1000 * 60 * 60 * 24 * 365.25))} years ago
+              </Text>
+            </Box>
           </VStack>
         </Box>
       )}
-      <DateTime/>
+          <DateTime/>
+          </Box>
+
+          {/* Network Legend Sidebar */}
+          <Box 
+            bg={useColorModeValue('white', 'gray.800')} 
+            borderRadius="xl" 
+            p={6} 
+            position="relative"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.600')}
+            boxShadow="lg"
+            width="340px"
+            maxHeight="650px"
+            overflowY="auto"
+          >
+            <Box mb={6}>
+              <Heading size="md" color={useColorModeValue('gray.900', 'white')} mb={2} fontWeight="600">
+                Network Upgrades
+              </Heading>
+              {hoveredNetwork && (
+                <Box 
+                  bg={useColorModeValue('blue.50', 'blue.900')} 
+                  px={3} 
+                  py={2} 
+                  borderRadius="md" 
+                  border="1px solid" 
+                  borderColor={useColorModeValue('blue.200', 'blue.700')}
+                >
+                  <Text fontSize="sm" fontWeight="500" color={useColorModeValue('blue.700', 'blue.200')}>
+                    Currently highlighting: {hoveredNetwork}
+                  </Text>
+                </Box>
+              )}
+            </Box>
+            <VStack spacing={2} align="stretch">
+              {uniqueUpgrades.map((upgrade) => {
+                const upgradeEips = rawData.filter(item => item.upgrade === upgrade);
+                const eipCount = upgradeEips.reduce((count, item) => count + (item.eip ? 1 : 0), 0);
+                const upgradeDate = new Date(upgradeEips[0]?.date || '').toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'short' 
+                });
+                
+                return (
+                  <Box
+                    key={upgrade}
+                    p={4}
+                    borderRadius="lg"
+                    border="1px solid"
+                    borderColor={hoveredNetwork === upgrade ? colorMap[upgrade] : useColorModeValue('gray.200', 'gray.600')}
+                    bg={hoveredNetwork === upgrade ? 
+                      useColorModeValue('white', 'gray.700') : 
+                      useColorModeValue('gray.50', 'gray.750')
+                    }
+                    cursor="pointer"
+                    transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                    transform={hoveredNetwork === upgrade ? 'translateY(-2px)' : 'translateY(0)'}
+                    boxShadow={hoveredNetwork === upgrade ? 
+                      `0 8px 25px -8px ${colorMap[upgrade]}40, 0 4px 12px -4px rgba(0,0,0,0.1)` : 
+                      useColorModeValue('0 1px 3px rgba(0,0,0,0.1)', '0 1px 3px rgba(0,0,0,0.3)')
+                    }
+                    onMouseEnter={() => setHoveredNetwork(upgrade)}
+                    onMouseLeave={() => setHoveredNetwork(null)}
+                    _hover={{
+                      transform: 'translateY(-2px)',
+                      borderColor: colorMap[upgrade]
+                    }}
+                  >
+                    <Flex align="flex-start" justify="space-between" gap={3}>
+                      <Box flex="1">
+                        <Flex align="center" gap={3} mb={2}>
+                          <Box
+                            width="8px"
+                            height="8px"
+                            borderRadius="full"
+                            bg={colorMap[upgrade]}
+                            boxShadow={hoveredNetwork === upgrade ? `0 0 8px ${colorMap[upgrade]}` : 'none'}
+                            transition="all 0.3s ease-in-out"
+                          />
+                          <Text fontSize="md" fontWeight="600" color={useColorModeValue('gray.900', 'white')} lineHeight="1.2">
+                            {upgrade}
+                          </Text>
+                        </Flex>
+                        <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} fontWeight="400">
+                          {upgradeDate} • {eipCount} EIP{eipCount !== 1 ? 's' : ''}
+                        </Text>
+                      </Box>
+                      <Box
+                        bg={hoveredNetwork === upgrade ? colorMap[upgrade] : useColorModeValue('gray.100', 'gray.600')}
+                        color={hoveredNetwork === upgrade ? 'white' : useColorModeValue('gray.700', 'gray.300')}
+                        fontSize="sm"
+                        fontWeight="600"
+                        px={3}
+                        py={1}
+                        borderRadius="md"
+                        minWidth="32px"
+                        textAlign="center"
+                        transition="all 0.3s ease-in-out"
+                      >
+                        {eipCount}
+                      </Box>
+                    </Flex>
+                  </Box>
+                );
+              })}
+            </VStack>
+            
+            {/* Legend Footer */}
+            <Box mt={6} pt={4} borderTop="1px solid" borderColor={useColorModeValue('gray.200', 'gray.600')}>
+              <Text fontSize="sm" color={useColorModeValue('gray.500', 'gray.400')} textAlign="center" fontWeight="400" lineHeight="1.5">
+                Hover over upgrade names to highlight corresponding EIPs in the timeline
+              </Text>
+            </Box>
+          </Box>
+        </Flex>
+      </Box>
     </Box>
   );
 };

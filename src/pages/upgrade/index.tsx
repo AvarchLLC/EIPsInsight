@@ -877,14 +877,12 @@ return (
             </motion.div>
           </Flex>
         ) : (
-          // Show upgrade content if data is loaded
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-          
-          {/* Page Header Section (Homepage-style theming) */}
+          {/* Container 1: Page Header + Selector + Countdown */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
             borderRadius="xl"
@@ -904,24 +902,12 @@ return (
               fontWeight="bold"
               color="#00CED1"
               id="pectrafusaka"
-              mb={4}
               textAlign="center"
+              mb={6}
             >
               Ethereum Network Upgrades
             </Text>
-          </Box>
-
-          {/* Upgrade Timeline Section */}
-          <Box
-            bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
-            boxShadow="sm"
-            border="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={8}
-            px={6}
-            py={8}
-          >
+            
             <Box mb={4}>
               <select
                 value={selectedOption}
@@ -938,14 +924,26 @@ return (
                 <option value="pectra">Pectra</option>
               </select>
             </Box>
-
+            
             {/* FUSAKA Countdown - Only show when Fusaka is selected */}
             {selectedOption === 'fusaka' && (
-              <Box mb={6}>
+              <Box>
                 <SlotCountdown />
               </Box>
             )}
-
+          </Box>
+          
+          {/* Container 2: Network Upgrade Timeline */}
+          <Box
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue("gray.200", "gray.700")}
+            mb={8}
+            px={6}
+            py={8}
+          >
             <Box id="NetworkUpgrades">
               <UpgradesTimeline
                 selectedOption={selectedOption}
@@ -956,7 +954,7 @@ return (
             </Box>
           </Box>
 
-          {/* Description Section */}
+          {/* Container 3: Description + Network Upgrade Inclusion Stages Chart */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
             borderRadius="xl"
@@ -1011,6 +1009,7 @@ return (
                       </Text>
                     </NLink>.
                   </>
+                  
                 ) : selectedOption === 'fusaka' ? (
                   <>
                     <NLink href="https://eipsinsight.com/eips/eip-7607">
@@ -1089,23 +1088,14 @@ return (
                 }
               </Text>
             </Flex>
+            
+            {/* Network Upgrade Inclusion Stages Chart (FUSAKA) */}
+            <Box id="NetworkUpgradeschart" mt={8}>  
+              <NetworkUpgradesChart />
+            </Box>
           </Box>
 
-          {/* EtherWorld Advertisement Section */}
-          <Box
-            bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
-            boxShadow="sm"
-            border="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={8}
-            px={6}
-            py={8}
-          >
-            <EtherWorldAdCard />
-          </Box>
-
-          {/* Blog Cards Section */}
+          {/* Container 4: Blog Cards Section */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
             borderRadius="xl"
@@ -1157,12 +1147,7 @@ return (
             </Box>
           </Box>
 
-          {/* Advertise With Us (subtle placement) */}
-          <Box mb={8}>
-            <PlaceYourAdCard />
-          </Box>
-
-          {/* Upgrade Table Section */}
+          {/* Container 5: Upgrade Table + Declined EIPs */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
             borderRadius="xl"
@@ -1181,7 +1166,16 @@ return (
             </Box>
 
             {(selectedOption === 'fusaka' || selectedOption === 'glamsterdam') && (
-              <Box mt={6}>
+              <Box mt={8}>
+                <Text
+                  fontSize={{ base: '2xl', md: '3xl' }}
+                  fontWeight="bold"
+                  color="#00CED1"
+                  textAlign="left"
+                  mb={6}
+                >
+                  Declined for Inclusion
+                </Text>
                 <DeclinedEIPListPage
                   selectedUpgrade={selectedOption}
                 />
@@ -1189,7 +1183,17 @@ return (
             )}
           </Box>
 
-          {/* Charts Section */}
+          {/* EtherWorld Advertisement - Balanced Styling */}
+          <Box 
+            my={8} 
+            mx="auto" 
+            maxW="1200px" 
+            px={{ base: 4, md: 6, lg: 8 }}
+          >
+            <EtherWorldAdCard />
+          </Box>
+
+          {/* Container 6: Author Contributions */}
           <Box
             bg={useColorModeValue('white', 'gray.800')}
             borderRadius="xl"
@@ -1200,39 +1204,50 @@ return (
             px={6}
             py={8}
           >
-            <Box id="NetworkUpgradeschart" mb={6}>  
-              <NetworkUpgradesChart />
-            </Box>
-
-            <Box id="AuthorContributions" mb={6}>
+            <Box id="AuthorContributions">
               <NetworkUpgradesChart2 />
             </Box>
+          </Box>
 
-            <Box
-              id="NetworkUpgradesChartp"
-              px={{ base: 2, md: 6 }}
-              width="100%"
-              overflowX="auto"
-            >
+          {/* Container 7: Network Upgrades and EIPs Relationship Graph */}
+          <Box
+            bg={useColorModeValue('white', 'gray.800')}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            mb={8}
+            px={6}
+            py={6}
+          >
+            <Box mb={6}>
               <Text
                 fontSize={{ base: '2xl', md: '3xl' }}
                 fontWeight="bold"
                 color="#00CED1"
                 textAlign="left"
-                mb={4}
+                id="NetworkUpgradesChartp"
               >
                 Network Upgrades and EIPs Relationship Graph
               </Text>
-              <Flex justifyContent="center" alignItems="center" width="100%">
-                <Box width="100%" overflow="hidden">
-                  <Graph />
-                </Box>
-              </Flex>
+            </Box>
+            <Box 
+              width="100%" 
+              position="relative"
+              minH="550px"
+              overflow="hidden"
+            >
+              <Graph />
             </Box>
           </Box>
 
           </motion.div>
         )}
+
+        {/* Place Your Ad Card - No Container */}
+        <Box my={8}>
+          <PlaceYourAdCard />
+        </Box>
       </Box>
     </AllLayout>
   </>

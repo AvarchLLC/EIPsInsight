@@ -291,75 +291,108 @@ export default function DeclinedEIPListPage({
   if (!data.length) return null;
 
   return (
-    <Box id="dfi" mt={8}>
-      {/* Compact Header Section */}
-      <VStack spacing={3} mb={6} align="start">
-        <Flex align="center" gap={3}>
-          <Text fontSize="lg" fontWeight="bold" color={textColor}>
-            Declined for Inclusion
-          </Text>
-          <Badge 
-            colorScheme="red" 
-            variant="subtle" 
-            px={2} 
-            py={1} 
-            borderRadius="md"
-            fontSize="sm"
-          >
-            {upgradeLabel}
-          </Badge>
-          <Badge 
-            colorScheme="gray" 
-            variant="outline" 
-            px={2} 
-            py={1} 
-            borderRadius="md"
-            fontSize="sm"
-          >
-            {data.length} EIPs
-          </Badge>
-        </Flex>
-        
-        <Text fontSize="sm" color={textColor} maxW="600px">
-          EIPs considered for {upgradeLabel} but not included in the upgrade. 
-          These proposals may be reconsidered in future upgrades.
-        </Text>
-        
-        <Divider borderColor={borderColor} />
-      </VStack>
-
-      {/* Compact Grid Display */}
-      <Box
-        bg={sectionBg}
-        p={4}
-        borderRadius="lg"
-        border="1px solid"
-        borderColor={borderColor}
+    <Box 
+      id="dfi" 
+      bg={useColorModeValue('white', 'gray.900')} 
+      borderRadius="2xl" 
+      boxShadow="xl"
+      border="1px solid"
+      borderColor={useColorModeValue('gray.200', 'gray.700')}
+      overflow="hidden"
+      mt={8}
+    >
+      {/* Professional Header Section */}
+      <Box 
+        bg={useColorModeValue('gray.50', 'gray.800')} 
+        px={8} 
+        py={6} 
+        borderBottom="1px solid"
+        borderColor={useColorModeValue('gray.200', 'gray.700')}
       >
+        <VStack spacing={4} align="start">
+          <Flex align="center" gap={4} wrap="wrap">
+            <Text 
+              fontSize={{ base: "xl", md: "2xl" }} 
+              fontWeight="700" 
+              color={useColorModeValue('gray.900', 'white')}
+              fontFamily="system-ui, -apple-system, sans-serif"
+            >
+              Declined for Inclusion
+            </Text>
+            <Badge 
+              colorScheme="red" 
+              variant="solid" 
+              px={3} 
+              py={1} 
+              borderRadius="full"
+              fontSize="sm"
+              fontWeight="600"
+              textTransform="uppercase"
+              letterSpacing="0.5px"
+            >
+              {upgradeLabel}
+            </Badge>
+            <Badge 
+              bg={useColorModeValue('gray.100', 'gray.700')}
+              color={useColorModeValue('gray.700', 'gray.300')}
+              px={3} 
+              py={1} 
+              borderRadius="full"
+              fontSize="sm"
+              fontWeight="600"
+            >
+              {data.length} EIP{data.length !== 1 ? 's' : ''}
+            </Badge>
+          </Flex>
+          
+          <Text 
+            fontSize="md" 
+            color={useColorModeValue('gray.600', 'gray.400')} 
+            maxW="700px"
+            lineHeight="1.6"
+            fontWeight="400"
+          >
+            EIPs considered for {upgradeLabel} but not included in the upgrade. 
+            These proposals may be reconsidered in future upgrades.
+          </Text>
+        </VStack>
+      </Box>
+
+      {/* Professional Content Section */}
+      <Box px={8} py={6}>
         <SimpleGrid 
           columns={{ base: 1, md: 2, lg: 3 }} 
-          spacing={3}
-          mb={hasMoreItems ? 4 : 0}
+          spacing={6}
+          mb={hasMoreItems ? 6 : 0}
         >
           {displayedData.map(eip => (
             <DeclinedEIPCard key={eip.id} eip={eip} />
           ))}
         </SimpleGrid>
 
-        {/* Show More/Less Button */}
+        {/* Enhanced Show More/Less Button */}
         {hasMoreItems && (
-          <Flex justify="center" mt={4}>
+          <Flex justify="center" mt={6}>
             <Button
-              variant="ghost"
+              variant="outline"
               colorScheme="blue"
-              size="sm"
+              size="md"
               onClick={() => setShowAll(!showAll)}
               leftIcon={showAll ? <ChevronUpIcon /> : <ChevronDownIcon />}
+              px={6}
+              py={3}
+              borderRadius="full"
+              fontWeight="600"
               _hover={{
                 bg: useColorModeValue("blue.50", "blue.900"),
-                transform: "translateY(-1px)"
+                transform: "translateY(-2px)",
+                boxShadow: "lg"
               }}
-              transition="all 0.2s"
+              _active={{
+                transform: "translateY(0px)"
+              }}
+              transition="all 0.3s ease"
+              boxShadow="md"
             >
               {showAll 
                 ? `Show Less` 
@@ -368,17 +401,22 @@ export default function DeclinedEIPListPage({
             </Button>
           </Flex>
         )}
+      </Box>
 
-        {/* Summary Footer */}
+      {/* Professional Footer */}
+      <Box 
+        bg={useColorModeValue('gray.50', 'gray.800')} 
+        px={8} 
+        py={4}
+        borderTop="1px solid"
+        borderColor={useColorModeValue('gray.200', 'gray.700')}
+      >
         <Flex 
           justify="space-between" 
-          align="center" 
-          mt={4} 
-          pt={3} 
-          borderTop="1px solid" 
-          borderColor={borderColor}
-          fontSize="xs"
-          color={textColor}
+          align="center"
+          fontSize="sm"
+          color={useColorModeValue('gray.600', 'gray.400')}
+          fontWeight="500"
         >
           <Text>
             Showing {displayedData.length} of {data.length} declined EIPs
