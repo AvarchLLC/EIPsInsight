@@ -26,28 +26,37 @@ interface NetworkConfig {
 
 // Define the available networks
 const networks: Record<string, NetworkConfig> = {
-  sepolia: {
-    beaconApi: "https://ethereum-sepolia-beacon-api.publicnode.com",
-    rpc: "https://ethereum-sepolia-rpc.publicnode.com",
-    target: 7118848,
-    targetepoch: 222464,
-    name: "Sepolia",
-  },
   holesky: {
     beaconApi: "https://ethereum-holesky-beacon-api.publicnode.com",
     rpc: "https://ethereum-holesky-rpc.publicnode.com",
-    target: 3710976,
-    targetepoch: 115968,
+    target: 5283840,        // Fusaka activation slot on Holesky (testnet)
+    targetepoch: Math.floor(5283840 / 32),
     name: "Holesky",
+  },
+  sepolia: {
+    beaconApi: "https://ethereum-sepolia-beacon-api.publicnode.com",
+    rpc: "https://ethereum-sepolia-rpc.publicnode.com",
+    target: 8724480,        // Fusaka activation slot on Sepolia (testnet)
+    targetepoch: Math.floor(8724480 / 32),
+    name: "Sepolia",
+  },
+  // If you also want Hoodi testnet:
+  hoodi: {
+    beaconApi: "<ho-beacon-api>",
+    rpc: "<ho-rpc>",
+    target: 1622016,        // Fusaka activation slot on Hoodi (testnet)
+    targetepoch: Math.floor(1622016 / 32),
+    name: "Hoodi",
   },
   mainnet: {
     beaconApi: "https://ethereum-beacon-api.publicnode.com",
     rpc: "https://ethereum-rpc.publicnode.com",
-    target: 11649024,
-    targetepoch: 364032,
+    target: Number.MAX_SAFE_INTEGER,  
+    targetepoch: Number.MAX_SAFE_INTEGER,
     name: "Mainnet",
   },
 };
+
 
 // Keyframes for celebratory animation
 const celebrateAnimation = keyframes`
@@ -321,7 +330,7 @@ const SlotCountdown: React.FC = () => {
             transition: "transform 0.2s",
           }}
         >
-          PECTRA
+          FUSAKA
         </Box>
         </Tooltip>
       </HStack>
@@ -444,7 +453,7 @@ const SlotCountdown: React.FC = () => {
           transition: "transform 0.2s",
         }}
       >
-        PECTRA
+        FUSAKA
       </Box>
       </Tooltip>
     </HStack>
@@ -493,7 +502,7 @@ const SlotCountdown: React.FC = () => {
       color={useColorModeValue("black", "white")}
       whiteSpace="nowrap"
     >
-      PECTRA Upgrade ({networks[network].name})
+      FUSAKA Upgrade ({networks[network].name})
     </Text>
   </Box>
 

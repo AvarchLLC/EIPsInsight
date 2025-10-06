@@ -938,6 +938,14 @@ return (
                 <option value="pectra">Pectra</option>
               </select>
             </Box>
+
+            {/* FUSAKA Countdown - Only show when Fusaka is selected */}
+            {selectedOption === 'fusaka' && (
+              <Box mb={6}>
+                <SlotCountdown />
+              </Box>
+            )}
+
             <Box id="NetworkUpgrades">
               <UpgradesTimeline
                 selectedOption={selectedOption}

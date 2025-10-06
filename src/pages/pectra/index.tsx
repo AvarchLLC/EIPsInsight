@@ -447,7 +447,7 @@ const All = () => {
 
               <br />
               {/* <br/> */}
-              {/* <SlotCountdown /> */}
+              
               {/* <br /> */}
               <Text
                 as={motion.div}
