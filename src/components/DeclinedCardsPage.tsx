@@ -1,4 +1,17 @@
-import { SimpleGrid, Box } from "@chakra-ui/react";
+import { 
+  SimpleGrid, 
+  Box, 
+  Button, 
+  VStack, 
+  Text, 
+  useColorModeValue,
+  Collapse,
+  Flex,
+  Badge,
+  Divider
+} from "@chakra-ui/react";
+import { useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import DeclinedEIPCard from "./DeclinedForInclusion";
 import Header from "@/components/Header";
 
@@ -260,25 +273,121 @@ export default function DeclinedEIPListPage({
   fusaka = defaultFusaka,
   glamsterdam = defaultGlamsterdam
 }: DeclinedEIPListPageProps) {
-
+  const [showAll, setShowAll] = useState(false);
+  
   const data = selectedUpgrade === 'fusaka' ? fusaka : glamsterdam;
   const upgradeLabel = selectedUpgrade === 'fusaka' ? 'Fusaka' : 'Glamsterdam';
+  
+  // Color mode values
+  const sectionBg = useColorModeValue("gray.50", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const textColor = useColorModeValue("gray.700", "gray.300");
+  
+  // Configure initial display count
+  const INITIAL_COUNT = 6;
+  const displayedData = showAll ? data : data.slice(0, INITIAL_COUNT);
+  const hasMoreItems = data.length > INITIAL_COUNT;
 
   if (!data.length) return null;
 
   return (
-    <Box id="dfi" mt={12}>
-      <Header
-        title={`Declined for Inclusion (${upgradeLabel}) - [${data.length}]`}
-        subtitle="Overview"
-        description={`EIPs considered for ${upgradeLabel} but not included. They may be reconsidered in later upgrades.`}
-        sectionId="dfi"
-      />
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} spacing={4}>
-        {data.map(eip => (
-          <DeclinedEIPCard key={eip.id} eip={eip} />
-        ))}
-      </SimpleGrid>
+    <Box id="dfi" mt={8}>
+      {/* Compact Header Section */}
+      <VStack spacing={3} mb={6} align="start">
+        <Flex align="center" gap={3}>
+          <Text fontSize="lg" fontWeight="bold" color={textColor}>
+            Declined for Inclusion
+          </Text>
+          <Badge 
+            colorScheme="red" 
+            variant="subtle" 
+            px={2} 
+            py={1} 
+            borderRadius="md"
+            fontSize="sm"
+          >
+            {upgradeLabel}
+          </Badge>
+          <Badge 
+            colorScheme="gray" 
+            variant="outline" 
+            px={2} 
+            py={1} 
+            borderRadius="md"
+            fontSize="sm"
+          >
+            {data.length} EIPs
+          </Badge>
+        </Flex>
+        
+        <Text fontSize="sm" color={textColor} maxW="600px">
+          EIPs considered for {upgradeLabel} but not included in the upgrade. 
+          These proposals may be reconsidered in future upgrades.
+        </Text>
+        
+        <Divider borderColor={borderColor} />
+      </VStack>
+
+      {/* Compact Grid Display */}
+      <Box
+        bg={sectionBg}
+        p={4}
+        borderRadius="lg"
+        border="1px solid"
+        borderColor={borderColor}
+      >
+        <SimpleGrid 
+          columns={{ base: 1, md: 2, lg: 3 }} 
+          spacing={3}
+          mb={hasMoreItems ? 4 : 0}
+        >
+          {displayedData.map(eip => (
+            <DeclinedEIPCard key={eip.id} eip={eip} />
+          ))}
+        </SimpleGrid>
+
+        {/* Show More/Less Button */}
+        {hasMoreItems && (
+          <Flex justify="center" mt={4}>
+            <Button
+              variant="ghost"
+              colorScheme="blue"
+              size="sm"
+              onClick={() => setShowAll(!showAll)}
+              leftIcon={showAll ? <ChevronUpIcon /> : <ChevronDownIcon />}
+              _hover={{
+                bg: useColorModeValue("blue.50", "blue.900"),
+                transform: "translateY(-1px)"
+              }}
+              transition="all 0.2s"
+            >
+              {showAll 
+                ? `Show Less` 
+                : `Show ${data.length - INITIAL_COUNT} More EIPs`
+              }
+            </Button>
+          </Flex>
+        )}
+
+        {/* Summary Footer */}
+        <Flex 
+          justify="space-between" 
+          align="center" 
+          mt={4} 
+          pt={3} 
+          borderTop="1px solid" 
+          borderColor={borderColor}
+          fontSize="xs"
+          color={textColor}
+        >
+          <Text>
+            Showing {displayedData.length} of {data.length} declined EIPs
+          </Text>
+          <Text>
+            Updated for {upgradeLabel} upgrade
+          </Text>
+        </Flex>
+      </Box>
     </Box>
   );
 }
