@@ -201,13 +201,7 @@ const linkHref =
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
       <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
         <Heading size="md" color={headingColor}>
-          Network Upgrade Inclusion Stages (
-          <Link href={linkHref}>
-            <Text as="span" color="blue.400" fontWeight="bold">
-              {selectedOption.toUpperCase()}
-            </Text>
-          </Link>
-          )
+          Network Upgrade Inclusion Stages
         </Heading>
         <HStack>
           <IconButton aria-label="Zoom In" icon={<AddIcon />} size="sm" onClick={() => setZoomLevel(z => z * 1.2)} />
@@ -326,17 +320,7 @@ onMouseEnter={(e) => {
               );
             })}
             {/* Upgrade Name at Bottom */}
-            <text
-              x={chartWidth / 2}
-              y={chartHeight - 10}
-              fontSize={20}
-              fontWeight="bold"
-              fill="#40E0D0"
-              textAnchor="middle"
-              vectorEffect="non-scaling-stroke"
-            >
-              {selectedOption.toUpperCase()}
-            </text>
+
           </Group>
         </svg>
       </Flex>
@@ -388,12 +372,7 @@ onMouseEnter={(e) => {
   </Box>
 )}
 
-      {/* Upgrade Name Display */}
-      <Box mt={4} mb={2} textAlign="center">
-        <Text fontSize="2xl" fontWeight="bold" color="#40E0D0">
-          {selectedOption.toUpperCase()}
-        </Text>
-      </Box>
+
 
       <DateTime />
     </Box>
