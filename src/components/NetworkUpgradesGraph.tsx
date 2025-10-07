@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import SpriteText from 'three-spritetext';
 import { Button, IconButton, HStack, Box, useColorModeValue, Text } from '@chakra-ui/react';
 import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
+import { useRouter } from 'next/router';
 
 const networkUpgradesData = {
   networkUpgrades: [
@@ -212,9 +213,11 @@ const networkUpgradesData = {
 };
 
 const EIP3DGraph = () => {
+  const router = useRouter();
   const fgRef = React.useRef<ForceGraphMethods<any, any> | undefined>(undefined);
   const [showResetZoom, setShowResetZoom] = useState(true);
   const [hoveredNetwork, setHoveredNetwork] = useState<string | null>(null);
+  const [selectedNetwork, setSelectedNetwork] = useState<string | null>(null);
   
   // Theme-aware colors
   const legendBg = useColorModeValue('rgba(255, 255, 255, 0.95)', 'rgba(26, 32, 44, 0.95)');
@@ -388,7 +391,22 @@ const EIP3DGraph = () => {
         maxW="200px"
         maxH="400px"
       >
-        <Text fontWeight="bold" color={legendText} mb={2}>Network Upgrades</Text>
+        <Text fontWeight="bold" color={legendText} mb={1}>Network Upgrades</Text>
+        <Text fontSize="0.7rem" color={useColorModeValue('gray.600', 'gray.400')} mb={2}>
+          Hover to highlight • Click EIP to visit • Shift+click to pin
+        </Text>
+        {selectedNetwork && (
+          <Button 
+            size="xs" 
+            variant="ghost" 
+            onClick={() => setSelectedNetwork(null)}
+            mb={2}
+            fontSize="0.65rem"
+            h="20px"
+          >
+            Clear Selection
+          </Button>
+        )}
         <div 
           style={{
             listStyleType: 'none',
@@ -410,7 +428,8 @@ const EIP3DGraph = () => {
               cursor="pointer"
               p={2}
               borderRadius="md"
-              bg={hoveredNetwork === group ? useColorModeValue('gray.100', 'gray.700') : 'transparent'}
+              bg={hoveredNetwork === group || selectedNetwork === group ? 
+                useColorModeValue('gray.100', 'gray.700') : 'transparent'}
               transition="all 0.2s ease"
               _hover={{
                 bg: useColorModeValue('gray.100', 'gray.700'),
@@ -418,6 +437,7 @@ const EIP3DGraph = () => {
               }}
               onMouseEnter={() => setHoveredNetwork(group)}
               onMouseLeave={() => setHoveredNetwork(null)}
+              onClick={() => setSelectedNetwork(selectedNetwork === group ? null : group)}
             >
               <Box
                 as="span"
@@ -427,9 +447,11 @@ const EIP3DGraph = () => {
                 borderRadius="50%"
                 bg={colorScale.get(group)}
                 mr={2}
-                boxShadow={hoveredNetwork === group ? `0 0 8px ${colorScale.get(group)}` : 'none'}
-                transform={hoveredNetwork === group ? 'scale(1.2)' : 'scale(1)'}
+                boxShadow={hoveredNetwork === group || selectedNetwork === group ? 
+                  `0 0 8px ${colorScale.get(group)}` : 'none'}
+                transform={hoveredNetwork === group || selectedNetwork === group ? 'scale(1.2)' : 'scale(1)'}
                 transition="all 0.2s ease"
+                border={selectedNetwork === group ? `2px solid ${colorScale.get(group)}` : 'none'}
               />
               {group}
             </Box>
@@ -486,10 +508,11 @@ const EIP3DGraph = () => {
           graphData={graphData}
           nodeThreeObject={(node: any) => {
             const baseColor = colorScale.get(node.group) || '#999';
-            const isHighlighted = hoveredNetwork === node.group;
-            const isOtherNetwork = hoveredNetwork && hoveredNetwork !== node.group;
+            const isHighlighted = hoveredNetwork === node.group || selectedNetwork === node.group;
+            const isOtherNetwork = (hoveredNetwork && hoveredNetwork !== node.group) || 
+                                 (selectedNetwork && selectedNetwork !== node.group && !hoveredNetwork);
             
-            // Adjust sphere properties based on hover state
+            // Adjust sphere properties based on hover/selection state
             const sphereRadius = isHighlighted ? 8 : 6;
             const sphereColor = isOtherNetwork ? '#666' : baseColor;
             const sphereOpacity = isOtherNetwork ? 0.3 : 1;
@@ -534,29 +557,32 @@ const EIP3DGraph = () => {
           linkColor={(link) => {
             const sourceNode = graphData.nodes.find(n => n.id === link.source);
             const targetNode = graphData.nodes.find(n => n.id === link.target);
-            const isRelatedToHovered = hoveredNetwork && (
-              sourceNode?.group === hoveredNetwork || 
-              targetNode?.group === hoveredNetwork
+            const activeNetwork = hoveredNetwork || selectedNetwork;
+            const isRelatedToActive = activeNetwork && (
+              sourceNode?.group === activeNetwork || 
+              targetNode?.group === activeNetwork
             );
-            return isRelatedToHovered ? (colorScale.get(hoveredNetwork) || '#999') : '#999';
+            return isRelatedToActive ? (colorScale.get(activeNetwork) || '#999') : '#999';
           }}
           linkWidth={(link) => {
             const sourceNode = graphData.nodes.find(n => n.id === link.source);
             const targetNode = graphData.nodes.find(n => n.id === link.target);
-            const isRelatedToHovered = hoveredNetwork && (
-              sourceNode?.group === hoveredNetwork || 
-              targetNode?.group === hoveredNetwork
+            const activeNetwork = hoveredNetwork || selectedNetwork;
+            const isRelatedToActive = activeNetwork && (
+              sourceNode?.group === activeNetwork || 
+              targetNode?.group === activeNetwork
             );
-            return isRelatedToHovered ? 4 : 2;
+            return isRelatedToActive ? 4 : 2;
           }}
           linkDirectionalParticles={(link) => {
             const sourceNode = graphData.nodes.find(n => n.id === link.source);
             const targetNode = graphData.nodes.find(n => n.id === link.target);
-            const isRelatedToHovered = hoveredNetwork && (
-              sourceNode?.group === hoveredNetwork || 
-              targetNode?.group === hoveredNetwork
+            const activeNetwork = hoveredNetwork || selectedNetwork;
+            const isRelatedToActive = activeNetwork && (
+              sourceNode?.group === activeNetwork || 
+              targetNode?.group === activeNetwork
             );
-            return isRelatedToHovered ? 4 : 2;
+            return isRelatedToActive ? 4 : 2;
           }}
           linkDirectionalParticleWidth={2}
           linkOpacity={0.6}
@@ -568,6 +594,21 @@ const EIP3DGraph = () => {
           nodeResolution={32}
           warmupTicks={100}
           cooldownTicks={1000}
+          onNodeClick={(node: any, event: any) => {
+            // Check if Shift key is pressed for selection, otherwise navigate
+            if (event?.shiftKey) {
+              // Toggle selection when Shift+click
+              setSelectedNetwork(selectedNetwork === node.group ? null : node.group);
+            } else {
+              // Navigate to EIP page on regular click
+              const eipNumber = node.label; // The EIP number from the node
+              router.push(`/eips/eip-${eipNumber}`);
+            }
+          }}
+          onBackgroundClick={() => {
+            // Clear selection when clicking on empty space
+            setSelectedNetwork(null);
+          }}
         // onZoom={() => setShowResetZoom(true)}
         />
       </div>
