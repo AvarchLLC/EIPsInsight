@@ -457,7 +457,7 @@ const SlotCountdown: React.FC = () => {
 
       {/* Target Epoch Box */}
       <Tooltip
-        label={`Target epoch: ${networks[network].targetepoch}, Date: May 07, 2025 (10:05:11 UTC)`}
+        label={`Target epoch: ${networks[network].target}, Date: ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}`}
         hasArrow
         placement="top"
         bg="gray.700"
