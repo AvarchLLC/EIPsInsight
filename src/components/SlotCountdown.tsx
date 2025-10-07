@@ -102,6 +102,7 @@ const SlotCountdown: React.FC = () => {
   const [countdown, setCountdown] = useState<string>(""); // Countdown for days, hours, minutes
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false); // Track if the upgrade is live
   const [viewMode, setViewMode] = useState<"slots" | "epochs">("epochs"); // Default to epochs view
+  const [showInfo, setShowInfo] = useState<boolean>(false); // Collapsible info section
 
   const countdownInterval = useRef<NodeJS.Timeout | null>(null); // Store interval reference
 
@@ -487,14 +488,65 @@ const SlotCountdown: React.FC = () => {
   );
 
   return (
+
     <>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        {/* Info Header Card */}
-
+        {/* Collapsible Info Section */}
+        <Box
+          maxWidth="1370px"
+          mx="auto"
+          mt={2}
+          mb={2}
+          borderRadius="lg"
+          boxShadow="xl"
+          bg={useColorModeValue("white","gray.800")}
+          color="white"
+          p={2}
+        >
+          <Flex align="center" justify="space-between">
+            <HStack spacing={2}>
+              <Icon as={FaInfoCircle} color={useColorModeValue("blue.600", "blue.300")} />
+              <Text fontWeight="bold" color={useColorModeValue("black", "white")}>
+                FUSAKA Network Upgrade
+              </Text>
+              <Badge colorScheme="purple" variant="subtle" fontSize="9px">Info</Badge>
+            </HStack>
+            <Button
+              onClick={() => setShowInfo((prev) => !prev)}
+              size="sm"
+              variant="ghost"
+              color={useColorModeValue("blue.600", "blue.200")}
+              rightIcon={showInfo ? <FaChevronUp /> : <FaChevronDown />}
+              aria-label={showInfo ? "Hide info" : "Show info"}
+            >
+              {showInfo ? "Hide" : "More"}
+            </Button>
+          </Flex>
+          <Collapse in={showInfo} animateOpacity>
+            <Box mt={3} mb={2} px={2}>
+              <Text fontWeight="bold" fontSize="md" color={useColorModeValue("gray.800", "gray.100")}>{FUSAKA_INFO.title}</Text>
+              <Text fontSize="sm" color={useColorModeValue("gray.700", "gray.300")} mb={2}>{FUSAKA_INFO.description}</Text>
+              <Text fontWeight="semibold" fontSize="sm" color={useColorModeValue("gray.800", "gray.200")}>Key Features:</Text>
+              <ul style={{ marginLeft: 18, marginBottom: 8 }}>
+                {FUSAKA_INFO.features.map((f, i) => (
+                  <li key={i} style={{ color: useColorModeValue("#333", "#eee"), fontSize: 13 }}>{f}</li>
+                ))}
+              </ul>
+              <Text fontWeight="semibold" fontSize="sm" color={useColorModeValue("gray.800", "gray.200")}>Activation Schedule:</Text>
+              <ul style={{ marginLeft: 18 }}>
+                {Object.entries(FUSAKA_INFO.schedule).map(([net, date]) => (
+                  <li key={net} style={{ color: useColorModeValue("#333", "#eee"), fontSize: 13 }}>
+                    <b>{net.charAt(0).toUpperCase() + net.slice(1)}:</b> {date}
+                  </li>
+                ))}
+              </ul>
+            </Box>
+          </Collapse>
+        </Box>
 
         <Box
           textAlign="center"
