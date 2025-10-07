@@ -31,10 +31,10 @@ import PectraTable from "@/components/PectraTable";
 import { Table, Thead, Tbody, Tr, Th, Td, Link, TableContainer } from "@chakra-ui/react";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
-import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
+
 import { FaSyncAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
+import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import Graph from "@/components/EIP3DWrapper"
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { IconButton } from '@chakra-ui/react';
@@ -1193,21 +1193,7 @@ return (
             <EtherWorldAdCard />
           </Box>
 
-          {/* Container 6: Author Contributions */}
-          <Box
-            bg={useColorModeValue('white', 'gray.800')}
-            borderRadius="xl"
-            boxShadow="sm"
-            border="1px solid"
-            borderColor={useColorModeValue('gray.200', 'gray.700')}
-            mb={8}
-            px={6}
-            py={8}
-          >
-            <Box id="AuthorContributions">
-              <NetworkUpgradesChart2 />
-            </Box>
-          </Box>
+
 
           {/* Container 7: Network Upgrades and EIPs Relationship Graph */}
           <Box

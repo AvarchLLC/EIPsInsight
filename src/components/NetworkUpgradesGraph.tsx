@@ -243,6 +243,7 @@ const EIP3DGraph = () => {
     const links: any[] = [];
     const seen = new Set<number>();
 
+    // First pass: Create nodes for all EIPs
     for (const upgrade of networkUpgradesData.networkUpgrades) {
       for (const { eip } of upgrade.eips) {
         if (!seen.has(eip)) {
@@ -257,6 +258,22 @@ const EIP3DGraph = () => {
       }
     }
 
+    // Ensure all network upgrades appear in legend (even those with no EIPs)
+    const networksWithNodes = new Set(nodes.map(node => node.group));
+    for (const upgrade of networkUpgradesData.networkUpgrades) {
+      if (!networksWithNodes.has(upgrade.name) && upgrade.eips.length === 0) {
+        // Create a placeholder node for networks without EIPs
+        const placeholderId = `placeholder-${upgrade.name}`;
+        nodes.push({
+          id: placeholderId,
+          label: `${upgrade.name}`,
+          group: upgrade.name,
+          upgradeName: upgrade.name,
+        });
+      }
+    }
+
+    // Second pass: Create links between EIPs
     for (const upgrade of networkUpgradesData.networkUpgrades) {
       for (const { eip, requires } of upgrade.eips) {
         for (const req of requires) {
@@ -280,18 +297,78 @@ const EIP3DGraph = () => {
   const uniqueGroups = useMemo(() => {
     const groups = new Set<string>();
     graphData.nodes.forEach((node) => groups.add(node.group));
-    return [...groups].filter((g) => g); // remove empty string group
+    
+    // Define chronological order (latest to oldest) - exact 19 network upgrades
+    const chronologicalOrder = [
+      'Pectra',           // May 2025 
+      'Dencun',           // March 2024
+      'Shanghai',         // April 2023
+      'Paris',            // September 2022
+      'Gray Glacier',     // June 2022
+      'Arrow Glacier',    // December 2021
+      'London',           // August 2021
+      'Berlin',           // April 2021
+      'Muir Glacier',     // January 2020
+      'Istanbul',         // December 2019
+      'Constantinople',   // February 2019
+      'Petersburg',       // February 2019
+      'Byzantium',        // October 2017
+      'Spurious Dragon',  // November 2016
+      'Tangerine Whistle', // October 2016
+      'DAO Fork',         // July 2016
+      'Homestead',        // March 2016
+      'Frontier Thawing', // September 2015
+      'Frontier'          // July 2015
+    ];
+    
+    // Sort groups by chronological order, with unknown groups at the end
+    const groupArray = [...groups].filter((g) => g);
+    const sorted = groupArray.sort((a, b) => {
+      const indexA = chronologicalOrder.indexOf(a);
+      const indexB = chronologicalOrder.indexOf(b);
+      
+      // If both are in the chronological order, sort by their position
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+      // If only one is in the chronological order, prioritize it
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+      // If neither is in the chronological order, sort alphabetically
+      return a.localeCompare(b);
+    });
+    
+    return sorted;
   }, [graphData]);
 
   const colorScale = useMemo(() => {
     const scale = new Map<string, string>();
     const palette = [
-      '#FF6B6B', '#4ECDC4', '#FFD93D', '#6A0572', '#1B9C  FC',
-      '#FF9F1C', '#2EC4B6', '#E71D36', '#A8DADC', '#457B9D',
+      '#FF6B6B', // Fusaka - Red
+      '#4ECDC4', // Pectra - Teal  
+      '#FFD93D', // Dencun - Yellow
+      '#6A0572', // Shapella - Purple
+      '#1B9CFC', // Paris - Blue (fixed typo)
+      '#FF9F1C', // Gray Glacier - Orange
+      '#2EC4B6', // Arrow Glacier - Cyan
+      '#E71D36', // London - Red
+      '#A8DADC', // Berlin - Light Blue  
+      '#457B9D', // Muir Glacier - Dark Blue
+      '#F72585', // Istanbul - Pink
+      '#7209B7', // Petersburg - Violet
+      '#560BAD', // Byzantium - Dark Purple
+      '#2D1B69', // Spurious Dragon - Navy
+      '#0F3460', // Tangerine Whistle - Dark Blue
+      '#16537E', // DAO Fork - Steel Blue
+      '#1A759F', // Homestead - Ocean Blue
+      '#168AAD', // Frontier Thawing - Light Ocean
+      '#34A0A4', // Frontier - Teal Blue
     ];
+    
     uniqueGroups.forEach((group, index) => {
       scale.set(group, palette[index % palette.length]);
     });
+    
     return scale;
   }, [uniqueGroups]);
 
@@ -309,12 +386,24 @@ const EIP3DGraph = () => {
         boxShadow={legendShadow}
         zIndex={10}
         maxW="200px"
+        maxH="400px"
       >
-        <Text fontWeight="bold" color={legendText}>Network Upgrades</Text>
-        <Box as="ul" listStyleType="none" p={0} mt={2}>
+        <Text fontWeight="bold" color={legendText} mb={2}>Network Upgrades</Text>
+        <div 
+          style={{
+            listStyleType: 'none',
+            padding: 0,
+            margin: '8px 0 0 0',
+            maxHeight: '340px',
+            overflowY: 'auto',
+            paddingRight: '4px',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#666 #f1f1f1'
+          }}
+        >
           {uniqueGroups.map((group) => (
             <Box 
-              as="li" 
+              as="div" 
               key={group} 
               mb={1.5} 
               color={legendText}
@@ -345,7 +434,7 @@ const EIP3DGraph = () => {
               {group}
             </Box>
           ))}
-        </Box>
+        </div>
       </Box>
 
 

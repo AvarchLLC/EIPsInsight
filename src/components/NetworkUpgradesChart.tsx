@@ -160,25 +160,23 @@ const rawData = [
   { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-161" },
   { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-170" },
 
-  // Frontier Thawing — September 7, 2015
-  { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "Gas Limit" },
+  // DAO Fork — July 20, 2016 (Irregular state change)
+  { date: "2016-07-20", upgrade: "DAO Fork", eip: "EIP-779" },
 
-  // Frontier — July 30, 2015
-  { date: "2015-07-30", upgrade: "Frontier", eip: "Genesis" },
-  
-  // DAO Fork — July 20, 2016 (adding this properly)
-  { date: "2016-07-20", upgrade: "DAO Fork", eip: "State Change" },
-  
-  // Bellatrix — September 6, 2022 (Consensus layer)
-  { date: "2022-09-06", upgrade: "Bellatrix", eip: "Consensus" },
-  
-  // Altair — October 27, 2021 (Consensus layer)
-  { date: "2021-10-27", upgrade: "Altair", eip: "Beacon Chain" },
+  // Frontier Thawing — September 7, 2015
+  { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "EIP-3" },
+
+  // Frontier — July 30, 2015 (Genesis mainnet launch)  
+  { date: "2015-07-30", upgrade: "Frontier", eip: "EIP-1" },
 ];
 
-// Group data by date-upgrade combination// Group data by date-upgrade combination (keeping duplicates)
+// Group data by date-upgrade combination (keeping duplicates)
 const upgradeMap: Record<string, { date: string, upgrade: string, eips: string[] }> = {};
 for (const { date, upgrade, eip } of rawData) {
+  // Only process actual EIP entries (must start with "EIP-" or be a number)
+  const isValidEIP = eip.startsWith("EIP-") || /^\d+$/.test(eip);
+  if (!isValidEIP) continue;
+  
   const baseKey = `${date}-${upgrade}`;
   let key = baseKey;
   let counter = 1;
@@ -189,9 +187,9 @@ for (const { date, upgrade, eip } of rawData) {
   if (eip) upgradeMap[key].eips.push(eip.replace("EIP-", ""));
 }
 
-const upgradeRows = Object.values(upgradeMap).sort(
-  (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-);
+const upgradeRows = Object.values(upgradeMap)
+  .filter(row => row.eips.length > 0) // Only include upgrades that have actual EIPs
+  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
 const uniqueUpgrades = [...new Set(upgradeRows.map(r => r.upgrade))];
 const colorMap = uniqueUpgrades.reduce((map, upgrade) => {
@@ -379,8 +377,8 @@ const NetworkUpgradesChart: React.FC = () => {
             top={height - margin.bottom + 20}
             scale={xScale}
             tickFormat={(date) => {
-              const upgradeName = dateToUpgradeMap[date as string];
-              return upgradeName || date as string;
+              // Only show dates, not upgrade names
+              return new Date(date as string).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
             }}
             tickLabelProps={(value, index) => ({ 
               fontSize: 12, 
@@ -553,117 +551,7 @@ const NetworkUpgradesChart: React.FC = () => {
           </Box>
 
           {/* Network Legend Sidebar */}
-          <Box 
-            bg={useColorModeValue('white', 'gray.800')} 
-            borderRadius="xl" 
-            p={6} 
-            position="relative"
-            border="1px solid"
-            borderColor={useColorModeValue('gray.200', 'gray.600')}
-            boxShadow="lg"
-            width="340px"
-            maxHeight="650px"
-            overflowY="auto"
-          >
-            <Box mb={6}>
-              <Heading size="md" color={useColorModeValue('gray.900', 'white')} mb={2} fontWeight="600">
-                Network Upgrades
-              </Heading>
-              {hoveredNetwork && (
-                <Box 
-                  bg={useColorModeValue('blue.50', 'blue.900')} 
-                  px={3} 
-                  py={2} 
-                  borderRadius="md" 
-                  border="1px solid" 
-                  borderColor={useColorModeValue('blue.200', 'blue.700')}
-                >
-                  <Text fontSize="sm" fontWeight="500" color={useColorModeValue('blue.700', 'blue.200')}>
-                    Currently highlighting: {hoveredNetwork}
-                  </Text>
-                </Box>
-              )}
-            </Box>
-            <VStack spacing={2} align="stretch">
-              {uniqueUpgrades.map((upgrade) => {
-                const upgradeEips = rawData.filter(item => item.upgrade === upgrade);
-                const eipCount = upgradeEips.reduce((count, item) => count + (item.eip ? 1 : 0), 0);
-                const upgradeDate = new Date(upgradeEips[0]?.date || '').toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'short' 
-                });
-                
-                return (
-                  <Box
-                    key={upgrade}
-                    p={4}
-                    borderRadius="lg"
-                    border="1px solid"
-                    borderColor={hoveredNetwork === upgrade ? colorMap[upgrade] : useColorModeValue('gray.200', 'gray.600')}
-                    bg={hoveredNetwork === upgrade ? 
-                      useColorModeValue('white', 'gray.700') : 
-                      useColorModeValue('gray.50', 'gray.750')
-                    }
-                    cursor="pointer"
-                    transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                    transform={hoveredNetwork === upgrade ? 'translateY(-2px)' : 'translateY(0)'}
-                    boxShadow={hoveredNetwork === upgrade ? 
-                      `0 8px 25px -8px ${colorMap[upgrade]}40, 0 4px 12px -4px rgba(0,0,0,0.1)` : 
-                      useColorModeValue('0 1px 3px rgba(0,0,0,0.1)', '0 1px 3px rgba(0,0,0,0.3)')
-                    }
-                    onMouseEnter={() => setHoveredNetwork(upgrade)}
-                    onMouseLeave={() => setHoveredNetwork(null)}
-                    _hover={{
-                      transform: 'translateY(-2px)',
-                      borderColor: colorMap[upgrade]
-                    }}
-                  >
-                    <Flex align="flex-start" justify="space-between" gap={3}>
-                      <Box flex="1">
-                        <Flex align="center" gap={3} mb={2}>
-                          <Box
-                            width="8px"
-                            height="8px"
-                            borderRadius="full"
-                            bg={colorMap[upgrade]}
-                            boxShadow={hoveredNetwork === upgrade ? `0 0 8px ${colorMap[upgrade]}` : 'none'}
-                            transition="all 0.3s ease-in-out"
-                          />
-                          <Text fontSize="md" fontWeight="600" color={useColorModeValue('gray.900', 'white')} lineHeight="1.2">
-                            {upgrade}
-                          </Text>
-                        </Flex>
-                        <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} fontWeight="400">
-                          {upgradeDate} • {eipCount} EIP{eipCount !== 1 ? 's' : ''}
-                        </Text>
-                      </Box>
-                      <Box
-                        bg={hoveredNetwork === upgrade ? colorMap[upgrade] : useColorModeValue('gray.100', 'gray.600')}
-                        color={hoveredNetwork === upgrade ? 'white' : useColorModeValue('gray.700', 'gray.300')}
-                        fontSize="sm"
-                        fontWeight="600"
-                        px={3}
-                        py={1}
-                        borderRadius="md"
-                        minWidth="32px"
-                        textAlign="center"
-                        transition="all 0.3s ease-in-out"
-                      >
-                        {eipCount}
-                      </Box>
-                    </Flex>
-                  </Box>
-                );
-              })}
-            </VStack>
-            
-            {/* Legend Footer */}
-            <Box mt={6} pt={4} borderTop="1px solid" borderColor={useColorModeValue('gray.200', 'gray.600')}>
-              <Text fontSize="sm" color={useColorModeValue('gray.500', 'gray.400')} textAlign="center" fontWeight="400" lineHeight="1.5">
-                Hover over upgrade names to highlight corresponding EIPs in the timeline
-              </Text>
-            </Box>
-          </Box>
+          
         </Flex>
       </Box>
     </Box>
