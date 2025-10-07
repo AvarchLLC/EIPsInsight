@@ -296,8 +296,6 @@ const NetworkUpgradesChart: React.FC = () => {
       boxShadow={useColorModeValue('0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', '0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1)')}
       ref={containerRef} 
       position="relative" 
-      overflowX="auto" 
-      overflowY="hidden" 
       minWidth="100%" 
       width="100%"
       border="1px solid"
@@ -358,12 +356,19 @@ const NetworkUpgradesChart: React.FC = () => {
             borderColor={useColorModeValue('gray.200', 'gray.600')}
             boxShadow={useColorModeValue('inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)', 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.2)')}
             flex="1"
+            overflowX="auto" 
+            overflowY="hidden"
           >
           <svg
         width={width}
         height={height}
         viewBox={`${offset.x} ${offset.y} ${width / zoomLevel} ${height / zoomLevel}`}
-        style={{ width: `${width}px`, height: `${height}px` }}
+        style={{ 
+          width: `${width}px`, 
+          height: `${height}px`,
+          minWidth: `${width}px`,
+          display: 'block'
+        }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -377,11 +382,11 @@ const NetworkUpgradesChart: React.FC = () => {
             top={height - margin.bottom + 20}
             scale={xScale}
             tickFormat={(date) => {
-              // Only show dates, not upgrade names
-              return new Date(date as string).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+              // Show upgrade names instead of dates
+              return dateToUpgradeMap[date as string] || date as string;
             }}
             tickLabelProps={(value, index) => ({ 
-              fontSize: 12, 
+              fontSize: 10, 
               textAnchor: 'middle', 
               fill: useColorModeValue('#374151', '#9CA3AF'), 
               fontWeight: '600',
@@ -547,12 +552,16 @@ const NetworkUpgradesChart: React.FC = () => {
           </VStack>
         </Box>
       )}
-          <DateTime/>
           </Box>
 
           {/* Network Legend Sidebar */}
           
         </Flex>
+        
+        {/* DateTime Component - Outside scrollable area */}
+        <Box mt={4}>
+          <DateTime/>
+        </Box>
       </Box>
     </Box>
   );
