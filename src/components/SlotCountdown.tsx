@@ -334,7 +334,7 @@ const SlotCountdown: React.FC = () => {
   
         {/* Golden Box */}
         <Tooltip
-        label={`Target Slot: ${networks[network].target}, Date: May 07, 2025 (10:05:11 UTC)`}
+        label={`Target Slot: ${networks[network].target}, Date: ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}`}
         hasArrow
         placement="top"
         bg="gray.700"
