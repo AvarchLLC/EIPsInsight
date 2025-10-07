@@ -17,11 +17,12 @@ import {
   CardBody,
   CardHeader,
   Icon,
+  Collapse,
 } from "@chakra-ui/react";
 import { keyframes } from '@chakra-ui/system';
 import { motion } from "framer-motion";
 import { useColorModeValue } from "@chakra-ui/react";
-import { FaRocket, FaNetworkWired, FaClock, FaInfoCircle } from 'react-icons/fa';
+import { FaRocket, FaNetworkWired, FaClock, FaInfoCircle, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 // Define the structure of a network
 interface NetworkConfig {
@@ -493,56 +494,7 @@ const SlotCountdown: React.FC = () => {
         transition={{ duration: 0.8 }}
       >
         {/* Info Header Card */}
-        <Card maxWidth="1370px" mx="auto" mb={4} bg={useColorModeValue("blue.50", "blue.900")} borderColor={useColorModeValue("blue.200", "blue.600")} border="2px solid">
-          <CardHeader pb={2}>
-            <HStack spacing={3} justify="center" align="center">
-              <Icon as={FaRocket} color={useColorModeValue("blue.600", "blue.300")} boxSize={6} />
-              <VStack spacing={0} align="center">
-                <Text fontSize="xl" fontWeight="bold" color={useColorModeValue("blue.800", "blue.200")}>
-                  {FUSAKA_INFO.title}
-                </Text>
-                <Text fontSize="sm" color={useColorModeValue("blue.600", "blue.300")}>
-                  {FUSAKA_INFO.description}
-                </Text>
-              </VStack>
-              <Icon as={FaRocket} color={useColorModeValue("blue.600", "blue.300")} boxSize={6} />
-            </HStack>
-          </CardHeader>
-          <CardBody pt={0}>
-            <VStack spacing={3}>
-              {/* Features */}
-              <HStack spacing={4} wrap="wrap" justify="center">
-                {FUSAKA_INFO.features.map((feature, index) => (
-                  <Badge 
-                    key={index} 
-                    colorScheme="blue" 
-                    variant="subtle" 
-                    p={2} 
-                    borderRadius="md"
-                    fontSize="xs"
-                  >
-                    {feature}
-                  </Badge>
-                ))}
-              </HStack>
-              
-              {/* Schedule Info */}
-              <Alert status="info" borderRadius="md" bg={useColorModeValue("blue.100", "blue.800")}>
-                <AlertIcon color={useColorModeValue("blue.600", "blue.300")} />
-                <VStack align="start" spacing={1} fontSize="xs">
-                  <Text fontWeight="bold" color={useColorModeValue("blue.800", "blue.200")}>
-                    📅 Activation Schedule
-                  </Text>
-                  <HStack spacing={4} wrap="wrap">
-                    <Text>🧪 Holesky: {FUSAKA_INFO.schedule.holesky}</Text>
-                    <Text>🧪 Sepolia: {FUSAKA_INFO.schedule.sepolia}</Text>
-                    <Text>🌐 Mainnet: {FUSAKA_INFO.schedule.mainnet}</Text>
-                  </HStack>
-                </VStack>
-              </Alert>
-            </VStack>
-          </CardBody>
-        </Card>
+
 
         <Box
           textAlign="center"
@@ -642,7 +594,7 @@ const SlotCountdown: React.FC = () => {
               >
                 Sepolia
               </Button>
-              <Button
+              {/* <Button
                 colorScheme={network === "hoodi" ? "blue" : "gray"}
                 onClick={() => handleNetworkChange("hoodi")}
                 leftIcon={<Text fontSize="xs">🧪</Text>}
@@ -650,7 +602,7 @@ const SlotCountdown: React.FC = () => {
                 size="sm"
               >
                 Hoodi
-              </Button>
+              </Button> */}
               <Button
                 colorScheme={network === "mainnet" ? "blue" : "gray"}
                 onClick={() => handleNetworkChange("mainnet")}
