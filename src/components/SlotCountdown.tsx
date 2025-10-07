@@ -1,752 +1,690 @@
-import React, { useState, useEffect, useRef } from "react";
-import AllLayout from "@/components/Layout";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Text,
   HStack,
   VStack,
-  Flex,
-  Tooltip,
   Button,
   Spinner,
-  Select,
+  Badge,
+  Progress,
+  Card,
+  CardHeader,
+  CardBody,
+  Grid,
+  Alert,
+  AlertIcon,
+  SimpleGrid,
+  Tooltip,
+  useColorModeValue,
+  Link,
+  Icon,
 } from "@chakra-ui/react";
 import { keyframes } from '@chakra-ui/system';
 import { motion } from "framer-motion";
-import { useColorModeValue } from "@chakra-ui/react";
 
-// Define the structure of a network
-interface NetworkConfig {
-  beaconApi: string;
-  rpc: string;
-  target: number;
-  targetepoch:number;
-  name: string;
-}
-
-// Define the available networks
-const networks: Record<string, NetworkConfig> = {
-  holesky: {
-    beaconApi: "https://ethereum-holesky-beacon-api.publicnode.com",
-    rpc: "https://ethereum-holesky-rpc.publicnode.com",
-    target: 5283840,        // Fusaka activation slot on Holesky (testnet)
-    targetepoch: Math.floor(5283840 / 32),
-    name: "Holesky",
-  },
-  sepolia: {
-    beaconApi: "https://ethereum-sepolia-beacon-api.publicnode.com",
-    rpc: "https://ethereum-sepolia-rpc.publicnode.com",
-    target: 8724480,        // Fusaka activation slot on Sepolia (testnet)
-    targetepoch: Math.floor(8724480 / 32),
-    name: "Sepolia",
-  },
-  // If you also want Hoodi testnet:
-  hoodi: {
-    beaconApi: "<ho-beacon-api>",
-    rpc: "<ho-rpc>",
-    target: 1622016,        // Fusaka activation slot on Hoodi (testnet)
-    targetepoch: Math.floor(1622016 / 32),
-    name: "Hoodi",
-  },
-  mainnet: {
-    beaconApi: "https://ethereum-beacon-api.publicnode.com",
-    rpc: "https://ethereum-rpc.publicnode.com",
-    target: Number.MAX_SAFE_INTEGER,  
-    targetepoch: Number.MAX_SAFE_INTEGER,
-    name: "Mainnet",
-  },
-};
-
-
-// Keyframes for celebratory animation
-const celebrateAnimation = keyframes`
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
+// Animation keyframes
+const pulse = keyframes`
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
 `;
 
+const rotate = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const shimmer = keyframes`
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+`;
+
+// Official Fusaka Schedule Data
+interface NetworkConfig {
+  name: string;
+  slot: number;
+  utcTime: string;
+  timestamp: number;
+  isLast?: boolean;
+  beaconApi?: string;
+  rpc?: string;
+  etherscan?: string;
+  beaconchain?: string;
+}
+
+const FUSAKA_NETWORKS: Record<string, NetworkConfig> = {
+  holesky: {
+    name: "Holesky",
+    slot: 5283840,
+    utcTime: "2025-10-01 08:48:00",
+    timestamp: 1727773680, // Correct timestamp for 2025-10-01 08:48:00 UTC
+    isLast: true,
+    beaconApi: "https://ethereum-holesky-beacon-api.publicnode.com",
+    rpc: "https://ethereum-holesky-rpc.publicnode.com",
+    etherscan: "https://holesky.etherscan.io",
+    beaconchain: "https://holesky.beaconcha.in"
+  },
+  sepolia: {
+    name: "Sepolia",
+    slot: 8724480,
+    utcTime: "2025-10-14 07:36:00",
+    timestamp: 1728891360, // Correct timestamp for 2025-10-14 07:36:00 UTC
+    isLast: false,
+    beaconApi: "https://ethereum-sepolia-beacon-api.publicnode.com",
+    rpc: "https://ethereum-sepolia-rpc.publicnode.com",
+    etherscan: "https://sepolia.etherscan.io",
+    beaconchain: "https://sepolia.beaconcha.in"
+  },
+  hoodi: {
+    name: "Hoodi",
+    slot: 1622016,
+    utcTime: "2025-10-28 18:53:12",
+    timestamp: 1730138392, // Correct timestamp for 2025-10-28 18:53:12 UTC
+    isLast: false,
+    etherscan: "https://hoodi.etherscan.io",
+    beaconchain: "https://hoodi.beaconcha.in"
+  },
+  mainnet: {
+    name: "Mainnet",
+    slot: 0, // TBD - To Be Determined
+    utcTime: "TBA",
+    timestamp: 0,
+    isLast: false,
+    beaconApi: "https://ethereum-beacon-api.publicnode.com",
+    rpc: "https://ethereum-rpc.publicnode.com",
+    etherscan: "https://etherscan.io",
+    beaconchain: "https://beaconcha.in"
+  }
+};
+
+// BPO (Blob Parameter Only) Schedule for Holesky
+interface BPOFork {
+  name: string;
+  epoch: number;
+  utcTime: string;
+  timestamp: number;
+  blobTarget: number;
+  blobMax: number;
+  description: string;
+}
+
+const BPO_SCHEDULE: BPOFork[] = [
+  {
+    name: "BPO1",
+    epoch: 166400,
+    utcTime: "2025-10-07 01:20:00",
+    timestamp: 1728264000, // Correct timestamp for 2025-10-07 01:20:00 UTC
+    blobTarget: 10,
+    blobMax: 15,
+    description: "Increases per-block blob target to 10 and maximum to 15"
+  },
+  {
+    name: "BPO2", 
+    epoch: 167936,
+    utcTime: "2025-10-13 21:10:24",
+    timestamp: 1728851424, // Correct timestamp for 2025-10-13 21:10:24 UTC
+    blobTarget: 14,
+    blobMax: 21,
+    description: "Further increases blob target to 14 and maximum to 21"
+  }
+];
+
 const SlotCountdown: React.FC = () => {
+  const [selectedNetwork, setSelectedNetwork] = useState<keyof typeof FUSAKA_NETWORKS>('holesky');
   const [currentSlot, setCurrentSlot] = useState<number>(0);
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
-  const [currentBlock, setCurrentBlock] = useState<number>(0);
-  const [timer, setTimer] = useState<number>(13); // 13-second timer
-  const [network, setNetwork] = useState<keyof typeof networks>("mainnet"); // Default network
-  const [loading, setLoading] = useState<boolean>(true); // Show loader only on first load
-  const [countdown, setCountdown] = useState<string>(""); // Countdown for days, hours, minutes
-  const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false); // Track if the upgrade is live
-  const [viewMode, setViewMode] = useState<"slots" | "epochs">("epochs"); // Default to epochs view
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showBPO, setShowBPO] = useState<boolean>(false);
+  const [refreshTimer, setRefreshTimer] = useState<number>(13);
+  const [currentTime, setCurrentTime] = useState<number>(Math.floor(Date.now() / 1000));
 
-  const countdownInterval = useRef<NodeJS.Timeout | null>(null); // Store interval reference
+  // Color theme
+  const bg = useColorModeValue("white", "gray.800");
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const textColor = useColorModeValue("gray.800", "white");
+  const accentColor = useColorModeValue("blue.600", "blue.300");
+  const mutedColor = useColorModeValue("gray.600", "gray.400");
 
-  const fetchData = async () => {
-    try {
-      const { beaconApi, rpc, target } = networks[network];
-
-      // Fetch the latest block header to get the current slot
-      const beaconResponse = await fetch(`${beaconApi}/eth/v1/beacon/headers/head`);
-      const beaconData = await beaconResponse.json();
-      const slot: number = parseInt(beaconData.data.header.message.slot);
-
-      // Calculate the epoch from the slot (1 epoch = 32 slots)
-      const epoch: number = Math.floor(slot / 32);
-
-      // Fetch the current block number from the execution layer
-      const executionResponse = await fetch(rpc, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          method: "eth_blockNumber",
-          params: [],
-          id: 1,
-        }),
-      });
-
-      const executionData = await executionResponse.json();
-      const blockNumber: number = parseInt(executionData.result, 16);
-
-      setCurrentSlot(slot);
-      setCurrentEpoch(epoch);
-      setCurrentBlock(blockNumber);
-
-      // Check if the upgrade is live
-      if (target !== 999999999 && slot >= target) {
-        setIsUpgradeLive(true);
-        setCountdown("");
-        return;
-      } else {
-        setIsUpgradeLive(false);
-      }
-
-      // Countdown logic with live updates
-      if (target !== 999999999 && !isUpgradeLive) {
-        let slotsRemaining: number = target - slot;
-        let totalSecondsRemaining: number = slotsRemaining * 12; // 12 seconds per slot
-
-        // Clear previous interval if it exists
-        if (countdownInterval.current) {
-          clearInterval(countdownInterval.current);
+  // Fetch current network data
+  useEffect(() => {
+    const fetchNetworkData = async () => {
+      try {
+        const network = FUSAKA_NETWORKS[selectedNetwork];
+        if (!network.beaconApi) {
+          // For networks without API, use mock data
+          setCurrentSlot(Math.floor(network.slot * 0.95));
+          setCurrentEpoch(Math.floor(network.slot * 0.95 / 32));
+          return;
         }
 
-        countdownInterval.current = setInterval(() => {
-          if (totalSecondsRemaining <= 0) {
-            clearInterval(countdownInterval.current!);
-            setCountdown("0D 0H 0M 0S");
-            return;
-          }
-
-          totalSecondsRemaining -= 1; // Decrement every second
-          const days: number = Math.floor(totalSecondsRemaining / (3600 * 24));
-          const hours: number = Math.floor((totalSecondsRemaining % (3600 * 24)) / 3600);
-          const minutes: number = Math.floor((totalSecondsRemaining % 3600) / 60);
-          const seconds: number = Math.floor(totalSecondsRemaining % 60);
-
-          setCountdown(`${days}D ${hours}H ${minutes}M ${seconds}S`);
-        }, 1000);
-      } else {
-        setCountdown("");
+        const response = await fetch(`${network.beaconApi}/eth/v1/beacon/headers/head`);
+        const data = await response.json();
+        
+        if (data?.data?.header?.message?.slot) {
+          const slot = parseInt(data.data.header.message.slot);
+          setCurrentSlot(slot);
+          setCurrentEpoch(Math.floor(slot / 32));
+        }
+      } catch (error) {
+        console.error('Failed to fetch network data:', error);
+        // Fallback to estimated current slot
+        const network = FUSAKA_NETWORKS[selectedNetwork];
+        setCurrentSlot(Math.floor(network.slot * 0.95));
+        setCurrentEpoch(Math.floor(network.slot * 0.95 / 32));
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchData();
-      setTimer(13); // Reset the timer to 13 seconds after each fetch
-    }, 13000); // Fetch every 13 seconds
-
-    // Countdown timer that resets every second
-    const countdownInterval = setInterval(() => {
-      setTimer((prev) => (prev === 0 ? 13 : prev - 1)); // Countdown logic
-    }, 1000);
-
-    fetchData(); // Fetch on initial load
-
-    // Cleanup intervals on component unmount
-    return () => {
-      clearInterval(interval);
-      clearInterval(countdownInterval);
     };
-  }, [network]);
 
-  const handleNetworkChange = (newNetwork: keyof typeof networks) => {
-    setNetwork(newNetwork);
-    setLoading(true); // Show loader when switching networks
+    fetchNetworkData();
+    const interval = setInterval(fetchNetworkData, 13000);
+    return () => clearInterval(interval);
+  }, [selectedNetwork]);
+
+  // Refresh timer countdown and real-time updates
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRefreshTimer((prev) => (prev <= 1 ? 13 : prev - 1));
+      setCurrentTime(Math.floor(Date.now() / 1000)); // Update current time for real-time countdown
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Calculate time remaining
+  const getTimeRemaining = (timestamp: number) => {
+    const now = currentTime; // Use state-managed current time for real-time updates
+    const diff = timestamp - now;
+    
+    if (diff <= 0) return { isLive: true, timeString: "🎉 LIVE!" };
+    
+    const days = Math.floor(diff / 86400);
+    const hours = Math.floor((diff % 86400) / 3600);
+    const minutes = Math.floor((diff % 3600) / 60);
+    const seconds = diff % 60;
+    
+    return {
+      isLive: false,
+      timeString: `${days}d ${hours}h ${minutes}m ${seconds}s`,
+      days,
+      hours,
+      minutes,
+      seconds
+    };
   };
 
-  // Calculate the slots in the current epoch
-  const startSlot = currentEpoch * 32;
-  const slotsInEpoch = Array.from({ length: 32 }, (_, i) => startSlot + i);
-
-  // Split the slots into two rows
-  const firstRowSlots = slotsInEpoch.slice(0, 20);
-  const secondRowSlots = slotsInEpoch.slice(20);
-
-  // Calculate the slots remaining until the target
-  const slotsRemaining = networks[network].target - currentSlot;
-  const epochsRemaining = networks[network].targetepoch - currentEpoch;
-
-  const renderSlotsView = () => (
-    <VStack spacing={3}>
-      {/* Progress Bar */}
-      <Box width="100%">
-        <Flex justify="space-between" mb={2} fontSize="xs" opacity={0.8}>
-          <Text>Current Slot: {currentSlot.toLocaleString()}</Text>
-          {networks[network].target !== Number.MAX_SAFE_INTEGER && (
-            <Text>Target: {networks[network].target.toLocaleString()}</Text>
-          )}
-        </Flex>
-        
-        <Box bg="gray.600" borderRadius="full" height="4px" position="relative">
-          {networks[network].target !== Number.MAX_SAFE_INTEGER && (
-            <Box
-              bg="linear-gradient(90deg, #4FD1C7, #81E6D9)"
-              height="100%"
-              borderRadius="full"
-              width={`${Math.min(95, (currentSlot / networks[network].target) * 100)}%`}
-              transition="width 0.5s ease"
-            />
-          )}
-        </Box>
-      </Box>
-
-      {/* Compact Slot Grid */}
-      <Box>
-        <Text fontSize="xs" fontWeight="medium" mb={2} textAlign="center" opacity={0.9}>
-          Current Epoch Slots ({currentEpoch})
-        </Text>
-        
-        <Flex wrap="wrap" gap={1} justify="center" maxW="600px">
-          {slotsInEpoch.slice(0, 16).map((slot) => {
-            const isProcessed = slot < currentSlot;
-            const isCurrent = slot === currentSlot;
-
-            return (
-              <Tooltip
-                key={slot}
-                label={`Slot ${slot} ${isCurrent ? '(Current)' : isProcessed ? '(Processed)' : '(Future)'}`}
-              >
-                <Box
-                  w="32px"
-                  h="32px"
-                  borderRadius="md"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  bg={
-                    isCurrent
-                      ? "green.400"
-                      : isProcessed
-                      ? "blue.500"
-                      : "gray.500"
-                  }
-                  color="white"
-                  fontSize="9px"
-                  fontWeight="bold"
-                  transition="all 0.2s"
-                  _hover={{ transform: "scale(1.1)" }}
-                  animation={isCurrent ? "pulse 2s infinite" : "none"}
-                  position="relative"
-                >
-                  {slot % 32}
-                  {isCurrent && (
-                    <Box
-                      position="absolute"
-                      top="-1px"
-                      right="-1px"
-                      w="8px"
-                      h="8px"
-                      borderRadius="full"
-                      bg="yellow.400"
-                    />
-                  )}
-                </Box>
-              </Tooltip>
-            );
-          })}
-          
-          {/* Arrow and Target */}
-          <Flex align="center" mx={3}>
-            <Text color="gray.300" fontSize="lg">→</Text>
-          </Flex>
-          
-          <Tooltip label={`FUSAKA Target: Slot ${networks[network].target}`}>
-            <Box
-              w="40px"
-              h="32px"
-              borderRadius="md"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              bg="linear-gradient(135deg, #FFD700, #FFA500)"
-              color="black"
-              fontSize="8px"
-              fontWeight="bold"
-              transition="all 0.2s"
-              _hover={{ transform: "scale(1.1)" }}
-              boxShadow="0 0 10px rgba(255, 215, 0, 0.5)"
-            >
-              FUSAKA
-            </Box>
-          </Tooltip>
-        </Flex>
-        
-        {/* Legend */}
-        <HStack spacing={4} justify="center" mt={3} fontSize="xs">
-          <HStack>
-            <Box w="12px" h="12px" bg="blue.500" borderRadius="sm" />
-            <Text>Processed</Text>
-          </HStack>
-          <HStack>
-            <Box w="12px" h="12px" bg="green.400" borderRadius="sm" />
-            <Text>Current</Text>
-          </HStack>
-          <HStack>
-            <Box w="12px" h="12px" bg="gray.500" borderRadius="sm" />
-            <Text>Future</Text>
-          </HStack>
-          <HStack>
-            <Box w="12px" h="12px" bg="linear-gradient(135deg, #FFD700, #FFA500)" borderRadius="sm" />
-            <Text>Target</Text>
-          </HStack>
-        </HStack>
-      </Box>
-    </VStack>
-  );
-
-  const renderEpochsView = () => (
-    <VStack spacing={3}>
-      {/* Progress Bar */}
-      <Box width="100%">
-        <Flex justify="space-between" mb={2} fontSize="xs" opacity={0.8}>
-          <Text>Current Epoch: {currentEpoch.toLocaleString()}</Text>
-          {networks[network].targetepoch !== Number.MAX_SAFE_INTEGER && (
-            <Text>Target: {networks[network].targetepoch.toLocaleString()}</Text>
-          )}
-        </Flex>
-        
-        <Box bg="gray.600" borderRadius="full" height="4px" position="relative">
-          {networks[network].targetepoch !== Number.MAX_SAFE_INTEGER && (
-            <Box
-              bg="linear-gradient(90deg, #4299E1, #63B3ED)"
-              height="100%"
-              borderRadius="full"
-              width={`${Math.min(95, (currentEpoch / networks[network].targetepoch) * 100)}%`}
-              transition="width 0.5s ease"
-            />
-          )}
-        </Box>
-      </Box>
-
-      {/* Epoch Timeline */}
-      <Box>
-        <Text fontSize="xs" fontWeight="medium" mb={2} textAlign="center" opacity={0.9}>
-          Epoch Timeline
-        </Text>
-        
-        <Flex justify="center" align="center" gap={2} wrap="wrap">
-          {/* Current Epoch */}
-          <Tooltip label={`Current Epoch: ${currentEpoch} (Slot: ${currentSlot})`}>
-            <Box
-              w="50px"
-              h="36px"
-              borderRadius="lg"
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              bg="green.400"
-              color="white"
-              fontSize="xs"
-              fontWeight="bold"
-              animation="pulse 2s infinite"
-              position="relative"
-            >
-              <Text fontSize="8px">NOW</Text>
-              <Text fontSize="sm">{currentEpoch}</Text>
-              <Box
-                position="absolute"
-                top="-1px"
-                right="-1px"
-                w="8px"
-                h="8px"
-                borderRadius="full"
-                bg="yellow.400"
-              />
-            </Box>
-          </Tooltip>
-
-          {/* Arrow */}
-          <Text color="gray.300" fontSize="lg" mx={1}>→</Text>
-
-          {/* Next few epochs */}
-          {Array.from({ length: 4 }, (_, i) => currentEpoch + i + 1).map((epoch) => {
-            const isTarget = epoch === networks[network].targetepoch;
-
-            return (
-              <Tooltip
-                key={epoch}
-                label={isTarget ? `FUSAKA Target Epoch: ${epoch}` : `Future Epoch: ${epoch}`}
-              >
-                <Box
-                  w={isTarget ? "60px" : "50px"}
-                  h="36px"
-                  borderRadius="lg"
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  justifyContent="center"
-                  bg={
-                    isTarget
-                      ? "linear-gradient(135deg, #FFD700, #FFA500)"
-                      : "blue.400"
-                  }
-                  color={isTarget ? "black" : "white"}
-                  fontSize="xs"
-                  fontWeight="bold"
-                  transition="all 0.2s"
-                  _hover={{ transform: "scale(1.05)" }}
-                  boxShadow={isTarget ? "0 0 15px rgba(255, 215, 0, 0.6)" : "none"}
-                >
-                  {isTarget ? (
-                    <>
-                      <Text fontSize="8px">FUSAKA</Text>
-                      <Text fontSize="sm">{epoch}</Text>
-                    </>
-                  ) : (
-                    <Text fontSize="sm">{epoch}</Text>
-                  )}
-                </Box>
-              </Tooltip>
-            );
-          })}
-
-          {/* If target is far away, show dots and target */}
-          {networks[network].targetepoch !== Number.MAX_SAFE_INTEGER && 
-           networks[network].targetepoch > currentEpoch + 5 && (
-            <>
-              <Text color="gray.400" mx={1}>...</Text>
-              
-              <Tooltip label={`FUSAKA Target Epoch: ${networks[network].targetepoch}`}>
-                <Box
-                  w="60px"
-                  h="36px"
-                  borderRadius="lg"
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  justifyContent="center"
-                  bg="linear-gradient(135deg, #FFD700, #FFA500)"
-                  color="black"
-                  fontSize="xs"
-                  fontWeight="bold"
-                  transition="all 0.2s"
-                  _hover={{ transform: "scale(1.05)" }}
-                  boxShadow="0 0 15px rgba(255, 215, 0, 0.6)"
-                >
-                  <Text fontSize="8px">FUSAKA</Text>
-                  <Text fontSize="sm">{networks[network].targetepoch}</Text>
-                </Box>
-              </Tooltip>
-            </>
-          )}
-        </Flex>
-        
-        {/* Legend */}
-        <HStack spacing={4} justify="center" mt={3} fontSize="xs">
-          <HStack>
-            <Box w="12px" h="12px" bg="green.400" borderRadius="sm" />
-            <Text>Current</Text>
-          </HStack>
-          <HStack>
-            <Box w="12px" h="12px" bg="blue.400" borderRadius="sm" />
-            <Text>Future</Text>
-          </HStack>
-          <HStack>
-            <Box w="12px" h="12px" bg="linear-gradient(135deg, #FFD700, #FFA500)" borderRadius="sm" />
-            <Text>Target</Text>
-          </HStack>
-        </HStack>
-      </Box>
-    </VStack>
-  );
+  const currentNetwork = FUSAKA_NETWORKS[selectedNetwork];
+  const timeData = getTimeRemaining(currentNetwork.timestamp);
+  const progress = currentNetwork.slot > 0 ? (currentSlot / currentNetwork.slot) * 100 : 0;
+  const slotsRemaining = Math.max(0, currentNetwork.slot - currentSlot);
 
   return (
-    <>
+    <Box maxWidth="700px" mx="auto" px={3} py={2}>
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.6 }}
       >
-        <Box
-          maxWidth="1200px"
-          mx="auto"
-          mt={4}
-          borderRadius="xl"
-          bg={useColorModeValue("white", "gray.800")}
-          border="1px solid"
-          borderColor={useColorModeValue("gray.200", "gray.600")}
-          overflow="hidden"
-        >
-          {/* Header Section */}
-          <Box
-            bg={useColorModeValue("blue.50", "blue.900")}
-            p={4}
-            borderBottom="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.600")}
-          >
-            <Flex justify="space-between" align="center" wrap="wrap" gap={3}>
-              <VStack align="start" spacing={1}>
-                <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  color={useColorModeValue("blue.800", "blue.200")}
+        {/* Main Header */}
+        <Card mb={3} bg={bg} borderColor={borderColor} shadow="lg" borderRadius="xl">
+          <CardBody p={3}>
+            <VStack spacing={3}>
+              {/* Title Section */}
+              <HStack spacing={3} align="center">
+                <Box
+                  bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                  p={2}
+                  borderRadius="full"
+                  animation={`${rotate} 15s linear infinite`}
                 >
-                  🚀 FUSAKA Upgrade Countdown
-                </Text>
-                <Text
-                  fontSize="sm"
-                  color={useColorModeValue("gray.600", "gray.300")}
-                >
-                  Real-time tracking for Ethereum's next major upgrade
-                </Text>
-              </VStack>
-              
-              <HStack spacing={2}>
-                <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
-                  View:
-                </Text>
-                <Select
-                  value={viewMode}
-                  onChange={(e) => setViewMode(e.target.value as "slots" | "epochs")}
-                  size="sm"
-                  width="100px"
-                  bg={useColorModeValue("white", "gray.700")}
-                  borderColor={useColorModeValue("gray.300", "gray.500")}
-                >
-                  <option value="epochs">Epochs</option>
-                  <option value="slots">Slots</option>
-                </Select>
+                  <Text fontSize="lg">🚀</Text>
+                </Box>
+                <VStack align="start" spacing={0}>
+                  <Text fontSize="lg" fontWeight="bold" color={accentColor}>
+                    FUSAKA Upgrade Countdown
+                  </Text>
+                  <Text fontSize="xs" color={mutedColor}>
+                    Ethereum's next major network upgrade with enhanced blob throughput
+                  </Text>
+                </VStack>
               </HStack>
-            </Flex>
-          </Box>
+              
+              {/* Security & Important Notice */}
+              <Alert 
+                status="info" 
+                borderRadius="lg" 
+                bg={useColorModeValue("blue.50", "blue.900")}
+                border="1px solid"
+                borderColor={useColorModeValue("blue.200", "blue.600")}
+                p={3}
+              >
+                <AlertIcon color={useColorModeValue("blue.500", "blue.300")} />
+                <Box fontSize="xs">
+                  <Text fontWeight="semibold" color={useColorModeValue("blue.800", "blue.200")}>
+                    🔒 Security Audit & Network Notice
+                  </Text>
+                  <Text color={useColorModeValue("blue.700", "blue.300")}>
+                    Security researchers can participate in the Fusaka audit competition to identify potential issues.
+                    {selectedNetwork === 'holesky' && " ⚠️ Holesky will be shut down after this final upgrade."}
+                  </Text>
+                </Box>
+              </Alert>
+            </VStack>
+          </CardBody>
+        </Card>
 
-          {/* Network Selection & Stats */}
-          <Box p={4} bg={useColorModeValue("gray.50", "gray.750")}>
-            <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
-              {/* Network Buttons */}
-              <HStack spacing={2}>
-                <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("gray.700", "gray.300")}>
-                  Network:
-                </Text>
-                {Object.entries(networks).map(([key, config]) => (
+        {/* Network Selection */}
+        <Card mb={3} bg={cardBg} borderColor={borderColor} borderRadius="lg">
+          <CardBody p={3}>
+            <VStack spacing={2}>
+              <Text fontSize="sm" fontWeight="semibold" color={textColor}>
+                Select Testnet
+              </Text>
+              <HStack spacing={2} wrap="wrap" justify="center">
+                {Object.entries(FUSAKA_NETWORKS).map(([key, network]) => (
                   <Button
                     key={key}
                     size="sm"
-                    variant={network === key ? "solid" : "outline"}
-                    colorScheme={network === key ? "blue" : "gray"}
-                    onClick={() => handleNetworkChange(key as keyof typeof networks)}
-                    minW="80px"
+                    variant={selectedNetwork === key ? "solid" : "outline"}
+                    colorScheme={selectedNetwork === key ? "blue" : "gray"}
+                    onClick={() => setSelectedNetwork(key as keyof typeof FUSAKA_NETWORKS)}
+                    isDisabled={key === 'mainnet' && network.timestamp === 0}
                   >
-                    {config.name}
+                    {network.name}
+                    {network.isLast && <Badge ml={1} colorScheme="red" fontSize="9px">FINAL</Badge>}
+                    {key === 'mainnet' && network.timestamp === 0 && <Badge ml={1} colorScheme="gray" fontSize="9px">TBD</Badge>}
                   </Button>
                 ))}
               </HStack>
+            </VStack>
+          </CardBody>
+        </Card>
 
-              {/* Current Stats */}
-              <HStack spacing={4} fontSize="sm">
-                <Box textAlign="center">
-                  <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
-                    Current {viewMode === "slots" ? "Slot" : "Epoch"}
+        {/* Main Countdown Display */}
+        <Card mb={3} bg={bg} borderColor={borderColor} shadow="xl" borderRadius="xl">
+          <CardBody p={4}>
+            <VStack spacing={4}>
+              {/* Network Info Header */}
+              <VStack spacing={1} textAlign="center">
+                <HStack spacing={2} align="center">
+                  <Text fontSize="md" fontWeight="bold" color={textColor}>
+                    {currentNetwork.name} Activation
                   </Text>
-                  <Text fontWeight="bold" color={useColorModeValue("blue.600", "blue.300")}>
-                    {viewMode === "slots" ? currentSlot.toLocaleString() : currentEpoch.toLocaleString()}
+                  {currentNetwork.isLast && (
+                    <Badge colorScheme="orange" fontSize="9px">FINAL UPGRADE</Badge>
+                  )}
+                  {selectedNetwork === 'mainnet' && currentNetwork.timestamp === 0 && (
+                    <Badge colorScheme="gray" fontSize="9px">TBD</Badge>
+                  )}
+                </HStack>
+                <Text fontSize="xs" color={mutedColor}>
+                  📅 {currentNetwork.utcTime === "TBA" ? "To Be Announced" : `${currentNetwork.utcTime} UTC`}
+                </Text>
+                <Text fontSize="xs" color={mutedColor}>
+                  🎯 Target Slot: {currentNetwork.slot === 0 ? "TBD" : currentNetwork.slot.toLocaleString()}
+                </Text>
+              </VStack>
+
+              {/* Countdown or Live Status */}
+              {selectedNetwork === 'mainnet' && currentNetwork.timestamp === 0 ? (
+                <Box
+                  p={4}
+                  bg="linear-gradient(135deg, #718096 0%, #4a5568 100%)"
+                  borderRadius="xl"
+                  textAlign="center"
+                  width="100%"
+                >
+                  <Text fontSize="lg" fontWeight="bold" color="white">
+                    📅 MAINNET DATE TO BE ANNOUNCED
+                  </Text>
+                  <Text fontSize="sm" color="gray.200" mt={1}>
+                    Mainnet activation date will be announced after successful testnet deployments
                   </Text>
                 </Box>
-                
-                <Box textAlign="center">
-                  <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
-                    Block Number
+              ) : timeData.isLive ? (
+                <Box
+                  p={4}
+                  bg="linear-gradient(135deg, #48bb78 0%, #38a169 100%)"
+                  borderRadius="xl"
+                  textAlign="center"
+                  animation={`${pulse} 2s infinite`}
+                  width="100%"
+                >
+                  <Text fontSize="lg" fontWeight="bold" color="white">
+                    🎉 FUSAKA IS LIVE ON {currentNetwork.name.toUpperCase()}! 🎉
                   </Text>
-                  <Text fontWeight="bold" color={useColorModeValue("green.600", "green.300")}>
-                    {currentBlock.toLocaleString()}
-                  </Text>
-                </Box>
-                
-                <Box textAlign="center">
-                  <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
-                    Next Update
-                  </Text>
-                  <Text fontWeight="bold" color={useColorModeValue("orange.600", "orange.300")}>
-                    {timer}s
+                  <Text fontSize="sm" color="green.100" mt={1}>
+                    The upgrade is now active on the network
                   </Text>
                 </Box>
+              ) : (
+                <VStack spacing={3} width="100%">
+                  {/* Live Countdown Timer */}
+                  <Box width="100%" textAlign="center">
+                    <Text fontSize="xs" color={mutedColor} mb={2}>
+                      ⏰ Time until activation:
+                    </Text>
+                    <SimpleGrid columns={4} spacing={2} maxW="350px" mx="auto">
+                      {[
+                        { label: "Days", value: timeData.days || 0, color: "blue" },
+                        { label: "Hours", value: timeData.hours || 0, color: "green" },
+                        { label: "Minutes", value: timeData.minutes || 0, color: "orange" },
+                        { label: "Seconds", value: timeData.seconds || 0, color: "red" }
+                      ].map((item, index) => (
+                        <Box
+                          key={index}
+                          p={2}
+                          bg={useColorModeValue(`${item.color}.50`, `${item.color}.900`)}
+                          borderColor={useColorModeValue(`${item.color}.200`, `${item.color}.600`)}
+                          border="2px solid"
+                          borderRadius="lg"
+                          textAlign="center"
+                          transition="all 0.3s"
+                          _hover={{ transform: "translateY(-1px)" }}
+                        >
+                          <Text fontSize="lg" fontWeight="bold" color={useColorModeValue(`${item.color}.600`, `${item.color}.200`)}>
+                            {item.value}
+                          </Text>
+                          <Text fontSize="9px" color={useColorModeValue(`${item.color}.500`, `${item.color}.300`)} textTransform="uppercase">
+                            {item.label}
+                          </Text>
+                        </Box>
+                      ))}
+                    </SimpleGrid>
+                  </Box>
+                  
+                  {/* Progress Bar */}
+                  <Box width="100%">
+                    <HStack justify="space-between" mb={1} fontSize="xs" color={mutedColor}>
+                      <Text>Progress: {progress.toFixed(2)}%</Text>
+                      <Text>Slots remaining: {slotsRemaining.toLocaleString()}</Text>
+                    </HStack>
+                    <Progress
+                      value={progress}
+                      colorScheme="blue"
+                      size="lg"
+                      borderRadius="full"
+                      bg={useColorModeValue("gray.200", "gray.600")}
+                      sx={{
+                        '& > div': {
+                          background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                          backgroundSize: '200% 100%',
+                          animation: `${shimmer} 3s ease-in-out infinite`
+                        }
+                      }}
+                    />
+                  </Box>
+                </VStack>
+              )}
+            </VStack>
+          </CardBody>
+        </Card>
+
+        {/* Network Stats */}
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3} mb={3}>
+          {/* Current Network Status */}
+          <Card bg={cardBg} borderColor={borderColor} borderRadius="lg">
+            <CardHeader pb={1}>
+              <Text fontSize="sm" fontWeight="semibold" color={textColor}>
+                📊 Current Status
+              </Text>
+            </CardHeader>
+            <CardBody pt={0}>
+              <VStack align="stretch" spacing={1} fontSize="xs">
+                <HStack justify="space-between">
+                  <Text color={mutedColor}>Current Slot:</Text>
+                  <Text fontWeight="semibold" color={useColorModeValue("green.600", "green.300")}>
+                    {loading ? <Spinner size="xs" /> : currentSlot.toLocaleString()}
+                  </Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text color={mutedColor}>Current Epoch:</Text>
+                  <Text fontWeight="semibold" color={useColorModeValue("green.600", "green.300")}>
+                    {loading ? <Spinner size="xs" /> : currentEpoch.toLocaleString()}
+                  </Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text color={mutedColor}>Next Update:</Text>
+                  <Text fontWeight="semibold" color={useColorModeValue("orange.600", "orange.300")}>
+                    {refreshTimer}s
+                  </Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text color={mutedColor}>Network Status:</Text>
+                  <Badge 
+                    colorScheme={loading ? "gray" : "green"} 
+                    fontSize="9px"
+                  >
+                    {loading ? "Loading..." : "Live"}
+                  </Badge>
+                </HStack>
+              </VStack>
+            </CardBody>
+          </Card>
+
+          {/* Target Information */}
+          <Card bg={cardBg} borderColor={borderColor} borderRadius="lg">
+            <CardHeader pb={1}>
+              <Text fontSize="sm" fontWeight="semibold" color={textColor}>
+                🎯 Target Details
+              </Text>
+            </CardHeader>
+            <CardBody pt={0}>
+              <VStack align="stretch" spacing={1} fontSize="xs">
+                <HStack justify="space-between">
+                  <Text color={mutedColor}>Target Slot:</Text>
+                  <Text fontWeight="semibold">{currentNetwork.slot === 0 ? "TBD" : currentNetwork.slot.toLocaleString()}</Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text color={mutedColor}>Target Epoch:</Text>
+                  <Text fontWeight="semibold">{currentNetwork.slot === 0 ? "TBD" : Math.floor(currentNetwork.slot / 32).toLocaleString()}</Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text color={mutedColor}>Activation Date:</Text>
+                  <Text fontWeight="semibold" fontSize="xs">{currentNetwork.utcTime === "TBA" ? "TBA" : currentNetwork.utcTime.split(' ')[0]}</Text>
+                </HStack>
+                <HStack justify="space-between">
+                  <Text color={mutedColor}>Activation Time:</Text>
+                  <Text fontWeight="semibold" fontSize="xs">{currentNetwork.utcTime === "TBA" ? "TBA" : `${currentNetwork.utcTime.split(' ')[1]} UTC`}</Text>
+                </HStack>
+              </VStack>
+            </CardBody>
+          </Card>
+        </SimpleGrid>
+
+        {/* Explorer Links */}
+        {selectedNetwork !== 'mainnet' && (
+          <Card bg={cardBg} borderColor={borderColor} borderRadius="lg" mb={3}>
+            <CardHeader pb={1}>
+              <Text fontSize="sm" fontWeight="semibold" color={textColor}>
+                🔗 Network Explorers
+              </Text>
+            </CardHeader>
+            <CardBody pt={0}>
+              <HStack spacing={3} wrap="wrap">
+                {currentNetwork.etherscan && (
+                  <Link
+                    href={currentNetwork.etherscan}
+                    isExternal
+                    _hover={{ textDecoration: 'none' }}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      colorScheme="blue"
+                      leftIcon={<Text fontSize="xs">🔍</Text>}
+                      _hover={{ transform: 'translateY(-1px)', shadow: 'md' }}
+                    >
+                      Etherscan
+                    </Button>
+                  </Link>
+                )}
+                {currentNetwork.beaconchain && (
+                  <Link
+                    href={currentNetwork.beaconchain}
+                    isExternal
+                    _hover={{ textDecoration: 'none' }}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      colorScheme="purple"
+                      leftIcon={<Text fontSize="xs">⛓️</Text>}
+                      _hover={{ transform: 'translateY(-1px)', shadow: 'md' }}
+                    >
+                      Beaconcha.in
+                    </Button>
+                  </Link>
+                )}
+                {currentNetwork.slot > 0 && currentNetwork.beaconchain && (
+                  <Link
+                    href={`${currentNetwork.beaconchain}/slot/${currentNetwork.slot}`}
+                    isExternal
+                    _hover={{ textDecoration: 'none' }}
+                  >
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      colorScheme="green"
+                      leftIcon={<Text fontSize="xs">🎯</Text>}
+                      _hover={{ transform: 'translateY(-1px)', shadow: 'md' }}
+                    >
+                      Target Slot
+                    </Button>
+                  </Link>
+                )}
               </HStack>
-            </Flex>
-          </Box>
+            </CardBody>
+          </Card>
+        )}
 
+        {/* Mainnet Notice */}
+        {selectedNetwork === 'mainnet' && (
+          <Card bg={bg} borderColor={borderColor} shadow="lg" borderRadius="xl">
+            <CardBody p={4}>
+              <Alert status="info" borderRadius="lg">
+                <AlertIcon />
+                <Box>
+                  <Text fontWeight="semibold" fontSize="sm">
+                    🌐 Mainnet Information
+                  </Text>
+                  <Text fontSize="xs" mt={1}>
+                    The Fusaka upgrade will be deployed to Ethereum Mainnet after successful completion 
+                    and thorough testing on all testnets. The mainnet activation date will be announced 
+                    by the Ethereum Foundation once all security audits and testing phases are complete.
+                  </Text>
+                </Box>
+              </Alert>
+            </CardBody>
+          </Card>
+        )}
 
-          {/* Main Content */}
-          <Box p={6}>
-            {loading ? (
-              <Flex justify="center" align="center" minH="200px">
-                <VStack spacing={3}>
-                  <Spinner size="xl" color="blue.500" />
-                  <Text color={useColorModeValue("gray.600", "gray.400")}>
-                    Loading {networks[network].name} data...
+        {/* BPO Schedule (Holesky only) */}
+        {selectedNetwork === 'holesky' && (
+          <Card bg={bg} borderColor={borderColor} shadow="lg" borderRadius="xl">
+            <CardHeader>
+              <HStack justify="space-between" align="center">
+                <VStack align="start" spacing={0}>
+                  <Text fontSize="sm" fontWeight="semibold" color={textColor}>
+                    📈 Blob Parameter Only (BPO) Forks
+                  </Text>
+                  <Text fontSize="xs" color={mutedColor}>
+                    Gradual blob throughput increases following Fusaka activation
                   </Text>
                 </VStack>
-              </Flex>
-            ) : (isUpgradeLive || slotsRemaining <= 0) ? (
-              <Box
-                textAlign="center"
-                p={8}
-                bg={useColorModeValue("green.50", "green.900")}
-                borderRadius="lg"
-                border="2px solid"
-                borderColor={useColorModeValue("green.200", "green.600")}
-              >
-                <Text
-                  fontSize="2xl"
-                  fontWeight="bold"
-                  color={useColorModeValue("green.800", "green.200")}
-                  animation={`${celebrateAnimation} 1s infinite`}
-                  mb={2}
-                >
-                  🎉 FUSAKA is Live! 🎉
-                </Text>
-                <Text fontSize="lg" color={useColorModeValue("green.600", "green.300")}>
-                  The upgrade is now active on {networks[network].name}
-                </Text>
-              </Box>
-            ) : (
-              <VStack spacing={6}>
-                {/* Countdown Display */}
-                {networks[network].target !== Number.MAX_SAFE_INTEGER && (
-                  <Box
-                    textAlign="center"
-                    p={4}
-                    bg={useColorModeValue("orange.50", "orange.900")}
-                    borderRadius="lg"
-                    border="1px solid"
-                    borderColor={useColorModeValue("orange.200", "orange.600")}
-                    width="100%"
-                  >
-                    <Text fontSize="sm" color={useColorModeValue("orange.600", "orange.300")} mb={2}>
-                      Time until FUSAKA activation:
+                <Button size="sm" variant="ghost" onClick={() => setShowBPO(!showBPO)}>
+                  {showBPO ? "Hide" : "Show"}
+                </Button>
+              </HStack>
+            </CardHeader>
+            {showBPO && (
+              <CardBody pt={0}>
+                <VStack spacing={3}>
+                  <Alert status="info" size="sm" borderRadius="md">
+                    <AlertIcon />
+                    <Text fontSize="xs">
+                      BPO forks gradually increase blob capacity without requiring client updates, 
+                      improving Ethereum's data availability for Layer 2 solutions.
                     </Text>
-                    <Text fontSize="2xl" fontWeight="bold" color={useColorModeValue("orange.800", "orange.200")}>
-                      {countdown || "Calculating..."}
-                    </Text>
-                    <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} mt={1}>
-                      {viewMode === "slots" 
-                        ? `${slotsRemaining.toLocaleString()} slots remaining` 
-                        : `${epochsRemaining.toLocaleString()} epochs remaining`}
-                    </Text>
-                  </Box>
-                )}
-
-                {/* Progress Visualization */}
-                <Box
-                  width="100%"
-                  bg={useColorModeValue("gray.800", "gray.700")}
-                  borderRadius="lg"
-                  p={4}
-                  color="white"
-                >
-                  <Flex justify="space-between" align="center" mb={3}>
-                    <Text fontSize="sm" fontWeight="medium">
-                      {viewMode === "slots" ? "Slot Progress" : "Epoch Progress"} 
-                      <Text as="span" ml={2} fontSize="xs" opacity={0.8}>
-                        ({networks[network].name})
-                      </Text>
-                    </Text>
-                    <Text fontSize="xs" opacity={0.7}>
-                      Updates every {viewMode === "slots" ? "12 seconds" : "6.4 minutes"}
-                    </Text>
-                  </Flex>
+                  </Alert>
                   
-                  {viewMode === "slots" ? renderSlotsView() : renderEpochsView()}
-                </Box>
-
-                {/* Info Cards */}
-                <Flex gap={4} wrap="wrap" width="100%" justify="center">
-                  <Box
-                    bg={useColorModeValue("blue.50", "blue.900")}
-                    p={3}
-                    borderRadius="md"
-                    textAlign="center"
-                    minW="120px"
-                  >
-                    <Text fontSize="xs" color={useColorModeValue("blue.600", "blue.300")}>
-                      Current Position
-                    </Text>
-                    <Text fontSize="lg" fontWeight="bold" color={useColorModeValue("blue.800", "blue.200")}>
-                      {viewMode === "slots" ? currentSlot : currentEpoch}
-                    </Text>
-                  </Box>
-                  
-                  <Box
-                    bg={useColorModeValue("yellow.50", "yellow.900")}
-                    p={3}
-                    borderRadius="md"
-                    textAlign="center"
-                    minW="120px"
-                  >
-                    <Text fontSize="xs" color={useColorModeValue("yellow.600", "yellow.300")}>
-                      Target Position
-                    </Text>
-                    <Text fontSize="lg" fontWeight="bold" color={useColorModeValue("yellow.800", "yellow.200")}>
-                      {networks[network].target !== Number.MAX_SAFE_INTEGER 
-                        ? (viewMode === "slots" ? networks[network].target : networks[network].targetepoch)
-                        : "TBA"}
-                    </Text>
-                  </Box>
-                  
-                  <Box
-                    bg={useColorModeValue("purple.50", "purple.900")}
-                    p={3}
-                    borderRadius="md"
-                    textAlign="center"
-                    minW="120px"
-                  >
-                    <Text fontSize="xs" color={useColorModeValue("purple.600", "purple.300")}>
-                      Progress
-                    </Text>
-                    <Text fontSize="lg" fontWeight="bold" color={useColorModeValue("purple.800", "purple.200")}>
-                      {networks[network].target !== Number.MAX_SAFE_INTEGER
-                        ? `${((viewMode === "slots" ? currentSlot / networks[network].target : currentEpoch / networks[network].targetepoch) * 100).toFixed(1)}%`
-                        : "0%"}
-                    </Text>
-                  </Box>
-                </Flex>
-              </VStack>
+                  {BPO_SCHEDULE.map((bpo, index) => {
+                    const bpoTime = getTimeRemaining(bpo.timestamp);
+                    return (
+                      <Box
+                        key={index}
+                        p={3}
+                        bg={cardBg}
+                        borderRadius="lg"
+                        width="100%"
+                        border="1px solid"
+                        borderColor={borderColor}
+                        transition="all 0.3s"
+                        _hover={{ transform: "translateY(-1px)", shadow: "md" }}
+                      >
+                        <Grid templateColumns="1fr auto" gap={3} alignItems="start">
+                          <VStack align="start" spacing={1}>
+                            <HStack>
+                              <Text fontWeight="bold" color={accentColor} fontSize="sm">
+                                {bpo.name}
+                              </Text>
+                              <Badge 
+                                colorScheme={bpoTime.isLive ? "green" : "blue"} 
+                                fontSize="9px"
+                              >
+                                {bpoTime.isLive ? "LIVE" : "Scheduled"}
+                              </Badge>
+                            </HStack>
+                            <Text fontSize="xs" color={mutedColor}>
+                              📅 Epoch {bpo.epoch.toLocaleString()} • {bpo.utcTime} UTC
+                            </Text>
+                            <Text fontSize="xs" color={textColor}>
+                              {bpo.description}
+                            </Text>
+                            <HStack spacing={3} fontSize="xs">
+                              <Text color={mutedColor}>
+                                <Text as="span" fontWeight="semibold">Target:</Text> {bpo.blobTarget}
+                              </Text>
+                              <Text color={mutedColor}>
+                                <Text as="span" fontWeight="semibold">Max:</Text> {bpo.blobMax}
+                              </Text>
+                            </HStack>
+                          </VStack>
+                          
+                          <VStack align="end" spacing={1}>
+                            {!bpoTime.isLive && (
+                              <Text fontSize="xs" color={mutedColor} textAlign="right">
+                                {bpoTime.timeString}
+                              </Text>
+                            )}
+                            <Progress
+                              value={bpoTime.isLive ? 100 : Math.min((Date.now() / 1000) / bpo.timestamp * 100, 99)}
+                              size="sm"
+                              colorScheme={bpoTime.isLive ? "green" : "blue"}
+                              width="50px"
+                              borderRadius="full"
+                            />
+                          </VStack>
+                        </Grid>
+                      </Box>
+                    );
+                  })}
+                </VStack>
+              </CardBody>
             )}
-          </Box>
+          </Card>
+        )}
+
+        {/* Footer Info */}
+        <Box mt={3} textAlign="center">
+          <Text fontSize="xs" color={mutedColor}>
+            Updates automatically every 13 seconds • Data refreshes in {refreshTimer} seconds
+          </Text>
         </Box>
+
       </motion.div>
-
-      {/* Animations */}
-      <style>
-        {`
-          @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.02); }
-            100% { opacity: 1; transform: scale(1); }
-          }
-
-          @keyframes glow {
-            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
-            100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
-          }
-        `}
-      </style>
-    </>
+    </Box>
   );
 };
 

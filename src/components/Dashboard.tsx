@@ -68,6 +68,7 @@ import { Clients } from "./Clients";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import TwitterTimeline from "./TwitterTimeline";
 import EtherWorldAdCard from "./EtherWorldAdCard";
+import FusakaCountdownBadge from "./FusakaCountdownBadge";
 
 interface EIP {
   _id: string;
@@ -342,7 +343,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                         </Text>
                       </Box>
 
-                      <Stack direction={"row"} spacing={"4"} flexWrap="wrap">
+                      <Stack direction={"row"} spacing={"4"} flexWrap="wrap" alignItems="center">
                         <Box>
                           <NextLink href={"/home#1"}>
                             <Button
@@ -442,6 +443,11 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                               Explore EIPs
                             </Button>
                           </NextLink>
+                        </Box>
+
+                        {/* Fusaka Countdown Badge */}
+                        <Box>
+                          <FusakaCountdownBadge variant="compact" />
                         </Box>
                       </Stack>
                     </Stack>
@@ -566,6 +572,11 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                     </Box>
 
                   </Stack>
+                  
+                  {/* Fusaka Countdown Badge - Mobile */}
+                  <Box mt={6} display="flex" justifyContent="center">
+                    <FusakaCountdownBadge variant="detailed" />
+                  </Box>
                   
                   <div className="mt-6">
                     <AllChart type="Total" dataset={data} />
