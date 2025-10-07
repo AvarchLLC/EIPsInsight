@@ -160,25 +160,23 @@ const rawData = [
   { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-161" },
   { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-170" },
 
-  // Frontier Thawing — September 7, 2015
-  { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "Gas Limit" },
+  // DAO Fork — July 20, 2016 (Irregular state change)
+  { date: "2016-07-20", upgrade: "DAO Fork", eip: "EIP-779" },
 
-  // Frontier — July 30, 2015
-  { date: "2015-07-30", upgrade: "Frontier", eip: "Genesis" },
-  
-  // DAO Fork — July 20, 2016 (adding this properly)
-  { date: "2016-07-20", upgrade: "DAO Fork", eip: "State Change" },
-  
-  // Bellatrix — September 6, 2022 (Consensus layer)
-  { date: "2022-09-06", upgrade: "Bellatrix", eip: "Consensus" },
-  
-  // Altair — October 27, 2021 (Consensus layer)
-  { date: "2021-10-27", upgrade: "Altair", eip: "Beacon Chain" },
+  // Frontier Thawing — September 7, 2015
+  { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "EIP-3" },
+
+  // Frontier — July 30, 2015 (Genesis mainnet launch)  
+  { date: "2015-07-30", upgrade: "Frontier", eip: "EIP-1" },
 ];
 
-// Group data by date-upgrade combination// Group data by date-upgrade combination (keeping duplicates)
+// Group data by date-upgrade combination (keeping duplicates)
 const upgradeMap: Record<string, { date: string, upgrade: string, eips: string[] }> = {};
 for (const { date, upgrade, eip } of rawData) {
+  // Only process actual EIP entries (must start with "EIP-" or be a number)
+  const isValidEIP = eip.startsWith("EIP-") || /^\d+$/.test(eip);
+  if (!isValidEIP) continue;
+  
   const baseKey = `${date}-${upgrade}`;
   let key = baseKey;
   let counter = 1;
@@ -189,9 +187,9 @@ for (const { date, upgrade, eip } of rawData) {
   if (eip) upgradeMap[key].eips.push(eip.replace("EIP-", ""));
 }
 
-const upgradeRows = Object.values(upgradeMap).sort(
-  (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-);
+const upgradeRows = Object.values(upgradeMap)
+  .filter(row => row.eips.length > 0) // Only include upgrades that have actual EIPs
+  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
 const uniqueUpgrades = [...new Set(upgradeRows.map(r => r.upgrade))];
 const colorMap = uniqueUpgrades.reduce((map, upgrade) => {
