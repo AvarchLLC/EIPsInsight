@@ -64,13 +64,19 @@ const networkUpgradesData = {
       ],
     },
     {
-      name: 'Petersburg',
+      name: 'Constantinople',
       eips: [
         { eip: 145, requires: [] },
         { eip: 1014, requires: [] },
         { eip: 1052, requires: [161] },
         { eip: 1234, requires: [] },
         { eip: 1283, requires: [] },
+      ],
+    },
+    {
+      name: 'Petersburg',
+      eips: [
+        // Petersburg removed EIP-1283 from Constantinople
       ],
     },
     {
@@ -119,23 +125,24 @@ const networkUpgradesData = {
       ],
     },
     {
-  name: 'Fusaka',
-  eips: [
-    { eip: 7594, requires: [4844] },
-    { eip: 7642, requires: [5793] },
-    { eip: 7823, requires: [198] },
-    { eip: 7825, requires: [] },
-    { eip: 7883, requires: [] },
-    { eip: 7892, requires: [] },
-    { eip: 7918, requires: [4844, 7840] },
-    { eip: 7935, requires: [] },
-    { eip: 5920, requires: [] },
-    { eip: 7901, requires: [] },
-    { eip: 7917, requires: [] },
-    { eip: 7934, requires: [] }
-  ]
-},
-
+      name: 'Berlin',
+      eips: [
+        { eip: 2565, requires: [198] },
+        { eip: 2929, requires: [] },
+        { eip: 2718, requires: [] },
+        { eip: 2930, requires: [2718, 2929] },
+      ],
+    },
+    {
+      name: 'London',
+      eips: [
+        { eip: 1559, requires: [2718, 2930] },
+        { eip: 3198, requires: [1559] },
+        { eip: 3529, requires: [2200, 2929, 2930] },
+        { eip: 3541, requires: [] },
+        { eip: 3554, requires: [] },
+      ],
+    },
     {
       name: 'Berlin',
       eips: [
@@ -183,7 +190,7 @@ const networkUpgradesData = {
       ],
     },
     {
-      name: 'Shapella',
+      name: 'Shanghai',
       eips: [
         { eip: 3651, requires: [2929] },
         { eip: 3855, requires: [] },
@@ -220,7 +227,8 @@ const EIP3DGraph = () => {
   const [selectedNetwork, setSelectedNetwork] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<number[]>([]);
-  
+  const [showTransitiveDeps, setShowTransitiveDeps] = useState(false);
+
   // Theme-aware colors
   const legendBg = useColorModeValue('rgba(255, 255, 255, 0.95)', 'rgba(26, 32, 44, 0.95)');
   const legendText = useColorModeValue('black', 'white');
@@ -298,6 +306,31 @@ const EIP3DGraph = () => {
     }
   };
 
+  // Function to compute all transitive dependencies for an EIP
+  const getTransitiveDependencies = (eipId: number, visited = new Set<number>()): Set<number> => {
+    if (visited.has(eipId)) return new Set(); // Avoid circular dependencies
+    visited.add(eipId);
+    
+    const dependencies = new Set<number>();
+    
+    // Find the EIP in the network upgrades data
+    for (const upgrade of networkUpgradesData.networkUpgrades) {
+      for (const { eip, requires } of upgrade.eips) {
+        if (eip === eipId) {
+          // Add direct dependencies
+          requires.forEach(reqEip => {
+            dependencies.add(reqEip);
+            // Recursively get transitive dependencies
+            const transitive = getTransitiveDependencies(reqEip, new Set(visited));
+            transitive.forEach(dep => dependencies.add(dep));
+          });
+          break;
+        }
+      }
+    }
+    
+    return dependencies;
+  };
 
   const graphData = useMemo(() => {
     const nodes: any[] = [];
@@ -337,42 +370,63 @@ const EIP3DGraph = () => {
     // Second pass: Create links between EIPs
     for (const upgrade of networkUpgradesData.networkUpgrades) {
       for (const { eip, requires } of upgrade.eips) {
-        for (const req of requires) {
-          links.push({ source: eip, target: req });
-          if (!seen.has(req)) {
-            nodes.push({
-              id: req,
-              label: `${req}`,
-              group: '',
-              upgradeName: '',
-            });
-            seen.add(req);
+        if (showTransitiveDeps) {
+          // Show all transitive dependencies
+          const allDeps = getTransitiveDependencies(eip);
+          allDeps.forEach(req => {
+            links.push({ source: eip, target: req });
+            if (!seen.has(req)) {
+              nodes.push({
+                id: req,
+                label: `${req}`,
+                group: '',
+                upgradeName: '',
+              });
+              seen.add(req);
+            }
+          });
+        } else {
+          // Show only direct dependencies (original behavior)
+          for (const req of requires) {
+            links.push({ source: eip, target: req });
+            if (!seen.has(req)) {
+              nodes.push({
+                id: req,
+                label: `${req}`,
+                group: '',
+                upgradeName: '',
+              });
+              seen.add(req);
+            }
           }
         }
       }
     }
 
     return { nodes, links };
-  }, []);
+  }, [showTransitiveDeps]);
 
   const uniqueGroups = useMemo(() => {
     const groups = new Set<string>();
     graphData.nodes.forEach((node) => groups.add(node.group));
     
-    // Define chronological order (latest to oldest) - exact 19 network upgrades
+    // Define chronological order (latest to oldest) - network upgrades
     const chronologicalOrder = [
+      'Fusaka',           // Future upgrade 
       'Pectra',           // May 2025 
       'Dencun',           // March 2024
       'Shanghai',         // April 2023
       'Paris',            // September 2022
+      'Bellatrix',        // August 2022
       'Gray Glacier',     // June 2022
       'Arrow Glacier',    // December 2021
+      'Altair',           // October 2021
       'London',           // August 2021
       'Berlin',           // April 2021
       'Muir Glacier',     // January 2020
       'Istanbul',         // December 2019
-      'Constantinople',   // February 2019
       'Petersburg',       // February 2019
+      'Constantinople',   // January 2019
       'Byzantium',        // October 2017
       'Spurious Dragon',  // November 2016
       'Tangerine Whistle', // October 2016
@@ -433,6 +487,12 @@ const EIP3DGraph = () => {
     return scale;
   }, [uniqueGroups]);
 
+  // Function to get EIP count for a network upgrade
+  const getEIPCount = (networkName: string): number => {
+    const upgrade = networkUpgradesData.networkUpgrades.find(u => u.name === networkName);
+    return upgrade ? upgrade.eips.length : 0;
+  };
+
   return (
     <div style={{ position: 'relative', height: '550px' }}>
       {/* Search Box */}
@@ -482,13 +542,26 @@ const EIP3DGraph = () => {
         fontSize="0.9rem"
         boxShadow={legendShadow}
         zIndex={10}
-        maxW="200px"
-        maxH="400px"
+        minW="240px"
+        maxW="260px"
+        maxH="480px"
+        overflowY="auto"
       >
         <Text fontWeight="bold" color={legendText} mb={1}>Network Upgrades</Text>
         <Text fontSize="0.7rem" color={useColorModeValue('gray.600', 'gray.400')} mb={2}>
           Hover to highlight • Click EIP to visit • Shift+click to pin
         </Text>
+        <Button 
+          size="xs" 
+          variant={showTransitiveDeps ? "solid" : "outline"}
+          colorScheme="blue"
+          onClick={() => setShowTransitiveDeps(!showTransitiveDeps)}
+          mb={2}
+          fontSize="0.6rem"
+          h="18px"
+        >
+          {showTransitiveDeps ? "Hide" : "Show"} All Dependencies
+        </Button>
         {selectedNetwork && (
           <Button 
             size="xs" 
@@ -501,16 +574,28 @@ const EIP3DGraph = () => {
             Clear Selection
           </Button>
         )}
-        <div 
-          style={{
-            listStyleType: 'none',
-            padding: 0,
-            margin: '8px 0 0 0',
-            maxHeight: '340px',
-            overflowY: 'auto',
-            paddingRight: '4px',
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#666 #f1f1f1'
+        <Box
+          as="div"
+          listStyleType="none"
+          p={0}
+          mt="8px"
+          maxH="350px"
+          overflowY="auto"
+          pr="8px"
+          css={{
+            '&::-webkit-scrollbar': {
+              width: '6px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: '#888',
+              borderRadius: '3px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: '#555',
+            },
           }}
         >
           {uniqueGroups.map((group) => (
@@ -548,55 +633,25 @@ const EIP3DGraph = () => {
                 border={selectedNetwork === group ? `2px solid ${colorScale.get(group)}` : 'none'}
               />
               {group}
+              <Text 
+                as="span" 
+                fontSize="0.65rem" 
+                color={useColorModeValue('gray.500', 'gray.400')}
+                bg={useColorModeValue('gray.100', 'gray.600')}
+                px={1.5}
+                py={0.5}
+                ml={2}
+                borderRadius="md"
+                fontWeight="medium"
+              >
+                {getEIPCount(group)}
+              </Text>
             </Box>
           ))}
-        </div>
+        </Box>
       </Box>
 
 
-      {/* Zoom Controls */}
-      <HStack position="absolute" bottom={4} right={4} zIndex={10} spacing={2}>
-        {
-          <>
-            <IconButton
-              aria-label="Zoom in"
-              icon={<AddIcon />}
-              onClick={handleZoomIn}
-              size="sm"
-              colorScheme="gray"
-            />
-            <IconButton
-              aria-label="Zoom out"
-              icon={<MinusIcon />}
-              onClick={handleZoomOut}
-              size="sm"
-              colorScheme="gray"
-            />
-            <Button
-              leftIcon={<RepeatIcon />}
-              onClick={() => {
-                fgRef.current?.zoomToFit(1000);
-              }}
-              size="xs"
-              colorScheme="gray"
-            >
-              Reset
-            </Button>
-          </>
-        }
-      </HStack>
-
-      <div
-        style={{
-          margin: '0 auto',
-          width: '90%',
-          maxWidth: '900px',
-          height: '450px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
         <ForceGraph3D
           ref={fgRef}
           graphData={graphData}
@@ -636,9 +691,13 @@ const EIP3DGraph = () => {
             // Create sprite label
             const sprite = new SpriteText(node.label);
             sprite.color = isOtherNetwork ? '#888' : '#ffffff';
-            sprite.backgroundColor = 'transparent';
-            sprite.textHeight = isHighlighted ? 5 : 4;
-            sprite.position.set(0, 10, 0);
+            sprite.backgroundColor = isSearchResult ? 'rgba(0, 0, 0, 0.7)' : 'transparent';
+            sprite.borderColor = isSearchResult ? '#ffff00' : 'transparent';
+            sprite.borderWidth = isSearchResult ? 1 : 0;
+            sprite.textHeight = isHighlighted ? 6 : 4;
+            sprite.fontWeight = isSearchResult ? 'bold' : 'normal';
+            // Position label higher for highlighted nodes to avoid overlap with enlarged spheres
+            sprite.position.set(0, isHighlighted ? 15 : 10, 0);
 
             // Combine into a group
             const group = new THREE.Group();
@@ -657,7 +716,30 @@ const EIP3DGraph = () => {
               sourceNode?.group === activeNetwork || 
               targetNode?.group === activeNetwork
             );
-            return isRelatedToActive ? (colorScale.get(activeNetwork) || '#999') : '#999';
+            
+            if (showTransitiveDeps && isRelatedToActive) {
+              // Check if this is a direct dependency
+              const sourceEip = typeof link.source === 'object' ? link.source.id : link.source;
+              const targetEip = typeof link.target === 'object' ? link.target.id : link.target;
+              
+              // Find if this is a direct dependency
+              let isDirect = false;
+              for (const upgrade of networkUpgradesData.networkUpgrades) {
+                for (const { eip, requires } of upgrade.eips) {
+                  if (eip === sourceEip && requires.includes(targetEip)) {
+                    isDirect = true;
+                    break;
+                  }
+                }
+                if (isDirect) break;
+              }
+              
+              // Use different colors for direct vs transitive dependencies
+              return isDirect ? colorScale.get(activeNetwork as string) || '#aaa' : '#888';
+            }
+            
+            // Color links related to the active network, otherwise gray
+            return isRelatedToActive ? colorScale.get(activeNetwork as string) || '#aaa' : '#bbb';
           }}
           linkWidth={(link) => {
             const sourceNode = graphData.nodes.find(n => n.id === link.source);
@@ -667,25 +749,29 @@ const EIP3DGraph = () => {
               sourceNode?.group === activeNetwork || 
               targetNode?.group === activeNetwork
             );
-            return isRelatedToActive ? 4 : 2;
+            
+            if (showTransitiveDeps && isRelatedToActive) {
+              // Check if this is a direct dependency
+              const sourceEip = typeof link.source === 'object' ? link.source.id : link.source;
+              const targetEip = typeof link.target === 'object' ? link.target.id : link.target;
+              
+              let isDirect = false;
+              for (const upgrade of networkUpgradesData.networkUpgrades) {
+                for (const { eip, requires } of upgrade.eips) {
+                  if (eip === sourceEip && requires.includes(targetEip)) {
+                    isDirect = true;
+                    break;
+                  }
+                }
+                if (isDirect) break;
+              }
+              
+              // Make direct dependencies thicker than transitive ones
+              return isDirect ? 3 : 1;
+            }
+            
+            return isRelatedToActive ? 2 : 1;
           }}
-          linkDirectionalParticles={(link) => {
-            const sourceNode = graphData.nodes.find(n => n.id === link.source);
-            const targetNode = graphData.nodes.find(n => n.id === link.target);
-            const activeNetwork = hoveredNetwork || selectedNetwork;
-            const isRelatedToActive = activeNetwork && (
-              sourceNode?.group === activeNetwork || 
-              targetNode?.group === activeNetwork
-            );
-            return isRelatedToActive ? 4 : 2;
-          }}
-          linkDirectionalParticleWidth={2}
-          linkOpacity={0.6}
-          linkDirectionalArrowLength={3}
-          linkDirectionalArrowRelPos={0.9}
-          forceEngine="d3"
-          d3VelocityDecay={0.3}
-          d3AlphaDecay={0.02}
           nodeResolution={32}
           warmupTicks={100}
           cooldownTicks={1000}
@@ -706,8 +792,6 @@ const EIP3DGraph = () => {
           }}
         // onZoom={() => setShowResetZoom(true)}
         />
-      </div>
-
     </div>
   );
 };
