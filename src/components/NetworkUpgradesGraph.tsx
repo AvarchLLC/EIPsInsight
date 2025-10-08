@@ -4,7 +4,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import ForceGraph3D, { ForceGraphMethods } from 'react-force-graph-3d';
 import * as THREE from 'three';
 import SpriteText from 'three-spritetext';
-import { Button, IconButton, HStack, Box, useColorModeValue, Text } from '@chakra-ui/react';
+import { Button, IconButton, HStack, Box, useColorModeValue, Text, Input } from '@chakra-ui/react';
 import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
 
@@ -218,6 +218,8 @@ const EIP3DGraph = () => {
   const [showResetZoom, setShowResetZoom] = useState(true);
   const [hoveredNetwork, setHoveredNetwork] = useState<string | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<number[]>([]);
   
   // Theme-aware colors
   const legendBg = useColorModeValue('rgba(255, 255, 255, 0.95)', 'rgba(26, 32, 44, 0.95)');
@@ -237,6 +239,62 @@ const EIP3DGraph = () => {
       const distance = fgRef.current.camera().position.length();
       fgRef.current.camera().position.setLength(distance * 1.2); // zoom out
       setShowResetZoom(true);
+    }
+  };
+
+  // Search handler
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    // Search for matching EIP numbers or upgrade names
+    const results: number[] = [];
+    const searchLower = query.toLowerCase().trim();
+    
+    // Search through all network upgrades
+    for (const upgrade of networkUpgradesData.networkUpgrades) {
+      // Match by upgrade name
+      if (upgrade.name.toLowerCase().includes(searchLower)) {
+        upgrade.eips.forEach(({ eip }) => results.push(eip));
+      } else {
+        // Match by EIP number
+        upgrade.eips.forEach(({ eip }) => {
+          if (eip.toString().includes(searchLower)) {
+            results.push(eip);
+          }
+        });
+      }
+    }
+    
+    setSearchResults(results);
+    
+    // Focus camera on first result if found
+    if (results.length > 0 && fgRef.current) {
+      const firstNode = graphData.nodes.find((n: any) => n.id === results[0]);
+      if (firstNode) {
+        // Calculate camera position at a distance from the node
+        const distance = 200; // Distance from the node
+        const nodePos = { 
+          x: firstNode.x ?? 0, 
+          y: firstNode.y ?? 0, 
+          z: firstNode.z ?? 0 
+        };
+        
+        // Position camera at an angle from the node
+        fgRef.current.cameraPosition(
+          { 
+            x: nodePos.x + distance * 0.5, 
+            y: nodePos.y + distance * 0.3, 
+            z: nodePos.z + distance * 0.8 
+          }, // camera position
+          nodePos, // look at target (the node)
+          1000 // transition duration
+        );
+      }
     }
   };
 
@@ -377,6 +435,42 @@ const EIP3DGraph = () => {
 
   return (
     <div style={{ position: 'relative', height: '550px' }}>
+      {/* Search Box */}
+      <Box
+        position="absolute"
+        top="20px"
+        left="20px"
+        bg={legendBg}
+        p="12px"
+        borderRadius="10px"
+        boxShadow={legendShadow}
+        zIndex={10}
+        width="280px"
+      >
+        <Input
+          placeholder="Search EIP/ERC number or title"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          size="sm"
+          bg={useColorModeValue('white', 'gray.700')}
+          borderColor={useColorModeValue('gray.300', 'gray.600')}
+          _focus={{
+            borderColor: useColorModeValue('blue.400', 'blue.500'),
+            boxShadow: '0 0 0 1px rgba(66, 153, 225, 0.6)',
+          }}
+        />
+        {searchResults.length > 0 && (
+          <Text fontSize="0.65rem" color={useColorModeValue('green.600', 'green.400')} mt={1}>
+            Found {searchResults.length} result{searchResults.length > 1 ? 's' : ''}
+          </Text>
+        )}
+        {searchQuery && searchResults.length === 0 && (
+          <Text fontSize="0.65rem" color={useColorModeValue('red.600', 'red.400')} mt={1}>
+            No results found
+          </Text>
+        )}
+      </Box>
+      
       {/* Legend */}
       <Box
         position="absolute"
@@ -508,11 +602,12 @@ const EIP3DGraph = () => {
           graphData={graphData}
           nodeThreeObject={(node: any) => {
             const baseColor = colorScale.get(node.group) || '#999';
-            const isHighlighted = hoveredNetwork === node.group || selectedNetwork === node.group;
-            const isOtherNetwork = (hoveredNetwork && hoveredNetwork !== node.group) || 
-                                 (selectedNetwork && selectedNetwork !== node.group && !hoveredNetwork);
+            const isSearchResult = searchResults.includes(node.id);
+            const isHighlighted = hoveredNetwork === node.group || selectedNetwork === node.group || isSearchResult;
+            const isOtherNetwork = ((hoveredNetwork && hoveredNetwork !== node.group) || 
+                                 (selectedNetwork && selectedNetwork !== node.group && !hoveredNetwork)) && !isSearchResult;
             
-            // Adjust sphere properties based on hover/selection state
+            // Adjust sphere properties based on hover/selection/search state
             const sphereRadius = isHighlighted ? 8 : 6;
             const sphereColor = isOtherNetwork ? '#666' : baseColor;
             const sphereOpacity = isOtherNetwork ? 0.3 : 1;
