@@ -23,6 +23,7 @@ import { keyframes } from '@chakra-ui/system';
 import { motion } from "framer-motion";
 import { useColorModeValue } from "@chakra-ui/react";
 import { FaRocket, FaNetworkWired, FaClock, FaInfoCircle, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import DateTime from "./DateTime";
 
 // Define the structure of a network
 interface NetworkConfig {
@@ -646,7 +647,7 @@ const SlotCountdown: React.FC = () => {
               >
                 Sepolia
               </Button>
-              {/* <Button
+              <Button
                 colorScheme={network === "hoodi" ? "blue" : "gray"}
                 onClick={() => handleNetworkChange("hoodi")}
                 leftIcon={<Text fontSize="xs">🧪</Text>}
@@ -654,7 +655,7 @@ const SlotCountdown: React.FC = () => {
                 size="sm"
               >
                 Hoodi
-              </Button> */}
+              </Button>
               <Button
                 colorScheme={network === "mainnet" ? "blue" : "gray"}
                 onClick={() => handleNetworkChange("mainnet")}
@@ -716,71 +717,70 @@ const SlotCountdown: React.FC = () => {
             </Card>
           ) : (
             <>
-              {/* Countdown Status */}
-              <Card mb={4} bg={useColorModeValue("blue.50", "blue.900")} border="2px solid" borderColor={useColorModeValue("blue.200", "blue.600")}>
-                <CardBody textAlign="center" p={4}>
-                  <HStack justify="center" spacing={3} mb={2}>
-                    <Icon as={FaClock} color={useColorModeValue("blue.600", "blue.300")} />
-                    <Text fontSize="lg" fontWeight="bold" color={useColorModeValue("blue.800", "blue.200")}>
-                      {countdown || "Calculating..."}
+              {/* Compact Countdown Status */}
+              <Box mb={4} bg={useColorModeValue("white", "gray.800")} p={4} borderRadius="md">
+                <VStack spacing={3}>
+                  <HStack justify="center" spacing={4} wrap="wrap">
+                    <HStack spacing={2}>
+                      <Icon as={FaClock} color={useColorModeValue("blue.600", "blue.300")} />
+                      <Text fontSize="lg" fontWeight="bold" color={useColorModeValue("gray.800", "white")}>
+                        {countdown || "Calculating..."}
+                      </Text>
+                    </HStack>
+                    <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                      until FUSAKA on {networks[network].name}
+                    </Text>
+                    <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>•</Text>
+                    <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                      {slotsRemaining.toLocaleString()} slots ({epochsRemaining.toLocaleString()} epochs)
                     </Text>
                   </HStack>
-                  <Text fontSize="sm" color={useColorModeValue("blue.600", "blue.300")}>
-                    Until FUSAKA activation on {networks[network].name}
-                  </Text>
-                  <HStack justify="center" spacing={6} mt={3} fontSize="xs">
-                    <VStack spacing={0}>
-                      <Text color={useColorModeValue("blue.500", "blue.400")}>Slots Remaining</Text>
-                      <Text fontWeight="bold" color={useColorModeValue("blue.700", "blue.200")}>
-                        {slotsRemaining.toLocaleString()}
-                      </Text>
-                    </VStack>
-                    <VStack spacing={0}>
-                      <Text color={useColorModeValue("blue.500", "blue.400")}>Epochs Remaining</Text>
-                      <Text fontWeight="bold" color={useColorModeValue("blue.700", "blue.200")}>
-                        {epochsRemaining.toLocaleString()}
-                      </Text>
-                    </VStack>
+                  <HStack justify="center" spacing={2} fontSize="xs">
+                    <Button
+                      as="a"
+                      href="https://etherworld.co/2025/10/01/bpo-forks-explained-how-fusaka-gradually-scales-blob-capacity/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="xs"
+                      variant="ghost"
+                      color={useColorModeValue("blue.600", "blue.300")}
+                      _hover={{ textDecoration: 'underline' }}
+                    >
+                      📖 Read about FUSAKA
+                    </Button>
                   </HStack>
-                </CardBody>
-              </Card>
+                </VStack>
+              </Box>
 
               {/* Progress Visualization */}
               <Box
                 as={motion.div}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                bg="gray.700"
-                color="white"
+                bg={useColorModeValue("white", "gray.800")}
+                color={useColorModeValue("gray.700", "white")}
                 borderRadius="md"
                 p={4}
                 mb={4}
                 fontSize="xs"
                 fontWeight="normal"
+                border="1px solid"
+                borderColor={useColorModeValue("gray.200", "gray.600")}
               >
                 {viewMode === "slots" ? renderSlotsView() : renderEpochsView()}
               </Box>
 
-              {/* Additional Info */}
-              <VStack spacing={2}>
-                <HStack spacing={2} align="center">
-                  <Icon as={FaClock} color={useColorModeValue("gray.600", "gray.400")} boxSize={3} />
-                  <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-                    Auto-refresh in {timer} seconds
-                  </Text>
+              {/* Minimal Footer Info */}
+              <HStack justify="center" spacing={4} fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
+                <HStack spacing={1}>
+                  <Icon as={FaClock} boxSize={3} />
+                  <Text>Auto-refresh in {timer}s</Text>
                 </HStack>
-                <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.500")}>
-                  {viewMode === "slots" 
-                    ? "📊 Slot view: Each box represents a 12-second slot on the beacon chain"
-                    : "📊 Epoch view: Each box represents a 6.4-minute epoch (32 slots)"}
-                </Text>
-                <Badge colorScheme="purple" variant="subtle" fontSize="9px">
-                  Live data from {networks[network].name} beacon chain
-                </Badge>
-              </VStack>
+              </HStack>
             </>
           )}
         </Box>
+        <DateTime/>
       </motion.div>
 
       {/* Blinking Animation */}
