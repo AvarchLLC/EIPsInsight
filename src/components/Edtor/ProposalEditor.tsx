@@ -826,7 +826,7 @@ if (errorItems.length > 0) {
       borderRadius="2xl"
       boxShadow="xl"
       id="EipTemplateEditor"
-      maxW="1200px"
+      maxW="100%" w="100%"
       minH="90vh"
     >
       <Box
@@ -1108,32 +1108,30 @@ if (errorItems.length > 0) {
                     </Popover>
                   </Box>
                   {step.type === "input" && (
-                    <Input
-                      disabled={
-                        step.key === "last-call-deadline" &&
-                        templateData["status"] !== "Last Call"
-                      }
-                      placeholder={
-                        step.label === "Title"
-                          ? "Enter title"
-                          : step.label === "Description"
-                          ? "Enter description"
-                          : step.label === "Author"
-                          ? "FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>"
-                          : step.label === "Discussions To"
-                          ? "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205"
-                          : step.label === "Created"
-                          ? "YYYY-MM-DD"
-                          : step.label === "Requires"
-                          ? "2537, 2935, 6110, 7002, 7251, 7549, 7594, 7685, 7702"
-                          : step.label
-                      }
-                      value={templateData[step.key] || ""}
-                      onChange={(e) =>
-                        handleInputChange(step.key, e.target.value)
-                      }
-                      borderWidth="2px"
-                    />
+<Input
+  disabled={
+    (step.key === "eip" && activeTab2 === "import") ||
+    (step.key === "last-call-deadline" && templateData["status"] !== "Last Call")
+  }
+  placeholder={
+    step.label === "Title"
+      ? "Enter title"
+      : step.label === "Description"
+      ? "Enter description"
+      : step.label === "Author"
+      ? "FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>"
+      : step.label === "Discussions To"
+      ? "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205"
+      : step.label === "Created"
+      ? "YYYY-MM-DD"
+      : step.label === "Requires"
+      ? "2537, 2935, ..."
+      : step.label
+  }
+  value={templateData[step.key] || ""}
+  onChange={(e) => handleInputChange(step.key, e.target.value)}
+  borderWidth="2px"
+/>
                   )}
                   {step.type === "textarea" && (
                     <Box>
@@ -1734,51 +1732,3 @@ if (errorItems.length > 0) {
   )
 }
 export default ProposalEditor;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

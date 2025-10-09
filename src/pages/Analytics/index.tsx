@@ -157,9 +157,98 @@ const GitHubPRTracker: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const endpoint = fetchEndpoint();
-        const response = await axios.get(endpoint);
-        setchartData(response.data);
+        if (selectedRepo === "All") {
+          // For "All", fetch data from individual repos and aggregate
+          const [eipsResponse, ercsResponse, ripsResponse] = await Promise.all([
+            axios.get(`/api/AnalyticsCharts/${activeTab === "PRs" ? "prs" : "issues"}/eips`),
+            axios.get(`/api/AnalyticsCharts/${activeTab === "PRs" ? "prs" : "issues"}/ercs`),
+            axios.get(`/api/AnalyticsCharts/${activeTab === "PRs" ? "prs" : "issues"}/rips`)
+          ]);
+          
+          const eipsData = eipsResponse.data.data || [];
+          const ercsData = ercsResponse.data.data || [];
+          const ripsData = ripsResponse.data.data || [];
+          
+          console.log("EIPs data sample:", eipsData.slice(0, 2));
+          console.log("ERCs data sample:", ercsData.slice(0, 2));
+          console.log("RIPs data sample:", ripsData.slice(0, 2));
+          
+          // Aggregate the data by monthYear and type
+          const aggregatedData: { [key: string]: any } = {};
+          
+          // Process EIPs data
+          eipsData.forEach((item: any) => {
+            const key = `${item.monthYear}-${item.type}`;
+            if (!aggregatedData[key]) {
+              aggregatedData[key] = {
+                _id: key,
+                category: "all",
+                monthYear: item.monthYear,
+                type: item.type,
+                count: 0,
+                eips: 0,
+                ercs: 0,
+                rips: 0
+              };
+            }
+            aggregatedData[key].count += item.count || 0;
+            aggregatedData[key].eips += item.count || 0; // For EIPs repo, count goes to eips
+          });
+          
+          // Process ERCs data
+          ercsData.forEach((item: any) => {
+            const key = `${item.monthYear}-${item.type}`;
+            if (!aggregatedData[key]) {
+              aggregatedData[key] = {
+                _id: key,
+                category: "all",
+                monthYear: item.monthYear,
+                type: item.type,
+                count: 0,
+                eips: 0,
+                ercs: 0,
+                rips: 0
+              };
+            }
+            aggregatedData[key].count += item.count || 0;
+            aggregatedData[key].ercs += item.count || 0; // For ERCs repo, count goes to ercs
+          });
+          
+          // Process RIPs data
+          ripsData.forEach((item: any) => {
+            const key = `${item.monthYear}-${item.type}`;
+            if (!aggregatedData[key]) {
+              aggregatedData[key] = {
+                _id: key,
+                category: "all",
+                monthYear: item.monthYear,
+                type: item.type,
+                count: 0,
+                eips: 0,
+                ercs: 0,
+                rips: 0
+              };
+            }
+            aggregatedData[key].count += item.count || 0;
+            aggregatedData[key].rips += item.count || 0; // For RIPs repo, count goes to rips
+          });
+          
+          const chartData = Object.values(aggregatedData);
+          console.log("Aggregated data sample:", chartData.slice(0, 3));
+          console.log("Aggregated data total length:", chartData.length);
+          
+          setchartData(chartData);
+        } else {
+          // For individual repos, use the existing endpoint
+          const endpoint = fetchEndpoint();
+          const response = await axios.get(endpoint);
+          
+          const chartData = response.data.data || response.data;
+          console.log("API Response sample:", chartData?.slice(0, 3));
+          console.log("API Response total length:", chartData?.length);
+          
+          setchartData(chartData);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -1207,8 +1296,25 @@ const GitHubPRTracker: React.FC = () => {
   };
 
   const renderChart = () => {
-    // Assuming `chartData` is your data array
-    console.log("chart data:", chartdata);
+    // Log chart data to understand structure
+    console.log("chart data sample:", chartdata?.slice(0, 3));
+    console.log("chart data total length:", chartdata?.length);
+
+    // Create a lookup map for original data to preserve eips/ercs/rips breakdown
+    const originalDataLookup = Array.isArray(chartdata) 
+      ? chartdata.reduce<{ [key: string]: any }>((acc, item) => {
+          const key = `${item.monthYear}-${item.type}`;
+          acc[key] = {
+            eips: item.eips || 0,
+            ercs: item.ercs || 0, 
+            rips: item.rips || 0,
+            count: item.count || 0
+          };
+          return acc;
+        }, {})
+      : {};
+
+    console.log("Original data lookup sample:", Object.keys(originalDataLookup).slice(0, 5));
 
     const transformedData = Array.isArray(chartdata) // Check if chartdata is an array
       ? chartdata?.reduce<{
@@ -1224,11 +1330,11 @@ const GitHubPRTracker: React.FC = () => {
 
             if (selectedRepo === "All") {
               acc[monthYear][`${type}-eips`] =
-                (acc[monthYear][`${type}-eips`] || 0) + eips;
+                (acc[monthYear][`${type}-eips`] || 0) + (eips || 0);
               acc[monthYear][`${type}-ercs`] =
-                (acc[monthYear][`${type}-ercs`] || 0) + ercs;
+                (acc[monthYear][`${type}-ercs`] || 0) + (ercs || 0);
               acc[monthYear][`${type}-rips`] =
-                (acc[monthYear][`${type}-rips`] || 0) + rips;
+                (acc[monthYear][`${type}-rips`] || 0) + (rips || 0);
             }
           }
 
@@ -1340,13 +1446,21 @@ const GitHubPRTracker: React.FC = () => {
               let value;
 
               if (selectedRepo === "All") {
-                // For "All" repo, format the value as `count(eips: X, ercs: Y, rips: Z)`
-                const eips = transformedData[monthYear]?.[`${type}-eips`] || 0;
-                const ercs = transformedData[monthYear]?.[`${type}-ercs`] || 0;
-                const rips = transformedData[monthYear]?.[`${type}-rips`] || 0;
-                value = `${Math.abs(count)}(eips: ${Math.abs(
-                  eips
-                )}, ercs: ${Math.abs(ercs)}, rips: ${Math.abs(rips)})`;
+                // For "All" repo, find the matching item for this month/type
+                const matchingItem = chartdata?.find(item => 
+                  item.monthYear === monthYear && item.type === type
+                );
+                
+                if (matchingItem && (matchingItem.eips || matchingItem.ercs || matchingItem.rips)) {
+                  const eips = Number(matchingItem.eips) || 0;
+                  const ercs = Number(matchingItem.ercs) || 0;
+                  const rips = Number(matchingItem.rips) || 0;
+                  
+                  value = `${Math.abs(count)} (eips: ${eips}, ercs: ${ercs}, rips: ${rips})`;
+                } else {
+                  // If no breakdown available, just show the count
+                  value = `${Math.abs(count)}`;
+                }
               } else {
                 // For non-"All" repos, just display the absolute count
                 value = `${Math.abs(count)}`;
@@ -1398,13 +1512,21 @@ const GitHubPRTracker: React.FC = () => {
               let value;
 
               if (selectedRepo === "All") {
-                // For "All" repo, format the value as `count(eips: X, ercs: Y, rips: Z)`
-                const eips = transformedData[monthYear]?.[`Open-eips`] || 0;
-                const ercs = transformedData[monthYear]?.[`Open-ercs`] || 0;
-                const rips = transformedData[monthYear]?.[`Open-rips`] || 0;
-                value = `${Open - getmin}(eips: ${Math.abs(
-                  eips
-                )}, ercs: ${Math.abs(ercs)}, rips: ${Math.abs(rips)})`;
+                // For "All" repo, find the matching item for Open
+                const matchingItem = chartdata?.find(item => 
+                  item.monthYear === monthYear && item.type === "Open"
+                );
+                
+                if (matchingItem && (matchingItem.eips || matchingItem.ercs || matchingItem.rips)) {
+                  const eips = Number(matchingItem.eips) || 0;
+                  const ercs = Number(matchingItem.ercs) || 0;
+                  const rips = Number(matchingItem.rips) || 0;
+                  
+                  value = `${Open - getmin} (eips: ${eips}, ercs: ${ercs}, rips: ${rips})`;
+                } else {
+                  // If no breakdown available, just show the count
+                  value = `${Open - getmin}`;
+                }
               } else {
                 // For non-"All" repos, just display the absolute count
                 value = `${Open - getmin}`;
