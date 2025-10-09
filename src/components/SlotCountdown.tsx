@@ -682,7 +682,6 @@ const SlotCountdown: React.FC = () => {
               {net.charAt(0).toUpperCase() + net.slice(1)}
               {net === "holesky" && <Badge ml={1} colorScheme="orange" fontSize="9px" variant="subtle">FINAL</Badge>}
               {net === "mainnet" && <Badge ml={1} colorScheme="gray" fontSize="9px" variant="subtle">TBD</Badge>}
-              {net === "hoodi" && <Badge ml={1} colorScheme="red" fontSize="9px" variant="subtle">ISSUE</Badge>}
             </Button>
           ))}
         </HStack>
