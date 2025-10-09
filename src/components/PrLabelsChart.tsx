@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Checkbox, Menu, MenuList, MenuItem, MenuButton, Button, Flex, useToast } from '@chakra-ui/react';
+import { Box, Heading, Checkbox, Menu, MenuList, MenuItem, MenuButton, Button, Flex, useToast, useColorModeValue } from '@chakra-ui/react';
 import { ColumnConfig } from '@ant-design/plots';
 import dynamic from "next/dynamic";
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
@@ -27,24 +27,40 @@ interface PRDetails {
   CreatedAt: string;
 }
 
-const availableLabels = [
+// Initial set of common labels - will be updated dynamically from API
+const initialLabels = [
   'a-review',
   'e-review',
   'e-consensus',
   'stagnant',
   'stale',
   'created-by-bot',
-  "miscellaneous"
+  'c-update',
+  'c-new-eip',
+  'w-review',
+  'w-author',
+  's-draft',
+  's-review',
+  's-final',
+  'miscellaneous'
 ];
 
 const EipsLabelChart = () => {
   const [chartData, setChartData] = useState<AggregatedLabelCount[]>([]);
+  const [availableLabels, setAvailableLabels] = useState<string[]>(initialLabels);
   const [loading, setLoading] = useState(true);
   const [selectedRepo, setSelectedRepo] = useState('erc');
   const [showLabels, setShowLabels] = useState<Record<string, boolean>>(
-    availableLabels?.reduce((acc, label) => ({ ...acc, [label]: true }), {})
+    initialLabels?.reduce((acc, label) => ({ ...acc, [label]: true }), {})
   );
   const toast = useToast();
+
+  // Dark mode color values
+  const bgColor = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("black", "white");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const loadingBg = useColorModeValue("gray.50", "gray.700");
+  const loadingText = useColorModeValue("gray.600", "gray.300");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,36 +68,53 @@ const EipsLabelChart = () => {
         setLoading(true);
         const controller = new AbortController();
         
-        // Use the same API as PrLabels.tsx with githubLabels labelType to get workflow labels
-        const repoApiMap: Record<string, string> = {
-          'eip': '/api/pr-stats',
-          'erc': '/api/ercpr-stats',
-          'rip': '/api/rippr-stats'
-        };
-        
-        const apiUrl = repoApiMap[selectedRepo];
-        if (!apiUrl) {
-          throw new Error(`Unknown repo: ${selectedRepo}`);
-        }
-        
-        const response = await fetch(`${apiUrl}?labelType=githubLabels`, { 
-          signal: controller.signal 
-        });
+        // Use the new AnalyticsCharts API for raw GitHub labels - fetch all available data
+        const response = await fetch(
+          `/api/AnalyticsCharts/labels/${selectedRepo}`, 
+          { signal: controller.signal }
+        );
         
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);
         }
         
-        const data = await response.json();
-        const chartData = Array.isArray(data) ? data as AggregatedLabelCount[] : [];
+        const result = await response.json();
+        const data = result.data || [];
         
-        // Filter to only include our specific labels
-        const filteredData = chartData.filter(item => 
-          availableLabels.includes(item.label) || 
-          (item.label !== 'miscellaneous' && !availableLabels.includes(item.label))
-        );
+        // Transform data to match expected format
+        const transformedData: AggregatedLabelCount[] = data.map((item: any) => ({
+          monthYear: item.monthYear,
+          label: item.type,
+          count: item.count,
+          labelType: 'githubLabels',
+          prNumbers: [] // This field isn't needed for the chart display
+        }));
         
-        setChartData(filteredData);
+        // Update available labels from API response
+        if (result.metadata?.uniqueLabels) {
+          const uniqueLabels = result.metadata.uniqueLabels;
+          setAvailableLabels(uniqueLabels);
+          
+          // Update showLabels state to include new labels
+          setShowLabels(prevState => {
+            const newState = { ...prevState };
+            uniqueLabels.forEach((label: string) => {
+              if (!(label in newState)) {
+                newState[label] = true; // Show new labels by default
+              }
+            });
+            return newState;
+          });
+        }
+        
+        setChartData(transformedData);
+        
+        // Debug: Log the data range we received
+        const monthYears = transformedData.map(item => item.monthYear).sort();
+        const earliestMonth = monthYears[0];
+        const latestMonth = monthYears[monthYears.length - 1];
+        console.log(`📊 Loaded ${transformedData.length} records from ${earliestMonth} to ${latestMonth}`);
+        
       } catch (error) {
         console.error('Error fetching data:', error);
         toast({
@@ -129,44 +162,62 @@ const EipsLabelChart = () => {
     setLoading(true);
     
     try {
-      // Fetch detailed PR data using the same API as PrLabels.tsx
-      const params = new URLSearchParams({
-        repo: selectedRepo,
-        mode: 'detail',
-        labelType: 'githubLabels',
-      }).toString();
+      // Get selected labels for filtering
+      const selectedLabels = availableLabels.filter(label => showLabels[label]);
       
-      const response = await fetch(`/api/pr-details?${params}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch PR details: ${response.status}`);
-      }
-      
-      const prData = await response.json();
-      const prDetails = Array.isArray(prData) ? prData as PRDetails[] : [];
-      
-      // Filter PRs that have labels matching our selected labels
-      const filteredPRs = prDetails.filter(pr => {
-        const label = pr.Label || '';
-        return showLabels[label] || (showLabels.miscellaneous && !availableLabels.includes(label));
-      });
-
-      if (filteredPRs.length === 0) {
+      if (selectedLabels.length === 0) {
         toast({
-          title: 'No data to download',
-          description: 'No PRs match the currently selected labels',
+          title: 'No labels selected',
+          description: 'Please select at least one label to download data',
           status: 'warning',
           duration: 3000,
           isClosable: true,
         });
+        setLoading(false);
         return;
       }
 
-      const csvData = convertToCSV(filteredPRs);
+      // Create CSV from current chart data
+      const csvRows = [];
+      const headers = ['Month', 'MonthYear', 'Label', 'Count', 'Repo'];
+      csvRows.push(headers.join(','));
+
+      // Filter chart data by selected labels
+      const filteredData = chartData.filter(item => showLabels[item.label]);
+      
+      if (filteredData.length === 0) {
+        toast({
+          title: 'No data to download',
+          description: 'No data matches the currently selected labels',
+          status: 'warning',
+          duration: 3000,
+          isClosable: true,
+        });
+        setLoading(false);
+        return;
+      }
+
+      filteredData.forEach(item => {
+        const monthName = item.monthYear ? 
+          new Date(item.monthYear + '-01').toLocaleString('default', { month: 'long', year: 'numeric' }) : 
+          '';
+        
+        const row = [
+          monthName,
+          item.monthYear || '',
+          item.label || '',
+          item.count || 0,
+          selectedRepo.toUpperCase()
+        ];
+        csvRows.push(row.join(','));
+      });
+
+      const csvData = csvRows.join('\n');
       const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${selectedRepo}-pr-details-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `${selectedRepo}-raw-labels-${new Date().toISOString().split('T')[0]}.csv`;
       document.body?.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -174,7 +225,7 @@ const EipsLabelChart = () => {
       
       toast({
         title: 'Download successful',
-        description: `Downloaded ${filteredPRs.length} PR records`,
+        description: `Downloaded ${filteredData.length} label count records`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -183,7 +234,7 @@ const EipsLabelChart = () => {
       console.error('Download error:', error);
       toast({
         title: 'Download failed',
-        description: 'Could not download PR data',
+        description: 'Could not download label data',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -237,6 +288,27 @@ const EipsLabelChart = () => {
   
       // Define colors for different label categories
       const getColor = (type: string) => {
+        // Specific colors for common labels
+        const colorMap: Record<string, string> = {
+          'a-review': '#FFA500',      // Orange
+          'e-review': '#4169E1',      // Royal Blue  
+          'e-consensus': '#1E90FF',   // Dodger Blue
+          'stagnant': '#8B008B',      // Dark Magenta
+          'stale': '#B22222',         // Fire Brick
+          'created-by-bot': '#228B22', // Forest Green
+          'c-update': '#32CD32',      // Lime Green
+          'c-new-eip': '#90EE90',     // Light Green
+          'w-review': '#FF6347',      // Tomato
+          'w-author': '#FF4500',      // Orange Red
+          's-draft': '#9370DB',       // Medium Purple
+          's-review': '#8A2BE2',      // Blue Violet
+          's-final': '#4B0082',       // Indigo
+          'miscellaneous': '#A9A9A9'  // Dark Gray
+        };
+
+        if (colorMap[type]) return colorMap[type];
+
+        // Fallback: color by prefix
         if (type.startsWith('a-')) return '#FFA500'; // Orange for author-related
         if (type.startsWith('e-')) return '#4169E1'; // Royal blue for editor-related
         if (type.startsWith('w-')) return '#FF6347'; // Tomato for waiting-related
@@ -246,6 +318,11 @@ const EipsLabelChart = () => {
         return '#A9A9A9'; // Dark gray for others
       };
   
+      // Detect dark mode for chart styling
+      const isDarkMode = document?.documentElement?.classList?.contains('chakra-ui-dark') || false;
+      const chartTextColor = isDarkMode ? '#E2E8F0' : '#2D3748';
+      const chartGridColor = isDarkMode ? '#4A5568' : '#E2E8F0';
+
       const config: ColumnConfig = {
         data: sortedData,
         xField: 'monthYear',
@@ -253,18 +330,7 @@ const EipsLabelChart = () => {
         seriesField: 'type',
         isStack: true,
         color: (datum: any) => {
-          const label = datum.type || '';
-          
-          // Specific colors for our available labels
-          if (label === 'a-review') return '#FFA500';  // Orange
-          if (label === 'e-review') return '#4169E1';  // Royal Blue  
-          if (label === 'e-consensus') return '#1E90FF';  // Dodger Blue
-          if (label === 'stagnant') return '#8B008B';  // Dark Magenta
-          if (label === 'stale') return '#B22222';  // Fire Brick
-          if (label === 'created-by-bot') return '#228B22';  // Forest Green
-          if (label === 'miscellaneous') return '#A9A9A9';  // Dark Gray
-        
-          return '#A9A9A9';  // Default gray for unknown labels
+          return getColor(datum.type || '');
         },
         legend: {
           position: 'top-right',
@@ -272,6 +338,9 @@ const EipsLabelChart = () => {
             formatter: (text: string) => {
               if (text?.length > 15) return text?.substring(0, 12) + '...';
               return text;
+            },
+            style: {
+              fill: chartTextColor,
             }
           }
         },
@@ -281,30 +350,81 @@ const EipsLabelChart = () => {
             formatter: (text: string) => {
               const [year, month] = text.split('-');
               return `${new Date(Number(year), Number(month) - 1)?.toLocaleString('default', { month: 'short' })} ${year.slice(-2)}`;
+            },
+            style: {
+              fill: chartTextColor,
+            }
+          },
+          line: {
+            style: {
+              stroke: chartGridColor,
             }
           }
         },
         yAxis: {
           label: {
             formatter: (value: string) => `${value}`,
+            style: {
+              fill: chartTextColor,
+            }
           },
+          grid: {
+            line: {
+              style: {
+                stroke: chartGridColor,
+                strokeOpacity: 0.5,
+              }
+            }
+          },
+          line: {
+            style: {
+              stroke: chartGridColor,
+            }
+          }
         },
         tooltip: {
           shared: true,
           showMarkers: false,
           customContent: (title: string, items: any[]) => {
-            return (
-              <div>
-                <h3>{title}</h3>
-                <ul>
-                  {items?.map((item, index) => (
-                    <li key={index}>
-                      {item.name}: {item?.value}
-                    </li>
-                  ))}
-                </ul>
+            const isDark = document.documentElement.classList.contains('chakra-ui-dark');
+            const tooltipBg = isDark ? '#2D3748' : '#ffffff';
+            const tooltipText = isDark ? '#E2E8F0' : '#2D3748';
+            const tooltipBorder = isDark ? '#4A5568' : '#E2E8F0';
+            
+            return `
+              <div style="
+                background: ${tooltipBg}; 
+                color: ${tooltipText};
+                border: 1px solid ${tooltipBorder}; 
+                border-radius: 6px; 
+                padding: 12px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,${isDark ? '0.3' : '0.15'});
+                min-width: 150px;
+              ">
+                <div style="
+                  font-weight: bold; 
+                  margin-bottom: 8px; 
+                  color: ${tooltipText};
+                  border-bottom: 1px solid ${tooltipBorder};
+                  padding-bottom: 6px;
+                ">
+                  ${title}
+                </div>
+                <div>
+                  ${items?.map(item => `
+                    <div style="
+                      display: flex; 
+                      justify-content: space-between; 
+                      padding: 2px 0;
+                      color: ${tooltipText};
+                    ">
+                      <span>${item.name}:</span>
+                      <span style="font-weight: 600; margin-left: 8px;">${item?.value}</span>
+                    </div>
+                  `).join('')}
+                </div>
               </div>
-            );
+            `;
           },
         },
         slider: {
@@ -327,9 +447,11 @@ const EipsLabelChart = () => {
 
   return (
     <Box p={2}>
-      <Box bg="white" p={4} borderRadius="md" boxShadow="sm">
+      <Box bg={bgColor} p={4} borderRadius="md" boxShadow="sm" border="1px solid" borderColor={borderColor}>
         {loading ? (
-          <Box textAlign="center" py={10}>Loading chart data...</Box>
+          <Box textAlign="center" py={10} bg={loadingBg} borderRadius="md">
+            <Box color={loadingText} fontSize="md">Loading chart data...</Box>
+          </Box>
         ) : (
           <>
             <Flex 
@@ -340,15 +462,14 @@ const EipsLabelChart = () => {
           mb={6}
         >
           {/* Title on the left */}
-          <Heading size="md" color="black" flexShrink={0}>PRs Label Distribution
-            <CopyLink link={`https://eipsinsight.com//Analytics#EIPsLabelChart`} />
+          <Heading size="md" color="blue.500" flexShrink={0}>Github Labels Distribution
+            <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
           </Heading>
           
           {/* Controls on the right */}
           <Flex direction={{ base: "column", md: "row" }} align="center" gap={6}>
             {/* Repo Selector */}
             <Box minW="200px">
-              {/* <Heading size="sm" color="black" mb={2} textAlign="center">Repo</Heading> */}
               <Menu>
                 <MenuButton
                   as={Button}
@@ -361,76 +482,85 @@ const EipsLabelChart = () => {
                    selectedRepo === 'erc' ? 'ERCs' : 
                    selectedRepo === 'rip' ? 'RIPs' : 'Select Type'}
                 </MenuButton>
-                <MenuList>
-                  <MenuItem onClick={() => setSelectedRepo('eip')}>EIPs</MenuItem>
-                  <MenuItem onClick={() => setSelectedRepo('erc')}>ERCs</MenuItem>
-                  <MenuItem onClick={() => setSelectedRepo('rip')}>RIPs</MenuItem>
+                <MenuList bg={bgColor} borderColor={borderColor}>
+                  <MenuItem onClick={() => setSelectedRepo('eip')} _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}>
+                    EIPs
+                  </MenuItem>
+                  <MenuItem onClick={() => setSelectedRepo('erc')} _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}>
+                    ERCs
+                  </MenuItem>
+                  <MenuItem onClick={() => setSelectedRepo('rip')} _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}>
+                    RIPs
+                  </MenuItem>
                 </MenuList>
               </Menu>
             </Box>
 
             {/* Labels Selector */}
             <Box minW="200px">
-              {/* <Heading size="sm" mb={2} color="black" textAlign="center">Labels</Heading> */}
               <Menu closeOnSelect={false}>
-  <MenuButton
-    as={Button}
-    rightIcon={<ChevronDownIcon />}
-    colorScheme="blue"
-    size="md"
-    width="200px"
-  >
-    Labels
-  </MenuButton>
-  <MenuList maxHeight="300px" overflowY="auto">
-    {/* Select All / Remove All Actions */}
-    <Flex px={3} py={2} borderBottomWidth="1px" borderColor="gray.200">
-      <Button 
-        size="sm" 
-        variant="ghost" 
-        colorScheme="blue"
-        onClick={() => {
-          const allSelected: Record<string, boolean> = {};
-          availableLabels?.forEach(label => {
-            allSelected[label] = true;
-          });
-          setShowLabels(allSelected);
-        }}
-        mr={2}
-      >
-        Select All
-      </Button>
-      <Button 
-        size="sm" 
-        variant="ghost" 
-        colorScheme="red"
-        onClick={() => {
-          const noneSelected: Record<string, boolean> = {};
-          availableLabels?.forEach(label => {
-            noneSelected[label] = false;
-          });
-          setShowLabels(noneSelected);
-        }}
-      >
-        Remove All
-      </Button>
-    </Flex>
-    
-    {/* Labels List */}
-    {availableLabels?.map(label => (
-      <MenuItem key={label} closeOnSelect={false}>
-        <Checkbox
-          isChecked={showLabels[label]}
-          onChange={() => toggleLabel(label)}
-          colorScheme="blue"
-          flex="1"
-        >
-          {label}
-        </Checkbox>
-      </MenuItem>
-    ))}
-  </MenuList>
-</Menu>
+                <MenuButton
+                  as={Button}
+                  rightIcon={<ChevronDownIcon />}
+                  colorScheme="blue"
+                  size="md"
+                  width="200px"
+                >
+                  Labels
+                </MenuButton>
+                <MenuList maxHeight="300px" overflowY="auto" bg={bgColor} borderColor={borderColor}>
+                  {/* Select All / Remove All Actions */}
+                  <Flex px={3} py={2} borderBottomWidth="1px" borderColor={borderColor}>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      colorScheme="blue"
+                      onClick={() => {
+                        const allSelected: Record<string, boolean> = {};
+                        availableLabels?.forEach(label => {
+                          allSelected[label] = true;
+                        });
+                        setShowLabels(allSelected);
+                      }}
+                      mr={2}
+                    >
+                      Select All
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      colorScheme="red"
+                      onClick={() => {
+                        const noneSelected: Record<string, boolean> = {};
+                        availableLabels?.forEach(label => {
+                          noneSelected[label] = false;
+                        });
+                        setShowLabels(noneSelected);
+                      }}
+                    >
+                      Remove All
+                    </Button>
+                  </Flex>
+                  
+                  {/* Labels List */}
+                  {availableLabels?.map(label => (
+                    <MenuItem 
+                      key={label} 
+                      closeOnSelect={false} 
+                      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                    >
+                      <Checkbox
+                        isChecked={showLabels[label]}
+                        onChange={() => toggleLabel(label)}
+                        colorScheme="blue"
+                        flex="1"
+                      >
+                        <Box color={textColor}>{label}</Box>
+                      </Checkbox>
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
             </Box>
             <Button 
               colorScheme="blue" 
@@ -438,7 +568,7 @@ const EipsLabelChart = () => {
               onClick={handleDownload}
               size="md"
             >
-              Download PR Data
+              Download Label Data
             </Button>
           </Flex>
         </Flex>
