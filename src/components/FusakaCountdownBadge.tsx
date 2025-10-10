@@ -123,7 +123,7 @@ const FusakaCountdownBadge: React.FC<FusakaCountdownBadgeProps> = ({
         >
           <Badge
             variant="outline"
-            colorScheme={timeData.isLive ? "green" : "blue"}
+            colorScheme={timeData.isLive ? "yellow" : "yellow"}
             p={2}
             borderRadius="lg"
             cursor={clickable ? "pointer" : "default"}
@@ -135,14 +135,14 @@ const FusakaCountdownBadge: React.FC<FusakaCountdownBadgeProps> = ({
             _hover={clickable ? { 
               transform: 'translateY(-1px)',
               shadow: 'lg',
-              borderColor: useColorModeValue("blue.300", "blue.500")
+              borderColor: useColorModeValue("yellow.300", "yellow.500")
             } : {}}
             transition="all 0.3s"
           >
             <HStack spacing={1}>
-              {showIcon && <Text fontSize="xs">🚀</Text>}
+              {showIcon && <Text fontSize="xs">🦓</Text>}
               <Text fontSize="xs" fontWeight="bold">
-                {timeData.isLive ? 'FUSAKA LIVE!' : `Fusaka in ${timeData.timeString}`}
+                {timeData.isLive ? 'Fusaka countdown' : `Fusaka in ${timeData.timeString}`}
               </Text>
             </HStack>
           </Badge>
@@ -184,12 +184,12 @@ const FusakaCountdownBadge: React.FC<FusakaCountdownBadgeProps> = ({
             <HStack spacing={2}>
               {showIcon && (
                 <Box
-                  bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                  bg="linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)"
                   p={1}
                   borderRadius="full"
                   animation={`${pulse} 3s infinite`}
                 >
-                  <Text fontSize="sm">🚀</Text>
+                  <Text fontSize="sm">🦓</Text>
                 </Box>
               )}
               <VStack spacing={0} align="start">
@@ -204,8 +204,8 @@ const FusakaCountdownBadge: React.FC<FusakaCountdownBadgeProps> = ({
             
             <Box textAlign="center">
               {timeData.isLive ? (
-                <Badge colorScheme="green" fontSize="xs" p={1}>
-                  🎉 LIVE NOW!
+                <Badge colorScheme="yellow" fontSize="xs" p={1}>
+                  🦓 Countdown Active!
                 </Badge>
               ) : (
                 <VStack spacing={1}>
@@ -222,7 +222,7 @@ const FusakaCountdownBadge: React.FC<FusakaCountdownBadgeProps> = ({
               )}
             </Box>
 
-            <Badge colorScheme="blue" fontSize="9px" variant="subtle">
+            <Badge colorScheme="yellow" fontSize="9px" variant="subtle">
               Click for details
             </Badge>
           </VStack>
