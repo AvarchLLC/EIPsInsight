@@ -18,9 +18,34 @@ import {
 import { FiThumbsUp, FiThumbsDown, FiMeh, FiX, FiMessageSquare } from "react-icons/fi";
 import { useRouter } from "next/router";
 
+// Combined thumbs up/down icon component
+const CombinedThumbsIcon = ({ size = "20px" }: { size?: string }) => (
+  <Box position="relative" width={size} height={size} display="flex" alignItems="center" justifyContent="center">
+    <Icon 
+      as={FiThumbsUp} 
+      position="absolute" 
+      top="1px"
+      left="1px"
+      fontSize="14px" 
+      color="currentColor"
+      opacity={0.8}
+    />
+    <Icon 
+      as={FiThumbsDown} 
+      position="absolute" 
+      bottom="1px"
+      right="1px"
+      fontSize="14px" 
+      color="currentColor"
+      opacity={0.8}
+      transform="rotate(0deg)"
+    />
+  </Box>
+);
+
 const UniversalFeedbackSystem = () => {
-  const [isVisible, setIsVisible] = useState(false); // Hidden until 70% scroll
-  const [isExpanded, setIsExpanded] = useState(false); // Expands at 70% scroll
+  const [isVisible, setIsVisible] = useState(false); // Always false - popup disabled
+  const [isExpanded, setIsExpanded] = useState(false); // Always false - popup disabled
   const [hasGivenRating, setHasGivenRating] = useState(false);
   const [selectedRating, setSelectedRating] = useState<'positive' | 'neutral' | 'negative' | null>(null);
   const [showCommentBox, setShowCommentBox] = useState(false);
@@ -29,7 +54,7 @@ const UniversalFeedbackSystem = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [timeLeft, setTimeLeft] = useState(5); // 5 second timer
-  const [showTriggerButton, setShowTriggerButton] = useState(false);
+  const [showTriggerButton, setShowTriggerButton] = useState(true); // Always show trigger button
   
   const toast = useToast();
   const router = useRouter();
@@ -55,30 +80,11 @@ const UniversalFeedbackSystem = () => {
     }
   }, []);
 
-  // Scroll detection for 70% trigger (changed from 75%)
+  // Scroll detection disabled - popup removed, only trigger button remains
   useEffect(() => {
-    const hasBeenShown = sessionStorage.getItem(getSessionKey());
-    if (hasBeenShown) return; // Don't set up scroll listener if already shown
-
-    const handleScroll = () => {
-      if (scrolledTo75Ref.current) return; // Already triggered
-
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / documentHeight) * 100;
-
-      if (scrollPercent >= 70) {
-        scrolledTo75Ref.current = true;
-        // Smooth entrance with slight delay
-        setTimeout(() => {
-          setIsVisible(true);
-          setTimeout(() => setIsExpanded(true), 200); // Stagger the expansion
-        }, 100);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Popup is disabled, so we don't need scroll detection
+    // The trigger button will always be available
+    return;
   }, []);
 
   // Timer management
@@ -403,7 +409,7 @@ const UniversalFeedbackSystem = () => {
             >
               <IconButton
                 aria-label="Give feedback"
-                icon={<Icon as={FiMessageSquare} />}
+                icon={<CombinedThumbsIcon size="20px" />}
                 size="md"
                 colorScheme="blue"
                 variant="solid"

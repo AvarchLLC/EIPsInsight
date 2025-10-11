@@ -24,6 +24,8 @@ import { sidebarConfig } from "./Sidebar/slidebarConfig";
 import { useSidebarStore } from "@/stores/useSidebarStore";
 import AppSidebar from "./Sidebar/AppSidebar";
 import UniversalFeedbackSystem from "./UniversalFeedbackSystem";
+import CookieConsent from "./CookieConsent";
+import analytics from "@/utils/analytics";
 
 const mont = Rajdhani({
   subsets: ["latin"],
@@ -41,6 +43,13 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
 
   const [isMobile, setIsMobile] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+
+  // Track page views automatically
+  useEffect(() => {
+    if (pathname) {
+      analytics.pageView(window.location.href, document.title);
+    }
+  }, [pathname]);
 
   useEffect(() => {
     if (window.location.hash) {
@@ -105,6 +114,14 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){window.dataLayer.push(arguments);}
+            
+            // Initialize with denied consent by default (EU compliance)
+            gtag('consent', 'default', {
+              analytics_storage: 'denied',
+              ad_storage: 'denied',
+              wait_for_update: 500,
+            });
+            
             gtag('js', new Date());
             gtag('config', 'G-R36R5NJFTW');
           `}
@@ -140,7 +157,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
               <Navbar />
               <AuthLocalStorageInitializer />
               {children}
-              {/* Universal Feedback Widget - appears on all pages */}
+              {/* Universal Feedback Widget - only bottom-right button, no popup */}
               <UniversalFeedbackSystem />
               <Box
                 position="fixed"
@@ -159,6 +176,9 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
 
               <LargeWithAppLinksAndSocial />
             </Box>
+            
+            {/* Cookie Consent Banner */}
+            <CookieConsent />
           </BookmarkProvider>
       </motion.div>
   );
