@@ -144,25 +144,6 @@ const networkUpgradesData = {
       ],
     },
     {
-      name: 'Berlin',
-      eips: [
-        { eip: 2565, requires: [198] },
-        { eip: 2929, requires: [] },
-        { eip: 2718, requires: [] },
-        { eip: 2930, requires: [2718, 2929] },
-      ],
-    },
-    {
-      name: 'London',
-      eips: [
-        { eip: 1559, requires: [2718, 2930] },
-        { eip: 3198, requires: [1559] },
-        { eip: 3529, requires: [2200, 2929, 2930] },
-        { eip: 3541, requires: [] },
-        { eip: 3554, requires: [] },
-      ],
-    },
-    {
       name: 'Arrow Glacier',
       eips: [{ eip: 4345, requires: [] }],
     },
