@@ -93,11 +93,11 @@ const GitHubPRTracker: React.FC = () => {
   const [loading2, setLoading2] = useState<boolean>(false);
   const [loading3, setLoading3] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"PRs" | "Issues">("PRs");
-  const [selectedRepo, setSelectedRepo] = useState<string>("All");
+  const [selectedRepo, setSelectedRepo] = useState<string>("EIPs");
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
-
+``
   const toggleCollapse = () => setShow(!show);
   // const [selectedYear, setSelectedYear] = useState(null);
   // const [selectedMonth, setSelectedMonth] = useState(null);

@@ -49,7 +49,7 @@ const EipsLabelChart = () => {
   const [chartData, setChartData] = useState<AggregatedLabelCount[]>([]);
   const [availableLabels, setAvailableLabels] = useState<string[]>(initialLabels);
   const [loading, setLoading] = useState(true);
-  const [selectedRepo, setSelectedRepo] = useState('erc');
+  const [selectedRepo, setSelectedRepo] = useState('eip');
   const [showLabels, setShowLabels] = useState<Record<string, boolean>>(
     initialLabels?.reduce((acc, label) => ({ ...acc, [label]: true }), {})
   );
@@ -391,6 +391,9 @@ const EipsLabelChart = () => {
             const tooltipText = isDark ? '#E2E8F0' : '#2D3748';
             const tooltipBorder = isDark ? '#4A5568' : '#E2E8F0';
             
+            // Calculate total count for this month
+            const totalCount = items?.reduce((sum, item) => sum + (item?.value || 0), 0);
+            
             return `
               <div style="
                 background: ${tooltipBg}; 
@@ -399,7 +402,7 @@ const EipsLabelChart = () => {
                 border-radius: 6px; 
                 padding: 12px; 
                 box-shadow: 0 4px 12px rgba(0,0,0,${isDark ? '0.3' : '0.15'});
-                min-width: 150px;
+                min-width: 180px;
               ">
                 <div style="
                   font-weight: bold; 
@@ -409,6 +412,21 @@ const EipsLabelChart = () => {
                   padding-bottom: 6px;
                 ">
                   ${title}
+                </div>
+                <div style="
+                  margin-bottom: 8px;
+                  padding-bottom: 6px;
+                  border-bottom: 1px solid ${tooltipBorder};
+                ">
+                  <div style="
+                    display: flex; 
+                    justify-content: space-between; 
+                    font-weight: bold;
+                    color: ${tooltipText};
+                  ">
+                    <span>Total:</span>
+                    <span style="color: #4299E1;">${totalCount}</span>
+                  </div>
                 </div>
                 <div>
                   ${items?.map(item => `
