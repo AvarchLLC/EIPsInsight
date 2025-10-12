@@ -55,6 +55,7 @@ const SearchBox: React.FC = () => {
   const [IssueData, setIssueData] = useState<IssueItem[]>([]);
   const [eipData, setEipData] = useState<EIP[]>([]);
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const router = usePathname();
   const splitPath = router?.split("/") || [];
   const type = splitPath[1] || "eip";
@@ -62,8 +63,10 @@ const SearchBox: React.FC = () => {
   const [filteredIssueResults, setFilteredIssueResults] = useState<IssueItem[]>([]);
   const [filteredEIPResults, setFilteredEIPResults] = useState<EIP[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showDropdown, setShowDropdown] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -144,6 +147,23 @@ const SearchBox: React.FC = () => {
     setAuthorCounts(authorArray);
   }, [authordata]);
 
+  // Debounce the query to optimize performance
+  useEffect(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 150); // 150ms delay
+    
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [query]);
+
   // const filteredAuthorData = query
   // ? authordata.filter(item =>
   //     item.author.toLowerCase().includes(query.toLowerCase())
@@ -151,7 +171,7 @@ const SearchBox: React.FC = () => {
   // : [];
 
   const filteredAuthors = authorCounts.filter((author) =>
-    author.name.toLowerCase().includes(query.toLowerCase())
+    author.name.toLowerCase().includes(debouncedQuery.toLowerCase())
   );
 
   console.log("filtered author data:", filteredAuthors);
@@ -200,7 +220,7 @@ const SearchBox: React.FC = () => {
   }, []);
 
     useEffect(() => {
-    var queryStr = query.trim();
+    var queryStr = debouncedQuery.trim();
     let queryStr2 = ''; // To store the non-numeric part at the beginning
 
     // Regular expression to split the query into numeric and non-numeric parts
@@ -378,7 +398,16 @@ if (queryStr2.toLowerCase() === "e") {
       setFilteredEIPResults([]);
       setFilteredIssueResults([]);
     }
-  }, [query]);
+  }, [debouncedQuery, data, IssueData, eipData]);
+
+  // Auto-select first result when query changes
+  useEffect(() => {
+    if (query.trim() && (filteredEIPResults.length > 0 || filteredAuthors.length > 0)) {
+      setSelectedIndex(0);
+    } else {
+      setSelectedIndex(-1);
+    }
+  }, [query, filteredEIPResults.length, filteredAuthors.length]);
   const handleSearchResultClick = async (selectedNumber: number, repo: string) => {
     try {
       window.location.href = `/PR/${repo}/${selectedNumber}`;
@@ -435,8 +464,6 @@ if (queryStr2.toLowerCase() === "e") {
     return isLengthValid && isUnique;
   });
 
-  const [showDropdown, setShowDropdown] = useState(false);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !(dropdownRef.current as HTMLDivElement).contains(event.target as Node)) {
@@ -451,49 +478,68 @@ if (queryStr2.toLowerCase() === "e") {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle keyboard events when search dropdown is open
+      if (!showDropdown || !query) return;
+      
+      const totalResults = filteredEIPResults.length + filteredAuthors.length + filteredResults.length + filteredIssueResults.length;
+      
       if (event.key === "ArrowDown") {
+        event.preventDefault();
         setSelectedIndex((prevIndex) => {
-          const newIndex = prevIndex < filteredAuthors.length + filteredResults.length + filteredIssueResults.length + filteredEIPResults.length - 1
-            ? prevIndex + 1
-            : prevIndex;
-          if (dropdownRef.current) {
-            const option = dropdownRef.current.querySelectorAll("option")[newIndex];
-            if (option) {
-              option.scrollIntoView({ block: "nearest" });
-            }
-          }
+          const newIndex = prevIndex < totalResults - 1 ? prevIndex + 1 : 0; // Wrap to first
+          scrollToSelectedOption(newIndex);
           return newIndex;
         });
       } else if (event.key === "ArrowUp") {
+        event.preventDefault();
         setSelectedIndex((prevIndex) => {
-          const newIndex = prevIndex > 0 ? prevIndex - 1 : prevIndex;
-          if (dropdownRef.current) {
-            const option = dropdownRef.current.querySelectorAll("option")[newIndex];
-            if (option) {
-              option.scrollIntoView({ block: "nearest" });
-            }
-          }
+          const newIndex = prevIndex > 0 ? prevIndex - 1 : totalResults - 1; // Wrap to last
+          scrollToSelectedOption(newIndex);
           return newIndex;
         });
-      } else if (event.key === "Enter" && selectedIndex >= 0) {
-        const allResults = [
-          ...filteredAuthors,
-          ...filteredResults,
-          ...filteredIssueResults,
-          ...filteredEIPResults,
-        ];
-        const selectedResult = allResults[selectedIndex];
-        if (selectedResult) {
-          if ("name" in selectedResult) {
-            handleAuthorSearchResultClick(selectedResult.name);
-          } else if ("prNumber" in selectedResult) {
-            handleSearchResultClick(selectedResult.prNumber, selectedResult.repo);
-          } else if ("issueNumber" in selectedResult) {
-            handleSearchIssueResultClick(selectedResult.issueNumber, selectedResult.repo);
-          } else if ("eip" in selectedResult) {
-            EIPhandleSearchResultClick(selectedResult.eip, selectedResult.repo);
-          }
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        if (selectedIndex >= 0) {
+          handleSelectResult(selectedIndex);
         }
+      } else if (event.key === "Escape") {
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+        inputRef.current?.blur();
+      }
+    };
+
+    const scrollToSelectedOption = (index: number) => {
+      if (dropdownRef.current) {
+        const options = dropdownRef.current.querySelectorAll("option");
+        const option = options[index];
+        if (option) {
+          option.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+      }
+    };
+
+    const handleSelectResult = (index: number) => {
+      const allResults = [
+        ...filteredEIPResults,
+        ...filteredAuthors,
+        ...filteredResults,
+        ...filteredIssueResults,
+      ];
+      const selectedResult = allResults[index];
+      
+      if (selectedResult) {
+        if ("name" in selectedResult) {
+          handleAuthorSearchResultClick(selectedResult.name);
+        } else if ("prNumber" in selectedResult) {
+          handleSearchResultClick(selectedResult.prNumber, selectedResult.repo);
+        } else if ("issueNumber" in selectedResult) {
+          handleSearchIssueResultClick(selectedResult.issueNumber, selectedResult.repo);
+        } else if ("eip" in selectedResult) {
+          EIPhandleSearchResultClick(selectedResult.eip, selectedResult.repo);
+        }
+        setShowDropdown(false);
+        setQuery("");
       }
     };
 
@@ -501,7 +547,7 @@ if (queryStr2.toLowerCase() === "e") {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedIndex, filteredAuthors, filteredResults, filteredIssueResults, filteredEIPResults]);
+  }, [selectedIndex, filteredAuthors, filteredResults, filteredIssueResults, filteredEIPResults, showDropdown, query]);
 
   return (
     <div className="relative w-full">
@@ -513,9 +559,13 @@ if (queryStr2.toLowerCase() === "e") {
         onChange={(e) => {
           setQuery(e.target.value);
           setShowDropdown(true); // Show dropdown when typing
-          setSelectedIndex(-1); // Reset selected index
         }}
-        className="border p-2 rounded w-full text-center focus:border-blue-100"
+        onFocus={() => {
+          if (query.trim()) {
+            setShowDropdown(true);
+          }
+        }}
+        className="border p-2 rounded w-full text-center focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200"
       />
 
       {showDropdown && query && (
@@ -529,57 +579,89 @@ if (queryStr2.toLowerCase() === "e") {
               Invalid EIP/ERC/RIP/Author
             </p>
           ) : (
-            <select
-              className="w-full p-2 rounded text-center"
-              size={10}
-              onChange={(e) => console.log(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-                  e.preventDefault();
-                }
-              }}
-            >
+            <div className="max-h-60 overflow-y-auto">
+              {/* EIP Results */}
               {filteredEIPResults.map((result, index) => (
-                <option
-                  key={result.eip}
-                  value={result.eip}
-                  onClick={() => EIPhandleSearchResultClick(result.eip, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + filteredIssueResults.length + index ? "bg-blue-100" : ""}`}
+                <div
+                  key={`eip-${result.eip}-${result.repo}`}
+                  onClick={() => {
+                    EIPhandleSearchResultClick(result.eip, result.repo);
+                    setShowDropdown(false);
+                    setQuery("");
+                  }}
+                  className={`cursor-pointer p-3 hover:bg-blue-50 border-b ${
+                    selectedIndex === index ? "bg-blue-100" : ""
+                  }`}
                 >
-                  {result.repo.toUpperCase()}-{result.eip}
-                </option>
+                  <div className="text-lg font-medium">
+                    {result.repo.toUpperCase()}-{result.eip}
+                  </div>
+                  <div className="text-sm text-gray-600 truncate">
+                    {result.title}
+                  </div>
+                </div>
               ))}
+              
+              {/* Author Results */}
               {filteredAuthors.map((result, index) => (
-                <option
-                  key={result.name}
-                  value={result.name}
-                  onClick={() => handleAuthorSearchResultClick(result.name)}
-                  className={`text-lg py-3 ${selectedIndex === index ? "bg-blue-100" : ""}`}
+                <div
+                  key={`author-${result.name}`}
+                  onClick={() => {
+                    handleAuthorSearchResultClick(result.name);
+                    setShowDropdown(false);
+                    setQuery("");
+                  }}
+                  className={`cursor-pointer p-3 hover:bg-blue-50 border-b ${
+                    selectedIndex === filteredEIPResults.length + index ? "bg-blue-100" : ""
+                  }`}
                 >
-                  {result.name} ({result.count})
-                </option>
+                  <div className="text-lg font-medium">
+                    {result.name}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {result.count} contribution{result.count !== 1 ? 's' : ''}
+                  </div>
+                </div>
               ))}
+              
+              {/* PR Results (commented out but keeping structure) */}
               {/* {uniqueResults.map((result, index) => (
-                <option
-                  key={result.prNumber}
-                  value={result.prNumber}
-                  onClick={() => handleSearchResultClick(result.prNumber, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + index ? "bg-blue-100" : ""}`}
+                <div
+                  key={`pr-${result.prNumber}-${result.repo}`}
+                  onClick={() => {
+                    handleSearchResultClick(result.prNumber, result.repo);
+                    setShowDropdown(false);
+                    setQuery("");
+                  }}
+                  className={`cursor-pointer p-3 hover:bg-blue-50 border-b ${
+                    selectedIndex === filteredEIPResults.length + filteredAuthors.length + index ? "bg-blue-100" : ""
+                  }`}
                 >
-                  {result.repo} PR: {result.prNumber}
-                </option>
+                  <div className="text-lg font-medium">
+                    {result.repo.toUpperCase()} PR: {result.prNumber}
+                  </div>
+                </div>
               ))} */}
+              
+              {/* Issue Results (commented out but keeping structure) */}
               {/* {filteredIssueResults.map((result, index) => (
-                <option
-                  key={result.issueNumber}
-                  value={result.issueNumber}
-                  onClick={() => handleSearchIssueResultClick(result.issueNumber, result.repo)}
-                  className={`text-lg py-3 ${selectedIndex === filteredAuthors.length + uniqueResults.length + index ? "bg-blue-100" : ""}`}
+                <div
+                  key={`issue-${result.issueNumber}-${result.repo}`}
+                  onClick={() => {
+                    handleSearchIssueResultClick(result.issueNumber, result.repo);
+                    setShowDropdown(false);
+                    setQuery("");
+                  }}
+                  className={`cursor-pointer p-3 hover:bg-blue-50 border-b ${
+                    selectedIndex === filteredEIPResults.length + filteredAuthors.length + uniqueResults.length + index ? "bg-blue-100" : ""
+                  }`}
                 >
-                  {result.repo} ISSUE: {result.issueNumber}
-                </option>
+                  <div className="text-lg font-medium">
+                    {result.repo.toUpperCase()} ISSUE: {result.issueNumber}
+                  </div>
+                </div>
               ))} */}
-            </select>
+            </div>
           )}
         </div>
       )}
