@@ -392,7 +392,7 @@ const EipsLabelChart = () => {
             const tooltipBorder = isDark ? '#4A5568' : '#E2E8F0';
             
             // Calculate total count for this month
-            const totalCount = items?.reduce((sum, item) => sum + (item?.value || 0), 0);
+            const totalCount = items?.reduce((sum, item) => sum + (Number(item?.value) || 0), 0);
             
             return `
               <div style="

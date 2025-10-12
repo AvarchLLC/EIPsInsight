@@ -252,14 +252,17 @@ const SlotCountdown: React.FC = () => {
                   key={slot}
                   label={
                     isProcessed
-                      ? `Slot: ${slot} • Epoch: ${epochOfSlot} • Block: ${blockOfSlot}`
-                      : `Future slot: ${slot}`
+                      ? `✅ Processed Slot: ${slot}\n📊 Epoch: ${epochOfSlot}\n📦 Block: ${blockOfSlot.toLocaleString()}\n🌐 Network: ${networks[network].name}`
+                      : isCurrent
+                      ? `📍 Current Slot: ${slot}\n📊 Epoch: ${epochOfSlot}\n📦 Current Block: ${blockOfSlot.toLocaleString()}\n🌐 Network: ${networks[network].name}\n⏱️ Next slot in ~${13 - timer}s`
+                      : `🔮 Future Slot: ${slot}\n📊 Epoch: ${epochOfSlot}\n📅 Est. Time: ${new Date(Date.now() + ((slot - currentSlot) * 12 * 1000)).toLocaleString()}\n📦 Est. Block: ${(currentBlock + (slot - currentSlot)).toLocaleString()}`
                   }
                   hasArrow
                   placement="top"
                   bg={useColorModeValue("gray.800", "gray.200")}
                   color={useColorModeValue("white", "gray.800")}
                   fontSize="xs"
+                  whiteSpace="pre-line"
                 >
                   <Box
                     w="55px"
@@ -313,14 +316,17 @@ const SlotCountdown: React.FC = () => {
                   key={slot}
                   label={
                     isProcessed
-                      ? `Slot: ${slot} • Epoch: ${epochOfSlot} • Block: ${blockOfSlot}`
-                      : `Future slot: ${slot}`
+                      ? `✅ Processed Slot: ${slot}\n📊 Epoch: ${epochOfSlot}\n📦 Block: ${blockOfSlot.toLocaleString()}\n🌐 Network: ${networks[network].name}`
+                      : isCurrent
+                      ? `📍 Current Slot: ${slot}\n📊 Epoch: ${epochOfSlot}\n📦 Current Block: ${blockOfSlot.toLocaleString()}\n🌐 Network: ${networks[network].name}\n⏱️ Next slot in ~${13 - timer}s`
+                      : `🔮 Future Slot: ${slot}\n📊 Epoch: ${epochOfSlot}\n📅 Est. Time: ${new Date(Date.now() + ((slot - currentSlot) * 12 * 1000)).toLocaleString()}\n📦 Est. Block: ${(currentBlock + (slot - currentSlot)).toLocaleString()}`
                   }
                   hasArrow
                   placement="top"
                   bg={useColorModeValue("gray.800", "gray.200")}
                   color={useColorModeValue("white", "gray.800")}
                   fontSize="xs"
+                  whiteSpace="pre-line"
                 >
                   <Box
                     w="55px"
@@ -371,12 +377,13 @@ const SlotCountdown: React.FC = () => {
                 </Box>
                 
                 <Tooltip
-                  label={`FUSAKA Target Slot: ${networks[network].target} • ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}`}
+                  label={`🎯 FUSAKA Target Slot: ${networks[network].target.toLocaleString()}\n📅 Scheduled: ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}\n📊 Target Epoch: ${networks[network].targetepoch.toLocaleString()}\n⏰ Estimated Block: ${(networks[network].target + (currentBlock - currentSlot)).toLocaleString()}\n🚀 Network: ${networks[network].name}\n⏳ Slots remaining: ${(networks[network].target - currentSlot).toLocaleString()}`}
                   hasArrow
                   placement="top"
                   bg={useColorModeValue("gray.800", "gray.200")}
                   color={useColorModeValue("white", "gray.800")}
                   fontSize="xs"
+                  whiteSpace="pre-line"
                 >
                   <Box
                     w="55px"
@@ -409,7 +416,7 @@ const SlotCountdown: React.FC = () => {
   };
 
   const renderEpochsView = () => {
-    const epochsToShow = 18;
+    const epochsToShow = 16; // Reduced to make room for target
     const epochs = Array.from({ length: epochsToShow }, (_, i) => currentEpoch + i);
     
     return (
@@ -420,26 +427,48 @@ const SlotCountdown: React.FC = () => {
         
         <VStack spacing={2}>
           <HStack spacing={1.5} wrap="wrap" justify="center">
-            {epochs.slice(0, 10).map((epoch) => {
+            {epochs.slice(0, 8).map((epoch) => {
               const isCurrent = epoch === currentEpoch;
               const isTarget = epoch === networks[network].targetepoch;
               const isPast = epoch < currentEpoch;
               
+              const formatTooltip = (epoch: number, isCurrent: boolean, isTarget: boolean) => {
+                const lines = [];
+                
+                if (isTarget) {
+                  lines.push(`🎯 FUSAKA Target Epoch: ${epoch}`);
+                  lines.push(`📅 Scheduled: ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}`);
+                  lines.push(`🔢 Target Slot: ${networks[network].target.toLocaleString()}`);
+                  lines.push(`⏰ Estimated Block: ${(networks[network].target + (currentBlock - currentSlot)).toLocaleString()}`);
+                  lines.push(`🚀 Network: ${networks[network].name}`);
+                } else if (isCurrent) {
+                  lines.push(`📍 Current Epoch: ${epoch}`);
+                  lines.push(`🔢 Current Slot: ${currentSlot.toLocaleString()}`);
+                  lines.push(`📦 Current Block: ${currentBlock.toLocaleString()}`);
+                  lines.push(`🌐 Network: ${networks[network].name}`);
+                  lines.push(`⏱️ Next slot in ~${13 - timer}s`);
+                } else if (isPast) {
+                  lines.push(`✅ Completed Epoch: ${epoch}`);
+                  lines.push(`📦 Estimated Block: ${(currentBlock - ((currentSlot - (epoch * 32)) * 1)).toLocaleString()}`);
+                } else {
+                  lines.push(`🔮 Future Epoch: ${epoch}`);
+                  lines.push(`📅 Est. Start: ${new Date(Date.now() + ((epoch - currentEpoch) * 32 * 12 * 1000)).toLocaleString()}`);
+                  lines.push(`📦 Est. Block: ${(currentBlock + ((epoch - currentEpoch) * 32)).toLocaleString()}`);
+                }
+                
+                return lines.join('\n');
+              };
+              
               return (
                 <Tooltip
                   key={epoch}
-                  label={
-                    isCurrent 
-                      ? `Current Epoch: ${epoch} • Slot: ${currentSlot}` 
-                      : isTarget
-                      ? `FUSAKA Target Epoch: ${epoch} • ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}`
-                      : `Epoch: ${epoch}`
-                  }
+                  label={formatTooltip(epoch, isCurrent, isTarget)}
                   hasArrow
                   placement="top"
                   bg={useColorModeValue("gray.800", "gray.200")}
                   color={useColorModeValue("white", "gray.800")}
                   fontSize="xs"
+                  whiteSpace="pre-line"
                 >
                   <Box
                     w="55px"
@@ -484,29 +513,52 @@ const SlotCountdown: React.FC = () => {
                 </Tooltip>
               );
             })}
+            
           </HStack>
           
           <HStack spacing={1.5} wrap="wrap" justify="center">
-            {epochs.slice(10).map((epoch) => {
+            {epochs.slice(8).map((epoch) => {
               const isCurrent = epoch === currentEpoch;
               const isTarget = epoch === networks[network].targetepoch;
               const isPast = epoch < currentEpoch;
               
+              const formatTooltip = (epoch: number, isCurrent: boolean, isTarget: boolean) => {
+                const lines = [];
+                
+                if (isTarget) {
+                  lines.push(`🎯 FUSAKA Target Epoch: ${epoch}`);
+                  lines.push(`📅 Scheduled: ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}`);
+                  lines.push(`🔢 Target Slot: ${networks[network].target.toLocaleString()}`);
+                  lines.push(`⏰ Estimated Block: ${(networks[network].target + (currentBlock - currentSlot)).toLocaleString()}`);
+                  lines.push(`🚀 Network: ${networks[network].name}`);
+                } else if (isCurrent) {
+                  lines.push(`📍 Current Epoch: ${epoch}`);
+                  lines.push(`🔢 Current Slot: ${currentSlot.toLocaleString()}`);
+                  lines.push(`📦 Current Block: ${currentBlock.toLocaleString()}`);
+                  lines.push(`🌐 Network: ${networks[network].name}`);
+                  lines.push(`⏱️ Next slot in ~${13 - timer}s`);
+                } else if (isPast) {
+                  lines.push(`✅ Completed Epoch: ${epoch}`);
+                  lines.push(`📦 Estimated Block: ${(currentBlock - ((currentSlot - (epoch * 32)) * 1)).toLocaleString()}`);
+                } else {
+                  lines.push(`🔮 Future Epoch: ${epoch}`);
+                  lines.push(`📅 Est. Start: ${new Date(Date.now() + ((epoch - currentEpoch) * 32 * 12 * 1000)).toLocaleString()}`);
+                  lines.push(`📦 Est. Block: ${(currentBlock + ((epoch - currentEpoch) * 32)).toLocaleString()}`);
+                }
+                
+                return lines.join('\n');
+              };
+              
               return (
                 <Tooltip
                   key={epoch}
-                  label={
-                    isCurrent 
-                      ? `Current Epoch: ${epoch} • Slot: ${currentSlot}` 
-                      : isTarget
-                      ? `FUSAKA Target Epoch: ${epoch} • ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}`
-                      : `Epoch: ${epoch}`
-                  }
+                  label={formatTooltip(epoch, isCurrent, isTarget)}
                   hasArrow
                   placement="top"
                   bg={useColorModeValue("gray.800", "gray.200")}
                   color={useColorModeValue("white", "gray.800")}
                   fontSize="xs"
+                  whiteSpace="pre-line"
                 >
                   <Box
                     w="55px"
@@ -551,6 +603,50 @@ const SlotCountdown: React.FC = () => {
                 </Tooltip>
               );
             })}
+            
+            {/* Add target epoch at the end if it's not already visible and network has a target */}
+            {networks[network].target !== Number.MAX_SAFE_INTEGER && 
+             networks[network].targetepoch > currentEpoch + 15 && (
+              <>
+                <Box mx={2}>
+                  <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
+                    ···
+                  </Text>
+                </Box>
+                
+                <Tooltip
+                  label={`🎯 FUSAKA Target Epoch: ${networks[network].targetepoch}\n📅 Scheduled: ${FUSAKA_INFO.schedule[network as keyof typeof FUSAKA_INFO.schedule]}\n🔢 Target Slot: ${networks[network].target.toLocaleString()}\n⏰ Estimated Block: ${(networks[network].target + (currentBlock - currentSlot)).toLocaleString()}\n🚀 Network: ${networks[network].name}\n⏳ Epochs remaining: ${(networks[network].targetepoch - currentEpoch).toLocaleString()}`}
+                  hasArrow
+                  placement="top"
+                  bg={useColorModeValue("gray.800", "gray.200")}
+                  color={useColorModeValue("white", "gray.800")}
+                  fontSize="xs"
+                  whiteSpace="pre-line"
+                >
+                  <Box
+                    w="55px"
+                    h="55px"
+                    borderRadius="md"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    bg={useColorModeValue("orange.400", "orange.500")}
+                    color="white"
+                    fontSize="10px"
+                    fontWeight="bold"
+                    border="2px solid"
+                    borderColor={useColorModeValue("orange.600", "orange.300")}
+                    _hover={{
+                      transform: "translateY(-1px)",
+                      shadow: "sm",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    FUSAKA
+                  </Box>
+                </Tooltip>
+              </>
+            )}
           </HStack>
         </VStack>
       </VStack>
