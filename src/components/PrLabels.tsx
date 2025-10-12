@@ -90,10 +90,10 @@ const CUSTOM_LABELS_ALL: LabelSpec[] = [
 ];
 
 const REPOS = [
-  { key: "all", label: "All PRs", api: "" },
-  { key: "eip", label: "EIP PRs", api: "/api/pr-stats" },
-  { key: "erc", label: "ERC PRs", api: "/api/ercpr-stats" },
-  { key: "rip", label: "RIP PRs", api: "/api/rippr-stats" },
+  { key: "all", label: "All Open PRs", api: "" },
+  { key: "eip", label: "EIP Open PRs", api: "/api/pr-stats" },
+  { key: "erc", label: "ERC Open PRs", api: "/api/ercpr-stats" },
+  { key: "rip", label: "RIP Open PRs", api: "/api/rippr-stats" },
 ];
 
 interface AggregatedLabelCount {
