@@ -68,9 +68,15 @@ const EipsLabelChart = () => {
         setLoading(true);
         const controller = new AbortController();
         
-        // Fetch detailed PR data with labels to avoid double counting
+        // Use the detailed PR endpoints that include labels for proper deduplication
+        const apiEndpoints = {
+          eip: '/api/eipsprdetails2',
+          erc: '/api/ercsprdetails2', 
+          rip: '/api/ripsprdetails2'
+        };
+        
         const response = await fetch(
-          `/api/AnalyticsCharts/pr-details/${selectedRepo}?labelType=githubLabels`, 
+          apiEndpoints[selectedRepo as keyof typeof apiEndpoints], 
           { signal: controller.signal }
         );
         
@@ -78,72 +84,93 @@ const EipsLabelChart = () => {
           throw new Error(`API error: ${response.status}`);
         }
         
-        const result = await response.json();
-        const data = result.data || [];
+        const rawPRs = await response.json();
         
-        console.log("Raw API data sample:", data.slice(0, 3));
+        console.log("Raw PR data sample:", rawPRs.slice(0, 3));
         
-        // Process data to avoid double counting PRs with multiple labels
-        const processedData = new Map<string, Set<number>>(); // monthYear-label -> Set of PR numbers
+        // Process PR data with proper deduplication
+        const monthlyLabelCounts = new Map<string, Map<string, Set<number>>>();
         const allLabels = new Set<string>();
         
-        // Group by month-label and collect unique PR numbers
-        data.forEach((item: any) => {
-          const { monthYear, label, prNumber } = item;
-          const key = `${monthYear}-${label}`;
+        rawPRs.forEach((pr: any) => {
+          if (!pr.created_at || !pr.labels || !Array.isArray(pr.labels)) return;
           
-          allLabels.add(label);
+          const createdDate = new Date(pr.created_at);
+          const monthYear = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}`;
           
-          if (!processedData.has(key)) {
-            processedData.set(key, new Set());
+          // Initialize month if not exists
+          if (!monthlyLabelCounts.has(monthYear)) {
+            monthlyLabelCounts.set(monthYear, new Map());
           }
-          processedData.get(key)!.add(prNumber);
+          
+          const monthData = monthlyLabelCounts.get(monthYear)!;
+          
+          // Count each PR only once per label, avoiding double counting
+          pr.labels.forEach((label: string) => {
+            if (!label) return;
+            
+            allLabels.add(label);
+            
+            // Initialize label set if not exists
+            if (!monthData.has(label)) {
+              monthData.set(label, new Set());
+            }
+            
+            // Add PR number to the set (sets automatically handle uniqueness)
+            monthData.get(label)!.add(pr.prNumber);
+          });
         });
         
-        // Convert to chart format with unique counts
+        // Convert to the format expected by the chart
         const transformedData: AggregatedLabelCount[] = [];
-        processedData.forEach((prNumbers, key) => {
-          const [monthYear, label] = key.split('-');
-          transformedData.push({
-            monthYear,
-            label,
-            count: prNumbers.size, // Count unique PRs, not label instances
-            labelType: 'githubLabels',
-            prNumbers: Array.from(prNumbers)
+        
+        monthlyLabelCounts.forEach((monthData, monthYear) => {
+          monthData.forEach((prNumbers, label) => {
+            transformedData.push({
+              monthYear,
+              label,
+              count: prNumbers.size, // Size of set = unique PR count
+              labelType: 'githubLabels',
+              prNumbers: Array.from(prNumbers)
+            });
           });
         });
         
         // Update available labels from processed data
         const uniqueLabels = Array.from(allLabels).sort();
-        setAvailableLabels(uniqueLabels);
-        
-        // Update showLabels state to include new labels
-        setShowLabels(prevState => {
-          const newState = { ...prevState };
-          uniqueLabels.forEach((label: string) => {
-            if (!(label in newState)) {
-              newState[label] = true; // Show new labels by default
-            }
+        if (uniqueLabels.length > 0) {
+          setAvailableLabels(uniqueLabels);
+          
+          // Update showLabels state to include new labels
+          setShowLabels(prevState => {
+            const newState = { ...prevState };
+            uniqueLabels.forEach((label: string) => {
+              if (!(label in newState)) {
+                newState[label] = true; // Show new labels by default
+              }
+            });
+            return newState;
           });
-          return newState;
-        });
+        }
         
         setChartData(transformedData);
         
-        // Debug: Log the processed data
-        console.log(`📊 Processed ${transformedData.length} unique label-month combinations`);
-        console.log("Sample processed data:", transformedData.slice(0, 5));
-        
+        // Debug: Log the processing results
         const monthYears = transformedData.map(item => item.monthYear).sort();
         const earliestMonth = monthYears[0];
         const latestMonth = monthYears[monthYears.length - 1];
-        console.log(`📊 Data range: ${earliestMonth} to ${latestMonth}`);
+        const totalUniqueLabels = uniqueLabels.length;
+        const totalPRs = rawPRs.length;
+        
+        console.log(`📊 Processed ${totalPRs} PRs with ${totalUniqueLabels} unique labels`);
+        console.log(`📊 Generated ${transformedData.length} data points from ${earliestMonth || 'N/A'} to ${latestMonth || 'N/A'}`);
+        console.log(`📊 Deduplication: Each PR counted only once per label`);
         
       } catch (error) {
         console.error('Error fetching data:', error);
         toast({
           title: 'Error fetching data',
-          description: 'Could not load chart data',
+          description: 'Could not load chart data. Please try again.',
           status: 'error',
           duration: 5000,
           isClosable: true,
@@ -201,9 +228,9 @@ const EipsLabelChart = () => {
         return;
       }
 
-      // Create CSV from current chart data
+      // Create CSV from current deduplicated chart data
       const csvRows = [];
-      const headers = ['Month', 'MonthYear', 'Label', 'Count', 'Repo'];
+      const headers = ['Month', 'MonthYear', 'Label', 'UniqueCount', 'PRNumbers', 'Repo'];
       csvRows.push(headers.join(','));
 
       // Filter chart data by selected labels
@@ -226,11 +253,15 @@ const EipsLabelChart = () => {
           new Date(item.monthYear + '-01').toLocaleString('default', { month: 'long', year: 'numeric' }) : 
           '';
         
+        const prNumbersList = item.prNumbers && item.prNumbers.length > 0 ? 
+          `"${item.prNumbers.join(', ')}"` : '""';
+        
         const row = [
           monthName,
           item.monthYear || '',
           item.label || '',
           item.count || 0,
+          prNumbersList,
           selectedRepo.toUpperCase()
         ];
         csvRows.push(row.join(','));
@@ -241,15 +272,17 @@ const EipsLabelChart = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${selectedRepo}-raw-labels-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `${selectedRepo}-deduplicated-labels-${new Date().toISOString().split('T')[0]}.csv`;
       document.body?.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
+      const totalUniqueCount = filteredData.reduce((sum, item) => sum + item.count, 0);
+      
       toast({
         title: 'Download successful',
-        description: `Downloaded ${filteredData.length} label count records`,
+        description: `Downloaded ${filteredData.length} records with ${totalUniqueCount} deduplicated PR counts`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -504,7 +537,7 @@ const EipsLabelChart = () => {
           mb={6}
         >
           {/* Title on the left */}
-          <Heading size="md" color="blue.500" flexShrink={0}>Github Labels Distribution
+          <Heading size="md" color="blue.500" flexShrink={0}>Github Labels Distribution (Deduplicated)
             <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
           </Heading>
           

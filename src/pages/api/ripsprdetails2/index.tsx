@@ -36,7 +36,7 @@ const PrDetails = mongoose.models.AllRipsPrDetails || mongoose.model('AllRipsPrD
 export default async (req: Request, res: Response) => {
     try {
         // Fetch only the required fields for performance optimization
-        const prDetails = await PrDetails.find({}).select('prNumber prTitle createdAt closedAt mergedAt').exec();
+        const prDetails = await PrDetails.find({}).select('prNumber prTitle labels createdAt closedAt mergedAt').exec();
 
         // Transform the data to include createdAt, closedAt, and mergedAt
         const transformedDetails = prDetails?.map((pr: any) => {
