@@ -68,9 +68,9 @@ const EipsLabelChart = () => {
         setLoading(true);
         const controller = new AbortController();
         
-        // Use the new AnalyticsCharts API for raw GitHub labels - fetch all available data
+        // Fetch detailed PR data with labels to avoid double counting
         const response = await fetch(
-          `/api/AnalyticsCharts/labels/${selectedRepo}`, 
+          `/api/AnalyticsCharts/pr-details/${selectedRepo}?labelType=githubLabels`, 
           { signal: controller.signal }
         );
         
@@ -81,39 +81,63 @@ const EipsLabelChart = () => {
         const result = await response.json();
         const data = result.data || [];
         
-        // Transform data to match expected format
-        const transformedData: AggregatedLabelCount[] = data.map((item: any) => ({
-          monthYear: item.monthYear,
-          label: item.type,
-          count: item.count,
-          labelType: 'githubLabels',
-          prNumbers: [] // This field isn't needed for the chart display
-        }));
+        console.log("Raw API data sample:", data.slice(0, 3));
         
-        // Update available labels from API response
-        if (result.metadata?.uniqueLabels) {
-          const uniqueLabels = result.metadata.uniqueLabels;
-          setAvailableLabels(uniqueLabels);
+        // Process data to avoid double counting PRs with multiple labels
+        const processedData = new Map<string, Set<number>>(); // monthYear-label -> Set of PR numbers
+        const allLabels = new Set<string>();
+        
+        // Group by month-label and collect unique PR numbers
+        data.forEach((item: any) => {
+          const { monthYear, label, prNumber } = item;
+          const key = `${monthYear}-${label}`;
           
-          // Update showLabels state to include new labels
-          setShowLabels(prevState => {
-            const newState = { ...prevState };
-            uniqueLabels.forEach((label: string) => {
-              if (!(label in newState)) {
-                newState[label] = true; // Show new labels by default
-              }
-            });
-            return newState;
+          allLabels.add(label);
+          
+          if (!processedData.has(key)) {
+            processedData.set(key, new Set());
+          }
+          processedData.get(key)!.add(prNumber);
+        });
+        
+        // Convert to chart format with unique counts
+        const transformedData: AggregatedLabelCount[] = [];
+        processedData.forEach((prNumbers, key) => {
+          const [monthYear, label] = key.split('-');
+          transformedData.push({
+            monthYear,
+            label,
+            count: prNumbers.size, // Count unique PRs, not label instances
+            labelType: 'githubLabels',
+            prNumbers: Array.from(prNumbers)
           });
-        }
+        });
+        
+        // Update available labels from processed data
+        const uniqueLabels = Array.from(allLabels).sort();
+        setAvailableLabels(uniqueLabels);
+        
+        // Update showLabels state to include new labels
+        setShowLabels(prevState => {
+          const newState = { ...prevState };
+          uniqueLabels.forEach((label: string) => {
+            if (!(label in newState)) {
+              newState[label] = true; // Show new labels by default
+            }
+          });
+          return newState;
+        });
         
         setChartData(transformedData);
         
-        // Debug: Log the data range we received
+        // Debug: Log the processed data
+        console.log(`📊 Processed ${transformedData.length} unique label-month combinations`);
+        console.log("Sample processed data:", transformedData.slice(0, 5));
+        
         const monthYears = transformedData.map(item => item.monthYear).sort();
         const earliestMonth = monthYears[0];
         const latestMonth = monthYears[monthYears.length - 1];
-        console.log(`📊 Loaded ${transformedData.length} records from ${earliestMonth} to ${latestMonth}`);
+        console.log(`📊 Data range: ${earliestMonth} to ${latestMonth}`);
         
       } catch (error) {
         console.error('Error fetching data:', error);

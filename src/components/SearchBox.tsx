@@ -511,10 +511,34 @@ if (queryStr2.toLowerCase() === "e") {
 
     const scrollToSelectedOption = (index: number) => {
       if (dropdownRef.current) {
-        const options = dropdownRef.current.querySelectorAll("option");
-        const option = options[index];
-        if (option) {
-          option.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        const resultItems = dropdownRef.current.querySelectorAll('[data-index]');
+        const targetItem = resultItems[index];
+        if (targetItem) {
+          const container = dropdownRef.current;
+          const containerRect = container.getBoundingClientRect();
+          const itemRect = targetItem.getBoundingClientRect();
+          
+          // Check if item is visible in container
+          const isVisible = (
+            itemRect.top >= containerRect.top && 
+            itemRect.bottom <= containerRect.bottom
+          );
+          
+          if (!isVisible) {
+            // Scroll to make item visible
+            const scrollTop = container.scrollTop;
+            const itemOffsetTop = (targetItem as HTMLElement).offsetTop;
+            const itemHeight = itemRect.height;
+            const containerHeight = containerRect.height;
+            
+            if (itemRect.top < containerRect.top) {
+              // Item is above visible area
+              container.scrollTop = itemOffsetTop;
+            } else if (itemRect.bottom > containerRect.bottom) {
+              // Item is below visible area
+              container.scrollTop = itemOffsetTop - containerHeight + itemHeight;
+            }
+          }
         }
       }
     };
@@ -571,26 +595,33 @@ if (queryStr2.toLowerCase() === "e") {
       {showDropdown && query && (
         <div
           ref={dropdownRef}
-          className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto"
+          className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto focus:outline-none"
+          style={{ maxHeight: '240px' }}
         >
           {filteredEIPResults.length === 0 &&
           filteredAuthors.length === 0 ? (
-            <p className="p-2 text-red-500 text-center font-bold">
-              Invalid EIP/ERC/RIP/Author
-            </p>
+            <div className="p-4 text-center">
+              <p className="text-red-500 font-bold">
+                No results found
+              </p>
+              <p className="text-gray-500 text-sm mt-1">
+                Try searching for an EIP number, title, or author name
+              </p>
+            </div>
           ) : (
             <div className="max-h-60 overflow-y-auto">
               {/* EIP Results */}
               {filteredEIPResults.map((result, index) => (
                 <div
                   key={`eip-${result.eip}-${result.repo}`}
+                  data-index={index}
                   onClick={() => {
                     EIPhandleSearchResultClick(result.eip, result.repo);
                     setShowDropdown(false);
                     setQuery("");
                   }}
-                  className={`cursor-pointer p-3 hover:bg-blue-50 border-b ${
-                    selectedIndex === index ? "bg-blue-100" : ""
+                  className={`cursor-pointer p-3 hover:bg-blue-50 border-b transition-colors duration-150 ${
+                    selectedIndex === index ? "bg-blue-100 border-blue-200" : ""
                   }`}
                 >
                   <div className="text-lg font-medium">
@@ -606,13 +637,14 @@ if (queryStr2.toLowerCase() === "e") {
               {filteredAuthors.map((result, index) => (
                 <div
                   key={`author-${result.name}`}
+                  data-index={filteredEIPResults.length + index}
                   onClick={() => {
                     handleAuthorSearchResultClick(result.name);
                     setShowDropdown(false);
                     setQuery("");
                   }}
-                  className={`cursor-pointer p-3 hover:bg-blue-50 border-b ${
-                    selectedIndex === filteredEIPResults.length + index ? "bg-blue-100" : ""
+                  className={`cursor-pointer p-3 hover:bg-blue-50 border-b transition-colors duration-150 ${
+                    selectedIndex === filteredEIPResults.length + index ? "bg-blue-100 border-blue-200" : ""
                   }`}
                 >
                   <div className="text-lg font-medium">
@@ -661,6 +693,15 @@ if (queryStr2.toLowerCase() === "e") {
                   </div>
                 </div>
               ))} */}
+              
+              {/* Keyboard hints */}
+              {(filteredEIPResults.length > 0 || filteredAuthors.length > 0) && (
+                <div className="px-3 py-2 bg-gray-50 border-t text-xs text-gray-500 flex justify-between">
+                  <span>↑↓ Navigate</span>
+                  <span>↵ Select</span>
+                  <span>Esc Close</span>
+                </div>
+              )}
             </div>
           )}
         </div>
