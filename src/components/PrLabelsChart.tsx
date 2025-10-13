@@ -68,9 +68,9 @@ const EipsLabelChart = () => {
         setLoading(true);
         const controller = new AbortController();
         
-        // Use the scheduler-generated raw charts data which is already properly deduplicated
+        // Use the new AnalyticsCharts API for raw GitHub labels - fetch all available data
         const response = await fetch(
-          `/api/AnalyticsCharts/labels/${selectedRepo}?months=0`, // months=0 for all historical data
+          `/api/AnalyticsCharts/labels/${selectedRepo}`, 
           { signal: controller.signal }
         );
         
@@ -81,21 +81,18 @@ const EipsLabelChart = () => {
         const result = await response.json();
         const data = result.data || [];
         
-        console.log("Scheduler raw data sample:", data.slice(0, 3));
-        
-        // Transform scheduler data to match expected format
-        // The scheduler data is already deduplicated and aggregated properly
+        // Transform data to match expected format
         const transformedData: AggregatedLabelCount[] = data.map((item: any) => ({
           monthYear: item.monthYear,
           label: item.type,
-          count: item.count, // This is already deduplicated by the scheduler
+          count: item.count,
           labelType: 'githubLabels',
-          prNumbers: [] // Not available in aggregated data, but not needed for display
+          prNumbers: [] // This field isn't needed for the chart display
         }));
         
         // Update available labels from API response
-        const uniqueLabels = result.metadata?.uniqueLabels || [];
-        if (uniqueLabels.length > 0) {
+        if (result.metadata?.uniqueLabels) {
+          const uniqueLabels = result.metadata.uniqueLabels;
           setAvailableLabels(uniqueLabels);
           
           // Update showLabels state to include new labels
@@ -112,25 +109,17 @@ const EipsLabelChart = () => {
         
         setChartData(transformedData);
         
-        // Debug: Log the data we received from scheduler
+        // Debug: Log the data range we received
         const monthYears = transformedData.map(item => item.monthYear).sort();
         const earliestMonth = monthYears[0];
         const latestMonth = monthYears[monthYears.length - 1];
-        const totalUniqueLabels = uniqueLabels.length;
-        const totalDataPoints = transformedData.length;
-        const totalCount = transformedData.reduce((sum, item) => sum + item.count, 0);
-        
-        console.log(`📊 Using scheduler-generated data: ${totalDataPoints} data points`);
-        console.log(`📊 Date range: ${earliestMonth || 'N/A'} to ${latestMonth || 'N/A'}`);
-        console.log(`📊 Unique labels: ${totalUniqueLabels}`);
-        console.log(`📊 Total aggregated count: ${totalCount}`);
-        console.log(`📊 Data source: Pre-deduplicated by scheduler`);
+        console.log(`📊 Loaded ${transformedData.length} records from ${earliestMonth} to ${latestMonth}`);
         
       } catch (error) {
         console.error('Error fetching data:', error);
         toast({
           title: 'Error fetching data',
-          description: 'Could not load chart data. Please try again.',
+          description: 'Could not load chart data',
           status: 'error',
           duration: 5000,
           isClosable: true,
@@ -188,9 +177,9 @@ const EipsLabelChart = () => {
         return;
       }
 
-      // Create CSV from scheduler-generated data (already deduplicated)
+      // Create CSV from current chart data
       const csvRows = [];
-      const headers = ['Month', 'MonthYear', 'Label', 'Count', 'Repo', 'DataSource'];
+      const headers = ['Month', 'MonthYear', 'Label', 'Count', 'Repo'];
       csvRows.push(headers.join(','));
 
       // Filter chart data by selected labels
@@ -218,8 +207,7 @@ const EipsLabelChart = () => {
           item.monthYear || '',
           item.label || '',
           item.count || 0,
-          selectedRepo.toUpperCase(),
-          'Scheduler-Deduplicated'
+          selectedRepo.toUpperCase()
         ];
         csvRows.push(row.join(','));
       });
@@ -229,17 +217,15 @@ const EipsLabelChart = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${selectedRepo}-scheduler-labels-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `${selectedRepo}-raw-labels-${new Date().toISOString().split('T')[0]}.csv`;
       document.body?.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      const totalCount = filteredData.reduce((sum, item) => sum + item.count, 0);
-      
       toast({
         title: 'Download successful',
-        description: `Downloaded ${filteredData.length} records with ${totalCount} scheduler-deduplicated counts`,
+        description: `Downloaded ${filteredData.length} label count records`,
         status: 'success',
         duration: 3000,
         isClosable: true,

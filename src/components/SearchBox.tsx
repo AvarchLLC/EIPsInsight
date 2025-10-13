@@ -487,14 +487,16 @@ if (queryStr2.toLowerCase() === "e") {
         event.preventDefault();
         setSelectedIndex((prevIndex) => {
           const newIndex = prevIndex < totalResults - 1 ? prevIndex + 1 : 0; // Wrap to first
-          scrollToSelectedOption(newIndex);
+          // Use setTimeout to ensure DOM update happens first
+          setTimeout(() => scrollToSelectedOption(newIndex), 0);
           return newIndex;
         });
       } else if (event.key === "ArrowUp") {
         event.preventDefault();
         setSelectedIndex((prevIndex) => {
           const newIndex = prevIndex > 0 ? prevIndex - 1 : totalResults - 1; // Wrap to last
-          scrollToSelectedOption(newIndex);
+          // Use setTimeout to ensure DOM update happens first
+          setTimeout(() => scrollToSelectedOption(newIndex), 0);
           return newIndex;
         });
       } else if (event.key === "Enter") {
@@ -512,33 +514,31 @@ if (queryStr2.toLowerCase() === "e") {
     const scrollToSelectedOption = (index: number) => {
       if (dropdownRef.current) {
         const resultItems = dropdownRef.current.querySelectorAll('[data-index]');
-        const targetItem = resultItems[index];
+        const targetItem = resultItems[index] as HTMLElement;
+        
         if (targetItem) {
           const container = dropdownRef.current;
-          const containerRect = container.getBoundingClientRect();
-          const itemRect = targetItem.getBoundingClientRect();
+          const containerHeight = container.clientHeight;
+          const containerScrollTop = container.scrollTop;
           
-          // Check if item is visible in container
-          const isVisible = (
-            itemRect.top >= containerRect.top && 
-            itemRect.bottom <= containerRect.bottom
-          );
+          const itemOffsetTop = targetItem.offsetTop;
+          const itemHeight = targetItem.offsetHeight;
           
-          if (!isVisible) {
-            // Scroll to make item visible
-            const scrollTop = container.scrollTop;
-            const itemOffsetTop = (targetItem as HTMLElement).offsetTop;
-            const itemHeight = itemRect.height;
-            const containerHeight = containerRect.height;
-            
-            if (itemRect.top < containerRect.top) {
-              // Item is above visible area
-              container.scrollTop = itemOffsetTop;
-            } else if (itemRect.bottom > containerRect.bottom) {
-              // Item is below visible area
-              container.scrollTop = itemOffsetTop - containerHeight + itemHeight;
-            }
+          // Calculate if item is visible
+          const itemTop = itemOffsetTop;
+          const itemBottom = itemOffsetTop + itemHeight;
+          const visibleTop = containerScrollTop;
+          const visibleBottom = containerScrollTop + containerHeight;
+          
+          // If item is above the visible area
+          if (itemTop < visibleTop) {
+            container.scrollTop = itemTop;
+          } 
+          // If item is below the visible area
+          else if (itemBottom > visibleBottom) {
+            container.scrollTop = itemBottom - containerHeight;
           }
+          // If item is already visible, no scrolling needed
         }
       }
     };
@@ -595,7 +595,7 @@ if (queryStr2.toLowerCase() === "e") {
       {showDropdown && query && (
         <div
           ref={dropdownRef}
-          className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto focus:outline-none"
+          className="absolute mt-2 w-full bg-white border rounded shadow-lg z-50 overflow-y-auto focus:outline-none scroll-smooth"
           style={{ maxHeight: '240px' }}
         >
           {filteredEIPResults.length === 0 &&
