@@ -408,6 +408,16 @@ if (queryStr2.toLowerCase() === "e") {
       setSelectedIndex(-1);
     }
   }, [query, filteredEIPResults.length, filteredAuthors.length]);
+
+  // Handle scrolling when selectedIndex changes
+  useEffect(() => {
+    if (selectedIndex >= 0 && showDropdown) {
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        scrollToSelectedOption(selectedIndex);
+      });
+    }
+  }, [selectedIndex, showDropdown]);
   const handleSearchResultClick = async (selectedNumber: number, repo: string) => {
     try {
       window.location.href = `/PR/${repo}/${selectedNumber}`;
@@ -476,6 +486,22 @@ if (queryStr2.toLowerCase() === "e") {
     };
   }, []);
 
+  // Move scrollToSelectedOption outside useEffect to prevent recreation
+  const scrollToSelectedOption = (index: number) => {
+    if (dropdownRef.current) {
+      const targetItem = dropdownRef.current.querySelector(`[data-index="${index}"]`) as HTMLElement;
+      
+      if (targetItem) {
+        // Use scrollIntoView for better browser compatibility and smoother scrolling
+        targetItem.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest'
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Only handle keyboard events when search dropdown is open
@@ -487,16 +513,12 @@ if (queryStr2.toLowerCase() === "e") {
         event.preventDefault();
         setSelectedIndex((prevIndex) => {
           const newIndex = prevIndex < totalResults - 1 ? prevIndex + 1 : 0; // Wrap to first
-          // Use setTimeout to ensure DOM update happens first
-          setTimeout(() => scrollToSelectedOption(newIndex), 0);
           return newIndex;
         });
       } else if (event.key === "ArrowUp") {
         event.preventDefault();
         setSelectedIndex((prevIndex) => {
           const newIndex = prevIndex > 0 ? prevIndex - 1 : totalResults - 1; // Wrap to last
-          // Use setTimeout to ensure DOM update happens first
-          setTimeout(() => scrollToSelectedOption(newIndex), 0);
           return newIndex;
         });
       } else if (event.key === "Enter") {
@@ -508,38 +530,6 @@ if (queryStr2.toLowerCase() === "e") {
         setShowDropdown(false);
         setSelectedIndex(-1);
         inputRef.current?.blur();
-      }
-    };
-
-    const scrollToSelectedOption = (index: number) => {
-      if (dropdownRef.current) {
-        const resultItems = dropdownRef.current.querySelectorAll('[data-index]');
-        const targetItem = resultItems[index] as HTMLElement;
-        
-        if (targetItem) {
-          const container = dropdownRef.current;
-          const containerHeight = container.clientHeight;
-          const containerScrollTop = container.scrollTop;
-          
-          const itemOffsetTop = targetItem.offsetTop;
-          const itemHeight = targetItem.offsetHeight;
-          
-          // Calculate if item is visible
-          const itemTop = itemOffsetTop;
-          const itemBottom = itemOffsetTop + itemHeight;
-          const visibleTop = containerScrollTop;
-          const visibleBottom = containerScrollTop + containerHeight;
-          
-          // If item is above the visible area
-          if (itemTop < visibleTop) {
-            container.scrollTop = itemTop;
-          } 
-          // If item is below the visible area
-          else if (itemBottom > visibleBottom) {
-            container.scrollTop = itemBottom - containerHeight;
-          }
-          // If item is already visible, no scrolling needed
-        }
       }
     };
 
