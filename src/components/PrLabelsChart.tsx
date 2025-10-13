@@ -68,15 +68,9 @@ const EipsLabelChart = () => {
         setLoading(true);
         const controller = new AbortController();
         
-        // Use the detailed PR endpoints that include labels for proper deduplication
-        const apiEndpoints = {
-          eip: '/api/eipsprdetails2',
-          erc: '/api/ercsprdetails2', 
-          rip: '/api/ripsprdetails2'
-        };
-        
+        // Use the scheduler-generated raw charts data which is already properly deduplicated
         const response = await fetch(
-          apiEndpoints[selectedRepo as keyof typeof apiEndpoints], 
+          `/api/AnalyticsCharts/labels/${selectedRepo}?months=0`, // months=0 for all historical data
           { signal: controller.signal }
         );
         
@@ -84,60 +78,23 @@ const EipsLabelChart = () => {
           throw new Error(`API error: ${response.status}`);
         }
         
-        const rawPRs = await response.json();
+        const result = await response.json();
+        const data = result.data || [];
         
-        console.log("Raw PR data sample:", rawPRs.slice(0, 3));
+        console.log("Scheduler raw data sample:", data.slice(0, 3));
         
-        // Process PR data with proper deduplication
-        const monthlyLabelCounts = new Map<string, Map<string, Set<number>>>();
-        const allLabels = new Set<string>();
+        // Transform scheduler data to match expected format
+        // The scheduler data is already deduplicated and aggregated properly
+        const transformedData: AggregatedLabelCount[] = data.map((item: any) => ({
+          monthYear: item.monthYear,
+          label: item.type,
+          count: item.count, // This is already deduplicated by the scheduler
+          labelType: 'githubLabels',
+          prNumbers: [] // Not available in aggregated data, but not needed for display
+        }));
         
-        rawPRs.forEach((pr: any) => {
-          if (!pr.created_at || !pr.labels || !Array.isArray(pr.labels)) return;
-          
-          const createdDate = new Date(pr.created_at);
-          const monthYear = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}`;
-          
-          // Initialize month if not exists
-          if (!monthlyLabelCounts.has(monthYear)) {
-            monthlyLabelCounts.set(monthYear, new Map());
-          }
-          
-          const monthData = monthlyLabelCounts.get(monthYear)!;
-          
-          // Count each PR only once per label, avoiding double counting
-          pr.labels.forEach((label: string) => {
-            if (!label) return;
-            
-            allLabels.add(label);
-            
-            // Initialize label set if not exists
-            if (!monthData.has(label)) {
-              monthData.set(label, new Set());
-            }
-            
-            // Add PR number to the set (sets automatically handle uniqueness)
-            monthData.get(label)!.add(pr.prNumber);
-          });
-        });
-        
-        // Convert to the format expected by the chart
-        const transformedData: AggregatedLabelCount[] = [];
-        
-        monthlyLabelCounts.forEach((monthData, monthYear) => {
-          monthData.forEach((prNumbers, label) => {
-            transformedData.push({
-              monthYear,
-              label,
-              count: prNumbers.size, // Size of set = unique PR count
-              labelType: 'githubLabels',
-              prNumbers: Array.from(prNumbers)
-            });
-          });
-        });
-        
-        // Update available labels from processed data
-        const uniqueLabels = Array.from(allLabels).sort();
+        // Update available labels from API response
+        const uniqueLabels = result.metadata?.uniqueLabels || [];
         if (uniqueLabels.length > 0) {
           setAvailableLabels(uniqueLabels);
           
@@ -155,16 +112,19 @@ const EipsLabelChart = () => {
         
         setChartData(transformedData);
         
-        // Debug: Log the processing results
+        // Debug: Log the data we received from scheduler
         const monthYears = transformedData.map(item => item.monthYear).sort();
         const earliestMonth = monthYears[0];
         const latestMonth = monthYears[monthYears.length - 1];
         const totalUniqueLabels = uniqueLabels.length;
-        const totalPRs = rawPRs.length;
+        const totalDataPoints = transformedData.length;
+        const totalCount = transformedData.reduce((sum, item) => sum + item.count, 0);
         
-        console.log(`📊 Processed ${totalPRs} PRs with ${totalUniqueLabels} unique labels`);
-        console.log(`📊 Generated ${transformedData.length} data points from ${earliestMonth || 'N/A'} to ${latestMonth || 'N/A'}`);
-        console.log(`📊 Deduplication: Each PR counted only once per label`);
+        console.log(`📊 Using scheduler-generated data: ${totalDataPoints} data points`);
+        console.log(`📊 Date range: ${earliestMonth || 'N/A'} to ${latestMonth || 'N/A'}`);
+        console.log(`📊 Unique labels: ${totalUniqueLabels}`);
+        console.log(`📊 Total aggregated count: ${totalCount}`);
+        console.log(`📊 Data source: Pre-deduplicated by scheduler`);
         
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -228,9 +188,9 @@ const EipsLabelChart = () => {
         return;
       }
 
-      // Create CSV from current deduplicated chart data
+      // Create CSV from scheduler-generated data (already deduplicated)
       const csvRows = [];
-      const headers = ['Month', 'MonthYear', 'Label', 'UniqueCount', 'PRNumbers', 'Repo'];
+      const headers = ['Month', 'MonthYear', 'Label', 'Count', 'Repo', 'DataSource'];
       csvRows.push(headers.join(','));
 
       // Filter chart data by selected labels
@@ -253,16 +213,13 @@ const EipsLabelChart = () => {
           new Date(item.monthYear + '-01').toLocaleString('default', { month: 'long', year: 'numeric' }) : 
           '';
         
-        const prNumbersList = item.prNumbers && item.prNumbers.length > 0 ? 
-          `"${item.prNumbers.join(', ')}"` : '""';
-        
         const row = [
           monthName,
           item.monthYear || '',
           item.label || '',
           item.count || 0,
-          prNumbersList,
-          selectedRepo.toUpperCase()
+          selectedRepo.toUpperCase(),
+          'Scheduler-Deduplicated'
         ];
         csvRows.push(row.join(','));
       });
@@ -272,17 +229,17 @@ const EipsLabelChart = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${selectedRepo}-deduplicated-labels-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `${selectedRepo}-scheduler-labels-${new Date().toISOString().split('T')[0]}.csv`;
       document.body?.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      const totalUniqueCount = filteredData.reduce((sum, item) => sum + item.count, 0);
+      const totalCount = filteredData.reduce((sum, item) => sum + item.count, 0);
       
       toast({
         title: 'Download successful',
-        description: `Downloaded ${filteredData.length} records with ${totalUniqueCount} deduplicated PR counts`,
+        description: `Downloaded ${filteredData.length} records with ${totalCount} scheduler-deduplicated counts`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -537,7 +494,7 @@ const EipsLabelChart = () => {
           mb={6}
         >
           {/* Title on the left */}
-          <Heading size="md" color="blue.500" flexShrink={0}>Github Labels Distribution (Deduplicated)
+          <Heading size="md" color="blue.500" flexShrink={0}>Github Labels Distribution
             <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
           </Heading>
           
