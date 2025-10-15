@@ -1183,13 +1183,8 @@ return (
             )}
           </Box>
 
-          {/* EtherWorld Advertisement - Balanced Styling */}
-          <Box 
-            my={8} 
-            mx="auto" 
-            maxW="1200px" 
-            px={{ base: 4, md: 6, lg: 8 }}
-          >
+          {/* EtherWorld Advertisement */}
+          <Box my={6}>
             <EtherWorldAdCard />
           </Box>
 

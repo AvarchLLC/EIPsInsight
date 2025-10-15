@@ -46,10 +46,10 @@ type Props = {
 };
 
 export default function PlaceYourAdCard({
-  title = "Are you a blockchain project implementing an EIP?",
-  subtitle = "Reach Ethereum developers, researchers, and EIP authors. Place your ad with EIPs Insight.",
+  title = "Want to advertise your project on EIPs Insight?",
+  subtitle = "Reach Ethereum developers, researchers, and EIP authors. Place your ad on EIPs Insight and connect with the community.",
   ctaHref =
-    "mailto:team@avarch.org?cc=ayush.avarch@gmail.com&subject=Advertising%20Inquiry%20-%20EIPs%20Insight%20-%20EIP%20Implementation%20Campaign&body=Hello%20EIPs%20Insight%20Team,%0D%0A%0D%0AWe%20would%20like%20to%20place%20an%20advertisement%20for%20our%20blockchain%20project%20implementing%20the%20following%20EIP(s):%20[EIP%20numbers/titles].%0D%0A%0D%0AProject%20Name:%20%0D%0AWebsite:%20%0D%0AEIP(s):%20%0D%0ATarget%20Audience:%20%0D%0ACampaign%20Goals:%20%0D%0ABudget/Flight:%20%0D%0ATimeline:%20%0D%0APreferred%20Placement(s):%20[Upgrade%20page,%20Homepage,%20Newsletter]%0D%0ACreatives%20Available:%20[Banner%20/%20Native%20/%20CTA]%0D%0A%0D%0APlease%20share%20available%20inventory,%20rates,%20and%20next%20steps.%0D%0A%0D%0ARegards,%0D%0A[Your%20Name]%0D%0A[Company]%0D%0A[Email]%0D%0A[Phone]",
+    "mailto:team@avarch.org?cc=ayush.avarch@gmail.com&subject=Advertising%20Inquiry%20-%20EIPs%20Insight%20-%20Ad%20Placement&body=Hello%20EIPs%20Insight%20Team,%0D%0A%0D%0AWe%20would%20like%20to%20place%20an%20advertisement%20on%20EIPs%20Insight.%0D%0A%0D%0AProject%20Name:%20%0D%0AWebsite:%20%0D%0ATarget%20Audience:%20%0D%0ACampaign%20Goals:%20%0D%0ABudget/Flight:%20%0D%0ATimeline:%20%0D%0APreferred%20Placement(s):%20[Analytics%20page,%20Homepage,%20Newsletter]%0D%0ACreatives%20Available:%20[Banner%20/%20Native%20/%20CTA]%0D%0A%0D%0APlease%20share%20available%20inventory,%20rates,%20and%20next%20steps.%0D%0A%0D%0ARegards,%0D%0A[Your%20Name]%0D%0A[Company]%0D%0A[Email]%0D%0A[Phone]",
   ctaLabel = "Place your ad",
   secondaryHref =
     "mailto:team@avarch.org?cc=ayush.avarch@gmail.com&subject=Media%20Kit%20Request%20-%20EIPs%20Insight&body=Hello%20Team,%0D%0A%0D%0APlease%20share%20your%20latest%20media%20kit%20and%20rate%20card%20for%20EIPs%20Insight.%0D%0A%0D%0ACompany:%20%0D%0AWebsite:%20%0D%0ACampaign%20Timeline:%20%0D%0A%0D%0ARegards,%0D%0A[Your%20Name]%0D%0A[Email]%0D%0A[Phone]",
@@ -99,25 +99,6 @@ export default function PlaceYourAdCard({
       
       <Stack spacing={3} align="center" textAlign="center" position="relative" zIndex={1}>
         <Box position="relative">
-          {/* Moderate Premium Badge */}
-          <Box
-            position="absolute"
-            top="-6px"
-            right="-6px"
-            bg="linear-gradient(45deg, #FF6B6B, #4ECDC4)"
-            color="white"
-            px={2}
-            py={0.5}
-            borderRadius="full"
-            fontSize="xs"
-            fontWeight="bold"
-            zIndex={2}
-            sx={{
-              animation: `${glow} 2s ease-in-out infinite`,
-            }}
-          >
-            ✨ AD
-          </Box>
           <Heading 
             size={{ base: "sm", md: "md", lg: "lg" }} 
             color={accent}
