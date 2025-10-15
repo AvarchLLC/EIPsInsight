@@ -1352,10 +1352,10 @@ const GitHubPRTracker: React.FC = () => {
             ? [{ monthYear, type: "Created", count: entry.Created || 0 }]
             : []),
           ...(showCategory.merged
-            ? [{ monthYear, type: "Merged", count: entry.Merged || 0 }]
+            ? [{ monthYear, type: "Merged", count: entry.Merged ? -Math.abs(entry.Merged) : 0 }] // Make merged negative
             : []),
           ...(showCategory.closed
-            ? [{ monthYear, type: "Closed", count: entry.Closed || 0 }]
+            ? [{ monthYear, type: "Closed", count: entry.Closed ? -Math.abs(entry.Closed) : 0 }] // Make closed negative
             : []),
         ];
       }
