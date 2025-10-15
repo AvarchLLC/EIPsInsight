@@ -1546,28 +1546,16 @@ const GitHubPRTracker: React.FC = () => {
           color: "#ff00ff",
         },
       ],
-      yAxis: [
-        {
-          min: -300,
-          max: 600,
-          label: {
-            formatter: () => "",
-          },
-          grid: null,
-          line: null,
-          tickLine: null,
+      yAxis: {
+        min: -300,
+        max: yAxisMax, // Use the same max for both bar and line
+        label: {
+          formatter: () => "",
         },
-        {
-          min: 0,
-          max: yAxisMax,
-          label: {
-            formatter: () => "",
-          },
-          grid: null,
-          line: null,
-          tickLine: null,
-        },
-      ],
+        grid: null,
+        line: null,
+        tickLine: null,
+      },
       slider: {
         start: 0,
         end: 1,
