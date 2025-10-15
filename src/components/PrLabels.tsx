@@ -383,7 +383,7 @@ export default function PRAnalyticsCard() {
       const csvData = filteredRows.map((pr: any) => ({
         Month: pr.Month || formatMonthLabel(pr.MonthKey),
         MonthKey: pr.MonthKey,
-        Label: pr.Label,
+        Label: labelSet === "customLabels" ? normalizeCustomLabel(pr.Repo || repoKey, pr.Label) : pr.Label, // Normalize for custom labels
         LabelType: pr.LabelType,
         Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
         PRNumber: pr.PRNumber,
