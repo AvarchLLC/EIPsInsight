@@ -946,7 +946,7 @@ const GitHubPRTracker: React.FC = () => {
     csvRows.push(headers.join(","));
 
     // console.log("filteredData",filteredData)
-    // Combine created and closed arrays for PRs and Issues
+    // Combine created and closed for PRs and Issues
     const items =
       type === "PRs"
         ? [
@@ -978,8 +978,6 @@ const GitHubPRTracker: React.FC = () => {
               ? filteredData.open
               : []),
           ];
-
-    // console.log(items);
 
     // Add data to CSV rows
     items?.forEach((item: PR | Issue) => {
@@ -1352,10 +1350,10 @@ const GitHubPRTracker: React.FC = () => {
             ? [{ monthYear, type: "Created", count: entry.Created || 0 }]
             : []),
           ...(showCategory.merged
-            ? [{ monthYear, type: "Merged", count: entry.Merged || 0 }]
+            ? [{ monthYear, type: "Merged", count: entry.Merged ? -Math.abs(entry.Merged) : 0 }] // Make merged negative
             : []),
           ...(showCategory.closed
-            ? [{ monthYear, type: "Closed", count: entry.Closed || 0 }]
+            ? [{ monthYear, type: "Closed", count: entry.Closed ? -Math.abs(entry.Closed) : 0 }] // Make closed negative
             : []),
         ];
       }
@@ -1420,9 +1418,16 @@ const GitHubPRTracker: React.FC = () => {
 
     // Dual axes configuration
     const config = {
-      data: [sortedData, sortedTrendData], // Provide both bar and trend data
+      data: [sortedData, sortedTrendData],
       xField: "monthYear",
-      yField: ["count", "Open"], // Use dual axes: one for bars and one for the line
+      yField: ["count", "Open"],
+      xAxis: {
+        label: {
+          formatter: () => "",
+        },
+        tickLine: null,
+        line: null,
+      },
       geometryOptions: [
         {
           geometry: "column", // Bar chart for categories
@@ -1541,23 +1546,16 @@ const GitHubPRTracker: React.FC = () => {
           color: "#ff00ff",
         },
       ],
-      yAxis: [
-        {
-          min: -300, // Set the minimum value for the bar chart y-axis
-          max: 600, // Set the maximum value for the bar chart y-axis
+      yAxis: {
+        min: -300,
+        max: yAxisMax, // Use the same max for both bar and line
+        label: {
+          formatter: () => "",
         },
-        {
-          min: 0,
-          max: yAxisMax, // Set max for trend line y-axis
-          label: {
-            formatter: () => "", // Completely hide labels
-          },
-
-          grid: {
-            line: { style: { stroke: "transparent" } }, // Hide grid lines
-          },
-        },
-      ],
+        grid: null,
+        line: null,
+        tickLine: null,
+      },
       slider: {
         start: 0,
         end: 1,
