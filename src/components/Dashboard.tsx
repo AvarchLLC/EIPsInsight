@@ -700,11 +700,6 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
 
             </motion.div>
             
-            {/* EtherWorld Ad */}
-            <Box mt={6} mb={8}>
-              <EtherWorldAdCard />
-            </Box>
-            
             {/* Status Changes Section */}
             <Box 
               py={8} 

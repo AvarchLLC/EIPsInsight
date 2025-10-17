@@ -931,20 +931,9 @@ return (
                 <SlotCountdown />
               </Box>
             )}
-          </Box>
-          
-          {/* Container 2: Network Upgrade Timeline */}
-          <Box
-            bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
-            boxShadow="sm"
-            border="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={8}
-            px={6}
-            py={8}
-          >
-            <Box id="NetworkUpgrades">
+            
+            {/* Network Upgrade Timeline (UpgradesTimeline) */}
+            <Box id="NetworkUpgrades" mt={8}>
               <UpgradesTimeline
                 selectedOption={selectedOption}
                 setSelectedOption={setSelectedOption}
@@ -953,8 +942,10 @@ return (
               />
             </Box>
           </Box>
+          
 
-          {/* Container 3: Description + Network Upgrade Inclusion Stages Chart */}
+
+          {/* Container 3: Description */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
             borderRadius="xl"
@@ -1183,13 +1174,8 @@ return (
             )}
           </Box>
 
-          {/* EtherWorld Advertisement - Balanced Styling */}
-          <Box 
-            my={8} 
-            mx="auto" 
-            maxW="1200px" 
-            px={{ base: 4, md: 6, lg: 8 }}
-          >
+          {/* EtherWorld Advertisement */}
+          <Box my={6}>
             <EtherWorldAdCard />
           </Box>
 

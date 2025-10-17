@@ -108,7 +108,7 @@ const SlotCountdown: React.FC = () => {
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [currentBlock, setCurrentBlock] = useState<number>(0);
   const [timer, setTimer] = useState<number>(13);
-  const [network, setNetwork] = useState<keyof typeof networks>("mainnet");
+  const [network, setNetwork] = useState<keyof typeof networks>("hoodi");
   const [loading, setLoading] = useState<boolean>(true);
   const [countdown, setCountdown] = useState<string>("");
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false);
