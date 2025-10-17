@@ -10,7 +10,6 @@ import { saveAs } from 'file-saver';
 import Link from "next/link";
 import DateTime from './DateTime';
 
-// Add 'proposed' to StatusType
 type StatusType = 'included' | 'scheduled' | 'declined' | 'considered' | 'proposed';
 
 interface EIPData {
@@ -19,67 +18,38 @@ interface EIPData {
   scheduled: string[];
   declined: string[];
   considered: string[];
-  proposed: string[]; // Added field
+  proposed: string[];
 }
 
 
 const COLOR_SCHEME: Record<StatusType, string> = {
   included: '#48BB78',
-  scheduled: '#4299E1',
+  scheduled: '#4299E1', 
   considered: '#F6AD55',
   declined: '#F56565',
-  proposed: '#9F7AEA', // Purple-ish for 'proposed'
+  proposed: '#9F7AEA',
 };
 
 const LEGEND_LABELS: Record<StatusType, string> = {
   included: 'INCLUDED',
   scheduled: 'SFI',
-  considered: 'CFI',
+  considered: 'CFI', 
   declined: 'DFI',
-  proposed: 'PFI', // Proposed-for-inclusion
+  proposed: 'PFI',
 };
 
-// Map dates to upgrade names based on Ethereum upgrade timeline
-const getUpgradeNameForDate = (date: string): string => {
-  const dateObj = new Date(date);
-  // Homestead: 2016-03-14
-  if (dateObj <= new Date('2016-09-01')) return 'Homestead';
-  // Tangerine Whistle & Spurious Dragon: 2016
-  if (dateObj <= new Date('2017-09-01')) return 'Spurious Dragon';
-  // Byzantium: 2017-10-16
-  if (dateObj <= new Date('2019-01-01')) return 'Byzantium';
-  // Petersburg: 2019-02-28
-  if (dateObj <= new Date('2019-11-01')) return 'Petersburg';
-  // Istanbul: 2019-12-08
-  if (dateObj <= new Date('2020-07-01')) return 'Istanbul';
-  // Muir Glacier & Berlin: 2020-2021
-  if (dateObj <= new Date('2021-07-01')) return 'Berlin';
-  // London: 2021-08-05
-  if (dateObj <= new Date('2021-11-01')) return 'London';
-  // Arrow Glacier & Gray Glacier: 2021-2022
-  if (dateObj <= new Date('2022-08-01')) return 'Gray Glacier';
-  // Paris (The Merge): 2022-09-15
-  if (dateObj <= new Date('2023-03-01')) return 'Paris';
-  // Shanghai: 2023-04-12
-  if (dateObj <= new Date('2024-02-01')) return 'Shanghai';
-  // Dencun: 2024-03-13
-  if (dateObj <= new Date('2025-01-01')) return 'Dencun';
-  // Pectra: 2024-2025
-  if (dateObj <= new Date('2025-08-01')) return 'Pectra';
-  // Fusaka: 2025+
-  return 'Fusaka';
-};
+
 
 
 interface Props {
   data: EIPData[];
-  selectedOption: 'pectra' | 'fusaka' | 'glamsterdam'; // Updated to include glamsterdam
+  selectedOption: 'pectra' | 'fusaka' | 'glamsterdam';
 }
 
 const cubeSize = 24;
 const blockHeight = cubeSize;
 const blockWidth = cubeSize * 2;
-const padding = 2;
+const padding = 80; // Increased padding to make room for date labels
 const rowHeight = cubeSize + 12;
 
 const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
@@ -87,19 +57,18 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  // Add `date` to hoveredEip!
   const [hoveredEip, setHoveredEip] = useState<{
-  eip: string;
-  type: StatusType;
-  date: string;
-  statusCounts: {
-    included: number;
-    scheduled: number;
-    considered: number;
-    declined: number;
-    proposed?: number; // Optional for proposed
-  };
-} | null>(null);
+    eip: string;
+    type: StatusType;
+    date: string;
+    statusCounts: {
+      included: number;
+      scheduled: number;
+      considered: number;
+      declined: number;
+      proposed: number;
+    };
+  } | null>(null);
 
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const dragStart = useRef({ x: 0, y: 0 });
@@ -108,7 +77,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const maxVisibleRows = 15;
   const visibleData = [...dataToRender].reverse().slice(scrollIndex, scrollIndex + maxVisibleRows);
 
-const MIN_ITEMS_DISPLAYED = 7; // Tune this!
+const MIN_ITEMS_DISPLAYED = 7;
 const maxItems = Math.max(
   MIN_ITEMS_DISPLAYED,
   ...dataToRender.map(
@@ -149,7 +118,7 @@ const maxItems = Math.max(
     if (status.toLowerCase() === 'scheduled') return 'SFI'
     if (status.toLowerCase() === 'considered') return 'CFI'
     if (status.toLowerCase() === 'declined') return 'DFI'
-    if (status.toLowerCase() === 'proposed') return 'PFI' // For proposed
+    if (status.toLowerCase() === 'proposed') return 'PFI'
     return status;
   }
 
@@ -247,26 +216,26 @@ const linkHref =
 
               return (
                 <Group key={rowIndex} top={rowIndex * rowHeight}>
-                  <Group left={0}>
+                  <Group left={80}>
                     {allEips.map((d, i) => {
                       const eipNum = d.eip.replace(/EIP-/, '');
                       return (
                         <a key={i} href={`/eips/eip-${eipNum}`} target="_blank" rel="noopener noreferrer">
                           <g
-onMouseEnter={(e) => {
-  setHoveredEip({
-    ...d,
-    date: item.date,
-    statusCounts: {
-      included: item.included?.length || 0,
-      scheduled: item.scheduled?.length || 0,
-      considered: item.considered?.length || 0,
-      declined: item.declined?.length || 0,
-      proposed: item.proposed?.length || 0, // Optional for proposed
-    },
-  });
-  setTooltipPos({ x: e.clientX, y: e.clientY });
-}}
+                            onMouseEnter={(e) => {
+                              setHoveredEip({
+                                ...d,
+                                date: item.date,
+                                statusCounts: {
+                                  included: item.included?.length || 0,
+                                  scheduled: item.scheduled?.length || 0,
+                                  considered: item.considered?.length || 0,
+                                  declined: item.declined?.length || 0,
+                                  proposed: item.proposed?.length || 0,
+                                },
+                              });
+                              setTooltipPos({ x: e.clientX, y: e.clientY });
+                            }}
 
                             onMouseLeave={() => setHoveredEip(null)}
                           >
@@ -297,29 +266,25 @@ onMouseEnter={(e) => {
                 </Group>
               );
             })}
-            {/* X-Axis Labels: Upgrade Names */}
+            {/* Y-Axis Labels: Dates */}
             {visibleData.map((item, rowIndex) => {
-              const upgradeName = getUpgradeNameForDate(item.date);
-              const yPos = (rowIndex * rowHeight) + blockHeight + 30;
+              const yPos = rowIndex * rowHeight + blockHeight / 1.5;
               return (
-                <g key={`xlabel-${rowIndex}`}>
+                <g key={`ylabel-${rowIndex}`}>
                   <text
-                    x={-10}
+                    x={0}
                     y={yPos}
-                    fontSize={10}
+                    fontSize={12}
                     fontWeight="600"
                     fill="#40E0D0"
-                    textAnchor="end"
+                    textAnchor="start"
                     vectorEffect="non-scaling-stroke"
-                    style={{ cursor: 'pointer' }}
                   >
-                    {upgradeName}
+                    {item.date}
                   </text>
-                  <title>{item.date}</title>
                 </g>
               );
             })}
-            {/* Upgrade Name at Bottom */}
 
           </Group>
         </svg>
@@ -363,11 +328,9 @@ onMouseEnter={(e) => {
       <Text fontSize="sm" color="red.200">
         DFI: {hoveredEip.statusCounts.declined}
       </Text>
-      {hoveredEip.statusCounts.proposed !== undefined && (
-        <Text fontSize="sm" color="purple.200">
-          PFI: {hoveredEip.statusCounts.proposed}
-        </Text>
-      )}
+      <Text fontSize="sm" color="purple.200">
+        PFI: {hoveredEip.statusCounts.proposed}
+      </Text>
     </Box>
   </Box>
 )}

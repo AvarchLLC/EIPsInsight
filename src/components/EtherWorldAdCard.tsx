@@ -99,10 +99,10 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
       borderRadius="lg"
       borderWidth="1px"
       borderColor={useColorModeValue("green.300", "green.600")}
-      p={1.5}
+      p={1}
       w="100%"
       maxW="900px"
-      minH="60px"
+      minH="50px"
       mx="auto"
       cursor="pointer"
       onClick={handleClick}
@@ -166,28 +166,28 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
       <Flex
         align="center"
         justify="flex-start"
-        gap={3}
+        gap={2}
         h="100%"
         position="relative"
         zIndex={2}
         overflow="hidden"
-        px={2}
+        px={1}
       >
         {/* Left: Micro Logo + Brand */}
-        <Flex align="center" gap={2} minW="fit-content" flexShrink={0}>
+        <Flex align="center" gap={1.5} minW="fit-content" flexShrink={0}>
           <Image 
             src={logoSrc} 
             alt="EtherWorld logo" 
-            boxSize="20px" 
+            boxSize="18px" 
             borderRadius="sm"
             fallback={
               <Box
                 bg="green.500"
                 color="white"
-                fontSize="11px"
+                fontSize="10px"
                 fontWeight="bold"
-                w="20px"
-                h="20px"
+                w="18px"
+                h="18px"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -202,51 +202,39 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
             fontWeight="bold"
             color={useColorModeValue("gray.900", "white")}
             lineHeight="1"
-            sx={{
-              animation: `${textFlash} 2.8s ease-in-out infinite`,
-              "@media (prefers-reduced-motion: reduce)": {
-                animation: "none",
-              }
-            }}
           >
             EtherWorld
           </Text>
         </Flex>
 
         {/* Center: Dense Info Stack */}
-        <Flex direction="column" flex={1} px={2} justify="center" overflow="hidden" position="relative" gap={0.5}>
+        <Flex direction="column" flex={1} px={1.5} justify="center" overflow="hidden" position="relative" gap={0}>
           <Text 
-            fontSize="13px"
+            fontSize="12px"
             fontWeight="bold"
             color={useColorModeValue("gray.900", "white")}
-            lineHeight="1.2"
+            lineHeight="1.1"
             mb={0.5}
             textTransform="uppercase"
             letterSpacing="0.5px"
-            sx={{
-              animation: `${textFlash} 3s ease-in-out infinite`,
-              "@media (prefers-reduced-motion: reduce)": {
-                animation: "none",
-              }
-            }}
           >
             Global ETH News • ACD Updates • Security Alerts • Protocol Analysis
           </Text>
-          <Flex align="center" gap={1} fontSize="9px" color={useColorModeValue("gray.600", "gray.300")} flexWrap="nowrap">
+          <Flex align="center" gap={1} fontSize="8px" color={useColorModeValue("gray.600", "gray.300")} flexWrap="nowrap">
             <Flex align="center" gap={0.5}>
-              <Icon as={FiShield} boxSize="9px" />
+              <Icon as={FiShield} boxSize="8px" />
               <Text>Grant-Backed</Text>
             </Flex>
             <Text>•</Text>
             <Flex align="center" gap={0.5}>
-              <Icon as={FiTrendingUp} boxSize="9px" />
+              <Icon as={FiTrendingUp} boxSize="8px" />
               <Text>Real-time</Text>
             </Flex>
             <Text>•</Text>
             <Text fontWeight="bold">15k+ Readers</Text>
             <Text>•</Text>
             <Flex align="center" gap={0.5}>
-              <Icon as={FiClock} boxSize="9px" />
+              <Icon as={FiClock} boxSize="8px" />
               <Text>24/7</Text>
             </Flex>
             <Text>•</Text>
@@ -255,13 +243,13 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
         </Flex>
 
         {/* Right: Compact CTA + Dense Badges */}
-        <Flex direction="column" align="flex-end" gap={1} minW="fit-content" flexShrink={0}>
-          <Flex gap={1}>
+        <Flex direction="column" align="flex-end" gap={0.5} minW="fit-content" flexShrink={0}>
+          <Flex gap={0.5}>
             <Badge 
               colorScheme="orange"
               variant="solid"
-              fontSize="8px"
-              px={1.5}
+              fontSize="7px"
+              px={1}
               py={0.5}
               borderRadius="sm"
               textTransform="uppercase"
@@ -272,8 +260,8 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
             <Badge 
               colorScheme="red"
               variant="solid"
-              fontSize="8px"
-              px={1.5}
+              fontSize="7px"
+              px={1}
               py={0.5}
               borderRadius="sm"
               textTransform="uppercase"
@@ -282,7 +270,7 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
               HOT
             </Badge>
           </Flex>
-          <Flex gap={1} fontSize="8px" color={useColorModeValue("gray.600", "gray.400")} fontWeight="medium">
+          <Flex gap={1} fontSize="7px" color={useColorModeValue("gray.600", "gray.400")} fontWeight="medium">
             <Text>📈 +2.5k</Text>
             <Text>•</Text>
             <Text>⭐ 4.9/5</Text>
@@ -291,10 +279,10 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
             as="button"
             bg={useColorModeValue("green.600", "green.500")}
             color="white"
-            px={2}
-            py={1}
+            px={1.5}
+            py={0.5}
             borderRadius="md"
-            fontSize="sm"
+            fontSize="xs"
             fontWeight="bold"
             cursor="pointer"
             position="relative"
@@ -303,14 +291,8 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
             border="1px solid"
             borderColor={useColorModeValue("green.700", "green.400")}
             whiteSpace="nowrap"
-            sx={{
-              animation: `${ctaGlow} 3s ease-in-out infinite`,
-              "@media (prefers-reduced-motion: reduce)": {
-                animation: "none",
-              }
-            }}
             _hover={{
-              transform: "scale(1.06)",
+              transform: "scale(1.03)",
               bg: useColorModeValue("green.700", "green.600"),
               boxShadow: "lg",
             }}
@@ -325,9 +307,9 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
               handleClick();
             }}
           >
-            <Flex align="center" gap={1}>
-              <Text fontSize="sm" fontWeight="bold">READ</Text>
-              <Icon as={FiExternalLink} boxSize="11px" />
+            <Flex align="center" gap={0.5}>
+              <Text fontSize="xs" fontWeight="bold">READ</Text>
+              <Icon as={FiExternalLink} boxSize="10px" />
             </Flex>
           </Box>
         </Flex>
