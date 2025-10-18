@@ -355,18 +355,23 @@ export default function PRAnalyticsCard() {
         ]);
         const toArr = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
         combined = [...toArr(eip), ...toArr(erc), ...toArr(rip)];
-
-        if (labelSet === "customLabels") {
-          combined = combined.map((pr: any) => ({
-            ...pr,
-            Label: normalizeCustomLabel(pr.Repo || "", pr.Label),
-            LabelType: "customLabels",
-          }));
-        }
       } else {
         const repo = repoKey;
         const rows = await fetchRows(repo);
         combined = rows;
+      }
+
+      // Normalize labels for customLabels mode for ALL repos
+      if (labelSet === "customLabels") {
+        combined = combined.map((pr: any) => ({
+          ...pr,
+          NormalizedLabel: normalizeCustomLabel(pr.Repo || repoKey, pr.Label || ""),
+        }));
+      } else if (labelSet === "githubLabels") {
+        combined = combined.map((pr: any) => ({
+          ...pr,
+          NormalizedLabel: normalizeGithubLabel(pr.Label || ""),
+        }));
       }
 
       // Get current/latest month key from filteredData
@@ -377,21 +382,11 @@ export default function PRAnalyticsCard() {
         const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
         if (mk !== latestMonthKey) return false;
 
-        const rawLabel = pr.Label || "";
+        // Use the normalized label we computed earlier
+        const friendlyLabel = pr.NormalizedLabel || pr.Label || "";
 
-        // Compute normalized/friendly label to show in CSV
-        const friendlyLabel = labelSet === "customLabels"
-          ? normalizeCustomLabel(pr.Repo || repoKey, rawLabel)
-          : labelSet === "githubLabels"
-            ? normalizeGithubLabel(rawLabel)
-            : rawLabel;
-
-        // Determine whether this row is selected according to the current filter
-        // For customLabels the selectedLabels contains friendly names (e.g., "Typo Fix")
-        // For githubLabels the selectedLabels contains raw workflow values (e.g., "a-review")
-        const passesFilter = labelSet === "customLabels"
-          ? selectedLabels.includes(friendlyLabel)
-          : selectedLabels.includes(rawLabel);
+        // Check if this label is in the selected labels
+        const passesFilter = selectedLabels.includes(friendlyLabel);
 
         return passesFilter;
       });
@@ -399,18 +394,12 @@ export default function PRAnalyticsCard() {
       const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
 
       const csvData = filteredRows.map((pr: any) => {
-        const rawLabel = pr.Label || "";
-        const friendlyLabel = labelSet === "customLabels"
-          ? normalizeCustomLabel(pr.Repo || repoKey, rawLabel)
-          : labelSet === "githubLabels"
-            ? normalizeGithubLabel(rawLabel)
-            : rawLabel;
+        const friendlyLabel = pr.NormalizedLabel || pr.Label || "";
 
         return {
           Month: pr.Month || formatMonthLabel(pr.MonthKey),
           MonthKey: pr.MonthKey,
           Label: friendlyLabel,
-          LabelType: pr.LabelType,
           Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
           PRNumber: pr.PRNumber,
           PRLink: pr.PRLink,
