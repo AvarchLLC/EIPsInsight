@@ -3,14 +3,14 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main  # Change to your default branch
+      - main  # Change if your default branch is different
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repo
+      # Step 1: Checkout repo (main branch)
       - name: Checkout Repository
         uses: actions/checkout@v3
 
@@ -50,10 +50,18 @@ jobs:
             # Remove temp folder if exists
             rm -rf $TEMP_DIR
 
-            # Clone the repo to temp folder
-            git clone -b main git@github.com:AvarchLLC/EIPsInsight.git $TEMP_DIR
+            # Clone the repo to temp folder (public repo uses HTTPS)
+            git clone -b main https://github.com/AvarchLLC/EIPsInsight.git $TEMP_DIR
 
-            # Go to temp folder and install dependencies
+            # Copy .env.local from deploy folder to temp folder
+            if [ -f "$DEPLOY_DIR/.env.local" ]; then
+              cp $DEPLOY_DIR/.env.local $TEMP_DIR/.env.local
+              echo ".env.local copied to build folder."
+            else
+              echo "⚠️ .env.local not found in deploy folder. Build may fail if env vars are required."
+            fi
+
+            # Go to temp folder and install dependencies with retries
             cd $TEMP_DIR
             for i in {1..3}; do
               echo "Server npm install attempt $i..."
