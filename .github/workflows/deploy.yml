@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main  # Change to your default branch if needed
+      - main  # Change to your default branch
 
 jobs:
   deploy:
@@ -43,18 +43,20 @@ jobs:
             set -e
             echo "Starting deployment process..."
 
-            # Navigate to project directory
-            cd eip-client/EIPsInsight
-            echo "Current directory: $(pwd)"
+            # Define directories
+            DEPLOY_DIR=~/eip-client/EIPsInsight
+            TEMP_DIR=~/eip-client/EIPsInsight_build_temp
 
-            # Reset git and pull latest
-            git reset --hard
-            git fetch --all
-            git reset --hard origin/main
+            # Remove temp folder if exists
+            rm -rf $TEMP_DIR
 
-            # Install dependencies with retry logic
+            # Clone the repo to temp folder
+            git clone -b main git@github.com:AvarchLLC/EIPsInsight.git $TEMP_DIR
+
+            # Go to temp folder and install dependencies
+            cd $TEMP_DIR
             for i in {1..3}; do
-              echo "Server install attempt $i..."
+              echo "Server npm install attempt $i..."
               if npm ci --force --legacy-peer-deps; then
                 echo "npm install succeeded"
                 break
@@ -69,24 +71,16 @@ jobs:
               fi
             done
 
-            # Build in temporary folder
-            TEMP_DIR=".next_temp"
-            rm -rf $TEMP_DIR
-            mkdir -p $TEMP_DIR
-
+            # Build Next.js in temp folder
             echo "Building project..."
-            if npm run build -- --output $TEMP_DIR; then
-              echo "✅ Build successful"
-            else
-              echo "❌ Build failed, aborting deployment"
-              exit 1
-            fi
+            npm run build || { echo "❌ Build failed, aborting deployment"; exit 1; }
 
-            # Atomic swap for zero downtime
+            # Swap .next folders atomically for zero-downtime
+            cd $DEPLOY_DIR
             if [ -d ".next" ]; then
               mv .next .next_old
             fi
-            mv $TEMP_DIR .next
+            mv $TEMP_DIR/.next .next
 
             # Reload PM2 gracefully
             if ! pm2 reload 39; then
@@ -94,10 +88,11 @@ jobs:
               pm2 start npm --name "eips-insight" -- start
             fi
 
-            # Remove old build folder
+            # Remove old build and temp folder
             rm -rf .next_old
+            rm -rf $TEMP_DIR
 
-            echo "Deployment completed successfully!"
+            echo "✅ Deployment completed successfully!"
 
       # Step 5: Notify Discord on Success
       - name: Discord Notification - Success
