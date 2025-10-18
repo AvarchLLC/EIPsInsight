@@ -372,26 +372,53 @@ export default function PRAnalyticsCard() {
       // Get current/latest month key from filteredData
       const latestMonthKey = months.length > 0 ? months[months.length - 1] : null;
 
-      // Filter only PRs from the latest month
+      // Filter only PRs from the latest month and apply label normalization + selected label filter
       const filteredRows = combined.filter((pr: any) => {
         const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
-        return mk === latestMonthKey;
+        if (mk !== latestMonthKey) return false;
+
+        const rawLabel = pr.Label || "";
+
+        // Compute normalized/friendly label to show in CSV
+        const friendlyLabel = labelSet === "customLabels"
+          ? normalizeCustomLabel(pr.Repo || repoKey, rawLabel)
+          : labelSet === "githubLabels"
+            ? normalizeGithubLabel(rawLabel)
+            : rawLabel;
+
+        // Determine whether this row is selected according to the current filter
+        // For customLabels the selectedLabels contains friendly names (e.g., "Typo Fix")
+        // For githubLabels the selectedLabels contains raw workflow values (e.g., "a-review")
+        const passesFilter = labelSet === "customLabels"
+          ? selectedLabels.includes(friendlyLabel)
+          : selectedLabels.includes(rawLabel);
+
+        return passesFilter;
       });
 
       const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
 
-      const csvData = filteredRows.map((pr: any) => ({
-        Month: pr.Month || formatMonthLabel(pr.MonthKey),
-        MonthKey: pr.MonthKey,
-        Label: labelSet === "customLabels" ? normalizeCustomLabel(pr.Repo || repoKey, pr.Label) : pr.Label, // Normalize for custom labels
-        LabelType: pr.LabelType,
-        Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
-        PRNumber: pr.PRNumber,
-        PRLink: pr.PRLink,
-        Author: pr.Author,
-        Title: pr.Title,
-        CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
-      }));
+      const csvData = filteredRows.map((pr: any) => {
+        const rawLabel = pr.Label || "";
+        const friendlyLabel = labelSet === "customLabels"
+          ? normalizeCustomLabel(pr.Repo || repoKey, rawLabel)
+          : labelSet === "githubLabels"
+            ? normalizeGithubLabel(rawLabel)
+            : rawLabel;
+
+        return {
+          Month: pr.Month || formatMonthLabel(pr.MonthKey),
+          MonthKey: pr.MonthKey,
+          Label: friendlyLabel,
+          LabelType: pr.LabelType,
+          Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
+          PRNumber: pr.PRNumber,
+          PRLink: pr.PRLink,
+          Author: pr.Author,
+          Title: pr.Title,
+          CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
+        };
+      });
 
       const csv = Papa.unparse(csvData);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });

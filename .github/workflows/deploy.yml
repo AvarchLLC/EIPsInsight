@@ -14,55 +14,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # Step 2: Notify Deployment Start
       - name: Notify Deployment Start
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
           embed-title: "🚀 Deployment Started"
-          embed-description: "Heads up: Deployment is now automated. No manual steps needed — the system will handle it."
+          embed-description: "Automated deployment started."
           embed-color: 16776960
 
-      # Step 2: Set up Node.js
+      # Step 3: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # Step 3: Configure npm and git for timeouts
-      - name: Configure npm and git timeouts
-        run: |
-          npm config set fetch-timeout 600000
-          npm config set fetch-retry-mintimeout 10000
-          npm config set fetch-retry-maxtimeout 60000
-          npm config set fetch-retries 5
-          git config --global http.postBuffer 1048576000
-          git config --global http.maxRequestBuffer 100M
-          git config --global core.compression 0
-
-      # Step 4: Install dependencies with retry logic
-      - name: Install Dependencies
-        run: |
-          for i in {1..3}; do
-            echo "Install attempt $i..."
-            if npm install --force --timeout=600000; then
-              echo "npm install succeeded on attempt $i"
-              break
-            else
-              echo "npm install failed on attempt $i"
-              if [ $i -eq 3 ]; then
-                echo "All npm install attempts failed"
-                exit 1
-              fi
-              sleep 30
-            fi
-          done
-
-      # Step 5: Build with timeout and retry
-      - name: Build Project
-        run: |
-          timeout 15m npm run build || echo "Build failed or timed out, skipping."
-
-      # Step 6: Deploy via SSH with enhanced timeout handling
+      # Step 4: Deploy via SSH with zero-downtime build
       - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -70,66 +37,69 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
-          timeout: 30m
-          command_timeout: 25m
+          timeout: 45m
+          command_timeout: 40m
           script: |
             set -e
             echo "Starting deployment process..."
-            
-            # Configure git and npm timeouts on server
-            git config --global http.postBuffer 1048576000
-            git config --global http.maxRequestBuffer 100M
-            git config --global core.compression 0
-            npm config set fetch-timeout 600000
-            npm config set fetch-retry-mintimeout 10000
-            npm config set fetch-retry-maxtimeout 60000
-            npm config set fetch-retries 5
-            
+
             # Navigate to project directory
             cd eip-client/EIPsInsight
             echo "Current directory: $(pwd)"
-            
-            # Reset and pull with timeout
-            echo "Resetting git state..."
+
+            # Reset git and pull latest
             git reset --hard
-            
-            echo "Pulling latest changes..."
-            timeout 5m git pull || {
-              echo "Git pull timed out, trying with different approach..."
-              git fetch --all
-              git reset --hard origin/main
-            }
-            
+            git fetch --all
+            git reset --hard origin/main
+
             # Install dependencies with retry logic
-            echo "Installing dependencies..."
             for i in {1..3}; do
               echo "Server install attempt $i..."
-              if timeout 10m npm install --force; then
-                echo "npm install succeeded on server attempt $i"
+              if npm ci --force --legacy-peer-deps; then
+                echo "npm install succeeded"
                 break
               else
-                echo "npm install failed on server attempt $i"
-                if [ $i -eq 3 ]; then
-                  echo "All server npm install attempts failed"
-                  exit 1
-                fi
-                echo "Cleaning npm cache and retrying..."
+                echo "npm install failed, cleaning cache and retrying..."
                 npm cache clean --force
                 sleep 30
+                if [ $i -eq 3 ]; then
+                  echo "❌ npm install failed after 3 attempts, aborting deployment"
+                  exit 1
+                fi
               fi
             done
-            
-            # Build with timeout
-            echo "Building project..."
-            timeout 15m npm run build || echo "Build failed or timed out, check manually"
-            
-            # Reload PM2
-            echo "Reloading PM2 process..."
-            pm2 reload 39 || echo "PM2 reload failed, check manually."
-            
-            echo "Deployment process completed."
 
-      # Step 7: Notify Discord on success with embeds
+            # Build in temporary folder
+            TEMP_DIR=".next_temp"
+            rm -rf $TEMP_DIR
+            mkdir -p $TEMP_DIR
+
+            echo "Building project..."
+            if npm run build -- --output $TEMP_DIR; then
+              echo "✅ Build successful"
+            else
+              echo "❌ Build failed, aborting deployment"
+              exit 1
+            fi
+
+            # Atomic swap for zero downtime
+            if [ -d ".next" ]; then
+              mv .next .next_old
+            fi
+            mv $TEMP_DIR .next
+
+            # Reload PM2 gracefully
+            if ! pm2 reload 39; then
+              echo "⚠️ PM2 reload failed, trying to start..."
+              pm2 start npm --name "eips-insight" -- start
+            fi
+
+            # Remove old build folder
+            rm -rf .next_old
+
+            echo "Deployment completed successfully!"
+
+      # Step 5: Notify Discord on Success
       - name: Discord Notification - Success
         if: success()
         uses: tsickert/discord-webhook@v7.0.0
@@ -140,12 +110,12 @@ jobs:
             **Branch:** ${{ github.ref_name }}
             **Repository:** ${{ github.repository }}
             **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
-            🎉 Deployment completed without timeout issues!
+            🎉 Deployment completed successfully without downtime!
           embed-color: 3066993
           embed-footer-text: "GitHub Actions • Deployment Bot"
           embed-timestamp: ${{ github.event.head_commit.timestamp }}
 
-      # Step 8: Notify Discord on failure with embeds
+      # Step 6: Notify Discord on Failure
       - name: Discord Notification - Failure
         if: failure()
         uses: tsickert/discord-webhook@v7.0.0
@@ -156,9 +126,7 @@ jobs:
             **Branch:** ${{ github.ref_name }}
             **Repository:** ${{ github.repository }}
             **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
-            ⚠️ Check GitHub Actions logs for timeout/connection details.
-            🔧 Enhanced timeout handling active - check server connectivity.
+            ⚠️ Deployment failed! Check GitHub Actions logs for details.
           embed-color: 15158332
           embed-footer-text: "GitHub Actions • Deployment Bot"
           embed-timestamp: ${{ github.event.head_commit.timestamp }}
-
