@@ -85,6 +85,7 @@ const ReviewTracker = () => {
   const [sliderValue4, setSliderValue4] = useState<number>(0);
   const [Linechart, setLinechart] = useState<boolean>(false);
   const [loading4, setLoading4] = useState<boolean>(false);
+  const [expandedCards, setExpandedCards] = useState<{ [key: string]: boolean }>({});
 
   const years = Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString());
   const months = [
@@ -683,37 +684,22 @@ const formatChartData = (rawData: Record<string, number>) => {
 // Initialize a global or shared map for reviewer colors
 const reviewerColorsMap: Record<string, string> = {};
 
-const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => {
-  return {
-    data: chartData,
-    xField: "count",
-    yField: "reviewer",
-    color: (datum: any) => reviewerColorsMap[(datum as { reviewer: string }).reviewer],
-    barWidthRatio: 0.8,
-    label: {
-      position: "middle" as const,
-      style: { fill: "#FFFFFF", opacity: 0.7 },
-    },
-    yAxis: {
-      label: {
-        formatter: (reviewer: string) => reviewer, // Display reviewer names on Y-axis
-      },
-    },
-    annotations: chartData?.map((datum) => ({
-      type: 'html',
-      position: { count: datum.count, reviewer: datum.reviewer }, // Correcting position
-      html: `
-        <div style="text-align: center;">
-          <img src="https://github.com/${datum.reviewer}.png?size=24" 
-               style="margin-left:1px; width: 24px; height: 24px; border-radius: 50%;" />
-        </div>
-      `,
-      offsetY: -12, // Adjust the vertical position to place above the bar
-    })),
-  };
+// Define consistent colors for top contributors (highly contrasting)
+const topContributorColors: Record<string, string> = {
+  'lightclient': '#FF6B6B',      // Bright red
+  'SamWilsn': '#4ECDC4',         // Teal
+  'xinbenlv': '#FFD93D',         // Yellow
+  'g11tech': '#6C5CE7',          // Purple
+  'Pandapip1': '#00D2FF',        // Cyan
+  'axic': '#FF8C42',             // Orange
+  'MicahZoltu': '#A8E6CF',       // Mint green
 };
 
-const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) => {
+const getBarChartConfig = (chartData: { reviewer: string; count: number }[]) => {
+  // Calculate max value for consistent scaling
+  const maxCount = Math.max(...chartData.map(d => d.count));
+  const maxScale = Math.ceil(maxCount / 500) * 500; // Round up to nearest 500
+
   return {
     data: chartData,
     xField: "count",
@@ -725,8 +711,9 @@ const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) =>
       style: { fill: "#FFFFFF", opacity: 0.7 },
     },
     xAxis: {
-      min: 0, // Ensure the axis starts at 0
-      max: 1500, // Set the maximum scale to 1500
+      min: 0,
+      max: maxScale,
+      tickInterval: 500, // 500-unit intervals
     },
     yAxis: {
       label: {
@@ -738,7 +725,46 @@ const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) =>
       position: { count: datum.count, reviewer: datum.reviewer }, // Correcting position
       html: `
         <div style="text-align: center;">
-          <img src="https://github.com/${datum.reviewer}.png?size=24" 
+          <img src="https://github.com/${datum.reviewer}.png?size=24"
+               style="margin-left:1px; width: 24px; height: 24px; border-radius: 50%;" />
+        </div>
+      `,
+      offsetY: -12, // Adjust the vertical position to place above the bar
+    })),
+  };
+};
+
+const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) => {
+  // Calculate max value for consistent scaling
+  const maxCount = Math.max(...chartData.map(d => d.count));
+  const maxScale = Math.ceil(maxCount / 500) * 500; // Round up to nearest 500
+
+  return {
+    data: chartData,
+    xField: "count",
+    yField: "reviewer",
+    color: (datum: any) => reviewerColorsMap[(datum as { reviewer: string }).reviewer],
+    barWidthRatio: 0.8,
+    label: {
+      position: "middle" as const,
+      style: { fill: "#FFFFFF", opacity: 0.7 },
+    },
+    xAxis: {
+      min: 0,
+      max: maxScale,
+      tickInterval: 500, // 500-unit intervals
+    },
+    yAxis: {
+      label: {
+        formatter: (reviewer: string) => reviewer, // Display reviewer names on Y-axis
+      },
+    },
+    annotations: chartData?.map((datum) => ({
+      type: 'html',
+      position: { count: datum.count, reviewer: datum.reviewer }, // Correcting position
+      html: `
+        <div style="text-align: center;">
+          <img src="https://github.com/${datum.reviewer}.png?size=24"
                style="margin-left:1px; width: 24px; height: 24px; border-radius: 50%;" />
         </div>
       `,
@@ -769,7 +795,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         <Box width={{ base: "100%", md: "45%" }} padding="1rem" bgColor={bg} borderRadius="0.55rem">
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
             <Heading size="md" color="black">
-              {`Editors Leaderboard`}
+              {`Editors - All-Time Contributions`}
               <CopyLink link={`https://eipsinsight.com/Editors#Leaderboard`} />
             </Heading>
             <CSVLink
@@ -799,7 +825,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         <Box width={{ base: "100%", md: "45%" }} padding="1rem" bgColor={bg} borderRadius="0.55rem">
           <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
             <Heading size="md" color="black">
-              {`Reviewers Leaderboard`}
+              {`Contributors - All-Time Contributions`}
               <CopyLink link={`https://eipsinsight.com/Reviewers#Leaderboard`} />
             </Heading>
             <CSVLink
@@ -855,9 +881,9 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
           {/* Editors Chart */}
           <Box width={{ base: "100%", md: "45%" }} padding="1rem">
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-              
+
               <Heading size="md" color="black">
-                {`Editors Leaderboard (Monthly)`}
+                {`Editors - Monthly Review Activity`}
               </Heading>
               <CSVLink
                 data={csvData?.length ? csvData : []}
@@ -883,7 +909,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
           <Box width={{ base: "100%", md: "45%" }} padding="1rem">
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
               <Heading size="md" color="black">
-                {`Reviewers Leaderboard (Monthly)`}
+                {`Contributors - Monthly Review Activity`}
               </Heading>
               <CSVLink
                 data={csvData?.length ? csvData : []} 
@@ -962,8 +988,12 @@ const renderChart = () => {
   const totalReviewers = reviewers?.length;
   filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
-      // Assign a new color only if the reviewer doesn't already have one
-      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
+      // Use predefined color for top contributors, otherwise generate distinct color
+      if (topContributorColors[item.reviewer]) {
+        reviewerColorsMap[item.reviewer] = topContributorColors[item.reviewer];
+      } else {
+        reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
+      }
     }
   });
   // console.log("filtered data:", filteredData);
@@ -1031,8 +1061,12 @@ const renderChart4 = () => {
   const totalReviewers = reviewers?.length;
   filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
-      // Assign a new color only if the reviewer doesn't already have one
-      reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
+      // Use predefined color for top contributors, otherwise generate distinct color
+      if (topContributorColors[item.reviewer]) {
+        reviewerColorsMap[item.reviewer] = topContributorColors[item.reviewer];
+      } else {
+        reviewerColorsMap[item.reviewer] = generateDistinctColor(Object.keys(reviewerColorsMap)?.length, totalReviewers);
+      }
     }
   });
 
@@ -1121,7 +1155,12 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
   const totalReviewers = reviewers?.length;
   filteredData?.forEach((item, index) => {
     if (!reviewerColorsMap[item.reviewer]) {
-      reviewerColorsMap[item.reviewer] = `hsl(${(index * (360 / totalReviewers)) % 360}, 85%, 50%)`;
+      // Use predefined color for top contributors, otherwise generate distinct color
+      if (topContributorColors[item.reviewer]) {
+        reviewerColorsMap[item.reviewer] = topContributorColors[item.reviewer];
+      } else {
+        reviewerColorsMap[item.reviewer] = `hsl(${(index * (360 / totalReviewers)) % 360}, 85%, 50%)`;
+      }
     }
   });
 
@@ -1197,6 +1236,8 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
       legend: { position: 'top-right' as const },
     };
 
+    const isExpanded = expandedCards[reviewer] || false;
+
     return (
       <Box
         id={reviewer}
@@ -1204,60 +1245,63 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
         bgColor={bg}
         padding="0.5rem"
         borderRadius="0.55rem"
-        style={{ flex: "1 0 22%", minWidth: "200px", margin: "2px" }}
-        // style={{ flex: "1 0 100%", minWidth: "100%", margin: "2px 0" }} 
+        style={{ flex: "1 0 100%", minWidth: "100%", margin: "2px 0" }}
         sx={{
-          "@media (min-width: 480px)": { flex: "1 0 45%", minWidth: "45%" }, // 2 columns on medium screens
-          "@media (min-width: 768px)": { flex: "1 0 22%", minWidth: "22%" }, // 4 columns on large screens
+          transition: "all 0.3s ease",
         }}
       >
-        <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem" flexWrap="wrap">
-          <Flex alignItems="center" flex="1" minWidth="150px" marginBottom={{ base: "0.5rem", md: "0" }}>
+        <Flex justifyContent="space-between" alignItems="center" flexWrap="wrap" cursor="pointer" onClick={() => setExpandedCards(prev => ({ ...prev, [reviewer]: !prev[reviewer] }))}>
+          <Flex alignItems="center" flex="1" minWidth="150px">
             <img
               src={`https://github.com/${reviewer}.png?size=24`}
               alt={`${reviewer}'s avatar`}
               style={{
                 marginRight: "8px",
-                width: "48px",
-                height: "48px",
+                width: "40px",
+                height: "40px",
                 borderRadius: "50%",
               }}
             />
-            <a
-              href={`https://github.com/${reviewer}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontWeight: "bold",
-                fontSize: "1rem",
-                textDecoration: "none",
-                color: "black",
-              }}
-            >
+            <Text fontWeight="bold" fontSize="1rem" color="black">
               {reviewer} ({getReviewerCount(reviewer)})
-            </a>
+            </Text>
           </Flex>
-          <CSVLink
-            data={csvData?.length ? csvData : []}
-            filename={`${reviewer}_reviews_data.csv`}
-            onClick={async () => {
-              try {
-                generateCSVData3(reviewer);
-                await axios.post("/api/DownloadCounter");
-              } catch (error) {
-                console.error("Error triggering download counter:", error);
-              }
-            }}
-          >
-            <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }}>
-              {loading3 ? <Spinner size="sm" /> : "Download CSV"}
-            </Button>
-          </CSVLink>
+          <Flex alignItems="center" gap={2}>
+            <Box onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+              <CSVLink
+                data={csvData?.length ? csvData : []}
+                filename={`${reviewer}_reviews_data.csv`}
+                onClick={async () => {
+                  try {
+                    generateCSVData3(reviewer);
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
+              >
+                <Button colorScheme="blue" fontSize={{ base: "0.6rem", md: "md" }} size="sm">
+                  {loading3 ? <Spinner size="sm" /> : "CSV"}
+                </Button>
+              </CSVLink>
+            </Box>
+            <IconButton
+              aria-label="Toggle chart"
+              icon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+              size="sm"
+              variant="ghost"
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                setExpandedCards(prev => ({ ...prev, [reviewer]: !prev[reviewer] }));
+              }}
+            />
+          </Flex>
         </Flex>
-        <Line {...config} />
-        {/* <Box className="w-full" style={{ marginTop: "20px" }}>
-          <LastUpdatedDateTime name="EditorsTool" />
-        </Box> */}
+        <Collapse in={isExpanded} animateOpacity>
+          <Box mt={3}>
+            <Line {...config} />
+          </Box>
+        </Collapse>
       </Box>
     );
   };
@@ -1742,50 +1786,80 @@ const editorsActivity = () => {
   const reviewers = [...new Set(processedData?.map((item: any) => item.reviewer))];
   const reviewerColors: { [key: string]: string } = {};
   reviewers?.forEach((reviewer, index) => {
-    reviewerColors[reviewer as string] = generateDistinctColor(index, reviewers?.length);
+    // Use consistent colors for top contributors
+    if (topContributorColors[reviewer as string]) {
+      reviewerColors[reviewer as string] = topContributorColors[reviewer as string];
+    } else {
+      reviewerColors[reviewer as string] = generateDistinctColor(index, reviewers?.length);
+    }
   });
 
-  const scatterConfig = {
+  const scatterConfig: any = {
     data: processedData,
     xField: "timeIn24Hour",
     yField: "reviewer",
     colorField: "reviewer",
-    size: 7,
+    size: 8,
+    shape: 'circle',
     pointStyle: ({ reviewer }: any) => ({
       fill: reviewerColors[reviewer] || "#000",
-      fillOpacity: 0.7,
-      stroke: reviewerColors[reviewer] || "#000", // Match stroke to fill color
-      lineWidth: 0.5, // Thinner border for better readability
+      fillOpacity: 0.85,
+      stroke: '#fff',
+      lineWidth: 1,
+      shadowBlur: 3,
+      shadowColor: 'rgba(0, 0, 0, 0.2)',
     }),
     xAxis: {
       title: {
-        text: "Time (24-hour format)",
+        text: "Time of Day (24-hour format)",
+        style: {
+          fontSize: 14,
+          fontWeight: 'bold',
+        },
       },
-      tickCount: 9,
+      tickCount: 24,
+      label: {
+        formatter: (val: string) => {
+          const hour = parseInt(val.split(':')[0]);
+          return hour % 3 === 0 ? val : '';
+        },
+      },
     },
     yAxis: {
       title: {
-        text: "Reviewer",
+        text: "Contributor/Editor",
+        style: {
+          fontSize: 14,
+          fontWeight: 'bold',
+        },
       },
     },
     tooltip: {
+      showTitle: true,
+      title: 'Review Activity',
       formatter: (datum: any) => ({
-        name: "Reviewer",
-        value: `${datum.reviewer} at ${datum.timeIn24Hour}`,
+        name: datum.reviewer,
+        value: `Review at ${datum.timeIn24Hour}`,
       }),
     },
-    slider: {
-      start: sliderValue3, // Set the start value from the state
-      end: 1, // End of the slider
-      step: 0.01, // Define the step value for the slider
-      min: 0, // Minimum value for the slider
-      max: 1, // Maximum value for the slider
-      onChange: (value:any) => {
-        setSliderValue3(value); // Update state when slider value changes
+    legend: {
+      position: 'top' as const,
+      itemName: {
+        style: {
+          fontSize: 12,
+        },
       },
-      // Optionally handle when sliding stops
+    },
+    slider: {
+      start: sliderValue3,
+      end: 1,
+      step: 0.01,
+      min: 0,
+      max: 1,
+      onChange: (value:any) => {
+        setSliderValue3(value);
+      },
       onAfterChange: (value:any) => {
-        // Perform any additional actions after the slider is changed
         // console.log('Slider moved to:', value);
       },
     },
@@ -1793,8 +1867,7 @@ const editorsActivity = () => {
   
 
   return (
-    <Box padding="1rem" overflowX="auto">
-      {loading4 ? (
+d      {loading4 ? (
         <Flex justify="center" align="center" height="100vh">
         <Spinner size="xl" />
       </Flex>
@@ -2202,7 +2275,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
               marginTop={2}
               fontWeight="bold"
               color={useColorModeValue("#3182CE", "blue.300")}
-            > Active Editors Timeline Scatterplot <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
+            > Review Activity Timeline (Time of Day Analysis) <CopyLink link={`https://eipsinsight.com/Reviewers#ActivityTimeline`} />
 
             </Heading> 
             </section>
