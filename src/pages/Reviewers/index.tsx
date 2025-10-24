@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import {
   Box, Flex, Spinner, Select, Heading, IconButton, Collapse, Checkbox, HStack,
   Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue,
-  Tooltip, Link, VStack, Badge, Avatar
+  Tooltip, Link, VStack, Badge, Avatar, Grid
 } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon, DownloadIcon } from '@chakra-ui/icons';
 import { FiFilter } from 'react-icons/fi';
@@ -782,6 +782,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
             }}
             loading={loading3}
             copyLink="https://eipsinsight.com/Editors#Leaderboard"
+            barChartConfig={getBarChartConfig(editorsData)}
           />
           <Box mt={2}>
             <LastUpdatedDateTime name="EditorsTool" />
@@ -805,6 +806,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
             }}
             loading={loading3}
             copyLink="https://eipsinsight.com/Reviewers#Leaderboard"
+            barChartConfig={getBarChartConfig2(reviewersData)}
           />
           <Box mt={2}>
             <LastUpdatedDateTime name="EditorsTool" />
@@ -1141,9 +1143,13 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
           Editors
         </Heading>
       </section>
-      <VStack spacing={3} align="stretch" mb={8}>
+      <Grid
+        templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}
+        gap={4}
+        mb={8}
+      >
         {editorCharts}
-      </VStack>
+      </Grid>
 
       <section id="Reviewers">
         <Heading
@@ -1157,9 +1163,12 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
           Reviewers
         </Heading>
       </section>
-      <VStack spacing={3} align="stretch">
+      <Grid
+        templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}
+        gap={4}
+      >
         {reviewerCharts}
-      </VStack>
+      </Grid>
     </Box>
   );
 };
@@ -2353,19 +2362,21 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
     </>
     )}
             <br/>
-            <Box className="w-full">
-            {/* <br/> */}
-              {renderCharts3(chart1data)} 
-              {/* <br/> */}
-            </Box>
             
-    <Box>
-
+      {/* Active Editors PR Reviews - Moved up */}
       <section id="active editors">
         <Box id="Speciality" className="w-full">
           {editorsSpecialityChart()}
         </Box>
       </section>
+      <br/>
+      
+      {/* Individual Editor/Reviewer Charts */}
+      <Box className="w-full">
+        {renderCharts3(chart1data)} 
+      </Box>
+            
+    <Box>
           <br/>
         <hr></hr>
         <br/>
