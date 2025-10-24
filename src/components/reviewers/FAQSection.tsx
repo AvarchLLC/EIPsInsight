@@ -30,19 +30,19 @@ const FAQSection: React.FC<FAQSectionProps> = ({ show, toggleCollapse }) => {
   return (
     <Box
       bgGradient={bgGradient}
-      borderRadius="xl"
+      borderRadius="lg"
       borderWidth="2px"
       borderColor={borderColor}
-      p={8}
-      mb={8}
-      boxShadow="lg"
+      p={4}
+      mb={4}
+      boxShadow="md"
       transition="all 0.3s"
-      _hover={{ boxShadow: 'xl', transform: 'translateY(-2px)' }}
+      _hover={{ boxShadow: 'lg' }}
     >
-      <Flex justify="space-between" align="center" mb={show ? 6 : 0} cursor="pointer" onClick={toggleCollapse}>
+      <Flex justify="space-between" align="center" mb={show ? 3 : 0} cursor="pointer" onClick={toggleCollapse}>
         <Heading
           as="h2"
-          size="xl"
+          size="md"
           color={headingColor}
           fontWeight="bold"
           letterSpacing="tight"
@@ -52,31 +52,31 @@ const FAQSection: React.FC<FAQSectionProps> = ({ show, toggleCollapse }) => {
         </Heading>
         <IconButton
           onClick={toggleCollapse}
-          icon={show ? <ChevronUpIcon boxSize={7} /> : <ChevronDownIcon boxSize={7} />}
+          icon={show ? <ChevronUpIcon boxSize={5} /> : <ChevronDownIcon boxSize={5} />}
           variant="ghost"
           colorScheme="blue"
           aria-label="Toggle FAQ"
-          size="lg"
+          size="sm"
           _hover={{ transform: 'scale(1.1)' }}
           transition="transform 0.2s"
         />
       </Flex>
 
       <Collapse in={show} animateOpacity>
-        <Box pt={6} px={2}>
+        <Box pt={3} px={1}>
           {/* Question 1 */}
-          <Box mb={8} p={5} bg={accentBg} borderRadius="lg" borderLeftWidth="4px" borderLeftColor="blue.500">
+          <Box mb={4} p={3} bg={accentBg} borderRadius="md" borderLeftWidth="3px" borderLeftColor="blue.500">
             <Heading 
               as="h3" 
-              size="md" 
-              mb={3} 
+              size="sm" 
+              mb={2} 
               color={questionColor} 
               fontWeight="bold"
               fontFamily="'Inter', sans-serif"
             >
               💡 What does this tool do?
             </Heading>
-            <Text fontSize="md" color={textColor} lineHeight="1.8" fontFamily="'Inter', sans-serif">
+            <Text fontSize="sm" color={textColor} lineHeight="1.6" fontFamily="'Inter', sans-serif">
               This tool provides a comprehensive overview of all EIP editor/reviewer reviews conducted to date.
               It displays the total number of reviews each month for each editor/reviewer, allowing you to easily
               track and analyze review activity across different months and editors.
@@ -84,18 +84,18 @@ const FAQSection: React.FC<FAQSectionProps> = ({ show, toggleCollapse }) => {
           </Box>
 
           {/* Question 2 */}
-          <Box mb={8} p={5} bg={accentBg} borderRadius="lg" borderLeftWidth="4px" borderLeftColor="purple.500">
+          <Box mb={4} p={3} bg={accentBg} borderRadius="md" borderLeftWidth="3px" borderLeftColor="purple.500">
             <Heading 
               as="h3" 
-              size="md" 
-              mb={3} 
+              size="sm" 
+              mb={2} 
               color={questionColor} 
               fontWeight="bold"
               fontFamily="'Inter', sans-serif"
             >
               📅 How can I view data for a specific Month?
             </Heading>
-            <Text fontSize="md" color={textColor} lineHeight="1.8" fontFamily="'Inter', sans-serif">
+            <Text fontSize="sm" color={textColor} lineHeight="1.6" fontFamily="'Inter', sans-serif">
               To view data for a specific month, you can use the timeline scroll bar or click the View More button.
               From there, select the desired Year and Month using the dropdown menus, and the table and graph will
               automatically update to display data for that selected month.
@@ -103,18 +103,18 @@ const FAQSection: React.FC<FAQSectionProps> = ({ show, toggleCollapse }) => {
           </Box>
 
           {/* Question 3 */}
-          <Box mb={8} p={5} bg={accentBg} borderRadius="lg" borderLeftWidth="4px" borderLeftColor="green.500">
+          <Box mb={4} p={3} bg={accentBg} borderRadius="md" borderLeftWidth="3px" borderLeftColor="green.500">
             <Heading 
               as="h3" 
-              size="md" 
-              mb={3} 
+              size="sm" 
+              mb={2} 
               color={questionColor} 
               fontWeight="bold"
               fontFamily="'Inter', sans-serif"
             >
               👤 How can I view data for a specific EIP Editor?
             </Heading>
-            <Text fontSize="md" color={textColor} lineHeight="1.8" fontFamily="'Inter', sans-serif">
+            <Text fontSize="sm" color={textColor} lineHeight="1.6" fontFamily="'Inter', sans-serif">
               You can refine the data by selecting or deselecting specific editors from the checkbox list.
               This will filter the chart and table to show data only for the selected editors, enabling you to
               focus on individual contributions.
@@ -122,34 +122,34 @@ const FAQSection: React.FC<FAQSectionProps> = ({ show, toggleCollapse }) => {
           </Box>
 
           {/* Question 4 */}
-          <Box p={5} bg={accentBg} borderRadius="lg" borderLeftWidth="4px" borderLeftColor="orange.500">
+          <Box p={3} bg={accentBg} borderRadius="md" borderLeftWidth="3px" borderLeftColor="orange.500">
             <Heading 
               as="h3" 
-              size="md" 
-              mb={3} 
+              size="sm" 
+              mb={2} 
               color={questionColor} 
               fontWeight="bold"
               fontFamily="'Inter', sans-serif"
             >
               ⚙️ How does this tool work?
             </Heading>
-            <Text fontSize="md" color={textColor} lineHeight="1.8" mb={3} fontFamily="'Inter', sans-serif">
+            <Text fontSize="sm" color={textColor} lineHeight="1.6" mb={2} fontFamily="'Inter', sans-serif">
               The tool will be going through all the reviews made by the editor/reviewer and update the database
               every 24 hours. This tool captures reviews only if the person is marked as a reviewer and has
               performed a review activity on the PR. If no review is made, it won't be counted, even if the
               person is listed as a reviewer.
             </Text>
             <Box 
-              p={3} 
+              p={2} 
               bg={useColorModeValue('yellow.50', 'gray.600')} 
-              borderRadius="md"
-              borderLeftWidth="3px"
+              borderRadius="sm"
+              borderLeftWidth="2px"
               borderLeftColor="yellow.400"
             >
               <Text 
-                fontSize="sm" 
+                fontSize="xs" 
                 color={textColor} 
-                lineHeight="1.7" 
+                lineHeight="1.5" 
                 fontStyle="italic"
                 fontFamily="'Inter', sans-serif"
               >

@@ -27,6 +27,7 @@ import LeaderboardGrid from '../../components/reviewers/LeaderboardGrid';
 import ReviewActivityTimeline from '../../components/reviewers/ReviewActivityTimeline';
 import ActiveEditorsChart from '../../components/reviewers/ActiveEditorsChart';
 import ReviewerCard from '../../components/reviewers/ReviewerCard';
+import EditorRepoGrid from '../../components/reviewers/EditorRepoGrid';
 import * as helpers from '../../utils/helpers';
 
 
@@ -783,6 +784,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
             loading={loading3}
             copyLink="https://eipsinsight.com/Editors#Leaderboard"
             barChartConfig={getBarChartConfig(editorsData)}
+            isReviewer={false}
           />
           <Box mt={2}>
             <LastUpdatedDateTime name="EditorsTool" />
@@ -792,7 +794,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         {/* Reviewers Leaderboard Grid */}
         <Box width={{ base: "100%", md: "48%" }}>
           <LeaderboardGrid
-            title="Contributors - All-Time Contributions"
+            title="Reviewers - All-Time Contributions"
             data={reviewersData}
             csvData={csvData}
             csvFilename="reviewers_yearly_data.csv"
@@ -807,6 +809,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
             loading={loading3}
             copyLink="https://eipsinsight.com/Reviewers#Leaderboard"
             barChartConfig={getBarChartConfig2(reviewersData)}
+            isReviewer={true}
           />
           <Box mt={2}>
             <LastUpdatedDateTime name="EditorsTool" />
@@ -1655,7 +1658,55 @@ const editorsSpecialityChart = () => {
   );
 };
 
+const renderEditorRepoGrid = () => {
+  const reviewersList = helpers.REVIEWERS_LIST;
+  
+  // Get data for each repo
+  const processData1 = helpers.getYearlyData(eipdata, showReviewer);
+  const yearlyChartData1 = helpers.formatChartData(processData1);
+  const processData2 = helpers.getYearlyData(ercdata, showReviewer);
+  const yearlyChartData2 = helpers.formatChartData(processData2);
+  const processData3 = helpers.getYearlyData(ripdata, showReviewer);
+  const yearlyChartData3 = helpers.formatChartData(processData3);
 
+  // Combine data by reviewer
+  const reviewerMap: { [key: string]: { eips: number; ercs: number; rips: number } } = {};
+  
+  yearlyChartData1.forEach(item => {
+    if (!reviewerMap[item.reviewer]) {
+      reviewerMap[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
+    }
+    reviewerMap[item.reviewer].eips = item.count;
+  });
+  
+  yearlyChartData2.forEach(item => {
+    if (!reviewerMap[item.reviewer]) {
+      reviewerMap[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
+    }
+    reviewerMap[item.reviewer].ercs = item.count;
+  });
+  
+  yearlyChartData3.forEach(item => {
+    if (!reviewerMap[item.reviewer]) {
+      reviewerMap[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
+    }
+    reviewerMap[item.reviewer].rips = item.count;
+  });
+
+  // Transform to array format and separate editors/reviewers
+  const allData = Object.entries(reviewerMap).map(([reviewer, repos]) => ({
+    reviewer,
+    eips: repos.eips,
+    ercs: repos.ercs,
+    rips: repos.rips,
+    total: repos.eips + repos.ercs + repos.rips,
+  })).sort((a, b) => b.total - a.total);
+
+  const editorsData = allData.filter(item => !reviewersList.includes(item.reviewer));
+  const reviewersData = allData.filter(item => reviewersList.includes(item.reviewer));
+
+  return <EditorRepoGrid editorsData={editorsData} reviewersData={reviewersData} />;
+};
 
 // Generate distinct colors for editors
 const generateDistinctColor = (index: number, total: number) => {
@@ -1839,7 +1890,11 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
   <Box id="Monthly" className={"w-full"}>
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
       <section id = "PRs Reviewed" >
-      <Heading size="md" color="black">
+      <Heading 
+        size="lg" 
+        fontWeight="bold"
+        color={useColorModeValue("#3182CE", "blue.300")}
+      >
         {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com/Reviewers#Monthly`} />
       </Heading>
       </section>
@@ -2371,9 +2426,9 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       </section>
       <br/>
       
-      {/* Individual Editor/Reviewer Charts */}
-      <Box className="w-full">
-        {renderCharts3(chart1data)} 
+      {/* Individual Editor/Reviewer Repository Distribution */}
+      <Box className="w-full" mt={8}>
+        {renderEditorRepoGrid()}
       </Box>
             
     <Box>

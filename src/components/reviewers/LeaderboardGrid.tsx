@@ -37,6 +37,7 @@ interface LeaderboardGridProps {
   loading?: boolean;
   copyLink?: string;
   barChartConfig?: any;
+  isReviewer?: boolean;
 }
 
 const LeaderboardGrid: React.FC<LeaderboardGridProps> = ({
@@ -48,9 +49,10 @@ const LeaderboardGrid: React.FC<LeaderboardGridProps> = ({
   loading = false,
   copyLink,
   barChartConfig,
+  isReviewer = false,
 }) => {
   const [showAll, setShowAll] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'chart'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'chart'>('chart');
   const bg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const hoverBg = useColorModeValue('blue.50', 'blue.900');
@@ -67,6 +69,7 @@ const LeaderboardGrid: React.FC<LeaderboardGridProps> = ({
       p={6}
       boxShadow="md"
       width="100%"
+      minH="500px"
     >
       <Flex justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={2}>
         <Heading size="md" color="blue.500">
@@ -141,7 +144,7 @@ const LeaderboardGrid: React.FC<LeaderboardGridProps> = ({
                         {item.reviewer}
                       </Text>
                       <Text fontSize="sm" color="gray.500">
-                        GitHub Contributor
+                        {isReviewer ? 'Reviewer' : 'Editor'}
                       </Text>
                     </VStack>
                   </HStack>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Flex,
@@ -9,11 +9,14 @@ import {
   VStack,
   HStack,
   Badge,
+  IconButton,
+  Collapse,
 } from '@chakra-ui/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import dynamic from 'next/dynamic';
 import CopyLink from '@/components/CopyLink';
 
-const Line = dynamic(() => import('@ant-design/plots').then((mod) => mod.Line), {
+const Column = dynamic(() => import('@ant-design/plots').then((mod) => mod.Column), {
   ssr: false,
   loading: () => (
     <Flex justify="center" align="center" height="400px">
@@ -39,6 +42,7 @@ const ActiveEditorsChart: React.FC<ActiveEditorsChartProps> = ({
   loading,
   reviewerColors,
 }) => {
+  const [showTotals, setShowTotals] = useState(false);
   const bg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const headingColor = useColorModeValue('blue.600', 'blue.300');
@@ -54,58 +58,49 @@ const ActiveEditorsChart: React.FC<ActiveEditorsChartProps> = ({
       .map(([reviewer, total]) => ({ reviewer, total }));
   }, [chartData]);
 
-  // Group data by repo for multi-line chart
-  const lineChartData = useMemo(() => {
-    // Transform data for line chart showing reviewer performance across repos
-    return chartData.map((item) => ({
-      reviewer: item.reviewer,
-      repo: item.repo,
-      value: item.value,
-    }));
-  }, [chartData]);
-
-  const lineConfig = useMemo(() => ({
-    data: lineChartData,
-    xField: 'repo',
+  // Transform data for stacked bar chart
+  const stackedBarConfig = useMemo(() => ({
+    data: chartData,
+    xField: 'reviewer',
     yField: 'value',
-    seriesField: 'reviewer',
-    color: (datum: any) => reviewerColors[datum.reviewer] || '#1890FF',
-    lineStyle: {
-      lineWidth: 3,
-    },
-    point: {
-      size: 5,
-      shape: 'circle',
-      style: {
-        fill: 'white',
-        stroke: '#1890FF',
-        lineWidth: 2,
-      },
+    seriesField: 'repo',
+    isStack: true,
+    color: ['#1890FF', '#52C41A', '#FF4D4F'],
+    label: {
+      position: 'middle' as const,
+      layout: [
+        { type: 'interval-adjust-position' },
+        { type: 'interval-hide-overlap' },
+        { type: 'adjust-color' },
+      ],
     },
     xAxis: {
       title: {
-        text: 'Repository Type',
+        text: 'Editor/Reviewer',
         style: { fontSize: 14, fontWeight: 'bold' as const },
+      },
+      label: {
+        autoRotate: true,
+        autoHide: false,
       },
     },
     yAxis: {
       title: {
-        text: 'Number of PRs Reviewed',
+        text: 'Total PRs Reviewed',
         style: { fontSize: 14, fontWeight: 'bold' as const },
       },
     },
     tooltip: {
       formatter: (datum: any) => ({
-        name: `${datum.reviewer} - ${datum.repo}`,
+        name: datum.repo,
         value: `${datum.value} PRs`,
       }),
     },
     legend: {
-      position: 'top' as const,
+      position: 'top-right' as const,
       itemName: { style: { fontSize: 12 } },
     },
-    smooth: true,
-  }), [lineChartData, reviewerColors]);
+  }), [chartData]);
 
   return (
     <Box
@@ -122,43 +117,64 @@ const ActiveEditorsChart: React.FC<ActiveEditorsChartProps> = ({
         <CopyLink link="https://eipsinsight.com/Reviewers#Speciality" />
       </Heading>
 
-      {/* Reviewer Totals Summary */}
-      <Box mb={6} p={4} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md">
-        <Heading size="sm" mb={3} color={headingColor}>
-          Total Reviews by Editor
-        </Heading>
-        <Flex flexWrap="wrap" gap={3}>
-          {reviewerTotals.map((item, index) => (
-            <HStack
-              key={item.reviewer}
-              p={2}
-              px={4}
-              bg={bg}
-              borderRadius="full"
-              borderWidth="1px"
-              borderColor={borderColor}
-              spacing={2}
-            >
-              <Badge colorScheme="blue" fontSize="sm">
-                #{index + 1}
-              </Badge>
-              <Text fontWeight="medium">{item.reviewer}</Text>
-              <Badge colorScheme="green" fontSize="md">
-                {item.total}
-              </Badge>
-            </HStack>
-          ))}
+      {/* Collapsible Reviewer Totals Summary */}
+      <Box mb={4}>
+        <Flex 
+          align="center" 
+          cursor="pointer" 
+          onClick={() => setShowTotals(!showTotals)}
+          p={3}
+          bg={useColorModeValue('blue.50', 'gray.700')}
+          borderRadius="md"
+          _hover={{ bg: useColorModeValue('blue.100', 'gray.600') }}
+          transition="background 0.2s"
+        >
+          <Heading size="sm" flex={1} color={headingColor}>
+            Total Reviews by Editor
+          </Heading>
+          <IconButton
+            aria-label="Toggle totals"
+            icon={showTotals ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            size="sm"
+            variant="ghost"
+          />
         </Flex>
+        <Collapse in={showTotals} animateOpacity>
+          <Box p={4} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" mt={2}>
+            <Flex flexWrap="wrap" gap={3}>
+              {reviewerTotals.map((item, index) => (
+                <HStack
+                  key={item.reviewer}
+                  p={2}
+                  px={4}
+                  bg={bg}
+                  borderRadius="full"
+                  borderWidth="1px"
+                  borderColor={borderColor}
+                  spacing={2}
+                >
+                  <Badge colorScheme="blue" fontSize="sm">
+                    #{index + 1}
+                  </Badge>
+                  <Text fontWeight="medium">{item.reviewer}</Text>
+                  <Badge colorScheme="green" fontSize="md">
+                    {item.total}
+                  </Badge>
+                </HStack>
+              ))}
+            </Flex>
+          </Box>
+        </Collapse>
       </Box>
 
-      {/* Line Chart */}
+      {/* Stacked Bar Chart */}
       {loading ? (
         <Flex justify="center" align="center" height="400px">
           <Spinner size="xl" />
         </Flex>
       ) : (
         <Box height="500px">
-          <Line {...lineConfig} />
+          <Column {...stackedBarConfig} />
         </Box>
       )}
     </Box>
