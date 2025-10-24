@@ -22,12 +22,12 @@ import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 
 // Import new components
-import FAQSection from './components/FAQSection';
-import LeaderboardGrid from './components/LeaderboardGrid';
-import ReviewActivityTimeline from './components/ReviewActivityTimeline';
-import ActiveEditorsChart from './components/ActiveEditorsChart';
-import ReviewerCard from './components/ReviewerCard';
-import * as helpers from './utils/helpers';
+import FAQSection from './_components/FAQSection';
+import LeaderboardGrid from './_components/LeaderboardGrid';
+import ReviewActivityTimeline from './_components/ReviewActivityTimeline';
+import ActiveEditorsChart from './_components/ActiveEditorsChart';
+import ReviewerCard from './_components/ReviewerCard';
+import * as helpers from './_utils/helpers';
 
 
 // Dynamic import for Ant Design's Column chart
