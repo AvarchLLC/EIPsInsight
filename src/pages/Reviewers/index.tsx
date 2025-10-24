@@ -1,28 +1,26 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
-import dynamic from "next/dynamic";
-import { Box, Flex, Spinner, Select,Heading, IconButton, Collapse, Checkbox, HStack, Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue  } from "@chakra-ui/react";
-import AllLayout from "@/components/Layout";
-import LoaderComponent from "@/components/Loader";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-import { CSVLink } from "react-csv";
-import {ChevronUpIcon } from "@chakra-ui/icons";
-import DateTime from "@/components/DateTime";
-import { motion } from "framer-motion";
-import Comments from "@/components/comments";
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import dynamic from 'next/dynamic';
+import {
+  Box, Flex, Spinner, Select, Heading, IconButton, Collapse, Checkbox, HStack,
+  Button, Menu, MenuButton, MenuList, MenuItem, Table, Thead, Tbody, Tr, Th, Td, Text, useColorModeValue,
+  Tooltip, Link
+} from '@chakra-ui/react';
+import { ChevronDownIcon, ChevronUpIcon, DownloadIcon } from '@chakra-ui/icons';
 import { FiFilter } from 'react-icons/fi';
 import { AiOutlineClose } from 'react-icons/ai';
-import { LineConfig } from '@ant-design/plots';
-import axios from "axios";
-import dayjs from "dayjs";
-import CopyLink from "@/components/CopyLink";
-import { useRouter } from "next/router";
-import { DownloadIcon } from "@chakra-ui/icons";
-import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
-import { Tooltip } from "@chakra-ui/react";
-import Link from "next/link";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
-// import { Bar } from "@ant-design/charts";
-// import { Line } from '@ant-design/charts';  // Import the Line chart component
+import axios from 'axios';
+import dayjs from 'dayjs';
+import { CSVLink } from 'react-csv';
+import AllLayout from '@/components/Layout';
+import LoaderComponent from '@/components/Loader';
+import DateTime from '@/components/DateTime';
+import Comments from '@/components/comments';
+import CopyLink from '@/components/CopyLink';
+import LastUpdatedDateTime from '@/components/LastUpdatedDateTime';
+import EtherWorldAdCard from '@/components/EtherWorldAdCard';
+import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
+
 
 // Dynamic import for Ant Design's Column chart
 const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -337,183 +335,186 @@ const ReviewTracker = () => {
     setCsvData(csv); 
   };
 
-  const generateCSVData9 = () => {
-    // Filter data for reviewers only
-    const filteredData = downloaddata?.filter((pr: PR) => reviewersList.includes(pr.reviewer));
+ 
 
-    const csv = filteredData?.map((pr: PR) => ({
-      Repo: pr.repo,
-      PR_Number: pr.prNumber,
-      Title: pr.prTitle,
-      Reviewer: pr.reviewer,
-      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-    }));
 
-    setCsvData(csv); // Set the CSV data for reviewers
-  };
+const generateCSVData9 = () => {
+  // Filter data for reviewers only
+  const filteredData = downloaddata?.filter((pr: PR) => reviewersList.includes(pr.reviewer));
 
-  const generateCSVData10 = () => {
-    // Filter data for editors only (exclude reviewers)
-    const filteredData = downloaddata?.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
+  const csv = filteredData?.map((pr: PR) => ({
+    Repo: pr.repo,
+    PR_Number: pr.prNumber,
+    Title: pr.prTitle,
+    Reviewer: pr.reviewer,
+    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+    Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+    Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+  }));
 
-    const csv = filteredData?.map((pr: PR) => ({
-      Repo: pr.repo,
-      PR_Number: pr.prNumber,
-      Title: pr.prTitle,
-      Reviewer: pr.reviewer,
-      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-    }));
+  setCsvData(csv); // Set the CSV data for reviewers
+};
 
-    setCsvData(csv); // Set the CSV data for editors
-  };
+const generateCSVData10 = () => {
+  // Filter data for editors only (exclude reviewers)
+  const filteredData = downloaddata?.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
 
-  const generateCSVData5 = () => {
+  const csv = filteredData?.map((pr: PR) => ({
+    Repo: pr.repo,
+    PR_Number: pr.prNumber,
+    Title: pr.prTitle,
+    Reviewer: pr.reviewer,
+    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+    Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+    Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+  }));
 
-    // console.log("selected start:",selectedStartYear);
-    // console.log("selected start month:",selectedStartMonth);
-    const currentYear = new Date().getFullYear();
+  setCsvData(csv); // Set the CSV data for editors
+};
+
+const generateCSVData5 = () => {
+
+  // console.log("selected start:",selectedStartYear);
+  // console.log("selected start month:",selectedStartMonth);
+  const currentYear = new Date().getFullYear();
     const currentMonth = String(new Date().getMonth() + 1).padStart(2, "0");
-    const startYear = selectedStartYear || "2015";
-    const startMonth=selectedStartMonth || "01";
-    const endYear = selectedEndYear || currentYear;
-    const endMonth =selectedEndMonth || currentMonth;
+  const startYear = selectedStartYear || "2015";
+  const startMonth=selectedStartMonth || "01";
+  const endYear = selectedEndYear || currentYear;
+  const endMonth =selectedEndMonth || currentMonth;
 
-    if (startYear && startMonth && endYear && endMonth) {
-      // Construct start and end dates in ISO format
-      const startDate = new Date(`${startYear}-${startMonth}-01T00:00:00Z`);
-      const endDate = new Date(
-        `${endYear}-${endMonth}-01T00:00:00Z`
+  if (startYear && startMonth && endYear && endMonth) {
+    // Construct start and end dates in ISO format
+    const startDate = new Date(`${startYear}-${startMonth}-01T00:00:00Z`);
+    const endDate = new Date(
+      `${endYear}-${endMonth}-01T00:00:00Z`
+    );
+
+    // console.log("start date:", startDate);
+    // console.log("end date:",endDate);
+
+    // Adjust end date to include the entire month
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0); // Last day of the month
+
+    // console.log("download data 5:", downloaddata)
+
+    const filteredData = downloaddata?.filter((pr) => {
+      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
+      const shouldIncludeReviewer = pr.reviewer && showReviewer[pr.reviewer];
+      return (
+        shouldIncludeReviewer &&
+        reviewDate &&
+        reviewDate >= startDate &&
+        reviewDate <= endDate
       );
+    });
+    // console.log("Filtered Data 5:", filteredData);
 
-      // console.log("start date:", startDate);
-      // console.log("end date:",endDate);
+    const csv = filteredData?.map((pr: PR) => ({
+      Repo: pr.repo,
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }))
+  ;
 
-      // Adjust end date to include the entire month
-      endDate.setMonth(endDate.getMonth() + 1);
-      endDate.setDate(0); // Last day of the month
+    setCsvData(csv);
+  // setLoading3(false);
+}
+else{
+  const filteredData =downloaddata
 
-      // console.log("download data 5:", downloaddata)
+  const csv = filteredData?.map((pr: PR) => ({
+    PR_Number: pr.prNumber,
+    Title: pr.prTitle,
+    Reviewer: pr.reviewer,
+    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+    Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+    Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+  }));
 
-      const filteredData = downloaddata?.filter((pr) => {
-        const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
-        const shouldIncludeReviewer = pr.reviewer && showReviewer[pr.reviewer];
-        return (
-          shouldIncludeReviewer &&
-          reviewDate &&
-          reviewDate >= startDate &&
-          reviewDate <= endDate
-        );
-      });
-      // console.log("Filtered Data 5:", filteredData);
+  setCsvData(csv); 
+}
 
-      const csv = filteredData?.map((pr: PR) => ({
-        Repo: pr.repo,
-        PR_Number: pr.prNumber,
-        Title: pr.prTitle,
-        Reviewer: pr.reviewer,
-        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-      }))
-    ;
+};
 
-      setCsvData(csv);
-    // setLoading3(false);
-    }
-    else{
-      const filteredData =downloaddata
+const generateCSVData3 = (reviewer: string) => {
+  // setLoading3(true);
 
-      const csv = filteredData?.map((pr: PR) => ({
-        PR_Number: pr.prNumber,
-        Title: pr.prTitle,
-        Reviewer: pr.reviewer,
-        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-      }));
+  // Construct the start and end dates if the year and month are selected
+  if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
+    const startDate = new Date(`${selectedStartYear}-${selectedStartMonth}-01T00:00:00Z`);
+    const endDate = new Date(`${selectedEndYear}-${selectedEndMonth}-01T00:00:00Z`);
 
-      setCsvData(csv);
-    }
+    // Adjust end date to include the entire month
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0); // Last day of the month
 
-  };
-
-  const generateCSVData3 = (reviewer: string) => {
-    // setLoading3(true);
-
-    // Construct the start and end dates if the year and month are selected
-    if (selectedStartYear && selectedStartMonth && selectedEndYear && selectedEndMonth) {
-      const startDate = new Date(`${selectedStartYear}-${selectedStartMonth}-01T00:00:00Z`);
-      const endDate = new Date(`${selectedEndYear}-${selectedEndMonth}-01T00:00:00Z`);
-
-      // Adjust end date to include the entire month
-      endDate.setMonth(endDate.getMonth() + 1);
-      endDate.setDate(0); // Last day of the month
-
-      // Filter the data based on review date and reviewer
-      const filteredData = downloaddata?.filter((pr) => {
-        const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
-        return (
-          reviewDate &&
-          reviewDate >= startDate &&
-          reviewDate <= endDate &&
-          (reviewer ? pr.reviewer === reviewer : true) // Filter by reviewer if provided
-        );
-      });
-
-      // Map the filtered data to CSV format
-      const csv = filteredData?.map((pr: PR) => ({
-        Repo: pr.repo,
-        PR_Number: pr.prNumber,
-        Title: pr.prTitle,
-        Reviewer: pr.reviewer,
-        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-      }));
-
-      setCsvData(csv);
-    } else {
-      // If no date range is selected, use all data and filter by reviewer if provided
-      const filteredData = downloaddata?.filter((pr) =>
-        reviewer ? pr.reviewer === reviewer : true // Filter by reviewer if provided
+    // Filter the data based on review date and reviewer
+    const filteredData = downloaddata?.filter((pr) => {
+      const reviewDate = pr.reviewDate ? new Date(pr.reviewDate) : null;
+      return (
+        reviewDate &&
+        reviewDate >= startDate &&
+        reviewDate <= endDate &&
+        (reviewer ? pr.reviewer === reviewer : true) // Filter by reviewer if provided
       );
+    });
 
-      const csv = filteredData?.map((pr: PR) => ({
-        PR_Number: pr.prNumber,
-        Title: pr.prTitle,
-        Reviewer: pr.reviewer,
-        Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
-        Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
-        Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
-        Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
-        Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
-        Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
-      }));
+    // Map the filtered data to CSV format
+    const csv = filteredData?.map((pr: PR) => ({
+      Repo: pr.repo,
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }));
 
-      setCsvData(csv);
-    }
+    setCsvData(csv);
+  } else {
+    // If no date range is selected, use all data and filter by reviewer if provided
+    const filteredData = downloaddata?.filter((pr) => 
+      reviewer ? pr.reviewer === reviewer : true // Filter by reviewer if provided
+    );
 
-    // setLoading3(false);
-  };
+    const csv = filteredData?.map((pr: PR) => ({
+      PR_Number: pr.prNumber,
+      Title: pr.prTitle,
+      Reviewer: pr.reviewer,
+      Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toLocaleDateString() : '-',
+      Created_Date: pr.created_at ? new Date(pr.created_at).toLocaleDateString() : '-',
+      Closed_Date: pr.closed_at ? new Date(pr.closed_at).toLocaleDateString() : '-',
+      Merged_Date: pr.merged_at ? new Date(pr.merged_at).toLocaleDateString() : '-',
+      Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+      Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    }));
+
+    setCsvData(csv);
+  }
+
+  // setLoading3(false);
+};
 
 
   useEffect(() => {
@@ -616,7 +617,7 @@ interface PRData {
 
 
 
-const getYearlyData = (data: PRData[], showReviewer: ShowReviewerType) => {
+const getYearlyData = (data: PRData[]) => {
   // Initialize an accumulator to hold yearly data
   const yearlyData: Record<string, number> = data
     ?.filter(item => {
@@ -646,7 +647,7 @@ const getYearlyData = (data: PRData[], showReviewer: ShowReviewerType) => {
 
 
 // Function to filter PR data for the selected month and year
-const getMonthlyData = (data: PRData[], year: string | null, month: string, showReviewer: ShowReviewerType) => {
+const getMonthlyData = (data: PRData[], year: string | null, month: string) => {
   const monthlyData: Record<string, number> = data
     ?.filter(item => item.monthYear === `${year}-${month.padStart(2, '0')}`)  // Filter by year and month
     ?.reduce((acc, item) => {
@@ -773,12 +774,12 @@ const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) =>
 
 
 
-const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null, showReviewer: ShowReviewerType) => {
+const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
   const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
   // Get yearly data and format it
-  const yearlyData = getYearlyData(data, showReviewer);
+  const yearlyData = getYearlyData(data);
   const yearlyChartData = formatChartData(yearlyData);
 
   // Separate data into reviewers and editors
@@ -856,13 +857,13 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 };
 
 
-const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMonth: string | null, showReviewer: ShowReviewerType) => {
+const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
   const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
   let monthlyChartData: any; // Declare monthlyChartData
   if (selectedMonth != null) {
-    const monthlyData = getMonthlyData(data, selectedYear, selectedMonth, showReviewer);
+    const monthlyData = getMonthlyData(data, selectedYear, selectedMonth);
     monthlyChartData = formatChartData(monthlyData); // Assign to the declared variable
   }
   console.log("chartdata1: ", monthlyChartData);
@@ -1109,7 +1110,7 @@ const renderChart4 = () => {
 };
 
 
-const renderCharts3 = (reviewsdata: PRData[], showReviewer: ShowReviewerType, handleFilterData: () => PRData[]) => {
+const renderCharts3 = (reviewsdata: PRData[]) => {
   const dataToUse = handleFilterData(); // Assuming 'data' is accessible in the scope
   const filteredData = dataToUse?.filter(item =>
     Object.keys(showReviewer)
@@ -1119,7 +1120,7 @@ const renderCharts3 = (reviewsdata: PRData[], showReviewer: ShowReviewerType, ha
 
   console.log("new data:", reviewsdata);
 
-  const yearlyData = getYearlyData(reviewsdata, showReviewer);
+  const yearlyData = getYearlyData(reviewsdata);
   const yearlyChartData = formatChartData(yearlyData);
 
   const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
@@ -1865,27 +1866,27 @@ const editorsActivity = () => {
 
   return (
     <Box>
-      {loading4 ? (
+     {loading4 ? (
         <Flex justify="center" align="center" height="100vh">
-          <Spinner size="xl" />
+        <Spinner size="xl" />
         </Flex>
-      ) : (
-        <div>
-          <Scatter {...scatterConfig} />
-        </div>
+    ) : (
+      <div>
+        <Scatter {...scatterConfig} />
+      </div>
       )}
     </Box>
   );
 };
 
 
-const editorsSpecialityChart = (eipdata: PRData[], ercdata: PRData[], ripdata: PRData[], showReviewer: ShowReviewerType) => {
+const editorsSpecialityChart = () => {
 
-  const processData1 = getYearlyData(eipdata, showReviewer);
+  const processData1 = getYearlyData(eipdata);
   const yearlyChartData1 = formatChartData(processData1);
-  const processData2 = getYearlyData(ercdata, showReviewer);
+  const processData2 = getYearlyData(ercdata);
   const yearlyChartData2 = formatChartData(processData2);
-  const processData3 = getYearlyData(ripdata, showReviewer);
+  const processData3 = getYearlyData(ripdata);
   const yearlyChartData3 = formatChartData(processData3);
   // console.log("new chart data:",yearlyChartData1)
 
@@ -2243,7 +2244,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         
             
             <Box id="Leaderboard" className="w-full">
-              {renderCharts(chart1data, selectedYear, selectedMonth, showReviewer)}
+              {renderCharts(chart1data, selectedYear, selectedMonth)}
               
             </Box>
           </Box>
@@ -2912,7 +2913,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
             // }}
           >
             <Box className="w-full">
-              {renderCharts2(chart1data, selectedYear, selectedMonth, showReviewer)}
+              {renderCharts2(chart1data, selectedYear, selectedMonth)}
               <LastUpdatedDateTime  name="EditorsTool"/>
             </Box>
           </Box>
@@ -2959,7 +2960,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
             <br/>
             <Box className="w-full">
             {/* <br/> */}
-              {renderCharts3(chart1data, showReviewer, handleFilterData)} 
+              {renderCharts3(chart1data)} 
               {/* <br/> */}
             </Box>
             
@@ -2987,7 +2988,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
             > Active Editors PR reviews in each Repository <CopyLink link={`https://eipsinsight.com/Reviewers#Speciality`} />
             </Heading>
             </section>
-              {editorsSpecialityChart(eipdata, ercdata, ripdata, showReviewer)}
+              {editorsSpecialityChart()}
             </Box>
           </Box>
           <br/>
@@ -3007,3 +3008,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
 
 
 export default ReviewTracker;
+
+function getYearlyData(eipdata: any) {
+  throw new Error("Function not implemented.");
+}
