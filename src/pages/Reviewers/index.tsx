@@ -1661,46 +1661,66 @@ const editorsSpecialityChart = () => {
 const renderEditorRepoGrid = () => {
   const reviewersList = helpers.REVIEWERS_LIST;
   
-  // Get data for each repo
-  const processData1 = helpers.getYearlyData(eipdata, showReviewer);
-  const yearlyChartData1 = helpers.formatChartData(processData1);
-  const processData2 = helpers.getYearlyData(ercdata, showReviewer);
-  const yearlyChartData2 = helpers.formatChartData(processData2);
-  const processData3 = helpers.getYearlyData(ripdata, showReviewer);
-  const yearlyChartData3 = helpers.formatChartData(processData3);
+  // Prepare time-series data for each reviewer
+  const reviewerTimeSeriesMap: { [key: string]: any[] } = {};
+  
+  // Process EIP data
+  eipdata.forEach(item => {
+    if (showReviewer[item.reviewer]) {
+      if (!reviewerTimeSeriesMap[item.reviewer]) {
+        reviewerTimeSeriesMap[item.reviewer] = [];
+      }
+      reviewerTimeSeriesMap[item.reviewer].push({
+        monthYear: item.monthYear,
+        repo: 'EIPs',
+        count: item.count,
+      });
+    }
+  });
+  
+  // Process ERC data
+  ercdata.forEach(item => {
+    if (showReviewer[item.reviewer]) {
+      if (!reviewerTimeSeriesMap[item.reviewer]) {
+        reviewerTimeSeriesMap[item.reviewer] = [];
+      }
+      reviewerTimeSeriesMap[item.reviewer].push({
+        monthYear: item.monthYear,
+        repo: 'ERCs',
+        count: item.count,
+      });
+    }
+  });
+  
+  // Process RIP data
+  ripdata.forEach(item => {
+    if (showReviewer[item.reviewer]) {
+      if (!reviewerTimeSeriesMap[item.reviewer]) {
+        reviewerTimeSeriesMap[item.reviewer] = [];
+      }
+      reviewerTimeSeriesMap[item.reviewer].push({
+        monthYear: item.monthYear,
+        repo: 'RIPs',
+        count: item.count,
+      });
+    }
+  });
 
-  // Combine data by reviewer
-  const reviewerMap: { [key: string]: { eips: number; ercs: number; rips: number } } = {};
-  
-  yearlyChartData1.forEach(item => {
-    if (!reviewerMap[item.reviewer]) {
-      reviewerMap[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
-    }
-    reviewerMap[item.reviewer].eips = item.count;
-  });
-  
-  yearlyChartData2.forEach(item => {
-    if (!reviewerMap[item.reviewer]) {
-      reviewerMap[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
-    }
-    reviewerMap[item.reviewer].ercs = item.count;
-  });
-  
-  yearlyChartData3.forEach(item => {
-    if (!reviewerMap[item.reviewer]) {
-      reviewerMap[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
-    }
-    reviewerMap[item.reviewer].rips = item.count;
-  });
-
-  // Transform to array format and separate editors/reviewers
-  const allData = Object.entries(reviewerMap).map(([reviewer, repos]) => ({
-    reviewer,
-    eips: repos.eips,
-    ercs: repos.ercs,
-    rips: repos.rips,
-    total: repos.eips + repos.ercs + repos.rips,
-  })).sort((a, b) => b.total - a.total);
+  // Calculate totals and prepare final data
+  const allData = Object.entries(reviewerTimeSeriesMap).map(([reviewer, timeSeriesData]) => {
+    const eipsTotal = timeSeriesData.filter(d => d.repo === 'EIPs').reduce((sum, d) => sum + d.count, 0);
+    const ercsTotal = timeSeriesData.filter(d => d.repo === 'ERCs').reduce((sum, d) => sum + d.count, 0);
+    const ripsTotal = timeSeriesData.filter(d => d.repo === 'RIPs').reduce((sum, d) => sum + d.count, 0);
+    
+    return {
+      reviewer,
+      eips: eipsTotal,
+      ercs: ercsTotal,
+      rips: ripsTotal,
+      total: eipsTotal + ercsTotal + ripsTotal,
+      timeSeriesData: timeSeriesData.sort((a, b) => a.monthYear.localeCompare(b.monthYear)),
+    };
+  }).sort((a, b) => b.total - a.total);
 
   const editorsData = allData.filter(item => !reviewersList.includes(item.reviewer));
   const reviewersData = allData.filter(item => reviewersList.includes(item.reviewer));

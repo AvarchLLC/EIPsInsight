@@ -75,30 +75,63 @@ const ActiveEditorsChart: React.FC<ActiveEditorsChartProps> = ({
       ],
     },
     xAxis: {
-      title: {
-        text: 'Editor/Reviewer',
-        style: { fontSize: 14, fontWeight: 'bold' as const },
-      },
       label: {
-        autoRotate: true,
-        autoHide: false,
+        autoRotate: false,
+        autoHide: true,
+        style: {
+          fontSize: 11,
+        },
       },
     },
     yAxis: {
       title: {
-        text: 'Total PRs Reviewed',
-        style: { fontSize: 14, fontWeight: 'bold' as const },
+        text: 'Number of Reviews',
+        style: { fontSize: 13, fontWeight: 'bold' as const },
+      },
+      grid: {
+        line: {
+          style: {
+            stroke: '#E5E7EB',
+            lineWidth: 1,
+            lineDash: [4, 4],
+          },
+        },
       },
     },
     tooltip: {
-      formatter: (datum: any) => ({
-        name: datum.repo,
-        value: `${datum.value} PRs`,
-      }),
+      customContent: (title: string, items: any[]) => {
+        if (!items || items.length === 0) return '';
+        
+        const total = items.reduce((sum, item) => sum + (Number(item.value) || 0), 0);
+        
+        return `
+          <div style="padding: 12px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+            <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #1f2937;">${title}</div>
+            <div style="margin-bottom: 8px; padding: 6px; background: #f3f4f6; border-radius: 4px;">
+              <span style="font-weight: 600; color: #4b5563;">Total Reviews: </span>
+              <span style="font-weight: bold; color: #2563eb; font-size: 15px;">${total}</span>
+            </div>
+            ${items.map(item => `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin: 4px 0;">
+                <span style="display: flex; align-items: center;">
+                  <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${item.color}; margin-right: 8px;"></span>
+                  <span style="color: #374151;">${item.name}</span>
+                </span>
+                <span style="font-weight: 600; margin-left: 12px; color: #1f2937;">${item.value}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      },
     },
     legend: {
       position: 'top-right' as const,
-      itemName: { style: { fontSize: 12 } },
+      itemName: { 
+        style: { 
+          fontSize: 12,
+          fontWeight: 500,
+        } 
+      },
     },
   }), [chartData]);
 
@@ -112,10 +145,21 @@ const ActiveEditorsChart: React.FC<ActiveEditorsChartProps> = ({
       mt={8}
       boxShadow="md"
     >
-      <Heading as="h3" size="lg" mb={4} fontWeight="bold" color={headingColor}>
-        Active Editors PR Reviews in Each Repository
+      <Heading 
+        as="h3" 
+        size="lg" 
+        mb={4} 
+        fontWeight="bold" 
+        color={headingColor}
+        bgGradient="linear(to-r, blue.400, purple.500)"
+        bgClip="text"
+      >
+        📊 Repository-wise Review Distribution
         <CopyLink link="https://eipsinsight.com/Reviewers#Speciality" />
       </Heading>
+      <Text fontSize="sm" color="gray.500" mb={4}>
+        Total contributions by each editor/reviewer across EIPs, ERCs, and RIPs repositories
+      </Text>
 
       {/* Collapsible Reviewer Totals Summary */}
       <Box mb={4}>
