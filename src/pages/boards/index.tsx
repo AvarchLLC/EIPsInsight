@@ -8,27 +8,39 @@ import {
   Th,
   Td,
   TableContainer,
-  Link as LI,
+  Link,
   Spinner,
   Text,
   Flex,
   Button,
-  useColorMode,
   useColorModeValue,
-  Collapse,
+  Badge,
+  Input,
+  Select,
+  HStack,
+  VStack,
+  Icon,
+  Tooltip,
+  Tag,
+  TagLabel,
+  Wrap,
+  WrapItem,
+  InputGroup,
+  InputLeftElement,
   IconButton,
+  Collapse,
+  useToast,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import React, { useEffect, useState, useMemo } from "react";
 import AllLayout from "@/components/Layout";
+import { ExternalLinkIcon, SearchIcon, DownloadIcon, ChevronUpIcon, ChevronDownIcon, CopyIcon } from "@chakra-ui/icons";
+import { BiGitPullRequest } from "react-icons/bi";
+import { format } from "date-fns";
 import axios from "axios";
-import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
-import { DownloadIcon } from "@chakra-ui/icons";
-import Comments from "@/components/comments";
+import EtherWorldAdCard from "@/components/EtherWorldAdCard";
 import LabelFilter from "@/components/LabelFilter";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
-import EipsLabelChart from "@/components/PrLabelsChart";
-import { useScrollSpy } from "@/hooks/useScrollSpy";
+import Comments from "@/components/comments";
 
 // Helper function to extract PR number from URL
 const extractPrNumber = (url: string) => {
@@ -180,30 +192,49 @@ const labelColors: { [key: string]: { color: string; description: string } } = {
     color: "green.600",
     description: "Relates to the EIPs website.",
   },
+  
+  // Auto-generated labels
+  "typo-fix": {
+    color: "purple.400",
+    description: "Fixes typos in the document.",
+  },
+  "status-change": {
+    color: "cyan.600",
+    description: "Changes the status of an EIP/ERC.",
+  },
 };
 
-interface EIPData {
+interface BoardData {
   _id: string;
-  prNumber: string;
-  prTitle: string;
+  number: number;
+  title: string;
+  url: string;
+  author: string;
+  created_at: string;
+  waiting_since: string;
+  wait_duration_hours: number;
+  priority_score: number;
+  is_withdrawn: boolean;
   labels: string[];
-  prCreatedDate: string;
-  prLink: string;
-  state: string;
+  events_count: number;
+  commits_count: number;
+  comments_count: number;
+  review_count: number;
+  last_updated: string;
+  last_editor_interaction: string | null;
+  last_author_interaction: string | null;
+  type: 'EIP' | 'ERC';
 }
 
 const DashboardPage = () => {
-  const [eipData, setEipData] = useState([]);
-  const [ercData, setErcData] = useState([]);
+  const [boardData, setBoardData] = useState<BoardData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [activeTab, setActiveTab] = useState("EIPs"); // Default to 'EIPs'
+  const [activeTab, setActiveTab] = useState("EIPs");
   const [show, setShow] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-    useScrollSpy([
-  "EIPsBOARD",
-]);
 
   const toggleCollapse = () => setShow(!show);
 
@@ -213,43 +244,56 @@ const DashboardPage = () => {
     );
   };
 
-  const filteredData = (data: EIPData[]) => {
-    const filterAndSort = (items: EIPData[]) => {
-      return items
-        ?.filter((item) => {
-          // Ignore items with state 'closed'
-          if (item.state === "closed") return false;
-
-          // Ignore items with both 'dependencies' and 'ruby' labels
-          const hasDependencies = item.labels.includes("dependencies");
-          const hasRuby = item.labels.includes("ruby");
-          if (hasDependencies && hasRuby) return false;
-
-          return true;
-        })
-        .sort((a, b) => {
-          const aHasWithdrawn = a.labels.includes("s-withdrawn") ? 1 : 0;
-          const bHasWithdrawn = b.labels.includes("s-withdrawn") ? 1 : 0;
-          return aHasWithdrawn - bHasWithdrawn;
-        });
-    };
-
-    if (selectedLabels?.length === 0) {
-      return filterAndSort(data);
+  // Auto-add labels based on title
+  const addAutoLabels = (item: BoardData): string[] => {
+    const autoLabels = [...item.labels];
+    const titleLower = item.title.toLowerCase();
+    
+    // Add "typo fix" label if title contains "typo"
+    if (titleLower.includes('typo') && !autoLabels.includes('typo-fix')) {
+      autoLabels.push('typo-fix');
     }
-
-    return filterAndSort(data)?.filter((item) =>
-      item.labels.some((label) => selectedLabels.includes(label))
-    );
+    
+    // Add "status-change" label if title contains "move to"
+    if (titleLower.includes('move to') && !autoLabels.includes('status-change')) {
+      autoLabels.push('status-change');
+    }
+    
+    return autoLabels;
   };
 
-  // Fetch data from the API
+  const filteredData = useMemo(() => {
+    let filtered = boardData.filter(item => item.type === activeTab.slice(0, 3).toUpperCase());
+    
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(item => 
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.number.toString().includes(searchQuery)
+      );
+    }
+    
+    // Label filter
+    if (selectedLabels.length > 0) {
+      filtered = filtered.filter(item => {
+        const itemLabels = addAutoLabels(item);
+        return itemLabels.some(label => selectedLabels.includes(label));
+      });
+    }
+    
+    // Sort by priority score (higher = more urgent)
+    return filtered.sort((a, b) => b.priority_score - a.priority_score);
+  }, [boardData, activeTab, searchQuery, selectedLabels]);
+
+  // Fetch data from the new API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("/api/FullBoards");
-        setEipData(response.data.eips || []);
-        setErcData(response.data.ercs || []);
+        const response = await axios.get("/api/boards");
+        if (response.data.success) {
+          setBoardData(response.data.data || []);
+        }
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -261,26 +305,20 @@ const DashboardPage = () => {
     fetchData();
   }, []);
 
-  const displayedData =
-    activeTab === "EIPs" ? filteredData(eipData) : filteredData(ercData);
-
-  // Extract unique labels for the filter
-  const allLabels = Array.from(
-    new Set([...eipData, ...ercData].flatMap((item: EIPData) => item.labels))
-  );
+  // Extract unique labels including auto-generated ones
+  const allLabels = useMemo(() => {
+    const labels = new Set<string>();
+    boardData.forEach(item => {
+      addAutoLabels(item).forEach(label => labels.add(label));
+    });
+    return Array.from(labels).sort();
+  }, [boardData]);
 
   const handleDownload = () => {
-    // Check the active tab and fetch the appropriate data
-    const filteredData = displayedData;
-
-    if (!filteredData || filteredData?.length === 0) {
-      alert(`No data available for the selected month in ${activeTab}.`);
+    if (!filteredData || filteredData.length === 0) {
+      alert(`No data available in ${activeTab}.`);
       return;
     }
-
-    console.log(`Data for download in ${activeTab}:`, filteredData);
-
-    // Pass the filtered data and active tab (EIPs or ERCs) to the CSV function
     downloadCSV(filteredData, activeTab);
   };
 
@@ -298,11 +336,116 @@ const DashboardPage = () => {
     document.body.removeChild(a);
   };
 
-  const convertToCSV = (filteredData: any, type: string) => {
+  const toast = useToast();
+
+  const handleCopyAsMarkdown = () => {
+    if (!filteredData || filteredData.length === 0) {
+      toast({
+        title: "No data available",
+        description: `No PRs found in ${activeTab}.`,
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // Group PRs by status change type
+    const statusGroups: { [key: string]: BoardData[] } = {
+      'Final': [],
+      'Last Call': [],
+      'Review': [],
+      'Draft': [],
+      'Other': []
+    };
+
+    filteredData.forEach(item => {
+      const titleLower = item.title.toLowerCase();
+      if (titleLower.includes('move to final')) {
+        statusGroups['Final'].push(item);
+      } else if (titleLower.includes('move to last call')) {
+        statusGroups['Last Call'].push(item);
+      } else if (titleLower.includes('move to review')) {
+        statusGroups['Review'].push(item);
+      } else if (titleLower.includes('move to draft') || titleLower.includes('add erc') || titleLower.includes('add eip')) {
+        statusGroups['Draft'].push(item);
+      } else {
+        statusGroups['Other'].push(item);
+      }
+    });
+
+    // Build markdown string
+    let markdown = '';
+
+    // Add each section if it has items
+    if (statusGroups['Final'].length > 0) {
+      markdown += '#### To `Final`\n';
+      statusGroups['Final'].forEach(item => {
+        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+      });
+      markdown += '\n';
+    }
+
+    if (statusGroups['Last Call'].length > 0) {
+      markdown += '#### To `Last Call`\n';
+      statusGroups['Last Call'].forEach(item => {
+        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+      });
+      markdown += '\n';
+    }
+
+    if (statusGroups['Review'].length > 0) {
+      markdown += '#### To `Review`\n';
+      statusGroups['Review'].forEach(item => {
+        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+      });
+      markdown += '\n';
+    }
+
+    if (statusGroups['Draft'].length > 0) {
+      markdown += '#### To `Draft`\n';
+      statusGroups['Draft'].forEach(item => {
+        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+      });
+      markdown += '\n';
+    }
+
+    if (statusGroups['Other'].length > 0) {
+      markdown += '#### Other\n';
+      statusGroups['Other'].forEach(item => {
+        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+      });
+      markdown += '\n';
+    }
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(markdown).then(() => {
+      toast({
+        title: "Copied to clipboard!",
+        description: `${filteredData.length} PRs copied as markdown.`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+      toast({
+        title: "Failed to copy",
+        description: "Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    });
+  };
+
+  const convertToCSV = (data: BoardData[], type: string) => {
     const headers = [
       "Serial Number",
       "PR Number",
       "PR Title",
+      "Author",
+      "Wait Duration (hours)",
       "Labels",
       "Created Date",
       "URL",
@@ -317,14 +460,16 @@ const DashboardPage = () => {
     const csvRows: string[] = [];
     csvRows.push(headers.map(escapeField).join(","));
 
-    filteredData?.forEach((item: any, index: number) => {
+    data.forEach((item, index) => {
       const rowValues = [
         index + 1,
-        item.prNumber,
-        item.prTitle,                // May contain commas → escaped
-        (item.labels || []).join("; "), // Use semicolons inside field
-        new Date(item.prCreatedDate).toLocaleDateString(),
-        item.prLink,
+        item.number,
+        item.title,
+        item.author,
+        item.wait_duration_hours.toFixed(1),
+        addAutoLabels(item).join("; "),
+        new Date(item.created_at).toLocaleDateString(),
+        item.url,
       ];
       csvRows.push(rowValues.map(escapeField).join(","));
     });
@@ -365,161 +510,171 @@ const DashboardPage = () => {
         {/* Tab selection for EIPs and ERCs */}
         <Box padding={{ base: 1, md: 4 }} margin={{ base: 2, md: 4 }}>
           <Box
-            pl={4}
-            bg={useColorModeValue("blue.50", "gray.700")}
-            borderRadius="md"
-            pr="8px"
-            marginBottom={2}
+            bgGradient={useColorModeValue(
+              'linear(to-br, blue.50, purple.50)',
+              'linear(to-br, gray.800, gray.900)'
+            )}
+            borderRadius="lg"
+            borderWidth="2px"
+            borderColor={useColorModeValue('blue.200', 'gray.600')}
+            p={4}
+            mb={4}
+            boxShadow="md"
+            transition="all 0.3s"
+            _hover={{ boxShadow: 'lg' }}
           >
-            <Flex justify="space-between" align="center" padding={1}>
+            <Flex justify="space-between" align="center" mb={show ? 3 : 0} cursor="pointer" onClick={toggleCollapse}>
               <Heading
-                as="h3"
-                size="lg"
-                marginBottom={2}
-                color={useColorModeValue("#3182CE", "blue.300")}
+                as="h2"
+                size="md"
+                color={useColorModeValue('blue.700', 'blue.300')}
+                fontWeight="bold"
+                letterSpacing="tight"
+                fontFamily="'Inter', sans-serif"
               >
-                EIP Board FAQ
+                📚 EIP Board FAQ
               </Heading>
-              <Box
-                bg="blue" // Gray background
-                borderRadius="md" // Rounded corners
-                padding={2} // Padding inside the box
-              >
-                <IconButton
-                  onClick={toggleCollapse}
-                  icon={
-                    show ? (
-                      <ChevronUpIcon boxSize={8} color="white" />
-                    ) : (
-                      <ChevronDownIcon boxSize={8} color="white" />
-                    )
-                  }
-                  variant="ghost"
-                  h="24px" // Smaller height
-                  w="20px"
-                  aria-label="Toggle Instructions"
-                  _hover={{ bg: "blue" }} // Maintain background color on hover
-                  _active={{ bg: "blue" }} // Maintain background color when active
-                  _focus={{ boxShadow: "none" }} // Remove focus outline
-                />
-              </Box>
+              <IconButton
+                onClick={toggleCollapse}
+                icon={show ? <ChevronUpIcon boxSize={5} /> : <ChevronDownIcon boxSize={5} />}
+                variant="ghost"
+                colorScheme="blue"
+                aria-label="Toggle FAQ"
+                size="sm"
+                _hover={{ transform: 'scale(1.1)' }}
+                transition="transform 0.2s"
+              />
             </Flex>
 
-            <Collapse in={show}>
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                What is EIP Board?
-              </Heading>
-              <Text
-                fontSize="md"
-                marginBottom={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                The table below lists all Open Pull Requests (till date) in a
-                order such that it uses oldest author interaction after the most
-                recent editor response.
-              </Text>
-
-              <Heading
-                as="h4"
-                size="md"
-                mb={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                How do label filters work?
-              </Heading>
-              <Text
-                fontSize="md"
-                mb={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                You can filter table data using label filters, and the same
-                filters will apply to the downloaded reports.
-              </Text>
-
-              <Heading
-                as="h4"
-                size="md"
-                mb={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                How is prioritization determined?
-              </Heading>
-              <Text
-                fontSize="md"
-                mb={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                PRs with the "s-withdrawn" label are given the lowest priority
-                and moved to the bottom of the table. The remaining PRs are
-                ranked based on the longest-waiting interaction time, with those
-                having the oldest interaction appearing at the top.
-              </Text>
-
-              <Text
-                fontSize="md"
-                marginBottom={4}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                PS: This tool is based on a fork from{" "}
-                <LI
-                  href="https://github.com/gaudren/eip-board"
-                  color="blue"
-                  textDecoration="underline"
-                  isExternal
+            <Collapse in={show} animateOpacity>
+            <Box pt={3} px={1}>
+              {/* Question 1 */}
+              <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="blue.500">
+                <Heading 
+                  as="h3" 
+                  size="sm" 
+                  mb={2} 
+                  color={useColorModeValue('gray.800', 'gray.100')} 
+                  fontWeight="bold"
+                  fontFamily="'Inter', sans-serif"
                 >
-                  here
-                </LI>
-                .
-              </Text>
+                  💡 What is EIP Board?
+                </Heading>
+                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
+                  The table below lists all Open Pull Requests (till date) in a
+                  order such that it uses oldest author interaction after the most
+                  recent editor response.
+                </Text>
+              </Box>
 
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                Who would use this tool?
-              </Heading>
-              <Text
-                fontSize="md"
-                marginBottom={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                This tool is created to support EIP/ERC Editors to identify the
-                longest waiting PRs for Editor's review. These PRs can also be
-                discussed in{" "}
-                <LI
-                  href="https://www.youtube.com/watch?v=dwJrlAfM14E&list=PL4cwHXAawZxqnDHxOyuwMpyt5s8F8gdmO"
-                  color="blue"
-                  textDecoration="underline"
-                  isExternal
+              {/* Question 2 */}
+              <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="purple.500">
+                <Heading 
+                  as="h3" 
+                  size="sm" 
+                  mb={2} 
+                  color={useColorModeValue('gray.800', 'gray.100')} 
+                  fontWeight="bold"
+                  fontFamily="'Inter', sans-serif"
                 >
-                  EIP Editing Office Hour
-                </LI>{" "}
-                and{" "}
-                <LI
-                  href="https://www.youtube.com/playlist?list=PL4cwHXAawZxpLrRIkDlBjDUUrGgF91pQw"
-                  color="blue"
-                  textDecoration="underline"
-                  isExternal
-                >
-                  EIPIP Meetings
-                </LI>{" "}
-                in case it requires attention of more than one editor/reviewer.
-              </Text>
-            </Collapse>
+                  🏷️ How do label filters work?
+                </Heading>
+                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
+                  You can filter table data using label filters, and the same
+                  filters will apply to the downloaded reports.
+                </Text>
+              </Box>
 
-            {/* {!show && (
+              {/* Question 3 */}
+              <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="green.500">
+                <Heading 
+                  as="h3" 
+                  size="sm" 
+                  mb={2} 
+                  color={useColorModeValue('gray.800', 'gray.100')} 
+                  fontWeight="bold"
+                  fontFamily="'Inter', sans-serif"
+                >
+                  📊 How is prioritization determined?
+                </Heading>
+                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
+                  PRs with the "s-withdrawn" label are given the lowest priority
+                  and moved to the bottom of the table. The remaining PRs are
+                  ranked based on the longest-waiting interaction time, with those
+                  having the oldest interaction appearing at the top.
+                </Text>
+              </Box>
+
+              {/* Question 4 */}
+              <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="orange.500">
+                <Heading 
+                  as="h3" 
+                  size="sm" 
+                  mb={2} 
+                  color={useColorModeValue('gray.800', 'gray.100')} 
+                  fontWeight="bold"
+                  fontFamily="'Inter', sans-serif"
+                >
+                  👥 Who would use this tool?
+                </Heading>
+                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" mb={2} fontFamily="'Inter', sans-serif">
+                  This tool is created to support EIP/ERC Editors to identify the
+                  longest waiting PRs for Editor's review. These PRs can also be
+                  discussed in{" "}
+                  <Link
+                    href="https://www.youtube.com/watch?v=dwJrlAfM14E&list=PL4cwHXAawZxqnDHxOyuwMpyt5s8F8gdmO"
+                    color="blue.500"
+                    textDecoration="underline"
+                    isExternal
+                  >
+                    EIP Editing Office Hour
+                  </Link>{" "}
+
+                  and{" "}
+
+                  <Link
+                    href="https://www.youtube.com/playlist?list=PL4cwHXAawZxpLrRIkDlBjDUUrGgF91pQw"
+                    color="blue.500"
+                    textDecoration="underline"
+                    isExternal
+                  >
+                    EIPIP Meetings
+                  </Link>{" "}
+
+                  in case it requires attention of more than one editor/reviewer.
+                </Text>
+                <Box 
+                  p={2} 
+                  bg={useColorModeValue('yellow.50', 'gray.600')} 
+                  borderRadius="sm"
+                  borderLeftWidth="2px"
+                  borderLeftColor="yellow.400"
+                >
+                  <Text 
+                    fontSize="xs" 
+                    color={useColorModeValue('gray.600', 'gray.300')} 
+                    lineHeight="1.5" 
+                    fontStyle="italic"
+                    fontFamily="'Inter', sans-serif"
+                  >
+                    📌 Note: This tool is based on a fork from{" "}
+
+                    <Link
+                      href="https://github.com/gaudren/eip-board"
+                      color="blue.500"
+                      textDecoration="underline"
+                      isExternal
+                    >
+                      here
+                    </Link>
+                    .
+                  </Text>
+                </Box>
+              </Box>
+            </Box>
+          </Collapse>
+
+          {/* {!show && (
         <Flex justify="center" align="center" marginTop={4}>
           <Text color={useColorModeValue("#3182CE", "blue.300")} cursor="pointer" onClick={toggleCollapse}>
             View Instructions
@@ -556,36 +711,61 @@ const DashboardPage = () => {
           boxShadow="lg"
           bg="#171923" // Dark mode background
         > */}
-          <Flex justify="space-between" align="center" p={4} id="EIPsBOARD">
-            <Heading
-              as="h2"
-              size="lg"
-              color={useColorModeValue("#3182CE", "blue.300")}
-            >
-              {activeTab} BOARD ({displayedData?.length})
-            </Heading>
-            <Button
-              colorScheme="blue"
-              variant="outline"
-              fontSize={{ base: "0.6rem", md: "md" }}
-              fontWeight={"bold"}
-              padding={"8px 20px"}
-              onClick={async () => {
-                try {
-                  // Trigger the CSV conversion and download
-                  handleDownload();
-
-                  // Trigger the API call
-                  await axios.post("/api/DownloadCounter");
-                } catch (error) {
-                  console.error("Error triggering download counter:", error);
-                }
-              }}
-            >
-              <DownloadIcon marginEnd={"1.5"} />
-              Download Reports
-            </Button>
-          </Flex>
+          <Box p={4} id="EIPsBOARD">
+            <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
+              <Heading
+                as="h2"
+                size="lg"
+                color={useColorModeValue("#3182CE", "blue.300")}
+              >
+                📋 {activeTab} BOARD ({filteredData.length})
+              </Heading>
+              <HStack spacing={2}>
+                <Button
+                  colorScheme="teal"
+                  variant="outline"
+                  fontSize={{ base: "0.6rem", md: "md" }}
+                  fontWeight={"bold"}
+                  padding={"8px 20px"}
+                  leftIcon={<CopyIcon />}
+                  onClick={handleCopyAsMarkdown}
+                >
+                  Copy as MD
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  variant="outline"
+                  fontSize={{ base: "0.6rem", md: "md" }}
+                  fontWeight={"bold"}
+                  padding={"8px 20px"}
+                  leftIcon={<DownloadIcon />}
+                  onClick={async () => {
+                    try {
+                      handleDownload();
+                      await axios.post("/api/DownloadCounter");
+                    } catch (error) {
+                      console.error("Error triggering download counter:", error);
+                    }
+                  }}
+                >
+                  Download Reports
+                </Button>
+              </HStack>
+            </Flex>
+            
+            {/* Search Bar */}
+            <InputGroup mb={4} maxW="400px">
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon color="gray.400" />
+              </InputLeftElement>
+              <Input
+                placeholder="Search by title, author, or PR number..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                bg={useColorModeValue("white", "gray.800")}
+              />
+            </InputGroup>
+          </Box>
 
           {/* EtherWorld Advertisement */}
           <Box my={6} mx={4}>
@@ -596,7 +776,6 @@ const DashboardPage = () => {
           <TableContainer
             minHeight="500px"
             overflowY="auto"
-            overflowX="auto"
             borderWidth="1px"
             borderRadius="md"
             p={4}
@@ -604,30 +783,73 @@ const DashboardPage = () => {
             maxHeight="900px"
           >
             <Table
-              variant="striped"
-              colorScheme="gray"
+              variant="simple"
               size="md"
-              borderRadius="md"
-              boxShadow="md"
+              borderRadius="lg"
+              overflow="hidden"
               width="100%"
+              bg={useColorModeValue("white", "gray.800")}
             >
-              <Thead bg="#171923">
+              <Thead 
+                bg={useColorModeValue("blue.600", "gray.700")}
+                position="sticky"
+                top={0}
+                zIndex={1}
+              >
                 <Tr>
-                  <Th
-                    textAlign="center"
-                    borderTopLeftRadius="10px"
-                    minWidth="6rem"
-                    color="white"
+                  <Th 
+                    textAlign="center" 
+                    color="white" 
+                    width="60px"
+                    fontSize="sm"
+                    fontWeight="bold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
                   >
-                    Serial Number
+                    #
                   </Th>
-                  <Th textAlign="center" minWidth="10rem" color="white">
+                  <Th 
+                    textAlign="center" 
+                    color="white" 
+                    width="110px"
+                    fontSize="sm"
+                    fontWeight="bold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
                     PR Number
                   </Th>
-                  <Th textAlign="center" minWidth="10rem" color="white">
-                    PR Date
+                  <Th 
+                    textAlign="left" 
+                    color="white" 
+                    width="auto"
+                    fontSize="sm"
+                    fontWeight="bold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    Title
                   </Th>
-                  <Th textAlign="center" minWidth="10rem" color="white">
+                  <Th 
+                    textAlign="center" 
+                    color="white" 
+                    width="140px"
+                    fontSize="sm"
+                    fontWeight="bold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    Wait Duration
+                  </Th>
+                  <Th 
+                    textAlign="center" 
+                    color="white" 
+                    width="220px"
+                    fontSize="sm"
+                    fontWeight="bold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
                     Labels
                     <LabelFilter
                       labels={allLabels}
@@ -635,126 +857,186 @@ const DashboardPage = () => {
                       onLabelToggle={handleLabelToggle}
                     />
                   </Th>
-                  <Th
-                    textAlign="center"
-                    borderTopRightRadius="10px"
-                    minWidth="10rem"
-                    color="white"
+                  <Th 
+                    textAlign="center" 
+                    color="white" 
+                    width="130px"
+                    fontSize="sm"
+                    fontWeight="bold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
                   >
-                    PR Link
+                    Created Date
+                  </Th>
+                  <Th 
+                    textAlign="center" 
+                    color="white" 
+                    width="110px"
+                    fontSize="sm"
+                    fontWeight="bold"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    Link
                   </Th>
                 </Tr>
               </Thead>
 
               <Tbody>
-                {displayedData?.length === 0 ? (
+                {filteredData.length === 0 ? (
                   <Tr>
-                    <Td colSpan={3} textAlign="center" color="white">
-                      No Data Available
+                    <Td colSpan={7} textAlign="center" py={8}>
+                      <VStack spacing={2}>
+                        <Icon as={BiGitPullRequest} boxSize={12} color="gray.400" />
+                        <Text color="gray.500" fontSize="lg">No PRs found</Text>
+                      </VStack>
                     </Td>
                   </Tr>
                 ) : (
-                  displayedData?.map((item: any, index: number) => (
-                    <Tr key={item._id} height="40px">
-                      {" "}
-                      {/* Adjust row height */}
-                      {/* Index */}
-                      <Td textAlign="center">
-                        <Box
-                          bg="gray.600"
-                          color="white"
-                          borderRadius="md"
-                          paddingX="8px"
-                          paddingY="4px"
-                          fontSize="md"
-                          display="inline-block"
-                        >
-                          {index + 1}
-                        </Box>
-                      </Td>
-                      {/* PR Number */}
-                      <Td textAlign="center">
-                        <Box
-                          bg="gray.600"
-                          color="white"
-                          borderRadius="md"
-                          paddingX="8px"
-                          paddingY="4px"
-                          fontSize="md"
-                          display="inline-block"
-                        >
-                          {item.prNumber}
-                        </Box>
-                      </Td>
-                      {/* PR Created Date */}
-                      <Td textAlign="center">
-                        <Box
-                          bg="gray.600"
-                          color="white"
-                          borderRadius="md"
-                          paddingX="8px"
-                          paddingY="4px"
-                          fontSize="md"
-                          display="inline-block"
-                        >
-                          {new Date(item.prCreatedDate).toLocaleDateString()}
-                        </Box>
-                      </Td>
-                      {/* Labels */}
-                      <Td textAlign="center">
-                        <Box
-                          display="flex"
-                          flexWrap="wrap"
-                          gap="8px"
-                          justifyContent="center"
-                        >
-                          {item.labels?.map((label: string, idx: number) => {
-                            // Use the mapped color or a fallback color if the label is not in labelColors
-                            const { color } = labelColors[
-                              label.toLowerCase()
-                            ] || { color: "gray.400" };
-
-                            return (
-                              <Box
-                                key={idx}
-                                bg={color}
-                                color="white"
-                                borderRadius="full"
-                                paddingX="10px"
-                                paddingY="4px"
-                                fontSize="sm"
-                              >
-                                {label}
-                              </Box>
-                            );
-                          })}
-                        </Box>
-                      </Td>
-                      {/* View PR Button */}
-                      <Td textAlign="center">
-                        <button
-                          style={{
-                            backgroundColor: "#428bca",
-                            color: "#ffffff",
-                            border: "none",
-                            padding: "6px 12px",
-                            fontSize: "0.85rem",
-                            cursor: "pointer",
-                            borderRadius: "5px",
-                          }}
-                        >
-                          <a
-                            href={item.prLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: "#ffffff", textDecoration: "none" }}
+                  filteredData.map((item, index) => {
+                    const itemLabels = addAutoLabels(item);
+                    const waitDays = Math.floor(item.wait_duration_hours / 24);
+                    const waitHours = Math.floor(item.wait_duration_hours % 24);
+                    
+                    return (
+                      <Tr 
+                        key={item._id}
+                        bg={item.is_withdrawn ? useColorModeValue("red.50", "red.900") : undefined}
+                        opacity={item.is_withdrawn ? 0.7 : 1}
+                        _hover={{ 
+                          bg: useColorModeValue("blue.50", "gray.700"),
+                          transform: "scale(1.001)",
+                          transition: "all 0.2s"
+                        }}
+                      >
+                        {/* Serial Number */}
+                        <Td textAlign="center">
+                          <Badge 
+                            colorScheme="gray" 
+                            fontSize="sm" 
+                            px={3} 
+                            py={1}
+                            borderRadius="full"
+                            fontWeight="bold"
                           >
-                            View PR
-                          </a>
-                        </button>
-                      </Td>
-                    </Tr>
-                  ))
+                            {index + 1}
+                          </Badge>
+                        </Td>
+                        
+                        {/* PR Number */}
+                        <Td textAlign="center">
+                          <HStack justify="center" spacing={2}>
+                            <Icon as={BiGitPullRequest} color="blue.500" boxSize={5} />
+                            <Badge 
+                              colorScheme="blue" 
+                              fontSize="sm" 
+                              px={3} 
+                              py={1}
+                              borderRadius="full"
+                              fontWeight="bold"
+                            >
+                              #{item.number}
+                            </Badge>
+                          </HStack>
+                        </Td>
+                        
+                        {/* Title */}
+                        <Td>
+                          <Tooltip label={item.title} placement="top" hasArrow>
+                            <Text 
+                              noOfLines={2} 
+                              fontWeight="medium"
+                              fontSize="sm"
+                              color={useColorModeValue("gray.700", "gray.200")}
+                              _hover={{ color: useColorModeValue("blue.600", "blue.300") }}
+                              transition="color 0.2s"
+                            >
+                              {item.title}
+                            </Text>
+                          </Tooltip>
+                        </Td>
+                        
+                        {/* Wait Duration */}
+                        <Td textAlign="center">
+                          <VStack spacing={1}>
+                            <Badge 
+                              colorScheme={
+                                waitDays > 30 ? "red" : 
+                                waitDays > 14 ? "orange" : 
+                                waitDays > 7 ? "yellow" : "green"
+                              }
+                              fontSize="sm"
+                              px={3}
+                              py={1}
+                              borderRadius="full"
+                              fontWeight="bold"
+                            >
+                              {waitDays}d {waitHours}h
+                            </Badge>
+                            <Text fontSize="xs" color="gray.500" fontWeight="medium">
+                              {item.wait_duration_hours.toFixed(0)}h total
+                            </Text>
+                          </VStack>
+                        </Td>
+                        
+                        {/* Labels */}
+                        <Td>
+                          <Wrap justify="center" spacing={1}>
+                            {itemLabels.map((label, idx) => {
+                              const { color } = labelColors[label.toLowerCase()] || { color: "gray.400" };
+                              return (
+                                <WrapItem key={idx}>
+                                  <Tag
+                                    size="sm"
+                                    bg={color}
+                                    color="white"
+                                    borderRadius="full"
+                                    fontWeight="semibold"
+                                    px={2}
+                                  >
+                                    <TagLabel fontSize="xs">{label}</TagLabel>
+                                  </Tag>
+                                </WrapItem>
+                              );
+                            })}
+                          </Wrap>
+                        </Td>
+                        
+                        {/* Created Date */}
+                        <Td textAlign="center">
+                          <VStack spacing={0}>
+                            <Text 
+                              fontSize="sm" 
+                              fontWeight="semibold"
+                              color={useColorModeValue("gray.700", "gray.200")}
+                            >
+                              {format(new Date(item.created_at), 'MMM dd, yyyy')}
+                            </Text>
+                            <Text fontSize="xs" color="gray.500">
+                              {format(new Date(item.created_at), 'HH:mm')}
+                            </Text>
+                          </VStack>
+                        </Td>
+                        
+                        {/* Link */}
+                        <Td textAlign="center">
+                          <Button
+                            as={Link}
+                            href={item.url}
+                            isExternal
+                            size="sm"
+                            colorScheme="blue"
+                            rightIcon={<ExternalLinkIcon />}
+                            fontWeight="semibold"
+                            _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                            transition="all 0.2s"
+                          >
+                            View
+                          </Button>
+                        </Td>
+                      </Tr>
+                    );
+                  })
                 )}
               </Tbody>
             </Table>
@@ -780,13 +1062,13 @@ const DashboardPage = () => {
           >
             <Text>
               For other details, check{" "}
-              <LI href="/Analytics" color="blue" isExternal>
+              <Link href="/Analytics" color="blue" isExternal>
                 PRs Analytics
-              </LI>{" "}
+              </Link>{" "}
               and{" "}
-              <LI href="/Reviewers" color="blue" isExternal>
+              <Link href="/Reviewers" color="blue" isExternal>
                 Editors Leaderboard
-              </LI>
+              </Link>
               .
             </Text>
           </Box>
