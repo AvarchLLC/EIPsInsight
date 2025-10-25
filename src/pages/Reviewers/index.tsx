@@ -1661,8 +1661,13 @@ const editorsSpecialityChart = () => {
 const renderEditorRepoGrid = () => {
   const reviewersList = helpers.REVIEWERS_LIST;
   
+  // Get totals from chart1data (same source as leaderboard for consistency)
+  const yearlyData = helpers.getYearlyData(chart1data, showReviewer);
+  const totalsByReviewer = yearlyData;
+  
   // Prepare time-series data for each reviewer
   const reviewerTimeSeriesMap: { [key: string]: any[] } = {};
+  const reviewerRepoTotals: { [key: string]: { eips: number; ercs: number; rips: number } } = {};
   
   // Process EIP data
   eipdata.forEach(item => {
@@ -1670,11 +1675,15 @@ const renderEditorRepoGrid = () => {
       if (!reviewerTimeSeriesMap[item.reviewer]) {
         reviewerTimeSeriesMap[item.reviewer] = [];
       }
+      if (!reviewerRepoTotals[item.reviewer]) {
+        reviewerRepoTotals[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
+      }
       reviewerTimeSeriesMap[item.reviewer].push({
         monthYear: item.monthYear,
         repo: 'EIPs',
         count: item.count,
       });
+      reviewerRepoTotals[item.reviewer].eips += Number(item.count);
     }
   });
   
@@ -1684,11 +1693,15 @@ const renderEditorRepoGrid = () => {
       if (!reviewerTimeSeriesMap[item.reviewer]) {
         reviewerTimeSeriesMap[item.reviewer] = [];
       }
+      if (!reviewerRepoTotals[item.reviewer]) {
+        reviewerRepoTotals[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
+      }
       reviewerTimeSeriesMap[item.reviewer].push({
         monthYear: item.monthYear,
         repo: 'ERCs',
         count: item.count,
       });
+      reviewerRepoTotals[item.reviewer].ercs += Number(item.count);
     }
   });
   
@@ -1698,26 +1711,29 @@ const renderEditorRepoGrid = () => {
       if (!reviewerTimeSeriesMap[item.reviewer]) {
         reviewerTimeSeriesMap[item.reviewer] = [];
       }
+      if (!reviewerRepoTotals[item.reviewer]) {
+        reviewerRepoTotals[item.reviewer] = { eips: 0, ercs: 0, rips: 0 };
+      }
       reviewerTimeSeriesMap[item.reviewer].push({
         monthYear: item.monthYear,
         repo: 'RIPs',
         count: item.count,
       });
+      reviewerRepoTotals[item.reviewer].rips += Number(item.count);
     }
   });
 
-  // Calculate totals and prepare final data
-  const allData = Object.entries(reviewerTimeSeriesMap).map(([reviewer, timeSeriesData]) => {
-    const eipsTotal = timeSeriesData.filter(d => d.repo === 'EIPs').reduce((sum, d) => sum + d.count, 0);
-    const ercsTotal = timeSeriesData.filter(d => d.repo === 'ERCs').reduce((sum, d) => sum + d.count, 0);
-    const ripsTotal = timeSeriesData.filter(d => d.repo === 'RIPs').reduce((sum, d) => sum + d.count, 0);
+  // Use totals from chart1data (combined source) for consistency with leaderboard
+  const allData = Object.keys(totalsByReviewer).map(reviewer => {
+    const repoTotals = reviewerRepoTotals[reviewer] || { eips: 0, ercs: 0, rips: 0 };
+    const timeSeriesData = reviewerTimeSeriesMap[reviewer] || [];
     
     return {
       reviewer,
-      eips: eipsTotal,
-      ercs: ercsTotal,
-      rips: ripsTotal,
-      total: eipsTotal + ercsTotal + ripsTotal,
+      eips: repoTotals.eips,
+      ercs: repoTotals.ercs,
+      rips: repoTotals.rips,
+      total: totalsByReviewer[reviewer], // Use the combined total from chart1data
       timeSeriesData: timeSeriesData.sort((a, b) => a.monthYear.localeCompare(b.monthYear)),
     };
   }).sort((a, b) => b.total - a.total);
