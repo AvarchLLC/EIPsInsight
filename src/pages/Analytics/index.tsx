@@ -474,6 +474,36 @@ const GitHubPRTracker: React.FC = () => {
         borderRadius="10px 10px 0 0"
         boxShadow="lg"
       >
+        {/* Total Count Display */}
+        <Box
+          bg={useColorModeValue("blue.50", "gray.700")}
+          p={3}
+          mb={3}
+          borderRadius="md"
+          textAlign="center"
+        >
+          <Text
+            fontSize="lg"
+            fontWeight="bold"
+            color={useColorModeValue("blue.700", "blue.300")}
+          >
+            Total Filtered Count:{" "}
+            {loading2 ? <Spinner size="sm" /> : (
+              (showCategory.created ? createdCount : 0) +
+              (showCategory.open ? openCount : 0) +
+              (showCategory.closed ? closedCount : 0) +
+              (showCategory.merged && type === "PRs" ? mergedCount : 0)
+            )}
+          </Text>
+          <Text
+            fontSize="xs"
+            color={useColorModeValue("gray.600", "gray.400")}
+            mt={1}
+          >
+            (Based on selected filters - This is what will be downloaded)
+          </Text>
+        </Box>
+
         <Flex
           wrap="wrap"
           justify="space-around"
@@ -1423,10 +1453,31 @@ const GitHubPRTracker: React.FC = () => {
       yField: ["count", "Open"],
       xAxis: {
         label: {
-          formatter: () => "",
+          autoRotate: true,
+          autoHide: true,
+          autoEllipsis: true,
+          style: {
+            fontSize: 10,
+          },
+          formatter: (text: string, item: any, index: number) => {
+            // Show every 3rd label to prevent overlap
+            const totalLabels = sortedData.length;
+            const step = totalLabels > 50 ? 6 : totalLabels > 30 ? 4 : totalLabels > 20 ? 3 : 2;
+            return index % step === 0 ? text : '';
+          },
         },
-        tickLine: null,
-        line: null,
+        tickLine: {
+          style: {
+            lineWidth: 1,
+            stroke: '#e8e8e8',
+          },
+        },
+        line: {
+          style: {
+            lineWidth: 1,
+            stroke: '#e8e8e8',
+          },
+        },
       },
       geometryOptions: [
         {
@@ -1623,129 +1674,127 @@ const GitHubPRTracker: React.FC = () => {
           
 
           <Box
-            pl={4}
-            bg={useColorModeValue("blue.50", "gray.700")}
-            borderRadius="md"
-            pr="8px"
-            marginBottom={2}
+            bgGradient={useColorModeValue(
+              'linear(to-br, blue.50, purple.50)',
+              'linear(to-br, gray.800, gray.900)'
+            )}
+            borderRadius="lg"
+            borderWidth="2px"
+            borderColor={useColorModeValue('blue.200', 'gray.600')}
+            p={4}
+            mb={4}
+            boxShadow="md"
+            transition="all 0.3s"
+            _hover={{ boxShadow: 'lg' }}
           >
-            <Flex justify="space-between" align="center">
+            <Flex justify="space-between" align="center" mb={show ? 3 : 0} cursor="pointer" onClick={toggleCollapse}>
               <Heading
-                as="h3"
-                size="lg"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
+                as="h2"
+                size="md"
+                color={useColorModeValue('blue.700', 'blue.300')}
+                fontWeight="bold"
+                letterSpacing="tight"
+                fontFamily="'Inter', sans-serif"
               >
-                Analytics FAQ
+                📚 Analytics FAQ
               </Heading>
-              <Box
-                bg="blue" // Gray background
-                borderRadius="md" // Rounded corners
-                padding={2} // Padding inside the box
-              >
-                <IconButton
-                  onClick={toggleCollapse}
-                  icon={
-                    show ? (
-                      <ChevronUpIcon boxSize={8} color="white" />
-                    ) : (
-                      <ChevronDownIcon boxSize={8} color="white" />
-                    )
-                  }
-                  variant="ghost"
-                  h="24px" // Smaller height
-                  w="20px"
-                  aria-label="Toggle Instructions"
-                  _hover={{ bg: "blue" }} // Maintain background color on hover
-                  _active={{ bg: "blue" }} // Maintain background color when active
-                  _focus={{ boxShadow: "none" }} // Remove focus outline
-                />
-              </Box>
+              <IconButton
+                onClick={toggleCollapse}
+                icon={show ? <ChevronUpIcon boxSize={5} /> : <ChevronDownIcon boxSize={5} />}
+                variant="ghost"
+                colorScheme="blue"
+                aria-label="Toggle FAQ"
+                size="sm"
+                _hover={{ transform: 'scale(1.1)' }}
+                transition="transform 0.2s"
+              />
             </Flex>
 
-            <Collapse in={show}>
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                What does this tool do?
-              </Heading>
-              <Text
-                fontSize="md"
-                marginBottom={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                This tool aims to automate the process of tracking PRs and
-                issues in GitHub repositories, providing visualizations and
-                reports to streamline project management. The default view
-                utilizes the timeline to observe trends in the number of
-                Created, Closed, Merged, and Open PRs/Issues at the end of each
-                month.
-              </Text>
+            <Collapse in={show} animateOpacity>
+              <Box pt={3} px={1}>
+                {/* Question 1 */}
+                <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="blue.500">
+                  <Heading 
+                    as="h3" 
+                    size="sm" 
+                    mb={2} 
+                    color={useColorModeValue('gray.800', 'gray.100')} 
+                    fontWeight="bold"
+                    fontFamily="'Inter', sans-serif"
+                  >
+                    💡 What does this tool do?
+                  </Heading>
+                  <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
+                    This tool aims to automate the process of tracking PRs and
+                    issues in GitHub repositories, providing visualizations and
+                    reports to streamline project management. The default view
+                    utilizes the timeline to observe trends in the number of
+                    Created, Closed, Merged, and Open PRs/Issues at the end of each
+                    month.
+                  </Text>
+                </Box>
 
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                How can I view data for a specific month?
-              </Heading>
-              <Text
-                fontSize="md"
-                marginBottom={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                To focus on a specific month, click the View More button and
-                choose the desired Year and Month from the dropdown menus. The
-                table and graph will then update to display data exclusively for
-                that selected month.
-              </Text>
+                {/* Question 2 */}
+                <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="purple.500">
+                  <Heading 
+                    as="h3" 
+                    size="sm" 
+                    mb={2} 
+                    color={useColorModeValue('gray.800', 'gray.100')} 
+                    fontWeight="bold"
+                    fontFamily="'Inter', sans-serif"
+                  >
+                    📅 How can I view data for a specific month?
+                  </Heading>
+                  <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
+                    To focus on a specific month, click the View More button and
+                    choose the desired Year and Month from the dropdown menus. The
+                    table and graph will then update to display data exclusively for
+                    that selected month.
+                  </Text>
+                </Box>
 
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                How to customize the chart?
-              </Heading>
-              <Text
-                fontSize="md"
-                marginBottom={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                To customize the chart, you can adjust the timeline scroll bar
-                to display data for a specific month/year. Additionally, you can
-                tailor the graph by selecting or deselecting checkboxes for
-                Created, Closed, Merged, and Open PRs/Issues, allowing you to
-                focus on the trends that are most relevant to you.
-              </Text>
+                {/* Question 3 */}
+                <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="green.500">
+                  <Heading 
+                    as="h3" 
+                    size="sm" 
+                    mb={2} 
+                    color={useColorModeValue('gray.800', 'gray.100')} 
+                    fontWeight="bold"
+                    fontFamily="'Inter', sans-serif"
+                  >
+                    🎨 How to customize the chart?
+                  </Heading>
+                  <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
+                    To customize the chart, you can adjust the timeline scroll bar
+                    to display data for a specific month/year. Additionally, you can
+                    tailor the graph by selecting or deselecting checkboxes for
+                    Created, Closed, Merged, and Open PRs/Issues, allowing you to
+                    focus on the trends that are most relevant to you.
+                  </Text>
+                </Box>
 
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                How to download reports?
-              </Heading>
-              <Text
-                fontSize="md"
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                After selecting your preferred data using the View More option,
-                you can download reports based on the filtered data for further
-                analysis or record-keeping. Simply click the download button to
-                export the data in your chosen format.
-              </Text>
-              <br />
+                {/* Question 4 */}
+                <Box p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="orange.500">
+                  <Heading 
+                    as="h3" 
+                    size="sm" 
+                    mb={2} 
+                    color={useColorModeValue('gray.800', 'gray.100')} 
+                    fontWeight="bold"
+                    fontFamily="'Inter', sans-serif"
+                  >
+                    📥 How to download reports?
+                  </Heading>
+                  <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
+                    After selecting your preferred data using the View More option,
+                    you can download reports based on the filtered data for further
+                    analysis or record-keeping. Simply click the download button to
+                    export the data in your chosen format.
+                  </Text>
+                </Box>
+              </Box>
             </Collapse>
 
             {/* {!show && (
@@ -1764,12 +1813,16 @@ const GitHubPRTracker: React.FC = () => {
               <ERCsPRChart/>
           </Box> */}
 
-          <Flex justify="center" mb={4}>
+          <Flex justify="center" mb={4} gap={4}>
             <Button
               colorScheme="blue"
               onClick={() => setActiveTab("PRs")}
               isActive={activeTab === "PRs"}
-              mr={4}
+              variant={activeTab === "PRs" ? "solid" : "outline"}
+              fontWeight="semibold"
+              px={8}
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+              transition="all 0.2s"
             >
               PRs
             </Button>
@@ -1777,6 +1830,11 @@ const GitHubPRTracker: React.FC = () => {
               colorScheme="blue"
               onClick={() => setActiveTab("Issues")}
               isActive={activeTab === "Issues"}
+              variant={activeTab === "Issues" ? "solid" : "outline"}
+              fontWeight="semibold"
+              px={8}
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+              transition="all 0.2s"
             >
               Issues
             </Button>
@@ -1784,20 +1842,24 @@ const GitHubPRTracker: React.FC = () => {
 
           <Box
             bgColor={bg}
-            padding="1rem"
-            borderRadius="0.55rem"
-            // _hover={{
-            //   border: "1px",
-            //   borderColor: "#30A0E0",
-            // }}
+            padding="1.5rem"
+            borderRadius="lg"
+            boxShadow="lg"
+            borderWidth="1px"
+            borderColor={useColorModeValue('gray.200', 'gray.600')}
+            transition="all 0.3s"
+            _hover={{
+              boxShadow: "xl",
+              transform: "translateY(-2px)",
+            }}
           >
-            <Box id="GithubAnalytics" borderRadius={"0.55rem"}>
+            <Box id="GithubAnalytics" borderRadius={"lg"} bg={useColorModeValue('white', 'gray.800')} p={4}>
               <Flex
                 justifyContent="space-between"
                 alignItems="center"
                 marginBottom="0.5rem"
               >
-                <Heading size="md" color="black">
+                <Heading size="md" color={useColorModeValue('gray.800', 'white')} fontWeight="bold">
                   {`Github PR Analytics (Monthly, since 2015)`}
                   <CopyLink
                     link={`https://eipsinsight.com//Analytics#GithubAnalytics`}
@@ -1806,6 +1868,8 @@ const GitHubPRTracker: React.FC = () => {
                 {/* Assuming a download option exists for the yearly data as well */}
                 <Button
                   colorScheme="blue"
+                  variant="solid"
+                  leftIcon={<DownloadIcon />}
                   onClick={async () => {
                     try {
                       // Trigger the CSV conversion and download
@@ -1821,7 +1885,9 @@ const GitHubPRTracker: React.FC = () => {
                     }
                   }}
                   disabled={loading3}
-                  fontSize={{ base: "0.6rem", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
+                  fontSize={{ base: "0.6rem", md: "md" }}
+                  _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                  transition="all 0.2s"
                 >
                   {loading3 ? <Spinner size="sm" /> : "Download CSV"}
                 </Button>
@@ -1834,6 +1900,9 @@ const GitHubPRTracker: React.FC = () => {
                     colorScheme="blue"
                     size="md"
                     width="200px"
+                    fontWeight="semibold"
+                    _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                    transition="all 0.2s"
                   >
                     {selectedRepo || "Select an option"}
                   </MenuButton>
@@ -1879,7 +1948,7 @@ const GitHubPRTracker: React.FC = () => {
               </Box>
               <br />
 
-              <Flex justify="center" ml={3} mb={8}>
+              <Flex justify="center" ml={3} mb={8} flexWrap="wrap" gap={2}>
                 <Checkbox
                   isChecked={showCategory.created}
                   onChange={() =>
@@ -1888,10 +1957,10 @@ const GitHubPRTracker: React.FC = () => {
                       created: !prev.created,
                     }))
                   }
-                  color="black"
-                  borderColor="black"
+                  colorScheme="blue"
                   mr={3}
                   fontSize={{ base: "xs", md: "sm" }}
+                  fontWeight="medium"
                 >
                   {activeTab === "PRs" ? "Created PRs" : "Created Issues"}
                 </Checkbox>
@@ -1901,10 +1970,10 @@ const GitHubPRTracker: React.FC = () => {
                   onChange={() =>
                     setShowCategory((prev) => ({ ...prev, open: !prev.open }))
                   }
-                  color="black"
-                  borderColor="black"
+                  colorScheme="purple"
                   mr={3}
                   fontSize={{ base: "xs", md: "sm" }}
+                  fontWeight="medium"
                 >
                   Open PRs
                 </Checkbox>
@@ -1917,10 +1986,10 @@ const GitHubPRTracker: React.FC = () => {
                       closed: !prev.closed,
                     }))
                   }
-                  color="black"
-                  borderColor="black"
+                  colorScheme="red"
                   mr={3}
                   fontSize={{ base: "xs", md: "sm" }}
+                  fontWeight="medium"
                 >
                   {activeTab === "PRs" ? "Closed PRs" : "Closed Issues"}
                 </Checkbox>
@@ -1933,10 +2002,10 @@ const GitHubPRTracker: React.FC = () => {
                         merged: !prev.merged,
                       }))
                     }
-                    color="black"
-                    borderColor="black"
+                    colorScheme="green"
                     mr={3}
                     fontSize={{ base: "xs", md: "sm" }}
+                    fontWeight="medium"
                   >
                     Merged PRs
                   </Checkbox>
@@ -1958,7 +2027,15 @@ const GitHubPRTracker: React.FC = () => {
 
   <br />
           <Flex justify="center" mb={8}>
-            <Button colorScheme="blue" onClick={toggleDropdown}>
+            <Button 
+              colorScheme="blue" 
+              onClick={toggleDropdown}
+              size="lg"
+              fontWeight="semibold"
+              px={8}
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+              transition="all 0.2s"
+            >
               {showDropdown ? "Hide" : "View More"}
             </Button>
           </Flex>
