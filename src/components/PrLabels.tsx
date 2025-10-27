@@ -313,9 +313,10 @@ export default function PRAnalyticsCard() {
         color: textColor,
         fontWeight: 600,
         fontSize: 11,
-        interval: 0,
+        interval: 'auto', // Auto-calculate interval to prevent overlap
         rotate: 0,
-        margin: 12
+        margin: 12,
+        hideOverlap: true
       },
       axisLine: {
         lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
@@ -397,32 +398,24 @@ export default function PRAnalyticsCard() {
         combined = rows;
       }
 
-      // Normalize labels for customLabels mode for ALL repos
-      if (labelSet === "customLabels") {
-        combined = combined.map((pr: any) => ({
-          ...pr,
-          NormalizedLabel: normalizeCustomLabel(pr.Repo || repoKey, pr.Label || ""),
-        }));
-      } else if (labelSet === "githubLabels") {
-        combined = combined.map((pr: any) => ({
-          ...pr,
-          NormalizedLabel: normalizeGithubLabel(pr.Label || ""),
-        }));
-      }
-
       // Get current/latest month key from filteredData
       const latestMonthKey = months.length > 0 ? months[months.length - 1] : null;
 
-      // Filter only PRs from the latest month and apply label normalization + selected label filter
+      // Filter only PRs from the latest month and apply selected label filter
       const filteredRows = combined.filter((pr: any) => {
         const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
         if (mk !== latestMonthKey) return false;
 
-        // Use the normalized label we computed earlier
-        const friendlyLabel = pr.NormalizedLabel || pr.Label || "";
+        // Normalize the label to match what's shown in the graph
+        let normalizedLabel = pr.Label || "";
+        if (labelSet === "customLabels") {
+          normalizedLabel = normalizeCustomLabel(pr.Repo || repoKey, pr.Label || "");
+        } else if (labelSet === "githubLabels") {
+          normalizedLabel = normalizeGithubLabel(pr.Label || "");
+        }
 
-        // Check if this label is in the selected labels
-        const passesFilter = selectedLabels.includes(friendlyLabel);
+        // Check if this normalized label is in the selected labels
+        const passesFilter = selectedLabels.includes(normalizedLabel);
 
         return passesFilter;
       });
@@ -430,13 +423,13 @@ export default function PRAnalyticsCard() {
       const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
 
       const csvData = filteredRows.map((pr: any) => {
-        // Use NormalizedLabel which has the friendly label name
-        const friendlyLabel = pr.NormalizedLabel || pr.Label || "Misc";
+        // Use the actual raw label from the PR, not the normalized one
+        const actualLabel = pr.Label || "Misc";
 
         return {
           Month: pr.Month || formatMonthLabel(pr.MonthKey),
           MonthKey: pr.MonthKey,
-          Label: friendlyLabel, // This will now show the actual label like "EIP Update", "Typo Fix", etc.
+          Label: actualLabel, // Show the actual raw label from GitHub
           Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
           PRNumber: pr.PRNumber,
           PRLink: pr.PRLink,
