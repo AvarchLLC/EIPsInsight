@@ -72,9 +72,7 @@ const Resource = () => {
       Data provided is used for tracking the progress and workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
     </Text>
 
-    <Text >
-      EIPsInsight is a tooling platform dedicated to providing in-depth analysis, up-to-date information, and comprehensive insights on Ethereum Standards. Our mission is to empower editors, developers, stakeholders, and the broader Ethereum community with the knowledge and tools necessary to understand and engage with the ongoing evolution of the Ethereum Standards. 
-    </Text>
+
 
     {/* Carousel for blogs */}
     <Box className="mt-6">

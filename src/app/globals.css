@@ -48,6 +48,99 @@ html {
   font-family: var(--font-rajdhani), sans-serif;
 }
 
+/* Enhanced UX improvements */
+* {
+  box-sizing: border-box;
+}
+
+/* Smooth transitions for better UX */
+.chakra-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.chakra-button:hover {
+  transform: translateY(-1px);
+}
+
+/* Better focus states */
+.chakra-button:focus,
+.chakra-input:focus,
+.chakra-textarea:focus {
+  box-shadow: 0 0 0 3px rgba(48, 160, 224, 0.1) !important;
+  border-color: #30A0E0 !important;
+}
+
+/* Improved scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(48, 160, 224, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(48, 160, 224, 0.5);
+}
+
+/* Dark mode scrollbar */
+.chakra-ui-dark ::-webkit-scrollbar-thumb {
+  background: rgba(79, 209, 255, 0.3);
+}
+
+.chakra-ui-dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 209, 255, 0.5);
+}
+
+/* Better loading states */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Improved card hover effects */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Better text selection */
+::selection {
+  background-color: rgba(48, 160, 224, 0.2);
+  color: inherit;
+}
+
+/* Improved mobile touch targets */
+@media (max-width: 768px) {
+  .chakra-button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  .chakra-icon-button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+}
+
 
 
   @layer base {

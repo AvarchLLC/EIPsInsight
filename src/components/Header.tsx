@@ -30,17 +30,19 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
   const descriptionColor = useColorModeValue("black", "white");
 
   return (
-    <Box id="Ethereum Improvement">
-      <Flex alignItems="center">
+    <Box id="Ethereum Improvement" mb={{ base: 6, lg: 8 }}>
+      <Flex alignItems="center" mb={4}>
         <Text
           as={motion.div}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          fontSize={{ base: "40px", sm: "42px", md: "44px", lg: "48px", xl: "56px", "2xl": "64px" }}
+          fontSize={{ base: "2xl", sm: "3xl", md: "4xl", lg: "5xl", xl: "6xl" }}
           fontWeight="extrabold"
           color={useColorModeValue(headingColorLight, headingColorDark)}
           bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)}
           bgClip="text"
+          lineHeight="1.1"
+          letterSpacing="-0.02em"
         >
           {title}
         </Text>
@@ -48,35 +50,36 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
         {sectionId && (
           <CopyLink
             link={dynamicLink}
-            style={{ marginLeft: "10px", marginBottom: "3px" }}
+            style={{ marginLeft: "12px", marginBottom: "4px" }}
           />
         )}
       </Flex>
 
-      <Text
+      <Box
         as={motion.div}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 } as any}
-        mt={3}
-        mb={2}
-        fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
-        fontWeight="medium"
-        whiteSpace="normal"
       >
         <Text
-          as="span"
+          fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
           fontWeight="bold"
-          fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
           color={subtitleColor}
+          mb={2}
         >
           {subtitle}
-        </Text>{" "}
-        -{" "}
-        <Text as="span" color={descriptionColor}>
+        </Text>
+        
+        <Text 
+          fontSize={{ base: "md", md: "lg", lg: "xl" }}
+          color={descriptionColor}
+          lineHeight="1.6"
+          maxWidth="800px"
+          opacity={0.9}
+        >
           {description}
         </Text>
-      </Text>
+      </Box>
     </Box>
   );
 };

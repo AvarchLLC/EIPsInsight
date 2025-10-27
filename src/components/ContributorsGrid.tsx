@@ -141,8 +141,17 @@ export default function ContributorsGrid() {
     : computeItems();
 
   return (
-    <Box mt={12}>
-      <Heading as="h3" size="md" mb={6} textAlign="center" letterSpacing="wide" color={textColor}>
+    <Box mt={4}>
+      <Heading 
+        as="h2" 
+        fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }} 
+        mb={6} 
+        textAlign="left" 
+        fontWeight="bold" 
+        bgGradient="linear(135deg, #30A0E0 0%, #4FD1FF 100%)"
+        bgClip="text"
+        color="transparent"
+      >
         Team
       </Heading>
 
