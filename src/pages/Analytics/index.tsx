@@ -1453,7 +1453,7 @@ const GitHubPRTracker: React.FC = () => {
       yField: ["count", "Open"],
       xAxis: {
         label: {
-          autoRotate: true,
+          autoRotate: false,
           autoHide: true,
           autoEllipsis: true,
           style: {

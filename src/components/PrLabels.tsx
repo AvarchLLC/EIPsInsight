@@ -260,9 +260,19 @@ export default function PRAnalyticsCard() {
         const found = filteredData.find(d => d.monthYear === month && d.label === value);
         return found ? found.count : 0;
       }),
-      itemStyle: { color }
+      itemStyle: { color },
+      barMaxWidth: 40
     }))
   }), [months, filteredData, labelSpecs]);
+
+  // Calculate total count for current month
+  const latestMonth = months.length > 0 ? months[months.length - 1] : null;
+  const currentMonthTotal = useMemo(() => {
+    if (!latestMonth) return 0;
+    return filteredData
+      .filter(d => d.monthYear === latestMonth)
+      .reduce((sum, d) => sum + d.count, 0);
+  }, [filteredData, latestMonth]);
 
   const defaultZoomStart = chartData.displayMonths.length > 18
     ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
@@ -304,13 +314,37 @@ export default function PRAnalyticsCard() {
         fontWeight: 600,
         fontSize: 11,
         interval: 0,
-        rotate: 0
+        rotate: 0,
+        margin: 12
+      },
+      axisLine: {
+        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
+      },
+      axisTick: {
+        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
       }
     }],
     yAxis: [{
       type: "value",
       name: "Open PRs",
-      axisLabel: { color: textColor }
+      nameTextStyle: {
+        color: textColor,
+        fontWeight: 600,
+        fontSize: 13
+      },
+      axisLabel: { 
+        color: textColor,
+        fontWeight: 500
+      },
+      axisLine: {
+        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
+      },
+      splitLine: {
+        lineStyle: { 
+          color: useColorModeValue('#f7fafc', '#2d3748'),
+          type: 'dashed'
+        }
+      }
     }],
     series: chartData.series,
     dataZoom: [
@@ -324,7 +358,9 @@ export default function PRAnalyticsCard() {
         height: 30,
       },
     ],
-    grid: { left: 60, right: 30, top: 80, bottom: 60 }
+    grid: { left: 70, right: 40, top: 90, bottom: 70 },
+    animationDuration: 800,
+    animationEasing: 'cubicOut'
   }), [chartData, textColor, cardBg, defaultZoomStart]);
 
   // CSV download
@@ -394,12 +430,13 @@ export default function PRAnalyticsCard() {
       const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
 
       const csvData = filteredRows.map((pr: any) => {
-        const friendlyLabel = pr.NormalizedLabel || pr.Label || "";
+        // Use NormalizedLabel which has the friendly label name
+        const friendlyLabel = pr.NormalizedLabel || pr.Label || "Misc";
 
         return {
           Month: pr.Month || formatMonthLabel(pr.MonthKey),
           MonthKey: pr.MonthKey,
-          Label: friendlyLabel,
+          Label: friendlyLabel, // This will now show the actual label like "EIP Update", "Typo Fix", etc.
           Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
           PRNumber: pr.PRNumber,
           PRLink: pr.PRLink,
@@ -533,12 +570,23 @@ export default function PRAnalyticsCard() {
             </MenuList>
           </Menu>
         </Flex>
-        {/* <Text color={accentColor} fontSize="sm" mb={2}>
-          {latestMonth
-            ? <>Open PRs in <b>{formatMonthLabel(latestMonth)}</b>: <b>{uniquePRsInLatest}</b> (across {selectedLabels.length} labels)</>
-            : <>No data for selected filter/period.</>
-          }
-        </Text> */}
+        <Box 
+          bg={useColorModeValue('blue.50', 'gray.700')} 
+          p={3} 
+          borderRadius="md" 
+          mb={3}
+          textAlign="center"
+        >
+          <Text fontSize="lg" fontWeight="bold" color={useColorModeValue('blue.700', 'blue.300')}>
+            {latestMonth
+              ? <>Current Month ({formatMonthLabel(latestMonth)}) Total Open PRs: <Text as="span" color={accentColor}>{currentMonthTotal}</Text></>
+              : <>No data available</>
+            }
+          </Text>
+          <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={1}>
+            (Based on {selectedLabels.length} selected label{selectedLabels.length !== 1 ? 's' : ''} - This is what will be downloaded)
+          </Text>
+        </Box>
         <Divider my={3} />
         <Box minH="350px">
           {loading ? (
