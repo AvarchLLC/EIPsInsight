@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Text, Button, Stack, useColorModeValue } from "@chakra-ui/react";
+import { Box, Heading, Text, Button, Stack, useColorModeValue, useColorMode } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 
 // Moderately flashy animations
@@ -58,6 +58,86 @@ export default function PlaceYourAdCard({
   const cardBg = useColorModeValue("white", "gray.800");
   const border = useColorModeValue("gray.200", "gray.700");
   const accent = "#00CED1";
+
+  const { colorMode } = useColorMode();
+
+  // If dark theme is active, render a toned-down dark variant and skip the
+  // bright, animated light card. This keeps the existing design exclusively
+  // for light mode as requested.
+  if (colorMode === "dark") {
+    return (
+      <Box
+        position="relative"
+        overflow="hidden"
+        bg={"linear-gradient(270deg,#04121a 0%, #063033 25%, #084a40 50%, #0b6a52 75%, #0f7f63 100%)"}
+        border="1px solid"
+        borderColor="gray.700"
+        borderRadius="lg"
+        px={{ base: 4, md: 6 }}
+        py={{ base: 4, md: 5 }}
+        transition="all 0.2s ease"
+        sx={{ boxShadow: '0 8px 30px rgba(2,12,20,0.7)', animation: `${pulse} 3s ease-in-out infinite` }}
+        _hover={{ transform: "translateY(-3px)", boxShadow: '0 12px 36px rgba(0, 120, 120, 0.12)' }}
+      >
+        {/* Subtle dark shimmer */}
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          backgroundImage="linear-gradient(90deg, transparent, rgba(0,200,190,0.04), transparent)"
+          backgroundSize="200% 100%"
+          sx={{ animation: `${shimmer} 6s linear infinite`, opacity: 0.85 }}
+          pointerEvents="none"
+          zIndex={0}
+        />
+        <Stack spacing={3} align="center" textAlign="center" position="relative" zIndex={1}>
+          <Box position="relative">
+            <Heading size={{ base: "sm", md: "md", lg: "lg" }} color="teal.300" fontWeight="extrabold" sx={{ textShadow: '0 0 12px rgba(0,200,190,0.12)' }}>
+              💎 {title}
+            </Heading>
+          </Box>
+          <Text fontSize={{ base: "sm", md: "md" }} color="gray.300" fontWeight="semibold" maxW="100%">
+            ⚡ {subtitle}
+          </Text>
+          <Stack direction={{ base: "column", sm: "row" }} spacing={3} pt={2}>
+            <Button
+              as="a"
+              href={ctaHref}
+              size="md"
+              target="_blank"
+              rel="noopener noreferrer"
+              bg="linear-gradient(180deg,#0ea5a4,#0891b2)"
+              color="white"
+              fontWeight="bold"
+              borderRadius="lg"
+              boxShadow="0 6px 20px rgba(14,165,164,0.12)"
+              sx={{ animation: `${glow} 2.5s ease-in-out infinite` }}
+            >
+              🚀 {ctaLabel}
+            </Button>
+            <Button
+              as="a"
+              href={secondaryHref}
+              variant="outline"
+              size="md"
+              target="_blank"
+              rel="noopener noreferrer"
+              borderWidth="1px"
+              borderColor="gray.600"
+              color="gray.200"
+              fontWeight="bold"
+              borderRadius="lg"
+              boxShadow="0 0 10px rgba(0,200,190,0.06)"
+            >
+              📋 {secondaryLabel}
+            </Button>
+          </Stack>
+        </Stack>
+      </Box>
+    );
+  }
 
   return (
     <Box
