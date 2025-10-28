@@ -402,34 +402,42 @@ export default function PRAnalyticsCard() {
       const latestMonthKey = months.length > 0 ? months[months.length - 1] : null;
 
       // Filter only PRs from the latest month and apply selected label filter
-      const filteredRows = combined.filter((pr: any) => {
-        const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
-        if (mk !== latestMonthKey) return false;
+      const filteredRows = combined
+        .map((pr: any) => {
+          // Normalize the label to match what's shown in the graph
+          let normalizedLabel = pr.Label || "";
+          if (labelSet === "customLabels") {
+            normalizedLabel = normalizeCustomLabel(pr.Repo || repoKey, pr.Label || "");
+          } else if (labelSet === "githubLabels") {
+            normalizedLabel = normalizeGithubLabel(pr.Label || "");
+          }
+          
+          // Store the normalized label in the PR object for later use
+          return {
+            ...pr,
+            DisplayLabel: normalizedLabel
+          };
+        })
+        .filter((pr: any) => {
+          const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
+          if (mk !== latestMonthKey) return false;
 
-        // Normalize the label to match what's shown in the graph
-        let normalizedLabel = pr.Label || "";
-        if (labelSet === "customLabels") {
-          normalizedLabel = normalizeCustomLabel(pr.Repo || repoKey, pr.Label || "");
-        } else if (labelSet === "githubLabels") {
-          normalizedLabel = normalizeGithubLabel(pr.Label || "");
-        }
+          // Check if this normalized label is in the selected labels
+          const passesFilter = selectedLabels.includes(pr.DisplayLabel);
 
-        // Check if this normalized label is in the selected labels
-        const passesFilter = selectedLabels.includes(normalizedLabel);
-
-        return passesFilter;
-      });
+          return passesFilter;
+        });
 
       const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
 
       const csvData = filteredRows.map((pr: any) => {
-        // Use the actual raw label from the PR, not the normalized one
-        const actualLabel = pr.Label || "Misc";
+        // Use the same label that's shown in the graph (DisplayLabel)
+        const graphLabel = pr.DisplayLabel || "Misc";
 
         return {
           Month: pr.Month || formatMonthLabel(pr.MonthKey),
           MonthKey: pr.MonthKey,
-          Label: actualLabel, // Show the actual raw label from GitHub
+          Label: graphLabel, // Show the same label as displayed in the graph
           Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
           PRNumber: pr.PRNumber,
           PRLink: pr.PRLink,
