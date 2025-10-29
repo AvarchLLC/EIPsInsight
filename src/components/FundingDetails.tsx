@@ -14,7 +14,7 @@ import {
   Button,
   Link as ChakraLink,
 } from '@chakra-ui/react';
-import { FaExternalLinkAlt, FaCheckCircle } from 'react-icons/fa';
+import { FaExternalLinkAlt } from 'react-icons/fa';
 
 const grants = [
   {
@@ -76,132 +76,34 @@ export default function FundingDetails() {
   const getShadowStyle = () => useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 10px 30px rgba(0,0,0,0.4)');
   const getHoverShadowStyle = () => useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 15px 40px rgba(0,0,0,0.6)');
 
-  const totalFunding = grants.reduce((sum, grant) => {
-    const amount = grant.amount.replace(/[^0-9.]/g, '');
-    return sum + (amount ? parseFloat(amount) : 0);
-  }, 0);
+  // Helper to convert an amount string into a human tier label.
+  const getTier = (amountStr: string) => {
+    if (!amountStr) return 'Community';
+    const numeric = parseFloat(amountStr.replace(/[^0-9.]/g, ''));
+    if (Number.isNaN(numeric)) return 'Community';
+    if (numeric >= 10000) return 'Significant';
+    if (numeric >= 500) return 'Moderate';
+    return 'Small';
+  };
+
+  const tierColor = (tier: string) => {
+    switch (tier) {
+      case 'Significant':
+        return 'purple';
+      case 'Moderate':
+        return 'blue';
+      case 'Small':
+        return 'cyan';
+      default:
+        return 'gray';
+    }
+  };
 
   return (
     <VStack spacing={8} align="stretch">
-      {/* Funding Overview */}
-      <Box
-        bg={cardBg}
-        p={6}
-        borderRadius="xl"
-        border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-        boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-      >
-        <HStack justify="space-between" align="start" mb={4}>
-          <VStack align="start" spacing={2}>
-            <Text fontSize="sm" fontWeight="600" color={textColor} opacity={0.8}>
-              Total Funding Secured
-            </Text>
-            <Text fontSize="3xl" fontWeight="bold" color={useColorModeValue('#30A0E0', '#4FD1FF')}>
-              ${totalFunding.toLocaleString()}+
-            </Text>
-          </VStack>
-          <Badge colorScheme="green" variant="subtle" px={3} py={1}>
-            <HStack spacing={1}>
-              <FaCheckCircle size={12} />
-              <Text fontSize="sm">Active Project</Text>
-            </HStack>
-          </Badge>
-        </HStack>
-        
-        <Text color={textColor} fontSize="md" lineHeight="tall">
-          EIPsInsight is an open-source public good supported by grants and community funding. 
-          These contributions help maintain our data infrastructure, develop new features, and keep 
-          the platform free and accessible to the Ethereum community.
-        </Text>
-      </Box>
+      {/* Funding overview removed as requested. */}
 
-      {/* Grant Details */}
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-        {grants.map((grant) => (
-          <Box
-            key={grant.id}
-            bg={cardBg}
-            p={6}
-            borderRadius="xl"
-            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-            transition="transform 180ms, box-shadow 180ms"
-            _hover={{
-              transform: 'translateY(-2px)',
-              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
-            }}
-          >
-            <VStack align="start" spacing={4}>
-              {/* Header */}
-              <HStack justify="space-between" w="full">
-                <HStack spacing={3}>
-                  <Image 
-                    src={grant.id === 'esp' ? logoSrc : grant.logo} 
-                    alt={grant.organization}
-                    h={10}
-                    objectFit="contain"
-                  />
-                  <VStack align="start" spacing={0}>
-                    <Text fontSize="lg" fontWeight="bold" color={textColor}>
-                      {grant.organization}
-                    </Text>
-                    <Text fontSize="sm" color={textColor} opacity={0.7}>
-                      {grant.startDate}
-                    </Text>
-                  </VStack>
-                </HStack>
-                <VStack align="end" spacing={1}>
-                  <Text fontSize="xl" fontWeight="bold" color={useColorModeValue('#30A0E0', '#4FD1FF')}>
-                    {grant.amount}
-                  </Text>
-                  <Badge 
-                    colorScheme={grant.status === 'Awarded' ? 'green' : 'blue'} 
-                    variant="subtle"
-                  >
-                    {grant.status}
-                  </Badge>
-                </VStack>
-              </HStack>
-
-              <Divider />
-
-              {/* Content */}
-              <VStack align="start" spacing={3} w="full">
-                <Text fontSize="md" fontWeight="semibold" color={textColor}>
-                  {grant.title}
-                </Text>
-                
-                <Text fontSize="sm" color={textColor} lineHeight="tall">
-                  {grant.impact}
-                </Text>
-
-                <HStack spacing={2} flexWrap="wrap">
-                  {grant.tags.map((tag) => (
-                    <Tag key={tag} size="sm" variant="subtle" colorScheme="blue">
-                      {tag}
-                    </Tag>
-                  ))}
-                </HStack>
-
-                {grant.link && (
-                  <Button
-                    as={ChakraLink}
-                    href={grant.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="sm"
-                    variant="outline"
-                    colorScheme="blue"
-                    rightIcon={<FaExternalLinkAlt size={12} />}
-                  >
-                    Learn More
-                  </Button>
-                )}
-              </VStack>
-            </VStack>
-          </Box>
-        ))}
-      </SimpleGrid>
+      {/* Grant details moved to a dedicated GrantList component */}
 
       {/* Call to Action */}
       <Box

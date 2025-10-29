@@ -13,11 +13,14 @@ import { motion } from 'framer-motion';
 
 const MotionBox = motion(Box);
 
+const STAGNANT = '#BBE1F5';
+const STAG_RGB = `187,225,245`;
+
 const EtherWorldAdCompact: React.FC = () => {
-  const bgColor = useColorModeValue('blue.50', 'blue.900');
-  const borderColor = useColorModeValue('blue.200', 'blue.600');
-  const textColor = useColorModeValue('blue.800', 'blue.100');
-  const accentColor = useColorModeValue('blue.600', 'blue.300');
+  const bgColor = useColorModeValue('#EBF7FF', '#05232f');
+  const borderColor = useColorModeValue(`rgba(${STAG_RGB},0.12)`, `rgba(${STAG_RGB},0.22)`);
+  const textColor = useColorModeValue('#05314a', '#e6f6ff');
+  const accentColor = useColorModeValue(STAGNANT, `rgba(${STAG_RGB},0.9)`);
 
   return (
     <MotionBox
@@ -41,7 +44,7 @@ const EtherWorldAdCompact: React.FC = () => {
           transition="all 0.3s ease"
           _hover={{
             transform: 'translateY(-2px)',
-            boxShadow: 'xl',
+            boxShadow: `0 10px 30px rgba(${STAG_RGB},0.12), 0 0 24px rgba(${STAG_RGB},0.08)`,
             borderColor: accentColor,
           }}
           maxW="300px"
@@ -82,7 +85,8 @@ const EtherWorldAdCompact: React.FC = () => {
                 </Text>
               </Flex>
               <Badge 
-                colorScheme="blue" 
+                bg={useColorModeValue(`rgba(${STAG_RGB},0.12)`, 'transparent')}
+                color={useColorModeValue(STAGNANT, '#cfefff')}
                 size="sm" 
                 fontSize="xs"
                 variant={useColorModeValue('solid', 'outline')}

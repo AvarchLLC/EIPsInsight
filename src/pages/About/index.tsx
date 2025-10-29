@@ -4,6 +4,9 @@ import Head from 'next/head';
 import ContributorsGrid from '@/components/ContributorsGrid';
 import Footer from '@/components/Footer';
 import FundingDetails from '@/components/FundingDetails';
+import GrantList from '@/components/GrantList';
+import Partners from '@/components/Partners';
+import Stats from '@/components/Stats';
 
 
 import NLink from 'next/link';
@@ -492,7 +495,7 @@ export default function AboutPage() {
               mb={6}
               textAlign="left"
             >
-              What is EIPsInsight?
+              About EIPsInsight
             </Heading>
 
             <Text
@@ -584,6 +587,11 @@ export default function AboutPage() {
           </Box>
         </Container>
 
+        {/* Stats Section */}
+        <Container maxW="7xl" py={4} id="stats">
+          <Stats />
+        </Container>
+
         {/* Contributors Section */}
         <Container maxW="7xl" py={4} id="team">
           <Box
@@ -618,6 +626,27 @@ export default function AboutPage() {
               boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
             }}
           >
+            {/* Funding heading removed as requested */}
+            <FundingDetails />
+            {/* Support / Contact buttons removed as requested */}
+          </Box>
+        </Container>
+
+        {/* Grants (moved out of Funding) */}
+        <Container maxW="7xl" py={4} id="grants">
+          <Box
+            className="section-container"
+            bg={cardBg}
+            p={{ base: 6, md: 8 }}
+            borderRadius="xl"
+            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+            style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+            _hover={{
+              transform: 'translateY(-2px)',
+              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+            }}
+          >
             <Heading
               as="h2"
               fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
@@ -628,16 +657,19 @@ export default function AboutPage() {
               fontWeight="bold"
               textAlign="left"
             >
-              Funding
+              Grants
             </Heading>
-            <FundingDetails />
-            {/* Support / Contact buttons removed as requested */}
+
+            <GrantList />
           </Box>
         </Container>
 
-        {/* Mission/join section removed - moved links into Funding support block */}
+  {/* Mission/join section removed - moved links into Funding support block */}
 
-        {/* FAQ Section */}
+  {/* Partners Section */}
+  <Partners />
+
+  {/* FAQ Section */}
         <Container maxW="7xl" py={4} id="faq">
           <Box
             className="section-container"
@@ -672,6 +704,7 @@ export default function AboutPage() {
             </Text>
 
             <Stack spacing={4}>
+              {/* Data source */}
               <Box
                 className="section-container"
                 bg={cardBg}
@@ -687,11 +720,7 @@ export default function AboutPage() {
               >
                 <Accordion allowMultiple>
                   <AccordionItem border="none">
-                    <AccordionButton
-                      p={6}
-                      transition="all 0.2s"
-                      _hover={{ bg: glassHover }}
-                    >
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
                       <Box flex="1" textAlign="left">
                         <Text fontWeight="semibold" fontSize="md">Where does the data come from?</Text>
                       </Box>
@@ -699,13 +728,14 @@ export default function AboutPage() {
                     </AccordionButton>
                     <AccordionPanel pb={6} px={6}>
                       <Text color={textColor} lineHeight="tall" fontSize="sm">
-                        We aggregate public GitHub data from the official ethereum repos (EIPs, ERCs, RIPs) and normalize labels for consistent analytics.
+                        We aggregate public GitHub data from the official ethereum repositories (EIPs, ERCs, RIPs) plus partner repos and community submissions. Data is normalized (labels, timestamps) to provide consistent analytics across different repos and timelines.
                       </Text>
                     </AccordionPanel>
                   </AccordionItem>
                 </Accordion>
               </Box>
 
+              {/* Contribution */}
               <Box
                 className="section-container"
                 bg={cardBg}
@@ -721,19 +751,170 @@ export default function AboutPage() {
               >
                 <Accordion allowMultiple>
                   <AccordionItem border="none">
-                    <AccordionButton
-                      p={6}
-                      transition="all 0.2s"
-                      _hover={{ bg: glassHover }}
-                    >
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
                       <Box flex="1" textAlign="left">
-                        <Text fontWeight="semibold" fontSize="md">Can I contribute?</Text>
+                        <Text fontWeight="semibold" fontSize="md">How can I contribute?</Text>
                       </Box>
                       <AccordionIcon />
                     </AccordionButton>
                     <AccordionPanel pb={6} px={6}>
                       <Text color={textColor} lineHeight="tall" fontSize="sm">
-                        Absolutely — check the repository on GitHub, open issues, PRs, or reach out to the maintainers listed in the team section.
+                        We welcome contributions. Please open issues or pull requests in our GitHub repository. Smaller documentation fixes, typo corrections, and feature ideas are a great place to start. For larger changes, open an issue first to discuss scope and design with maintainers.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+              {/* Frequency */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">How often is the data refreshed?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        Most data is refreshed periodically (hourly to daily) depending on the endpoint. Some aggregated dashboards are updated nightly. Where possible, we surface the last-updated timestamp on charts and exportable data.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+              {/* Labels */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">What do the labels and statuses mean?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        We normalize GitHub labels into a smaller set of "customLabels" for analytics (e.g., review, consensus, stagnant). Statuses like Draft, Review, Last Call, and Final follow the EIP repository conventions — where possible we map repo statuses to our visualizations and explain them in charts/tooltips.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+              {/* Exports & API */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">Can I export or access raw data via an API?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        Yes — several pages provide CSV export. We also expose internal API endpoints for many datasets (used by our charts). Check the documentation or contact us if you need a specific dataset or higher-rate access.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+              {/* Reporting & feature requests */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">How do I report a bug or request a feature?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        Please open an issue on our GitHub repository with reproduction steps, screenshots, and expected behavior. For feature requests, include use-cases and any data or API needs; maintainers will triage and respond with suggested approaches.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+              {/* Privacy */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">What about privacy and personal data?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        We only surface public data available on GitHub and other public feeds. We do not collect or store private user data. For details, see our Privacy page or contact support for any data removal requests.
                       </Text>
                     </AccordionPanel>
                   </AccordionItem>

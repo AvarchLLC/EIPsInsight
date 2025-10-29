@@ -40,10 +40,11 @@ const coreContributors = [
   github: 'https://github.com/poojaranjan',
   twitter: 'https://x.com/poojaranjan19',
     linkedin: 'https://www.linkedin.com/in/pooja-r-072899114/',
+    farcaster: 'https://farcaster.xyz/poojaranjan19',
     bio: 'Building the Ethereum community. ECHInstitute | wiepteam | TeamAvarch | ether_world',
   },
   {
-    name: 'Ayu Shetty',
+    name: 'Ayush Shetty',
     handle: 'AyuShetty',
     role: 'Outreach & Content',
     avatar: '/avatars/Ayush.jpg',
@@ -189,18 +190,12 @@ export default function ContributorsGrid() {
                   />
                 </Center>
                 <Text mt={3} fontWeight="800" color={textColor} fontSize={{ base: 'lg', md: 'lg' }}>{contrib.name || '—'}</Text>
-                <Text fontSize="sm" color={useColorModeValue('gray.500', 'gray.400')}>{contrib.role || 'Contributor'}</Text>
-                {contrib.bio && (
-                  <Text mt={2} fontSize="sm" color={useColorModeValue('gray.600','gray.300')} textAlign="center" maxW="xl">
-                    {contrib.bio}
-                  </Text>
-                )}
               </Box>
 
               <Divider />
 
-              <Flex w="100%" pt={1} align="center">
-                <HStack spacing={2}>
+              <Flex w="100%" pt={1} align="center" justify="center">
+                <HStack spacing={3}>
                   {contrib.github && (
                     <Tooltip label="GitHub" hasArrow>
                       <IconButton
@@ -249,11 +244,6 @@ export default function ContributorsGrid() {
                       />
                     </Tooltip>
                   )}
-                </HStack>
-
-                <Spacer />
-
-                <HStack spacing={1}>
                   {contrib.farcaster && (
                     <Tooltip label="Farcaster" hasArrow>
                       <IconButton
@@ -291,7 +281,6 @@ export default function ContributorsGrid() {
           <ModalBody pb={6}>
             <VStack spacing={4}>
               <Avatar src={selected?.avatar} name={selected?.name} size="2xl" />
-              <Text fontWeight="bold">{selected?.role}</Text>
               <HStack spacing={4}>
                 {selected?.github && (
                   <Link href={selected?.github} isExternal color={linkColor} aria-label="Selected GitHub" title="GitHub">
