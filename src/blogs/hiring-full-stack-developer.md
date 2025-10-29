@@ -2,6 +2,10 @@
 title: "Join EIPsInsight.com as a Full-Stack Developer (Remote)"
 date: 2025-06-29
 author: Yash Kamal Chaturvedi
+avatar: https://avatars.githubusercontent.com/u/76512851?v=4
+role: Blockchain Technical Writer
+category: Hiring
+tags: [Job Opening, Full Stack, Remote, Ethereum]
 image: https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/hiring-full-stack-developer.png
 ---
 

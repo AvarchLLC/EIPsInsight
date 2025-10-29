@@ -2,6 +2,10 @@
 title: "Enshrined Proposer Builder Separation (ePBS) (EIP-7732)"
 date: 2025-06-16
 author: Yash Kamal Chaturvedi
+avatar: https://avatars.githubusercontent.com/u/76512851?v=4
+role: Blockchain Technical Writer
+category: Protocol Upgrade
+tags: [EIP-7732, ePBS, MEV, Consensus Layer]
 image: https://etherworld.co/content/images/2025/06/ePBS.jpg
 ---
 

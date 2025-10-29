@@ -2,6 +2,10 @@
 title: "Importance of Transaction Gas Limit Cap (EIP-7825)"
 date: 2025-06-29
 author: Yash Kamal Chaturvedi
+avatar: https://avatars.githubusercontent.com/u/76512851?v=4
+role: Blockchain Technical Writer
+category: Protocol Upgrade
+tags: [EIP-7825, Gas Limit, DoS Protection, Transaction Security]
 image: https://etherworld.co/content/images/2025/07/Gas-Limit-Cap.jpg
 ---
 

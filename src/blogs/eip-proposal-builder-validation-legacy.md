@@ -2,6 +2,10 @@
 title: "EIP Proposal Builder and Validation Issues with Legacy EIPs"
 author: "Dhanush Naik"
 date: "2025-08-28"
+avatar: https://avatars.githubusercontent.com/u/85634565?v=4
+role: Full Stack Developer
+category: Tools
+tags: [EIP Proposal Builder, EIPW, Validation, Tooling]
 image: "https://github.com/AvarchLLC/EIPsInsight/blob/main/public/Nody2.png?raw=true"
 ---
 

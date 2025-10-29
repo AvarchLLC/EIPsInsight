@@ -13,6 +13,11 @@ const frontmatterSchema = z
     author: z.string(),
     date: z.coerce.date(),
     image: z.string().url().optional(),
+    avatar: z.string().url().optional(),
+    role: z.string().optional(),
+    category: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    readTime: z.number().optional(),
   })
   .passthrough(); // Allow additional properties
 

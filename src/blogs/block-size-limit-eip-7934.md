@@ -2,6 +2,10 @@
 title: "Importance of Block Size Limit (EIP-7934)"
 date: 2025-06-23
 author: Yash Kamal Chaturvedi
+avatar: https://avatars.githubusercontent.com/u/76512851?v=4
+role: Blockchain Technical Writer
+category: Protocol Upgrade
+tags: [EIP-7934, Block Size, Network Security, Fusaka]
 image: https://etherworld.co/content/images/2025/07/Importance-of-Block-Size-Limit--EIP-7934-.jpg
 ---
 

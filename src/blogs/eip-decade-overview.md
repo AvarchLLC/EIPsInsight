@@ -2,6 +2,10 @@
 title: "EIPs @10: A Decade of Standardizing Ethereum"
 date: "2025-07-29"
 author: "Ayush Shetty"
+avatar: https://avatars.githubusercontent.com/u/139878073?v=4
+role: Blockchain Developer
+category: History
+tags: [EIP History, Ethereum, Decade Review, Standards]
 image: "https://github.com/AvarchLLC/EIPsInsight/blob/main/public/nody.png?raw=true"
 ---
 
