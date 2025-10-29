@@ -87,7 +87,7 @@ export function readPostFromFile(filename: string, postsDirectory = POSTS_DIRECT
  * Gets all blog posts with frontmatter and content
  */
 export async function getAllPosts() {
-  const postsDirectory = path.join(process.cwd(), "blogs");
+  const postsDirectory = path.join(process.cwd(), "src", "blogs");
   const files = await fs.promises.readdir(postsDirectory);
 
   // Filter only .md files and process each file
