@@ -38,14 +38,25 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState, useMemo } from "react";
 import AllLayout from "@/components/Layout";
-import { ExternalLinkIcon, SearchIcon, DownloadIcon, ChevronUpIcon, ChevronDownIcon, CopyIcon, ChevronDownIcon as ChevronIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon, SearchIcon, DownloadIcon, ChevronUpIcon, ChevronDownIcon, CopyIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { BiGitPullRequest } from "react-icons/bi";
 import { format } from "date-fns";
 import axios from "axios";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import LabelFilter from "@/components/LabelFilter";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import Comments from "@/components/comments";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  flexRender,
+  createColumnHelper,
+  ColumnDef,
+  SortingState,
+} from "@tanstack/react-table";
 
 // Helper function to extract PR number from URL
 const extractPrNumber = (url: string) => {
@@ -238,7 +249,10 @@ const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("EIPs");
   const [show, setShow] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 20,
+  });
 
   // Allowed labels to display
   const allowedLabels = [
@@ -295,15 +309,6 @@ const DashboardPage = () => {
       return true;
     });
     
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.number.toString().includes(searchQuery)
-      );
-    }
-    
     // Label filter
     if (selectedLabels.length > 0) {
       filtered = filtered.filter(item => {
@@ -314,7 +319,7 @@ const DashboardPage = () => {
     
     // Sort by priority score (higher = more urgent)
     return filtered.sort((a, b) => b.priority_score - a.priority_score);
-  }, [boardData, activeTab, searchQuery, selectedLabels]);
+  }, [boardData, activeTab, selectedLabels]);
 
   // Fetch data from the new API
   useEffect(() => {
@@ -347,6 +352,155 @@ const DashboardPage = () => {
     });
     return Array.from(labels).sort();
   }, [boardData, allowedLabels]);
+
+  const columnHelper = createColumnHelper<BoardData>();
+
+  const columns = useMemo<ColumnDef<BoardData, any>[]>(
+    () => [
+      columnHelper.display({
+        id: 'serial',
+        header: '#',
+        cell: (info) => (
+          <Text fontSize="md" fontWeight="semibold" color="gray.600">
+            {pagination.pageIndex * pagination.pageSize + info.row.index + 1}
+          </Text>
+        ),
+        size: 60,
+      }),
+      columnHelper.accessor('number', {
+        header: 'PR #',
+        cell: (info) => (
+          <HStack justify="center" spacing={1}>
+            <Icon as={BiGitPullRequest} color="blue.500" boxSize={5} />
+            <Text fontSize="md" fontWeight="bold" color="blue.500">
+              {info.getValue()}
+            </Text>
+          </HStack>
+        ),
+        size: 100,
+      }),
+      columnHelper.accessor('title', {
+        header: 'Title',
+        cell: (info) => {
+          const row = info.row.original;
+          return (
+            <Link href={row.url} isExternal _hover={{ textDecoration: 'none' }}>
+              <Tooltip label={info.getValue()} placement="top" hasArrow>
+                <Text
+                  noOfLines={1}
+                  fontWeight="medium"
+                  fontSize="md"
+                  color={useColorModeValue("blue.600", "blue.300")}
+                  _hover={{
+                    color: useColorModeValue("blue.800", "blue.100"),
+                    textDecoration: "underline"
+                  }}
+                  transition="all 0.2s"
+                  cursor="pointer"
+                >
+                  {info.getValue()}
+                </Text>
+              </Tooltip>
+            </Link>
+          );
+        },
+      }),
+      columnHelper.accessor('wait_duration_hours', {
+        header: 'Wait Time',
+        cell: (info) => {
+          const waitDays = Math.floor(info.getValue() / 24);
+          const waitHours = Math.floor(info.getValue() % 24);
+          return (
+            <Badge
+              colorScheme={
+                waitDays > 30 ? "red" :
+                waitDays > 14 ? "orange" :
+                waitDays > 7 ? "yellow" : "green"
+              }
+              fontSize="sm"
+              px={3}
+              py={1}
+              borderRadius="md"
+              fontWeight="bold"
+            >
+              {waitDays}d {waitHours}h
+            </Badge>
+          );
+        },
+        size: 120,
+      }),
+      columnHelper.accessor('labels', {
+        header: 'Labels',
+        cell: (info) => {
+          const row = info.row.original;
+          const itemLabels = addAutoLabels(row).filter(label =>
+            allowedLabels.includes(label.toLowerCase())
+          );
+          return (
+            <Wrap justify="center" spacing={1}>
+              {itemLabels.length > 0 ? (
+                itemLabels.slice(0, 3).map((label, idx) => {
+                  const { color } = labelColors[label.toLowerCase()] || { color: "gray.400" };
+                  return (
+                    <WrapItem key={idx}>
+                      <Tag
+                        size="md"
+                        bg={color}
+                        color="white"
+                        borderRadius="md"
+                        fontWeight="semibold"
+                        px={2}
+                        py={1}
+                      >
+                        <TagLabel fontSize="sm">{label}</TagLabel>
+                      </Tag>
+                    </WrapItem>
+                  );
+                })
+              ) : (
+                <Text fontSize="sm" color="gray.400">-</Text>
+              )}
+              {itemLabels.length > 3 && (
+                <Tooltip label={itemLabels.slice(3).join(', ')} placement="top">
+                  <Tag size="md" bg="gray.500" color="white" borderRadius="md" px={2} py={1}>
+                    <TagLabel fontSize="sm">+{itemLabels.length - 3}</TagLabel>
+                  </Tag>
+                </Tooltip>
+              )}
+            </Wrap>
+          );
+        },
+        size: 280,
+      }),
+      columnHelper.accessor('created_at', {
+        header: 'Created',
+        cell: (info) => (
+          <Text
+            fontSize="sm"
+            fontWeight="medium"
+            color={useColorModeValue("gray.600", "gray.300")}
+          >
+            {format(new Date(info.getValue()), 'MMM dd, yyyy')}
+          </Text>
+        ),
+        size: 120,
+      }),
+    ],
+    [pagination.pageIndex, pagination.pageSize, allowedLabels]
+  );
+
+  const table = useReactTable({
+    data: filteredData,
+    columns,
+    state: {
+      pagination,
+    },
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: false,
+  });
 
   const handleDownload = () => {
     if (!filteredData || filteredData.length === 0) {
@@ -718,33 +872,39 @@ const DashboardPage = () => {
       )} */}
           </Box>
 
-          <Flex justify="center" mt={1}>
-            <Button
-              colorScheme="blue"
-              onClick={() => setActiveTab("EIPs")}
-              isActive={activeTab === "EIPs"}
-              mr={4}
-            >
-              EIPs
-            </Button>
-            <Button
-              colorScheme="blue"
-              onClick={() => setActiveTab("ERCs")}
-              isActive={activeTab === "ERCs"}
-            >
-              ERCs
-            </Button>
+          {/* EIP/ERC Toggle and Ad */}
+          <Flex 
+            direction={{ base: "column", md: "row" }} 
+            justify="space-between" 
+            align="center" 
+            gap={4}
+            my={6}
+          >
+            <HStack spacing={4}>
+              <Button
+                colorScheme="blue"
+                onClick={() => setActiveTab("EIPs")}
+                variant={activeTab === "EIPs" ? "solid" : "outline"}
+                size="lg"
+              >
+                EIPs
+              </Button>
+              <Button
+                colorScheme="blue"
+                onClick={() => setActiveTab("ERCs")}
+                variant={activeTab === "ERCs" ? "solid" : "outline"}
+                size="lg"
+              >
+                ERCs
+              </Button>
+            </HStack>
+            
+            <Box flex="1" maxW={{ base: "100%", md: "600px" }}>
+              <CloseableAdCard />
+            </Box>
           </Flex>
 
-          {/* Heading based on active tab */}
-          {/* <Box
-          ml={2}
-          mr={2}
-          border="1px solid #e2e8f0"
-          borderRadius="10px 10px 10px 10px"
-          boxShadow="lg"
-          bg="#171923" // Dark mode background
-        > */}
+          {/* Board Header with Filters */}
           <Box p={4} id="EIPsBOARD">
             <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
               <Heading
@@ -754,54 +914,9 @@ const DashboardPage = () => {
               >
                 📋 {activeTab} BOARD ({filteredData.length})
               </Heading>
-              <HStack spacing={2}>
-                <Button
-                  colorScheme="teal"
-                  variant="outline"
-                  fontSize={{ base: "0.6rem", md: "md" }}
-                  fontWeight={"bold"}
-                  padding={"8px 20px"}
-                  leftIcon={<CopyIcon />}
-                  onClick={handleCopyAsMarkdown}
-                >
-                  Copy as MD
-                </Button>
-                <Button
-                  colorScheme="blue"
-                  variant="outline"
-                  fontSize={{ base: "0.6rem", md: "md" }}
-                  fontWeight={"bold"}
-                  padding={"8px 20px"}
-                  leftIcon={<DownloadIcon />}
-                  onClick={async () => {
-                    try {
-                      handleDownload();
-                      await axios.post("/api/DownloadCounter");
-                    } catch (error) {
-                      console.error("Error triggering download counter:", error);
-                    }
-                  }}
-                >
-                  Download Reports
-                </Button>
-              </HStack>
-            </Flex>
-            
-            {/* Search Bar and Filter Controls */}
-            <Flex gap={4} mb={4} flexWrap="wrap" align="center">
-              <InputGroup maxW="400px" flex="1">
-                <InputLeftElement pointerEvents="none">
-                  <SearchIcon color="gray.400" />
-                </InputLeftElement>
-                <Input
-                  placeholder="Search by title, author, or PR number..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  bg={useColorModeValue("white", "gray.800")}
-                />
-              </InputGroup>
               
-              <HStack spacing={2}>
+              {/* Filters and Actions */}
+              <HStack spacing={2} flexWrap="wrap">
                 <LabelFilter
                   labels={allLabels}
                   selectedLabels={selectedLabels}
@@ -834,16 +949,39 @@ const DashboardPage = () => {
                     </MenuItem>
                   </MenuList>
                 </Menu>
+                
+                <Button
+                  colorScheme="teal"
+                  variant="outline"
+                  fontSize={{ base: "xs", md: "md" }}
+                  fontWeight={"bold"}
+                  leftIcon={<CopyIcon />}
+                  onClick={handleCopyAsMarkdown}
+                >
+                  Copy as MD
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  variant="outline"
+                  fontSize={{ base: "xs", md: "md" }}
+                  fontWeight={"bold"}
+                  leftIcon={<DownloadIcon />}
+                  onClick={async () => {
+                    try {
+                      handleDownload();
+                      await axios.post("/api/DownloadCounter");
+                    } catch (error) {
+                      console.error("Error triggering download counter:", error);
+                    }
+                  }}
+                >
+                  Download Reports
+                </Button>
               </HStack>
             </Flex>
           </Box>
 
-          {/* EtherWorld Advertisement */}
-          <Box my={6} mx={4}>
-            <EtherWorldAdCard />
-          </Box>
-
-          {/* Responsive Table */}
+          {/* TanStack Table with Pagination */}
           <Box
             borderWidth="1px"
             borderRadius="md"
@@ -851,95 +989,46 @@ const DashboardPage = () => {
             overflow="hidden"
             bg={useColorModeValue("white", "gray.800")}
           >
-            <Box overflowX="auto">
-              <Table
-                variant="simple"
-                size="sm"
-                width="100%"
-                sx={{
-                  tableLayout: 'fixed',
-                  minWidth: { base: '100%', md: '100%' },
-                }}
-              >
+            <Box 
+              overflowX="auto" 
+              overflowY="auto" 
+              maxH="calc(100vh - 400px)"
+              position="relative"
+            >
+              <Table variant="simple" size="md" width="100%">
                 <Thead 
                   bg={useColorModeValue("blue.600", "gray.700")}
                   position="sticky"
                   top={0}
                   zIndex={10}
-                  boxShadow="sm"
+                  boxShadow="md"
                 >
-                  <Tr>
-                    <Th 
-                      textAlign="center" 
-                      color="white" 
-                      width="5%"
-                      fontSize="xs"
-                      fontWeight="bold"
-                      textTransform="uppercase"
-                      py={3}
-                    >
-                      #
-                    </Th>
-                    <Th 
-                      textAlign="center" 
-                      color="white" 
-                      width="8%"
-                      fontSize="xs"
-                      fontWeight="bold"
-                      textTransform="uppercase"
-                      py={3}
-                    >
-                      PR #
-                    </Th>
-                    <Th 
-                      textAlign="left" 
-                      color="white" 
-                      width="40%"
-                      fontSize="xs"
-                      fontWeight="bold"
-                      textTransform="uppercase"
-                      py={3}
-                    >
-                      Title
-                    </Th>
-                    <Th 
-                      textAlign="center" 
-                      color="white" 
-                      width="12%"
-                      fontSize="xs"
-                      fontWeight="bold"
-                      textTransform="uppercase"
-                      py={3}
-                    >
-                      Wait Time
-                    </Th>
-                    <Th 
-                      textAlign="center" 
-                      color="white" 
-                      width="25%"
-                      fontSize="xs"
-                      fontWeight="bold"
-                      textTransform="uppercase"
-                      py={3}
-                    >
-                      Labels
-                    </Th>
-                    <Th 
-                      textAlign="center" 
-                      color="white" 
-                      width="10%"
-                      fontSize="xs"
-                      fontWeight="bold"
-                      textTransform="uppercase"
-                      py={3}
-                    >
-                      Created
-                    </Th>
-                  </Tr>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <Tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <Th
+                          key={header.id}
+                          color="white"
+                          fontSize="sm"
+                          fontWeight="bold"
+                          textTransform="uppercase"
+                          py={4}
+                          textAlign={header.id === 'title' ? 'left' : 'center'}
+                          bg={useColorModeValue("blue.600", "gray.700")}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </Th>
+                      ))}
+                    </Tr>
+                  ))}
                 </Thead>
-
-              <Tbody>
-                {filteredData.length === 0 ? (
+                <Tbody>
+                  {table.getRowModel().rows.length === 0 ? (
                   <Tr>
                     <Td colSpan={6} textAlign="center" py={8}>
                       <VStack spacing={2}>
@@ -949,139 +1038,101 @@ const DashboardPage = () => {
                     </Td>
                   </Tr>
                 ) : (
-                  filteredData.map((item, index) => {
-                    const itemLabels = addAutoLabels(item).filter(label => 
-                      allowedLabels.includes(label.toLowerCase())
-                    );
-                    const waitDays = Math.floor(item.wait_duration_hours / 24);
-                    const waitHours = Math.floor(item.wait_duration_hours % 24);
-                    
-                    return (
-                      <Tr 
-                        key={item._id}
-                        bg={item.is_withdrawn ? useColorModeValue("red.50", "red.900") : undefined}
-                        opacity={item.is_withdrawn ? 0.7 : 1}
-                        _hover={{ 
-                          bg: useColorModeValue("blue.50", "gray.700"),
-                          transition: "all 0.2s"
-                        }}
-                      >
-                        {/* Serial Number */}
-                        <Td textAlign="center" py={2}>
-                          <Text fontSize="xs" fontWeight="semibold" color="gray.500">
-                            {index + 1}
-                          </Text>
-                        </Td>
-                        
-                        {/* PR Number */}
-                        <Td textAlign="center" py={2}>
-                          <HStack justify="center" spacing={1}>
-                            <Icon as={BiGitPullRequest} color="blue.500" boxSize={4} />
-                            <Text fontSize="xs" fontWeight="bold" color="blue.500">
-                              {item.number}
-                            </Text>
-                          </HStack>
-                        </Td>
-                        
-                        {/* Title - Clickable */}
-                        <Td py={2} maxW="0" overflow="hidden">
-                          <Link 
-                            href={item.url} 
-                            isExternal
-                            _hover={{ textDecoration: 'none' }}
-                          >
-                            <Tooltip label={item.title} placement="top" hasArrow>
-                              <Text 
-                                noOfLines={1} 
-                                fontWeight="medium"
-                                fontSize="sm"
-                                color={useColorModeValue("blue.600", "blue.300")}
-                                _hover={{ 
-                                  color: useColorModeValue("blue.800", "blue.100"),
-                                  textDecoration: "underline"
-                                }}
-                                transition="all 0.2s"
-                                cursor="pointer"
-                                overflow="hidden"
-                                textOverflow="ellipsis"
-                                whiteSpace="nowrap"
-                              >
-                                {item.title}
-                              </Text>
-                            </Tooltip>
-                          </Link>
-                        </Td>
-                        
-                        {/* Wait Duration */}
-                        <Td textAlign="center" py={2}>
-                          <Badge 
-                            colorScheme={
-                              waitDays > 30 ? "red" : 
-                              waitDays > 14 ? "orange" : 
-                              waitDays > 7 ? "yellow" : "green"
-                            }
-                            fontSize="xs"
-                            px={2}
-                            py={1}
-                            borderRadius="md"
-                            fontWeight="bold"
-                          >
-                            {waitDays}d {waitHours}h
-                          </Badge>
-                        </Td>
-                        
-                        {/* Labels */}
-                        <Td py={2} maxW="0">
-                          <Wrap justify="center" spacing={1} overflow="hidden">
-                            {itemLabels.length > 0 ? (
-                              itemLabels.slice(0, 3).map((label, idx) => {
-                                const { color } = labelColors[label.toLowerCase()] || { color: "gray.400" };
-                                return (
-                                  <WrapItem key={idx}>
-                                    <Tag
-                                      size="sm"
-                                      bg={color}
-                                      color="white"
-                                      borderRadius="md"
-                                      fontWeight="semibold"
-                                      px={2}
-                                      py={0.5}
-                                    >
-                                      <TagLabel fontSize="2xs">{label}</TagLabel>
-                                    </Tag>
-                                  </WrapItem>
-                                );
-                              })
-                            ) : (
-                              <Text fontSize="xs" color="gray.400">-</Text>
-                            )}
-                            {itemLabels.length > 3 && (
-                              <Tooltip label={itemLabels.slice(3).join(', ')} placement="top">
-                                <Tag size="sm" bg="gray.500" color="white" borderRadius="md" px={2} py={0.5}>
-                                  <TagLabel fontSize="2xs">+{itemLabels.length - 3}</TagLabel>
-                                </Tag>
-                              </Tooltip>
-                            )}
-                          </Wrap>
-                        </Td>
-                        
-                        {/* Created Date */}
-                        <Td textAlign="center" py={2}>
-                          <Text 
-                            fontSize="xs" 
-                            fontWeight="medium"
-                            color={useColorModeValue("gray.600", "gray.300")}
-                          >
-                            {format(new Date(item.created_at), 'MMM dd, yyyy')}
-                          </Text>
-                        </Td>
-                      </Tr>
-                    );
-                  })
-                )}
+                    table.getRowModel().rows.map((row) => {
+                      const item = row.original;
+                      return (
+                        <Tr
+                          key={row.id}
+                          bg={item.is_withdrawn ? useColorModeValue("red.50", "red.900") : undefined}
+                          opacity={item.is_withdrawn ? 0.7 : 1}
+                          _hover={{
+                            bg: useColorModeValue("blue.50", "gray.700"),
+                            transition: "all 0.2s"
+                          }}
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                            <Td
+                              key={cell.id}
+                              py={3}
+                              textAlign={cell.column.id === 'title' ? 'left' : 'center'}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </Td>
+                          ))}
+                        </Tr>
+                      );
+                    })
+                  )}
                 </Tbody>
               </Table>
             </Box>
+            
+            {/* Pagination Controls */}
+            <Flex
+              justify="space-between"
+              align="center"
+              p={4}
+              borderTopWidth="1px"
+              borderColor={useColorModeValue("gray.200", "gray.600")}
+              flexWrap="wrap"
+              gap={4}
+            >
+              <HStack spacing={2}>
+                <Button
+                  size="sm"
+                  onClick={() => table.setPageIndex(0)}
+                  isDisabled={!table.getCanPreviousPage()}
+                  leftIcon={<ChevronLeftIcon />}
+                >
+                  First
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => table.previousPage()}
+                  isDisabled={!table.getCanPreviousPage()}
+                >
+                  Previous
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => table.nextPage()}
+                  isDisabled={!table.getCanNextPage()}
+                >
+                  Next
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  isDisabled={!table.getCanNextPage()}
+                  rightIcon={<ChevronRightIcon />}
+                >
+                  Last
+                </Button>
+              </HStack>
+              
+              <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                Page {table.getState().pagination.pageIndex + 1} of{' '}
+                {table.getPageCount()} ({filteredData.length} total PRs)
+              </Text>
+              
+              <HStack spacing={2}>
+                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                  Go to page:
+                </Text>
+                <Input
+                  type="number"
+                  min={1}
+                  max={table.getPageCount()}
+                  defaultValue={table.getState().pagination.pageIndex + 1}
+                  onChange={(e) => {
+                    const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                    table.setPageIndex(page);
+                  }}
+                  w="70px"
+                  size="sm"
+                />
+              </HStack>
+            </Flex>
           </Box>
           <Box
             bg={useColorModeValue("blue.50", "gray.700")}
