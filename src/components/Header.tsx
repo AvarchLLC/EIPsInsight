@@ -9,9 +9,10 @@ interface HeaderProps {
   subtitle: React.ReactNode;
   description: React.ReactNode;
   sectionId?: string;
+  center?: boolean; // when true, center-align heading, subtitle and description
 }
 
-const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId }) => {
+const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId, center = false }) => {
   const headingColorLight = "#2C7A7B";
   const headingColorDark = "#81E6D9";
   const headingBgGradientLight = "linear(to-r, #4FD1C5, #319795)";
@@ -31,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
 
   return (
     <Box id="Ethereum Improvement" mb={{ base: 6, lg: 8 }}>
-      <Flex alignItems="center" mb={4}>
+      <Flex alignItems={center ? 'center' : 'center'} mb={4} gap={4} direction={center ? 'column' : 'row'} textAlign={center ? 'center' : 'left'}>
         <Text
           as={motion.div}
           initial={{ opacity: 0, y: -20 }}
@@ -46,12 +47,17 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
         >
           {title}
         </Text>
-
-        {sectionId && (
-          <CopyLink
-            link={dynamicLink}
-            style={{ marginLeft: "12px", marginBottom: "4px" }}
-          />
+        {sectionId && !center && (
+          // keep copy button vertically centered next to the large heading when not centering
+          <Box alignSelf="center">
+            <CopyLink link={dynamicLink} />
+          </Box>
+        )}
+        {sectionId && center && (
+          // when centering, show copy button beneath the title
+          <Box mt={3}>
+            <CopyLink link={dynamicLink} />
+          </Box>
         )}
       </Flex>
 
@@ -65,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
           fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
           fontWeight="bold"
           color={subtitleColor}
-          mb={2}
+          mb={3}
         >
           {subtitle}
         </Text>
@@ -76,6 +82,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
           lineHeight="1.6"
           maxWidth="800px"
           opacity={0.9}
+          mt={2}
         >
           {description}
         </Text>

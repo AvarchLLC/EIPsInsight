@@ -2,176 +2,152 @@ import React from 'react';
 import {
   Box,
   Text,
-  SimpleGrid,
   Image,
   useColorModeValue,
-  Container,
+  Flex,
+  Button,
 } from '@chakra-ui/react';
 import Header from './Header';
 
 export default function SupportedBy() {
   const cardBg = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('gray.700', 'gray.200');
-  const logoSrc = useColorModeValue('/EF-ESP-logo.svg', '/EF-ESP-logo-white-text.svg');
+  const borderCol = useColorModeValue('gray.200', 'gray.700');
+  const nameColor = useColorModeValue('gray.900', 'white');
+  const logoSrc = useColorModeValue('/ESP_square.png', '/ESP_square.png');
+  const gitcoinSrc = useColorModeValue('/gitcoin-square.png', '/gitcoin-square.png');
 
   return (
-    <Box as="section" py={{ base: 6, md: 8 }} id="supported-by">
-      <Container maxW="7xl">
-        <Box
-          bg={cardBg}
-          borderRadius="xl"
-          p={{ base: 6, md: 8 }}
-          border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-          boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-          style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
-          transition="transform 180ms, box-shadow 180ms"
-          _hover={{
-            transform: 'translateY(-2px)',
-            boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
-          }}
+    <Box as="section" id="supported-by" py={{ base: 8, md: 12 }}>
+      <Box
+        bg={cardBg}
+        borderRadius="xl"
+        boxShadow="sm"
+        border="1px solid"
+        borderColor={borderCol}
+        p={{ base: 6, md: 10 }}
+        mb={8}
+        maxWidth="100%"
+        mx="auto"
+        transition="box-shadow 0.2s"
+        className="supportedby-card"
+      >
+        <Header
+          title="Supported by"
+          subtitle=""
+          description=""
+          sectionId="supported-by"
+        />
+        <Flex
+          direction={{ base: 'column', md: 'row' }}
+          align="center"
+          justify="center"
+          gap={{ base: 12, md: 20 }}
+          mt={{ base: 2, md: 4 }}
+          wrap="wrap"
+          className="supportedby-list"
         >
-          <Header
-            title="Supported by"
-            subtitle="Community"
-            description="Organizations and community members who support EIPs Insight as an open-source public good."
-            sectionId="supported-by"
-          />
-          <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={10} alignItems="center">
-            <Box textAlign="center">
-              <Box
-                as="a"
-                href="https://ethereum.org/"
-                target="_blank"
-                rel="noopener noreferrer"
-                display="inline-block"
-                cursor="pointer"
-                p={4}
-                borderRadius="xl"
-                bg={useColorModeValue('gray.50', 'gray.700')}
-                border="1px solid"
-                borderColor={useColorModeValue('gray.200', 'gray.600')}
-                transition="all 300ms ease"
-                _hover={{
-                  transform: 'translateY(-6px) scale(1.02)',
-                  boxShadow: useColorModeValue('0 10px 25px rgba(0,0,0,0.1)', '0 10px 25px rgba(0,0,0,0.3)'),
-                  borderColor: useColorModeValue('#30A0E0', '#4FD1FF')
-                }}
-              >
-                <Image
-                  src={logoSrc}
-                  alt="Ecosystem Support Program"
-                  h={{ base: 14, md: 18 }}
-                  mx="auto"
-                  transition="all 200ms ease"
-                />
-                <Text
-                  fontSize="sm"
-                  color={useColorModeValue('gray.700', 'gray.300')}
-                  mt={3}
-                  fontWeight="semibold"
-                >
-                  Ecosystem Support
-                </Text>
-              </Box>
-            </Box>
-
-            <Box textAlign="center">
-              <Box
-                as="a"
-                href="https://octant.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                display="inline-block"
-                cursor="pointer"
-                p={4}
-                borderRadius="xl"
-                bg={useColorModeValue('gray.50', 'gray.700')}
-                border="1px solid"
-                borderColor={useColorModeValue('gray.200', 'gray.600')}
-                transition="all 300ms ease"
-                _hover={{
-                  transform: 'translateY(-6px) scale(1.02)',
-                  boxShadow: useColorModeValue('0 10px 25px rgba(0,0,0,0.1)', '0 10px 25px rgba(0,0,0,0.3)'),
-                  borderColor: useColorModeValue('#30A0E0', '#4FD1FF')
-                }}
-              >
-                <Image
-                  src="/octant.png"
-                  alt="Octant"
-                  h={{ base: 14, md: 18 }}
-                  mx="auto"
-                  transition="all 200ms ease"
-                />
-                <Text
-                  fontSize="sm"
-                  color={useColorModeValue('gray.700', 'gray.300')}
-                  mt={3}
-                  fontWeight="semibold"
-                >
-                  Octant
-                </Text>
-              </Box>
-            </Box>
-
-            <Box textAlign="center">
-              <Box
-                as="a"
-                href="https://gitcoin.co/"
-                target="_blank"
-                rel="noopener noreferrer"
-                display="inline-block"
-                cursor="pointer"
-                p={4}
-                borderRadius="xl"
-                bg={useColorModeValue('gray.50', 'gray.700')}
-                border="1px solid"
-                borderColor={useColorModeValue('gray.200', 'gray.600')}
-                transition="all 300ms ease"
-                _hover={{
-                  transform: 'translateY(-6px) scale(1.02)',
-                  boxShadow: useColorModeValue('0 10px 25px rgba(0,0,0,0.1)', '0 10px 25px rgba(0,0,0,0.3)'),
-                  borderColor: useColorModeValue('#30A0E0', '#4FD1FF')
-                }}
-              >
-                <Image
-                  src="/Gitcoin-logo-.jpg"
-                  alt="Gitcoin"
-                  h={{ base: 14, md: 18 }}
-                  mx="auto"
-                  transition="all 200ms ease"
-                />
-                <Text
-                  fontSize="sm"
-                  color={useColorModeValue('gray.700', 'gray.300')}
-                  mt={3}
-                  fontWeight="semibold"
-                >
-                  Gitcoin
-                </Text>
-              </Box>
-            </Box>
-          </SimpleGrid>
-
-          <Box mt={6} textAlign="center">
+          {/* Ecosystem Support */}
+          <Box
+            as="a"
+            href="https://ethereum.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            display="flex"
+            flexDir="column"
+            alignItems="center"
+            textAlign="center"
+            transition="transform 0.22s, box-shadow 0.22s"
+            _hover={{
+              transform: 'scale(1.10)',
+              boxShadow: useColorModeValue('0 16px 40px rgba(2,6,23,0.12)', '0 20px 48px rgba(2,6,23,0.45)'),
+            }}
+            px={{ base: 2, md: 4 }}
+            py={2}
+            className="supportedby-item"
+          >
+            <Image
+              src={logoSrc}
+              alt="Ecosystem Support Program"
+              h={{ base: 32, md: 40, lg: 48 }}
+              w={{ base: 32, md: 40, lg: 48 }}
+              mb={4}
+              borderRadius="xl"
+              boxShadow="lg"
+              transition="inherit"
+              className="supportedby-logo"
+            />
             <Text
-              fontSize="sm"
-              color={textColor}
-              opacity={0.8}
+              fontSize={{ base: 'xl', md: '2xl', lg: '2xl' }}
+              color={nameColor}
+              fontWeight="bold"
+              mt={2}
+              textAlign="center"
+              className="supportedby-name"
+              letterSpacing="-0.5px"
             >
-              Interested in supporting the project?{' '}
-              <Text
-                as="a"
-                href="/about#funding"
-                color={useColorModeValue('blue.500', 'blue.300')}
-                fontWeight="medium"
-                _hover={{ textDecoration: 'underline' }}
-              >
-                Learn more about funding
-              </Text>
+              Ecosystem Support
             </Text>
           </Box>
+
+          {/* Gitcoin */}
+          <Box
+            as="a"
+            href="https://gitcoin.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            display="flex"
+            flexDir="column"
+            alignItems="center"
+            textAlign="center"
+            transition="transform 0.22s, box-shadow 0.22s"
+            _hover={{
+              transform: 'scale(1.10)',
+              boxShadow: useColorModeValue('0 16px 40px rgba(2,6,23,0.12)', '0 20px 48px rgba(2,6,23,0.45)'),
+            }}
+            px={{ base: 2, md: 4 }}
+            py={2}
+            className="supportedby-item"
+          >
+            <Image
+              src={gitcoinSrc}
+              alt="Gitcoin"
+              h={{ base: 32, md: 40, lg: 48 }}
+              w={{ base: 32, md: 40, lg: 48 }}
+              mb={4}
+              borderRadius="xl"
+              boxShadow="lg"
+              transition="inherit"
+              className="supportedby-logo"
+            />
+            <Text
+              fontSize={{ base: 'xl', md: '2xl', lg: '2xl' }}
+              color={nameColor}
+              fontWeight="bold"
+              mt={2}
+              textAlign="center"
+              className="supportedby-name"
+              letterSpacing="-0.5px"
+            >
+              Gitcoin
+            </Text>
+          </Box>
+        </Flex>
+        <Box mt={{ base: 10, md: 12 }} textAlign="center">
+          <Button
+            as="a"
+            href="/donate"
+            colorScheme="blue"
+            size="lg"
+            fontWeight="bold"
+            borderRadius="xl"
+            px={8}
+            py={6}
+            className="supportedby-learnmore"
+          >
+            Learn More
+          </Button>
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 }

@@ -249,7 +249,7 @@ const Navbar: React.FC = () => {
         top={0}
         zIndex="sticky"
       >
-        <Box className={"lg:block md:hidden sm:hidden hidden"}>
+  <Box display={{ base: "none", lg: "block" }}>
           <Flex
             minH={"60px"}
             py={{ base: 2 }}
@@ -258,38 +258,32 @@ const Navbar: React.FC = () => {
             borderStyle={"solid"}
             borderColor={useColorModeValue("gray.200", "gray.900")}
             align={"center"}
-            // wrap={"wrap"}
-            justifyContent={"space-between"} // Add this line
+            justifyContent={"space-between"}
             className="md:mx-10 sm:mx-10 mx-10"
           >
-            <Box className={"flex"} flexShrink={0}>
+            <Flex align="center" flexShrink={0} gap={2}>
               <NextLink href={`/`} passHref>
-                {" "}
                 <Logo />
               </NextLink>
-
               <NextLink href={`/`} passHref>
                 <Text
                   textAlign={useBreakpointValue({ base: "center", md: "left" })}
                   color={useColorModeValue("gray.800", "white")}
-                  ml={4}
-                  mt={3}
+                  ml={2}
+                  mt={0}
                   className="font-bold hover:opacity-25 cursor-pointer ease-in duration-150"
+                  lineHeight="1"
+                  display="flex"
+                  alignItems="center"
                 >
                   EIPsInsight
                 </Text>
               </NextLink>
-            </Box>
+            </Flex>
 
             <Spacer />
 
-            <div
-              className={`flex space-x-2 font-bold ${
-                isCollapsed
-                  ? "opacity-100"
-                  : "opacity-0 pointer-events-none hidden"
-              }`}
-            >
+            <Flex align="center" gap={4}>
               {NAV_ITEMS.map((navItem) => (
                 <Box key={navItem.label}>
                   <Popover trigger={"hover"} placement={"bottom-start"}>
@@ -343,6 +337,7 @@ const Navbar: React.FC = () => {
                         <Stack direction={"column"} spacing={2}>
                           {navItem.children.map((child) => (
                             <Box
+                              key={child.label}
                               _hover={{
                                 bg: useColorModeValue("pink.50", "gray.900"),
                               }}
@@ -379,6 +374,7 @@ const Navbar: React.FC = () => {
                         <Stack direction={"column"} spacing={2}>
                           {navItem.children.map((child) => (
                             <Box
+                              key={child.label}
                               _hover={{
                                 bg: useColorModeValue("pink.50", "gray.900"),
                               }}
@@ -467,7 +463,7 @@ const Navbar: React.FC = () => {
                   </Popover>
                 </Box>
               ))}
-            </div>
+            </Flex>
             <Box
               ml={5}
               display={{ base: "none", md: "block" }}
@@ -500,7 +496,7 @@ const Navbar: React.FC = () => {
           </Flex>
         </Box>
 
-        <Box className={"lg:hidden md:block sm:block block"}>
+  <Box display={{ base: "block", lg: "none" }}>
           <Flex
             minH={"60px"}
             py={{ base: 2 }}
@@ -570,7 +566,7 @@ const Navbar: React.FC = () => {
               </Flex>
             </Box>
           </Flex>
-          <div className="lg:hidden md:block sm:block block">
+          <Box display={{ base: "block", lg: "none" }}>
             {isOpen ? (
               <>
                 <div className="flex flex-col relative  border rounded-[0.55rem] my-3 mx-4 space-y-4 py-3 text-lg">
@@ -646,6 +642,7 @@ const Navbar: React.FC = () => {
                             <Stack direction={"column"} spacing={2}>
                               {navItem.children.map((child) => (
                                 <Box
+                                  key={child.label}
                                   _hover={{
                                     bg: useColorModeValue(
                                       "pink.50",
@@ -800,7 +797,7 @@ const Navbar: React.FC = () => {
             ) : (
               <></>
             )}
-          </div>
+          </Box>
         </Box>
       </Box>
     </>

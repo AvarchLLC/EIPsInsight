@@ -44,7 +44,10 @@ const Stats: React.FC = () => {
       <Heading as="h3" size="md" mb={4} className="gradient-text">What we track</Heading>
 
       {loading && (
-        <Text><Spinner size="sm" mr={2} /> Loading stats…</Text>
+        <Box display="flex" alignItems="center">
+          <Spinner size="sm" mr={2} />
+          <Text as="span">Loading stats…</Text>
+        </Box>
       )}
 
       {!loading && (

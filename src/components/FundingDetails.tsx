@@ -100,60 +100,58 @@ export default function FundingDetails() {
   };
 
   return (
-    <VStack spacing={8} align="stretch">
+    <VStack spacing={4} align="stretch">
       {/* Funding overview removed as requested. */}
 
       {/* Grant details moved to a dedicated GrantList component */}
 
-      {/* Call to Action */}
-      <Box
-        bg={cardBg}
-        p={6}
-        borderRadius="xl"
-        border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-        boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-        textAlign="center"
-      >
-        <VStack spacing={4}>
-          <Heading size="md" color={textColor}>
-            Support EIPsInsight
-          </Heading>
-          <Text color={textColor} maxW="2xl">
-            Interested in supporting the project? We welcome contributions, partnerships, 
-            and funding opportunities that help us continue building tools for the Ethereum community.
-          </Text>
-          <HStack spacing={4}>
-            <Button
-              as={ChakraLink}
-              href="https://github.com/AvarchLLC/EIPsInsight"
-              target="_blank"
-              rel="noopener noreferrer"
-              colorScheme="blue"
-              variant="outline"
-            >
-              Open GitHub Issue
-            </Button>
-            <Button
-              as={ChakraLink}
-              href="mailto:team@avarch.org"
-              colorScheme="blue"
-            >
-              Contact Team
-            </Button>
-            <Button
-              as={ChakraLink}
-              href="https://discord.gg/tUXgfV822C"
-              target="_blank"
-              rel="noopener noreferrer"
-              colorScheme="blue"
-              variant="outline"
-            >
-              Join Us
-            </Button>
-            
-          </HStack>
-        </VStack>
-      </Box>
+      {/* Call to Action (no internal container) */}
+      <VStack spacing={2} align="center">
+        <Heading size="sm" color={textColor} textAlign="center">
+          Support EIPsInsight
+        </Heading>
+        <Text color={textColor} maxW="2xl" fontSize="xs" mb={0} textAlign="center">
+          Interested in supporting the project? We welcome contributions, partnerships,
+          and funding opportunities that help us continue building tools for the Ethereum community.
+        </Text>
+        <HStack spacing={2}>
+          <Button
+            as={ChakraLink}
+            href="https://github.com/AvarchLLC/EIPsInsight"
+            target="_blank"
+            rel="noopener noreferrer"
+            colorScheme="blue"
+            variant="outline"
+          >
+            Open GitHub Issue
+          </Button>
+          <Button
+            as={ChakraLink}
+            href="mailto:team@avarch.org"
+            colorScheme="blue"
+          >
+            Contact Team
+          </Button>
+          <Button
+            as={ChakraLink}
+            href="https://discord.gg/tUXgfV822C"
+            target="_blank"
+            rel="noopener noreferrer"
+            colorScheme="blue"
+            variant="outline"
+          >
+            Join Us
+          </Button>
+          <Button
+            as={ChakraLink}
+            href="/donate"
+            colorScheme="pink"
+            variant="outline"
+          >
+            Donate
+          </Button>
+        </HStack>
+      </VStack>
     </VStack>
   );
 }

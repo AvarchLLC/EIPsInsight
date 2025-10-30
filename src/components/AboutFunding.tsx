@@ -80,41 +80,39 @@ export default function AboutFunding() {
             </GridItem>
 
             <GridItem>
-              <Box p={4} borderRadius="md" bg={useColorModeValue('gray.50','transparent')} border={useColorModeValue('1px solid rgba(2,6,23,0.03)','1px solid rgba(255,255,255,0.02)')}>
-                <Stack spacing={3} align="stretch">
-                  <Flex align="center" justify="space-between">
-                    <Text fontWeight="600">Support & Acknowledgements</Text>
-                    <Tooltip label="Organizations and community supporters" aria-label="Supported by tooltip">
-                      <Icon as={FaHeart} color="red.400" />
-                    </Tooltip>
-                  </Flex>
+              <Stack spacing={3} align="stretch">
+                <Flex align="center" justify="space-between">
+                  <Text fontWeight="600">Support & Acknowledgements</Text>
+                  <Tooltip label="Organizations and community supporters" aria-label="Supported by tooltip">
+                    <Icon as={FaHeart} color="red.400" />
+                  </Tooltip>
+                </Flex>
 
-                  <Text color={textColor} fontSize="sm">We are grateful to the organizations and community members who have supported EIPs Insight. The logos above acknowledge past and present support.</Text>
+                <Text color={textColor} fontSize="sm">We are grateful to the organizations and community members who have supported EIPs Insight. The logos above acknowledge past and present support.</Text>
 
-                  <VStack spacing={2} pt={2}>
-                    <a href="https://gap.karmahq.xyz/project/eipsinsight" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
-                      <Button variant="outline" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
-                        <Image src="/logos/karma.svg" alt="karma" boxSize="18px" mr={3} />
-                        Karma (project page)
-                      </Button>
-                    </a>
-                    <a href="https://giveth.io/project/eipsinsight" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
-                      <Button colorScheme="green" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
-                        <Image src="/logos/giveth.svg" alt="giveth" boxSize="18px" mr={3} />
-                        Donate via Giveth
-                      </Button>
-                    </a>
-                    <a href="https://discuss.octant.app/t/eipsinsight-analytics-for-ethereum-improvement-proposals/659" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
-                      <Button colorScheme="cyan" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
-                        <Image src="/logos/octant.svg" alt="octant" boxSize="18px" mr={3} />
-                        Octant discussion
-                      </Button>
-                    </a>
-                  </VStack>
+                <VStack spacing={2} pt={2}>
+                  <a href="https://gap.karmahq.xyz/project/eipsinsight" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
+                    <Button variant="outline" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
+                      <Image src="/logos/karma.svg" alt="karma" boxSize="18px" mr={3} />
+                      Karma (project page)
+                    </Button>
+                  </a>
+                  <a href="https://giveth.io/project/eipsinsight" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
+                    <Button colorScheme="green" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
+                      <Image src="/logos/giveth.svg" alt="giveth" boxSize="18px" mr={3} />
+                      Donate via Giveth
+                    </Button>
+                  </a>
+                  <a href="https://discuss.octant.app/t/eipsinsight-analytics-for-ethereum-improvement-proposals/659" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
+                    <Button colorScheme="cyan" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
+                      <Image src="/logos/octant.svg" alt="octant" boxSize="18px" mr={3} />
+                      Octant discussion
+                    </Button>
+                  </a>
+                </VStack>
 
-                  <Text fontSize="xs" color={useColorModeValue('gray.600','gray.400')}>Note: Karma shows project details and past funding; it is informational, not a direct payment checkout.</Text>
-                </Stack>
-              </Box>
+                <Text fontSize="xs" color={useColorModeValue('gray.600','gray.400')}>Note: Karma shows project details and past funding; it is informational, not a direct payment checkout.</Text>
+              </Stack>
             </GridItem>
           </Grid>
         </Box>

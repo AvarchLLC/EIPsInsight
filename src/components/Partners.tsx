@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Heading, Text, SimpleGrid, Image, useColorModeValue, Stack } from '@chakra-ui/react';
+import { Box, Container, Heading, Text, SimpleGrid, Image, useColorModeValue, Stack, Link as ChakraLink } from '@chakra-ui/react';
 
 const Partners: React.FC = () => {
   const cardBg = useColorModeValue('white', '#2d3748');
@@ -43,16 +43,18 @@ const Partners: React.FC = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Stack spacing={3} align="center">
-              <Image
-                src={"https://etherworld.co/favicon.ico"}
-                alt="EtherWorld logo"
-                boxSize="56px"
-                objectFit="contain"
-                fallbackSrc={logoFallback}
-              />
-              <Text fontWeight="bold">EtherWorld</Text>
-            </Stack>
+            <ChakraLink href="https://etherworld.co" isExternal _hover={{ textDecoration: 'none' }}>
+              <Stack spacing={3} align="center">
+                <Image
+                  src={"https://etherworld.co/favicon.ico"}
+                  alt="EtherWorld logo"
+                  boxSize="56px"
+                  objectFit="contain"
+                  fallbackSrc={logoFallback}
+                />
+                <Text fontWeight="bold">EtherWorld</Text>
+              </Stack>
+            </ChakraLink>
           </Box>
         </SimpleGrid>
       </Box>

@@ -11,6 +11,7 @@ import {
   Tag,
   Button,
   Link as ChakraLink,
+  Tooltip,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
@@ -34,7 +35,7 @@ const grants: Grant[] = [
   {
     id: 'ef-esp',
     title: 'EF ESP Allocation Q2 2025',
-    organization: 'Ethereum Foundation',
+    organization: 'Ecosystem Support Program',
     amount: '$20,000',
     status: 'Awarded',
     startDate: '2024',
@@ -66,7 +67,7 @@ const grants: Grant[] = [
     status: 'Completed',
     startDate: 'Aug 7, 2024',
     impact:
-      "Focus on inclusion across Asian languages and developer communities, expanding EIPsInsight's global reach.",
+      "This round (Gitcoin Grants Round 21) is the 21st round of donations for Gitcoin, focusing on ecosystem and community-driven initiatives.",
     logo: '/Gitcoin-logo-.jpg',
     tags: ['Community', 'Asia', 'Inclusion'],
   },
@@ -78,7 +79,7 @@ const grants: Grant[] = [
     status: 'Completed',
     startDate: 'Aug 1, 2023',
     impact:
-      'Community-driven funding supporting projects aligned with Gitcoin DAO mission, focusing on community impact and sustainability.',
+      'Gitcoin Grants Round 18 (Core) covers four core categories: Web3 Open Source Software, Web3 Community & Education, Climate Solutions, and Ethereum infrastructure.',
     logo: '/Gitcoin-logo-.jpg',
     tags: ['Community', 'Network'],
   },
@@ -88,8 +89,9 @@ const getTier = (amountStr?: string) => {
   if (!amountStr) return 'Community';
   const numeric = parseFloat(amountStr.replace(/[^0-9.]/g, ''));
   if (Number.isNaN(numeric)) return 'Community';
-  if (numeric >= 10000) return 'Significant';
-  if (numeric >= 500) return 'Moderate';
+  // Updated thresholds: Significant >= $20,000; Moderate >= $2,000; Small < $2,000
+  if (numeric >= 20000) return 'Significant';
+  if (numeric >= 2000) return 'Moderate';
   return 'Small';
 };
 
@@ -132,7 +134,7 @@ export default function GrantList() {
                 <HStack spacing={3}>
                   {grant.logo && <Image src={grant.logo} alt={grant.organization} h={10} objectFit="contain" />}
                   <VStack align="start" spacing={0}>
-                    <Text fontSize="lg" fontWeight="bold" color={textColor}>
+                    <Text as="div" fontSize="lg" fontWeight="bold" color={textColor}>
                       {grant.organization}
                     </Text>
                   </VStack>
@@ -141,11 +143,17 @@ export default function GrantList() {
                   (() => {
                     const tier = getTier(grant.amount);
                     if (tier === 'Significant' || tier === 'Small') {
+                      const tipLabel = tier === 'Significant'
+                        ? '>= $20000'
+                        : '< $2000';
+
                       return (
                         <ChakraLink as={NLink} href="/donate" _hover={{ textDecoration: 'none' }}>
-                          <Badge as="span" colorScheme={tierColor(tier)} variant="subtle" px={3} py={1} cursor="pointer">
-                            {tier}
-                          </Badge>
+                          <Tooltip label={tipLabel} placement="top" hasArrow>
+                            <Badge as="span" colorScheme={tierColor(tier)} variant="subtle" px={3} py={1} cursor="pointer">
+                              {tier}
+                            </Badge>
+                          </Tooltip>
                         </ChakraLink>
                       );
                     }
@@ -161,11 +169,11 @@ export default function GrantList() {
               <Divider />
 
               <VStack align="start" spacing={3} w="full">
-                <Text fontSize="md" fontWeight="semibold" color={textColor}>
+                <Text as="div" fontSize="md" fontWeight="semibold" color={textColor}>
                   {grant.title}
                 </Text>
                 {grant.impact && (
-                  <Text fontSize="sm" color={textColor} lineHeight="tall">
+                  <Text as="div" fontSize="sm" color={textColor} lineHeight="tall">
                     {grant.impact}
                   </Text>
                 )}
@@ -196,6 +204,20 @@ export default function GrantList() {
           </Box>
         ))}
       </SimpleGrid>
+      <Box as="footer" mt={6} py={4} textAlign="center">
+        <Text fontSize="sm" color={textColor} mb={2}>
+          If you find EIPsInsight useful, please consider supporting the project.
+        </Text>
+        <ChakraLink
+          as={NLink}
+          href="/donate"
+          color="blue.500"
+          fontWeight="semibold"
+          _hover={{ textDecoration: 'underline' }}
+        >
+          Donate
+        </ChakraLink>
+      </Box>
     </VStack>
   );
 }

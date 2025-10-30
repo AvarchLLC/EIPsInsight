@@ -409,7 +409,11 @@ const UniversalFeedbackSystem = () => {
             >
               <IconButton
                 aria-label="Give feedback"
-                icon={<CombinedThumbsIcon size="20px" />}
+                icon={
+                  <Box display="flex" alignItems="center" justifyContent="center" w="100%" h="100%">
+                    <Icon as={FiMessageSquare} boxSize={5} />
+                  </Box>
+                }
                 size="md"
                 colorScheme="blue"
                 variant="solid"

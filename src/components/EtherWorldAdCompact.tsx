@@ -17,16 +17,18 @@ const STAGNANT = '#BBE1F5';
 const STAG_RGB = `187,225,245`;
 
 const EtherWorldAdCompact: React.FC = () => {
-  const bgColor = useColorModeValue('#EBF7FF', '#05232f');
-  const borderColor = useColorModeValue(`rgba(${STAG_RGB},0.12)`, `rgba(${STAG_RGB},0.22)`);
+  // Use the requested stagnant solid colors for light/dark mode
+  const bgColor = useColorModeValue('#B8DBEF', '#213B61');
+  const borderColor = bgColor; // solid border same as background (stagnant)
   const textColor = useColorModeValue('#05314a', '#e6f6ff');
-  const accentColor = useColorModeValue(STAGNANT, `rgba(${STAG_RGB},0.9)`);
+  const accentColor = bgColor;
 
   return (
     <MotionBox
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
+      initial={{ opacity: 0, x: 20, scale: 0.995 }}
+      animate={{ opacity: 1, x: 0, scale: [1, 1.04, 1] }}
+      transition={{ duration: 2, delay: 0.15, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
+      style={{ willChange: 'transform', overflow: 'visible' }}
     >
       <Link
         href="https://etherworld.co"
@@ -42,30 +44,20 @@ const EtherWorldAdCompact: React.FC = () => {
           p={4}
           cursor="pointer"
           transition="all 0.3s ease"
+          boxShadow={`0 6px 20px rgba(${STAG_RGB},0.12)`}
           _hover={{
             transform: 'translateY(-2px)',
-            boxShadow: `0 10px 30px rgba(${STAG_RGB},0.12), 0 0 24px rgba(${STAG_RGB},0.08)`,
+            boxShadow: `0 14px 40px rgba(${STAG_RGB},0.18)`,
             borderColor: accentColor,
           }}
           maxW="300px"
           position="relative"
-          overflow="hidden"
+          overflow="visible" /* allow glow to be visible outside the card */
           role="banner"
           aria-label="EtherWorld Partnership Advertisement"
         >
-          {/* Background Pattern */}
-          <Box
-            position="absolute"
-            top={0}
-            right={0}
-            w="60px"
-            h="60px"
-            opacity={0.1}
-            background={`radial-gradient(circle, ${accentColor} 20%, transparent 20%)`}
-            backgroundSize="8px 8px"
-            pointerEvents="none"
-          />
-          
+          {/* Pulse only: no colored glow per request */}
+
           <Flex direction="column" gap={2} position="relative" zIndex={1}>
             {/* Header with badge */}
             <Flex align="center" justify="space-between">

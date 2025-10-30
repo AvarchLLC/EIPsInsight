@@ -7,6 +7,7 @@ import FundingDetails from '@/components/FundingDetails';
 import GrantList from '@/components/GrantList';
 import Partners from '@/components/Partners';
 import Stats from '@/components/Stats';
+import Navbar from '@/components/Navbar';
 
 
 import NLink from 'next/link';
@@ -117,145 +118,8 @@ export default function AboutPage() {
         <meta property="og:image" content="/EIPsInsightsDark.gif" />
       </Head>
 
-      {/* Custom Navbar */}
-      <Box
-        className="navbar"
-        position="fixed"
-        top={0}
-        left={0}
-        right={0}
-        zIndex={1000}
-        bg={navBg}
-        py={4}
-        px={{ base: 4, md: 8 }}
-      >
-        <Container maxW="7xl">
-          <HStack justify="space-between" align="center">
-            {/* Logo */}
-            <NLink href="/">
-              <Text
-                fontSize="xl"
-                fontWeight="bold"
-                className="gradient-text"
-                cursor="pointer"
-              >
-                EIPsInsight
-              </Text>
-            </NLink>
-
-            {/* Desktop Navigation */}
-            <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
-              {sections.map((section) => {
-                const IconComponent = section.icon;
-                return (
-                  <Box
-                    key={section.id}
-                    className={`nav-link ${activeSection === section.id ? 'active' : ''}`}
-                    cursor="pointer"
-                    onClick={() => scrollToSection(section.id)}
-                    py={2}
-                    px={3}
-                    borderRadius="md"
-                    color={activeSection === section.id ? mainHeadingColor : navLinkColor}
-                    _hover={{
-                      color: navLinkHoverColor,
-                      bg: glassHover
-                    }}
-                  >
-                    <Text fontSize="sm" fontWeight="medium">
-                      {section.label}
-                    </Text>
-                  </Box>
-                );
-              })}
-
-              {/* Dark Mode Toggle */}
-              <IconButton
-                aria-label="Toggle color mode"
-                icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
-                onClick={toggleColorMode}
-                variant="ghost"
-                size="sm"
-                color={navLinkColor}
-                _hover={{
-                  bg: glassHover,
-                  color: navLinkHoverColor
-                }}
-              />
-            </HStack>
-
-            {/* Mobile Controls */}
-            <HStack spacing={3} display={{ base: 'flex', md: 'none' }}>
-              {/* Dark Mode Toggle for Mobile */}
-              <IconButton
-                aria-label="Toggle color mode"
-                icon={useColorModeValue(<MoonIcon />, <SunIcon />)}
-                onClick={toggleColorMode}
-                variant="ghost"
-                size="sm"
-                color={navLinkColor}
-                _hover={{
-                  bg: glassHover,
-                  color: navLinkHoverColor
-                }}
-              />
-
-              {/* Mobile Menu Button */}
-              <Box
-                cursor="pointer"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                color={navLinkColor}
-                _hover={{ color: navLinkHoverColor }}
-              >
-                {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-              </Box>
-            </HStack>
-          </HStack>
-
-          {/* Mobile Navigation */}
-          {isMenuOpen && (
-            <Box
-              className="mobile-menu"
-              position="absolute"
-              top="100%"
-              left={0}
-              right={0}
-              bg={navBg}
-              borderRadius="md"
-              mt={2}
-              p={4}
-              boxShadow="lg"
-              display={{ base: 'block', md: 'none' }}
-            >
-              <Stack spacing={3}>
-                {sections.map((section) => {
-                  const IconComponent = section.icon;
-                  return (
-                    <Box
-                      key={section.id}
-                      className={`nav-link ${activeSection === section.id ? 'active' : ''}`}
-                      cursor="pointer"
-                      onClick={() => scrollToSection(section.id)}
-                      py={3}
-                      px={4}
-                      borderRadius="md"
-                      color={activeSection === section.id ? mainHeadingColor : navLinkColor}
-                      _hover={{
-                        color: navLinkHoverColor,
-                        bg: glassHover
-                      }}
-                    >
-                      <Text fontSize="md" fontWeight="medium">
-                        {section.label}
-                      </Text>
-                    </Box>
-                  );
-                })}
-              </Stack>
-            </Box>
-          )}
-        </Container>
-      </Box>
+  {/* Render site Navbar for pages router so about page matches site header */}
+  <Navbar />
 
       <style jsx>{`
         body {
@@ -466,27 +330,30 @@ export default function AboutPage() {
         }
       `}</style>
       <Box
-        paddingBottom={{ base: 4, sm: 6, lg: 8 }}
+        paddingBottom={{ base: 2, sm: 3, lg: 4 }}
         marginX={0}
-        paddingX={{ base: 4, md: 6, lg: 8 }}
-        marginTop={{ base: 20, sm: 24, md: 28, lg: 32 }}
+        paddingX={{ base: 2, md: 3, lg: 4 }}
+        /* Reduced top spacing so content sits closer under the site navbar */
+        marginTop={{ base: 4, sm: 6, md: 8, lg: 0 }}
       >
         {/* Overview Section */}
-        <Container maxW="7xl" py={4} id="overview">
-          <Box
-            className="section-container"
-            bg={cardBg}
-            p={{ base: 6, md: 8 }}
-            borderRadius="xl"
-            textAlign="left"
-            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-            style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
-            _hover={{
-              transform: 'translateY(-2px)',
-              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
-            }}
-          >
+  <Container maxW="7xl" py={6} id="overview">
+            <Box
+              className="section-container"
+              bg={cardBg}
+              p={{ base: 6, md: 8 }}
+              pb={0}
+              mb={-4}
+              borderRadius="xl"
+              textAlign="left"
+              border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+              boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+              style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+              _hover={{
+                transform: 'translateY(-2px)',
+                boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+              }}
+            >
             <Heading
               as="h1"
               fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
@@ -587,13 +454,9 @@ export default function AboutPage() {
           </Box>
         </Container>
 
-        {/* Stats Section */}
-        <Container maxW="7xl" py={4} id="stats">
-          <Stats />
-        </Container>
 
         {/* Contributors Section */}
-        <Container maxW="7xl" py={4} id="team">
+  <Container maxW="7xl" py={1} id="team">
           <Box
             className="section-container"
             bg={cardBg}
@@ -611,8 +474,13 @@ export default function AboutPage() {
           </Box>
         </Container>
 
+        {/* Stats Section */}
+  <Container maxW="7xl" py={-20} id="stats">
+          <Stats />
+        </Container>
+
         {/* Funding Section */}
-        <Container maxW="7xl" py={4} id="funding">
+  <Container maxW="7xl" py={1} id="funding">
           <Box
             className="section-container"
             bg={cardBg}
@@ -633,7 +501,7 @@ export default function AboutPage() {
         </Container>
 
         {/* Grants (moved out of Funding) */}
-        <Container maxW="7xl" py={4} id="grants">
+  <Container maxW="7xl" py={1} id="grants">
           <Box
             className="section-container"
             bg={cardBg}
@@ -670,7 +538,7 @@ export default function AboutPage() {
   <Partners />
 
   {/* FAQ Section */}
-        <Container maxW="7xl" py={4} id="faq">
+  <Container maxW="7xl" py={1} id="faq">
           <Box
             className="section-container"
             bg={cardBg}
@@ -728,7 +596,7 @@ export default function AboutPage() {
                     </AccordionButton>
                     <AccordionPanel pb={6} px={6}>
                       <Text color={textColor} lineHeight="tall" fontSize="sm">
-                        We aggregate public GitHub data from the official ethereum repositories (EIPs, ERCs, RIPs) plus partner repos and community submissions. Data is normalized (labels, timestamps) to provide consistent analytics across different repos and timelines.
+                        We aggregate public GitHub data from the official Ethereum repositories (EIPs, ERCs, RIPs), partner repositories, and community submissions. We fetch commits, PRs, and proposal files using GitHub's API, normalize labels and timestamps into monthly buckets, and persist processed records in MongoDB. Public API endpoints (for example, <code>/api/stats</code> and PR snapshot APIs) expose the aggregated metrics; when the database is unavailable the UI shows a friendly fallback.
                       </Text>
                     </AccordionPanel>
                   </AccordionItem>
@@ -829,35 +697,7 @@ export default function AboutPage() {
               </Box>
 
               {/* Exports & API */}
-              <Box
-                className="section-container"
-                bg={cardBg}
-                borderRadius="xl"
-                overflow="hidden"
-                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
-                _hover={{
-                  transform: 'translateY(-2px)',
-                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
-                }}
-              >
-                <Accordion allowMultiple>
-                  <AccordionItem border="none">
-                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
-                      <Box flex="1" textAlign="left">
-                        <Text fontWeight="semibold" fontSize="md">Can I export or access raw data via an API?</Text>
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                    <AccordionPanel pb={6} px={6}>
-                      <Text color={textColor} lineHeight="tall" fontSize="sm">
-                        Yes — several pages provide CSV export. We also expose internal API endpoints for many datasets (used by our charts). Check the documentation or contact us if you need a specific dataset or higher-rate access.
-                      </Text>
-                    </AccordionPanel>
-                  </AccordionItem>
-                </Accordion>
-              </Box>
+              {/* Export/API question removed per request */}
 
               {/* Reporting & feature requests */}
               <Box
@@ -891,35 +731,7 @@ export default function AboutPage() {
               </Box>
 
               {/* Privacy */}
-              <Box
-                className="section-container"
-                bg={cardBg}
-                borderRadius="xl"
-                overflow="hidden"
-                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
-                _hover={{
-                  transform: 'translateY(-2px)',
-                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
-                }}
-              >
-                <Accordion allowMultiple>
-                  <AccordionItem border="none">
-                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
-                      <Box flex="1" textAlign="left">
-                        <Text fontWeight="semibold" fontSize="md">What about privacy and personal data?</Text>
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                    <AccordionPanel pb={6} px={6}>
-                      <Text color={textColor} lineHeight="tall" fontSize="sm">
-                        We only surface public data available on GitHub and other public feeds. We do not collect or store private user data. For details, see our Privacy page or contact support for any data removal requests.
-                      </Text>
-                    </AccordionPanel>
-                  </AccordionItem>
-                </Accordion>
-              </Box>
+              
             </Stack>
           </Box>
         </Container>
