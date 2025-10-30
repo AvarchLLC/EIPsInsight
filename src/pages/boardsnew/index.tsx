@@ -599,7 +599,7 @@ const DashboardPage = () => {
     if (statusGroups['Final'].length > 0) {
       markdown += '#### To `Final`\n';
       statusGroups['Final'].forEach(item => {
-        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+        markdown += `- ${item.url}\n`;
       });
       markdown += '\n';
     }
@@ -607,7 +607,7 @@ const DashboardPage = () => {
     if (statusGroups['Last Call'].length > 0) {
       markdown += '#### To `Last Call`\n';
       statusGroups['Last Call'].forEach(item => {
-        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+        markdown += `- ${item.url}\n`;
       });
       markdown += '\n';
     }
@@ -615,7 +615,7 @@ const DashboardPage = () => {
     if (statusGroups['Review'].length > 0) {
       markdown += '#### To `Review`\n';
       statusGroups['Review'].forEach(item => {
-        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+        markdown += `- ${item.url}\n`;
       });
       markdown += '\n';
     }
@@ -623,7 +623,7 @@ const DashboardPage = () => {
     if (statusGroups['Draft'].length > 0) {
       markdown += '#### To `Draft`\n';
       statusGroups['Draft'].forEach(item => {
-        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+        markdown += `- ${item.url}\n`;
       });
       markdown += '\n';
     }
@@ -631,7 +631,7 @@ const DashboardPage = () => {
     if (statusGroups['Other'].length > 0) {
       markdown += '#### Other\n';
       statusGroups['Other'].forEach(item => {
-        markdown += `* [${item.title} ${item.type}s#${item.number}](${item.url})\n`;
+        markdown += `- ${item.url}\n`;
       });
       markdown += '\n';
     }
