@@ -168,21 +168,20 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
         overflow="visible"
         ref={cardRef}
         bg={STAGNANT}
-    borderRadius="lg"
-    borderWidth="1px"
-    borderColor={`rgba(${STAG_RGB},0.18)`}
-  p={0.5}
-  pr="44px"
-  minH="44px"
-    w="100%"
-    maxW="880px"
-    mx="auto"
-  onClick={handleClick}
+        borderRadius="lg"
+        borderWidth="1px"
+        borderColor={`rgba(${STAG_RGB},0.18)`}
+        p={2}
+        minH="56px"
+        w="100%"
+        maxW="880px"
+        mx="auto"
+        onClick={handleClick}
         boxShadow={`inset 0 1px 0 rgba(255,255,255,0.02), 0 12px 30px rgba(${STAG_RGB},0.12)`}
-  sx={{ animation: `${darkPulse} 3.5s ease-in-out infinite` }}
-  _hover={{ transform: "translateY(-2px)", boxShadow: "0 14px 36px rgba(16,185,129,0.08)" }}
-  opacity={isClosing ? 0 : 1}
-  transition="opacity 220ms ease, transform 0.18s ease, box-shadow 0.18s ease"
+        sx={{ animation: `${darkPulse} 3.5s ease-in-out infinite` }}
+        _hover={{ transform: "translateY(-2px)", boxShadow: "0 14px 36px rgba(16,185,129,0.08)" }}
+        opacity={isClosing ? 0 : 1}
+        transition="opacity 220ms ease, transform 0.18s ease, box-shadow 0.18s ease"
         tabIndex={0}
         onKeyDown={(e: React.KeyboardEvent) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -230,29 +229,24 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
           zIndex={1}
         />
 
-        {/* Ultra-Compact Information Dense Layout (dark) - mirror light content but darker tones */}
+        {/* Main Flex Layout: Left (logo/text), Center (headline/desc), Right (READ/Close) */}
         <Flex
           align="center"
-          justify="center"
-          gap={2}
-          minH="36px"
+          justify="space-between"
+          gap={4}
+          h="100%"
           position="relative"
           zIndex={2}
           overflow="visible"
-          px={0.5}
+          px={2}
         >
-
-        {/* Close button (appears on hover of the group) */}
-  {/* Small in-card close button (kept inside the card) */}
-  {/* Close button removed from absolute card corner; rendered next to the READ CTA instead */}
-
           {/* Left: Micro Logo + Brand */}
-          <Flex align="center" gap={1} minW="fit-content" flexShrink={0}>
+          <Flex align="center" gap={2} minW="fit-content" flexShrink={0}>
             <Image
               src={logoSrc}
               alt="EtherWorld logo"
-              boxSize="28px"
-              borderRadius="sm"
+              boxSize="32px"
+              borderRadius="full"
               borderWidth="1px"
               borderColor="rgba(255,255,255,0.08)"
               boxShadow="sm"
@@ -260,69 +254,69 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
                 <Box
                   bg={STAGNANT}
                   color="white"
-                  fontSize="12px"
+                  fontSize="13px"
                   fontWeight="bold"
-                  w="28px"
-                  h="28px"
+                  w="32px"
+                  h="32px"
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
-                  borderRadius="sm"
+                  borderRadius="full"
                 >
                   EW
                 </Box>
               }
             />
-            <Text fontSize="sm" fontWeight="bold" color="white" lineHeight="1">
+            <Text fontSize="md" fontWeight="bold" color="white" lineHeight="1" display="flex" alignItems="center" justifyContent="center">
               EtherWorld
             </Text>
           </Flex>
 
           {/* Center: Dense Info Stack */}
-          <Flex direction="column" flex={1} px={1.5} justify="center" overflow="visible" position="relative" gap={0}>
+          <Flex direction="column" flex={1} px={2} justify="center" align="center" overflow="hidden" position="relative" gap={1}>
             <Text
-              fontSize="10px"
+              fontSize="12px"
               fontWeight="bold"
               color="white"
-              lineHeight="1.05"
-              mb={0.25}
+              lineHeight="1.2"
+              mb={0.5}
               textTransform="uppercase"
-              letterSpacing="0.4px"
+              letterSpacing="0.5px"
+              textAlign="center"
             >
               Global ETH News • ACD Updates • Security Alerts • Protocol Analysis
             </Text>
-            <Flex align="center" gap={1} fontSize="7px" color="gray.300" flexWrap="nowrap">
+            <Flex align="center" gap={1.5} fontSize="8px" color="gray.300" flexWrap="nowrap" justify="center">
               <Flex align="center" gap={0.5}>
-                <Icon as={FiShield} boxSize="7px" color="gray.300" />
+                <Icon as={FiShield} boxSize="8px" color="gray.300" />
                 <Text>Grant-Backed</Text>
               </Flex>
               <Text>•</Text>
               <Flex align="center" gap={0.5}>
-                <Icon as={FiTrendingUp} boxSize="8px" color="gray.300" />
+                <Icon as={FiTrendingUp} boxSize="9px" color="gray.300" />
                 <Text>Real-time</Text>
               </Flex>
               <Text>•</Text>
               <Text fontWeight="bold">15k+ Readers</Text>
               <Text>•</Text>
               <Flex align="center" gap={0.5}>
-                <Icon as={FiClock} boxSize="7px" color="gray.300" />
+                <Icon as={FiClock} boxSize="8px" color="gray.300" />
                 <Text>24/7</Text>
               </Flex>
               <Text>•</Text>
-                <Text fontWeight="bold" color={STAGNANT}>Premium Intel</Text>
+              <Text fontWeight="bold" color={STAGNANT}>Premium Intel</Text>
             </Flex>
           </Flex>
 
-          {/* Right: Compact CTA + Dense Badges (centered vertically in dark mode) */}
-          <Flex direction="column" align="center" justify="center" gap={0.5} minW="fit-content" flexShrink={0}>
-            {/* Badges and small stats removed per request to avoid overlap with close button */}
+          {/* Right: READ button and Close button spaced apart */}
+          <Flex align="center" gap={3} minW="fit-content" flexShrink={0}>
             <Box
               bg="green.500"
               color="white"
-              px={0.9}
-              py={0.3}
+              px={2.5}
+              py={1}
               borderRadius="md"
-              fontSize="10px"
+              fontSize="12px"
               fontWeight="bold"
               cursor="pointer"
               position="relative"
@@ -335,7 +329,7 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
               mb={0}
               role="button"
               tabIndex={0}
-              _hover={{ transform: "scale(1.03)", boxShadow: "lg", bg: 'green.600' }}
+              _hover={{ transform: "scale(1.04)", boxShadow: "lg", bg: 'green.600' }}
               _focusVisible={{ outline: "3px solid", outlineColor: `rgba(${STAG_RGB},0.6)`, outlineOffset: "2px" }}
               transition="all 0.2s ease"
               onClick={(e: React.MouseEvent) => {
@@ -349,27 +343,40 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
                 }
               }}
             >
-              <Flex align="center" gap={0.5}>
-                <Text fontSize="9px" fontWeight="bold">READ</Text>
-                <Icon as={FiExternalLink} boxSize="8px" />
+              <Flex align="center" gap={1}>
+                <Text fontSize="12px" fontWeight="bold">READ</Text>
+                <Icon as={FiExternalLink} boxSize="12px" />
               </Flex>
-
-              {/* Close button placed to the right/above the READ CTA so it doesn't cover content */}
-              <CloseButton
-                position="absolute"
-                top={-2}
-                right={-10}
-                zIndex={40}
-                size="xs"
-                aria-label="Close ad (Shift+Click to request an ad)"
-                title="Close ad (Shift+Click to request an ad)"
-                bg="rgba(239,68,68,0.65)"
-                _hover={{ bg: 'rgba(220,38,38,0.82)' }}
-                color="white"
-                boxShadow={`0 3px 8px rgba(0,0,0,0.08)`}
-                onClick={handleCloseButtonClick}
-              />
             </Box>
+            {/* Modern Close Button */}
+            <CloseButton
+              aria-label="Close ad (Shift+Click to request an ad)"
+              title="Close ad (Shift+Click to request an ad)"
+              size="md"
+              bg="gray.800"
+              color="red.300"
+              borderRadius="full"
+              boxShadow="sm"
+              borderWidth="1px"
+              borderColor="gray.700"
+              transition="all 0.18s ease"
+              _hover={{
+                bg: "red.700",
+                color: "white",
+                boxShadow: "md",
+                transform: "scale(1.08)",
+              }}
+              _active={{
+                bg: "red.800",
+                color: "white",
+              }}
+              _focusVisible={{
+                outline: "2px solid",
+                outlineColor: "red.300",
+                outlineOffset: "2px",
+              }}
+              onClick={handleCloseButtonClick}
+            />
           </Flex>
         </Flex>
       </Box>
@@ -384,16 +391,15 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
         position="relative"
         overflow="visible"
         ref={cardRef}
-  bg={useColorModeValue("#BBE1F5", "linear-gradient(270deg,#071827 0%, #083045 40%, #0b4a66 100%)")}
-    borderRadius="lg"
-    borderWidth="1px"
-    p={0.5}
-  pr="44px"
-  minH="44px"
-  opacity={isClosing ? 0 : 1}
-    w="100%"
-    maxW="880px"
-    mx="auto"
+        bg={useColorModeValue("#BBE1F5", "linear-gradient(270deg,#071827 0%, #083045 40%, #0b4a66 100%)")}
+        borderRadius="lg"
+        borderWidth="1px"
+        p={2}
+        minH="56px"
+        opacity={isClosing ? 0 : 1}
+        w="100%"
+        maxW="880px"
+        mx="auto"
         cursor="pointer"
         onClick={handleClick}
         backgroundSize="300% 300%"
@@ -433,194 +439,206 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
         onFocus={() => setHovered(true)}
         onBlur={() => setHovered(false)}
       >
-      {/* Background glow overlay + animated sheen effect */}
-      <Box
-        position="absolute"
-        top="-10%"
-        left="-10%"
-        right="-10%"
-        bottom="-10%"
-        pointerEvents="none"
-        zIndex={0}
-        sx={{
-          background: `radial-gradient(circle at 20% 30%, rgba(${STAG_RGB},0.12), transparent 12%), radial-gradient(circle at 80% 70%, rgba(${STAG_RGB},0.08), transparent 18%)`,
-          filter: "blur(14px)",
-          opacity: 0.95,
-        }}
-      />
+        {/* Background glow overlay + animated sheen effect */}
+        <Box
+          position="absolute"
+          top="-10%"
+          left="-10%"
+          right="-10%"
+          bottom="-10%"
+          pointerEvents="none"
+          zIndex={0}
+          sx={{
+            background: `radial-gradient(circle at 20% 30%, rgba(${STAG_RGB},0.12), transparent 12%), radial-gradient(circle at 80% 70%, rgba(${STAG_RGB},0.08), transparent 18%)`,
+            filter: "blur(14px)",
+            opacity: 0.95,
+          }}
+        />
 
-      {/* Animated sheen effect */}
-      <Box
-        position="absolute"
-        top="0"
-        left="0"
-        right="0"
-        bottom="0"
-        backgroundImage="linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)"
-        backgroundSize="200% 100%"
-        sx={{
-          animation: `${sheen} 7s infinite linear`,
-          "@media (prefers-reduced-motion: reduce)": {
-            animation: "none",
-          }
-        }}
-        pointerEvents="none"
-        zIndex={1}
-      />
+        {/* Animated sheen effect */}
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          backgroundImage="linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)"
+          backgroundSize="200% 100%"
+          sx={{
+            animation: `${sheen} 7s infinite linear`,
+            "@media (prefers-reduced-motion: reduce)": {
+              animation: "none",
+            }
+          }}
+          pointerEvents="none"
+          zIndex={1}
+        />
 
-      {/* Ultra-Compact Information Dense Layout */}
-  <Flex
-    align="center"
-    justify="flex-start"
-    gap={2}
-    h="100%"
-    position="relative"
-    zIndex={2}
-    overflow="visible"
-    px={0.8}
-  >
-
-      {/* Small in-card close button (kept inside the card) */}
-      {/* Close button removed from absolute card corner; rendered next to the READ CTA instead */}
-
-        {/* Left: Micro Logo + Brand */}
-          <Flex align="center" gap={1.5} minW="fit-content" flexShrink={0}>
-          <Image 
-            src={logoSrc} 
-            alt="EtherWorld logo" 
-            boxSize="28px" 
-            borderRadius="sm"
-            fallback={
-              <Box
-                bg="green.500"
-                color="white"
-                fontSize="12px"
-                fontWeight="bold"
-                w="28px"
-                h="28px"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                borderRadius="sm"
+        {/* Main Flex Layout: Left (logo/text), Center (headline/desc), Right (READ/Close) */}
+        <Flex
+          align="center"
+          justify="space-between"
+          gap={4}
+          h="100%"
+          position="relative"
+          zIndex={2}
+          overflow="visible"
+          px={2}
+        >
+          {/* Left: Micro Logo + Brand */}
+          <Flex align="center" gap={2} minW="fit-content" flexShrink={0}>
+            <Image
+              src={logoSrc}
+              alt="EtherWorld logo"
+              boxSize="32px"
+              borderRadius="full"
+              fallback={
+                <Box
+                  bg="green.500"
+                  color="white"
+                  fontSize="13px"
+                  fontWeight="bold"
+                  w="32px"
+                  h="32px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  borderRadius="full"
                 >
                   EW
                 </Box>
               }
             />
-          <Text 
-            fontSize="sm"
-            fontWeight="bold"
-            color={useColorModeValue("gray.900", "white")}
-            lineHeight="1"
-          >
-            EtherWorld
-          </Text>
-        </Flex>
-
-        {/* Center: Dense Info Stack */}
-          <Flex direction="column" flex={1} px={1.2} justify="center" overflow="hidden" position="relative" gap={0}>
-          <Text 
-            fontSize="11px"
-            fontWeight="bold"
-            color={useColorModeValue("gray.900", "white")}
-            lineHeight="1.1"
-            mb={0.5}
-            textTransform="uppercase"
-            letterSpacing="0.5px"
-          >
-            Global ETH News • ACD Updates • Security Alerts • Protocol Analysis
-          </Text>
-          <Flex align="center" gap={1} fontSize="7px" color={useColorModeValue("gray.600", "gray.300")} flexWrap="nowrap">
-            <Flex align="center" gap={0.5}>
-              <Icon as={FiShield} boxSize="7px" />
-              <Text>Grant-Backed</Text>
-            </Flex>
-            <Text>•</Text>
-            <Flex align="center" gap={0.5}>
-              <Icon as={FiTrendingUp} boxSize="8px" />
-              <Text>Real-time</Text>
-            </Flex>
-            <Text>•</Text>
-            <Text fontWeight="bold">15k+ Readers</Text>
-            <Text>•</Text>
-            <Flex align="center" gap={0.5}>
-              <Icon as={FiClock} boxSize="8px" />
-              <Text>24/7</Text>
-            </Flex>
-            <Text>•</Text>
-            <Text fontWeight="bold" color={useColorModeValue("green.700", "green.300")}>Premium Intel</Text>
+            <Text
+              fontSize="md"
+              fontWeight="bold"
+              color={useColorModeValue("gray.900", "white")}
+              lineHeight="1"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              EtherWorld
+            </Text>
           </Flex>
-        </Flex>
 
-  {/* Right: Compact CTA + Dense Badges */}
-              <Flex direction="column" align="flex-end" justify="flex-end" gap={0.5} minW="fit-content" flexShrink={0} h="100%">
-          {/* Removed LIVE/HOT badges and compact stats to prevent overlap with the close button */}
-          <Box
-            bg={useColorModeValue("green.600", "green.500")}
-            color="white"
-            px={1}
-            py={0.4}
-            borderRadius="md"
-            fontSize="10px"
-            fontWeight="bold"
-            cursor="pointer"
-            position="relative"
-            overflow="visible"
-            boxShadow="md"
-            border="1px solid"
-            borderColor={useColorModeValue("green.700", "green.400")}
-            whiteSpace="nowrap"
-            alignSelf="flex-end"
-            mb={2}
-            role="button"
-            tabIndex={0}
-            _hover={{
-              transform: "scale(1.03)",
-              bg: useColorModeValue("green.700", "green.600"),
-              boxShadow: "lg",
-            }}
-            _focusVisible={{
-              outline: "3px solid",
-              outlineColor: useColorModeValue("green.500", "green.400"),
-              outlineOffset: "2px",
-            }}
-            transition="all 0.2s ease"
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-            onKeyDown={(e: React.KeyboardEvent) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleClick();
-              }
-            }}
-          >
-            <Flex align="center" gap={0.5}>
-              <Text fontSize="10px" fontWeight="bold">READ</Text>
-              <Icon as={FiExternalLink} boxSize="9px" />
+          {/* Center: Dense Info Stack */}
+          <Flex direction="column" flex={1} px={2} justify="center" align="center" overflow="hidden" position="relative" gap={1}>
+            <Text
+              fontSize="12px"
+              fontWeight="bold"
+              color={useColorModeValue("gray.900", "white")}
+              lineHeight="1.2"
+              mb={0.5}
+              textTransform="uppercase"
+              letterSpacing="0.5px"
+              textAlign="center"
+            >
+              Global ETH News • ACD Updates • Security Alerts • Protocol Analysis
+            </Text>
+            <Flex align="center" gap={1.5} fontSize="8px" color={useColorModeValue("gray.600", "gray.300")} flexWrap="nowrap" justify="center">
+              <Flex align="center" gap={0.5}>
+                <Icon as={FiShield} boxSize="8px" />
+                <Text>Grant-Backed</Text>
+              </Flex>
+              <Text>•</Text>
+              <Flex align="center" gap={0.5}>
+                <Icon as={FiTrendingUp} boxSize="9px" />
+                <Text>Real-time</Text>
+              </Flex>
+              <Text>•</Text>
+              <Text fontWeight="bold">15k+ Readers</Text>
+              <Text>•</Text>
+              <Flex align="center" gap={0.5}>
+                <Icon as={FiClock} boxSize="8px" />
+                <Text>24/7</Text>
+              </Flex>
+              <Text>•</Text>
+              <Text fontWeight="bold" color={useColorModeValue("green.700", "green.300")}>Premium Intel</Text>
             </Flex>
+          </Flex>
 
-            {/* Close button placed to the right/above the READ CTA so it doesn't cover content */}
+          {/* Right: READ button and Close button spaced apart */}
+          <Flex align="center" gap={3} minW="fit-content" flexShrink={0}>
+            <Box
+              bg={useColorModeValue("green.600", "green.500")}
+              color="white"
+              px={2.5}
+              py={1}
+              borderRadius="md"
+              fontSize="12px"
+              fontWeight="bold"
+              cursor="pointer"
+              position="relative"
+              overflow="visible"
+              boxShadow="md"
+              border="1px solid"
+              borderColor={useColorModeValue("green.700", "green.400")}
+              whiteSpace="nowrap"
+              alignSelf="center"
+              mb={0}
+              role="button"
+              tabIndex={0}
+              _hover={{
+                transform: "scale(1.04)",
+                bg: useColorModeValue("green.700", "green.600"),
+                boxShadow: "lg",
+              }}
+              _focusVisible={{
+                outline: "3px solid",
+                outlineColor: useColorModeValue("green.500", "green.400"),
+                outlineOffset: "2px",
+              }}
+              transition="all 0.2s ease"
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleClick();
+              }}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleClick();
+                }
+              }}
+            >
+              <Flex align="center" gap={1}>
+                <Text fontSize="12px" fontWeight="bold">READ</Text>
+                <Icon as={FiExternalLink} boxSize="12px" />
+              </Flex>
+            </Box>
+            {/* Modern Close Button */}
             <CloseButton
-              position="absolute"
-              top={2}
-              right={-42}
-              zIndex={40}
-              size="xs"
               aria-label="Close ad (Shift+Click to request an ad)"
               title="Close ad (Shift+Click to request an ad)"
-              bg="rgba(239,68,68,0.65)"
-              _hover={{ bg: 'rgba(220,38,38,0.82)' }}
-              color="white"
-              boxShadow={`0 3px 8px rgba(0,0,0,0.08)`}
+              size="md"
+              bg={useColorModeValue("white", "gray.700")}
+              color={useColorModeValue("red.500", "red.300")}
+              borderRadius="full"
+              boxShadow="sm"
+              borderWidth="1px"
+              borderColor={useColorModeValue("gray.200", "gray.600")}
+              transition="all 0.18s ease"
+              _hover={{
+                bg: useColorModeValue("red.50", "red.700"),
+                color: useColorModeValue("red.600", "white"),
+                boxShadow: "md",
+                transform: "scale(1.08)",
+              }}
+              _active={{
+                bg: useColorModeValue("red.100", "red.800"),
+                color: useColorModeValue("red.700", "white"),
+              }}
+              _focusVisible={{
+                outline: "2px solid",
+                outlineColor: useColorModeValue("red.400", "red.300"),
+                outlineOffset: "2px",
+              }}
               onClick={handleCloseButtonClick}
             />
-          </Box>
+          </Flex>
         </Flex>
-      </Flex>
-    </Box>
-  );
+      </Box>
+    );
 };
 
 export default EtherWorldAdCard;
