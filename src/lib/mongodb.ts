@@ -29,5 +29,8 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = client.connect();
 }
 
-// Export only the function
+// Export the clientPromise as default
+export default clientPromise;
+
+// Also export the function for backwards compatibility
 export const connectToDatabase = () => clientPromise;

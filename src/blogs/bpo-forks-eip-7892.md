@@ -2,6 +2,10 @@
 title: "Blob Parameter Only (BPO) Forks (EIP-7892)"
 date: 2025-06-07
 author: Yash Kamal Chaturvedi
+avatar: https://avatars.githubusercontent.com/u/76512851?v=4
+role: Blockchain Technical Writer
+category: Scaling
+tags: [EIP-7892, BPO, Blobs, Layer 2, Data Availability]
 image: https://etherworld.co/content/images/2025/06/Your-paragraph-text--1-.jpg
 ---
 
