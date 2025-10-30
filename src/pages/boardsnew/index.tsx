@@ -254,10 +254,15 @@ const DashboardPage = () => {
     pageSize: 20,
   });
 
-  // Allowed labels to display
+  // Labels available in the filter dropdown
+  const filterLabels = [
+    "typo-fix", "status-change", "c-new"
+  ];
+
+  // All labels that can be displayed in the table
   const allowedLabels = [
-    "e-review", "e-consensus", "w-response", "s-ci", "w-stale", 
-    "bug", "enhancement", "c-new", "c-update", "s-draft", 
+    "e-review", "e-consensus", "w-response", "w-ci", "w-stale", 
+    "bug", "enhancement", "c-new", "c-update", "c-status", "s-draft", 
     "s-final", "s-lastcall", "s-review", "s-stagnant", "s-withdrawn",
     "created-by-bot", "typo-fix", "status-change"
   ];
@@ -340,18 +345,18 @@ const DashboardPage = () => {
     fetchData();
   }, []);
 
-  // Extract unique labels including auto-generated ones, filtered by allowed labels
+  // Extract unique labels for the filter dropdown (only filterLabels)
   const allLabels = useMemo(() => {
     const labels = new Set<string>();
     boardData.forEach(item => {
       addAutoLabels(item).forEach(label => {
-        if (allowedLabels.includes(label.toLowerCase())) {
+        if (filterLabels.includes(label.toLowerCase())) {
           labels.add(label);
         }
       });
     });
     return Array.from(labels).sort();
-  }, [boardData, allowedLabels]);
+  }, [boardData, filterLabels]);
 
   const columnHelper = createColumnHelper<BoardData>();
 
@@ -369,14 +374,29 @@ const DashboardPage = () => {
       }),
       columnHelper.accessor('number', {
         header: 'PR #',
-        cell: (info) => (
-          <HStack justify="center" spacing={1}>
-            <Icon as={BiGitPullRequest} color="blue.500" boxSize={5} />
-            <Text fontSize="md" fontWeight="bold" color="blue.500">
-              {info.getValue()}
-            </Text>
-          </HStack>
-        ),
+        cell: (info) => {
+          const row = info.row.original;
+          return (
+            <Link href={row.url} isExternal _hover={{ textDecoration: 'none' }}>
+              <HStack justify="center" spacing={1}>
+                <Icon as={BiGitPullRequest} color="blue.500" boxSize={5} />
+                <Text 
+                  fontSize="md" 
+                  fontWeight="bold" 
+                  color="blue.500"
+                  _hover={{
+                    color: useColorModeValue("blue.800", "blue.100"),
+                    textDecoration: "underline"
+                  }}
+                  transition="all 0.2s"
+                  cursor="pointer"
+                >
+                  {info.getValue()}
+                </Text>
+              </HStack>
+            </Link>
+          );
+        },
         size: 100,
       }),
       columnHelper.accessor('title', {
@@ -404,6 +424,19 @@ const DashboardPage = () => {
             </Link>
           );
         },
+      }),
+      columnHelper.accessor('created_at', {
+        header: 'Created',
+        cell: (info) => (
+          <Text
+            fontSize="sm"
+            fontWeight="medium"
+            color={useColorModeValue("gray.600", "gray.300")}
+          >
+            {format(new Date(info.getValue()), 'MMM dd, yyyy')}
+          </Text>
+        ),
+        size: 120,
       }),
       columnHelper.accessor('wait_duration_hours', {
         header: 'Wait Time',
@@ -471,19 +504,6 @@ const DashboardPage = () => {
           );
         },
         size: 280,
-      }),
-      columnHelper.accessor('created_at', {
-        header: 'Created',
-        cell: (info) => (
-          <Text
-            fontSize="sm"
-            fontWeight="medium"
-            color={useColorModeValue("gray.600", "gray.300")}
-          >
-            {format(new Date(info.getValue()), 'MMM dd, yyyy')}
-          </Text>
-        ),
-        size: 120,
       }),
     ],
     [pagination.pageIndex, pagination.pageSize, allowedLabels]
@@ -1110,11 +1130,6 @@ const DashboardPage = () => {
                 </Button>
               </HStack>
               
-              <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-                Page {table.getState().pagination.pageIndex + 1} of{' '}
-                {table.getPageCount()} ({filteredData.length} total PRs)
-              </Text>
-              
               <HStack spacing={2}>
                 <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
                   Go to page:
@@ -1132,16 +1147,17 @@ const DashboardPage = () => {
                   size="sm"
                 />
               </HStack>
+
+              <VStack spacing={1} align="flex-end">
+                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                  Page {table.getState().pagination.pageIndex + 1} of{' '}
+                  {table.getPageCount()} ({filteredData.length} total PRs)
+                </Text>
+                <Box fontSize="sm">
+                  <LastUpdatedDateTime name="Boards" />
+                </Box>
+              </VStack>
             </Flex>
-          </Box>
-          <Box
-            bg={useColorModeValue("blue.50", "gray.700")}
-            color="black"
-            borderRadius="md"
-            padding={3}
-            marginTop={4}
-          >
-            <LastUpdatedDateTime name="Boards" />
           </Box>
 
           {/* </Box> */}
