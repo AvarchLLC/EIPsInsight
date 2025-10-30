@@ -249,6 +249,7 @@ const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("EIPs");
   const [show, setShow] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 20,
@@ -314,6 +315,15 @@ const DashboardPage = () => {
       return true;
     });
     
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(item => 
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.number.toString().includes(searchQuery)
+      );
+    }
+    
     // Label filter
     if (selectedLabels.length > 0) {
       filtered = filtered.filter(item => {
@@ -324,7 +334,7 @@ const DashboardPage = () => {
     
     // Sort by priority score (higher = more urgent)
     return filtered.sort((a, b) => b.priority_score - a.priority_score);
-  }, [boardData, activeTab, selectedLabels]);
+  }, [boardData, activeTab, searchQuery, selectedLabels]);
 
   // Fetch data from the new API
   useEffect(() => {
@@ -892,7 +902,7 @@ const DashboardPage = () => {
       )} */}
           </Box>
 
-          {/* EIP/ERC Toggle and Ad */}
+          {/* EIP/ERC Toggle, Ad, and Search */}
           <Flex 
             direction={{ base: "column", md: "row" }} 
             justify="space-between" 
@@ -922,6 +932,19 @@ const DashboardPage = () => {
             <Box flex="1" maxW={{ base: "100%", md: "600px" }}>
               <CloseableAdCard />
             </Box>
+
+            {/* Search Bar */}
+            <InputGroup maxW={{ base: "100%", md: "350px" }} minW="250px">
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon color="gray.400" />
+              </InputLeftElement>
+              <Input
+                placeholder="Search by title, author, or PR#..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                bg={useColorModeValue("white", "gray.800")}
+              />
+            </InputGroup>
           </Flex>
 
           {/* Board Header with Filters */}
