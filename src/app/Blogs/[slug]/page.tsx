@@ -74,13 +74,65 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         )}
 
         <div className='w-full mt-6'>
-          <h1 className='text-5xl font-bold mb-2'>{frontmatter.title}</h1>
-          <p className='text-sm text-gray-500 mb-6'>
-            Written by {frontmatter.author} on {frontmatter.date.toLocaleDateString()}
-          </p>
+          {(frontmatter as any).category && (
+            <div className="mb-4">
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-sm font-semibold rounded-full">
+                {(frontmatter as any).category}
+              </span>
+            </div>
+          )}
+          
+          <h1 className='text-5xl font-bold mb-4'>{frontmatter.title}</h1>
+          
+          {/* Author Info with Avatar */}
+          <div className='flex items-center gap-4 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700'>
+            {(frontmatter as any).avatar ? (
+              <img
+                src={(frontmatter as any).avatar}
+                alt={frontmatter.author}
+                className="w-14 h-14 rounded-full border-2 border-blue-500"
+              />
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-xl">
+                {frontmatter.author.charAt(0)}
+              </div>
+            )}
+            <div className='flex-1'>
+              <p className='font-semibold text-lg text-gray-900 dark:text-white'>
+                {frontmatter.author}
+              </p>
+              {(frontmatter as any).role && (
+                <p className='text-sm text-gray-600 dark:text-gray-400'>
+                  {(frontmatter as any).role}
+                </p>
+              )}
+              <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
+                {frontmatter.date.toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </p>
+            </div>
+          </div>
+
+          {/* Tags */}
+          {(frontmatter as any).tags && (frontmatter as any).tags.length > 0 && (
+            <div className='flex flex-wrap gap-2 mb-6'>
+              {(frontmatter as any).tags.map((tag: string, index: number) => (
+                <span 
+                  key={index}
+                  className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-full"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+          
           <ScrollToHashOnLoad />
-          <div className='text-justify'>
-          <MarkdownRenderer markdown={content} />
+          <div className='text-justify prose prose-lg dark:prose-invert max-w-none'>
+            <MarkdownRenderer markdown={content} />
           </div>
         </div>
       </div>

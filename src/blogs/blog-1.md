@@ -1,7 +1,11 @@
 ---
-title: "Purr-suit of Ethereum 🐾 #3"
+title: "Purr-suit of Ethereum #3"
 date: 2025-01-26
 author: Pooja Ranjan
+avatar: https://avatars.githubusercontent.com/u/22412996?v=4
+role: Ethereum Cat Herders PM
+category: Newsletter
+tags: [Ethereum, Pectra, EIP Updates, Community]
 image: https://hackmd.io/_uploads/HyG8GJEO1g.png
 ---
 
