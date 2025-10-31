@@ -15,7 +15,7 @@ import {
   import React, { useEffect, useState } from "react";
   import AllLayout from "@/components/Layout";
   import axios from "axios";
-  import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+  import CloseableAdCard from "@/components/CloseableAdCard";
 // import Comments from "@/components/comments";
   
   // Helper function to extract PR number from URL
@@ -85,7 +85,7 @@ import {
           
           {/* EtherWorld Advertisement */}
           <Box my={6} width="100%">
-            <EtherWorldAdCard />
+            <CloseableAdCard />
           </Box>
   
           {/* Scrollable Table */}

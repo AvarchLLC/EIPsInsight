@@ -1,6 +1,6 @@
 import FlexBetween from "@/components/FlexBetween";
 import StatBox from "@/components/StatBox";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import PlaceYourAdCard from "@/components/PlaceYourAdCard";
 import {
     Box,
@@ -37,7 +37,7 @@ const Dasboard = () => {
             
             {/* EtherWorld Advertisement */}
             <Box my={6} width="100%">
-                <EtherWorldAdCard />
+                <CloseableAdCard />
             </Box>
             <Dashboard/>
             {/* Advertise With Us (moved lower for spacing) */}

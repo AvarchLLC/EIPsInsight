@@ -1,5 +1,5 @@
 ﻿import AllLayout from "@/components/Layout";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import { Box, Button, Grid, Text, useColorModeValue, IconButton, Flex, Collapse, Heading, useDisclosure, Link as LI, ButtonGroup, GridItem, Select, SimpleGrid, Link, useToast } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
@@ -433,7 +433,7 @@ const RIP = () => {
                 
                 {/* EtherWorld Advertisement */}
                 <Box my={6} width="100%">
-                  <EtherWorldAdCard />
+                  <CloseableAdCard />
                 </Box>
 
                 <Text fontSize="md" mt={4} textAlign="justify">

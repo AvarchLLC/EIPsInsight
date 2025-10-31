@@ -1,6 +1,6 @@
 import { VStack } from "@chakra-ui/react";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -52,7 +52,7 @@ const EIPsInsightRecap = () => {
 
         {/* EtherWorld Advertisement */}
         <Box w="100%" my={6}>
-          <EtherWorldAdCard />
+          <CloseableAdCard />
         </Box>
 
         <Stack 

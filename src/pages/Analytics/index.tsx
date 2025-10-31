@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import PlaceYourAdCard from "@/components/PlaceYourAdCard";
 import dynamic from "next/dynamic";
 import { ChevronDownIcon } from "@chakra-ui/icons";
@@ -43,6 +43,7 @@ import FeedbackWidget from "@/components/FeedbackWidget";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import ERCsPRChart from "@/components/Ercsprs";
 import PRAnalyticsCard from "@/components/PrLabels";
+import AnimatedHeader from "@/components/AnimatedHeader";
 
 // Dynamic import for Ant Design's Column chart
 // const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -1657,19 +1658,17 @@ const GitHubPRTracker: React.FC = () => {
     <>
       <FeedbackWidget />
       <AllLayout>
-        <Box padding={{ base: 1, md: 4 }} margin={{ base: 2, md: 4 }}>
-          <Heading
-            size="xl"
-            marginBottom={10}
-            textAlign="center"
-            style={{ color: "#42a5f5", fontSize: "2.5rem", fontWeight: "bold" }}
-          >
-            Analytics
-          </Heading>
+        <Box padding={{ base: 3, md: 6 }} margin={{ base: 2, md: 3 }}>
+          {/* Animated Header */}
+          <AnimatedHeader
+            title="PR Analytics"
+            description="Comprehensive analytics and insights for Ethereum Improvement Proposals and ERCs. Track pull request trends, review activity, and contribution metrics across all repositories."
+            emoji="📊"
+          />
 
           {/* EtherWorld Advertisement */}
-          <Box my={6}>
-            <EtherWorldAdCard />
+          <Box my={5}>
+            <CloseableAdCard />
           </Box>
           
 
@@ -1842,7 +1841,7 @@ const GitHubPRTracker: React.FC = () => {
 
           <Box
             bgColor={bg}
-            padding="1.5rem"
+            padding={{ base: "1rem", md: "1.5rem" }}
             borderRadius="lg"
             boxShadow="lg"
             borderWidth="1px"
@@ -1853,7 +1852,7 @@ const GitHubPRTracker: React.FC = () => {
               transform: "translateY(-2px)",
             }}
           >
-            <Box id="GithubAnalytics" borderRadius={"lg"} bg={useColorModeValue('white', 'gray.800')} p={4}>
+            <Box id="GithubAnalytics" borderRadius={"lg"} bg={useColorModeValue('white', 'gray.800')} p={{ base: 3, md: 4 }}>
               <Flex
                 justifyContent="space-between"
                 alignItems="center"

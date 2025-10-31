@@ -1,7 +1,7 @@
 import { VStack } from "@chakra-ui/react";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Spinner,
@@ -110,7 +110,7 @@ const AboutPage = () => {
 
             {/* EtherWorld Advertisement */}
             <Box my={6} width="100%">
-              <EtherWorldAdCard />
+              <CloseableAdCard />
             </Box>
 
             <Heading as="h2" size="lg" textAlign="justify" color={headingColor}>

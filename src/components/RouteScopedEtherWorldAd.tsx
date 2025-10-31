@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 
-const EtherWorldAdCard = dynamic(() => import("@/components/EtherWorldAdCard"), {
+const CloseableAdCard = dynamic(() => import("@/components/CloseableAdCard"), {
   ssr: false,
 });
 
@@ -37,7 +37,7 @@ export default function RouteScopedEtherWorldAd() {
 
   return (
     <div style={{ marginTop: "2rem" }}>
-      <EtherWorldAdCard />
+      <CloseableAdCard />
     </div>
   );
 }

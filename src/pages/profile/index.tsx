@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Avatar,
@@ -341,7 +341,7 @@ const handleCancel = async () => {
       
       {/* EtherWorld Advertisement */}
       <Box my={4} width="100%">
-        <EtherWorldAdCard />
+        <CloseableAdCard />
       </Box>
       
       {/* Absolute positioned navigation buttons */}

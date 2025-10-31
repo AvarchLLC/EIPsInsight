@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -442,7 +442,7 @@ const All = () => {
 
               {/* EtherWorld Advertisement */}
               <Box my={6}>
-                <EtherWorldAdCard />
+                <CloseableAdCard />
               </Box>
 
               <br />

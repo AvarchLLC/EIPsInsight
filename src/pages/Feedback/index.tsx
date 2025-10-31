@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AllLayout from "@/components/Layout";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Text,
@@ -93,7 +93,7 @@ const Feedback: React.FC = () => {
 
         {/* EtherWorld Advertisement */}
         <Box my={4} width="100%">
-          <EtherWorldAdCard />
+          <CloseableAdCard />
         </Box>
 
         {isLoading ? (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Spinner,
@@ -49,7 +49,7 @@ useScrollSpy([
         
           {/* EtherWorld Advertisement */}
           <Box mb={4} width="100%">
-            <EtherWorldAdCard />
+            <CloseableAdCard />
           </Box>
           
           <ProposalEditor/>

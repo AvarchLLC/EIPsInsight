@@ -1,5 +1,5 @@
 import React from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import Header from "@/components/Header";
 import {
@@ -202,7 +202,7 @@ const Status = () => {
 
             {/* EtherWorld Advertisement */}
             <Box my={6}>
-              <EtherWorldAdCard />
+              <CloseableAdCard />
             </Box>
 
             <Text

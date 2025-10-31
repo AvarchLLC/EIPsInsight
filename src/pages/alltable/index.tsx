@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Box, Button, Spinner } from "@chakra-ui/react";
 import { DownloadIcon } from "@chakra-ui/icons";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 
 import AllLayout from "@/components/Layout";
 import FlexBetween from "@/components/FlexBetween";
@@ -100,7 +100,7 @@ const AllTable = () => {
             
             {/* EtherWorld Advertisement */}
             <Box my={6}>
-              <EtherWorldAdCard />
+              <CloseableAdCard />
             </Box>
             
             <Table type="Total" />

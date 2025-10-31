@@ -46,6 +46,7 @@ import CloseableAdCard from "@/components/CloseableAdCard";
 import LabelFilter from "@/components/LabelFilter";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import Comments from "@/components/comments";
+import AnimatedHeader from "@/components/AnimatedHeader";
 import {
   useReactTable,
   getCoreRowModel,
@@ -737,6 +738,13 @@ const DashboardPage = () => {
       <AllLayout>
         {/* Tab selection for EIPs and ERCs */}
         <Box padding={{ base: 1, md: 4 }} margin={{ base: 2, md: 4 }}>
+          {/* Animated Header */}
+          <AnimatedHeader
+            title="EIP/ERC Board"
+            description="Track and prioritize open pull requests for Ethereum Improvement Proposals and Ethereum Request for Comments. View the longest-waiting PRs for editor review, sorted by priority and interaction time."
+            emoji="📋"
+          />
+
           <Box
             bgGradient={useColorModeValue(
               'linear(to-br, blue.50, purple.50)',
@@ -1201,9 +1209,6 @@ const DashboardPage = () => {
               </Text>
               
               <HStack spacing={4}>
-                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-                  EIPsInsight.com
-                </Text>
                 <Box fontSize="sm">
                   <LastUpdatedDateTime name="Boards" />
                 </Box>

@@ -17,9 +17,9 @@ import DateTime from '@/components/DateTime';
 import Comments from '@/components/comments';
 import CopyLink from '@/components/CopyLink';
 import LastUpdatedDateTime from '@/components/LastUpdatedDateTime';
-import EtherWorldAdCard from '@/components/EtherWorldAdCard';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
+import AnimatedHeader from '@/components/AnimatedHeader';
 
 // Import new components
 import FAQSection from '../../components/reviewers/FAQSection';
@@ -29,6 +29,7 @@ import ActiveEditorsChart from '../../components/reviewers/ActiveEditorsChart';
 import ReviewerCard from '../../components/reviewers/ReviewerCard';
 import EditorRepoGrid from '../../components/reviewers/EditorRepoGrid';
 import * as helpers from '../../utils/helpers';
+import CloseableAdCard from '@/components/CloseableAdCard';
 
 
 // Dynamic import for Ant Design's Column chart
@@ -764,8 +765,8 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   const editorsData = yearlyChartData?.filter((item: any) => !reviewersList.includes(item.reviewer));
 
   return (
-    <Box padding={{ base: "1rem", md: "2rem" }}>
-      <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap={{ base: "1rem", md: "2rem" }}>
+    <Box padding={{ base: "1rem", md: "1.5rem" }}>
+      <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap={{ base: "1rem", md: "1.5rem" }}>
         {/* Editors Leaderboard Grid */}
         <Box width={{ base: "100%", md: "48%" }}>
           <LeaderboardGrid
@@ -837,11 +838,11 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
   const editorsData = monthlyChartData?.filter((item: any) => !reviewersList.includes(item.reviewer));
 
   return (
-    <Box padding="2rem">
+    <Box padding={{ base: "1rem", md: "1.5rem" }}>
       {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
-        <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap="2rem">
+        <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap={{ base: "1rem", md: "1.5rem" }}>
           {/* Editors Chart */}
-          <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+          <Box width={{ base: "100%", md: "45%" }} padding={{ base: "0.5rem", md: "1rem" }}>
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
 
               <Heading size="md" color="black">
@@ -868,7 +869,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
             <Bar {...getBarChartConfig(editorsData)} />
           </Box>
           {/* Reviewers Chart */}
-          <Box width={{ base: "100%", md: "45%" }} padding="1rem">
+          <Box width={{ base: "100%", md: "45%" }} padding={{ base: "0.5rem", md: "1rem" }}>
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
               <Heading size="md" color="black">
                 {`Contributors - Monthly Review Activity`}
@@ -1804,29 +1805,26 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         {/* Rest of the component */}
         <Flex
           direction={{ base: "column", md: "row" }}
-          gap={{ base: 4, md: 8 }}
-          p={{ base: 4, md: 8 }}
+          gap={{ base: 3, md: 6 }}
+          p={{ base: 3, md: 6 }}
         >
           {/* Sidebar and other content */}
           {/* ... */}
         </Flex>
       
-      <Box p={4}>
+      <Box p={{ base: 3, md: 4 }}>
         <section id = "LeaderBoard">
           
-      <Heading
-        size="xl"
-        marginBottom={10}
-        textAlign="center"
-        color={useColorModeValue('blue.600', 'blue.300')}
-        fontWeight="bold"
-      >
-        Editors & Reviewers Leaderboard
-      </Heading>
+      {/* Animated Header */}
+      <AnimatedHeader
+        title="Editors & Reviewers Leaderboard"
+        description="Discover the top contributors and reviewers in the Ethereum ecosystem. Track editor activity, review metrics, and contribution statistics across EIPs, ERCs, and RIPs."
+        emoji="🏆"
+      />
       
       {/* EtherWorld Advertisement */}
-      <Box my={6} width="100%">
-        <EtherWorldAdCard />
+      <Box my={5} width="100%">
+        <CloseableAdCard />
       </Box>
       
       </section>
@@ -1883,7 +1881,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
 </Flex>
 
      
-        <Box padding="0.5rem" borderRadius="0.55rem">
+        <Box padding={{ base: "0.5rem", md: "1rem" }} borderRadius="0.55rem">
           <Box
             // bgColor={bg}
             // padding="2rem"
@@ -1914,7 +1912,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
 
         <Box
   bgColor={bg}
-  padding="2rem"
+  padding={{ base: "1rem", md: "1.5rem" }}
   borderRadius="0.55rem"
   mt={2}
   // _hover={{
@@ -2397,7 +2395,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       <br/>
 
       {selectedMonth && (
-        <Box padding="0.5rem" borderRadius="0.55rem">
+        <Box padding={{ base: "0.5rem", md: "1rem" }} borderRadius="0.55rem">
           <Box
             bgColor={bg}
             // padding="2rem"

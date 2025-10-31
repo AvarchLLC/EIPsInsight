@@ -19,7 +19,7 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import axios from "axios";
 import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
@@ -589,7 +589,7 @@ const DashboardPage = () => {
 
           {/* EtherWorld Advertisement */}
           <Box my={6} mx={4}>
-            <EtherWorldAdCard />
+            <CloseableAdCard />
           </Box>
 
           {/* Scrollable Table */}

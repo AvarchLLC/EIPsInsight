@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Flex,
   Box,
@@ -320,7 +320,7 @@ const EthereumV2 = () => {
         
           {/* EtherWorld Advertisement */}
           <Box my={4} width="100%">
-            <EtherWorldAdCard />
+            <CloseableAdCard />
           </Box>
           
           {headerBar}

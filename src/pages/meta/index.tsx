@@ -152,7 +152,7 @@
 // export default Meta;
 
 import React, { useEffect, useState } from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -275,7 +275,7 @@ const Meta = () => {
 
             {/* EtherWorld Advertisement */}
             <Box my={6}>
-              <EtherWorldAdCard />
+              <CloseableAdCard />
             </Box>
 
             <TableStatus cat="Meta" />

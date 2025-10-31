@@ -65,7 +65,7 @@ interface SponsorBannerProps {
   variant?: 'compact' | 'default' | 'spacious';
 }
 
-const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
+const CloseableAdCard: React.FC<SponsorBannerProps> = ({
   logoSrc = etherWorldLogo,
   headline = "EtherWorld — Global Ethereum News & Intelligence",
   subheadline = "Daily news, ACD highlights, upgrade briefs, security notes, and policy/market coverage—source-linked.",
@@ -318,4 +318,4 @@ const EtherWorldAdCard: React.FC<SponsorBannerProps> = ({
   );
 };
 
-export default EtherWorldAdCard;
+export default CloseableAdCard;
