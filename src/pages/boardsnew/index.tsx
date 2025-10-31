@@ -257,15 +257,25 @@ const DashboardPage = () => {
 
   // Labels available in the filter dropdown
   const filterLabels = [
-    "typo-fix", "status-change", "c-new"
+    "w-ci", "c-new", "created-by-bot", "status-change", "typo-fix", "e-review"
   ];
+
+  // Normalized display names for filter labels
+  const labelDisplayNames: { [key: string]: string } = {
+    "w-ci": "Waiting on CI",
+    "c-new": "New Proposal",
+    "created-by-bot": "Created by Bot",
+    "status-change": "Status Change",
+    "typo-fix": "Typo Fix",
+    "e-review": "Editor Review"
+  };
 
   // All labels that can be displayed in the table
   const allowedLabels = [
     "e-review", "e-consensus", "w-response", "w-ci", "w-stale", 
     "bug", "enhancement", "c-new", "c-update", "c-status", "s-draft", 
     "s-final", "s-lastcall", "s-review", "s-stagnant", "s-withdrawn",
-    "created-by-bot", "typo-fix", "status-change"
+    "created-by-bot", "status-change"
   ];
 
 
@@ -964,6 +974,7 @@ const DashboardPage = () => {
                   labels={allLabels}
                   selectedLabels={selectedLabels}
                   onLabelToggle={handleLabelToggle}
+                  labelDisplayNames={labelDisplayNames}
                 />
                 <Menu>
                   <MenuButton
@@ -1170,16 +1181,33 @@ const DashboardPage = () => {
                   size="sm"
                 />
               </HStack>
-
-              <VStack spacing={1} align="flex-end">
+            </Flex>
+            
+            {/* Page Info and Footer */}
+            <Flex
+              justify="space-between"
+              align="center"
+              px={4}
+              py={2}
+              borderTopWidth="1px"
+              borderColor={useColorModeValue("gray.200", "gray.600")}
+              bg={useColorModeValue("gray.50", "gray.900")}
+              flexWrap="wrap"
+              gap={2}
+            >
+              <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                Page {table.getState().pagination.pageIndex + 1} of{' '}
+                {table.getPageCount()} ({filteredData.length} total PRs)
+              </Text>
+              
+              <HStack spacing={4}>
                 <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-                  Page {table.getState().pagination.pageIndex + 1} of{' '}
-                  {table.getPageCount()} ({filteredData.length} total PRs)
+                  EIPsInsight.com
                 </Text>
                 <Box fontSize="sm">
                   <LastUpdatedDateTime name="Boards" />
                 </Box>
-              </VStack>
+              </HStack>
             </Flex>
           </Box>
 
