@@ -9,9 +9,10 @@ interface HeaderProps {
   subtitle: React.ReactNode;
   description: React.ReactNode;
   sectionId?: string;
+  center?: boolean; // when true, center-align heading, subtitle and description
 }
 
-const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId }) => {
+const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId, center = false }) => {
   const headingColorLight = "#2C7A7B";
   const headingColorDark = "#81E6D9";
   const headingBgGradientLight = "linear(to-r, #4FD1C5, #319795)";
@@ -30,53 +31,62 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
   const descriptionColor = useColorModeValue("black", "white");
 
   return (
-    <Box id="Ethereum Improvement">
-      <Flex alignItems="center">
+    <Box id="Ethereum Improvement" mb={{ base: 6, lg: 8 }}>
+      <Flex alignItems={center ? 'center' : 'center'} mb={4} gap={4} direction={center ? 'column' : 'row'} textAlign={center ? 'center' : 'left'}>
         <Text
           as={motion.div}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          fontSize={{ base: "40px", sm: "42px", md: "44px", lg: "48px", xl: "56px", "2xl": "64px" }}
+          fontSize={{ base: "2xl", sm: "3xl", md: "4xl", lg: "5xl", xl: "6xl" }}
           fontWeight="extrabold"
           color={useColorModeValue(headingColorLight, headingColorDark)}
           bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)}
           bgClip="text"
+          lineHeight="1.1"
+          letterSpacing="-0.02em"
         >
           {title}
         </Text>
-
-        {sectionId && (
-          <CopyLink
-            link={dynamicLink}
-            style={{ marginLeft: "10px", marginBottom: "3px" }}
-          />
+        {sectionId && !center && (
+          // keep copy button vertically centered next to the large heading when not centering
+          <Box alignSelf="center">
+            <CopyLink link={dynamicLink} />
+          </Box>
+        )}
+        {sectionId && center && (
+          // when centering, show copy button beneath the title
+          <Box mt={3}>
+            <CopyLink link={dynamicLink} />
+          </Box>
         )}
       </Flex>
 
-      <Text
+      <Box
         as={motion.div}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 } as any}
-        mt={3}
-        mb={2}
-        fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
-        fontWeight="medium"
-        whiteSpace="normal"
       >
         <Text
-          as="span"
+          fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
           fontWeight="bold"
-          fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
           color={subtitleColor}
+          mb={3}
         >
           {subtitle}
-        </Text>{" "}
-        -{" "}
-        <Text as="span" color={descriptionColor}>
+        </Text>
+        
+        <Text 
+          fontSize={{ base: "md", md: "lg", lg: "xl" }}
+          color={descriptionColor}
+          lineHeight="1.6"
+          maxWidth="800px"
+          opacity={0.9}
+          mt={2}
+        >
           {description}
         </Text>
-      </Text>
+      </Box>
     </Box>
   );
 };

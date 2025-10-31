@@ -119,25 +119,31 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const eips = dataset?.eip ?? [];
+        const ercs = dataset?.erc ?? [];
+        const rips = dataset?.rip ?? [];
+
         if (type === "EIP") {
-          setData(dataset.eip);
+          setData(eips);
         } else if (type === "ERC") {
-          setData(dataset.erc);
+          setData(ercs);
         } else if (type === "RIP") {
-          setData(dataset.rip);
+          setData(rips);
         } else if (type === "Total") {
-          setData(dataset.eip?.concat(dataset.erc?.concat(dataset.rip)));
+          setData([...eips, ...ercs, ...rips]);
         } else {
-          setData(dataset.eip?.concat(dataset.erc?.concat(dataset.rip)));
+          setData([...eips, ...ercs, ...rips]);
         }
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setData([]);
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [type, dataset]);
 
   interface TransformedData {
     category: string;
@@ -151,7 +157,7 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     value: number;
   }
 
-  const transformedData = data.reduce<TransformedData[]>((acc, item) => {
+  const transformedData = (data ?? []).reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const category = item.repo === "rip" ? "RIPs" : getCat(item.category);
 
@@ -175,7 +181,7 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     return acc;
   }, []);
 
-  const transformedData2 = data?.reduce<TransformedData[]>((acc, item) => {
+  const transformedData2 = (data ?? []).reduce<TransformedData[]>((acc, item) => {
     const year = new Date(item.created).getFullYear();
     const status = getStatus(item.status);
 

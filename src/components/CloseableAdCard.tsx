@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Box, Flex, Text, Badge, Image, useColorModeValue, Icon, CloseButton } from "@chakra-ui/react";
+import { motion } from 'framer-motion';
 import { keyframes } from "@emotion/react";
 import { FiExternalLink, FiClock, FiShield, FiTrendingUp } from "react-icons/fi";
 import { trackFeatureUsage } from "@/utils/analytics";
@@ -23,6 +24,8 @@ const flashyPulse = keyframes`
   }
 `;
 
+const MotionBox = motion(Box);
+
 const CloseableAdCard: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -33,17 +36,26 @@ const CloseableAdCard: React.FC = () => {
     window.open("https://etherworld.co/", "_blank", "noopener,noreferrer");
   };
 
+  // Use the requested solid stagnant colors for light/dark modes (no gradients).
+  const primaryBg = useColorModeValue('#B8DBEF', '#213B61');
+  const primaryBorder = useColorModeValue('#B8DBEF', '#213B61');
+  const glowColor = useColorModeValue('rgba(184,219,239,0.75)', 'rgba(33,59,97,0.75)');
+  const boxShadowVal = useColorModeValue(
+    `0 10px 30px rgba(184,219,239,0.12), 0 0 80px rgba(184,219,239,0.28)`,
+    `0 10px 30px rgba(33,59,97,0.12), 0 0 80px rgba(33,59,97,0.28)`
+  );
+
   return (
-    <Box
+    <MotionBox
       as="aside"
       role="complementary"
       aria-label="EtherWorld sponsor promotion"
       position="relative"
-      overflow="hidden"
-      bg={useColorModeValue("green.50", "green.900")}
+      overflow="visible" /* allow glow to escape */
+      bg={primaryBg}
       borderRadius="lg"
       borderWidth="1px"
-      borderColor={useColorModeValue("green.300", "green.600")}
+      borderColor={primaryBorder}
       p={1}
       w="100%"
       maxW="900px"
@@ -51,30 +63,12 @@ const CloseableAdCard: React.FC = () => {
       mx="auto"
       cursor="pointer"
       onClick={handleClick}
-      backgroundImage={useColorModeValue(
-        "linear-gradient(270deg, #F0FDF4 0%, #DCFCE7 20%, #BBF7D0 40%, #86EFAC 60%, #4ADE80 80%, #22C55E 100%)",
-        "linear-gradient(270deg, #14532D 0%, #166534 20%, #15803D 40%, #16A34A 60%, #22C55E 80%, #10B981 100%)"
-      )}
-      backgroundSize="300% 300%"
-      sx={{
-        backgroundPosition: "0% 50%",
-        animation: `${flashyPulse} 2.5s ease-in-out infinite, backgroundShift 4s ease-in-out infinite`,
-        "@keyframes backgroundShift": {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" }
-        },
-        "@media (prefers-reduced-motion: reduce)": {
-          animation: "none",
-        }
-      }}
       _hover={{
         transform: "translateY(-3px) scale(1.01)",
-        boxShadow: useColorModeValue(
-          "0 10px 30px rgba(34, 197, 94, 0.4), 0 0 20px rgba(34, 197, 94, 0.2)",
-          "0 10px 30px rgba(34, 197, 94, 0.5), 0 0 20px rgba(34, 197, 94, 0.3)"
-        ),
+        boxShadow: useColorModeValue('0 8px 24px rgba(0,0,0,0.08)', '0 8px 24px rgba(0,0,0,0.4)'),
       }}
-      transition="all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+  boxShadow={boxShadowVal}
+  sx={{ transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
       tabIndex={0}
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -87,7 +81,12 @@ const CloseableAdCard: React.FC = () => {
         outlineColor: useColorModeValue("green.500", "green.400"),
         outlineOffset: "2px",
       }}
+  initial={{ scale: 1 }}
+  animate={{ scale: [1, 1.02, 1] }}
+  transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+      style={{ willChange: 'transform' }}
     >
+      {/* glow removed per request */}
       {/* Close Button */}
       <CloseButton
         position="absolute"
@@ -106,24 +105,7 @@ const CloseableAdCard: React.FC = () => {
         }}
       />
 
-      {/* Animated sheen effect */}
-      <Box
-        position="absolute"
-        top="0"
-        left="0"
-        right="0"
-        bottom="0"
-        backgroundImage="linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)"
-        backgroundSize="200% 100%"
-        sx={{
-          animation: `${sheen} 7s infinite linear`,
-          "@media (prefers-reduced-motion: reduce)": {
-            animation: "none",
-          }
-        }}
-        pointerEvents="none"
-        zIndex={1}
-      />
+      {/* No sheen/gradient overlay — using solid stagnant color per theme */}
 
       {/* Ultra-Compact Information Dense Layout */}
       <Flex
@@ -277,7 +259,7 @@ const CloseableAdCard: React.FC = () => {
           </Box>
         </Flex>
       </Flex>
-    </Box>
+    </MotionBox>
   );
 };
 
