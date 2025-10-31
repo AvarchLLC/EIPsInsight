@@ -6,6 +6,7 @@ interface DateTimeProps {
 
 const LastUpdatedDateTime: React.FC<DateTimeProps> = ({ name }) => {
   const [lastUpdatedTime, setLastUpdatedTime] = useState<string | null>(null);
+  const [nextUpdateTime, setNextUpdateTime] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -17,6 +18,11 @@ const LastUpdatedDateTime: React.FC<DateTimeProps> = ({ name }) => {
         }
         const data = await response.json();
         setLastUpdatedTime(data.lastUpdatedTime);
+        
+        // Calculate next update time (5 minutes from last update)
+        const lastUpdate = new Date(data.lastUpdatedTime);
+        const nextUpdate = new Date(lastUpdate.getTime() + 5 * 60 * 1000);
+        setNextUpdateTime(nextUpdate.toISOString());
         
       } catch (err:any) {
         setError(err.message);
@@ -52,8 +58,8 @@ const LastUpdatedDateTime: React.FC<DateTimeProps> = ({ name }) => {
           <p className={'text-gray-500 px-3 rounded-[0.55rem] py-1'}>EIPsInsight.com</p>
         </div>
         <div className={'text-gray-500 px-3 rounded-[0.55rem] py-1'}>
-          {lastUpdatedTime ? (
-            <p>Last Updated: {formatDateTime(lastUpdatedTime)}</p>
+          {nextUpdateTime ? (
+            <p>Next Update: {formatDateTime(nextUpdateTime)}</p>
           ) : (
             <p>Loading...</p>
           )}
