@@ -738,192 +738,34 @@ const DashboardPage = () => {
       <AllLayout>
         {/* Tab selection for EIPs and ERCs */}
         <Box padding={{ base: 1, md: 4 }} margin={{ base: 2, md: 4 }}>
-          {/* Animated Header */}
+          {/* Animated Header with FAQ */}
           <AnimatedHeader
             title="EIP/ERC Board"
-            description="Track and prioritize open pull requests for Ethereum Improvement Proposals and Ethereum Request for Comments. View the longest-waiting PRs for editor review, sorted by priority and interaction time."
             emoji="📋"
+            faqItems={[
+              {
+                question: "💡 What is EIP Board?",
+                answer: "The table below lists all Open Pull Requests (till date) in an order such that it uses oldest author interaction after the most recent editor response."
+              },
+              {
+                question: "🏷️ How do label filters work?",
+                answer: "You can filter table data using label filters, and the same filters will apply to the downloaded reports."
+              },
+              {
+                question: "📊 How is prioritization determined?",
+                answer: "PRs with the 's-withdrawn' label are given the lowest priority and moved to the bottom of the table. The remaining PRs are ranked based on the longest-waiting interaction time, with those having the oldest interaction appearing at the top."
+              },
+              {
+                question: "👥 Who would use this tool?",
+                answer: "This tool is created to support EIP/ERC Editors to identify the longest waiting PRs for Editor's review. These PRs can also be discussed in EIP Editing Office Hour and EIPIP Meetings in case it requires attention of more than one editor/reviewer. Note: This tool is based on a fork from gaudren/eip-board."
+              }
+            ]}
           />
 
-          <Box
-            bgGradient={useColorModeValue(
-              'linear(to-br, blue.50, purple.50)',
-              'linear(to-br, gray.800, gray.900)'
-            )}
-            borderRadius="lg"
-            borderWidth="2px"
-            borderColor={useColorModeValue('blue.200', 'gray.600')}
-            p={4}
-            mb={4}
-            boxShadow="md"
-            transition="all 0.3s"
-            _hover={{ boxShadow: 'lg' }}
-          >
-            <Flex justify="space-between" align="center" mb={show ? 3 : 0} cursor="pointer" onClick={toggleCollapse}>
-              <Heading
-                as="h2"
-                size="md"
-                color={useColorModeValue('blue.700', 'blue.300')}
-                fontWeight="bold"
-                letterSpacing="tight"
-                fontFamily="'Inter', sans-serif"
-              >
-                📚 EIP Board FAQ
-              </Heading>
-              <IconButton
-                onClick={toggleCollapse}
-                icon={show ? <ChevronUpIcon boxSize={5} /> : <ChevronDownIcon boxSize={5} />}
-                variant="ghost"
-                colorScheme="blue"
-                aria-label="Toggle FAQ"
-                size="sm"
-                _hover={{ transform: 'scale(1.1)' }}
-                transition="transform 0.2s"
-              />
-            </Flex>
-
-            <Collapse in={show} animateOpacity>
-            <Box pt={3} px={1}>
-              {/* Question 1 */}
-              <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="blue.500">
-                <Heading 
-                  as="h3" 
-                  size="sm" 
-                  mb={2} 
-                  color={useColorModeValue('gray.800', 'gray.100')} 
-                  fontWeight="bold"
-                  fontFamily="'Inter', sans-serif"
-                >
-                  💡 What is EIP Board?
-                </Heading>
-                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
-                  The table below lists all Open Pull Requests (till date) in a
-                  order such that it uses oldest author interaction after the most
-                  recent editor response.
-                </Text>
-              </Box>
-
-              {/* Question 2 */}
-              <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="purple.500">
-                <Heading 
-                  as="h3" 
-                  size="sm" 
-                  mb={2} 
-                  color={useColorModeValue('gray.800', 'gray.100')} 
-                  fontWeight="bold"
-                  fontFamily="'Inter', sans-serif"
-                >
-                  🏷️ How do label filters work?
-                </Heading>
-                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
-                  You can filter table data using label filters, and the same
-                  filters will apply to the downloaded reports.
-                </Text>
-              </Box>
-
-              {/* Question 3 */}
-              <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="green.500">
-                <Heading 
-                  as="h3" 
-                  size="sm" 
-                  mb={2} 
-                  color={useColorModeValue('gray.800', 'gray.100')} 
-                  fontWeight="bold"
-                  fontFamily="'Inter', sans-serif"
-                >
-                  📊 How is prioritization determined?
-                </Heading>
-                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
-                  PRs with the "s-withdrawn" label are given the lowest priority
-                  and moved to the bottom of the table. The remaining PRs are
-                  ranked based on the longest-waiting interaction time, with those
-                  having the oldest interaction appearing at the top.
-                </Text>
-              </Box>
-
-              {/* Question 4 */}
-              <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="orange.500">
-                <Heading 
-                  as="h3" 
-                  size="sm" 
-                  mb={2} 
-                  color={useColorModeValue('gray.800', 'gray.100')} 
-                  fontWeight="bold"
-                  fontFamily="'Inter', sans-serif"
-                >
-                  👥 Who would use this tool?
-                </Heading>
-                <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" mb={2} fontFamily="'Inter', sans-serif">
-                  This tool is created to support EIP/ERC Editors to identify the
-                  longest waiting PRs for Editor's review. These PRs can also be
-                  discussed in{" "}
-                  <Link
-                    href="https://www.youtube.com/watch?v=dwJrlAfM14E&list=PL4cwHXAawZxqnDHxOyuwMpyt5s8F8gdmO"
-                    color="blue.500"
-                    textDecoration="underline"
-                    isExternal
-                  >
-                    EIP Editing Office Hour
-                  </Link>{" "}
-
-                  and{" "}
-
-                  <Link
-                    href="https://www.youtube.com/playlist?list=PL4cwHXAawZxpLrRIkDlBjDUUrGgF91pQw"
-                    color="blue.500"
-                    textDecoration="underline"
-                    isExternal
-                  >
-                    EIPIP Meetings
-                  </Link>{" "}
-
-                  in case it requires attention of more than one editor/reviewer.
-                </Text>
-                <Box 
-                  p={2} 
-                  bg={useColorModeValue('yellow.50', 'gray.600')} 
-                  borderRadius="sm"
-                  borderLeftWidth="2px"
-                  borderLeftColor="yellow.400"
-                >
-                  <Text 
-                    fontSize="xs" 
-                    color={useColorModeValue('gray.600', 'gray.300')} 
-                    lineHeight="1.5" 
-                    fontStyle="italic"
-                    fontFamily="'Inter', sans-serif"
-                  >
-                    📌 Note: This tool is based on a fork from{" "}
-
-                    <Link
-                      href="https://github.com/gaudren/eip-board"
-                      color="blue.500"
-                      textDecoration="underline"
-                      isExternal
-                    >
-                      here
-                    </Link>
-                    .
-                  </Text>
-                </Box>
-              </Box>
-            </Box>
-          </Collapse>
-
-          {/* {!show && (
-        <Flex justify="center" align="center" marginTop={4}>
-          <Text color={useColorModeValue("#3182CE", "blue.300")} cursor="pointer" onClick={toggleCollapse}>
-            View Instructions
-          </Text>
-          <ChevronDownIcon color={useColorModeValue("#3182CE", "blue.300")} />
-        </Flex>
-      )} */}
-          </Box>
-
-          {/* EIP/ERC Toggle, Ad, and Search */}
+          {/* Tab Buttons and Search */}
           <Flex 
-            direction={{ base: "column", md: "row" }} 
-            justify="space-between" 
+            direction={{ base: "column", md: "row" }}
+            justify="space-between"
             align="center" 
             gap={4}
             my={6}

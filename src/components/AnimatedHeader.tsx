@@ -1,16 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Heading,
   Text,
   useColorModeValue,
+  Collapse,
+  IconButton,
+  Flex,
+  VStack,
 } from '@chakra-ui/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { keyframes } from '@emotion/react';
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
 
 interface AnimatedHeaderProps {
   title: string;
-  description: string;
   emoji?: string;
+  faqItems?: FAQItem[];
 }
 
 const fadeInUp = keyframes`
@@ -65,9 +75,11 @@ const pulse = keyframes`
 
 const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({ 
   title, 
-  description, 
-  emoji = "🚀" 
+  emoji = "🚀",
+  faqItems
 }) => {
+  const [showFAQ, setShowFAQ] = useState(false);
+  
   const bgGradient = useColorModeValue(
     'linear(135deg, #3182ce 0%, #2c5282 25%, #2b6cb0 50%, #4299e1 75%, #63b3ed 100%)',
     'linear(135deg, #1a365d 0%, #2c5282 25%, #2b6cb0 50%, #3182ce 75%, #4299e1 100%)'
@@ -139,37 +151,33 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
       <Box
         position="relative"
         zIndex={1}
-        p={{ base: 6, md: 10 }}
         bg={useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.9)')}
         backdropFilter="blur(10px)"
       >
-        <Box
+        <Flex
+          justify="space-between"
+          align="center"
+          p={{ base: 4, md: 5 }}
+          cursor={faqItems ? "pointer" : "default"}
+          onClick={() => faqItems && setShowFAQ(!showFAQ)}
           animation={`${fadeInUp} 0.8s cubic-bezier(0.4, 0, 0.2, 1)`}
         >
-          <Heading
-            as="h1"
-            size={{ base: 'xl', md: '2xl' }}
-            color={textColor}
-            fontWeight="black"
-            letterSpacing="tight"
-            mb={4}
-            display="flex"
-            alignItems="center"
-            gap={3}
-            flexWrap="wrap"
-          >
+          <Flex align="center" gap={3}>
             <Box
               as="span"
               display="inline-block"
               animation={`${float} 3s ease-in-out infinite`}
-              fontSize={{ base: '3xl', md: '4xl' }}
+              fontSize={{ base: '2xl', md: '3xl' }}
               filter="drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))"
             >
               {emoji}
             </Box>
-            <Box
-              as="span"
-              position="relative"
+            <Heading
+              as="h1"
+              size={{ base: 'lg', md: 'xl' }}
+              color={textColor}
+              fontWeight="black"
+              letterSpacing="tight"
               bgGradient={useColorModeValue(
                 'linear(to-r, #2b6cb0, #3182ce, #4299e1)',
                 'linear(to-r, #4299e1, #63b3ed, #90cdf4)'
@@ -177,44 +185,62 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
               bgClip="text"
               backgroundSize="200% auto"
               animation={`${shimmer} 3s linear infinite`}
-              _after={{
-                content: '""',
-                position: 'absolute',
-                bottom: '-4px',
-                left: 0,
-                right: 0,
-                height: '3px',
-                bgGradient: useColorModeValue(
-                  'linear(to-r, #2b6cb0, #3182ce)',
-                  'linear(to-r, #4299e1, #63b3ed)'
-                ),
-                borderRadius: 'full',
-                transform: 'scaleX(0)',
-                transformOrigin: 'left',
-                transition: 'transform 0.3s ease',
-              }}
-              _hover={{
-                _after: {
-                  transform: 'scaleX(1)',
-                },
-              }}
             >
               {title}
-            </Box>
-          </Heading>
+            </Heading>
+          </Flex>
           
-          <Text
-            fontSize={{ base: 'md', md: 'lg' }}
-            color={descriptionColor}
-            lineHeight="tall"
-            maxW="3xl"
-            animation={`${fadeInUp} 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both`}
-            fontWeight="medium"
-            opacity={0.9}
-          >
-            {description}
-          </Text>
-        </Box>
+          {faqItems && (
+            <IconButton
+              icon={showFAQ ? <ChevronUpIcon boxSize={6} /> : <ChevronDownIcon boxSize={6} />}
+              variant="ghost"
+              colorScheme="blue"
+              aria-label="Toggle FAQ"
+              size="md"
+              _hover={{ transform: 'scale(1.1)' }}
+              transition="transform 0.2s"
+            />
+          )}
+        </Flex>
+
+        {faqItems && (
+          <Collapse in={showFAQ} animateOpacity>
+            <VStack
+              align="stretch"
+              spacing={3}
+              px={{ base: 4, md: 5 }}
+              pb={{ base: 4, md: 5 }}
+              pt={2}
+            >
+              {faqItems.map((item, index) => (
+                <Box
+                  key={index}
+                  p={3}
+                  bg={useColorModeValue('blue.50', 'gray.700')}
+                  borderRadius="md"
+                  borderLeft="3px solid"
+                  borderColor={useColorModeValue('blue.400', 'blue.500')}
+                >
+                  <Text
+                    fontWeight="bold"
+                    color={useColorModeValue('blue.700', 'blue.300')}
+                    mb={1}
+                    fontSize="sm"
+                  >
+                    {item.question}
+                  </Text>
+                  <Text
+                    fontSize="sm"
+                    color={descriptionColor}
+                    lineHeight="tall"
+                  >
+                    {item.answer}
+                  </Text>
+                </Box>
+              ))}
+            </VStack>
+          </Collapse>
+        )}
       </Box>
       
       {/* Bottom accent line with shimmer effect */}

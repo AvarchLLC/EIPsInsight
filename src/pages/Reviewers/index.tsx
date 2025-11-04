@@ -1815,11 +1815,28 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       <Box p={{ base: 3, md: 4 }}>
         <section id = "LeaderBoard">
           
-      {/* Animated Header */}
+      {/* Animated Header with FAQ */}
       <AnimatedHeader
         title="Editors & Reviewers Leaderboard"
-        description="Discover the top contributors and reviewers in the Ethereum ecosystem. Track editor activity, review metrics, and contribution statistics across EIPs, ERCs, and RIPs."
         emoji="🏆"
+        faqItems={[
+          {
+            question: "💡 What does this tool do?",
+            answer: "This tool provides a comprehensive overview of all EIP editor/reviewer reviews conducted to date. It displays the total number of reviews each month for each editor/reviewer, allowing you to easily track and analyze review activity across different months and editors."
+          },
+          {
+            question: "📅 How can I view data for a specific Month?",
+            answer: "To view data for a specific month, you can use the timeline scroll bar or click the View More button. From there, select the desired Year and Month using the dropdown menus, and the table and graph will automatically update to display data for that selected month."
+          },
+          {
+            question: "👤 How can I view data for a specific EIP Editor?",
+            answer: "You can refine the data by selecting or deselecting specific editors from the checkbox list. This will filter the chart and table to show data only for the selected editors, enabling you to focus on individual contributions."
+          },
+          {
+            question: "⚙️ How does this tool work?",
+            answer: "The tool will be going through all the reviews made by the editor/reviewer and update the database every 24 hours. This tool captures reviews only if the person is marked as a reviewer and has performed a review activity on the PR. If no review is made, it won't be counted, even if the person is listed as a reviewer. Note: The reviews made by the editor during their active time as an editor are considered for plotting the charts."
+          }
+        ]}
       />
       
       {/* EtherWorld Advertisement */}
@@ -1827,11 +1844,6 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         <CloseableAdCard />
       </Box>
       
-      </section>
-
-
-      <section id="Leaderboard FAQ">
-        <FAQSection show={show} toggleCollapse={toggleCollapse} />
       </section>
 
 

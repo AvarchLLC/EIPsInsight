@@ -1659,158 +1659,34 @@ const GitHubPRTracker: React.FC = () => {
       <FeedbackWidget />
       <AllLayout>
         <Box padding={{ base: 3, md: 6 }} margin={{ base: 2, md: 3 }}>
-          {/* Animated Header */}
+          {/* Animated Header with FAQ */}
           <AnimatedHeader
             title="PR Analytics"
-            description="Comprehensive analytics and insights for Ethereum Improvement Proposals and ERCs. Track pull request trends, review activity, and contribution metrics across all repositories."
             emoji="📊"
+            faqItems={[
+              {
+                question: "💡 What does this tool do?",
+                answer: "This tool aims to automate the process of tracking PRs and issues in GitHub repositories, providing visualizations and reports to streamline project management. The default view utilizes the timeline to observe trends in the number of Created, Closed, Merged, and Open PRs/Issues at the end of each month."
+              },
+              {
+                question: "📅 How can I view data for a specific month?",
+                answer: "To focus on a specific month, click the View More button and choose the desired Year and Month from the dropdown menus. The table and graph will then update to display data exclusively for that selected month."
+              },
+              {
+                question: "🎨 How to customize the chart?",
+                answer: "To customize the chart, you can adjust the timeline scroll bar to display data for a specific month/year. Additionally, you can tailor the graph by selecting or deselecting checkboxes for Created, Closed, Merged, and Open PRs/Issues, allowing you to focus on the trends that are most relevant to you."
+              },
+              {
+                question: "📥 How to download reports?",
+                answer: "After selecting your preferred data using the View More option, you can download reports based on the filtered data for further analysis or record-keeping. Simply click the download button to export the data in your chosen format."
+              }
+            ]}
           />
 
           {/* EtherWorld Advertisement */}
           <Box my={5}>
             <CloseableAdCard />
           </Box>
-          
-
-          <Box
-            bgGradient={useColorModeValue(
-              'linear(to-br, blue.50, purple.50)',
-              'linear(to-br, gray.800, gray.900)'
-            )}
-            borderRadius="lg"
-            borderWidth="2px"
-            borderColor={useColorModeValue('blue.200', 'gray.600')}
-            p={4}
-            mb={4}
-            boxShadow="md"
-            transition="all 0.3s"
-            _hover={{ boxShadow: 'lg' }}
-          >
-            <Flex justify="space-between" align="center" mb={show ? 3 : 0} cursor="pointer" onClick={toggleCollapse}>
-              <Heading
-                as="h2"
-                size="md"
-                color={useColorModeValue('blue.700', 'blue.300')}
-                fontWeight="bold"
-                letterSpacing="tight"
-                fontFamily="'Inter', sans-serif"
-              >
-                📚 Analytics FAQ
-              </Heading>
-              <IconButton
-                onClick={toggleCollapse}
-                icon={show ? <ChevronUpIcon boxSize={5} /> : <ChevronDownIcon boxSize={5} />}
-                variant="ghost"
-                colorScheme="blue"
-                aria-label="Toggle FAQ"
-                size="sm"
-                _hover={{ transform: 'scale(1.1)' }}
-                transition="transform 0.2s"
-              />
-            </Flex>
-
-            <Collapse in={show} animateOpacity>
-              <Box pt={3} px={1}>
-                {/* Question 1 */}
-                <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="blue.500">
-                  <Heading 
-                    as="h3" 
-                    size="sm" 
-                    mb={2} 
-                    color={useColorModeValue('gray.800', 'gray.100')} 
-                    fontWeight="bold"
-                    fontFamily="'Inter', sans-serif"
-                  >
-                    💡 What does this tool do?
-                  </Heading>
-                  <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
-                    This tool aims to automate the process of tracking PRs and
-                    issues in GitHub repositories, providing visualizations and
-                    reports to streamline project management. The default view
-                    utilizes the timeline to observe trends in the number of
-                    Created, Closed, Merged, and Open PRs/Issues at the end of each
-                    month.
-                  </Text>
-                </Box>
-
-                {/* Question 2 */}
-                <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="purple.500">
-                  <Heading 
-                    as="h3" 
-                    size="sm" 
-                    mb={2} 
-                    color={useColorModeValue('gray.800', 'gray.100')} 
-                    fontWeight="bold"
-                    fontFamily="'Inter', sans-serif"
-                  >
-                    📅 How can I view data for a specific month?
-                  </Heading>
-                  <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
-                    To focus on a specific month, click the View More button and
-                    choose the desired Year and Month from the dropdown menus. The
-                    table and graph will then update to display data exclusively for
-                    that selected month.
-                  </Text>
-                </Box>
-
-                {/* Question 3 */}
-                <Box mb={4} p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="green.500">
-                  <Heading 
-                    as="h3" 
-                    size="sm" 
-                    mb={2} 
-                    color={useColorModeValue('gray.800', 'gray.100')} 
-                    fontWeight="bold"
-                    fontFamily="'Inter', sans-serif"
-                  >
-                    🎨 How to customize the chart?
-                  </Heading>
-                  <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
-                    To customize the chart, you can adjust the timeline scroll bar
-                    to display data for a specific month/year. Additionally, you can
-                    tailor the graph by selecting or deselecting checkboxes for
-                    Created, Closed, Merged, and Open PRs/Issues, allowing you to
-                    focus on the trends that are most relevant to you.
-                  </Text>
-                </Box>
-
-                {/* Question 4 */}
-                <Box p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="orange.500">
-                  <Heading 
-                    as="h3" 
-                    size="sm" 
-                    mb={2} 
-                    color={useColorModeValue('gray.800', 'gray.100')} 
-                    fontWeight="bold"
-                    fontFamily="'Inter', sans-serif"
-                  >
-                    📥 How to download reports?
-                  </Heading>
-                  <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.6" fontFamily="'Inter', sans-serif">
-                    After selecting your preferred data using the View More option,
-                    you can download reports based on the filtered data for further
-                    analysis or record-keeping. Simply click the download button to
-                    export the data in your chosen format.
-                  </Text>
-                </Box>
-              </Box>
-            </Collapse>
-
-            {/* {!show && (
-        <Flex justify="center" align="center" marginTop={4}>
-          <Text color={useColorModeValue("#3182CE", "blue.300")} cursor="pointer" onClick={toggleCollapse}>
-            View Instructions
-          </Text>
-          <ChevronDownIcon color={useColorModeValue("#3182CE", "blue.300")} />
-        </Flex>
-      )} */}
-          </Box>
-          <br/>
-          {/* Advertise With Us (moved below FAQ for spacing) */}
-
-          {/* <Box>
-              <ERCsPRChart/>
-          </Box> */}
 
           <Flex justify="center" mb={4} gap={4}>
             <Button
