@@ -4,203 +4,706 @@ import AllLayout from "@/components/Layout";
 import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
-  Spinner,
-  useColorModeValue,
-  Wrap,
-  WrapItem,
+  Container,
   Text,
-  List,
+  Stack,
+  HStack,
+  Image,
+  Link,
+  Heading,
   UnorderedList,
   ListItem,
-  Heading,
-  Grid,
-  Stack,
-  Image,
-  Link
-} from "@chakra-ui/react";
-import NLink from "next/link";
-import { FiHome } from "react-icons/fi";
+  SimpleGrid,
+  useColorModeValue,
+  useColorMode,
+  IconButton,
+  Button,
+  Collapse,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  Tooltip
+} from '@chakra-ui/react';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
-const AboutPage = () => {
-  const bg = useColorModeValue("#f6f6f7", "#171923");
-  const cardBg = useColorModeValue("white", "gray.800");
+export default function AboutPage() {
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string>('overview');
+  const [showFeaturesOverview, setShowFeaturesOverview] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { toggleColorMode } = useColorMode();
   const textColor = useColorModeValue("gray.700", "gray.200");
   const headingColor = useColorModeValue("gray.800", "white");
   const mainHeadingColor = useColorModeValue("#30A0E0", "#4FD1FF");
   const linkColor = useColorModeValue("blue.500", "blue.300");
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  
-  useEffect(() => {
-    if (bg === "#f6f6f7") {
-      setIsDarkMode(false);
-    } else {
-      setIsDarkMode(true);
+  const navLinkColor = useColorModeValue("gray.600", "gray.200");
+  const navLinkHoverColor = useColorModeValue("gray.800", "white");
+  const cardBg = useColorModeValue("white", "#2d3748");
+  const navBg = useColorModeValue("rgba(249, 250, 251, 0.8)", "rgba(23, 25, 35, 0.8)");
+  const glassBg = useColorModeValue("rgba(255, 255, 255, 0.05)", "rgba(26, 32, 44, 0.05)");
+  const glassHover = useColorModeValue("rgba(243, 244, 246, 0.8)", "rgba(55, 65, 81, 0.8)");
+
+  // Enhanced dark mode visibility
+  const containerBorder = useColorModeValue('1px solid rgba(2,6,23,0.04)', '2px solid rgba(74,85,104,0.8)');
+  const containerShadow = useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 10px 30px rgba(0,0,0,0.4)');
+  const containerHoverShadow = useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 15px 40px rgba(0,0,0,0.6)');
+
+  const sections = [
+    { id: 'overview', label: 'Overview', icon: FiHome },
+    { id: 'team', label: 'Team', icon: FaUsers },
+    { id: 'funding', label: 'Funding', icon: FaHeart },
+    { id: 'faq', label: 'FAQ', icon: FaQuestionCircle },
+  ];
+
+  const featuresList = [
+    { icon: FaChartLine, title: 'Monthly Insight', desc: 'Follow the status change of proposals under different types and categories with beautiful charts and tables providing details.', color: '#30A0E0' },
+    { icon: FaTools, title: 'Advanced Toolings', desc: 'Make use of different toolings such as "Editor Review Tracker" and "Issues and PRs Trackers" for comprehensive proposal management.', color: '#4FD1FF' },
+    { icon: FaDatabase, title: 'Detailed EIP Database', desc: 'Explore our extensive database of EIPs, complete with detailed descriptions, statuses, and relevant discussions.', color: '#7B61FF' },
+    { icon: FaComments, title: 'Expert Analysis', desc: 'Gain access to expert commentary and analysis on significant EIPs and their potential impacts on the Ethereum ecosystem.', color: '#FF6FD8' },
+    { icon: FaUsers, title: 'Community Engagement', desc: 'Join our vibrant community of Ethereum enthusiasts, developers, and stakeholders in meaningful discussions.', color: '#2AC7FF' },
+    { icon: FaGraduationCap, title: 'Educational Resources', desc: 'Comprehensive learning materials designed to help you understand the proposal process and technical details.', color: '#30A0E0' },
+  ];
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveSection(sectionId);
+      setIsMenuOpen(false);
     }
-  });
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const element = document.getElementById(section.id);
+        if (element) {
+          const offsetTop = element.offsetTop;
+          const offsetBottom = offsetTop + element.offsetHeight;
+
+          if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+            setActiveSection(section.id);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [sections]);
 
   return (
     <>
-      <AllLayout>
-        <Box 
-          paddingBottom={{ lg: "10", sm: "10", base: "10" }}
-          marginX={{ lg: "40", md: "2", sm: "2", base: "2" }}
-          paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
-          marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
-        >
-          <VStack spacing={6} align="start">
-            <Text
-              id="what"
-              transition={{ duration: 0.5 } as any}
-              fontSize={{ base: "2xl", md: "4xl", lg: "6xl" }}
-              fontWeight={{ base: "extrabold", md: "bold", lg: "bold" }}
-              color={mainHeadingColor}
+      <Head>
+        <title>About — EIPs Insight</title>
+        <meta name="description" content="EIPs Insight — analytics, tools and community for Ethereum Improvement Proposals, ERCs and RIPs." />
+        <meta property="og:title" content="About — EIPs Insight" />
+        <meta property="og:description" content="EIPs Insight — analytics, tools and community for Ethereum Improvement Proposals, ERCs and RIPs." />
+        <meta property="og:image" content="/EIPsInsightsDark.gif" />
+      </Head>
+
+  {/* Render site Navbar for pages router so about page matches site header */}
+  <Navbar />
+
+      <style jsx>{`
+        body {
+          background: linear-gradient(135deg, 
+            rgba(48,160,224,0.03) 0%, 
+            rgba(79,209,255,0.05) 25%, 
+            rgba(123,97,255,0.03) 50%, 
+            rgba(255,111,216,0.05) 75%, 
+            rgba(42,199,255,0.03) 100%);
+          min-height: 100vh;
+        }
+
+        .glass-card {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+          background: rgba(255, 255, 255, 0.15);
+          border: 1px solid rgba(48,160,224,0.3);
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(48,160,224,0.15);
+        }
+
+        .hero-section {
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(25px);
+          -webkit-backdrop-filter: blur(25px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card {
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+          position: relative;
+          overflow: hidden;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(48,160,224,0.1), transparent);
+          transition: left 0.5s;
+        }
+
+        .feature-card:hover::before {
+          left: 100%;
+        }
+
+        .feature-card:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(48,160,224,0.3);
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(48,160,224,0.15);
+        }
+
+        .gradient-text {
+          background: linear-gradient(135deg, #30A0E0 0%, #4FD1FF 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .section-divider {
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(48,160,224,0.3), transparent);
+          margin: 1rem 0;
+        }
+
+        @keyframes fadeInUp {
+          from { 
+            opacity: 0; 
+            transform: translateY(30px);
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .cta-button {
+          background: linear-gradient(135deg, #30A0E0 0%, #4FD1FF 100%);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 25px rgba(48,160,224,0.3);
+        }
+
+        .cta-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 35px rgba(48,160,224,0.4);
+          background: linear-gradient(135deg, #2A8BC5 0%, #4FD1FF 100%);
+        }
+
+        .navbar {
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(229, 231, 235, 0.3);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .navbar {
+          border-bottom: 1px solid rgba(55, 65, 81, 0.3);
+        }
+
+        .nav-link {
+          transition: all 0.2s ease;
+          position: relative;
+          border-radius: 6px;
+        }
+
+        .nav-link:hover {
+          background: rgba(243, 244, 246, 0.8);
+        }
+
+        .dark .nav-link:hover {
+          background: rgba(55, 65, 81, 0.8);
+        }
+
+        .nav-link.active {
+          color: #30A0E0;
+          background: rgba(48,160,224,0.1);
+        }
+
+        .nav-link.active::after {
+          content: '';
+          position: absolute;
+          bottom: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 4px;
+          height: 4px;
+          background: #30A0E0;
+          border-radius: 50%;
+        }
+
+        .mobile-menu {
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(229, 231, 235, 0.3);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .mobile-menu {
+          border: 1px solid rgba(55, 65, 81, 0.3);
+        }
+
+        .glass-accordion {
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .glass-accordion:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(48,160,224,0.2);
+        }
+
+        .mission-card {
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(25px);
+          -webkit-backdrop-filter: blur(25px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-container {
+          transition: transform 180ms, box-shadow 180ms;
+        }
+
+        .section-container:hover {
+          transform: translateY(-2px);
+        }
+
+        /* Enhanced dark mode visibility */
+        [data-theme="dark"] .section-container,
+        .chakra-ui-dark .section-container {
+          background: #2d3748 !important;
+          border: 2px solid #4a5568 !important;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        [data-theme="dark"] .section-container:hover,
+        .chakra-ui-dark .section-container:hover {
+          background: #374151 !important;
+          border: 2px solid #5a6570 !important;
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7) !important;
+        }
+      `}</style>
+      <Box
+        paddingBottom={{ base: 2, sm: 3, lg: 4 }}
+        marginX={0}
+        paddingX={{ base: 2, md: 3, lg: 4 }}
+        /* Reduced top spacing so content sits closer under the site navbar */
+        marginTop={{ base: 4, sm: 6, md: 8, lg: 0 }}
+      >
+        {/* Overview Section */}
+  <Container maxW="7xl" py={6} id="overview">
+            <Box
+              className="section-container"
+              bg={cardBg}
+              p={{ base: 6, md: 8 }}
+              pb={0}
+              mb={-4}
+              borderRadius="xl"
+              textAlign="left"
+              border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+              boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+              style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+              _hover={{
+                transform: 'translateY(-2px)',
+                boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+              }}
             >
-              What is EIPsInsight?
+            <Heading
+              as="h1"
+              fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
+              fontWeight="bold"
+              className="gradient-text"
+              mb={6}
+              textAlign="left"
+            >
+              About EIPsInsight
+            </Heading>
+
+            <Text
+              fontSize={{ base: "md", md: "lg", lg: "xl" }}
+              color={textColor}
+              lineHeight="tall"
+              fontWeight="medium"
+            >
+              EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of{" "}
+              <Link
+                href="https://github.com/ethereum/EIPs"
+                color={linkColor}
+                isExternal
+                fontWeight="semibold"
+                _hover={{ textDecoration: 'none', color: mainHeadingColor }}
+                transition="color 0.2s"
+              >
+                Ethereum Improvement Proposals (EIPs)
+              </Link>,{" "}
+              <Link
+                href="https://github.com/ethereum/ERCs"
+                color={linkColor}
+                isExternal
+                fontWeight="semibold"
+                _hover={{ textDecoration: 'none', color: mainHeadingColor }}
+                transition="color 0.2s"
+              >
+                Ethereum Request for Comments (ERCs)
+              </Link>, and{" "}
+              <Link
+                href="https://github.com/ethereum/RIPs"
+                color={linkColor}
+                isExternal
+                fontWeight="semibold"
+                _hover={{ textDecoration: 'none', color: mainHeadingColor }}
+                transition="color 0.2s"
+              >
+                Rollup Improvement Proposals (RIPs)
+              </Link>{" "}
+              over a specified period. Data provided is used for tracking the progress and workload distribution among
+              EIP Editors, ensuring transparency and efficiency in the proposal review process.
+            </Text>
+            {/* Read more toggle to show Key Features inline */}
+            <Box mt={6}>
+              <Button
+                onClick={() => setShowFeaturesOverview(!showFeaturesOverview)}
+                size="sm"
+                colorScheme="blue"
+                variant="ghost"
+                className="cta-button"
+              >
+                {showFeaturesOverview ? 'Hide key features' : 'Read more'}
+              </Button>
+
+              <Collapse in={showFeaturesOverview} animateOpacity>
+                <Box mt={4}>
+                  <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                    {featuresList.map((feature, index) => (
+                      <Box
+                        key={feature.title}
+                        className="section-container"
+                        bg={cardBg}
+                        p={4}
+                        borderRadius="lg"
+                        textAlign="left"
+                        cursor="pointer"
+                        onClick={() => setExpanded(expanded === feature.title ? null : feature.title)}
+                        style={{ animationDelay: `${index * 0.05}s` }}
+                        border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                        boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                        _hover={{ transform: 'translateY(-2px)', boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)') }}
+                        transition="transform 180ms, box-shadow 180ms"
+                      >
+                        <Box as={feature.icon} size="28px" color={feature.color} mb={2} />
+                        <Heading as="h3" size="sm" color={headingColor} mb={1} fontWeight="bold">{feature.title}</Heading>
+                        <Text color={textColor} fontSize="sm" lineHeight="tall" opacity={0.9}>{feature.desc}</Text>
+
+                        {expanded === feature.title && (
+                          <Box mt={3} p={3} bg={useColorModeValue('rgba(243, 244, 246, 0.8)', 'rgba(55, 65, 81, 0.8)')} borderRadius="md" borderLeft="3px solid" borderColor={feature.color}>
+                            <Text fontSize="xs" color={textColor} fontStyle="italic">Explore detailed dashboards with charts, filters, and export options to analyze trends and insights.</Text>
+                          </Box>
+                        )}
+                      </Box>
+                    ))}
+                  </SimpleGrid>
+                </Box>
+              </Collapse>
+            </Box>
+          </Box>
+        </Container>
+
+
+        {/* Contributors Section */}
+  <Container maxW="7xl" py={1} id="team">
+          <Box
+            className="section-container"
+            bg={cardBg}
+            p={{ base: 6, md: 8 }}
+            borderRadius="xl"
+            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+            style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+            _hover={{
+              transform: 'translateY(-2px)',
+              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+            }}
+          >
+            <ContributorsGrid />
+          </Box>
+        </Container>
+
+        {/* Stats Section */}
+  <Container maxW="7xl" py={-20} id="stats">
+          <Stats />
+        </Container>
+
+        {/* Funding Section */}
+  <Container maxW="7xl" py={1} id="funding">
+          <Box
+            className="section-container"
+            bg={cardBg}
+            p={{ base: 6, md: 8 }}
+            borderRadius="xl"
+            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+            style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+            _hover={{
+              transform: 'translateY(-2px)',
+              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+            }}
+          >
+            {/* Funding heading removed as requested */}
+            <FundingDetails />
+            {/* Support / Contact buttons removed as requested */}
+          </Box>
+        </Container>
+
+        {/* Grants (moved out of Funding) */}
+  <Container maxW="7xl" py={1} id="grants">
+          <Box
+            className="section-container"
+            bg={cardBg}
+            p={{ base: 6, md: 8 }}
+            borderRadius="xl"
+            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+            style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+            _hover={{
+              transform: 'translateY(-2px)',
+              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+            }}
+          >
+            <Heading
+              as="h2"
+              fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
+              bgGradient="linear(135deg, #30A0E0 0%, #4FD1FF 100%)"
+              bgClip="text"
+              color="transparent"
+              mb={6}
+              fontWeight="bold"
+              textAlign="left"
+            >
+              Grants
+            </Heading>
+
+            <GrantList />
+          </Box>
+        </Container>
+
+  {/* Mission/join section removed - moved links into Funding support block */}
+
+  {/* Partners Section */}
+  <Partners />
+
+  {/* FAQ Section */}
+  <Container maxW="7xl" py={1} id="faq">
+          <Box
+            className="section-container"
+            bg={cardBg}
+            p={{ base: 6, md: 8 }}
+            borderRadius="xl"
+            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+            style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+            _hover={{
+              transform: 'translateY(-2px)',
+              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+            }}
+          >
+            <Heading
+              as="h2"
+              fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
+              className="gradient-text"
+              mb={3}
+              fontWeight="bold"
+              textAlign="left"
+            >
+              Frequently Asked Questions
+            </Heading>
+            <Text
+              fontSize={{ base: "sm", md: "md" }}
+              color={textColor}
+              opacity={0.8}
+              mb={6}
+            >
+              Get answers to common questions about our platform and services
             </Text>
 
-            <Stack 
-              direction={{ base: "column", lg: "row" }}
-              spacing={6} 
-              align="center"
-              justify="center"
-            >
-              {/* Image Box */}
-              <Box 
-                display="flex" 
-                justifyContent="center" 
-                width={{ base: "100%", lg: "40%" }}
+            <Stack spacing={4}>
+              {/* Data source */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
               >
-                <Image 
-                  src="Blockchain_Future.png" 
-                  alt="EIPsInsight Platform" 
-                  borderRadius="md" 
-                  width={{ base: "250px", md: "350px", lg: "100%" }}
-                  height="auto"
-                  objectFit="contain"
-                />
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">Where does the data come from?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        We aggregate public GitHub data from the official Ethereum repositories (EIPs, ERCs, RIPs), partner repositories, and community submissions. We fetch commits, PRs, and proposal files using GitHub's API, normalize labels and timestamps into monthly buckets, and persist processed records in MongoDB. Public API endpoints (for example, <code>/api/stats</code> and PR snapshot APIs) expose the aggregated metrics; when the database is unavailable the UI shows a friendly fallback.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
               </Box>
 
-              {/* Text */}
-              <Box 
-                width={{ base: "100%", lg: "60%" }}
-                textAlign="justify"
-              >     
-                <Text fontSize={{ base: "md", md: "xl", lg: "xl" }} textAlign="justify" color={textColor}>
-                  EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of{" "}
-                  <Link href="https://github.com/ethereum/EIPs" color={linkColor} isExternal className="underline">
-                    Ethereum Improvement Proposals (EIPs)
-                  </Link>,{" "}
-                  <Link href="https://github.com/ethereum/ERCs" color={linkColor} isExternal className="underline">
-                    Ethereum Request for Comments (ERCs)
-                  </Link>, and{" "}
-                  <Link href="https://github.com/ethereum/RIPs" color={linkColor} isExternal className="underline">
-                    Rollup Improvement Proposals (RIPs)
-                  </Link>{" "}
-                  over a specified period. Data provided is used for tracking the progress and workload distribution among
-                  EIP Editors, ensuring transparency and efficiency in the proposal review process.
-                </Text>
-                <Text fontSize={{ base: "md", md: "xl", lg: "xl" }} textAlign="justify" color={textColor} mt={4}>
-                  EIPsInsight is a tooling platform dedicated to providing in-depth analysis, up-to-date information, and
-                  comprehensive insights on Ethereum Standards. Our mission is to empower editors, developers, stakeholders,
-                  and the broader Ethereum community with the knowledge and tools necessary to understand and engage with
-                  the ongoing evolution of the Ethereum Standards.
-                </Text>
+              {/* Contribution */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">How can I contribute?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        We welcome contributions. Please open issues or pull requests in our GitHub repository. Smaller documentation fixes, typo corrections, and feature ideas are a great place to start. For larger changes, open an issue first to discuss scope and design with maintainers.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
               </Box>
-            </Stack>
 
             {/* EtherWorld Advertisement */}
             <Box my={6} width="100%">
               <CloseableAdCard />
             </Box>
 
-            <Heading as="h2" size="lg" textAlign="justify" color={headingColor}>
-              Key Features
-            </Heading>
-            
-            <Box 
-              bg={cardBg}
-              p={6}
-              borderRadius="xl"
-              boxShadow="md"
-              width="100%"
-            >
-              <UnorderedList 
-                fontSize={{ base: "md", sm: "md", md: "xl" }} 
-                spacing={4}
-                color={textColor}
+              {/* Labels */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
               >
-                <ListItem>
-                  <Text as="span" fontWeight="bold" color={textColor}>Monthly Insight:</Text> Follow the status change of proposals under different types and
-                  categories with beautiful charts and tables providing details.
-                </ListItem>
-                <ListItem>
-                  <Text as="span" fontWeight="bold" color={textColor}>Toolings:</Text> Make use of different toolings such as "Editor Review Tracker" and "Issues
-                  and PRs Trackers" which will provide the proposals added, reviewed and moved to various statuses by EIP
-                  Editors. These will be helpful for tracking the progress and workload distribution among EIP Editors,
-                  ensuring transparency and efficiency in the proposal review process.
-                </ListItem>
-                <ListItem>
-                  <Text as="span" fontWeight="bold" color={textColor}>Detailed EIP Database:</Text> Explore our extensive database of EIPs, complete with detailed
-                  descriptions, statuses, and relevant discussions. Whether you're looking for historical proposals or the
-                  latest advancements, our database is your go-to resource.
-                </ListItem>
-                <ListItem>
-                  <Text as="span" fontWeight="bold" color={textColor}>Expert Analysis:</Text> Gain access to expert commentary and analysis on significant EIPs,
-                  their potential impacts, and the broader implications for the Ethereum ecosystem. Our team of
-                  experienced analysts and contributors ensure you have the most accurate and relevant insights.
-                </ListItem>
-                <ListItem>
-                  <Text as="span" fontWeight="bold" color={textColor}>Community Engagement:</Text> Join the conversation with our vibrant community of Ethereum
-                  enthusiasts, developers, and stakeholders. Participate in forums, provide feedback on proposals, and
-                  stay connected with the latest developments in the Ethereum space.
-                </ListItem>
-                <ListItem>
-                  <Text as="span" fontWeight="bold" color={textColor}>Educational Resources:</Text> New to EIPs? Our educational resources are designed to help you
-                  understand the proposal process, the technical details, and the importance of various EIPs. From
-                  beginners to seasoned developers, there's something for everyone.
-                </ListItem>
-                <ListItem>
-                  <Text as="span" fontWeight="bold" color={textColor}>Regular Updates:</Text> Stay informed with our regular updates and newsletters. Get the latest
-                  news, changes, and discussions surrounding EIPs delivered straight to your inbox.
-                </ListItem>
-              </UnorderedList>
-            </Box>
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">What do the labels and statuses mean?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        We normalize GitHub labels into a smaller set of "customLabels" for analytics (e.g., review, consensus, stagnant). Statuses like Draft, Review, Last Call, and Final follow the EIP repository conventions — where possible we map repo statuses to our visualizations and explain them in charts/tooltips.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
 
-            <Text fontSize={{ base: "md", md: "xl", lg: "xl" }} textAlign="justify" color={textColor}>
-              At EIPsInsight, we believe in the power of open-source collaboration and the continuous improvement of the
-              Ethereum network.{" "}
-              <Link href="https://x.com/TeamAvarch" color={linkColor} isExternal className="underline">
-                Join us
-              </Link>{" "}
-              in exploring the future of Ethereum, one proposal at a time.
-            </Text>
+              {/* Exports & API */}
+              {/* Export/API question removed per request */}
 
-            <Box display="flex" justifyContent="center" w="100%">
-              <NLink href="/">
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  bg="#30A0E0"
-                  color="white"
-                  padding="10px 20px"
-                  borderRadius="8px"
-                  fontWeight="bold"
-                  cursor="pointer"
-                  _hover={{ bg: "#2A8BC5" }}
-                  _active={{ bg: "#1F6F99" }}
-                  transition="background-color 0.3s"
-                >
-                  <FiHome style={{ marginRight: '8px' }} />
-                  Go to Dashboard
-                </Box>
-              </NLink>
-            </Box>
+              {/* Reporting & feature requests */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">How do I report a bug or request a feature?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        Please open an issue on our GitHub repository with reproduction steps, screenshots, and expected behavior. For feature requests, include use-cases and any data or API needs; maintainers will triage and respond with suggested approaches.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
 
-          </VStack>
-        </Box>
-      </AllLayout>
+              {/* Privacy */}
+              
+            </Stack>
+          </Box>
+        </Container>
+
+        {/* CTA removed as requested */}
+      </Box>
+
+      {/* Footer */}
+      <Footer />
     </>
   );
-};
-
-export default AboutPage;
+}

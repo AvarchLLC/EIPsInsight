@@ -69,6 +69,8 @@ import { useScrollSpy } from "@/hooks/useScrollSpy";
 import TwitterTimeline from "./TwitterTimeline";
 import CloseableAdCard from "./CloseableAdCard";
 import FusakaCountdownBadge from "./FusakaCountdownBadge";
+import SupportedBy from "./SupportedBy";
+
 
 interface EIP {
   _id: string;
@@ -1090,6 +1092,9 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
             >
               <TwitterTimeline />
             </Box>
+            
+            {/* Supported By Section */}
+            <SupportedBy />
             
           </motion.div>
         )}

@@ -1,10 +1,8 @@
-import React from "react";
-import { Box, Flex, Text, Badge, Image, useColorModeValue, Stack, Icon } from "@chakra-ui/react";
-import { keyframes } from "@emotion/react";
-import { FiExternalLink, FiClock, FiShield, FiTrendingUp } from "react-icons/fi";
-import { trackFeatureUsage } from "@/utils/analytics";
+// Re-export the closeable, session-aware EtherWorld ad implementation.
+// This ensures every existing import of `EtherWorldAdCard` renders the
+// `CloseableAdCard` without changing all import sites.
 
-const etherWorldLogo = "https://etherworld.co/favicon.ico";
+import CloseableAdCard from "./CloseableAdCard";
 
 // Flashy animations for small ad
 const sheen = keyframes`
