@@ -1,7 +1,7 @@
 import { Box, Heading, Text, Button } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
 import FactsSection from "@/components/TriviaContents";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 
 const UnderConstructionPage: React.FC = () => {
   return (
@@ -41,7 +41,7 @@ const UnderConstructionPage: React.FC = () => {
        >
         {/* EtherWorld Advertisement */}
         <Box my={6}>
-          <EtherWorldAdCard />
+          <CloseableAdCard />
         </Box>
         
         <FactsSection/>

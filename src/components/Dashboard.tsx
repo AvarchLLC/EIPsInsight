@@ -67,7 +67,7 @@ import FeedbackWidget from "./FeedbackWidget";
 import { Clients } from "./Clients";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import TwitterTimeline from "./TwitterTimeline";
-import EtherWorldAdCard from "./EtherWorldAdCard";
+import CloseableAdCard from "./CloseableAdCard";
 import FusakaCountdownBadge from "./FusakaCountdownBadge";
 import SupportedBy from "./SupportedBy";
 
@@ -472,7 +472,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                     mb={{ base: 4, lg: 6 }}
                     px={{ base: 4, md: 6, lg: 8 }}
                   >
-                    <EtherWorldAdCard />
+                    <CloseableAdCard />
                   </Box>
                   
                   <Box

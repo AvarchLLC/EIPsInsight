@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import Table from "@/components/Table";
 import { Box } from "@chakra-ui/react";
 import Header from "@/components/Header";
@@ -32,7 +32,7 @@ const EIPTable = () => {
           
           {/* EtherWorld Advertisement */}
           <Box my={6}>
-            <EtherWorldAdCard />
+            <CloseableAdCard />
           </Box>
           
           <Table type="EIP" />

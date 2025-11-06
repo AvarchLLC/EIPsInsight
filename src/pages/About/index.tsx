@@ -1,18 +1,7 @@
-
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import ContributorsGrid from '@/components/ContributorsGrid';
-import Footer from '@/components/Footer';
-import FundingDetails from '@/components/FundingDetails';
-import GrantList from '@/components/GrantList';
-import Partners from '@/components/Partners';
-import Stats from '@/components/Stats';
-import Navbar from '@/components/Navbar';
-
-
-import NLink from 'next/link';
-import { FiHome, FiMenu, FiX } from 'react-icons/fi';
-import { FaChartLine, FaTools, FaDatabase, FaUsers, FaGraduationCap, FaComments, FaQuestionCircle, FaHeart } from 'react-icons/fa';
+import { VStack } from "@chakra-ui/react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
+import AllLayout from "@/components/Layout";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Container,
@@ -634,36 +623,10 @@ export default function AboutPage() {
                 </Accordion>
               </Box>
 
-              {/* Frequency */}
-              <Box
-                className="section-container"
-                bg={cardBg}
-                borderRadius="xl"
-                overflow="hidden"
-                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
-                _hover={{
-                  transform: 'translateY(-2px)',
-                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
-                }}
-              >
-                <Accordion allowMultiple>
-                  <AccordionItem border="none">
-                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
-                      <Box flex="1" textAlign="left">
-                        <Text fontWeight="semibold" fontSize="md">How often is the data refreshed?</Text>
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                    <AccordionPanel pb={6} px={6}>
-                      <Text color={textColor} lineHeight="tall" fontSize="sm">
-                        Most data is refreshed periodically (hourly to daily) depending on the endpoint. Some aggregated dashboards are updated nightly. Where possible, we surface the last-updated timestamp on charts and exportable data.
-                      </Text>
-                    </AccordionPanel>
-                  </AccordionItem>
-                </Accordion>
-              </Box>
+            {/* EtherWorld Advertisement */}
+            <Box my={6} width="100%">
+              <CloseableAdCard />
+            </Box>
 
               {/* Labels */}
               <Box

@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 import { CSmartTable, CCardBody } from "@coreui/react-pro";
 import "@coreui/coreui/dist/css/coreui.min.css";
 import axios from "axios";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 
 const MotionBox = motion(Box);
 interface EIP {
@@ -291,7 +291,7 @@ useEffect(() => {
 
         {/* EtherWorld Ad - Strategic placement before table */}
         <Box mb={6}>
-          <EtherWorldAdCard />
+          <CloseableAdCard />
         </Box>
 
         {/* Table */}

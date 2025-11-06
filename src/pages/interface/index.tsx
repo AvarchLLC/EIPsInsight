@@ -1,5 +1,5 @@
 import React from "react";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import { Box, Button } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
@@ -124,7 +124,7 @@ const Interface = () => {
             
             {/* EtherWorld Advertisement */}
             <Box my={6}>
-              <EtherWorldAdCard />
+              <CloseableAdCard />
             </Box>
             
             <TableStatus cat="Interface" />

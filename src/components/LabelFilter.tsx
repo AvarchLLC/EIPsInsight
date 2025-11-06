@@ -14,12 +14,14 @@ import {
     labels: string[];
     selectedLabels: string[];
     onLabelToggle: (label: string) => void;
+    labelDisplayNames?: { [key: string]: string };
   }
   
   const LabelFilter: React.FC<LabelFilterProps> = ({
     labels,
     selectedLabels,
     onLabelToggle,
+    labelDisplayNames = {},
   }) => {
     // Force dark mode styles
     const menuBg = useColorModeValue("gray.800", "gray.800"); // Dark background
@@ -54,7 +56,7 @@ import {
                 onChange={() => onLabelToggle(label)}
                 colorScheme="blue" // Ensure the checkbox stands out
               >
-                {label}
+                {labelDisplayNames[label] || label}
               </Checkbox>
             </MenuItem>
           ))}

@@ -9,7 +9,7 @@ import TypeGraphs3 from "@/components/TypeGraphs3";
 import SearchBox from "@/components/SearchBox";
 import { useRouter } from "next/router";
 import { CopyIcon } from "@chakra-ui/icons";
-import EtherWorldAdCard from "@/components/EtherWorldAdCard";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Grid,
@@ -323,7 +323,7 @@ const Type = () => {
 
             {/* EtherWorld Advertisement */}
             <Box mb={4} width="100%">
-              <EtherWorldAdCard />
+              <CloseableAdCard />
             </Box>
 
             <Flex
