@@ -1,22 +1,21 @@
-import { VStack } from "@chakra-ui/react";
-import React, { useState, useEffect, useLayoutEffect } from "react";
-import AllLayout from "@/components/Layout";
+import React, { useState } from "react";
+import Head from "next/head";
 import CloseableAdCard from "@/components/CloseableAdCard";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import ContributorsGrid from "@/components/ContributorsGrid";
+import Stats from "@/components/AboutStats";
+import FundingDetails from "@/components/FundingDetails";
+import GrantList from "@/components/GrantList";
+import Partners from "@/components/Partners";
 import {
   Box,
   Container,
   Text,
-  Stack,
-  HStack,
-  Image,
   Link,
   Heading,
-  UnorderedList,
-  ListItem,
   SimpleGrid,
   useColorModeValue,
-  useColorMode,
-  IconButton,
   Button,
   Collapse,
   Accordion,
@@ -24,38 +23,25 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-  Tooltip
+  Stack
 } from '@chakra-ui/react';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { 
+  FaUsers, 
+  FaChartLine, 
+  FaTools, 
+  FaDatabase, 
+  FaComments, 
+  FaGraduationCap 
+} from 'react-icons/fa';
 
 export default function AboutPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<string>('overview');
   const [showFeaturesOverview, setShowFeaturesOverview] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { toggleColorMode } = useColorMode();
   const textColor = useColorModeValue("gray.700", "gray.200");
   const headingColor = useColorModeValue("gray.800", "white");
-  const mainHeadingColor = useColorModeValue("#30A0E0", "#4FD1FF");
   const linkColor = useColorModeValue("blue.500", "blue.300");
-  const navLinkColor = useColorModeValue("gray.600", "gray.200");
-  const navLinkHoverColor = useColorModeValue("gray.800", "white");
   const cardBg = useColorModeValue("white", "#2d3748");
-  const navBg = useColorModeValue("rgba(249, 250, 251, 0.8)", "rgba(23, 25, 35, 0.8)");
-  const glassBg = useColorModeValue("rgba(255, 255, 255, 0.05)", "rgba(26, 32, 44, 0.05)");
   const glassHover = useColorModeValue("rgba(243, 244, 246, 0.8)", "rgba(55, 65, 81, 0.8)");
-
-  // Enhanced dark mode visibility
-  const containerBorder = useColorModeValue('1px solid rgba(2,6,23,0.04)', '2px solid rgba(74,85,104,0.8)');
-  const containerShadow = useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 10px 30px rgba(0,0,0,0.4)');
-  const containerHoverShadow = useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 15px 40px rgba(0,0,0,0.6)');
-
-  const sections = [
-    { id: 'overview', label: 'Overview', icon: FiHome },
-    { id: 'team', label: 'Team', icon: FaUsers },
-    { id: 'funding', label: 'Funding', icon: FaHeart },
-    { id: 'faq', label: 'FAQ', icon: FaQuestionCircle },
-  ];
 
   const featuresList = [
     { icon: FaChartLine, title: 'Monthly Insight', desc: 'Follow the status change of proposals under different types and categories with beautiful charts and tables providing details.', color: '#30A0E0' },
@@ -65,37 +51,6 @@ export default function AboutPage() {
     { icon: FaUsers, title: 'Community Engagement', desc: 'Join our vibrant community of Ethereum enthusiasts, developers, and stakeholders in meaningful discussions.', color: '#2AC7FF' },
     { icon: FaGraduationCap, title: 'Educational Resources', desc: 'Comprehensive learning materials designed to help you understand the proposal process and technical details.', color: '#30A0E0' },
   ];
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setActiveSection(sectionId);
-      setIsMenuOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
-
-      for (const section of sections) {
-        const element = document.getElementById(section.id);
-        if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetBottom = offsetTop + element.offsetHeight;
-
-          if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
-            setActiveSection(section.id);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [sections]);
 
   return (
     <>
@@ -366,7 +321,7 @@ export default function AboutPage() {
                 color={linkColor}
                 isExternal
                 fontWeight="semibold"
-                _hover={{ textDecoration: 'none', color: mainHeadingColor }}
+                _hover={{ textDecoration: 'none', color: headingColor }}
                 transition="color 0.2s"
               >
                 Ethereum Improvement Proposals (EIPs)
@@ -376,7 +331,7 @@ export default function AboutPage() {
                 color={linkColor}
                 isExternal
                 fontWeight="semibold"
-                _hover={{ textDecoration: 'none', color: mainHeadingColor }}
+                _hover={{ textDecoration: 'none', color: headingColor }}
                 transition="color 0.2s"
               >
                 Ethereum Request for Comments (ERCs)
@@ -386,7 +341,7 @@ export default function AboutPage() {
                 color={linkColor}
                 isExternal
                 fontWeight="semibold"
-                _hover={{ textDecoration: 'none', color: mainHeadingColor }}
+                _hover={{ textDecoration: 'none', color: headingColor }}
                 transition="color 0.2s"
               >
                 Rollup Improvement Proposals (RIPs)
