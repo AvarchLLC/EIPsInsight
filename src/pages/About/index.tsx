@@ -4,7 +4,6 @@ import CloseableAdCard from "@/components/CloseableAdCard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContributorsGrid from "@/components/ContributorsGrid";
-import Stats from "@/components/AboutStats";
 import FundingDetails from "@/components/FundingDetails";
 import GrantList from "@/components/GrantList";
 import Partners from "@/components/Partners";
@@ -416,11 +415,6 @@ export default function AboutPage() {
           >
             <ContributorsGrid />
           </Box>
-        </Container>
-
-        {/* Stats Section */}
-  <Container maxW="7xl" py={-20} id="stats">
-          <Stats />
         </Container>
 
         {/* Funding Section */}

@@ -70,6 +70,7 @@ import TwitterTimeline from "./TwitterTimeline";
 import CloseableAdCard from "./CloseableAdCard";
 import FusakaCountdownBadge from "./FusakaCountdownBadge";
 import SupportedBy from "./SupportedBy";
+import StatsGrid from "./StatsGrid";
 
 
 interface EIP {
@@ -585,6 +586,9 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                   </div>
                 </div>
               </Box>
+
+              {/* Stats Grid Section */}
+              <StatsGrid />
 
               <Box
                 className="py-2"
