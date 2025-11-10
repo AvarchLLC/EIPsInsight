@@ -11,12 +11,12 @@ import {
   useColorModeValue,
   Button,
   HStack,
-  Image,
   Stack,
   Tooltip,
   Flex,
   Container,
 } from '@chakra-ui/react';
+import Image from 'next/image';
 import { FaHeart } from 'react-icons/fa';
 
 export default function AboutFunding() {
@@ -51,21 +51,27 @@ export default function AboutFunding() {
                     <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={4} alignItems="center">
                       <Box textAlign="center">
                         <a href="https://ethereum.org/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', cursor: 'pointer' }}>
-                          <Image src={logoSrc} alt="Ecosystem Support Program" h={{ base: 10, md: 14 }} mx="auto" transition="transform 160ms" _hover={{ transform: 'translateY(-4px)' }} />
+                          <Box position="relative" height={{ base: "40px", md: "56px" }} width="auto" display="inline-block" transition="transform 160ms" _hover={{ transform: 'translateY(-4px)' }}>
+                            <Image src={logoSrc} alt="Ecosystem Support Program" height={56} width={200} style={{ height: '100%', width: 'auto' }} unoptimized />
+                          </Box>
                         </a>
                         <Text fontSize="xs" color={useColorModeValue('gray.600','gray.400')} mt={2}>Ecosystem Support</Text>
                       </Box>
 
                       <Box textAlign="center">
                         <a href="https://octant.app/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', cursor: 'pointer' }}>
-                          <Image src="/octant.png" alt="Octant" h={{ base: 10, md: 14 }} mx="auto" />
+                          <Box position="relative" height={{ base: "40px", md: "56px" }} width="auto" display="inline-block">
+                            <Image src="/octant.png" alt="Octant" height={56} width={200} style={{ height: '100%', width: 'auto' }} />
+                          </Box>
                         </a>
                         <Text fontSize="xs" color={useColorModeValue('gray.600','gray.400')} mt={2}>Octant</Text>
                       </Box>
 
                       <Box textAlign="center">
                         <a href="https://gitcoin.co/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', cursor: 'pointer' }}>
-                          <Image src="/Gitcoin-logo-.jpg" alt="Gitcoin" h={{ base: 10, md: 14 }} mx="auto" />
+                          <Box position="relative" height={{ base: "40px", md: "56px" }} width="auto" display="inline-block">
+                            <Image src="/Gitcoin-logo-.jpg" alt="Gitcoin" height={56} width={200} style={{ height: '100%', width: 'auto' }} />
+                          </Box>
                         </a>
                         <Text fontSize="xs" color={useColorModeValue('gray.600','gray.400')} mt={2}>Gitcoin</Text>
                       </Box>
@@ -93,19 +99,25 @@ export default function AboutFunding() {
                 <VStack spacing={2} pt={2}>
                   <a href="https://gap.karmahq.xyz/project/eipsinsight" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
                     <Button variant="outline" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
-                      <Image src="/logos/karma.svg" alt="karma" boxSize="18px" mr={3} />
+                      <Box position="relative" height="18px" width="18px" marginRight="12px" display="inline-block">
+                        <Image src="/logos/karma.svg" alt="karma" height={18} width={18} style={{ height: '100%', width: '100%' }} unoptimized />
+                      </Box>
                       Karma (project page)
                     </Button>
                   </a>
                   <a href="https://giveth.io/project/eipsinsight" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
                     <Button colorScheme="green" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
-                      <Image src="/logos/giveth.svg" alt="giveth" boxSize="18px" mr={3} />
+                      <Box position="relative" height="18px" width="18px" marginRight="12px" display="inline-block">
+                        <Image src="/logos/giveth.svg" alt="giveth" height={18} width={18} style={{ height: '100%', width: '100%' }} unoptimized />
+                      </Box>
                       Donate via Giveth
                     </Button>
                   </a>
                   <a href="https://discuss.octant.app/t/eipsinsight-analytics-for-ethereum-improvement-proposals/659" target="_blank" rel="noopener noreferrer" style={{ width: '100%' }}>
                     <Button colorScheme="cyan" width="100%" _hover={{ transform: 'translateY(-3px)' }} transition="transform 150ms">
-                      <Image src="/logos/octant.svg" alt="octant" boxSize="18px" mr={3} />
+                      <Box position="relative" height="18px" width="18px" marginRight="12px" display="inline-block">
+                        <Image src="/logos/octant.svg" alt="octant" height={18} width={18} style={{ height: '100%', width: '100%' }} unoptimized />
+                      </Box>
                       Octant discussion
                     </Button>
                   </a>
