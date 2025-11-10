@@ -187,6 +187,11 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     }));
   });
   
+  // Get the current year from the actual data to avoid hardcoded values
+  const currentYear = transformedData.length > 0 
+    ? transformedData[0].year.split(' ')[1] 
+    : new Date().getFullYear().toString();
+  
   const categories = [
     "Core",
     "Networking",
@@ -203,7 +208,7 @@ const StackedColumnChart: React.FC<AreaCProps> = ({ dataset, status }) => {
     if (!hasCategory) {
       transformedData.push({
         category: category,
-        year: "2024", 
+        year: `Jan ${currentYear}`, 
         value: 0,     
       });
     }

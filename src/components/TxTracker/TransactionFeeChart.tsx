@@ -10,7 +10,7 @@ import {
   Tooltip as ChakraTooltip,
   Divider,
 } from "@chakra-ui/react";
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { convertGweiToUSD } from "./ethereumService";
@@ -110,55 +110,60 @@ const TransactionFeeChart = ({
   const textPrimary = useColorModeValue("gray.800", "gray.100");
   const subColor = useColorModeValue("gray.600", "gray.400");
 
-  // Merge and sort (oldest→newest)
+  // Merge and sort (oldest→newest) with performance optimization
   const merged = useMemo(
-    () =>
-      mergeSeries(data || [], data1 || [], data2 || [], data3 || [])
-        .filter(p => p.time) // ensure valid
-        .sort((a, b) => {
-          // Try to parse time to Date (fallback lexical)
-            // We rely on lexicographic fallback (HH:MM:SS)
-          return a.time.localeCompare(b.time);
-        }),
+    () => {
+      const mergedData = mergeSeries(data || [], data1 || [], data2 || [], data3 || [])
+        .filter(p => p.time && typeof p.time === 'string') // ensure valid
+        .sort((a, b) => a.time.localeCompare(b.time));
+      
+      // Limit data points to prevent performance issues
+      const maxPoints = 100;
+      if (mergedData.length > maxPoints) {
+        const step = Math.ceil(mergedData.length / maxPoints);
+        return mergedData.filter((_, index) => index % step === 0);
+      }
+      
+      return mergedData;
+    },
     [data, data1, data2, data3]
   );
 
   const meta = METRIC_META[metric];
 
-  // Chart config
-  const chartConfig: any = {
-    // Filter out rows where current metric is missing / not numeric (avoids invalid shapes)
-    data: merged.filter(p => typeof (p as any)[metric] === 'number' && isFinite((p as any)[metric])),
-    xField: "time",
-    yField: metric,
-    color: meta.color,
-    smooth: true,
-    connectNulls: false,
-    // The previous custom appear animation 'path-in' caused getTotalLength errors in G2
-    // Disable complex animation (or switch to a simple fade if you prefer)
-    animation: false,
-    // If you want a subtle intro instead, uncomment:
-    // animation: { appear: { animation: 'fade-in', duration: 300 } },
-    lineStyle: {
-      stroke: meta.color,
-      lineWidth: 2.2,
-      shadowColor: meta.color,
-      shadowBlur: 6,
-      opacity: 0.95
-    },
-    point: {
-      size: 0,
-      shape: "circle",
-      style: { fill: meta.color }
-    },
-    slider: merged.length > 30 ? {
-      start: sliderStart,
-      end: 1,
-      height: 18,
-      trendCfg: { isArea: true },
-      handlerStyle: { fill: meta.color, stroke: meta.color },
-      onChange: (cfg: any) => setSliderStart(cfg.start)
-    } : undefined,
+  // Chart config with performance optimizations
+  const chartConfig: any = useMemo(() => {
+    const validData = merged.filter(p => {
+      const value = (p as any)[metric];
+      return typeof value === 'number' && isFinite(value) && !isNaN(value);
+    });
+
+    return {
+      data: validData,
+      xField: "time",
+      yField: metric,
+      color: meta.color,
+      smooth: false, // Disable smoothing for better performance
+      connectNulls: false,
+      animation: false, // Disable animations for better performance
+      lineStyle: {
+        stroke: meta.color,
+        lineWidth: 2,
+        opacity: 0.9
+      },
+      point: {
+        size: 0,
+        shape: "circle",
+        style: { fill: meta.color }
+      },
+      slider: validData.length > 30 ? {
+        start: sliderStart,
+        end: 1,
+        height: 18,
+        trendCfg: { isArea: false }, // Disable area for better performance
+        handlerStyle: { fill: meta.color, stroke: meta.color },
+        onChange: (cfg: any) => setSliderStart(cfg.start)
+      } : undefined,
     tooltip: {
       showTitle: true,
       shared: false,
@@ -201,7 +206,8 @@ const TransactionFeeChart = ({
       },
       line: { style: { stroke: "rgba(100,116,139,0.35)" } }
     }
-  };
+    };
+  }, [merged, metric, meta, sliderStart, ethPriceInUSD]);
 
   const FAQ = (
     <Collapse in={showFAQ} animateOpacity>
@@ -271,10 +277,10 @@ const TransactionFeeChart = ({
         </Flex>
         <Box flex="1 1 auto" minW="220px">
           <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
-            Transaction Fee Metrics
+            💰 Transaction Cost Monitor
           </Text>
           <Text fontSize="xs" opacity={0.85}>
-            Live trends: base, priority, gas used & burnt
+            How much does it cost to use Ethereum? Track fees and gas usage over time
           </Text>
         </Box>
         <Flex gap={2} flexWrap="wrap">
@@ -357,4 +363,4 @@ const TransactionFeeChart = ({
   );
 };
 
-export default TransactionFeeChart;
+export default React.memo(TransactionFeeChart);

@@ -90,10 +90,10 @@ const CUSTOM_LABELS_ALL: LabelSpec[] = [
 ];
 
 const REPOS = [
-  { key: "all", label: "All PRs", api: "" },
-  { key: "eip", label: "EIP PRs", api: "/api/pr-stats" },
-  { key: "erc", label: "ERC PRs", api: "/api/ercpr-stats" },
-  { key: "rip", label: "RIP PRs", api: "/api/rippr-stats" },
+  { key: "all", label: "All Open PRs", api: "" },
+  { key: "eip", label: "EIP Open PRs", api: "/api/pr-stats" },
+  { key: "erc", label: "ERC Open PRs", api: "/api/ercpr-stats" },
+  { key: "rip", label: "RIP Open PRs", api: "/api/rippr-stats" },
 ];
 
 interface AggregatedLabelCount {
@@ -260,9 +260,19 @@ export default function PRAnalyticsCard() {
         const found = filteredData.find(d => d.monthYear === month && d.label === value);
         return found ? found.count : 0;
       }),
-      itemStyle: { color }
+      itemStyle: { color },
+      barMaxWidth: 40
     }))
   }), [months, filteredData, labelSpecs]);
+
+  // Calculate total count for current month
+  const latestMonth = months.length > 0 ? months[months.length - 1] : null;
+  const currentMonthTotal = useMemo(() => {
+    if (!latestMonth) return 0;
+    return filteredData
+      .filter(d => d.monthYear === latestMonth)
+      .reduce((sum, d) => sum + d.count, 0);
+  }, [filteredData, latestMonth]);
 
   const defaultZoomStart = chartData.displayMonths.length > 18
     ? (100 * (chartData.displayMonths.length - 18) / chartData.displayMonths.length)
@@ -303,14 +313,39 @@ export default function PRAnalyticsCard() {
         color: textColor,
         fontWeight: 600,
         fontSize: 11,
-        interval: 0,
-        rotate: 0
+        interval: 'auto', // Auto-calculate interval to prevent overlap
+        rotate: 0,
+        margin: 12,
+        hideOverlap: true
+      },
+      axisLine: {
+        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
+      },
+      axisTick: {
+        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
       }
     }],
     yAxis: [{
       type: "value",
       name: "Open PRs",
-      axisLabel: { color: textColor }
+      nameTextStyle: {
+        color: textColor,
+        fontWeight: 600,
+        fontSize: 13
+      },
+      axisLabel: { 
+        color: textColor,
+        fontWeight: 500
+      },
+      axisLine: {
+        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
+      },
+      splitLine: {
+        lineStyle: { 
+          color: useColorModeValue('#f7fafc', '#2d3748'),
+          type: 'dashed'
+        }
+      }
     }],
     series: chartData.series,
     dataZoom: [
@@ -324,7 +359,9 @@ export default function PRAnalyticsCard() {
         height: 30,
       },
     ],
-    grid: { left: 60, right: 30, top: 80, bottom: 60 }
+    grid: { left: 70, right: 40, top: 90, bottom: 70 },
+    animationDuration: 800,
+    animationEasing: 'cubicOut'
   }), [chartData, textColor, cardBg, defaultZoomStart]);
 
   // CSV download
@@ -355,14 +392,6 @@ export default function PRAnalyticsCard() {
         ]);
         const toArr = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
         combined = [...toArr(eip), ...toArr(erc), ...toArr(rip)];
-
-        if (labelSet === "customLabels") {
-          combined = combined.map((pr: any) => ({
-            ...pr,
-            Label: normalizeCustomLabel(pr.Repo || "", pr.Label),
-            LabelType: "customLabels",
-          }));
-        }
       } else {
         const repo = repoKey;
         const rows = await fetchRows(repo);
@@ -372,26 +401,51 @@ export default function PRAnalyticsCard() {
       // Get current/latest month key from filteredData
       const latestMonthKey = months.length > 0 ? months[months.length - 1] : null;
 
-      // Filter only PRs from the latest month
-      const filteredRows = combined.filter((pr: any) => {
-        const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
-        return mk === latestMonthKey;
-      });
+      // Filter only PRs from the latest month and apply selected label filter
+      const filteredRows = combined
+        .map((pr: any) => {
+          // Normalize the label to match what's shown in the graph
+          let normalizedLabel = pr.Label || "";
+          if (labelSet === "customLabels") {
+            normalizedLabel = normalizeCustomLabel(pr.Repo || repoKey, pr.Label || "");
+          } else if (labelSet === "githubLabels") {
+            normalizedLabel = normalizeGithubLabel(pr.Label || "");
+          }
+          
+          // Store the normalized label in the PR object for later use
+          return {
+            ...pr,
+            DisplayLabel: normalizedLabel
+          };
+        })
+        .filter((pr: any) => {
+          const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
+          if (mk !== latestMonthKey) return false;
+
+          // Check if this normalized label is in the selected labels
+          const passesFilter = selectedLabels.includes(pr.DisplayLabel);
+
+          return passesFilter;
+        });
 
       const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
 
-      const csvData = filteredRows.map((pr: any) => ({
-        Month: pr.Month || formatMonthLabel(pr.MonthKey),
-        MonthKey: pr.MonthKey,
-        Label: pr.Label,
-        LabelType: pr.LabelType,
-        Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
-        PRNumber: pr.PRNumber,
-        PRLink: pr.PRLink,
-        Author: pr.Author,
-        Title: pr.Title,
-        CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
-      }));
+      const csvData = filteredRows.map((pr: any) => {
+        // Use the same label that's shown in the graph (DisplayLabel)
+        const graphLabel = pr.DisplayLabel || "Misc";
+
+        return {
+          Month: pr.Month || formatMonthLabel(pr.MonthKey),
+          MonthKey: pr.MonthKey,
+          Label: graphLabel, // Show the same label as displayed in the graph
+          Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
+          PRNumber: pr.PRNumber,
+          PRLink: pr.PRLink,
+          Author: pr.Author,
+          Title: pr.Title,
+          CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
+        };
+      });
 
       const csv = Papa.unparse(csvData);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
@@ -517,12 +571,23 @@ export default function PRAnalyticsCard() {
             </MenuList>
           </Menu>
         </Flex>
-        {/* <Text color={accentColor} fontSize="sm" mb={2}>
-          {latestMonth
-            ? <>Open PRs in <b>{formatMonthLabel(latestMonth)}</b>: <b>{uniquePRsInLatest}</b> (across {selectedLabels.length} labels)</>
-            : <>No data for selected filter/period.</>
-          }
-        </Text> */}
+        <Box 
+          bg={useColorModeValue('blue.50', 'gray.700')} 
+          p={3} 
+          borderRadius="md" 
+          mb={3}
+          textAlign="center"
+        >
+          <Text fontSize="lg" fontWeight="bold" color={useColorModeValue('blue.700', 'blue.300')}>
+            {latestMonth
+              ? <>Current Month ({formatMonthLabel(latestMonth)}) Total Open PRs: <Text as="span" color={accentColor}>{currentMonthTotal}</Text></>
+              : <>No data available</>
+            }
+          </Text>
+          <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={1}>
+            (Based on {selectedLabels.length} selected label{selectedLabels.length !== 1 ? 's' : ''} - This is what will be downloaded)
+          </Text>
+        </Box>
         <Divider my={3} />
         <Box minH="350px">
           {loading ? (

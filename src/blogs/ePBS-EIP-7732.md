@@ -1,19 +1,12 @@
 ---
 title: "Enshrined Proposer Builder Separation (ePBS) (EIP-7732)"
-date: "2025-06-16"
-author: "Yash Kamal Chaturvedi"
-image: "https://etherworld.co/content/images/2025/06/ePBS.jpg"
-authorAvatar : "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
-authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
-authorTwitter: "https://x.com/YashKamalChatu1"
-authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
-authorGithub: "https://github.com/yashkamalchaturvedi"
-summaryPoints:
-  - "ePBS (EIP-7732) enshrines proposer-builder separation directly into Ethereum’s protocol, replacing off-chain MEV-Boost."
-  - "Makes block building more decentralized and removes reliance on third-party relays, improving censorship resistance."
-  - "Validators process consensus and execution in pipeline stages, boosting efficiency and supporting future stateless upgrades."
-  - "Builder activity, auction models, and Payload Timeless Committee (PTC) add transparency, cryptographic accountability, and modular upgrade compatibility."
-  - "Major design debates remain on auction types, inclusion list rollout, payload incentives, and fork choice complexity—collaboration needed for safe mainnet launch."
+date: 2025-06-16
+author: Yash Kamal Chaturvedi
+avatar: https://avatars.githubusercontent.com/u/76512851?v=4
+role: Blockchain Technical Writer
+category: Protocol Upgrade
+tags: [EIP-7732, ePBS, MEV, Consensus Layer]
+image: https://etherworld.co/content/images/2025/06/ePBS.jpg
 ---
 
 Ethereum is getting ready for one of its most practical upgrades yet with ePBS, or Enshrined Proposer Builder Separation, under [EIP-7732](https://youtu.be/Wo7IEUCGRxU?si=fp955F0ZwLAiROix). This change rethinks how blocks are built and confirmed by separating the roles of proposing and executing blocks within the protocol itself. 
@@ -28,8 +21,6 @@ It is a move designed to make Ethereum more efficient, easier to scale, and less
 * [Compatibility of ePBS with Other Ethereum Proposals](#compatibility-of-epbs-with-other-ethereum-proposals)
 * [Challenges to ePBS](#challenges-to-epbs)
 
----
-
 ## What is ePBS?
 
 Enshrined Proposer-Builder Separation (ePBS) is one of the most transformative upgrades currently being proposed in Ethereum. Defined in [EIP-7732](https://efdn.notion.site/ePBS-EIP-7732-tracker-9f85f7b086994bd79192bc72bae703a1) (currently in draft), this proposal restructures how Ethereum blocks are created by formally separating two critical roles in the block production process.
@@ -38,8 +29,6 @@ In the current system, the same validator is often responsible for both proposin
 
 1. The **proposer** – a validator responsible for selecting and submitting the next block on the blockchain.
 2. The **builder** – an entity that constructs the contents of the block by deciding which transactions to include and how to order them for maximum efficiency or value.
-
----
 
 ## Why Do We Need ePBS?
 
@@ -68,8 +57,6 @@ This design constrains the protocol’s ability to support larger blocks or more
 ePBS introduces the ability to decouple consensus validation from execution payload validation. Validators can first validate a lightweight consensus block—which is fast to process—and handle the more resource-intensive execution payload later.
 
 By doing so, the network improves responsiveness and scalability. Validators are no longer constrained by tight time windows for full block verification, making the protocol more resilient and performance-optimized.
-
----
 
 ## Key Architectural Changes Proposed in ePBS
 
@@ -141,8 +128,6 @@ The fork choice rule in Ethereum determines the canonical chain. Under ePBS, thi
 
 Attestations now include these dimensions, and the chain can differentiate between blocks that are "full" vs "empty." This more granular view helps the protocol better handle latency, withheld payloads, or invalid reveals.
 
----
-
 ## PBS Vs ePBS
 
 PBS, or **Proposer-Builder Separation**, was originally designed to solve a growing centralization problem in Ethereum block production—especially related to MEV (Maximal Extractable Value).
@@ -180,8 +165,6 @@ By 2025, over [80% of Ethereum blocks were being proposed through MEV-Boost rela
 
 ![PBS Vs ePBS](https://etherworld.co/content/images/2025/06/Coinbase-s-6-Step-Crisis-Response--2-.jpg)
 
----
-
 ## ePBS Advantages
 
 ePBS is not just a technical proposal. It reflects a deliberate shift in Ethereum’s architecture and its approach to decentralization, validator efficiency, and protocol neutrality.
@@ -195,8 +178,6 @@ Second, it enhances censorship resistance. By introducing payload attestations t
 Third, [ePBS](https://docs.google.com/presentation/d/1-NMq36QRiCzBYK5inDiV6HQI9z2BQlGuDgUjSMwtwn4/edit?slide=id.g2f4f28a00ad_0_34#slide=id.g2f4f28a00ad_0_34) improves validator efficiency and scalability. Validators are no longer required to validate full blocks in a single step. Instead, they process consensus and execution in separate pipeline stages, giving them more time and reducing CPU bottlenecks. This enables support for larger blocks and lays the foundation for stateless execution in the future.
 
 Finally, ePBS supports modular upgrades across Ethereum’s roadmap. Its structure is flexible enough to accommodate upcoming changes such as inclusion lists, slot auctions, data availability sampling, and the transition to a stateless architecture. By formally integrating previously off-chain logic, EPBS creates a more consistent and adaptable protocol layer.
-
----
 
 ## Compatibility of ePBS with Other Ethereum Proposals
 
@@ -225,8 +206,6 @@ Inclusion lists can technically ship with ePBS, but tight integration may requir
 [ePBS](https://eipsinsight.com/eips/eip-7732) aligns closely with Ethereum’s vision for stateless validation, where validators no longer need to maintain the full execution state. By decoupling execution from consensus, ePBS allows validators to process consensus blocks quickly while deferring execution, making it ideal for lightweight or resource-constrained nodes. 
 
 This design also supports Data Availability Sampling (DAS), as the pipelined slot structure provides additional time for blob propagation and verification. As a result, delayed execution not only facilitates stateless processing but also makes DAS easier to implement within the existing consensus framework.
-
----
 
 ## Challenges to ePBS
 
@@ -277,8 +256,6 @@ This risks overlooking real-world operational needs. MEV builders, Flashbots, an
 Ethereum’s roadmap is highly interdependent. [ePBS](https://hackmd.io/@ttsao/H1ejTtfd3?print-pdf#/) interacts with inclusion lists, MEV mechanics, builder APIs, and fork choice logic. The temptation to bundle many features into one fork is high.
 
 However, bundling increases implementation risk. It can delay testnet readiness, strain client resources, and obscure root causes of bugs. A modular rollout strategy may be safer and more efficient.
-
----
 
 ## Conclusion
 

@@ -1,5 +1,5 @@
-import { IconButton, useToast } from "@chakra-ui/react";
-import { CopyIcon } from "@chakra-ui/icons";
+import { IconButton, useToast, useColorModeValue, Tooltip, useBreakpointValue } from "@chakra-ui/react";
+import { CopyIcon, CheckIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 
 // Reusable CopyLink component
@@ -11,51 +11,52 @@ interface CopyLinkProps {
 const CopyLink: React.FC<CopyLinkProps> = ({ link, style }) => {
   const [isCopied, setIsCopied] = useState(false);
   const toast = useToast();
+  const bg = useColorModeValue('whiteAlpha.900', 'gray.700');
+  const hoverBg = useColorModeValue('gray.50', 'gray.600');
+  const iconSize = useBreakpointValue({ base: '16px', md: '18px' });
 
   // Function to copy the link to the clipboard
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(link).then(() => {
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
       setIsCopied(true);
       toast({
-        title: "Link copied!",
-        description: "The link has been copied to your clipboard.",
-        status: "success",
-        duration: 2000,
+        title: 'Link copied',
+        status: 'success',
+        duration: 1800,
         isClosable: true,
       });
-    }).catch(() => {
+
+      // reset after a short delay so users can copy again
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
       toast({
-        title: "Failed to copy!",
-        description: "There was an issue copying the link.",
-        status: "error",
-        duration: 2000,
+        title: 'Copy failed',
+        description: 'Could not copy link to clipboard',
+        status: 'error',
+        duration: 2500,
         isClosable: true,
       });
-    });
+    }
   };
 
   return (
-    <IconButton
-      icon={<CopyIcon />}
-      style={style}
-      aria-label="Copy link"
-      onClick={copyToClipboard}
-      size="lg" // Increase the size of the icon button
-      variant="link"
-      color="blue.400"
-      marginLeft={2}
-      bg="gray.200" // Set the background color to gray
-      borderRadius="md" // Partially rounded corners
-      _hover={{
-        bg: "gray.300", // Darker gray on hover
-      }}
-      _active={{
-        bg: "gray.400", // Even darker gray when active
-      }}
-      fontSize="2xl" // Make the icon much bigger (you can adjust the size)
-      padding="0.5rem" // Add padding around the icon
-      marginY="0.5rem" // Add vertical margin (top and bottom)
-    />
+    <Tooltip label={isCopied ? 'Copied' : 'Copy link'} hasArrow>
+      <IconButton
+        onClick={copyToClipboard}
+        aria-label={isCopied ? 'Copied' : 'Copy link'}
+        icon={isCopied ? <CheckIcon boxSize={iconSize} /> : <CopyIcon boxSize={iconSize} />}
+        variant="outline"
+        size="sm"
+        bg={bg}
+        borderColor={useColorModeValue('gray.200', 'gray.600')}
+        _hover={{ bg: hoverBg, transform: 'translateY(-2px)', boxShadow: 'md' }}
+        _active={{ transform: 'translateY(0)' }}
+        borderRadius="md"
+        aria-pressed={isCopied}
+        ml={2}
+      />
+    </Tooltip>
   );
 };
 

@@ -1,6 +1,7 @@
 import { Box, Heading, Text, Button } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
 import FactsSection from "@/components/TriviaContents";
+import CloseableAdCard from "@/components/CloseableAdCard";
 
 const UnderConstructionPage: React.FC = () => {
   return (
@@ -38,6 +39,11 @@ const UnderConstructionPage: React.FC = () => {
        justifyContent="center"
       //  alignItems="center"
        >
+        {/* EtherWorld Advertisement */}
+        <Box my={6}>
+          <CloseableAdCard />
+        </Box>
+        
         <FactsSection/>
       </Box>
     </AllLayout>

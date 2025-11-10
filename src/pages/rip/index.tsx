@@ -1,4 +1,5 @@
-import AllLayout from "@/components/Layout";
+﻿import AllLayout from "@/components/Layout";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import { Box, Button, Grid, Text, useColorModeValue, IconButton, Flex, Collapse, Heading, useDisclosure, Link as LI, ButtonGroup, GridItem, Select, SimpleGrid, Link, useToast } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
@@ -228,7 +229,7 @@ const RIP = () => {
 
   useScrollSpy([
     "Ethereum Improvement",
-    "GitHub Stats – RIPs",
+    "GitHub Stats â€“ RIPs",
     "draft",
     "final",
     "living",
@@ -429,11 +430,16 @@ const RIP = () => {
                   A Rollup Improvement Proposal (RIP) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem. RIPs act as specifications to improve rollups, enhance interoperability, and standardize development processes.
 
                   All RIPs are optional. RIPs are and will always remain optional standards for Rollups and participants in the larger EVM ecosystem.</Text>
-                {/* <br/> */}
-                <Text fontSize="md" className="text-md text-left text-justify" mt={4} textAlign="justify">
+                
+                {/* EtherWorld Advertisement */}
+                <Box my={6} width="100%">
+                  <CloseableAdCard />
+                </Box>
+
+                <Text fontSize="md" mt={4} textAlign="justify">
                   RIPs help coordinate technical improvements for rollups in a transparent, collaborative way. They:
                 </Text>
-                <ul className="list-disc list-inside space-y-2 text-md text-left text-justify">
+                <ul >
                   <li>Propose new features and optimizations.</li>
                   <li>Collect community feedback on rollup-related issues.</li>
                   <li>Serve as a historical record of design decisions.</li>
@@ -573,13 +579,13 @@ const RIP = () => {
                     gap={6}
                     w="100%"
                     wrap="wrap"
-                    align="stretch" // ✅ Ensures both boxes stretch to same height
+                    align="stretch" // âœ… Ensures both boxes stretch to same height
                   >
                     {/* Status Chart */}
                     <Box
                       flex={1}
                       bg="gray.50"
-                      p={0} // ✅ Remove padding
+                      p={0} // âœ… Remove padding
                       borderRadius="xl"
                       overflowX="auto"
                       h="100%"
@@ -597,7 +603,7 @@ const RIP = () => {
                     <Box
                       flex={1}
                       bg="gray.50"
-                      p={0} // ✅ Remove padding
+                      p={0} // âœ… Remove padding
                       borderRadius="xl"
                       overflowX="auto"
                       h="100%"

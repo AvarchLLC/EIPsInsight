@@ -13,7 +13,7 @@ const DateTime = () => {
 
   return (
     <>
-    <div className="flex justify-between mx-4 text-[12px]">
+    <div className="flex justify-between mx-2 text-[12px]">
       <p className="text-gray-500">EIPsInsight.com</p>
       <p className="text-gray-500">
         {date < 10 ? '0' + date : date}-

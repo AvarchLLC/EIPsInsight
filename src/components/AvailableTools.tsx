@@ -129,25 +129,33 @@ const ToolsSection: FC = () => {
             label="All EIPs"
             link="/all"
           />
-          <ToolCard
-            imageSrc="/DashBoardCard4.png"
-            label="Did you Know"
-            link="/trivia"
+                              <ToolCard
+            imageSrc="/proposal_builder.png"
+            label= "Proposal Builder "
+            link="/proposalbuilder"
           />
+
+                                        <ToolCard
+            imageSrc="/txtracker.png"
+            label= "Transaction Tracker"
+            link="/txtracker"
+          />
+
           <ToolCard
             imageSrc="/DashboardCard6.png"
             label="Feedback Form"
             link="/Feedback"
           />
-                    <ToolCard
-            imageSrc="/proposal_builder.png"
-            label= "Proposal Builder "
-            link="/proposalbuilder"
-          />
+
           <ToolCard
             imageSrc="/dashBoardCard8.png"
             label="More Resources"
             link="/resources"
+          />
+                    <ToolCard
+            imageSrc="/DashBoardCard4.png"
+            label="Did you Know"
+            link="/trivia"
           />
 
         </Grid>

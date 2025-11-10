@@ -4,6 +4,8 @@ import AllLayout from "@/components/Layout";
 import Dashboard from "@/components/Dashboard"
 import Head from "next/head"
 import ViewsShare from "@/components/ViewsNShare";
+import PlaceYourAdCard from "@/components/PlaceYourAdCard";
+import { Box } from "@chakra-ui/react";
 
 
 const Dasboard = () => {
@@ -26,7 +28,13 @@ const Dasboard = () => {
           Home
         </title>
       </Head>
+      
+      {/* Removed top sponsor ad per request */}
       <Dashboard />
+      {/* Advertise With Us (moved lower for spacing) */}
+      <Box my={12} width="100%">
+        <PlaceYourAdCard />
+      </Box>
       <ViewsShare path={'/home'} />
     </AllLayout>
   );

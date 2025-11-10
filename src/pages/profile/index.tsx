@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Avatar,
@@ -337,6 +338,12 @@ const handleCancel = async () => {
     <AllLayout>
       <SessionWrapper>
     <Box minH="100vh" bg={bgColor} position="relative">
+      
+      {/* EtherWorld Advertisement */}
+      <Box my={4} width="100%">
+        <CloseableAdCard />
+      </Box>
+      
       {/* Absolute positioned navigation buttons */}
       <IconButton
         aria-label="Go back"

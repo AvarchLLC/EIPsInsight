@@ -1,6 +1,7 @@
-import { VStack } from "@chakra-ui/react";
+﻿import { VStack } from "@chakra-ui/react";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Spinner,
@@ -77,10 +78,10 @@ const EIPsInsightRecap = () => {
                 width={{ base: "100%", lg: "60%" }} // Text takes up 60% of the width on large screens
                 textAlign="justify"
             >     
-            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} mt={4} textAlign="justify">
             The goal of Ethereum Request for Change (<Link href="/erc" color="blue.300" isExternal>ERCs</Link>) is to standardize and provide high-quality documentation for the Ethereum application layer. This repository tracks past and ongoing improvements application standards in the form of ERCs.
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} mt={4} textAlign="justify">
                 <Link  href="/ercs/erc-1"
                 isExternal
                 color="blue.500"
@@ -90,10 +91,15 @@ const EIPsInsightRecap = () => {
             </Box>
             </Stack>
 
-            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+            {/* EtherWorld Advertisement */}
+            <Box my={6} width="100%">
+              <CloseableAdCard />
+            </Box>
+
+            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
   The <Link href="/status">status page</Link> tracks and lists ERCs, which can be divided into the following categories:
 </Text>
-<ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+<ul >
   {/* <li>
     <b>
       <Link href="/core" className="text-blue-500 underline">Core EIPs</Link>
@@ -125,7 +131,7 @@ const EIPsInsightRecap = () => {
     </b> are non-standard improvements that do not require any form of consensus.
   </li>
 </ul>
-<Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+<Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
   Before you write an ERC, ideas MUST be thoroughly discussed on <Link href="https://ethereum-magicians.org/" className="text-blue-500 underline">Ethereum Magicians</Link> or <Link href="https://ethresear.ch/t/read-this-before-posting/8" className="text-blue-500 underline">Ethereum Research</Link>. Once consensus is reached, thoroughly read and review 
   {" "}<Link href="/ercs/erc-1" className="text-blue-500 underline">
     ERC-1

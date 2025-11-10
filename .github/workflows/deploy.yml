@@ -1,0 +1,135 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  # Change if your default branch is different
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repo (main branch)
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Notify Deployment Start
+      - name: Notify Deployment Start
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "🚀 Deployment Started"
+          embed-description: "Automated deployment started."
+          embed-color: 16776960
+
+      # Step 3: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Step 4: Deploy via SSH with zero-downtime build
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          timeout: 45m
+          command_timeout: 40m
+          script: |
+            set -e
+            echo "Starting deployment process..."
+
+            # Define directories
+            DEPLOY_DIR=~/eip-client/EIPsInsight
+            TEMP_DIR=~/eip-client/EIPsInsight_build_temp
+
+            # Remove temp folder if exists
+            rm -rf $TEMP_DIR
+
+            # Clone the repo to temp folder (public repo uses HTTPS)
+            git clone -b main https://github.com/AvarchLLC/EIPsInsight.git $TEMP_DIR
+
+            # Copy .env.local from deploy folder to temp folder
+            if [ -f "$DEPLOY_DIR/.env.local" ]; then
+              cp $DEPLOY_DIR/.env.local $TEMP_DIR/.env.local
+              echo ".env.local copied to build folder."
+            else
+              echo "⚠️ .env.local not found in deploy folder. Build may fail if env vars are required."
+            fi
+
+            # Go to temp folder and install dependencies with retries
+            cd $TEMP_DIR
+            for i in {1..3}; do
+              echo "Server npm install attempt $i..."
+              if npm ci --force --legacy-peer-deps; then
+                echo "npm install succeeded"
+                break
+              else
+                echo "npm install failed, cleaning cache and retrying..."
+                npm cache clean --force
+                sleep 30
+                if [ $i -eq 3 ]; then
+                  echo "❌ npm install failed after 3 attempts, aborting deployment"
+                  exit 1
+                fi
+              fi
+            done
+
+            # Build Next.js in temp folder
+            echo "Building project..."
+            npm run build || { echo "❌ Build failed, aborting deployment"; exit 1; }
+
+            # Swap .next folders atomically for zero-downtime
+            cd $DEPLOY_DIR
+            if [ -d ".next" ]; then
+              mv .next .next_old
+            fi
+            mv $TEMP_DIR/.next .next
+
+            # Reload PM2 gracefully
+            if ! pm2 reload 39; then
+              echo "⚠️ PM2 reload failed, trying to start..."
+              pm2 start npm --name "eips-insight" -- start
+            fi
+
+            # Remove old build and temp folder
+            rm -rf .next_old
+            rm -rf $TEMP_DIR
+
+            echo "✅ Deployment completed successfully!"
+
+      # Step 5: Notify Discord on Success
+      - name: Discord Notification - Success
+        if: success()
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "✅ Deployment Successful"
+          embed-description: |
+            **Branch:** ${{ github.ref_name }}
+            **Repository:** ${{ github.repository }}
+            **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            🎉 Deployment completed successfully without downtime!
+          embed-color: 3066993
+          embed-footer-text: "GitHub Actions • Deployment Bot"
+          embed-timestamp: ${{ github.event.head_commit.timestamp }}
+
+      # Step 6: Notify Discord on Failure
+      - name: Discord Notification - Failure
+        if: failure()
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: "❌ Deployment Failed"
+          embed-description: |
+            **Branch:** ${{ github.ref_name }}
+            **Repository:** ${{ github.repository }}
+            **Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            ⚠️ Deployment failed! Check GitHub Actions logs for details.
+          embed-color: 15158332
+          embed-footer-text: "GitHub Actions • Deployment Bot"
+          embed-timestamp: ${{ github.event.head_commit.timestamp }}

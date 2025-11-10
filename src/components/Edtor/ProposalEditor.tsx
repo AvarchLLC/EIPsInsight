@@ -37,10 +37,12 @@ import {
     PopoverCloseButton,
     PopoverHeader,
     PopoverBody,
+    useColorModeValue
 } from "@chakra-ui/react";
 
 import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, 
   AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react";
+
 import { CloseIcon } from "@chakra-ui/icons";
 
 
@@ -824,7 +826,7 @@ if (errorItems.length > 0) {
       borderRadius="2xl"
       boxShadow="xl"
       id="EipTemplateEditor"
-      maxW="1200px"
+      maxW="100%" w="100%"
       minH="90vh"
     >
       <Box
@@ -1106,32 +1108,30 @@ if (errorItems.length > 0) {
                     </Popover>
                   </Box>
                   {step.type === "input" && (
-                    <Input
-                      disabled={
-                        step.key === "last-call-deadline" &&
-                        templateData["status"] !== "Last Call"
-                      }
-                      placeholder={
-                        step.label === "Title"
-                          ? "Enter title"
-                          : step.label === "Description"
-                          ? "Enter description"
-                          : step.label === "Author"
-                          ? "FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>"
-                          : step.label === "Discussions To"
-                          ? "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205"
-                          : step.label === "Created"
-                          ? "YYYY-MM-DD"
-                          : step.label === "Requires"
-                          ? "2537, 2935, 6110, 7002, 7251, 7549, 7594, 7685, 7702"
-                          : step.label
-                      }
-                      value={templateData[step.key] || ""}
-                      onChange={(e) =>
-                        handleInputChange(step.key, e.target.value)
-                      }
-                      borderWidth="2px"
-                    />
+<Input
+  disabled={
+    (step.key === "eip" && activeTab2 === "import") ||
+    (step.key === "last-call-deadline" && templateData["status"] !== "Last Call")
+  }
+  placeholder={
+    step.label === "Title"
+      ? "Enter title"
+      : step.label === "Description"
+      ? "Enter description"
+      : step.label === "Author"
+      ? "FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>"
+      : step.label === "Discussions To"
+      ? "https://ethereum-magicians.org/t/eip-7600-hardfork-meta-prague-electra/18205"
+      : step.label === "Created"
+      ? "YYYY-MM-DD"
+      : step.label === "Requires"
+      ? "2537, 2935, ..."
+      : step.label
+  }
+  value={templateData[step.key] || ""}
+  onChange={(e) => handleInputChange(step.key, e.target.value)}
+  borderWidth="2px"
+/>
                   )}
                   {step.type === "textarea" && (
                     <Box>
@@ -1567,18 +1567,23 @@ if (errorItems.length > 0) {
                     <>
                       {tableRows?.length > 0 && (
                         <TableContainer mt={2}>
-                          <Table variant="striped" colorScheme="blue">
-                            <Thead>
+                          <Table
+                            variant="striped"
+                            colorScheme={useColorModeValue("gray", "blue")}
+                            bg={useColorModeValue("white", "gray.700")}
+                            borderRadius="md"
+                          >
+                            <Thead bg={useColorModeValue("gray.100", "gray.800")}>
                               <Tr>
-                                <Th color="white">Field</Th>
-                                <Th color="white">Value</Th>
+                                <Th color={useColorModeValue("gray.700", "gray.200")}>Field</Th>
+                                <Th color={useColorModeValue("gray.700", "gray.200")}>Value</Th>
                               </Tr>
                             </Thead>
                             <Tbody>
                               {tableRows?.map((row, index) => (
                                 <Tr key={index}>
-                                  <Td color="white">{row[0]}</Td>
-                                  <Td color="white">{row[1]}</Td>
+                                  <Td color={useColorModeValue("gray.700", "gray.200")}>{row[0]}</Td>
+                                  <Td color={useColorModeValue("gray.700", "gray.200")}>{row[1]}</Td>
                                 </Tr>
                               ))}
                             </Tbody>
@@ -1586,7 +1591,15 @@ if (errorItems.length > 0) {
                         </TableContainer>
                       )}
                       <Box mt={4} />
-                      <MarkdownViewer value={markdownValue} isDarkTheme={true} />
+                      <Box
+                        bg={useColorModeValue("white", "gray.900")}
+                        color={useColorModeValue("gray.800", "gray.200")}
+                        borderRadius="md"
+                        p={4}
+                        minHeight="320px"
+                      >
+                        <MarkdownViewer value={markdownValue} isDarkTheme={useColorModeValue(false, true)} />
+                      </Box>
                     </>
                   ) : (
                     <Box
@@ -1719,51 +1732,3 @@ if (errorItems.length > 0) {
   )
 }
 export default ProposalEditor;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

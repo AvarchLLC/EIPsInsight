@@ -10,6 +10,7 @@ import {
   chakra,
   useColorModeValue,
   Button,
+  Flex,
 } from "@chakra-ui/react";
 import { FaTwitter, FaYoutube, FaInstagram } from "react-icons/fa";
 import NextLink from "next/link";
@@ -69,62 +70,235 @@ export default function LargeWithAppLinksAndSocial() {
       <Box
         bg={useColorModeValue("gray.50", "gray.900")}
         color={useColorModeValue("gray.700", "gray.200")}
-        paddingX={14}
-        paddingY={8}
+        px={{ base: 6, md: 14 }}
+        py={8}
       >
-        <div className={'lg:flex md:flex block justify-evenly lg:space-x-16 md:space-x-16 space-y-5 lg:space-y-0 md:space-y-0'}>
-          <Stack
-            direction={"column"}
+        <Container maxW="7xl">
+          <SimpleGrid
+            columns={{ base: 1, md: 3 }}
+            spacing={{ base: 8, md: 8 }}
+            alignItems="flex-start"
           >
-            <h1 className={'font-bold text-2xl'}>EIPs Insight</h1>
-            <h2 className={'text-xl'}>Build With <span> 💙 </span> by&nbsp; <NextLink href={'https://avarch.org'} target={'_blank'}>Avarch</NextLink></h2>
-            <div className={'flex space-x-5'}>
-              <Text className={'text-lg font-bold'}>Join us: </Text>
-              <NextLink href={'https://github.com/AvarchLLC/EIPsInsight'} target={'_blank'}><BsGithub size={25} className={'hover:scale-125 duration-200'} /></NextLink>
-              <NextLink href={'https://discord.gg/tUXgfV822C'} target={'_blank'}><BsDiscord size={25} className={'hover:scale-125 duration-200'} /></NextLink>
-            </div>
-            <div className={'w-full flex justify-end'}>
-              <Text className={'text-gray-500'}>v3.0.0</Text>
-            </div>
-          </Stack>
+            {/* EIPs Insight Section */}
+            <Box>
+              <Stack spacing={5} h="100%" justify="space-between">
+                <Box>
+                  <Text fontSize="xl" fontWeight="bold" color={useColorModeValue("gray.800", "white")} mb={4}>
+                    EIPs Insight
+                  </Text>
+                  
+                  <Text fontSize="md" color={useColorModeValue("gray.600", "gray.300")} mb={4}>
+                    Build With <Box as="span" color="blue.500">💙</Box> by{" "}
+                    <NextLink href="https://avarch.org" target="_blank">
+                      <Box as="span" color="blue.500" _hover={{ textDecoration: "underline" }} cursor="pointer">
+                        Avarch
+                      </Box>
+                    </NextLink>
+                  </Text>
+                  
+                  <Flex align="center" gap={3} mb={4}>
+                    <Text fontSize="md" fontWeight="semibold">Join us:</Text>
+                    <Flex gap={3}>
+                      <NextLink href="https://github.com/AvarchLLC/EIPsInsight" target="_blank">
+                        <Box _hover={{ transform: "scale(1.1)" }} transition="transform 0.2s" cursor="pointer">
+                          <BsGithub size={20} />
+                        </Box>
+                      </NextLink>
+                      <NextLink href="https://discord.gg/tUXgfV822C" target="_blank">
+                        <Box _hover={{ transform: "scale(1.1)" }} transition="transform 0.2s" cursor="pointer">
+                          <BsDiscord size={20} />
+                        </Box>
+                      </NextLink>
+                    </Flex>
+                  </Flex>
+                </Box>
+                
+                <Flex justify="flex-end">
+                  <Text fontSize="sm" color="gray.500">v3.0.0</Text>
+                </Flex>
+              </Stack>
+            </Box>
 
-          <Stack
-            direction={"column"}
-          >
-            <p className={'text-xl underline underline-offset-4 font-bold'}>Links</p>
-            <NextLink href={'/all'}>All</NextLink>
-            <NextLink href={'/status'}>Status</NextLink>
-            <NextLink href={`/insight/${year}/${getMonth(monthName)}`}>{monthName} {year} Insights</NextLink>
-            <NextLink href={'/resources'}>Resources</NextLink>
-            <NextLink href={'https://github.com/AvarchLLC/EIPsInsight/issues'}>Found a bug? Report here!</NextLink>
-            <NextLink href={'/Feedback'} target="_blank">Feedback Form</NextLink>
-          </Stack>
+            {/* Links Section */}
+            <Box>
+              <Stack spacing={4}>
+                <Text fontSize="xl" fontWeight="bold" textDecoration="underline" textUnderlineOffset="4px">
+                  Links
+                </Text>
+                
+                <SimpleGrid columns={2} spacing={4} spacingY={3}>
+                  <Box>
+                    <NextLink href="/all">
+                      <Text 
+                        _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }} 
+                        cursor="pointer"
+                        transition="all 0.2s ease"
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        All
+                      </Text>
+                    </NextLink>
+                  </Box>
+                  
+                  <Box>
+                    <NextLink href="/status">
+                      <Text 
+                        _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }} 
+                        cursor="pointer"
+                        transition="all 0.2s ease"
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        Status
+                      </Text>
+                    </NextLink>
+                  </Box>
+                  
+                  <Box>
+                    <NextLink href={`/insight/${year}/${getMonth(monthName)}`}>
+                      <Text 
+                        _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }} 
+                        cursor="pointer"
+                        transition="all 0.2s ease"
+                        fontSize="sm"
+                        fontWeight="medium"
+                        lineHeight="1.3"
+                      >
+                        {monthName} {year} Insights
+                      </Text>
+                    </NextLink>
+                  </Box>
+                  
+                  <Box>
+                    <NextLink href="/about">
+                      <Text 
+                        _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }} 
+                        cursor="pointer"
+                        transition="all 0.2s ease"
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        About Us
+                      </Text>
+                    </NextLink>
+                  </Box>
+                  
+                  <Box>
+                    <NextLink href="/resources">
+                      <Text 
+                        _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }} 
+                        cursor="pointer"
+                        transition="all 0.2s ease"
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        Resources
+                      </Text>
+                    </NextLink>
+                  </Box>
+                  
+                  <Box>
+                    <NextLink href="https://github.com/AvarchLLC/EIPsInsight/issues">
+                      <Text 
+                        _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }} 
+                        cursor="pointer"
+                        transition="all 0.2s ease"
+                        fontSize="sm"
+                        fontWeight="medium"
+                        lineHeight="1.3"
+                      >
+                        Found a bug?
+                      </Text>
+                    </NextLink>
+                  </Box>
+                  
+                  <Box>
+                    <NextLink href="/donate">
+                      <Text
+                        _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }}
+                        cursor="pointer"
+                        transition="all 0.2s ease"
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        Donate
+                      </Text>
+                    </NextLink>
+                  </Box>
+                  
+                  <Box>
+                    <NextLink href="/Feedback" target="_blank">
+                      <Text 
+                        _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }} 
+                        cursor="pointer"
+                        transition="all 0.2s ease"
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        Feedback
+                      </Text>
+                    </NextLink>
+                  </Box>
+                </SimpleGrid>
+              </Stack>
+            </Box>
 
-          <Stack
-            direction={'column'}
-            className={'space-y-5'}
-          >
-            <Text className={'text-xl font-bold'}>Follow Us</Text>
+            {/* Follow Us Section */}
+            <Box>
+              <Stack spacing={4}>
+                <Text fontSize="xl" fontWeight="bold">Follow Us</Text>
 
-            <div className={'flex space-x-10'}>
-              <NextLink href={'https://twitter.com/TeamAvarch'} target={'_blank'}><BsTwitter size={25} className={'hover:scale-125 duration-200'} /></NextLink>
-              {/* <NextLink href={'https://www.instagram.com/etherworld.co/?hl=en'} target={'_blank'}><BsInstagram size={25} className={'hover:scale-125 duration-200'}/></NextLink> */}
-              <NextLink href={'https://www.youtube.com/channel/UCnceAY-vAQsO8TgGAj5SGFA'} target={'_blank'}><BsYoutube size={25} className={'hover:scale-125 duration-200'} /></NextLink>
-              <NextLink href={'https://www.linkedin.com/company/avarch-llc/'} target={'_blank'}><BsLinkedin size={25} className={'hover:scale-125 duration-200'} /></NextLink>
-              <NextLink href={'https://etherworld.co/tag/eipsinsight/'} target={'_blank'}><BsNewspaper size={25} className={'hover:scale-125 duration-200'} /></NextLink>
-            </div>
+                <SimpleGrid columns={2} spacing={4}>
+                  <NextLink href="https://twitter.com/TeamAvarch" target="_blank">
+                    <Flex align="center" gap={2} _hover={{ transform: "translateX(2px)" }} transition="transform 0.2s" cursor="pointer">
+                      <BsTwitter size={18} />
+                      <Text fontSize="sm">Twitter</Text>
+                    </Flex>
+                  </NextLink>
+                  
+                  <NextLink href="https://www.youtube.com/channel/UCnceAY-vAQsO8TgGAj5SGFA" target="_blank">
+                    <Flex align="center" gap={2} _hover={{ transform: "translateX(2px)" }} transition="transform 0.2s" cursor="pointer">
+                      <BsYoutube size={18} />
+                      <Text fontSize="sm">YouTube</Text>
+                    </Flex>
+                  </NextLink>
+                  
+                  <NextLink href="https://www.linkedin.com/company/avarch-llc/" target="_blank">
+                    <Flex align="center" gap={2} _hover={{ transform: "translateX(2px)" }} transition="transform 0.2s" cursor="pointer">
+                      <BsLinkedin size={18} />
+                      <Text fontSize="sm">LinkedIn</Text>
+                    </Flex>
+                  </NextLink>
+                  
+                  <NextLink href="https://etherworld.co/tag/eipsinsight/" target="_blank">
+                    <Flex align="center" gap={2} _hover={{ transform: "translateX(2px)" }} transition="transform 0.2s" cursor="pointer">
+                      <BsNewspaper size={18} />
+                      <Text fontSize="sm">EtherWorld</Text>
+                    </Flex>
+                  </NextLink>
+                </SimpleGrid>
 
-            <NextLink href={'https://buy.stripe.com/test_7sI7sXdHu9SL8JG001'} target={'_blank'}>
-              <Box className={'justify-center flex w-full'}>
-                <Button variant={"outline"} colorScheme={'blue'}>
-                  Support Us
-                </Button>
-              </Box>
-            </NextLink>
-          </Stack>
-        </div>
-
-
+                <NextLink href="https://buy.stripe.com/test_7sI7sXdHu9SL8JG001" target="_blank">
+                  <Button 
+                    variant="outline" 
+                    colorScheme="blue" 
+                    size="sm"
+                    w="full"
+                    mt={4}
+                    _hover={{ 
+                      bg: useColorModeValue("blue.50", "blue.900"),
+                      transform: "translateY(-1px)" 
+                    }}
+                    transition="all 0.2s ease"
+                  >
+                    Support Us
+                  </Button>
+                </NextLink>
+              </Stack>
+            </Box>
+          </SimpleGrid>
+        </Container>
       </Box>
     </>
   );

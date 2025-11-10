@@ -1,6 +1,7 @@
-import { VStack } from "@chakra-ui/react";
+﻿import { VStack } from "@chakra-ui/react";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Spinner,
@@ -77,22 +78,27 @@ const EIPsInsightRecap = () => {
                 width={{ base: "100%", lg: "60%" }} // Text takes up 60% of the width on large screens
                 textAlign="justify"
             >     
-            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
             <Link href="/eip" color="blue.300" isExternal>EIP</Link>{" "} stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
               </Text>
               
             </Box>
             </Stack>
 
-            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+            {/* EtherWorld Advertisement */}
+            <Box my={6} width="100%">
+              <CloseableAdCard />
+            </Box>
+
+            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} mt={4} textAlign="justify">
   There are three types of EIP:
 </Text>
-<ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+<ul >
   <li>
     <b>Standards Track EIP</b>: Describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, block or transaction validity rules, proposed application standards/conventions, or any change that affects interoperability of applications using Ethereum. Standards Track EIPs include:
     <ul className="list-disc list-inside ml-5 space-y-2">
       <li>
-        <b><Link href="/core" color="blue.300" isExternal>Core</Link></b>: Improvements requiring a consensus fork (e.g., <a href="/eips/eip-5">EIP-5</a>, <a href="/eips/eip-101">EIP-101</a>), as well as changes relevant to <a href="https://github.com/ethereum/pm">“core dev” discussions</a>.
+        <b><Link href="/core" color="blue.300" isExternal>Core</Link></b>: Improvements requiring a consensus fork (e.g., <a href="/eips/eip-5">EIP-5</a>, <a href="/eips/eip-101">EIP-101</a>), as well as changes relevant to <a href="https://github.com/ethereum/pm">â€œcore devâ€ discussions</a>.
       </li>
       <li>
         <b><Link href="/networking" color="blue.300" isExternal>Networking</Link></b>: Includes improvements to <a href="https://github.com/ethereum/devp2p/blob/readme-spec-links/rlpx.md">devp2p</a> (e.g., <a href="/eips/eip-8">EIP-8</a>), the <a href="https://ethereum.org/en/developers/docs/nodes-and-clients/#light-node">Light Ethereum Subprotocol</a>, and network protocol specifications like <a href="https://github.com/ethereum/go-ethereum/issues/16013#issuecomment-364639309">Whisper</a> and <a href="https://github.com/ethereum/go-ethereum/pull/2959">Swarm</a>.
@@ -113,22 +119,22 @@ const EIPsInsightRecap = () => {
   </li>
 </ul>
 
-<Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+<Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
   It is highly recommended that an EIP focuses on a single proposal or idea to ensure clarity and success. A clear and complete description of the proposed enhancement must be included, representing a net improvement without undue protocol complexity.
 </Text>
 
-<Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+<Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
   <b>Special Requirements for Core EIPs:</b> If a Core EIP mentions or proposes changes to the EVM, it should use instruction mnemonics and define opcodes, for example:
 </Text>
 <pre className="bg-gray-900 text-white p-4 rounded-md">
   REVERT (0xfe)
 </pre>
 
-<Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+<Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
   <b>EIP Workflow:</b> Before drafting an EIP, it is crucial to vet the idea with the Ethereum community through platforms like the <a href="https://ethereum-magicians.org/">Ethereum Magicians forum</a>. After obtaining feedback, the EIP author (or champion) must write the EIP, invite feedback from editors, developers, and the community, and gauge interest in the proposal.
 </Text>
 
-<ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+<ul >
   <li>
     For Core EIPs, presenting them on an <a href="https://github.com/ethereum/pm/issues">AllCoreDevs agenda</a> can help gain client implementer support and coordinate implementation for network upgrades.
   </li>
@@ -137,7 +143,7 @@ const EIPsInsightRecap = () => {
   </li>
 </ul>
 
-<Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+<Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
   The EIP process aims to foster collaboration and standardization, ensuring technical soundness and alignment within the Ethereum ecosystem.
 </Text>
 <Box >

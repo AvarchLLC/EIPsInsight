@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+﻿import React, { useEffect, useRef } from "react";
 import Header from "./Header";
 import { Box, useColorModeValue, Text } from "@chakra-ui/react";
 import Image from "next/image";
@@ -64,7 +64,7 @@ const Resource = () => {
     <Text className="text-4xl text-blue-400 font-semibold text-left">
       What is EIPsInsight?
     </Text>
-    <Text className="text-xl text-left text-justify">
+    <Text >
       EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of 
       <a href="https://github.com/ethereum/EIPs" className="underline" target="_blank" style={{ color: "blue" }}> Ethereum Improvement Proposal (EIP)</a>, 
       <a href="https://github.com/ethereum/ERCs" className="underline" target="_blank" style={{ color: "blue" }}> Ethereum Request for Comments (ERCs)</a>, and 
@@ -72,9 +72,7 @@ const Resource = () => {
       Data provided is used for tracking the progress and workload distribution among EIP Editors, ensuring transparency and efficiency in the proposal review process.
     </Text>
 
-    <Text className="text-xl text-left text-justify">
-      EIPsInsight is a tooling platform dedicated to providing in-depth analysis, up-to-date information, and comprehensive insights on Ethereum Standards. Our mission is to empower editors, developers, stakeholders, and the broader Ethereum community with the knowledge and tools necessary to understand and engage with the ongoing evolution of the Ethereum Standards. 
-    </Text>
+
 
     {/* Carousel for blogs */}
     <Box className="mt-6">
@@ -304,7 +302,7 @@ const Resource = () => {
     <Text className="text-4xl font-semibold text-blue-400 text-left mt-10">
       Key Features:
     </Text>
-    <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+    <ul >
       <li>
         <strong>Monthly Insight:</strong> Follow the status change of proposals under different types and categories with beautiful charts and tables providing details.
       </li>
@@ -328,7 +326,7 @@ const Resource = () => {
       </li>
     </ul>
 
-    <Text className="text-xl text-left mt-6 text-justify">
+    <Text >
       At EIPsInsight, we believe in the power of open-source collaboration and the continuous improvement of the Ethereum network.{" "}  
       <a href="https://x.com/TeamAvarch" className="underline" target="_blank" style={{ color: "blue" }}>Join us</a> in exploring the future of Ethereum, one proposal at a time.
     </Text>

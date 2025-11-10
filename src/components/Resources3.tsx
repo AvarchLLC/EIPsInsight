@@ -242,7 +242,7 @@ const ResourcesPage: React.FC = () => {
       title: "What is EIPsInsight?",
       content:
         "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period.",
-      link: "/About",
+      link: "/about",
       tag: "About",
     },
   ];
@@ -340,6 +340,13 @@ const ResourcesPage: React.FC = () => {
   ];
 
   const BLOGS = [
+    {
+      image: "/Nody2.png",
+      title: "EIP Proposal Builder and Validation Issues with Legacy EIPs",
+      content: "The Proposal Builder simulates EIPW Lint to let authors import drafts and validate them against the latest linting rules before submission.",
+      link: "Blogs/eip-proposal-builder-validation-legacy",
+      tag: "Technical"
+    },
     {
       image: "/nody.png",
       title: "EIPs @10: A Decade of Standardizing Ethereum",

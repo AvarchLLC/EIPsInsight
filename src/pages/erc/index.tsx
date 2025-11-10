@@ -6,6 +6,7 @@ import { CopyIcon, DownloadIcon } from "@chakra-ui/icons";
 import TableStatus from "@/components/TableStatus";
 import AreaStatus from "@/components/AreaStatus";
 import React, { useEffect, useState } from "react";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import { motion } from "framer-motion";
 import LoaderComponent from "@/components/Loader";
 import ERCGraph from "@/components/ERCGraph";
@@ -288,6 +289,11 @@ const ERC = () => {
                   </Text>
                 }
               />
+
+              {/* EtherWorld Advertisement */}
+              <Box my={6}>
+                <CloseableAdCard />
+              </Box>
 
               {/* Row: Subscription + Toggle Buttons */}
               <Flex

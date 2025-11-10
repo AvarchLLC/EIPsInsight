@@ -1,6 +1,7 @@
-import { VStack } from "@chakra-ui/react";
+﻿import { VStack } from "@chakra-ui/react";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Spinner,
@@ -77,10 +78,10 @@ const EIPsInsightRecap = () => {
                 width={{ base: "100%", lg: "60%" }} // Text takes up 60% of the width on large screens
                 textAlign="justify"
             >     
-            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+            <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} mt={4} textAlign="justify">
                 A Rollup Improvement Proposal (<Link href="/rip" color="blue.300" isExternal>RIP</Link>) is a formal document that outlines new features, processes, or optimizations for rollup solutions in the Ethereum ecosystem. RIPs act as specifications to improve rollups, enhance interoperability, and standardize development processes.
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} mt={4} textAlign="justify">
                 <Link  href="https://ethereum-magicians.org/t/about-the-rips-category/19805"
                 isExternal
                 color="blue.500"
@@ -90,44 +91,49 @@ const EIPsInsightRecap = () => {
             </Box>
             </Stack>
 
+            {/* EtherWorld Advertisement */}
+            <Box my={6} width="100%">
+              <CloseableAdCard />
+            </Box>
+
             <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 Why are RIPs Important?
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 RIPs help coordinate technical improvements for rollups in a transparent, collaborative way. They:
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li>Propose <b>new features</b> and optimizations.</li>
                 <li>Collect <b>community feedback</b> on rollup-related issues.</li>
                 <li>Serve as a <b>historical record</b> of design decisions.</li>
                 <li>Help rollups track progress, especially for multi-client implementations.</li>
               </ul>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 By adopting RIPs, rollups can align on standards and ensure better <b>interoperability</b> across Layer 2 solutions. The goal of the RIP project is to standardize and provide high-quality documentation for Rollups in the Ethereum ecosystem.
               </Text>
             
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10">
                 What are the Different Types of RIPs?
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 <strong>Standards Track RIPs</strong> - Changes that impact most or all rollup implementations, including:
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li><b>Core</b>: Changes to network rules, block validity, EVM opcodes, cryptographic updates.</li>
                 <li><b>RRC (Rollup Request for Comments)</b>: Application-level standards like token or wallet formats.</li>
                 <li><b>Other</b>: Improvements relevant to core developer discussions.</li>
               </ul>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 <strong>Meta RIPs</strong> - Proposals related to rollup processes, governance, or the RIP process itself. These are not technical but focus on <b>procedures, tools, or guidelines</b>.
               </Text>
             
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 What is the RIP Process?
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 The RIP process follows these steps:
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li><b>Idea Stage</b>: Share your proposal idea for initial feedback (e.g., Ethereum Magicians forum).</li>
                 <li><b>Draft</b>: Submit a formal RIP using the template provided.</li>
                 <li><b>Review</b>: Invite community discussion and peer review.</li>
@@ -136,7 +142,7 @@ const EIPsInsightRecap = () => {
                 <li><b>Withdrawn</b>: Proposals that authors decide to discontinue.</li>
                 <li><b>Living</b>: RIPs continually updated without reaching a final state.</li>
               </ul>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 <b>Tip</b>: For Core RIPs, presenting your proposal during  <Link  href="https://github.com/ethereum/pm/issues"
                 isExternal
                 color="blue.500"
@@ -147,10 +153,10 @@ const EIPsInsightRecap = () => {
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 Who Can Submit a RIP?
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 Anyone! Whether you're a developer, researcher, or rollup enthusiast, you can submit an RIP. Before drafting:
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li>Discuss your idea on the <Link  href="https://ethereum-magicians.org/"
                 isExternal
                 color="blue.500"
@@ -162,10 +168,10 @@ const EIPsInsightRecap = () => {
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 What Makes a Successful RIP?
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 A strong RIP includes:
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li><b>Clear Specification</b>: Detailed syntax and semantics of the proposed change.</li>
                 <li><b>Motivation</b>: Why the change is necessary.</li>
                 <li><b>Rationale</b>: Design decisions and alternatives considered.</li>
@@ -176,10 +182,10 @@ const EIPsInsightRecap = () => {
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 How Do I Format a RIP?
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 RIPs must follow a specific template and structure in Markdown format. Each RIP includes:
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li><b>Preamble</b>: Metadata such as RIP number, title, author(s), and status.</li>
                 <li><b>Abstract</b>: A brief technical summary.</li>
                 <li><b>Specification</b>: A detailed technical description of the proposal.</li>
@@ -188,7 +194,7 @@ const EIPsInsightRecap = () => {
                 <li><b>Test Cases (if applicable)</b>: Mandatory for consensus changes.</li>
                 <li><b>Reference Implementation (optional)</b>: Code to aid understanding.</li>
               </ul>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 Refer to the <Link  href="https://github.com/ethereum/RIPs/blob/master/rip-template.md"
                 isExternal
                 color="blue.500"
@@ -199,10 +205,10 @@ const EIPsInsightRecap = () => {
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 Who Oversees the RIP Process?
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 RIP Editors ensure proposals are well-formatted and ready for review. They do not decide the merits of a proposal. Current RIP editors include:
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li><b>Ansgar Dietrichs</b></li>
                 <li><b>Carl Beekhuizen</b></li>
                 <li><b>Yoav Weiss</b></li>
@@ -212,7 +218,7 @@ const EIPsInsightRecap = () => {
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 Where Can I Track RIPs and Rollup Progress?
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li><b>GitHub Repository</b>: <Link  href="https://github.com/ethereum/RIPs"
                 isExternal
                 color="blue.500"
@@ -242,14 +248,14 @@ const EIPsInsightRecap = () => {
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 What Happens After a RIP is Final?
               </Text>
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={4} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={4} textAlign="justify">
                 Once an RIP is accepted and implemented by at least one rollup on their mainnet, it becomes a <b>Final RIP</b>. Care is taken to resolve any conflicts before deployment to avoid competing standards.
               </Text>
             
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">
                 How Do I Stay Involved?
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li><b>Contribute</b>: Submit your RIP or provide feedback on existing proposals.</li>
                 <li><b>Discuss</b>: Join community discussions on forums and GitHub.</li>
                 <li><b>Engage</b>: Present your RIP at Rollcall meetings to build consensus.</li>
@@ -258,7 +264,7 @@ const EIPsInsightRecap = () => {
               <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10"textAlign="justify">
                 Where Can I Find More Information?
               </Text>
-              <ul className="list-disc list-inside space-y-2 text-xl text-left text-justify">
+              <ul >
                 <li><b>RIP Template</b>: <Link  href="https://github.com/ethereum/RIPs/blob/master/rip-template.md"
                 isExternal
                 color="blue.500"
@@ -278,7 +284,7 @@ const EIPsInsightRecap = () => {
                   rollup.codes</Link></li>
               </ul>
             
-              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-xl text-left text-justify" mt={6} textAlign="justify">
+              <Text fontSize={{ base: "sm", sm: "xs", md: "md" }}  mt={6} textAlign="justify">
                 By collaborating through RIPs, we can drive innovation and ensure a shared, open-source approach to improving Ethereum rollup solutions.
               </Text>
 

@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Text,
@@ -23,6 +24,7 @@ import {
   FaCoins
 } from 'react-icons/fa';
 import { convertEthToUSD, convertGweiToUSD } from './ethereumService';
+import MongoDataService, { type LatestValues } from '@/services/MongoDataService';
 
 const numberFmt = (v: any) =>
   typeof v === 'number'
@@ -34,15 +36,14 @@ const chipBg = (mode: 'light' | 'dark') =>
 
 const BlockInfo = ({
   title,
-  data,
   ethPriceInUSD,
-  isLoading = false
+  isLoading: externalLoading = false
 }: {
   title: string;
-  data: any;
   ethPriceInUSD: number;
   isLoading?: boolean;
 }) => {
+  const [mongoData, setMongoData] = useState<LatestValues | null>(null);
   const mode: 'light' | 'dark' = useColorModeValue('light', 'dark') as 'light' | 'dark';
 
   const cardBg = useColorModeValue(
@@ -63,71 +64,83 @@ const BlockInfo = ({
   const textColor = useColorModeValue('gray.800', 'gray.100');
   const subColor = useColorModeValue('gray.500', 'gray.400');
 
-  const baseFeeNum = data?.baseFee
-    ? Number(String(data.baseFee).split(' ')[0])
-    : 0;
-  const gasBurntNum = data?.gasBurnt
-    ? Number(String(data.gasBurnt).split(' ')[0])
-    : 0;
+  // Subscribe to MongoDB data
+  useEffect(() => {
+    const mongoService = MongoDataService.getInstance();
+    
+    const unsubscribe = mongoService.subscribe((data: LatestValues) => {
+      setMongoData(data);
+    });
 
-  const metrics =
-    !data
-      ? []
-      : [
-          {
-            key: 'block',
-            label: 'Block Number',
-            value: numberFmt(Number(data.blockNumber)),
-            icon: FaCube
-          },
-            {
-            key: 'epoch',
-            label: 'Epoch',
-            value: numberFmt(data.epochNumber),
-            icon: FaClock
-          },
-          {
-            key: 'slot',
-            label: 'Slot (Epoch)',
-            value: numberFmt(data.slotInEpoch),
-            icon: FaClock,
-            help: `Slot within epoch ${data.epochNumber}`
-          },
-          {
-            key: 'baseFee',
-            label: 'Base Fee',
-            value: `${baseFeeNum} gwei`,
-            icon: FaCoins,
-            usd: convertGweiToUSD(baseFeeNum, ethPriceInUSD)
-          },
-          {
-            key: 'gasUsed',
-            label: 'Gas Used',
-            value: numberFmt(data.gasUsed),
-            icon: FaGasPump,
-            help: 'Total gas consumed'
-          },
-          {
-            key: 'gasLimit',
-            label: 'Gas Limit',
-            value: numberFmt(data.gasLimit),
-            icon: FaGasPump,
-            help: 'Block gas target'
-          },
-          {
-            key: 'gasBurnt',
-            label: 'Gas Burnt',
-            value: `${gasBurntNum} ETH`,
-            icon: FaFire,
-            usd: convertEthToUSD(gasBurntNum, ethPriceInUSD)
-          },
-          {
-            key: 'txs',
-            label: 'Transactions',
-            value: numberFmt(data.transactions),
-            icon: FaList
-          }
-        ];
+    // Start the service if not already started
+    mongoService.startAutoRefresh(30000);
+
+    return unsubscribe;
+  }, []);
+
+  const isLoading = externalLoading || mongoData?.isLoading || !mongoData;
+
+  const metrics = !mongoData ? [] : [
+    {
+      key: 'block',
+      label: 'Block Number',
+      value: numberFmt(mongoData.blockNumber),
+      icon: FaCube,
+      help: 'Latest block from MongoDB data'
+    },
+    {
+      key: 'baseFee',
+      label: 'Base Fee',
+      value: `${mongoData.baseFeeGwei.toFixed(2)} gwei`,
+      icon: FaCoins,
+      usd: convertGweiToUSD(mongoData.baseFeeGwei, ethPriceInUSD),
+      help: 'Minimum fee to include transaction'
+    },
+    {
+      key: 'priorityFee',
+      label: 'Priority Fee',
+      value: `${mongoData.priorityFeeGwei.toFixed(2)} gwei`,
+      icon: FaCoins,
+      usd: convertGweiToUSD(mongoData.priorityFeeGwei, ethPriceInUSD),
+      help: 'Tip for faster processing'
+    },
+    {
+      key: 'gasUsed',
+      label: 'Gas Used',
+      value: `${numberFmt(mongoData.gasUsed)} (${mongoData.gasUsedPercentage}%)`,
+      icon: FaGasPump,
+      help: 'Block capacity utilization'
+    },
+    {
+      key: 'gasLimit',
+      label: 'Gas Limit',
+      value: numberFmt(mongoData.gasLimit),
+      icon: FaGasPump,
+      help: 'Maximum gas per block'
+    },
+    {
+      key: 'gasBurnt',
+      label: 'ETH Burned',
+      value: `${(mongoData.gasBurnt / 1e18).toFixed(6)} ETH`,
+      icon: FaFire,
+      usd: convertEthToUSD(mongoData.gasBurnt / 1e18, ethPriceInUSD),
+      help: 'ETH permanently removed from supply'
+    },
+    {
+      key: 'txs',
+      label: 'Transactions',
+      value: numberFmt(mongoData.totalTransactions),
+      icon: FaList,
+      help: 'Total transactions in latest block'
+    },
+    {
+      key: 'updated',
+      label: 'Last Updated',
+      value: mongoData.timestamp.toLocaleTimeString(),
+      icon: FaClock,
+      help: 'When this data was last refreshed'
+    }
+  ];
 
   return (
     <Box
@@ -259,4 +272,4 @@ const BlockInfo = ({
   );
 };
 
-export default BlockInfo;
+export default React.memo(BlockInfo);

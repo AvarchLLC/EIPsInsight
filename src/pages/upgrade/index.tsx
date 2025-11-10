@@ -1,6 +1,6 @@
-'use client';
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AllLayout from "@/components/Layout";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Spinner,
@@ -45,6 +45,7 @@ import StatusGraph from "@/components/Statuschangesgraph";
 import { useSidebar } from '@/components/Sidebar/SideBarContext';
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import DeclinedEIPListPage from "@/components/DeclinedCardsPage";
+import PlaceYourAdCard from "@/components/PlaceYourAdCard";
 
 const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
@@ -301,8 +302,20 @@ const declinedEIPs: DeclinedEIP[] = [
 
 
 const All = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Homepage-style theme values
+  
+  // Use exact same pattern as Dashboard component
+  const textColor = useColorModeValue("gray.800", "gray.200");
+  const linkColor = useColorModeValue("blue.600", "blue.300");
   const bg = useColorModeValue("#f6f6f7", "#171923");
+  
+  // Note: avoid logging color mode on server to prevent noisy SSR logs
+  
+  // Set loading to false after component mounts (like Dashboard does)
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+  
   const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam'>('fusaka');
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
   // const selectedOption = selectedUpgrade;       // just alias so rest of code works
@@ -351,13 +364,7 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   }, []);
 
 
-  useEffect(() => {
-    if (bg === "#f6f6f7") {
-      setIsDarkMode(false);
-    } else {
-      setIsDarkMode(true);
-    }
-  });
+  // (No-op) bg is consumed directly via useColorModeValue in render
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -824,7 +831,7 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     }
   }, [isLoading]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     router.events.on("routeChangeComplete", scrollToHash);
     return () => {
       router.events.off("routeChangeComplete", scrollToHash);
@@ -849,7 +856,7 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     "AuthorContributions",
   ]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     router.events.on("routeChangeComplete", scrollToHash);
     return () => {
       router.events.off("routeChangeComplete", scrollToHash);
@@ -858,13 +865,34 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 return (
   <>
     <AllLayout>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <Box px={{ base: "1rem", md: "4rem" }} py="2rem">
-          <Box>
+      <Box px={{ base: 3, md: 5, lg: 8 }} py={{ base: 3, md: 4, lg: 6 }}>
+        {isLoading ? (
+          <Flex justify="center" align="center" minH="70vh">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Spinner size="xl" />
+            </motion.div>
+          </Flex>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+          {/* Container 1: Page Header + Selector + Countdown */}
+          <Box
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue("gray.200", "gray.700")}
+            mb={8}
+            px={6}
+            py={8}
+          >
             <Text
               as={motion.div}
               initial={{ opacity: 0, y: -20 }}
@@ -874,12 +902,13 @@ return (
               fontWeight="bold"
               color="#00CED1"
               id="pectrafusaka"
-              mb={4}
+              textAlign="center"
+              mb={6}
             >
               Ethereum Network Upgrades
             </Text>
-
-            <Box my={4}>
+            
+            <Box mb={4}>
               <select
                 value={selectedOption}
                 onChange={handleSelectChange}
@@ -893,10 +922,18 @@ return (
                 <option value="glamsterdam">Glamsterdam</option>
                 <option value="fusaka">Fusaka</option>
                 <option value="pectra">Pectra</option>
-                
               </select>
             </Box>
-            <Box id="NetworkUpgrades" my={6}>
+            
+            {/* FUSAKA Countdown - Only show when Fusaka is selected */}
+            {selectedOption === 'fusaka' && (
+              <Box>
+                <SlotCountdown />
+              </Box>
+            )}
+            
+            {/* Network Upgrade Timeline (UpgradesTimeline) */}
+            <Box id="NetworkUpgrades" mt={8}>
               <UpgradesTimeline
                 selectedOption={selectedOption}
                 setSelectedOption={setSelectedOption}
@@ -904,14 +941,28 @@ return (
                 fusakaData={fusakaData}
               />
             </Box>
+          </Box>
+          
 
+
+          {/* Container 3: Description */}
+          <Box
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue("gray.200", "gray.700")}
+            transition="background-color .15s ease, border-color .15s ease"
+            mb={8}
+            px={6}
+            py={8}
+          >
             <Flex
               direction={{ base: "column", md: "row" }}
               align="flex-start"
               gap={{ base: 6, md: 8 }}
               width="100%"
               wrap="wrap"
-              my={4}
             >
               <Text
                 flex="1"
@@ -949,6 +1000,7 @@ return (
                       </Text>
                     </NLink>.
                   </>
+                  
                 ) : selectedOption === 'fusaka' ? (
                   <>
                     <NLink href="https://eipsinsight.com/eips/eip-7607">
@@ -1027,9 +1079,25 @@ return (
                 }
               </Text>
             </Flex>
+            
+            {/* Network Upgrade Inclusion Stages Chart (FUSAKA) */}
+            <Box id="NetworkUpgradeschart" mt={8}>  
+              <NetworkUpgradesChart />
+            </Box>
+          </Box>
 
-            {/* Blog Cards Section */}
-            <Box maxH="450px" overflowY="auto" width="100%" py={4} id="upgrade-blogs">
+          {/* Container 4: Blog Cards Section */}
+          <Box
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue("gray.200", "gray.700")}
+            mb={8}
+            px={6}
+            py={8}
+          >
+            <Box maxH="450px" overflowY="auto" width="100%" id="upgrade-blogs">
               <Grid
                 templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
                 gap={6}
@@ -1068,9 +1136,20 @@ return (
                 })}
               </Grid>
             </Box>
+          </Box>
 
-            {/* Upgrade Table */}
-            <Box id="upgrade-table" mt={6} display={{ base: "none", md: "block" }}>
+          {/* Container 5: Upgrade Table + Declined EIPs */}
+          <Box
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue("gray.200", "gray.700")}
+            mb={8}
+            px={6}
+            py={8}
+          >
+            <Box id="upgrade-table" display={{ base: "none", md: "block" }}>
               <PectraTable
                 PectraData={selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : glamsterdamData}
                 title={selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : "Glamsterdam"}
@@ -1078,47 +1157,84 @@ return (
             </Box>
 
             {(selectedOption === 'fusaka' || selectedOption === 'glamsterdam') && (
-  <DeclinedEIPListPage
-    selectedUpgrade={selectedOption}
-  />
-)}
+              <Box mt={8}>
+                <Text
+                  fontSize={{ base: '2xl', md: '3xl' }}
+                  fontWeight="bold"
+                  color="#00CED1"
+                  textAlign="left"
+                  mb={6}
+                >
+                  Declined for Inclusion
+                </Text>
+                <DeclinedEIPListPage
+                  selectedUpgrade={selectedOption}
+                />
+              </Box>
+            )}
+          </Box>
 
-            {/* Charts */}
-            <Box id="NetworkUpgradeschart" my={6}>  
-              <NetworkUpgradesChart />
-            </Box>
+          {/* EtherWorld Advertisement */}
+          <Box my={6}>
+            <CloseableAdCard />
+          </Box>
 
-            <Box id="AuthorContributions" my={6}>
+          {/* Container 6: Author Contributions */}
+          <Box
+            bg={useColorModeValue('white', 'gray.800')}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            mb={8}
+            px={6}
+            py={8}
+          >
+            <Box id="AuthorContributions">
               <NetworkUpgradesChart2 />
             </Box>
+          </Box>
 
-            <Box
-              id="NetworkUpgradesChartp"
-              mt={8}
-              px={{ base: 2, md: 6 }}
-              width="100%"
-              overflowX="auto"
-            >
+          {/* Container 7: Network Upgrades and EIPs Relationship Graph */}
+          <Box
+            bg={useColorModeValue('white', 'gray.800')}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            mb={8}
+            px={6}
+            py={6}
+          >
+            <Box mb={6}>
               <Text
                 fontSize={{ base: '2xl', md: '3xl' }}
                 fontWeight="bold"
                 color="#00CED1"
                 textAlign="left"
-                mb={4}
+                id="NetworkUpgradesChartp"
               >
                 Network Upgrades and EIPs Relationship Graph
               </Text>
-              <Flex justifyContent="center" alignItems="center" width="100%">
-                <Box width="100%" overflow="hidden">
-                  <Graph />
-                </Box>
-              </Flex>
-
-             
+            </Box>
+            <Box 
+              width="100%" 
+              position="relative"
+              minH="550px"
+              overflow="hidden"
+            >
+              <Graph />
             </Box>
           </Box>
+
+          </motion.div>
+        )}
+
+        {/* Place Your Ad Card - No Container */}
+        <Box my={8}>
+          <PlaceYourAdCard />
         </Box>
-      </motion.div>
+      </Box>
     </AllLayout>
   </>
 );

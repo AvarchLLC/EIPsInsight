@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import {
   Box,
@@ -439,9 +440,14 @@ const All = () => {
                 Ethereum Network Upgrades
               </Text>
 
+              {/* EtherWorld Advertisement */}
+              <Box my={6}>
+                <CloseableAdCard />
+              </Box>
+
               <br />
               {/* <br/> */}
-              {/* <SlotCountdown /> */}
+              
               {/* <br /> */}
               <Text
                 as={motion.div}

@@ -1,4 +1,5 @@
 import React from "react";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import { Box, Tabs, TabList, Tab, useColorModeValue  } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
@@ -120,6 +121,12 @@ const Networking = () => {
                 description="This section lists all Networking EIPs, which propose changes to the Ethereum network protocol."
               />
             </FlexBetween>
+            
+            {/* EtherWorld Advertisement */}
+            <Box my={6}>
+              <CloseableAdCard />
+            </Box>
+            
             <TableStatus cat="Networking" />
             <Box
                         marginTop={"2rem"}

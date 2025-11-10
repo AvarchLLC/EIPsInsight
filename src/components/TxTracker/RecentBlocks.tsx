@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import {
   Box,
   Text,
@@ -35,9 +36,14 @@ const RecentBlocks = ({
   blocks,
   ethPriceInUSD,
   isLoading = false,
-  limit = 12
+  limit = 10 // Reduced default limit
 }: RecentBlocksProps) => {
-  const data = (blocks || []).slice(0, limit);
+  // Memoize data processing to prevent unnecessary recalculations
+  const data = useMemo(() => {
+    if (!blocks || !Array.isArray(blocks)) return [];
+    return blocks.slice(0, limit).filter(block => block && block.number);
+  }, [blocks, limit]);
+  
   if ((!data || data.length === 0) && !isLoading) return null;
 
   const cardBorder = useColorModeValue('blackAlpha.200', 'whiteAlpha.200');
@@ -100,10 +106,10 @@ const RecentBlocks = ({
         </Flex>
         <Box>
           <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight="bold">
-            Recent Blocks
+            📚 Recent Block History
           </Text>
           <Text fontSize="xs" opacity={0.85}>
-            Live execution layer snapshot (last {data.length || 0})
+            Each block = a new "page" in Ethereum's ledger (last {data.length || 0} blocks)
           </Text>
         </Box>
       </Flex>
@@ -267,4 +273,4 @@ const RecentBlocks = ({
   );
 };
 
-export default RecentBlocks;
+export default React.memo(RecentBlocks);

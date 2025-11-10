@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
+import CloseableAdCard from "@/components/CloseableAdCard";
+import PlaceYourAdCard from "@/components/PlaceYourAdCard";
 import dynamic from "next/dynamic";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
@@ -40,7 +42,8 @@ import CopyLink from "@/components/CopyLink";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import ERCsPRChart from "@/components/Ercsprs";
-import PRAnalyticsCard from "@/components/PrLabels"
+import PRAnalyticsCard from "@/components/PrLabels";
+import AnimatedHeader from "@/components/AnimatedHeader";
 
 // Dynamic import for Ant Design's Column chart
 // const Column = dynamic(() => import("@ant-design/plots").then(mod => mod.Column), { ssr: false });
@@ -91,11 +94,11 @@ const GitHubPRTracker: React.FC = () => {
   const [loading2, setLoading2] = useState<boolean>(false);
   const [loading3, setLoading3] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"PRs" | "Issues">("PRs");
-  const [selectedRepo, setSelectedRepo] = useState<string>("All");
+  const [selectedRepo, setSelectedRepo] = useState<string>("EIPs");
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
-
+``
   const toggleCollapse = () => setShow(!show);
   // const [selectedYear, setSelectedYear] = useState(null);
   // const [selectedMonth, setSelectedMonth] = useState(null);
@@ -155,9 +158,98 @@ const GitHubPRTracker: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const endpoint = fetchEndpoint();
-        const response = await axios.get(endpoint);
-        setchartData(response.data);
+        if (selectedRepo === "All") {
+          // For "All", fetch data from individual repos and aggregate
+          const [eipsResponse, ercsResponse, ripsResponse] = await Promise.all([
+            axios.get(`/api/AnalyticsCharts/${activeTab === "PRs" ? "prs" : "issues"}/eips`),
+            axios.get(`/api/AnalyticsCharts/${activeTab === "PRs" ? "prs" : "issues"}/ercs`),
+            axios.get(`/api/AnalyticsCharts/${activeTab === "PRs" ? "prs" : "issues"}/rips`)
+          ]);
+          
+          const eipsData = eipsResponse.data.data || [];
+          const ercsData = ercsResponse.data.data || [];
+          const ripsData = ripsResponse.data.data || [];
+          
+          console.log("EIPs data sample:", eipsData.slice(0, 2));
+          console.log("ERCs data sample:", ercsData.slice(0, 2));
+          console.log("RIPs data sample:", ripsData.slice(0, 2));
+          
+          // Aggregate the data by monthYear and type
+          const aggregatedData: { [key: string]: any } = {};
+          
+          // Process EIPs data
+          eipsData.forEach((item: any) => {
+            const key = `${item.monthYear}-${item.type}`;
+            if (!aggregatedData[key]) {
+              aggregatedData[key] = {
+                _id: key,
+                category: "all",
+                monthYear: item.monthYear,
+                type: item.type,
+                count: 0,
+                eips: 0,
+                ercs: 0,
+                rips: 0
+              };
+            }
+            aggregatedData[key].count += item.count || 0;
+            aggregatedData[key].eips += item.count || 0; // For EIPs repo, count goes to eips
+          });
+          
+          // Process ERCs data
+          ercsData.forEach((item: any) => {
+            const key = `${item.monthYear}-${item.type}`;
+            if (!aggregatedData[key]) {
+              aggregatedData[key] = {
+                _id: key,
+                category: "all",
+                monthYear: item.monthYear,
+                type: item.type,
+                count: 0,
+                eips: 0,
+                ercs: 0,
+                rips: 0
+              };
+            }
+            aggregatedData[key].count += item.count || 0;
+            aggregatedData[key].ercs += item.count || 0; // For ERCs repo, count goes to ercs
+          });
+          
+          // Process RIPs data
+          ripsData.forEach((item: any) => {
+            const key = `${item.monthYear}-${item.type}`;
+            if (!aggregatedData[key]) {
+              aggregatedData[key] = {
+                _id: key,
+                category: "all",
+                monthYear: item.monthYear,
+                type: item.type,
+                count: 0,
+                eips: 0,
+                ercs: 0,
+                rips: 0
+              };
+            }
+            aggregatedData[key].count += item.count || 0;
+            aggregatedData[key].rips += item.count || 0; // For RIPs repo, count goes to rips
+          });
+          
+          const chartData = Object.values(aggregatedData);
+          console.log("Aggregated data sample:", chartData.slice(0, 3));
+          console.log("Aggregated data total length:", chartData.length);
+          
+          setchartData(chartData);
+        } else {
+          // For individual repos, use the existing endpoint
+          const endpoint = fetchEndpoint();
+          const response = await axios.get(endpoint);
+          
+          const chartData = response.data.data || response.data;
+          console.log("API Response sample:", chartData?.slice(0, 3));
+          console.log("API Response total length:", chartData?.length);
+          
+          setchartData(chartData);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -383,6 +475,36 @@ const GitHubPRTracker: React.FC = () => {
         borderRadius="10px 10px 0 0"
         boxShadow="lg"
       >
+        {/* Total Count Display */}
+        <Box
+          bg={useColorModeValue("blue.50", "gray.700")}
+          p={3}
+          mb={3}
+          borderRadius="md"
+          textAlign="center"
+        >
+          <Text
+            fontSize="lg"
+            fontWeight="bold"
+            color={useColorModeValue("blue.700", "blue.300")}
+          >
+            Total Filtered Count:{" "}
+            {loading2 ? <Spinner size="sm" /> : (
+              (showCategory.created ? createdCount : 0) +
+              (showCategory.open ? openCount : 0) +
+              (showCategory.closed ? closedCount : 0) +
+              (showCategory.merged && type === "PRs" ? mergedCount : 0)
+            )}
+          </Text>
+          <Text
+            fontSize="xs"
+            color={useColorModeValue("gray.600", "gray.400")}
+            mt={1}
+          >
+            (Based on selected filters - This is what will be downloaded)
+          </Text>
+        </Box>
+
         <Flex
           wrap="wrap"
           justify="space-around"
@@ -855,7 +977,7 @@ const GitHubPRTracker: React.FC = () => {
     csvRows.push(headers.join(","));
 
     // console.log("filteredData",filteredData)
-    // Combine created and closed arrays for PRs and Issues
+    // Combine created and closed for PRs and Issues
     const items =
       type === "PRs"
         ? [
@@ -887,8 +1009,6 @@ const GitHubPRTracker: React.FC = () => {
               ? filteredData.open
               : []),
           ];
-
-    // console.log(items);
 
     // Add data to CSV rows
     items?.forEach((item: PR | Issue) => {
@@ -1205,8 +1325,25 @@ const GitHubPRTracker: React.FC = () => {
   };
 
   const renderChart = () => {
-    // Assuming `chartData` is your data array
-    console.log("chart data:", chartdata);
+    // Log chart data to understand structure
+    console.log("chart data sample:", chartdata?.slice(0, 3));
+    console.log("chart data total length:", chartdata?.length);
+
+    // Create a lookup map for original data to preserve eips/ercs/rips breakdown
+    const originalDataLookup = Array.isArray(chartdata) 
+      ? chartdata.reduce<{ [key: string]: any }>((acc, item) => {
+          const key = `${item.monthYear}-${item.type}`;
+          acc[key] = {
+            eips: item.eips || 0,
+            ercs: item.ercs || 0, 
+            rips: item.rips || 0,
+            count: item.count || 0
+          };
+          return acc;
+        }, {})
+      : {};
+
+    console.log("Original data lookup sample:", Object.keys(originalDataLookup).slice(0, 5));
 
     const transformedData = Array.isArray(chartdata) // Check if chartdata is an array
       ? chartdata?.reduce<{
@@ -1222,11 +1359,11 @@ const GitHubPRTracker: React.FC = () => {
 
             if (selectedRepo === "All") {
               acc[monthYear][`${type}-eips`] =
-                (acc[monthYear][`${type}-eips`] || 0) + eips;
+                (acc[monthYear][`${type}-eips`] || 0) + (eips || 0);
               acc[monthYear][`${type}-ercs`] =
-                (acc[monthYear][`${type}-ercs`] || 0) + ercs;
+                (acc[monthYear][`${type}-ercs`] || 0) + (ercs || 0);
               acc[monthYear][`${type}-rips`] =
-                (acc[monthYear][`${type}-rips`] || 0) + rips;
+                (acc[monthYear][`${type}-rips`] || 0) + (rips || 0);
             }
           }
 
@@ -1244,10 +1381,10 @@ const GitHubPRTracker: React.FC = () => {
             ? [{ monthYear, type: "Created", count: entry.Created || 0 }]
             : []),
           ...(showCategory.merged
-            ? [{ monthYear, type: "Merged", count: entry.Merged || 0 }]
+            ? [{ monthYear, type: "Merged", count: entry.Merged ? -Math.abs(entry.Merged) : 0 }] // Make merged negative
             : []),
           ...(showCategory.closed
-            ? [{ monthYear, type: "Closed", count: entry.Closed || 0 }]
+            ? [{ monthYear, type: "Closed", count: entry.Closed ? -Math.abs(entry.Closed) : 0 }] // Make closed negative
             : []),
         ];
       }
@@ -1312,9 +1449,37 @@ const GitHubPRTracker: React.FC = () => {
 
     // Dual axes configuration
     const config = {
-      data: [sortedData, sortedTrendData], // Provide both bar and trend data
+      data: [sortedData, sortedTrendData],
       xField: "monthYear",
-      yField: ["count", "Open"], // Use dual axes: one for bars and one for the line
+      yField: ["count", "Open"],
+      xAxis: {
+        label: {
+          autoRotate: false,
+          autoHide: true,
+          autoEllipsis: true,
+          style: {
+            fontSize: 10,
+          },
+          formatter: (text: string, item: any, index: number) => {
+            // Show every 3rd label to prevent overlap
+            const totalLabels = sortedData.length;
+            const step = totalLabels > 50 ? 6 : totalLabels > 30 ? 4 : totalLabels > 20 ? 3 : 2;
+            return index % step === 0 ? text : '';
+          },
+        },
+        tickLine: {
+          style: {
+            lineWidth: 1,
+            stroke: '#e8e8e8',
+          },
+        },
+        line: {
+          style: {
+            lineWidth: 1,
+            stroke: '#e8e8e8',
+          },
+        },
+      },
       geometryOptions: [
         {
           geometry: "column", // Bar chart for categories
@@ -1338,13 +1503,21 @@ const GitHubPRTracker: React.FC = () => {
               let value;
 
               if (selectedRepo === "All") {
-                // For "All" repo, format the value as `count(eips: X, ercs: Y, rips: Z)`
-                const eips = transformedData[monthYear]?.[`${type}-eips`] || 0;
-                const ercs = transformedData[monthYear]?.[`${type}-ercs`] || 0;
-                const rips = transformedData[monthYear]?.[`${type}-rips`] || 0;
-                value = `${Math.abs(count)}(eips: ${Math.abs(
-                  eips
-                )}, ercs: ${Math.abs(ercs)}, rips: ${Math.abs(rips)})`;
+                // For "All" repo, find the matching item for this month/type
+                const matchingItem = chartdata?.find(item => 
+                  item.monthYear === monthYear && item.type === type
+                );
+                
+                if (matchingItem && (matchingItem.eips || matchingItem.ercs || matchingItem.rips)) {
+                  const eips = Number(matchingItem.eips) || 0;
+                  const ercs = Number(matchingItem.ercs) || 0;
+                  const rips = Number(matchingItem.rips) || 0;
+                  
+                  value = `${Math.abs(count)} (eips: ${eips}, ercs: ${ercs}, rips: ${rips})`;
+                } else {
+                  // If no breakdown available, just show the count
+                  value = `${Math.abs(count)}`;
+                }
               } else {
                 // For non-"All" repos, just display the absolute count
                 value = `${Math.abs(count)}`;
@@ -1396,13 +1569,21 @@ const GitHubPRTracker: React.FC = () => {
               let value;
 
               if (selectedRepo === "All") {
-                // For "All" repo, format the value as `count(eips: X, ercs: Y, rips: Z)`
-                const eips = transformedData[monthYear]?.[`Open-eips`] || 0;
-                const ercs = transformedData[monthYear]?.[`Open-ercs`] || 0;
-                const rips = transformedData[monthYear]?.[`Open-rips`] || 0;
-                value = `${Open - getmin}(eips: ${Math.abs(
-                  eips
-                )}, ercs: ${Math.abs(ercs)}, rips: ${Math.abs(rips)})`;
+                // For "All" repo, find the matching item for Open
+                const matchingItem = chartdata?.find(item => 
+                  item.monthYear === monthYear && item.type === "Open"
+                );
+                
+                if (matchingItem && (matchingItem.eips || matchingItem.ercs || matchingItem.rips)) {
+                  const eips = Number(matchingItem.eips) || 0;
+                  const ercs = Number(matchingItem.ercs) || 0;
+                  const rips = Number(matchingItem.rips) || 0;
+                  
+                  value = `${Open - getmin} (eips: ${eips}, ercs: ${ercs}, rips: ${rips})`;
+                } else {
+                  // If no breakdown available, just show the count
+                  value = `${Open - getmin}`;
+                }
               } else {
                 // For non-"All" repos, just display the absolute count
                 value = `${Open - getmin}`;
@@ -1419,20 +1600,15 @@ const GitHubPRTracker: React.FC = () => {
       ],
       yAxis: [
         {
-          min: -300, // Set the minimum value for the bar chart y-axis
-          max: 600, // Set the maximum value for the bar chart y-axis
+          min: -300,
+          max: yAxisMax,
+          label: { formatter: () => "" },
         },
         {
-          min: 0,
-          max: yAxisMax, // Set max for trend line y-axis
-          label: {
-            formatter: () => "", // Completely hide labels
-          },
-
-          grid: {
-            line: { style: { stroke: "transparent" } }, // Hide grid lines
-          },
-        },
+          min: -300,
+          max: yAxisMax,
+          label: { formatter: () => "" },
+        }
       ],
       slider: {
         start: 0,
@@ -1482,162 +1658,46 @@ const GitHubPRTracker: React.FC = () => {
     <>
       <FeedbackWidget />
       <AllLayout>
-        <Box padding={{ base: 1, md: 4 }} margin={{ base: 2, md: 4 }}>
-          <Heading
-            size="xl"
-            marginBottom={10}
-            textAlign="center"
-            style={{ color: "#42a5f5", fontSize: "2.5rem", fontWeight: "bold" }}
-          >
-            Analytics
-          </Heading>
+        <Box padding={{ base: 3, md: 6 }} margin={{ base: 2, md: 3 }}>
+          {/* Animated Header with FAQ */}
+          <AnimatedHeader
+            title="PR Analytics"
+            emoji="📊"
+            faqItems={[
+              {
+                question: "💡 What does this tool do?",
+                answer: "This tool aims to automate the process of tracking PRs and issues in GitHub repositories, providing visualizations and reports to streamline project management. The default view utilizes the timeline to observe trends in the number of Created, Closed, Merged, and Open PRs/Issues at the end of each month."
+              },
+              {
+                question: "📅 How can I view data for a specific month?",
+                answer: "To focus on a specific month, click the View More button and choose the desired Year and Month from the dropdown menus. The table and graph will then update to display data exclusively for that selected month."
+              },
+              {
+                question: "🎨 How to customize the chart?",
+                answer: "To customize the chart, you can adjust the timeline scroll bar to display data for a specific month/year. Additionally, you can tailor the graph by selecting or deselecting checkboxes for Created, Closed, Merged, and Open PRs/Issues, allowing you to focus on the trends that are most relevant to you."
+              },
+              {
+                question: "📥 How to download reports?",
+                answer: "After selecting your preferred data using the View More option, you can download reports based on the filtered data for further analysis or record-keeping. Simply click the download button to export the data in your chosen format."
+              }
+            ]}
+          />
 
-          <Box
-            pl={4}
-            bg={useColorModeValue("blue.50", "gray.700")}
-            borderRadius="md"
-            pr="8px"
-            marginBottom={2}
-          >
-            <Flex justify="space-between" align="center">
-              <Heading
-                as="h3"
-                size="lg"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                Analytics FAQ
-              </Heading>
-              <Box
-                bg="blue" // Gray background
-                borderRadius="md" // Rounded corners
-                padding={2} // Padding inside the box
-              >
-                <IconButton
-                  onClick={toggleCollapse}
-                  icon={
-                    show ? (
-                      <ChevronUpIcon boxSize={8} color="white" />
-                    ) : (
-                      <ChevronDownIcon boxSize={8} color="white" />
-                    )
-                  }
-                  variant="ghost"
-                  h="24px" // Smaller height
-                  w="20px"
-                  aria-label="Toggle Instructions"
-                  _hover={{ bg: "blue" }} // Maintain background color on hover
-                  _active={{ bg: "blue" }} // Maintain background color when active
-                  _focus={{ boxShadow: "none" }} // Remove focus outline
-                />
-              </Box>
-            </Flex>
-
-            <Collapse in={show}>
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                What does this tool do?
-              </Heading>
-              <Text
-                fontSize="md"
-                marginBottom={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                This tool aims to automate the process of tracking PRs and
-                issues in GitHub repositories, providing visualizations and
-                reports to streamline project management. The default view
-                utilizes the timeline to observe trends in the number of
-                Created, Closed, Merged, and Open PRs/Issues at the end of each
-                month.
-              </Text>
-
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                How can I view data for a specific month?
-              </Heading>
-              <Text
-                fontSize="md"
-                marginBottom={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                To focus on a specific month, click the View More button and
-                choose the desired Year and Month from the dropdown menus. The
-                table and graph will then update to display data exclusively for
-                that selected month.
-              </Text>
-
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                How to customize the chart?
-              </Heading>
-              <Text
-                fontSize="md"
-                marginBottom={2}
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                To customize the chart, you can adjust the timeline scroll bar
-                to display data for a specific month/year. Additionally, you can
-                tailor the graph by selecting or deselecting checkboxes for
-                Created, Closed, Merged, and Open PRs/Issues, allowing you to
-                focus on the trends that are most relevant to you.
-              </Text>
-
-              <Heading
-                as="h4"
-                size="md"
-                marginBottom={4}
-                color={useColorModeValue("#3182CE", "blue.300")}
-              >
-                How to download reports?
-              </Heading>
-              <Text
-                fontSize="md"
-                color={useColorModeValue("gray.800", "gray.200")}
-                className="text-justify"
-              >
-                After selecting your preferred data using the View More option,
-                you can download reports based on the filtered data for further
-                analysis or record-keeping. Simply click the download button to
-                export the data in your chosen format.
-              </Text>
-              <br />
-            </Collapse>
-
-            {/* {!show && (
-        <Flex justify="center" align="center" marginTop={4}>
-          <Text color={useColorModeValue("#3182CE", "blue.300")} cursor="pointer" onClick={toggleCollapse}>
-            View Instructions
-          </Text>
-          <ChevronDownIcon color={useColorModeValue("#3182CE", "blue.300")} />
-        </Flex>
-      )} */}
+          {/* EtherWorld Advertisement */}
+          <Box my={5}>
+            <CloseableAdCard />
           </Box>
-          <br/>
-          {/* <Box>
-              <ERCsPRChart/>
-          </Box> */}
 
-          <Flex justify="center" mb={4}>
+          <Flex justify="center" mb={4} gap={4}>
             <Button
               colorScheme="blue"
               onClick={() => setActiveTab("PRs")}
               isActive={activeTab === "PRs"}
-              mr={4}
+              variant={activeTab === "PRs" ? "solid" : "outline"}
+              fontWeight="semibold"
+              px={8}
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+              transition="all 0.2s"
             >
               PRs
             </Button>
@@ -1645,6 +1705,11 @@ const GitHubPRTracker: React.FC = () => {
               colorScheme="blue"
               onClick={() => setActiveTab("Issues")}
               isActive={activeTab === "Issues"}
+              variant={activeTab === "Issues" ? "solid" : "outline"}
+              fontWeight="semibold"
+              px={8}
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+              transition="all 0.2s"
             >
               Issues
             </Button>
@@ -1652,20 +1717,24 @@ const GitHubPRTracker: React.FC = () => {
 
           <Box
             bgColor={bg}
-            padding="1rem"
-            borderRadius="0.55rem"
-            // _hover={{
-            //   border: "1px",
-            //   borderColor: "#30A0E0",
-            // }}
+            padding={{ base: "1rem", md: "1.5rem" }}
+            borderRadius="lg"
+            boxShadow="lg"
+            borderWidth="1px"
+            borderColor={useColorModeValue('gray.200', 'gray.600')}
+            transition="all 0.3s"
+            _hover={{
+              boxShadow: "xl",
+              transform: "translateY(-2px)",
+            }}
           >
-            <Box id="GithubAnalytics" borderRadius={"0.55rem"}>
+            <Box id="GithubAnalytics" borderRadius={"lg"} bg={useColorModeValue('white', 'gray.800')} p={{ base: 3, md: 4 }}>
               <Flex
                 justifyContent="space-between"
                 alignItems="center"
                 marginBottom="0.5rem"
               >
-                <Heading size="md" color="black">
+                <Heading size="md" color={useColorModeValue('gray.800', 'white')} fontWeight="bold">
                   {`Github PR Analytics (Monthly, since 2015)`}
                   <CopyLink
                     link={`https://eipsinsight.com//Analytics#GithubAnalytics`}
@@ -1674,6 +1743,8 @@ const GitHubPRTracker: React.FC = () => {
                 {/* Assuming a download option exists for the yearly data as well */}
                 <Button
                   colorScheme="blue"
+                  variant="solid"
+                  leftIcon={<DownloadIcon />}
                   onClick={async () => {
                     try {
                       // Trigger the CSV conversion and download
@@ -1689,7 +1760,9 @@ const GitHubPRTracker: React.FC = () => {
                     }
                   }}
                   disabled={loading3}
-                  fontSize={{ base: "0.6rem", md: "md" }} // Adjusts font size for small screens (base) and larger screens (md)
+                  fontSize={{ base: "0.6rem", md: "md" }}
+                  _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                  transition="all 0.2s"
                 >
                   {loading3 ? <Spinner size="sm" /> : "Download CSV"}
                 </Button>
@@ -1702,6 +1775,9 @@ const GitHubPRTracker: React.FC = () => {
                     colorScheme="blue"
                     size="md"
                     width="200px"
+                    fontWeight="semibold"
+                    _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                    transition="all 0.2s"
                   >
                     {selectedRepo || "Select an option"}
                   </MenuButton>
@@ -1747,7 +1823,7 @@ const GitHubPRTracker: React.FC = () => {
               </Box>
               <br />
 
-              <Flex justify="center" ml={3} mb={8}>
+              <Flex justify="center" ml={3} mb={8} flexWrap="wrap" gap={2}>
                 <Checkbox
                   isChecked={showCategory.created}
                   onChange={() =>
@@ -1756,10 +1832,10 @@ const GitHubPRTracker: React.FC = () => {
                       created: !prev.created,
                     }))
                   }
-                  color="black"
-                  borderColor="black"
+                  colorScheme="blue"
                   mr={3}
                   fontSize={{ base: "xs", md: "sm" }}
+                  fontWeight="medium"
                 >
                   {activeTab === "PRs" ? "Created PRs" : "Created Issues"}
                 </Checkbox>
@@ -1769,10 +1845,10 @@ const GitHubPRTracker: React.FC = () => {
                   onChange={() =>
                     setShowCategory((prev) => ({ ...prev, open: !prev.open }))
                   }
-                  color="black"
-                  borderColor="black"
+                  colorScheme="purple"
                   mr={3}
                   fontSize={{ base: "xs", md: "sm" }}
+                  fontWeight="medium"
                 >
                   Open PRs
                 </Checkbox>
@@ -1785,10 +1861,10 @@ const GitHubPRTracker: React.FC = () => {
                       closed: !prev.closed,
                     }))
                   }
-                  color="black"
-                  borderColor="black"
+                  colorScheme="red"
                   mr={3}
                   fontSize={{ base: "xs", md: "sm" }}
+                  fontWeight="medium"
                 >
                   {activeTab === "PRs" ? "Closed PRs" : "Closed Issues"}
                 </Checkbox>
@@ -1801,10 +1877,10 @@ const GitHubPRTracker: React.FC = () => {
                         merged: !prev.merged,
                       }))
                     }
-                    color="black"
-                    borderColor="black"
+                    colorScheme="green"
                     mr={3}
                     fontSize={{ base: "xs", md: "sm" }}
+                    fontWeight="medium"
                   >
                     Merged PRs
                   </Checkbox>
@@ -1820,9 +1896,21 @@ const GitHubPRTracker: React.FC = () => {
             <PRAnalyticsCard/>
           </Box>
 
+                    <Box my={12}>
+            <PlaceYourAdCard />
+          </Box>
+
   <br />
           <Flex justify="center" mb={8}>
-            <Button colorScheme="blue" onClick={toggleDropdown}>
+            <Button 
+              colorScheme="blue" 
+              onClick={toggleDropdown}
+              size="lg"
+              fontWeight="semibold"
+              px={8}
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+              transition="all 0.2s"
+            >
               {showDropdown ? "Hide" : "View More"}
             </Button>
           </Flex>

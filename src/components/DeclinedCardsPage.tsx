@@ -1,4 +1,17 @@
-import { SimpleGrid, Box } from "@chakra-ui/react";
+import { 
+  SimpleGrid, 
+  Box, 
+  Button, 
+  VStack, 
+  Text, 
+  useColorModeValue,
+  Collapse,
+  Flex,
+  Badge,
+  Divider
+} from "@chakra-ui/react";
+import { useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import DeclinedEIPCard from "./DeclinedForInclusion";
 import Header from "@/components/Header";
 
@@ -260,25 +273,159 @@ export default function DeclinedEIPListPage({
   fusaka = defaultFusaka,
   glamsterdam = defaultGlamsterdam
 }: DeclinedEIPListPageProps) {
-
+  const [showAll, setShowAll] = useState(false);
+  
   const data = selectedUpgrade === 'fusaka' ? fusaka : glamsterdam;
   const upgradeLabel = selectedUpgrade === 'fusaka' ? 'Fusaka' : 'Glamsterdam';
+  
+  // Color mode values
+  const sectionBg = useColorModeValue("gray.50", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const textColor = useColorModeValue("gray.700", "gray.300");
+  
+  // Configure initial display count
+  const INITIAL_COUNT = 6;
+  const displayedData = showAll ? data : data.slice(0, INITIAL_COUNT);
+  const hasMoreItems = data.length > INITIAL_COUNT;
 
   if (!data.length) return null;
 
   return (
-    <Box id="dfi" mt={12}>
-      <Header
-        title={`Declined for Inclusion (${upgradeLabel}) - [${data.length}]`}
-        subtitle="Overview"
-        description={`EIPs considered for ${upgradeLabel} but not included. They may be reconsidered in later upgrades.`}
-        sectionId="dfi"
-      />
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} spacing={4}>
-        {data.map(eip => (
-          <DeclinedEIPCard key={eip.id} eip={eip} />
-        ))}
-      </SimpleGrid>
+    <Box 
+      id="dfi" 
+      bg={useColorModeValue('white', 'gray.900')} 
+      borderRadius="2xl" 
+      boxShadow="xl"
+      border="1px solid"
+      borderColor={useColorModeValue('gray.200', 'gray.700')}
+      overflow="hidden"
+      mt={8}
+    >
+      {/* Professional Header Section */}
+      <Box 
+        bg={useColorModeValue('gray.50', 'gray.800')} 
+        px={8} 
+        py={6} 
+        borderBottom="1px solid"
+        borderColor={useColorModeValue('gray.200', 'gray.700')}
+      >
+        <VStack spacing={4} align="start">
+          <Flex align="center" gap={4} wrap="wrap">
+            <Text 
+              fontSize={{ base: "xl", md: "2xl" }} 
+              fontWeight="700" 
+              color={useColorModeValue('gray.900', 'white')}
+              fontFamily="system-ui, -apple-system, sans-serif"
+            >
+              Declined for Inclusion
+            </Text>
+            <Badge 
+              colorScheme="red" 
+              variant="solid" 
+              px={3} 
+              py={1} 
+              borderRadius="full"
+              fontSize="sm"
+              fontWeight="600"
+              textTransform="uppercase"
+              letterSpacing="0.5px"
+            >
+              {upgradeLabel}
+            </Badge>
+            <Badge 
+              bg={useColorModeValue('gray.100', 'gray.700')}
+              color={useColorModeValue('gray.700', 'gray.300')}
+              px={3} 
+              py={1} 
+              borderRadius="full"
+              fontSize="sm"
+              fontWeight="600"
+            >
+              {data.length} EIP{data.length !== 1 ? 's' : ''}
+            </Badge>
+          </Flex>
+          
+          <Text 
+            fontSize="md" 
+            color={useColorModeValue('gray.600', 'gray.400')} 
+            maxW="700px"
+            lineHeight="1.6"
+            fontWeight="400"
+          >
+            EIPs considered for {upgradeLabel} but not included in the upgrade. 
+            These proposals may be reconsidered in future upgrades.
+          </Text>
+        </VStack>
+      </Box>
+
+      {/* Professional Content Section */}
+      <Box px={8} py={6}>
+        <SimpleGrid 
+          columns={{ base: 1, md: 2, lg: 3 }} 
+          spacing={6}
+          mb={hasMoreItems ? 6 : 0}
+        >
+          {displayedData.map(eip => (
+            <DeclinedEIPCard key={eip.id} eip={eip} />
+          ))}
+        </SimpleGrid>
+
+        {/* Enhanced Show More/Less Button */}
+        {hasMoreItems && (
+          <Flex justify="center" mt={6}>
+            <Button
+              variant="outline"
+              colorScheme="blue"
+              size="md"
+              onClick={() => setShowAll(!showAll)}
+              leftIcon={showAll ? <ChevronUpIcon /> : <ChevronDownIcon />}
+              px={6}
+              py={3}
+              borderRadius="full"
+              fontWeight="600"
+              _hover={{
+                bg: useColorModeValue("blue.50", "blue.900"),
+                transform: "translateY(-2px)",
+                boxShadow: "lg"
+              }}
+              _active={{
+                transform: "translateY(0px)"
+              }}
+              transition="all 0.3s ease"
+              boxShadow="md"
+            >
+              {showAll 
+                ? `Show Less` 
+                : `Show ${data.length - INITIAL_COUNT} More EIPs`
+              }
+            </Button>
+          </Flex>
+        )}
+      </Box>
+
+      {/* Professional Footer */}
+      <Box 
+        bg={useColorModeValue('gray.50', 'gray.800')} 
+        px={8} 
+        py={4}
+        borderTop="1px solid"
+        borderColor={useColorModeValue('gray.200', 'gray.700')}
+      >
+        <Flex 
+          justify="space-between" 
+          align="center"
+          fontSize="sm"
+          color={useColorModeValue('gray.600', 'gray.400')}
+          fontWeight="500"
+        >
+          <Text>
+            Showing {displayedData.length} of {data.length} declined EIPs
+          </Text>
+          <Text>
+            Updated for {upgradeLabel} upgrade
+          </Text>
+        </Flex>
+      </Box>
     </Box>
   );
 }

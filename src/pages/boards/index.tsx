@@ -19,6 +19,7 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import axios from "axios";
 import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
@@ -585,6 +586,11 @@ const DashboardPage = () => {
               Download Reports
             </Button>
           </Flex>
+
+          {/* EtherWorld Advertisement */}
+          <Box my={6} mx={4}>
+            <CloseableAdCard />
+          </Box>
 
           {/* Scrollable Table */}
           <TableContainer

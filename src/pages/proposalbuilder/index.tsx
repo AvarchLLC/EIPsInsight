@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import AllLayout from "@/components/Layout";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import {
   Box,
   Spinner,
@@ -45,6 +46,12 @@ useScrollSpy([
         paddingX={{ lg: "10", md: "5", sm: "5", base: "5" }}
         marginTop={{ lg: "10", md: "5", sm: "5", base: "5" }}
         >
+        
+          {/* EtherWorld Advertisement */}
+          <Box mb={4} width="100%">
+            <CloseableAdCard />
+          </Box>
+          
           <ProposalEditor/>
         </Box>
         </motion.div>

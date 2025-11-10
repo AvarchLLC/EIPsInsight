@@ -181,6 +181,11 @@ const originalData = [
   'EIP-7912',
   'EIP-7919'
 ], considered: [] , proposed: []},
+  { date: '2025-09-16', 
+    included: [], 
+    scheduled: ['EIP-7594', 'EIP-7642', 'EIP-7823', 'EIP-7825', 'EIP-7883', 'EIP-7892', 'EIP-7910', 'EIP-7917', 'EIP-7918', 'EIP-7934', 'EIP-7935', 'EIP-7939', 'EIP-7951'], 
+    declined: [], considered: [] , proposed: []},
+    
 ];
 
 const glamsterDamData = [
@@ -258,7 +263,132 @@ proposed: [
   'EIP-7791',
   'EIP-7903',
   'EIP-7907',
-  'EIP-7923'
+  'EIP-7923',
+  'EIP-7997'
+]
+
+  },
+      {
+    date: '2025-08-27',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+proposed: [
+  'EIP-2926',
+  'EIP-6873',
+  'EIP-7667',
+  'EIP-7793',
+  'EIP-7819',
+  'EIP-7843',
+  'EIP-7919',
+  'EIP-5920',
+  'EIP-7791',
+  'EIP-7903',
+  'EIP-7907',
+  'EIP-7923',
+  'EIP-7932',
+  'EIP-7979',
+  'EIP-7980',
+  'EIP-7981',
+  'EIP-7997',
+  'EIP-7999'
+]
+
+  },
+        {
+    date: '2025-09-04',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+proposed: [
+  'EIP-2926',
+  'EIP-6873',
+  'EIP-7667',
+  'EIP-7793',
+  'EIP-7819',
+  'EIP-7843',
+  'EIP-7919',
+  'EIP-5920',
+  'EIP-7791',
+  'EIP-7903',
+  'EIP-7907',
+  'EIP-7923',
+  'EIP-7932',
+    'EIP-7979',
+  'EIP-7980',
+  'EIP-7981',
+  'EIP-7997',
+  'EIP-7999',
+  'EIP-7778',
+  'EIP-7976',
+  'EIP-7688',
+]
+
+  },
+          {
+    date: '2025-09-12',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+proposed: [
+  'EIP-2926',
+  'EIP-6873',
+  'EIP-7667',
+  'EIP-7793',
+  'EIP-7819',
+  'EIP-7843',
+  'EIP-7919',
+  'EIP-5920',
+  'EIP-7791',
+  'EIP-7903',
+  'EIP-7907',
+  'EIP-7923',
+  'EIP-7932',
+    'EIP-7979',
+  'EIP-7980',
+  'EIP-7981',
+  'EIP-7997',
+  'EIP-7999',
+  'EIP-7778',
+  'EIP-7976',
+  'EIP-7688',
+  'EIP-2780',
+]
+
+  },
+            {
+    date: '2025-09-24',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+proposed: [
+  'EIP-2926',
+  'EIP-6873',
+  'EIP-7667',
+  'EIP-7793',
+  'EIP-7819',
+  'EIP-7843',
+  'EIP-7919',
+  'EIP-5920',
+  'EIP-7791',
+  'EIP-7903',
+  'EIP-7907',
+  'EIP-7923',
+  'EIP-7932',
+    'EIP-7979',
+  'EIP-7980',
+  'EIP-7981',
+  'EIP-7997',
+  'EIP-7999',
+  'EIP-7778',
+  'EIP-7976',
+  'EIP-7688',
+  'EIP-2780',
+  'EIP-7610'
 ]
 
   },

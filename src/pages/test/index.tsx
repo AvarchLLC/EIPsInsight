@@ -1,12 +1,9 @@
-import PRAnalyticsCard from '@/components/PrLabels';
-import TrendingEips from '@/components/TrendingEips';
-import AllLayout from "@/components/Layout";
-export default function HomePage() {
+"use client";
+
+import SlotCountdown from "@/components/OldSlotCountdown";
+
+export default function TestClientError() {
   return (
-<>
-<AllLayout>
-  <PRAnalyticsCard/>
-  </AllLayout>
-</>
+<SlotCountdown/>
   );
 }

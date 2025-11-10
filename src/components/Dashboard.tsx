@@ -67,6 +67,10 @@ import FeedbackWidget from "./FeedbackWidget";
 import { Clients } from "./Clients";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import TwitterTimeline from "./TwitterTimeline";
+import CloseableAdCard from "./CloseableAdCard";
+import FusakaCountdownBadge from "./FusakaCountdownBadge";
+import SupportedBy from "./SupportedBy";
+
 
 interface EIP {
   _id: string;
@@ -256,6 +260,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
   return (
     <>
       <FeedbackWidget />
+      
   <Box px={{ base: 3, md: 5, lg: 8 }} py={{ base: 3, md: 4, lg: 6 }}>
     {isLoading ? (
       <Flex justify="center" align="center" minH="70vh">
@@ -281,19 +286,29 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
             >
               <Box
                 id={"hero"}
-pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
+                pt={{ base: 4, lg: 6 }} 
+                pb={{ base: 8, lg: 10 }}
+                bg={useColorModeValue("white", "gray.800")}
+                borderRadius="xl"
+                boxShadow="sm"
+                border="1px solid"
+                borderColor={useColorModeValue("gray.200", "gray.700")}
+                mb={8}
+                px={6}
               >
                 <div className="lg:block hidden">
                   <Box
                     display={{ lg: "grid" }}
-                    gridTemplateColumns={{ lg: "2fr 1fr" }}
+                    gridTemplateColumns={{ lg: "1.5fr 1fr" }}
+                    gap={{ lg: 8 }}
+                    alignItems="center"
                   >
-                    <Stack direction={"column"}>
+                    <Stack direction={"column"} spacing={6}>
                       <Box
                         borderRadius="md"
                         padding={2}
                         paddingLeft="4"
-                        maxWidth="500px"
+                        maxWidth="550px"
                       >
                         <Text
                           color={useColorModeValue(
@@ -313,13 +328,24 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
                             base: "xl",
                           }}
                           lineHeight="1.1"
+                          mb={4}
                         >
                           Ethereum <br /> Improvement <br /> Proposal <br />{" "}
                           Insight
                         </Text>
+                        
+                        {/* Add a subtle description */}
+                        <Text
+                          color={useColorModeValue("gray.600", "gray.300")}
+                          fontSize={{ lg: "lg", md: "md", base: "sm" }}
+                          lineHeight="1.5"
+                          maxWidth="450px"
+                        >
+                          Track proposal progress, explore EIP insights, and stay updated with the latest Ethereum improvements.
+                        </Text>
                       </Box>
 
-                      <Stack direction={"row"} spacing={"4"} mt={4}>
+                      <Stack direction={"row"} spacing={"4"} flexWrap="wrap" alignItems="center">
                         <Box>
                           <NextLink href={"/home#1"}>
                             <Button
@@ -420,11 +446,33 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
                             </Button>
                           </NextLink>
                         </Box>
+
+                        {/* Fusaka Countdown Badge */}
+                        <Box>
+                          <FusakaCountdownBadge variant="compact" />
+                        </Box>
                       </Stack>
                     </Stack>
-                    {/* <BoyGirl2/> */}
-                    <BoyGirl3 />
-                    {/* <AllChart type="Total" /> */}
+                    
+                    {/* Right column - centered image */}
+                    <Box display="flex" justifyContent="center" alignItems="center">
+                      <Box
+                        position="relative"
+                        _hover={{ transform: "scale(1.02)" }}
+                        transition="transform 0.3s ease"
+                      >
+                        <BoyGirl3 />
+                      </Box>
+                    </Box>
+                  </Box>
+                  
+                  {/* EtherWorld Advertisement */}
+                  <Box
+                    mt={{ base: 6, lg: 8 }}
+                    mb={{ base: 4, lg: 6 }}
+                    px={{ base: 4, md: 6, lg: 8 }}
+                  >
+                    <CloseableAdCard />
                   </Box>
                   
                   <Box
@@ -527,6 +575,11 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
 
                   </Stack>
                   
+                  {/* Fusaka Countdown Badge - Mobile */}
+                  <Box mt={6} display="flex" justifyContent="center">
+                    <FusakaCountdownBadge variant="detailed" />
+                  </Box>
+                  
                   <div className="mt-6">
                     <AllChart type="Total" dataset={data} />
                   </div>
@@ -544,13 +597,46 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
                   <SearchBox />
                 </Box>
               </Box>
-              <div className="mt-3">
+              
+              {/* Tools Section */}
+              <Box
+                mt={6}
+                bg={useColorModeValue("white", "gray.800")}
+                borderRadius="xl"
+                boxShadow="sm"
+                border="1px solid"
+                borderColor={useColorModeValue("gray.200", "gray.700")}
+                p={6}
+                mb={6}
+              >
                 <ToolsSection />
-              </div>
-              <div className="mt-4">
+              </Box>
+              
+              {/* Clients Section */}
+              <Box
+                bg={useColorModeValue("white", "gray.800")}
+                borderRadius="xl"
+                boxShadow="sm"
+                border="1px solid"
+                borderColor={useColorModeValue("gray.200", "gray.700")}
+                p={6}
+                mb={8}
+              >
                 <Clients />
-              </div>
-<div className="py-6 lg:py-8" id="what">
+              </Box>
+
+{/* What is EIPsInsight Section */}
+<Box 
+  py={8} 
+  id="what"
+  bg={useColorModeValue("white", "gray.800")}
+  borderRadius="xl"
+  boxShadow="sm"
+  border="1px solid"
+  borderColor={useColorModeValue("gray.200", "gray.700")}
+  mb={8}
+  px={6}
+>
   <Header
     title="What is EIPsInsight?"
     subtitle="Overview"
@@ -612,11 +698,22 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
       </div>
     </div>
   </Box>
-</div>
+</Box>
 
             </motion.div>
             
-            <div className="py-6" id="statuschanges">
+            {/* Status Changes Section */}
+            <Box 
+              py={8} 
+              id="statuschanges"
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              mb={8}
+              px={6}
+            >
               <Box>
                 <Header
                   title="EIP Status Changes by Year"
@@ -628,8 +725,20 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
               <Box paddingTop={3} paddingBottom={3}>
                 <TypeGraphs />
               </Box>
-            </div>
-            <Box id="dashboard" sx={{ scrollMarginTop: "100px" }}>
+            </Box>
+            
+            {/* Dashboard Section */}
+            <Box 
+              id="dashboard" 
+              sx={{ scrollMarginTop: "100px" }}
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              p={6}
+              mb={8}
+            >
               <Box
                 // bg="rgba(0, 0, 0, 0.5)"
                 borderRadius="md" // Rounded corners
@@ -970,10 +1079,22 @@ pt={{ base: 4, lg: 6 }} pb={{ base: 4, lg: 5 }}
               </Box>
             </Box>
             
-            {/* Latest Tweets Section */}
-            <Box id="latest-updates">
+            {/* Latest Updates Section */}
+            <Box 
+              id="latest-updates"
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              p={6}
+              mb={8}
+            >
               <TwitterTimeline />
             </Box>
+            
+            {/* Supported By Section */}
+            <SupportedBy />
             
           </motion.div>
         )}

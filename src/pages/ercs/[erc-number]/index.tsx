@@ -6,6 +6,7 @@ import AllLayout from "@/components/Layout";
 import NLink from "next/link";
 import { motion } from "framer-motion";
 import React from "react";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import SearchBox from "@/components/SearchBox";
 import {
@@ -540,6 +541,11 @@ const TestComponent = () => {
                   </Box>
                 </motion.div>
               )}
+
+              {/* EtherWorld Advertisement */}
+              <Box my={6}>
+                <CloseableAdCard />
+              </Box>
 
               <Container maxW="1200px" mx="auto">
                 <motion.div

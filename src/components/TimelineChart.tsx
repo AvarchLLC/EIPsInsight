@@ -10,7 +10,6 @@ import { saveAs } from 'file-saver';
 import Link from "next/link";
 import DateTime from './DateTime';
 
-// Add 'proposed' to StatusType
 type StatusType = 'included' | 'scheduled' | 'declined' | 'considered' | 'proposed';
 
 interface EIPData {
@@ -19,36 +18,38 @@ interface EIPData {
   scheduled: string[];
   declined: string[];
   considered: string[];
-  proposed: string[]; // Added field
+  proposed: string[];
 }
 
 
 const COLOR_SCHEME: Record<StatusType, string> = {
   included: '#48BB78',
-  scheduled: '#4299E1',
+  scheduled: '#4299E1', 
   considered: '#F6AD55',
   declined: '#F56565',
-  proposed: '#9F7AEA', // Purple-ish for 'proposed'
+  proposed: '#9F7AEA',
 };
 
 const LEGEND_LABELS: Record<StatusType, string> = {
   included: 'INCLUDED',
   scheduled: 'SFI',
-  considered: 'CFI',
+  considered: 'CFI', 
   declined: 'DFI',
-  proposed: 'PFI', // Proposed-for-inclusion
+  proposed: 'PFI',
 };
+
+
 
 
 interface Props {
   data: EIPData[];
-  selectedOption: 'pectra' | 'fusaka' | 'glamsterdam'; // Updated to include glamsterdam
+  selectedOption: 'pectra' | 'fusaka' | 'glamsterdam';
 }
 
 const cubeSize = 24;
 const blockHeight = cubeSize;
 const blockWidth = cubeSize * 2;
-const padding = 2;
+const padding = 80; // Increased padding to make room for date labels
 const rowHeight = cubeSize + 12;
 
 const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
@@ -56,19 +57,18 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  // Add `date` to hoveredEip!
   const [hoveredEip, setHoveredEip] = useState<{
-  eip: string;
-  type: StatusType;
-  date: string;
-  statusCounts: {
-    included: number;
-    scheduled: number;
-    considered: number;
-    declined: number;
-    proposed?: number; // Optional for proposed
-  };
-} | null>(null);
+    eip: string;
+    type: StatusType;
+    date: string;
+    statusCounts: {
+      included: number;
+      scheduled: number;
+      considered: number;
+      declined: number;
+      proposed: number;
+    };
+  } | null>(null);
 
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const dragStart = useRef({ x: 0, y: 0 });
@@ -77,7 +77,7 @@ const TimelineVisxChart: React.FC<Props> = ({ data, selectedOption }) => {
   const maxVisibleRows = 15;
   const visibleData = [...dataToRender].reverse().slice(scrollIndex, scrollIndex + maxVisibleRows);
 
-const MIN_ITEMS_DISPLAYED = 7; // Tune this!
+const MIN_ITEMS_DISPLAYED = 7;
 const maxItems = Math.max(
   MIN_ITEMS_DISPLAYED,
   ...dataToRender.map(
@@ -118,7 +118,7 @@ const maxItems = Math.max(
     if (status.toLowerCase() === 'scheduled') return 'SFI'
     if (status.toLowerCase() === 'considered') return 'CFI'
     if (status.toLowerCase() === 'declined') return 'DFI'
-    if (status.toLowerCase() === 'proposed') return 'PFI' // For proposed
+    if (status.toLowerCase() === 'proposed') return 'PFI'
     return status;
   }
 
@@ -170,13 +170,7 @@ const linkHref =
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
       <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
         <Heading size="md" color={headingColor}>
-          Network Upgrade Inclusion Stages (
-          <Link href={linkHref}>
-            <Text as="span" color="blue.400" fontWeight="bold">
-              {selectedOption.toUpperCase()}
-            </Text>
-          </Link>
-          )
+          Network Upgrade Inclusion Stages
         </Heading>
         <HStack>
           <IconButton aria-label="Zoom In" icon={<AddIcon />} size="sm" onClick={() => setZoomLevel(z => z * 1.2)} />
@@ -222,37 +216,26 @@ const linkHref =
 
               return (
                 <Group key={rowIndex} top={rowIndex * rowHeight}>
-                  <text
-                    x={0}
-                    y={blockHeight / 1.5}
-                    fontSize={16}
-                    fontWeight="bold"
-                    fill="gray"
-                    vectorEffect="non-scaling-stroke"
-                  >
-                    {item.date}
-                  </text>
-
                   <Group left={80}>
                     {allEips.map((d, i) => {
                       const eipNum = d.eip.replace(/EIP-/, '');
                       return (
                         <a key={i} href={`/eips/eip-${eipNum}`} target="_blank" rel="noopener noreferrer">
                           <g
-onMouseEnter={(e) => {
-  setHoveredEip({
-    ...d,
-    date: item.date,
-    statusCounts: {
-      included: item.included?.length || 0,
-      scheduled: item.scheduled?.length || 0,
-      considered: item.considered?.length || 0,
-      declined: item.declined?.length || 0,
-      proposed: item.proposed?.length || 0, // Optional for proposed
-    },
-  });
-  setTooltipPos({ x: e.clientX, y: e.clientY });
-}}
+                            onMouseEnter={(e) => {
+                              setHoveredEip({
+                                ...d,
+                                date: item.date,
+                                statusCounts: {
+                                  included: item.included?.length || 0,
+                                  scheduled: item.scheduled?.length || 0,
+                                  considered: item.considered?.length || 0,
+                                  declined: item.declined?.length || 0,
+                                  proposed: item.proposed?.length || 0,
+                                },
+                              });
+                              setTooltipPos({ x: e.clientX, y: e.clientY });
+                            }}
 
                             onMouseLeave={() => setHoveredEip(null)}
                           >
@@ -283,6 +266,26 @@ onMouseEnter={(e) => {
                 </Group>
               );
             })}
+            {/* Y-Axis Labels: Dates */}
+            {visibleData.map((item, rowIndex) => {
+              const yPos = rowIndex * rowHeight + blockHeight / 1.5;
+              return (
+                <g key={`ylabel-${rowIndex}`}>
+                  <text
+                    x={0}
+                    y={yPos}
+                    fontSize={12}
+                    fontWeight="600"
+                    fill="#40E0D0"
+                    textAnchor="start"
+                    vectorEffect="non-scaling-stroke"
+                  >
+                    {item.date}
+                  </text>
+                </g>
+              );
+            })}
+
           </Group>
         </svg>
       </Flex>
@@ -325,14 +328,13 @@ onMouseEnter={(e) => {
       <Text fontSize="sm" color="red.200">
         DFI: {hoveredEip.statusCounts.declined}
       </Text>
-      {hoveredEip.statusCounts.proposed !== undefined && (
-        <Text fontSize="sm" color="purple.200">
-          PFI: {hoveredEip.statusCounts.proposed}
-        </Text>
-      )}
+      <Text fontSize="sm" color="purple.200">
+        PFI: {hoveredEip.statusCounts.proposed}
+      </Text>
     </Box>
   </Box>
 )}
+
 
 
       <DateTime />
