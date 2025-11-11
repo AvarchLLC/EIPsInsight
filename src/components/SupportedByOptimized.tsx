@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Text,
@@ -7,16 +7,22 @@ import {
   Link,
   Button,
   Icon,
-  Flex,
 } from '@chakra-ui/react';
 import { FiHeart } from 'react-icons/fi';
-import CopyLink from './CopyLink';
+import Header from './Header';
+import {
+  useGifHover,
+  useInfiniteScroll,
+  useResponsiveCardSize,
+  usePrefersReducedMotion,
+} from '@/hooks/useSupportedByGallery';
 
+// Supporter data
 const supportersData = [
   {
     id: 'etherworld',
     name: 'EtherWorld',
-    staticUrl: '/EtherWorld-gif.gif#static', // Suffix helps browser cache separately
+    staticUrl: '/EtherWorld-gif.gif#static',
     gifUrl: '/EtherWorld-gif.gif',
     url: 'https://etherworld.co/',
   },
@@ -44,61 +50,48 @@ const supportersData = [
 ];
 
 // Individual supporter card component
-const SupporterCard = ({ supporter }: { 
+const SupporterCard = ({ 
+  supporter, 
+  onHoverChange 
+}: { 
   supporter: typeof supportersData[0]; 
+  onHoverChange: (isHovered: boolean) => void;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [showGif, setShowGif] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const staticImgRef = useRef<HTMLImageElement>(null);
+  const {
+    isHovered,
+    showGif,
+    canvasRef,
+    imgRef,
+    handleMouseEnter,
+    handleMouseLeave,
+    getCurrentGifSrc,
+  } = useGifHover(supporter.staticUrl, supporter.gifUrl);
 
-  // Create static frame from GIF on mount
-  useEffect(() => {
-    const img = new window.Image();
-    img.crossOrigin = 'anonymous';
-    img.src = supporter.staticUrl.replace('#static', '');
-    
-    img.onload = () => {
-      if (canvasRef.current) {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-        }
-      }
-    };
-  }, [supporter.staticUrl]);
+  const cardSize = useResponsiveCardSize();
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const bgColor = useColorModeValue('white', 'gray.800');
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    setShowGif(true);
-    // Removed: onHoverChange(true) - no longer pausing gallery
+  const onMouseEnter = () => {
+    handleMouseEnter();
+    onHoverChange(true);
   };
 
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setShowGif(false);
-    // Removed: onHoverChange(false) - no longer pausing gallery
+  const onMouseLeave = () => {
+    handleMouseLeave();
+    onHoverChange(false);
   };
-
-  const borderColor = useColorModeValue('transparent', 'transparent');
-  const bgColor = useColorModeValue('transparent', 'transparent');
-  const tooltipBg = useColorModeValue('gray.800', 'gray.700');
 
   return (
     <Box
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       cursor="pointer"
       position="relative"
-      mx={6}
+      mx={4}
       flexShrink={0}
-      transition="transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+      transition="all 0.3s ease"
       _hover={{
-        transform: 'scale(1.08)',
+        transform: 'scale(1.05)',
       }}
     >
       <Link
@@ -109,20 +102,17 @@ const SupporterCard = ({ supporter }: {
       >
         <Box
           bg={bgColor}
-          borderRadius="lg"
-          border="1px solid"
+          borderRadius="xl"
+          border="2px solid"
           borderColor={borderColor}
           overflow="hidden"
-          boxShadow={isHovered ? '0 8px 30px rgba(0, 0, 0, 0.12)' : '0 2px 8px rgba(0, 0, 0, 0.04)'}
-          transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+          boxShadow={isHovered ? '2xl' : 'md'}
+          transition="all 0.3s ease"
           position="relative"
-          width={{ base: "180px", md: "220px", lg: "260px" }}
+          width={{ base: "200px", md: "240px", lg: "280px" }}
           height="auto"
-          _hover={{
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)',
-          }}
         >
-          {/* Canvas for static frame - shown when not hovering */}
+          {/* Canvas for static frame */}
           <canvas
             ref={canvasRef}
             style={{
@@ -130,8 +120,6 @@ const SupporterCard = ({ supporter }: {
               width: '100%',
               height: 'auto',
               objectFit: 'contain',
-              opacity: isHovered ? 0 : 1,
-              transition: 'opacity 0.3s ease',
             }}
           />
           
@@ -139,54 +127,36 @@ const SupporterCard = ({ supporter }: {
           {showGif && (
             <Image
               ref={imgRef}
-              src={supporter.gifUrl} // Removed cache busting to prevent reload glitch
+              src={getCurrentGifSrc()}
               alt={supporter.name}
               width="100%"
               height="auto"
               objectFit="contain"
               draggable={false}
               loading="eager"
-              style={{
-                opacity: isHovered ? 1 : 0,
-                transition: 'opacity 0.3s ease',
-              }}
             />
           )}
           
-          {/* Smooth tooltip overlay */}
+          {/* Hover indicator overlay */}
           <Box
             position="absolute"
             bottom="0"
-            left="50%"
-            transform={isHovered ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(10px)'}
-            bg={tooltipBg}
-            color="white"
+            left="0"
+            right="0"
+            bg="blackAlpha.700"
             py={2}
-            px={4}
-            borderRadius="md"
+            px={3}
             opacity={isHovered ? 1 : 0}
-            pointerEvents="none"
-            transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-            whiteSpace="nowrap"
-            fontSize="sm"
-            fontWeight="600"
-            boxShadow="lg"
-            zIndex={2}
-            mb={-10}
+            transition="opacity 0.3s ease"
           >
-            <Text textAlign="center">{supporter.name}</Text>
-            {/* Tooltip arrow */}
-            <Box
-              position="absolute"
-              top="-4px"
-              left="50%"
-              transform="translateX(-50%)"
-              width="0"
-              height="0"
-              borderLeft="6px solid transparent"
-              borderRight="6px solid transparent"
-              borderBottom={`6px solid ${tooltipBg}`}
-            />
+            <Text
+              fontSize="sm"
+              fontWeight="600"
+              color="white"
+              textAlign="center"
+            >
+              {supporter.name}
+            </Text>
           </Box>
         </Box>
       </Link>
@@ -194,14 +164,18 @@ const SupporterCard = ({ supporter }: {
   );
 };
 
-export default function SupportedBy() {
+export default function SupportedByOptimized() {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderCol = useColorModeValue('gray.200', 'gray.700');
-  const headingColor = useColorModeValue('gray.800', 'white');
-  const subtitleColor = useColorModeValue('gray.600', 'gray.400');
+  
+  const { isPaused, handleHoverChange } = useInfiniteScroll();
+  const prefersReducedMotion = usePrefersReducedMotion();
   
   // Duplicate the array to create seamless infinite scroll
   const duplicatedSupporters = [...supportersData, ...supportersData, ...supportersData];
+
+  // Disable animation if user prefers reduced motion
+  const animationDuration = prefersReducedMotion ? '0s' : '40s';
 
   return (
     <Box
@@ -212,8 +186,8 @@ export default function SupportedBy() {
       boxShadow="sm"
       border="1px solid"
       borderColor={borderCol}
-      p={{ base: 4, md: 6 }}
-      mb={4}
+      p={{ base: 6, md: 8 }}
+      mb={8}
       position="relative"
       overflow="hidden"
     >
@@ -223,57 +197,40 @@ export default function SupportedBy() {
         top="0"
         left="0"
         right="0"
-        height="3px"
+        height="4px"
         bgGradient="linear(90deg, #667eea 0%, #764ba2 50%, #0fdb8b 100%)"
-        opacity={0.6}
+        opacity={0.8}
       />
 
-      {/* Improved Header with Subtitle */}
-      <Box mb={4}>
-        <Flex alignItems="center" mb={3} gap={3} direction="row" textAlign="left" justifyContent="center">
-          <Text
-            fontSize={{ base: "2xl", md: "3xl" }}
-            fontWeight="700"
-            color={headingColor}
-            letterSpacing="-0.02em"
-          >
-            Supported by
-          </Text>
-          <Box alignSelf="center">
-            <CopyLink link="https://eipsinsight.com/#supported-by" />
-          </Box>
-        </Flex>
-        <Text
-          fontSize={{ base: "sm", md: "md" }}
-          color={subtitleColor}
-          fontWeight="500"
-          textAlign="center"
-        >
-          Proudly backed by leading organizations in the Ethereum ecosystem
-        </Text>
-      </Box>
+      {/* Header */}
+      <Header
+        title="Supported by"
+        subtitle=""
+        description=""
+        sectionId="supported-by"
+      />
 
       {/* Continuous Scrolling Gallery Container */}
       <Box
+        mt={6}
         position="relative"
         overflow="hidden"
         width="100%"
-        py={3}
+        py={4}
       >
-        {/* Scrolling Track - Always Running */}
+        {/* Scrolling Track */}
         <Box
           display="flex"
           alignItems="center"
           width="max-content"
           sx={{
-            animation: 'scroll 50s linear infinite',
-            willChange: 'transform',
+            animation: isPaused || prefersReducedMotion ? 'none' : `scroll ${animationDuration} linear infinite`,
             '@keyframes scroll': {
               '0%': {
                 transform: 'translateX(0)',
               },
               '100%': {
-                transform: 'translateX(-33.333%)', // Move by one set of 4 items
+                transform: 'translateX(-33.333%)',
               },
             },
           }}
@@ -282,17 +239,18 @@ export default function SupportedBy() {
             <SupporterCard
               key={`${supporter.id}-${index}`}
               supporter={supporter}
+              onHoverChange={handleHoverChange}
             />
           ))}
         </Box>
 
-        {/* Softer Gradient Overlays for Fade Effect */}
+        {/* Gradient Overlays for Fade Effect */}
         <Box
           position="absolute"
           top="0"
           left="0"
           bottom="0"
-          width="120px"
+          width="80px"
           bgGradient={`linear(to-r, ${cardBg}, transparent)`}
           pointerEvents="none"
           zIndex={1}
@@ -302,7 +260,7 @@ export default function SupportedBy() {
           top="0"
           right="0"
           bottom="0"
-          width="120px"
+          width="80px"
           bgGradient={`linear(to-l, ${cardBg}, transparent)`}
           pointerEvents="none"
           zIndex={1}
@@ -310,7 +268,7 @@ export default function SupportedBy() {
       </Box>
 
       {/* Support CTA */}
-      <Box mt={6} textAlign="center">
+      <Box mt={8} textAlign="center">
         <Link href="/donate" _hover={{ textDecoration: 'none' }}>
           <Button
             size="lg"

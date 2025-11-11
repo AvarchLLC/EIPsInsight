@@ -55,11 +55,11 @@ const TwitterTimeline: React.FC = () => {
   const socialLinks = [
     {
       name: 'EIPsInsight',
-      platform: 'LinkedIn',
-      url: 'https://www.linkedin.com/company/eipsinsight',
-      color: '#0077B5',
-      icon: FaLinkedin,
-      description: 'Professional network'
+      platform: 'X (Twitter)',
+      url: 'https://x.com/EIPsInsight',
+      color: '#000000',
+      icon: FaXTwitter,
+      description: 'Latest insights'
     },
     {
       name: 'EtherWorld',
@@ -86,9 +86,9 @@ const TwitterTimeline: React.FC = () => {
       description: 'Official website'
     },
     {
-      name: 'BlockAction',
+      name: 'TeamAvarch',
       platform: 'X (Twitter)',
-      url: 'https://x.com/blockaction_io', 
+      url: 'https://x.com/TeamAvarch', 
       color: '#000000',
       icon: FaXTwitter,
       description: 'Blockchain insights'
