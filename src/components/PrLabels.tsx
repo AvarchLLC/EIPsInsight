@@ -404,26 +404,35 @@ export default function PRAnalyticsCard() {
       // Filter only PRs from the latest month and apply selected label filter
       const filteredRows = combined
         .map((pr: any) => {
-          // Normalize the label to match what's shown in the graph
-          let normalizedLabel = pr.Label || "";
-          if (labelSet === "customLabels") {
-            normalizedLabel = normalizeCustomLabel(pr.Repo || repoKey, pr.Label || "");
-          } else if (labelSet === "githubLabels") {
-            normalizedLabel = normalizeGithubLabel(pr.Label || "");
+          // Get the actual label from the PR data
+          const actualLabel = pr.Label || "";
+          
+          // Only normalize for 'all' view to match the graph display
+          let displayLabel = actualLabel;
+          if (repoKey === "all") {
+            if (labelSet === "customLabels") {
+              displayLabel = normalizeCustomLabel(pr.Repo || repoKey, actualLabel);
+            } else if (labelSet === "githubLabels") {
+              displayLabel = normalizeGithubLabel(actualLabel);
+            }
           }
           
-          // Store the normalized label in the PR object for later use
+          // Store both actual and display label in the PR object
           return {
             ...pr,
-            DisplayLabel: normalizedLabel
+            ActualLabel: actualLabel,
+            DisplayLabel: displayLabel
           };
         })
         .filter((pr: any) => {
           const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
           if (mk !== latestMonthKey) return false;
 
-          // Check if this normalized label is in the selected labels
-          const passesFilter = selectedLabels.includes(pr.DisplayLabel);
+          // For 'all' view, check if the normalized DisplayLabel is in selectedLabels
+          // For individual repos, check if the ActualLabel is in selectedLabels
+          const passesFilter = repoKey === "all" 
+            ? selectedLabels.includes(pr.DisplayLabel)
+            : selectedLabels.includes(pr.ActualLabel);
 
           return passesFilter;
         });
@@ -431,13 +440,13 @@ export default function PRAnalyticsCard() {
       const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
 
       const csvData = filteredRows.map((pr: any) => {
-        // Use the same label that's shown in the graph (DisplayLabel)
-        const graphLabel = pr.DisplayLabel || "Misc";
+        // Use DisplayLabel which is normalized for 'all' view, or ActualLabel for individual repos
+        const csvLabel = pr.DisplayLabel || pr.ActualLabel || "Misc";
 
         return {
           Month: pr.Month || formatMonthLabel(pr.MonthKey),
           MonthKey: pr.MonthKey,
-          Label: graphLabel, // Show the same label as displayed in the graph
+          Label: csvLabel, // Show the label that matches what's displayed in the graph
           Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
           PRNumber: pr.PRNumber,
           PRLink: pr.PRLink,
