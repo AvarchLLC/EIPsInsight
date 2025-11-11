@@ -50,6 +50,7 @@ import EIPS_dashboard_img from "../../public/EIPS_dashboard_img.png";
 import ToolsSection from "./AvailableTools";
 import TypeGraphs from "@/components/TypeGraphs2";
 import CopyLink from "./CopyLink";
+import TrendingEips from "./TrendingEips";
 import {
   FiMenu,
   FiHome,
@@ -58,6 +59,7 @@ import {
   FiTool,
   FiInfo,
   FiDatabase,
+  FiHeart,
 } from "react-icons/fi";
 
 import { useSidebar } from "@/components/Sidebar/SideBarContext";
@@ -68,8 +70,10 @@ import { Clients } from "./Clients";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import TwitterTimeline from "./TwitterTimeline";
 import CloseableAdCard from "./CloseableAdCard";
+import FAQ from "./FAQ";
 import FusakaCountdownBadge from "./FusakaCountdownBadge";
 import SupportedBy from "./SupportedBy";
+import WhatIsEIPsInsightDropdown from "./WhatIsEIPsInsightDropdown";
 
 
 interface EIP {
@@ -238,7 +242,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
     "all",
     "ourtools",
     "trending",
-    "what",
+    "what-is-eipsinsight",
     "statuschanges",
     "dashboard",
     "latest-updates",
@@ -261,7 +265,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
     <>
       <FeedbackWidget />
       
-  <Box px={{ base: 3, md: 5, lg: 8 }} py={{ base: 3, md: 4, lg: 6 }}>
+  <Box px={{ base: 2, md: 4, lg: 6 }} py={{ base: 2, md: 3, lg: 4 }}>
     {isLoading ? (
       <Flex justify="center" align="center" minH="70vh">
         <motion.div
@@ -286,172 +290,268 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
             >
               <Box
                 id={"hero"}
-                pt={{ base: 4, lg: 6 }} 
-                pb={{ base: 8, lg: 10 }}
+                pt={{ base: 3, lg: 4 }} 
+                pb={{ base: 4, lg: 6 }}
                 bg={useColorModeValue("white", "gray.800")}
                 borderRadius="xl"
                 boxShadow="sm"
                 border="1px solid"
                 borderColor={useColorModeValue("gray.200", "gray.700")}
-                mb={8}
-                px={6}
+                mb={4}
+                px={4}
               >
                 <div className="lg:block hidden">
+                  {/* Enhanced Hero Section with Background */}
                   <Box
-                    display={{ lg: "grid" }}
-                    gridTemplateColumns={{ lg: "1.5fr 1fr" }}
-                    gap={{ lg: 8 }}
-                    alignItems="center"
+                    className="relative overflow-hidden"
+                    bgGradient={useColorModeValue(
+                      "linear(135deg, rgba(79, 209, 197, 0.1) 0%, rgba(48, 160, 224, 0.05) 50%, rgba(66, 153, 225, 0.1) 100%)",
+                      "linear(135deg, rgba(26, 32, 44, 0.8) 0%, rgba(45, 55, 72, 0.6) 50%, rgba(26, 32, 44, 0.9) 100%)"
+                    )}
+                    borderRadius="2xl"
+                    p={{ base: 6, lg: 8 }}
+                    border="1px solid"
+                    borderColor={useColorModeValue("rgba(79, 209, 197, 0.2)", "rgba(79, 209, 197, 0.1)")}
+                    boxShadow={useColorModeValue(
+                      "0 20px 40px -12px rgba(79, 209, 197, 0.15)",
+                      "0 20px 40px -12px rgba(0, 0, 0, 0.3)"
+                    )}
+                    _hover={{
+                      transform: "translateY(-2px)",
+                      boxShadow: useColorModeValue(
+                        "0 25px 50px -12px rgba(79, 209, 197, 0.25)",
+                        "0 25px 50px -12px rgba(0, 0, 0, 0.4)"
+                      ),
+                    }}
+                    transition="all 0.3s ease"
                   >
-                    <Stack direction={"column"} spacing={6}>
-                      <Box
-                        borderRadius="md"
-                        padding={2}
-                        paddingLeft="4"
-                        maxWidth="550px"
-                      >
-                        <Text
-                          color={useColorModeValue(
-                            textColorLight,
-                            textColorDark
-                          )}
-                          fontWeight={"bold"}
-                          bgGradient={useColorModeValue(
-                            bgGradientLight,
-                            bgGradientDark
-                          )}
-                          bgClip="text"
-                          fontSize={{
-                            lg: "5xl",
-                            md: "4xl",
-                            sm: "3xl",
-                            base: "xl",
-                          }}
-                          lineHeight="1.1"
-                          mb={4}
-                        >
-                          Ethereum <br /> Improvement <br /> Proposal <br />{" "}
-                          Insight
-                        </Text>
-                        
-                        {/* Add a subtle description */}
-                        <Text
-                          color={useColorModeValue("gray.600", "gray.300")}
-                          fontSize={{ lg: "lg", md: "md", base: "sm" }}
-                          lineHeight="1.5"
-                          maxWidth="450px"
-                        >
-                          Track proposal progress, explore EIP insights, and stay updated with the latest Ethereum improvements.
-                        </Text>
-                      </Box>
+                    {/* Decorative Background Elements */}
+                    <Box
+                      position="absolute"
+                      top="10px"
+                      right="10px"
+                      width="100px"
+                      height="100px"
+                      borderRadius="full"
+                      bg={useColorModeValue("rgba(79, 209, 197, 0.05)", "rgba(79, 209, 197, 0.03)")}
+                      filter="blur(20px)"
+                      pointerEvents="none"
+                    />
+                    <Box
+                      position="absolute"
+                      bottom="20px"
+                      left="20px"
+                      width="60px"
+                      height="60px"
+                      borderRadius="full"
+                      bg={useColorModeValue("rgba(48, 160, 224, 0.08)", "rgba(48, 160, 224, 0.05)")}
+                      filter="blur(15px)"
+                      pointerEvents="none"
+                    />
 
-                      <Stack direction={"row"} spacing={"4"} flexWrap="wrap" alignItems="center">
-                        <Box>
-                          <NextLink href={"/home#1"}>
-                            <Button
-                              color="#F5F5F5"
-                              variant={"outline"}
-                              fontSize={{
-                                lg: "14px",
-                                md: "12px",
-                                sm: "12px",
-                                base: "10px",
-                              }}
-                              fontWeight={"bold"}
-                              padding={{
-                                lg: "10px 20px",
-                                md: "5px 10px",
-                                sm: "5px 10px",
-                                base: "5px 10px",
-                              }}
-                              rightIcon={<BsArrowUpRight />}
-                              bgColor={"#30A0E0"}
-                              _hover={{
-                                bgColor: useColorModeValue(
-                                  "#2B6CB0",
-                                  "#4A5568"
-                                ),
-                                color: useColorModeValue("white", "#F5F5F5"),
-                              }}
-                            >
-                              Dashboard
-                            </Button>
-                          </NextLink>
-                        </Box>
-
-                        <Box>
-                          <NextLink
-                            href={`/insight/${year}/${getMonth(monthName)}`}
+                    <Box
+                      display={{ lg: "grid" }}
+                      gridTemplateColumns={{ lg: "1.5fr 1fr" }}
+                      gap={{ lg: 8 }}
+                      alignItems="center"
+                      position="relative"
+                      zIndex={1}
+                    >
+                      <Stack direction={"column"} spacing={4}>
+                        <Text
+                            as={motion.div}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2 } as any}
+                            fontWeight={"extrabold"}
+                            bgGradient={useColorModeValue(
+                              "linear(to-r, #2D7B7B, #319795, #4FD1C5, #30A0E0)",
+                              "linear(to-r, #4FD1C5, #81E6D9, #38B2AC, #4299E1)"
+                            )}
+                            bgClip="text"
+                            sx={{ WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+                            fontSize={{
+                              lg: "6xl",
+                              md: "5xl",
+                              sm: "4xl",
+                              base: "2xl",
+                            }}
+                            lineHeight="1.1"
+                            mb={4}
+                            letterSpacing="-0.02em"
                           >
-                            <Button
-                              color="#F5F5F5"
-                              variant={"outline"}
-                              fontSize={{
-                                lg: "14px",
-                                md: "10px",
-                                sm: "12px",
-                                base: "10px",
-                              }}
-                              fontWeight={"bold"}
-                              padding={{
-                                lg: "10px 20px",
-                                md: "5px 10px",
-                                sm: "5px 10px",
-                                base: "5px 10px",
-                              }}
-                              rightIcon={<BsGraphUp />}
-                              bgColor={"#30A0E0"}
-                              _hover={{
-                                bgColor: useColorModeValue(
-                                  "#2B6CB0",
-                                  "#4A5568"
-                                ),
-                                color: useColorModeValue("white", "#F5F5F5"),
-                              }}
-                            >
-                              {monthName} {year} Insight
-                            </Button>
-                          </NextLink>
-                        </Box>
+                            Ethereum <br /> Improvement <br /> Proposal <br /> Insight
+                          </Text>
+                          
+                          {/* Enhanced Description */}
+                          <Text
+                            as={motion.div}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.4 } as any}
+                            color={useColorModeValue("gray.700", "gray.200")}
+                            fontSize={{ lg: "xl", md: "lg", base: "md" }}
+                            lineHeight="1.6"
+                            maxWidth="500px"
+                            fontWeight="medium"
+                          >
+                            Track proposal progress, explore EIP insights, and stay updated with the latest{" "}
+                            <Text as="span" color={useColorModeValue("#30A0E0", "#4FD1C5")} fontWeight="semibold">
+                              Ethereum improvements
+                            </Text>
+                            .
+                          </Text>
 
-                                                <Box>
-                          <NextLink href={"/all"}>
-                            <Button
-                              color="#F5F5F5"
-                              variant={"outline"}
-                              fontSize={{
-                                lg: "14px",
-                                md: "12px",
-                                sm: "12px",
-                                base: "10px",
-                              }}
-                              fontWeight={"bold"}
-                              padding={{
-                                lg: "10px 20px",
-                                md: "5px 10px",
-                                sm: "5px 10px",
-                                base: "5px 10px",
-                              }}
-                              rightIcon={ <BookOpen/> }
-                              bgColor={"#30A0E0"}
-                              _hover={{
-                                bgColor: useColorModeValue(
-                                  "#2B6CB0",
-                                  "#4A5568"
-                                ),
-                                color: useColorModeValue("white", "#F5F5F5"),
-                              }}
-                            >
-                              Explore EIPs
-                            </Button>
-                          </NextLink>
-                        </Box>
+                        {/* Enhanced Button Row */}
+                        <Box 
+                          as={motion.div}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.8, delay: 0.6 } as any}
+                          id="button-row-container" 
+                          maxWidth="700px"
+                        >
+                          <Stack direction={"row"} spacing={"4"} flexWrap="nowrap" alignItems="center" mb={3}>
+                          <Box
+                            as={motion.div}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 17 } as any}
+                          >
+                            <NextLink href={"/home#1"}>
+                              <Button
+                                color="#F5F5F5"
+                                variant={"outline"}
+                                fontSize={{
+                                  lg: "14px",
+                                  md: "12px",
+                                  sm: "12px",
+                                  base: "10px",
+                                }}
+                                fontWeight={"bold"}
+                                padding={{
+                                  lg: "10px 20px",
+                                  md: "5px 10px",
+                                  sm: "5px 10px",
+                                  base: "5px 10px",
+                                }}
+                                rightIcon={<BsArrowUpRight />}
+                                bgGradient="linear(to-r, #30A0E0, #4299E1)"
+                                _hover={{
+                                  bgGradient: "linear(to-r, #2B6CB0, #3182CE)",
+                                  transform: "translateY(-1px)",
+                                  boxShadow: "0 8px 25px -8px rgba(48, 160, 224, 0.5)",
+                                }}
+                                boxShadow="0 4px 12px -4px rgba(48, 160, 224, 0.3)"
+                                borderRadius="lg"
+                                transition="all 0.2s ease"
+                              >
+                                Dashboard
+                              </Button>
+                            </NextLink>
+                          </Box>
 
-                        {/* Fusaka Countdown Badge */}
-                        <Box>
-                          <FusakaCountdownBadge variant="compact" />
+                          <Box
+                            as={motion.div}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 17 } as any}
+                          >
+                            <NextLink
+                              href={`/insight/${year}/${getMonth(monthName)}`}
+                            >
+                              <Button
+                                color="#F5F5F5"
+                                variant={"outline"}
+                                fontSize={{
+                                  lg: "14px",
+                                  md: "10px",
+                                  sm: "12px",
+                                  base: "10px",
+                                }}
+                                fontWeight={"bold"}
+                                padding={{
+                                  lg: "10px 20px",
+                                  md: "5px 10px",
+                                  sm: "5px 10px",
+                                  base: "5px 10px",
+                                }}
+                                rightIcon={<BsGraphUp />}
+                                bgGradient="linear(to-r, #30A0E0, #4299E1)"
+                                _hover={{
+                                  bgGradient: "linear(to-r, #2B6CB0, #3182CE)",
+                                  transform: "translateY(-1px)",
+                                  boxShadow: "0 8px 25px -8px rgba(48, 160, 224, 0.5)",
+                                }}
+                                boxShadow="0 4px 12px -4px rgba(48, 160, 224, 0.3)"
+                                borderRadius="lg"
+                                transition="all 0.2s ease"
+                              >
+                                {monthName} {year} Insight
+                              </Button>
+                            </NextLink>
+                          </Box>
+
+                          <Box
+                            as={motion.div}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 17 } as any}
+                          >
+                            <NextLink href={"/all"}>
+                              <Button
+                                color="#F5F5F5"
+                                variant={"outline"}
+                                fontSize={{
+                                  lg: "14px",
+                                  md: "12px",
+                                  sm: "12px",
+                                  base: "10px",
+                                }}
+                                fontWeight={"bold"}
+                                padding={{
+                                  lg: "10px 20px",
+                                  md: "5px 10px",
+                                  sm: "5px 10px",
+                                  base: "5px 10px",
+                                }}
+                                rightIcon={ <BookOpen/> }
+                                bgGradient="linear(to-r, #30A0E0, #4299E1)"
+                                _hover={{
+                                  bgGradient: "linear(to-r, #2B6CB0, #3182CE)",
+                                  transform: "translateY(-1px)",
+                                  boxShadow: "0 8px 25px -8px rgba(48, 160, 224, 0.5)",
+                                }}
+                                boxShadow="0 4px 12px -4px rgba(48, 160, 224, 0.3)"
+                                borderRadius="lg"
+                                transition="all 0.2s ease"
+                              >
+                                Explore EIPs
+                              </Button>
+                            </NextLink>
+                          </Box>
+
+                          {/* Fusaka Countdown Badge - Enhanced */}
+                          <Box
+                            as={motion.div}
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 17 } as any}
+                          >
+                            <FusakaCountdownBadge variant="compact" />
+                          </Box>
+                        </Stack>
+
+                        {/* Enhanced Dropdown */}
+                        <Box 
+                          as={motion.div}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.8, delay: 0.8 } as any}
+                          maxWidth="700px"
+                        >
+                          <WhatIsEIPsInsightDropdown />
                         </Box>
-                      </Stack>
+                      </Box>
                     </Stack>
                     
                     {/* Right column - centered image */}
@@ -464,29 +564,52 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                         <BoyGirl3 />
                       </Box>
                     </Box>
+                    </Box>
                   </Box>
                   
-                  {/* EtherWorld Advertisement */}
-                  <Box
-                    mt={{ base: 6, lg: 8 }}
-                    mb={{ base: 4, lg: 6 }}
-                    px={{ base: 4, md: 6, lg: 8 }}
-                  >
-                    <CloseableAdCard />
-                  </Box>
-                  
+
+
                   <Box
                     borderRadius="md"
                     id="all"
-                    mt={{ base: 3, lg: 4 }}
+                    mt={{ base: 2, lg: 3 }}
                   >
-                    <div className="py-3">
-                      <Header
-                        title="All Categories and Status"
-                        subtitle="Overview"
-                        description="A high-level overview of Ethereum Standards by categories, and status."
-                        sectionId="all"
-                      />
+                    <div className="py-2">
+                      {/* Header with Ad in clean horizontal line */}
+                      <Flex
+                        align="center"
+                        justify="space-between"
+                        flexWrap="wrap"
+                        gap={4}
+                        mb={4}
+                        w="100%"
+                        px={{ base: 4, md: 6, lg: 8 }}
+                      >
+                        {/* Header content - takes 50-60% width */}
+                        <Box 
+                          flex={{ base: "1 1 100%", lg: "1 1 50%" }}
+                          minW={{ base: "100%", lg: "300px" }}
+                          maxW={{ base: "100%", lg: "60%" }}
+                        >
+                          <Header
+                            title="All Categories and Status"
+                            subtitle="Overview"
+                            description="A high-level overview of Ethereum Standards by categories, and status."
+                            sectionId="all"
+                          />
+                        </Box>
+                        
+                        {/* Advertisement card - takes 40-50% width */}
+                        <Box
+                          flex={{ base: "1 1 100%", lg: "1 1 40%" }}
+                          w={{ base: "100%", lg: "auto" }}
+                          maxW={{ base: "100%", lg: "45%" }}
+                          minW={{ base: "100%", lg: "280px" }}
+                        >
+                          <CloseableAdCard />
+                        </Box>
+                      </Flex>
+                      
                       <AllChart type="Total" dataset={data} />
                     </div>
                   </Box>
@@ -512,6 +635,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                     spacing={"3"}
                     paddingTop={"10"}
                     justifyContent={"center"}
+                    flexWrap="wrap"
                   >
                     <Box>
                       <NextLink href={"/home#1"}>
@@ -573,6 +697,8 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                       </NextLink>
                     </Box>
 
+
+
                   </Stack>
                   
                   {/* Fusaka Countdown Badge - Mobile */}
@@ -585,6 +711,8 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                   </div>
                 </div>
               </Box>
+
+              {/* Stats Grid Section - Removed, now integrated in dropdown */}
 
               <Box
                 className="py-2"
@@ -606,113 +734,31 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                 boxShadow="sm"
                 border="1px solid"
                 borderColor={useColorModeValue("gray.200", "gray.700")}
-                p={6}
-                mb={6}
+                p={4}
+                mb={4}
               >
                 <ToolsSection />
               </Box>
               
-              {/* Clients Section */}
-              <Box
-                bg={useColorModeValue("white", "gray.800")}
-                borderRadius="xl"
-                boxShadow="sm"
-                border="1px solid"
-                borderColor={useColorModeValue("gray.200", "gray.700")}
-                p={6}
-                mb={8}
-              >
-                <Clients />
-              </Box>
 
-{/* What is EIPsInsight Section */}
-<Box 
-  py={8} 
-  id="what"
-  bg={useColorModeValue("white", "gray.800")}
-  borderRadius="xl"
-  boxShadow="sm"
-  border="1px solid"
-  borderColor={useColorModeValue("gray.200", "gray.700")}
-  mb={8}
-  px={6}
->
-  <Header
-    title="What is EIPsInsight?"
-    subtitle="Overview"
-    description="EIPsInsight visualizes Ethereum proposal activity to track progress and editor workloads."
-    sectionId="what"
-  />
 
-  <Box
-    className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center mt-4"
-    borderRadius="md"
-  >
-    {/* Left Side - YouTube Video */}
-    <div className="w-full flex justify-center">
-      <iframe
-        width="100%"
-        height="315"
-        className="rounded-lg max-w-xl"
-        src="https://www.youtube.com/embed/AyidVR6X6J8?start=8"
-        title="EIPsInsight Overview"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
-    </div>
-
-    {/* Right Side - Text Content */}
-    <div className="flex justify-center items-start">
-      <div className="text-left max-w-xl space-y-6">
-<p className="text-xl leading-relaxed" style={{ color: textColor }}>
-  <span style={{ color: linkColor, fontWeight: "600" }}>EIPsInsight</span> is a
-  tooling platform designed to provide visual insights into the activity of
-  Ethereum Improvement Proposals (
-  <NextLink href="/eip">
-    <span  className="text-blue-400">EIPs</span>
-  </NextLink>
-  ), Ethereum Request for Comments (
-  <NextLink href="/erc">
-    <span className="text-blue-400">ERCs</span>
-  </NextLink>
-  ), and Rollup Improvement Proposals (
-  <NextLink href="/rip">
-    <span className="text-blue-400">RIPs</span>
-  </NextLink>
-  ). It helps track proposal progress and workload of
-  <NextLink href="/eips/eip-1">
-    <span className="text-blue-400"> EIP Editors</span>
-  </NextLink>
-  , enhancing transparency and efficiency in the review process.
-</p>
-
-<NextLink href="/resources">
-  <span
-    className="text-xl flex items-center space-x-2 hover:underline"
-  >
-    Learn More <BsArrowUpRight className="pt-1" size={22} />
-  </span>
-</NextLink>
-
-      </div>
-    </div>
-  </Box>
-</Box>
 
             </motion.div>
             
+            {/* Supported By Section */}
+            <SupportedBy />
+            
             {/* Status Changes Section */}
             <Box 
-              py={8} 
+              py={4} 
               id="statuschanges"
               bg={useColorModeValue("white", "gray.800")}
               borderRadius="xl"
               boxShadow="sm"
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
-              mb={8}
-              px={6}
+              mb={4}
+              px={4}
             >
               <Box>
                 <Header
@@ -727,6 +773,19 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
               </Box>
             </Box>
             
+            {/* Trending EIPs Section */}
+            <Box
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              p={4}
+              mb={4}
+            >
+              <Clients />
+            </Box>
+
             {/* Dashboard Section */}
             <Box 
               id="dashboard" 
@@ -736,8 +795,8 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
               boxShadow="sm"
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
-              p={6}
-              mb={8}
+              p={4}
+              mb={4}
             >
               <Box
                 // bg="rgba(0, 0, 0, 0.5)"
@@ -776,10 +835,10 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                 <Box
                   display="grid"
                   gridTemplateColumns={{ lg: "repeat(2, 1fr)" }}
-                  gap={"4"}
-                  marginTop={"6px"}
+                  gap={"3"}
+                  marginTop={"2px"}
                 >
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="col-span-2">
                       <StatBox
                         title="Meta EIPs"
@@ -1087,17 +1146,17 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
               boxShadow="sm"
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
-              p={6}
-              mb={8}
+              p={4}
+              mb={4}
             >
               <TwitterTimeline />
             </Box>
             
-            {/* Supported By Section */}
-            <SupportedBy />
-            
           </motion.div>
         )}
+
+        {/* FAQ Section */}
+        <FAQ />
       </Box>
     </>
   );
