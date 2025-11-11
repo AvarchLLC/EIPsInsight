@@ -17,13 +17,13 @@ import {
   useColorModeValue,
   Collapse,
   IconButton,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import axios from "axios";
-import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
-import { DownloadIcon } from "@chakra-ui/icons";
+import { ChevronUpIcon, ChevronDownIcon, DownloadIcon, CopyIcon } from "@chakra-ui/icons";
 import Comments from "@/components/comments";
 import LabelFilter from "@/components/LabelFilter";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
@@ -200,10 +200,11 @@ const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("EIPs"); // Default to 'EIPs'
   const [show, setShow] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const toast = useToast();
 
-    useScrollSpy([
-  "EIPsBOARD",
-]);
+  useScrollSpy([
+    "EIPsBOARD",
+  ]);
 
   const toggleCollapse = () => setShow(!show);
 
@@ -321,7 +322,7 @@ const DashboardPage = () => {
       const rowValues = [
         index + 1,
         item.prNumber,
-        item.prTitle,                // May contain commas → escaped
+        item.prTitle, // May contain commas → escaped
         (item.labels || []).join("; "), // Use semicolons inside field
         new Date(item.prCreatedDate).toLocaleDateString(),
         item.prLink,
@@ -330,6 +331,84 @@ const DashboardPage = () => {
     });
 
     return csvRows.join("\r\n");
+  };
+
+  const copyAsMarkdown = () => {
+    const filteredData = displayedData;
+
+    if (!filteredData || filteredData?.length === 0) {
+      toast({
+        title: "No data available",
+        description: `No data to copy for ${activeTab}.`,
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // Group PRs by status
+    const toReview: EIPData[] = [];
+    const toDraft: EIPData[] = [];
+    const other: EIPData[] = [];
+
+    filteredData.forEach((item: EIPData) => {
+      if (item.labels.includes("s-review")) {
+        toReview.push(item);
+      } else if (item.labels.includes("s-draft")) {
+        toDraft.push(item);
+      } else {
+        other.push(item);
+      }
+    });
+
+    // Build markdown string
+    let markdown = "";
+
+    if (toReview.length > 0) {
+      markdown += "### To `Review`\n";
+      toReview.forEach((item) => {
+        markdown += `* [${item.prTitle}#${item.prNumber}](${item.prLink})\n`;
+      });
+      markdown += "\n";
+    }
+
+    if (toDraft.length > 0) {
+      markdown += "### To `Draft`\n";
+      toDraft.forEach((item) => {
+        markdown += `* [${item.prTitle}#${item.prNumber}](${item.prLink})\n`;
+      });
+      markdown += "\n";
+    }
+
+    if (other.length > 0) {
+      markdown += "#### Other\n";
+      other.forEach((item) => {
+        markdown += `* [${item.prTitle}#${item.prNumber}](${item.prLink})\n`;
+      });
+    }
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(markdown).then(
+      () => {
+        toast({
+          title: "Copied to clipboard",
+          description: "Markdown content copied successfully!",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      },
+      () => {
+        toast({
+          title: "Copy failed",
+          description: "Failed to copy to clipboard.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    );
   };
 
   if (isLoading) {
@@ -564,27 +643,40 @@ const DashboardPage = () => {
             >
               {activeTab} BOARD ({displayedData?.length})
             </Heading>
-            <Button
-              colorScheme="blue"
-              variant="outline"
-              fontSize={{ base: "0.6rem", md: "md" }}
-              fontWeight={"bold"}
-              padding={"8px 20px"}
-              onClick={async () => {
-                try {
-                  // Trigger the CSV conversion and download
-                  handleDownload();
+            <Flex gap={2}>
+              <Button
+                colorScheme="teal"
+                variant="outline"
+                fontSize={{ base: "0.6rem", md: "md" }}
+                fontWeight={"bold"}
+                padding={"8px 20px"}
+                onClick={copyAsMarkdown}
+              >
+                <CopyIcon marginEnd={"1.5"} />
+                Copy as MD
+              </Button>
+              <Button
+                colorScheme="blue"
+                variant="outline"
+                fontSize={{ base: "0.6rem", md: "md" }}
+                fontWeight={"bold"}
+                padding={"8px 20px"}
+                onClick={async () => {
+                  try {
+                    // Trigger the CSV conversion and download
+                    handleDownload();
 
-                  // Trigger the API call
-                  await axios.post("/api/DownloadCounter");
-                } catch (error) {
-                  console.error("Error triggering download counter:", error);
-                }
-              }}
-            >
-              <DownloadIcon marginEnd={"1.5"} />
-              Download Reports
-            </Button>
+                    // Trigger the API call
+                    await axios.post("/api/DownloadCounter");
+                  } catch (error) {
+                    console.error("Error triggering download counter:", error);
+                  }
+                }}
+              >
+                <DownloadIcon marginEnd={"1.5"} />
+                Download Reports
+              </Button>
+            </Flex>
           </Flex>
 
           {/* EtherWorld Advertisement */}
@@ -624,6 +716,9 @@ const DashboardPage = () => {
                   <Th textAlign="center" minWidth="10rem" color="white">
                     PR Number
                   </Th>
+                  <Th textAlign="center" minWidth="20rem" color="white">
+                    PR Title
+                  </Th>
                   <Th textAlign="center" minWidth="10rem" color="white">
                     PR Date
                   </Th>
@@ -649,7 +744,7 @@ const DashboardPage = () => {
               <Tbody>
                 {displayedData?.length === 0 ? (
                   <Tr>
-                    <Td colSpan={3} textAlign="center" color="white">
+                    <Td colSpan={6} textAlign="center" color="white">
                       No Data Available
                     </Td>
                   </Tr>
@@ -685,6 +780,18 @@ const DashboardPage = () => {
                         >
                           {item.prNumber}
                         </Box>
+                      </Td>
+                      {/* PR Title */}
+                      <Td textAlign="left">
+                        <Text
+                          color={useColorModeValue("gray.800", "gray.200")}
+                          fontSize="sm"
+                          isTruncated
+                          maxWidth="300px"
+                          title={item.prTitle}
+                        >
+                          {item.prTitle}
+                        </Text>
                       </Td>
                       {/* PR Created Date */}
                       <Td textAlign="center">
