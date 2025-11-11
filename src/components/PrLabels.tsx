@@ -140,6 +140,34 @@ export default function PRAnalyticsCard() {
   const [selectedLabels, setSelectedLabels] = useState<string[]>(labelSpecs.map(l => l.value));
   useEffect(() => setSelectedLabels(labelSpecs.map(l => l.value)), [labelSpecs]);
 
+  // Categorize PR based on ALL its labels (matching API aggregation logic)
+  const categorizePRByLabels = (allLabelsStr: string, repo: string): string => {
+    // Parse all labels from the semicolon-separated string
+    const allLabels = allLabelsStr.split(";").map(l => l.trim()).filter(l => l);
+    
+    // Apply priority-based categorization matching the API logic
+    if (repo.toLowerCase() === "erc prs" || repo === "erc") {
+      if (allLabels.includes("Typo Fix")) return "Typo Fix";
+      if (allLabels.includes("Status Change")) return "Status Change";
+      if (allLabels.includes("ERC Update")) return "ERC Update";
+      if (allLabels.includes("Created By Bot")) return "Created By Bot";
+      if (allLabels.includes("New ERC")) return "New ERC";
+    } else if (repo.toLowerCase() === "rip prs" || repo === "rip") {
+      if (allLabels.includes("Typo Fix")) return "Typo Fix";
+      if (allLabels.includes("Update")) return "Update";
+      if (allLabels.includes("New RIP")) return "New RIP";
+      if (allLabels.includes("Created By Bot")) return "Created By Bot";
+    } else {
+      // EIP or default
+      if (allLabels.includes("Typo Fix")) return "Typo Fix";
+      if (allLabels.includes("Status Change")) return "Status Change";
+      if (allLabels.includes("EIP Update")) return "EIP Update";
+      if (allLabels.includes("Created By Bot")) return "Created By Bot";
+      if (allLabels.includes("New EIP")) return "New EIP";
+    }
+    return "Misc";
+  };
+
   // Normalize custom labels for 'all' view
   const normalizeCustomLabel = (repo: string, label: string): string => {
     // Map to overlapping categories
@@ -194,8 +222,17 @@ export default function PRAnalyticsCard() {
       for (const pr of rows) {
         const monthYear: string = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
         if (!monthYear) continue;
-        let label: string = pr.Label || "";
-    if (labelSet === "customLabels") label = normalizeCustomLabel(pr.Repo || "", label);
+        
+        // For custom labels, categorize based on ALL labels
+        let label: string;
+        if (labelSet === "customLabels") {
+          const allLabelsStr = pr.Labels || "";
+          const categorized = categorizePRByLabels(allLabelsStr, pr.Repo || "");
+          label = normalizeCustomLabel(pr.Repo || "", categorized);
+        } else {
+          label = pr.Label || "";
+        }
+        
         const key = `${monthYear}__${label}`;
         const curr = acc.get(key) || { monthYear, label, count: 0, labelType: labelSet, prNumbers: [] };
         curr.count += 1;
@@ -404,8 +441,18 @@ export default function PRAnalyticsCard() {
       // Filter only PRs from the latest month and apply selected label filter
       const filteredRows = combined
         .map((pr: any) => {
-          // Get the actual label from the PR data
-          const actualLabel = pr.Label || "";
+          // For custom labels, categorize based on ALL labels (from Labels field)
+          // For github labels, use the single Label field
+          let actualLabel: string;
+          
+          if (labelSet === "customLabels") {
+            // Use ALL labels to determine the correct category (matching API aggregation logic)
+            const allLabelsStr = pr.Labels || "";
+            actualLabel = categorizePRByLabels(allLabelsStr, pr.Repo || repoKey);
+          } else {
+            // For github labels, use the single label
+            actualLabel = pr.Label || "";
+          }
           
           // Only normalize for 'all' view to match the graph display
           let displayLabel = actualLabel;
