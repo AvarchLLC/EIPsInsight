@@ -323,6 +323,15 @@ const DashboardPage = () => {
       const itemLabels = addAutoLabels(item);
       if (itemLabels.some(label => label.toLowerCase() === 'a-review')) return false;
       
+      // Filter out PRs starting with "CI" or "bump"
+      const titleLower = item.title.toLowerCase();
+      if (titleLower.startsWith('ci') || titleLower.startsWith('bump')) return false;
+      
+      // Filter out bot-generated stagnant PRs (pattern: EIP-XXXX stagnant (date) or ERC-XXXX stagnant (date))
+      // Keep author-generated stagnant PRs like "Update EIP-5003: Move to Stagnant"
+      const botStagnantPattern = /^(EIP|ERC)-\d+\s+stagnant\s+\(/i;
+      if (botStagnantPattern.test(item.title)) return false;
+      
       return true;
     });
     
@@ -610,7 +619,7 @@ const DashboardPage = () => {
     if (statusGroups['Final'].length > 0) {
       markdown += '### To `Final` \n';
       statusGroups['Final'].forEach(item => {
-        markdown += `* [${item.title}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
       });
       markdown += '\n';
     }
@@ -618,7 +627,7 @@ const DashboardPage = () => {
     if (statusGroups['Last Call'].length > 0) {
       markdown += '### To `Last Call` \n';
       statusGroups['Last Call'].forEach(item => {
-        markdown += `* [${item.title}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
       });
       markdown += '\n';
     }
@@ -626,7 +635,7 @@ const DashboardPage = () => {
     if (statusGroups['Review'].length > 0) {
       markdown += '### To `Review` \n';
       statusGroups['Review'].forEach(item => {
-        markdown += `* [${item.title}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
       });
       markdown += '\n';
     }
@@ -634,7 +643,7 @@ const DashboardPage = () => {
     if (statusGroups['Draft'].length > 0) {
       markdown += '### To `Draft` \n';
       statusGroups['Draft'].forEach(item => {
-        markdown += `* [${item.title}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
       });
       markdown += '\n';
     }
@@ -642,7 +651,7 @@ const DashboardPage = () => {
     if (statusGroups['Other'].length > 0) {
       markdown += '#### Other\n';
       statusGroups['Other'].forEach(item => {
-        markdown += `* [${item.title}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
       });
       markdown += '\n';
     }
