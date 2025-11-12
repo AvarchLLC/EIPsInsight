@@ -42,12 +42,12 @@ export default function AboutPage() {
   const glassHover = useColorModeValue("rgba(243, 244, 246, 0.8)", "rgba(55, 65, 81, 0.8)");
 
   const featuresList = [
-    { icon: FaChartLine, title: 'Monthly Insight', desc: 'Follow the status change of proposals under different types and categories with beautiful charts and tables providing details.', color: '#30A0E0' },
-    { icon: FaTools, title: 'Advanced Toolings', desc: 'Make use of different toolings such as "Editor Review Tracker" and "Issues and PRs Trackers" for comprehensive proposal management.', color: '#4FD1FF' },
-    { icon: FaDatabase, title: 'Detailed EIP Database', desc: 'Explore our extensive database of EIPs, complete with detailed descriptions, statuses, and relevant discussions.', color: '#7B61FF' },
-    { icon: FaComments, title: 'Expert Analysis', desc: 'Gain access to expert commentary and analysis on significant EIPs and their potential impacts on the Ethereum ecosystem.', color: '#FF6FD8' },
-    { icon: FaUsers, title: 'Community Engagement', desc: 'Join our vibrant community of Ethereum enthusiasts, developers, and stakeholders in meaningful discussions.', color: '#2AC7FF' },
-    { icon: FaGraduationCap, title: 'Educational Resources', desc: 'Comprehensive learning materials designed to help you understand the proposal process and technical details.', color: '#30A0E0' },
+    { icon: FaChartLine, title: 'Monthly Insight', desc: 'We help you follow the status changes of proposals under different types and categories with beautiful charts and tables providing comprehensive details.', color: '#30A0E0' },
+    { icon: FaTools, title: 'Advanced Toolings', desc: 'We provide advanced toolings such as our "Editor Review Tracker" and "Issues and PRs Trackers" for comprehensive proposal management.', color: '#4FD1FF' },
+    { icon: FaDatabase, title: 'Detailed EIP Database', desc: 'We maintain an extensive database of EIPs, complete with detailed descriptions, statuses, and relevant discussions.', color: '#7B61FF' },
+    { icon: FaComments, title: 'Expert Analysis', desc: 'We provide expert commentary and analysis on significant EIPs and their potential impacts on the Ethereum ecosystem.', color: '#FF6FD8' },
+    { icon: FaUsers, title: 'Community Engagement', desc: 'We foster a vibrant community of Ethereum enthusiasts, developers, and stakeholders for meaningful discussions.', color: '#2AC7FF' },
+    { icon: FaGraduationCap, title: 'Educational Resources', desc: 'We offer comprehensive learning materials designed to help you understand the proposal process and technical details.', color: '#30A0E0' },
   ];
 
   return (
@@ -305,7 +305,7 @@ export default function AboutPage() {
               mb={8}
               textAlign="left"
             >
-              About EIPsInsight
+              About Us
             </Heading>
 
             <Text
@@ -314,7 +314,7 @@ export default function AboutPage() {
               lineHeight="1.6"
               fontWeight="400"
             >
-              EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of{" "}
+              We specialize in providing advanced toolings designed to deliver clear, visual insights into the activity of{" "}
               <Link
                 href="https://github.com/ethereum/EIPs"
                 color={linkColor}
@@ -345,7 +345,7 @@ export default function AboutPage() {
               >
                 Rollup Improvement Proposals (RIPs)
               </Link>{" "}
-              over a specified period. Data provided is used for tracking the progress and workload distribution among
+              over specific time periods. Our data is used for tracking progress and workload distribution among
               EIP Editors, ensuring transparency and efficiency in the proposal review process.
             </Text>
             {/* Read more toggle to show Key Features inline */}
@@ -385,7 +385,7 @@ export default function AboutPage() {
 
                         {expanded === feature.title && (
                           <Box mt={3} p={3} bg={useColorModeValue('rgba(243, 244, 246, 0.8)', 'rgba(55, 65, 81, 0.8)')} borderRadius="md" borderLeft="3px solid" borderColor={feature.color}>
-                            <Text fontSize="xs" color={textColor} fontStyle="italic" lineHeight="1.5">Explore detailed dashboards with charts, filters, and export options to analyze trends and insights.</Text>
+                            <Text fontSize="xs" color={textColor} fontStyle="italic" lineHeight="1.5">We provide detailed dashboards with charts, filters, and export options to help you analyze trends and insights.</Text>
                           </Box>
                         )}
                       </Box>
