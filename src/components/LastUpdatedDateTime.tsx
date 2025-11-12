@@ -19,9 +19,9 @@ const LastUpdatedDateTime: React.FC<DateTimeProps> = ({ name }) => {
         const data = await response.json();
         setLastUpdatedTime(data.lastUpdatedTime);
         
-        // Calculate next update time (5 minutes from last update)
-        const lastUpdate = new Date(data.lastUpdatedTime);
-        const nextUpdate = new Date(lastUpdate.getTime() + 5 * 60 * 1000);
+        // Calculate next update time (5 minutes from now)
+        const now = new Date();
+        const nextUpdate = new Date(now.getTime() + 5 * 60 * 1000);
         setNextUpdateTime(nextUpdate.toISOString());
         
       } catch (err:any) {
@@ -40,15 +40,21 @@ const LastUpdatedDateTime: React.FC<DateTimeProps> = ({ name }) => {
     return <div>Error: {error}</div>;
   }
 
-  // Format the lastUpdatedTime
+  // Format the lastUpdatedTime with 12-hour format and AM/PM
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
+    
+    let hours = date.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const hoursStr = String(hours).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}-${month}-${year} ${hours}:${minutes}`;
+    
+    return `${day}-${month}-${year} ${hoursStr}:${minutes} ${ampm}`;
   };
 
   return (
