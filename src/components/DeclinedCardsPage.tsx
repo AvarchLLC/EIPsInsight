@@ -260,13 +260,49 @@ const defaultFusaka: DeclinedEIP[] = [
 
 const defaultGlamsterdam: DeclinedEIP[] = [
   {
+  id: "EIP-7692",
+  title: "EIP-7692: EVM Object Format (EOFv1) Meta",
+  description: "List of EIPs belonging to the EOFv1 proposal.",
+  eipsLink: "/eips/eip-7692",
+  discussionLink: "https://ethereum-magicians.org/t/eip-7692-evm-object-format-eof-meta/19686",
+},
+  {
   id: "EIP-7782",
   title: "EIP-7782: Reduce Block Latency",
   description: "Reduce Ethereum's slot time from 12s to 6s to decrease latency by 50%, distribute bandwidth usage, and improve UX.",
   eipsLink: "/eips/eip-7782",
   discussionLink: "https://ethereum-magicians.org/t/eip-7782-reduce-block-latency/21271",
 },
+  {
+  id: "EIP-7886",
+  title: "EIP-7886: Delayed execution",
+  description: "Separate block validation from execution.",
+  eipsLink: "/eips/eip-7886",
+  discussionLink: "https://ethereum-magicians.org/t/eip-7886-delayed-execution/22890",
+},
+  {
+  id: "EIP-7919",
+  title: "EIP-7782: Pureth Meta",
+  description: "List of EIPs belonging to the Pureth proposal.",
+  eipsLink: "/eips/eip-7919",
+  discussionLink: "https://ethereum-magicians.org/t/eip-7919-pureth-meta/23273",
+},
+  {
+  id: "EIP-7937",
+  title: "EIP-7782: EVM64 - 64-bit mode EVM opcodes",
+  description: "Multibyte opcodes for 64-bit arithmetic, comparison, bitwise and flow operations in EVM.",
+  eipsLink: "/eips/eip-7937",
+  discussionLink: "https://ethereum-magicians.org/t/eip-9687-64-bit-mode-evm-operations/23794",
+},
+  {
+  id: "EIP-7942",
+  title: "EIP-7942: EVM64 - Available Attestation",
+  description: "A reorg-resilient solution for Ethereum",
+  eipsLink: "/eips/eip-7942",
+  discussionLink: "https://ethereum-magicians.org/t/eip-7942-available-attestation-a-reorg-resilient-solution-for-ethereum/23927",
+},
 ]
+
 
 export default function DeclinedEIPListPage({
   selectedUpgrade,

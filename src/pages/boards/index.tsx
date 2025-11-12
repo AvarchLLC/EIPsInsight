@@ -223,28 +223,17 @@ const labelColors: { [key: string]: { color: string; description: string } } = {
 
 interface BoardData {
   _id: string;
-  number: number;
-  title: string;
-  url: string;
-  author: string;
-  created_at: string;
-  waiting_since: string;
-  wait_duration_hours: number;
-  priority_score: number;
-  is_withdrawn: boolean;
+  prNumber: string;
+  prTitle: string;
   labels: string[];
-  events_count: number;
-  commits_count: number;
-  comments_count: number;
-  review_count: number;
-  last_updated: string;
-  last_editor_interaction: string | null;
-  last_author_interaction: string | null;
-  type: 'EIP' | 'ERC';
+  prCreatedDate: string;
+  prLink: string;
+  state: string;
 }
 
 const DashboardPage = () => {
-  const [boardData, setBoardData] = useState<BoardData[]>([]);
+  const [eipData, setEipData] = useState<BoardData[]>([]);
+  const [ercData, setErcData] = useState<BoardData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [activeTab, setActiveTab] = useState("EIPs");
@@ -299,7 +288,7 @@ const DashboardPage = () => {
   // Auto-add labels based on title
   const addAutoLabels = (item: BoardData): string[] => {
     const autoLabels = [...item.labels];
-    const titleLower = item.title.toLowerCase();
+    const titleLower = item.prTitle.toLowerCase();
     
     // Add "typo fix" label if title contains "typo"
     if (titleLower.includes('typo') && !autoLabels.includes('typo-fix')) {
@@ -315,22 +304,29 @@ const DashboardPage = () => {
   };
 
   const filteredData = useMemo(() => {
-    let filtered = boardData.filter(item => {
-      // Filter by type
-      if (item.type !== activeTab.slice(0, 3).toUpperCase()) return false;
+    const currentData = activeTab === "EIPs" ? eipData : ercData;
+    
+    let filtered = currentData.filter(item => {
+      // Ignore items with state 'closed'
+      if (item.state === "closed") return false;
+
+      // Ignore items with both 'dependencies' and 'ruby' labels
+      const hasDependencies = item.labels.includes("dependencies");
+      const hasRuby = item.labels.includes("ruby");
+      if (hasDependencies && hasRuby) return false;
       
       // Remove PRs with 'a-review' label
       const itemLabels = addAutoLabels(item);
       if (itemLabels.some(label => label.toLowerCase() === 'a-review')) return false;
       
       // Filter out PRs starting with "CI" or "bump"
-      const titleLower = item.title.toLowerCase();
+      const titleLower = item.prTitle.toLowerCase();
       if (titleLower.startsWith('ci') || titleLower.startsWith('bump')) return false;
       
       // Filter out bot-generated stagnant PRs (pattern: EIP-XXXX stagnant (date) or ERC-XXXX stagnant (date))
       // Keep author-generated stagnant PRs like "Update EIP-5003: Move to Stagnant"
       const botStagnantPattern = /^(EIP|ERC)-\d+\s+stagnant\s+\(/i;
-      if (botStagnantPattern.test(item.title)) return false;
+      if (botStagnantPattern.test(item.prTitle)) return false;
       
       return true;
     });
@@ -338,9 +334,8 @@ const DashboardPage = () => {
     // Search filter
     if (searchQuery) {
       filtered = filtered.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.number.toString().includes(searchQuery)
+        item.prTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.prNumber.toString().includes(searchQuery)
       );
     }
     
@@ -352,18 +347,21 @@ const DashboardPage = () => {
       });
     }
     
-    // Sort by priority score (higher = more urgent)
-    return filtered.sort((a, b) => b.priority_score - a.priority_score);
-  }, [boardData, activeTab, searchQuery, selectedLabels]);
+    // Sort by s-withdrawn label (move to bottom)
+    return filtered.sort((a, b) => {
+      const aHasWithdrawn = a.labels.includes("s-withdrawn") ? 1 : 0;
+      const bHasWithdrawn = b.labels.includes("s-withdrawn") ? 1 : 0;
+      return aHasWithdrawn - bHasWithdrawn;
+    });
+  }, [eipData, ercData, activeTab, searchQuery, selectedLabels]);
 
-  // Fetch data from the new API
+  // Fetch data from the API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("/api/boards");
-        if (response.data.success) {
-          setBoardData(response.data.data || []);
-        }
+        const response = await axios.get("/api/FullBoards");
+        setEipData(response.data.eips || []);
+        setErcData(response.data.ercs || []);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -378,7 +376,7 @@ const DashboardPage = () => {
   // Extract unique labels for the filter dropdown (only filterLabels)
   const allLabels = useMemo(() => {
     const labels = new Set<string>();
-    boardData.forEach(item => {
+    [...eipData, ...ercData].forEach(item => {
       addAutoLabels(item).forEach(label => {
         if (filterLabels.includes(label.toLowerCase())) {
           labels.add(label);
@@ -386,7 +384,7 @@ const DashboardPage = () => {
       });
     });
     return Array.from(labels).sort();
-  }, [boardData, filterLabels]);
+  }, [eipData, ercData, filterLabels]);
 
   const columnHelper = createColumnHelper<BoardData>();
 
@@ -402,12 +400,12 @@ const DashboardPage = () => {
         ),
         size: 60,
       }),
-      columnHelper.accessor('number', {
+      columnHelper.accessor('prNumber', {
         header: 'PR #',
         cell: (info) => {
           const row = info.row.original;
           return (
-            <Link href={row.url} isExternal _hover={{ textDecoration: 'none' }}>
+            <Link href={row.prLink} isExternal _hover={{ textDecoration: 'none' }}>
               <HStack justify="center" spacing={1}>
                 <Icon as={BiGitPullRequest} color="blue.500" boxSize={5} />
                 <Text 
@@ -429,12 +427,12 @@ const DashboardPage = () => {
         },
         size: 100,
       }),
-      columnHelper.accessor('title', {
+      columnHelper.accessor('prTitle', {
         header: 'Title',
         cell: (info) => {
           const row = info.row.original;
           return (
-            <Link href={row.url} isExternal _hover={{ textDecoration: 'none' }}>
+            <Link href={row.prLink} isExternal _hover={{ textDecoration: 'none' }}>
               <Tooltip label={info.getValue()} placement="top" hasArrow>
                 <Text
                   noOfLines={1}
@@ -455,7 +453,7 @@ const DashboardPage = () => {
           );
         },
       }),
-      columnHelper.accessor('created_at', {
+      columnHelper.accessor('prCreatedDate', {
         header: 'Created',
         cell: (info) => (
           <Text
@@ -466,30 +464,6 @@ const DashboardPage = () => {
             {format(new Date(info.getValue()), 'MMM dd, yyyy')}
           </Text>
         ),
-        size: 120,
-      }),
-      columnHelper.accessor('wait_duration_hours', {
-        header: 'Wait Time',
-        cell: (info) => {
-          const waitDays = Math.floor(info.getValue() / 24);
-          const waitHours = Math.floor(info.getValue() % 24);
-          return (
-            <Badge
-              colorScheme={
-                waitDays > 30 ? "red" :
-                waitDays > 14 ? "orange" :
-                waitDays > 7 ? "yellow" : "green"
-              }
-              fontSize="sm"
-              px={3}
-              py={1}
-              borderRadius="md"
-              fontWeight="bold"
-            >
-              {waitDays}d {waitHours}h
-            </Badge>
-          );
-        },
         size: 120,
       }),
       columnHelper.accessor('labels', {
@@ -598,7 +572,7 @@ const DashboardPage = () => {
     };
 
     filteredData.forEach(item => {
-      const titleLower = item.title.toLowerCase();
+      const titleLower = item.prTitle.toLowerCase();
       if (titleLower.includes('move to final')) {
         statusGroups['Final'].push(item);
       } else if (titleLower.includes('move to last call')) {
@@ -619,7 +593,7 @@ const DashboardPage = () => {
     if (statusGroups['Final'].length > 0) {
       markdown += '### To `Final` \n';
       statusGroups['Final'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.prTitle} #${item.prNumber}](${item.prLink})\n`;
       });
       markdown += '\n';
     }
@@ -627,7 +601,7 @@ const DashboardPage = () => {
     if (statusGroups['Last Call'].length > 0) {
       markdown += '### To `Last Call` \n';
       statusGroups['Last Call'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.prTitle} #${item.prNumber}](${item.prLink})\n`;
       });
       markdown += '\n';
     }
@@ -635,7 +609,7 @@ const DashboardPage = () => {
     if (statusGroups['Review'].length > 0) {
       markdown += '### To `Review` \n';
       statusGroups['Review'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.prTitle} #${item.prNumber}](${item.prLink})\n`;
       });
       markdown += '\n';
     }
@@ -643,7 +617,7 @@ const DashboardPage = () => {
     if (statusGroups['Draft'].length > 0) {
       markdown += '### To `Draft` \n';
       statusGroups['Draft'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.prTitle} #${item.prNumber}](${item.prLink})\n`;
       });
       markdown += '\n';
     }
@@ -651,7 +625,7 @@ const DashboardPage = () => {
     if (statusGroups['Other'].length > 0) {
       markdown += '#### Other\n';
       statusGroups['Other'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.prTitle} #${item.prNumber}](${item.prLink})\n`;
       });
       markdown += '\n';
     }
@@ -682,8 +656,6 @@ const DashboardPage = () => {
       "Serial Number",
       "PR Number",
       "PR Title",
-      "Author",
-      "Wait Duration (hours)",
       "Labels",
       "Created Date",
       "URL",
@@ -701,13 +673,11 @@ const DashboardPage = () => {
     data.forEach((item, index) => {
       const rowValues = [
         index + 1,
-        item.number,
-        item.title,
-        item.author,
-        item.wait_duration_hours.toFixed(1),
+        item.prNumber,
+        item.prTitle,
         addAutoLabels(item).join("; "),
-        new Date(item.created_at).toLocaleDateString(),
-        item.url,
+        new Date(item.prCreatedDate).toLocaleDateString(),
+        item.prLink,
       ];
       csvRows.push(rowValues.map(escapeField).join(","));
     });
@@ -754,7 +724,7 @@ const DashboardPage = () => {
             faqItems={[
               {
                 question: "💡 What is EIP Board?",
-                answer: "The table below lists all Open Pull Requests (till date) in an order such that it uses oldest author interaction after the most recent editor response."
+                answer: "The table below lists all Open Pull Requests (till date) that are awaiting editor review."
               },
               {
                 question: "🏷️ How do label filters work?",
@@ -762,7 +732,7 @@ const DashboardPage = () => {
               },
               {
                 question: "📊 How is prioritization determined?",
-                answer: "PRs with the 's-withdrawn' label are given the lowest priority and moved to the bottom of the table. The remaining PRs are ranked based on the longest-waiting interaction time, with those having the oldest interaction appearing at the top."
+                answer: "PRs with the 's-withdrawn' label are given the lowest priority and moved to the bottom of the table."
               },
               {
                 question: "👥 Who would use this tool?",
@@ -808,7 +778,7 @@ const DashboardPage = () => {
                 <SearchIcon color="gray.400" />
               </InputLeftElement>
               <Input
-                placeholder="Search by title, author, or PR#..."
+                placeholder="Search by title or PR#..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 bg={useColorModeValue("white", "gray.800")}
@@ -956,8 +926,8 @@ const DashboardPage = () => {
                       return (
                         <Tr
                           key={row.id}
-                          bg={item.is_withdrawn ? useColorModeValue("red.50", "red.900") : undefined}
-                          opacity={item.is_withdrawn ? 0.7 : 1}
+                          bg={item.labels.includes("s-withdrawn") ? useColorModeValue("red.50", "red.900") : undefined}
+                          opacity={item.labels.includes("s-withdrawn") ? 0.7 : 1}
                           _hover={{
                             bg: useColorModeValue("blue.50", "gray.700"),
                             transition: "all 0.2s"
@@ -967,7 +937,7 @@ const DashboardPage = () => {
                             <Td
                               key={cell.id}
                               py={3}
-                              textAlign={cell.column.id === 'title' ? 'left' : 'center'}
+                              textAlign={cell.column.id === 'prTitle' ? 'left' : 'center'}
                             >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </Td>
