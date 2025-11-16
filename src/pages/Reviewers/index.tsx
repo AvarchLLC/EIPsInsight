@@ -115,13 +115,19 @@ const ReviewTracker = () => {
     const currentYear = new Date().getFullYear();
     const currentMonth = String(new Date().getMonth() + 1).padStart(2, "0");
 
+    // Use combined data when activeTab is 'all' for consistency
+    let dataSource = chart1data;
+    if (activeTab === 'all') {
+      dataSource = [...eipdata, ...ercdata, ...ripdata];
+    }
+
     // Set default values for start and end dates
     const startDate = `${selectedStartYear || "2015"}-${selectedStartMonth || "01"}`;
     const endDate = `${selectedEndYear || currentYear}-${selectedEndMonth || currentMonth}`;
 
     // Filter only if start or end date is provided
     if (startDate && endDate) {
-        const filteredData = chart1data?.filter((item) => {
+        const filteredData = dataSource?.filter((item) => {
             const itemDate = item.monthYear; // Assuming monthYear is in "YYYY-MM" format
             return itemDate >= startDate && itemDate <= endDate;
         });
@@ -131,7 +137,7 @@ const ReviewTracker = () => {
     }
 
     // Return all data if no filters are applied
-    return chart1data;
+    return dataSource;
 };
 
 
@@ -756,8 +762,17 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   // List of reviewers (others are editors)
   const reviewersList = helpers.REVIEWERS_LIST;
 
+  // Use combined data from all repos when activeTab is 'all' for consistency
+  let dataToUse = data;
+  if (activeTab === 'all') {
+    // Combine eipdata, ercdata, and ripdata to ensure consistency
+    const combinedData = [...eipdata, ...ercdata, ...ripdata];
+    dataToUse = combinedData;
+    console.log(`Data consistency check - EIP records: ${eipdata.length}, ERC records: ${ercdata.length}, RIP records: ${ripdata.length}, Combined: ${combinedData.length}`);
+  }
+
   // Get yearly data and format it
-  const yearlyData = helpers.getYearlyData(data, showReviewer);
+  const yearlyData = helpers.getYearlyData(dataToUse, showReviewer);
   const yearlyChartData = helpers.formatChartData(yearlyData);
 
   // Separate data into reviewers and editors
@@ -826,9 +841,16 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
   // List of reviewers (others are editors)
   const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
+  // Use combined data when activeTab is 'all' for consistency
+  let dataToUse = data;
+  if (activeTab === 'all') {
+    const combinedData = [...eipdata, ...ercdata, ...ripdata];
+    dataToUse = combinedData;
+  }
+
   let monthlyChartData: any; // Declare monthlyChartData
   if (selectedMonth != null) {
-    const monthlyData = getMonthlyData(data, selectedYear, selectedMonth);
+    const monthlyData = getMonthlyData(dataToUse, selectedYear, selectedMonth);
     monthlyChartData = helpers.formatChartData(monthlyData); // Assign to the declared variable
   }
   console.log("chartdata1: ", monthlyChartData);
@@ -1062,7 +1084,13 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
       .includes(item.reviewer)
   );
 
-  const yearlyData = helpers.getYearlyData(reviewsdata, showReviewer);
+  // Use combined data when activeTab is 'all' for consistency
+  let reviewsdataToUse = reviewsdata;
+  if (activeTab === 'all') {
+    reviewsdataToUse = [...eipdata, ...ercdata, ...ripdata];
+  }
+
+  const yearlyData = helpers.getYearlyData(reviewsdataToUse, showReviewer);
   const yearlyChartData = helpers.formatChartData(yearlyData);
   const reviewersList = helpers.REVIEWERS_LIST;
 
