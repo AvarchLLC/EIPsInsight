@@ -381,7 +381,7 @@ const EditorRepoGrid: React.FC<EditorRepoGridProps> = ({
                   onClick={() => setShowAllReviewers(!showAllReviewers)}
                   size="md"
                 >
-                  {reviewersViewMode ? 'Show Less' : `See More (${reviewersData.length - 3} more)`}
+                  {showAllReviewers ? 'Show Less' : `See More (${reviewersData.length - 3} more)`}
                 </Button>
               </Flex>
             )}
