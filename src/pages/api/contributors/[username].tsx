@@ -37,27 +37,95 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const contributors = db.collection('contributors');
     const snapshots = db.collection('contributor_snapshots');
 
-    // Get contributor details
-    const contributor = await contributors.findOne({ username });
+    // Get contributor details - search by all possible username fields
+    const contributor = await contributors.findOne({
+      $or: [
+        { githubUsername: username },
+        { username: username },
+        { login: username },
+      ]
+    });
 
     if (!contributor) {
       return res.status(404).json({ error: 'Contributor not found' });
     }
 
     // Get snapshots for trend analysis (last 90 days)
+    const actualUsername = contributor.githubUsername || contributor.username || contributor.login;
     const contributorSnapshots = await snapshots
-      .find({ username })
+      .find({ 
+        $or: [
+          { username: actualUsername },
+          { githubUsername: actualUsername },
+        ]
+      })
       .sort({ date: -1 })
       .limit(90)
       .toArray();
 
+    // Calculate activity score from flat structure
+    const activityScore = contributor.totals?.activityScore || (
+      (contributor.totalCommits || 0) * 3 +
+      (contributor.totalPRs || 0) * 5 +
+      (contributor.totalReviews || 0) * 4 +
+      (contributor.totalComments || 0) * 2 +
+      (contributor.totalIssues || 0) * 3
+    );
+
     // Get rank among all contributors
     const rank = await contributors.countDocuments({
-      'totals.activityScore': { $gt: contributor.totals?.activityScore || 0 }
+      $or: [
+        { 'totals.activityScore': { $gt: activityScore } },
+        { 
+          $expr: { 
+            $gt: [
+              { 
+                $add: [
+                  { $multiply: [{ $ifNull: ['$totalCommits', 0] }, 3] },
+                  { $multiply: [{ $ifNull: ['$totalPRs', 0] }, 5] },
+                  { $multiply: [{ $ifNull: ['$totalReviews', 0] }, 4] },
+                  { $multiply: [{ $ifNull: ['$totalComments', 0] }, 2] },
+                  { $multiply: [{ $ifNull: ['$totalIssues', 0] }, 3] },
+                ]
+              },
+              activityScore
+            ]
+          }
+        }
+      ]
     }) + 1;
 
+    // Transform to expected format
+    const hasFlatStructure = contributor.totalCommits !== undefined;
+    const transformedContributor = {
+      username: contributor.githubUsername || contributor.username || contributor.login,
+      name: contributor.name || contributor.githubUsername || contributor.username,
+      avatarUrl: contributor.avatarUrl || contributor.avatar_url,
+      email: contributor.email,
+      company: contributor.company,
+      bio: contributor.bio,
+      totals: hasFlatStructure ? {
+        commits: contributor.totalCommits || 0,
+        prsOpened: contributor.totalPRs || 0,
+        prsMerged: 0,
+        reviews: contributor.totalReviews || 0,
+        comments: contributor.totalComments || 0,
+        issuesOpened: contributor.totalIssues || 0,
+        activityScore,
+      } : contributor.totals,
+      repos: contributor.repos || [],
+      activityStatus: contributor.activityStatus || 'Active',
+      lastActivityDate: contributor.lastFetchedAt || contributor.lastActivityDate,
+      firstContributionDate: contributor.firstContributionDate,
+      risingStarIndex: contributor.risingStarIndex,
+      expertise: contributor.expertise,
+      languageBreakdown: contributor.languageBreakdown,
+      avgResponseTime: contributor.avgResponseTime,
+      timeline: contributor.timeline || [],
+    };
+
     return res.status(200).json({
-      ...contributor,
+      ...transformedContributor,
       rank,
       snapshots: contributorSnapshots.reverse(), // Reverse to show oldest first
     });
