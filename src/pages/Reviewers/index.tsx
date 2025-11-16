@@ -766,9 +766,9 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 
   return (
     <Box padding={{ base: "1rem", md: "1.5rem" }}>
-      <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap={{ base: "1rem", md: "1.5rem" }}>
+      <Flex direction={{ base: "column", md: "row" }} gap={{ base: "1rem", md: "1.5rem" }}>
         {/* Editors Leaderboard Grid */}
-        <Box width={{ base: "100%", md: "48%" }}>
+        <Box width={{ base: "100%", md: "50%" }}>
           <LeaderboardGrid
             title="Editors - All-Time Contributions"
             data={editorsData}
@@ -793,7 +793,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         </Box>
 
         {/* Reviewers Leaderboard Grid */}
-        <Box width={{ base: "100%", md: "48%" }}>
+        <Box width={{ base: "100%", md: "50%" }}>
           <LeaderboardGrid
             title="Reviewers - All-Time Contributions"
             data={reviewersData}
@@ -1662,10 +1662,6 @@ const editorsSpecialityChart = () => {
 const renderEditorRepoGrid = () => {
   const reviewersList = helpers.REVIEWERS_LIST;
   
-  // Get totals from chart1data (same source as leaderboard for consistency)
-  const yearlyData = helpers.getYearlyData(chart1data, showReviewer);
-  const totalsByReviewer = yearlyData;
-  
   // Prepare time-series data for each reviewer
   const reviewerTimeSeriesMap: { [key: string]: any[] } = {};
   const reviewerRepoTotals: { [key: string]: { eips: number; ercs: number; rips: number } } = {};
@@ -1724,17 +1720,18 @@ const renderEditorRepoGrid = () => {
     }
   });
 
-  // Use totals from chart1data (combined source) for consistency with leaderboard
-  const allData = Object.keys(totalsByReviewer).map(reviewer => {
-    const repoTotals = reviewerRepoTotals[reviewer] || { eips: 0, ercs: 0, rips: 0 };
+  // Calculate total from individual repo totals for data consistency
+  const allData = Object.keys(reviewerRepoTotals).map(reviewer => {
+    const repoTotals = reviewerRepoTotals[reviewer];
     const timeSeriesData = reviewerTimeSeriesMap[reviewer] || [];
+    const total = repoTotals.eips + repoTotals.ercs + repoTotals.rips;
     
     return {
       reviewer,
       eips: repoTotals.eips,
       ercs: repoTotals.ercs,
       rips: repoTotals.rips,
-      total: totalsByReviewer[reviewer], // Use the combined total from chart1data
+      total: total,
       timeSeriesData: timeSeriesData.sort((a, b) => a.monthYear.localeCompare(b.monthYear)),
     };
   }).sort((a, b) => b.total - a.total);
@@ -1812,7 +1809,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
           {/* ... */}
         </Flex>
       
-      <Box p={{ base: 3, md: 4 }}>
+      <Box p={{ base: 2, md: 3 }}>
         <section id = "LeaderBoard">
           
       {/* Animated Header with FAQ */}
@@ -1839,58 +1836,61 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         ]}
       />
       
-      {/* EtherWorld Advertisement */}
-      <Box my={5} width="100%">
-        <CloseableAdCard />
-      </Box>
-      
       </section>
 
+      {/* Tab selector and Ad in one row */}
+      <Flex 
+        direction={{ base: "column", lg: "row" }} 
+        gap={{ base: 3, md: 4 }} 
+        align={{ base: "stretch", lg: "center" }}
+        justify="space-between"
+        padding={{ base: "1rem", md: "1.5rem" }}
+        mt={4}
+        mb={4}
+      >
+        {/* Left: Tab buttons */}
+        <Box>
+          <HStack spacing={2}>
+            <Button
+              colorScheme={activeTab === 'all' ? 'blue' : 'gray'}
+              variant={activeTab === 'all' ? 'solid' : 'outline'}
+              onClick={() => setActiveTab('all')}
+              size="md"
+            >
+              ALL
+            </Button>
+            <Button
+              colorScheme={activeTab === 'eips' ? 'blue' : 'gray'}
+              variant={activeTab === 'eips' ? 'solid' : 'outline'}
+              onClick={() => setActiveTab('eips')}
+              size="md"
+            >
+              EIPs
+            </Button>
+            <Button
+              colorScheme={activeTab === 'ercs' ? 'blue' : 'gray'}
+              variant={activeTab === 'ercs' ? 'solid' : 'outline'}
+              onClick={() => setActiveTab('ercs')}
+              size="md"
+            >
+              ERCs
+            </Button>
+            <Button
+              colorScheme={activeTab === 'rips' ? 'blue' : 'gray'}
+              variant={activeTab === 'rips' ? 'solid' : 'outline'}
+              onClick={() => setActiveTab('rips')}
+              size="md"
+            >
+              RIPs
+            </Button>
+          </HStack>
+        </Box>
 
-     
-      <Flex justify="center" >
-  <Menu>
-    <MenuButton
-      as={Button}
-      rightIcon={<ChevronDownIcon />}
-      colorScheme="blue"
-      size="md"
-      width="200px"
-    >
-      {activeTab ? activeTab.toUpperCase() : "Select an option"}
-    </MenuButton>
-
-    <MenuList maxHeight="200px" overflowY="auto">
-     
-      <MenuItem onClick={() => {
-        setActiveTab('all');
-      }}>
-        ALL
-      </MenuItem>
-
-     
-      <MenuItem onClick={() => {
-        setActiveTab('eips');
-      }}>
-        EIPs
-      </MenuItem>
-
-      
-      <MenuItem onClick={() => {
-        setActiveTab('ercs');
-      }}>
-        ERCs
-      </MenuItem>
-
-     
-      <MenuItem onClick={() => {
-        setActiveTab('rips');
-      }}>
-        RIPs
-      </MenuItem>
-    </MenuList>
-  </Menu>
-</Flex>
+        {/* Right: Advertisement */}
+        <Box width={{ base: "100%" }} flexShrink={0}>
+          <CloseableAdCard />
+        </Box>
+      </Flex>
 
      
         <Box padding={{ base: "0.5rem", md: "1rem" }} borderRadius="0.55rem">
