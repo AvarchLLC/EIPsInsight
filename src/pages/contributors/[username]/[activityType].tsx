@@ -4,6 +4,7 @@ import {
   useColorModeValue, Spinner, Alert, AlertIcon, Table, Thead, Tbody,
   Tr, Th, Td, Card, CardBody, CardHeader, Icon, Link, Breadcrumb,
   BreadcrumbItem, BreadcrumbLink, SimpleGrid, IconButton, Tooltip,
+  Stat, StatLabel, StatNumber, StatHelpText,
 } from '@chakra-ui/react';
 import {
   FiGitCommit, FiGitPullRequest, FiMessageSquare,
@@ -43,6 +44,8 @@ const ActivityDetailPage: React.FC = () => {
   const [repo, setRepo] = useState('');
   const [period, setPeriod] = useState<'all' | 'weekly' | 'monthly'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<any>(null);
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -71,15 +74,26 @@ const ActivityDetailPage: React.FC = () => {
 
   const fetchActivities = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await axios.get(`/api/contributors/${username}/activities/${activityType}`, {
-        params: { page, limit: 50, repo: repo || undefined, period, sortOrder },
+        params: { page, limit: 100, repo: repo || undefined, period, sortOrder },
       });
-      setActivities(response.data.data);
-      setTotal(response.data.pagination.total);
-      setHasMore(response.data.pagination.hasNextPage);
-    } catch (error) {
+      
+      if (!response.data || !response.data.data) {
+        setError('No activity data available');
+        setActivities([]);
+        return;
+      }
+      
+      setActivities(response.data.data || []);
+      setTotal(response.data.pagination?.total || 0);
+      setHasMore(response.data.pagination?.hasNextPage || false);
+      setStats(response.data.stats || null);
+    } catch (error: any) {
       console.error('Failed to fetch activities:', error);
+      setError(error.response?.data?.message || 'Failed to load activity data');
+      setActivities([]);
     } finally {
       setLoading(false);
     }
@@ -196,24 +210,24 @@ const ActivityDetailPage: React.FC = () => {
           </Breadcrumb>
 
           {/* Header */}
-          <Card bg={cardBg} mb={6}>
-            <CardHeader>
+          <Card bg={cardBg} mb={6} overflow="hidden">
+            <CardHeader bgGradient={`linear(to-r, ${getActivityColor(activityType as string)}.500, ${getActivityColor(activityType as string)}.700)`} py={6}>
               <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
-                <HStack>
-                  <Icon as={ActivityIcon} boxSize={8} color={`${getActivityColor(activityType as string)}.500`} />
-                  <VStack align="start" spacing={0}>
-                    <Heading size="lg">{getActivityTitle(activityType as string)}</Heading>
-                    <Text color={mutedColor}>
+                <HStack spacing={4}>
+                  <Icon as={ActivityIcon} boxSize={10} color="white" />
+                  <VStack align="start" spacing={1}>
+                    <Heading size="xl" color="white">{getActivityTitle(activityType as string)}</Heading>
+                    <Text color="whiteAlpha.900" fontSize="lg">
                       by <Text as="span" fontWeight="bold">{username}</Text>
                     </Text>
                   </VStack>
                 </HStack>
                 <HStack>
-                  <Badge colorScheme={getActivityColor(activityType as string)} fontSize="lg" px={3} py={1}>
+                  <Badge bg="whiteAlpha.300" color="white" fontSize="xl" px={4} py={2} borderRadius="lg">
                     {total} {total === 1 ? 'activity' : 'activities'}
                   </Badge>
                   {period !== 'all' && (
-                    <Badge colorScheme="purple" fontSize="md" px={3} py={1}>
+                    <Badge bg="whiteAlpha.200" color="white" fontSize="md" px={3} py={1} borderRadius="lg">
                       {getPeriodLabel(period)}
                     </Badge>
                   )}
@@ -222,8 +236,9 @@ const ActivityDetailPage: React.FC = () => {
                       aria-label="Download CSV"
                       icon={<FiDownload />}
                       onClick={downloadCSV}
-                      colorScheme="blue"
-                      variant="outline"
+                      colorScheme="whiteAlpha"
+                      variant="solid"
+                      size="lg"
                     />
                   </Tooltip>
                 </HStack>
@@ -231,14 +246,63 @@ const ActivityDetailPage: React.FC = () => {
             </CardHeader>
           </Card>
 
+          {/* Stats Summary */}
+          {stats && (
+            <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4} mb={6}>
+              <Card bg={cardBg} borderWidth="2px" borderColor={`${getActivityColor(activityType as string)}.200`}>
+                <CardBody>
+                  <Stat>
+                    <StatLabel fontSize="sm">Total Count</StatLabel>
+                    <StatNumber fontSize="3xl" color={`${getActivityColor(activityType as string)}.600`}>
+                      {stats.total || total}
+                    </StatNumber>
+                    <StatHelpText>All time</StatHelpText>
+                  </Stat>
+                </CardBody>
+              </Card>
+              <Card bg={cardBg}>
+                <CardBody>
+                  <Stat>
+                    <StatLabel fontSize="sm">This Month</StatLabel>
+                    <StatNumber fontSize="3xl">{stats.thisMonth || 0}</StatNumber>
+                    <StatHelpText>Last 30 days</StatHelpText>
+                  </Stat>
+                </CardBody>
+              </Card>
+              <Card bg={cardBg}>
+                <CardBody>
+                  <Stat>
+                    <StatLabel fontSize="sm">This Week</StatLabel>
+                    <StatNumber fontSize="3xl">{stats.thisWeek || 0}</StatNumber>
+                    <StatHelpText>Last 7 days</StatHelpText>
+                  </Stat>
+                </CardBody>
+              </Card>
+              <Card bg={cardBg}>
+                <CardBody>
+                  <Stat>
+                    <StatLabel fontSize="sm">Avg/Month</StatLabel>
+                    <StatNumber fontSize="3xl">{stats.avgPerMonth || 0}</StatNumber>
+                    <StatHelpText>Average</StatHelpText>
+                  </Stat>
+                </CardBody>
+              </Card>
+            </SimpleGrid>
+          )}
+
           {/* Filters */}
-          <Card bg={cardBg} mb={6}>
+          <Card bg={cardBg} mb={6} borderWidth="2px" borderColor={borderColor}>
+            <CardHeader>
+              <Heading size="md">
+                <Icon as={FiFilter} mr={2} />
+                Advanced Filters & Analytics
+              </Heading>
+            </CardHeader>
             <CardBody>
-              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+              <SimpleGrid columns={{ base: 1, md: 4 }} spacing={4}>
                 <Box>
-                  <Text fontSize="sm" mb={2} fontWeight="semibold">
-                    <Icon as={FiFilter} mr={2} />
-                    Filter by Repository
+                  <Text fontSize="sm" mb={2} fontWeight="semibold" color={mutedColor}>
+                    Repository
                   </Text>
                   <Select
                     value={repo}
@@ -247,17 +311,35 @@ const ActivityDetailPage: React.FC = () => {
                       setPage(1);
                     }}
                     placeholder="All Repositories"
+                    size="lg"
                   >
-                    <option value="EIPs">EIPs</option>
-                    <option value="ERCs">ERCs</option>
-                    <option value="RIPs">RIPs</option>
+                    <option value="EIPs">📜 EIPs</option>
+                    <option value="ERCs">🎨 ERCs</option>
+                    <option value="RIPs">⚡ RIPs</option>
                   </Select>
                 </Box>
 
                 <Box>
-                  <Text fontSize="sm" mb={2} fontWeight="semibold">
-                    <Icon as={FiCalendar} mr={2} />
-                    Sort by Date
+                  <Text fontSize="sm" mb={2} fontWeight="semibold" color={mutedColor}>
+                    Time Period
+                  </Text>
+                  <Select
+                    value={period}
+                    onChange={(e) => {
+                      setPeriod(e.target.value as any);
+                      setPage(1);
+                    }}
+                    size="lg"
+                  >
+                    <option value="all">All Time</option>
+                    <option value="monthly">Last 30 Days</option>
+                    <option value="weekly">Last 7 Days</option>
+                  </Select>
+                </Box>
+
+                <Box>
+                  <Text fontSize="sm" mb={2} fontWeight="semibold" color={mutedColor}>
+                    Sort Order
                   </Text>
                   <Select
                     value={sortOrder}
@@ -265,21 +347,37 @@ const ActivityDetailPage: React.FC = () => {
                       setSortOrder(e.target.value as 'asc' | 'desc');
                       setPage(1);
                     }}
+                    size="lg"
                   >
-                    <option value="desc">Newest First</option>
-                    <option value="asc">Oldest First</option>
+                    <option value="desc">⬇️ Newest First</option>
+                    <option value="asc">⬆️ Oldest First</option>
                   </Select>
                 </Box>
 
                 <Box>
-                  <Text fontSize="sm" mb={2} fontWeight="semibold">Results</Text>
-                  <Text fontSize="2xl" fontWeight="bold" color={`${getActivityColor(activityType as string)}.500`}>
+                  <Text fontSize="sm" mb={2} fontWeight="semibold" color={mutedColor}>Showing</Text>
+                  <Text fontSize="3xl" fontWeight="bold" color={`${getActivityColor(activityType as string)}.600`}>
                     {activities.length} / {total}
                   </Text>
+                  <Text fontSize="xs" color={mutedColor}>activities found</Text>
                 </Box>
               </SimpleGrid>
             </CardBody>
           </Card>
+
+          {/* Error State */}
+          {error && (
+            <Alert status="error" borderRadius="md" mb={6}>
+              <AlertIcon />
+              <Box flex="1">
+                <Text fontWeight="bold">Error Loading Activities</Text>
+                <Text fontSize="sm">{error}</Text>
+              </Box>
+              <Button size="sm" onClick={fetchActivities} colorScheme="red" variant="outline">
+                Retry
+              </Button>
+            </Alert>
+          )}
 
           {/* Activities Table */}
           <Card bg={cardBg}>
@@ -358,26 +456,41 @@ const ActivityDetailPage: React.FC = () => {
           </Card>
 
           {/* Pagination */}
-          {total > 50 && (
-            <Flex justify="center" align="center" gap={4} mt={6}>
-              <Button
-                onClick={() => setPage(page - 1)}
-                isDisabled={page === 1}
-                variant="outline"
-              >
-                Previous
-              </Button>
-              <Text>
-                Page {page} of {Math.ceil(total / 50)}
-              </Text>
-              <Button
-                onClick={() => setPage(page + 1)}
-                isDisabled={!hasMore}
-                variant="outline"
-              >
-                Next
-              </Button>
-            </Flex>
+          {total > 100 && (
+            <Card bg={cardBg} mt={6}>
+              <CardBody>
+                <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
+                  <Button
+                    onClick={() => setPage(page - 1)}
+                    isDisabled={page === 1}
+                    colorScheme="blue"
+                    variant="outline"
+                    size="lg"
+                    leftIcon={<Text>⬅️</Text>}
+                  >
+                    Previous
+                  </Button>
+                  <VStack spacing={1}>
+                    <Text fontSize="xl" fontWeight="bold">
+                      Page {page} of {Math.ceil(total / 100)}
+                    </Text>
+                    <Text fontSize="sm" color={mutedColor}>
+                      {activities.length} items on this page
+                    </Text>
+                  </VStack>
+                  <Button
+                    onClick={() => setPage(page + 1)}
+                    isDisabled={!hasMore}
+                    colorScheme="blue"
+                    variant="outline"
+                    size="lg"
+                    rightIcon={<Text>➡️</Text>}
+                  >
+                    Next
+                  </Button>
+                </Flex>
+              </CardBody>
+            </Card>
           )}
         </Box>
       </Box>

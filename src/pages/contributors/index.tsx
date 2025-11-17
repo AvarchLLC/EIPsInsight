@@ -3,10 +3,11 @@ import {
   Box, Heading, Text, Flex, Badge, VStack, HStack, Select, Button,
   useColorModeValue, Spinner, Alert, AlertIcon, Input, InputGroup,
   InputLeftElement, Link, Avatar, SimpleGrid, Card, CardBody, Icon,
-  Menu, MenuButton, MenuList, MenuItem, Divider,
+  Menu, MenuButton, MenuList, MenuItem, Divider, Container, Stat,
+  StatLabel, StatNumber, StatHelpText, Collapse, IconButton,
 } from '@chakra-ui/react';
-import { SearchIcon, ChevronDownIcon } from '@chakra-ui/icons';
-import { FiGitCommit, FiGitPullRequest, FiMessageSquare, FiAlertCircle, FiEye } from 'react-icons/fi';
+import { SearchIcon, ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { FiGitCommit, FiGitPullRequest, FiMessageSquare, FiAlertCircle, FiEye, FiTrendingUp, FiUsers } from 'react-icons/fi';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import AllLayout from '@/components/Layout';
@@ -41,6 +42,9 @@ const ContributorsPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPrevPage, setHasPrevPage] = useState(false);
+  const [showFAQ, setShowFAQ] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalContributors, setTotalContributors] = useState(0);
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -53,6 +57,7 @@ const ContributorsPage: React.FC = () => {
 
   const fetchContributors = async () => {
     setLoading(true);
+    setError(null);
     try {
       const params: any = {
         page,
@@ -65,25 +70,54 @@ const ContributorsPage: React.FC = () => {
       if (repoFilter) params.repo = repoFilter;
 
       const response = await axios.get('/api/contributors', { params });
-      setContributors(response.data.data);
-      setTotalPages(response.data.pagination.totalPages);
-      setHasNextPage(response.data.pagination.hasNextPage);
-      setHasPrevPage(response.data.pagination.hasPrevPage);
-    } catch (error) {
+      
+      // Handle empty or invalid response
+      if (!response.data || !response.data.data) {
+        setContributors([]);
+        setError('No data available from the server');
+        return;
+      }
+      
+      setContributors(response.data.data || []);
+      setTotalPages(response.data.pagination?.totalPages || 1);
+      setHasNextPage(response.data.pagination?.hasNextPage || false);
+      setHasPrevPage(response.data.pagination?.hasPrevPage || false);
+      setTotalContributors(response.data.pagination?.totalCount || 0);
+    } catch (error: any) {
       console.error('Failed to fetch contributors:', error);
+      setError(error.response?.data?.message || 'Failed to load contributors. Please try again later.');
+      setContributors([]);
     } finally {
       setLoading(false);
     }
   };
 
   const getActivityBadge = (status?: string) => {
-    if (!status) return <Badge colorScheme="gray">Unknown</Badge>;
+    if (!status) return <Badge colorScheme="gray" fontSize="sm" px={3} py={1}>Unknown</Badge>;
     const colors: Record<string, string> = {
       Active: 'green',
       Occasional: 'yellow',
       Dormant: 'red',
     };
-    return <Badge colorScheme={colors[status] || 'gray'}>{status}</Badge>;
+    return (
+      <Badge 
+        colorScheme={colors[status] || 'gray'} 
+        fontSize="sm" 
+        px={3} 
+        py={1}
+        borderRadius="full"
+        fontWeight="semibold"
+      >
+        {status === 'Active' ? '🟢 Active' : status === 'Occasional' ? '🟡 Occasional' : '🔴 Dormant'}
+      </Badge>
+    );
+  };
+
+  const getRepoColor = (repo: string) => {
+    if (repo === 'EIPs') return 'blue';
+    if (repo === 'ERCs') return 'purple';
+    if (repo === 'RIPs') return 'orange';
+    return 'gray';
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,22 +148,106 @@ const ContributorsPage: React.FC = () => {
       </Head>
 
       <Box bg={bgColor} minH="100vh" py={8} px={4}>
-        <Box maxW="7xl" mx="auto">
+        <Container maxW="7xl">
           {/* Header */}
           <VStack spacing={6} align="stretch" mb={8}>
             <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
               <Box>
-                <Heading size="xl" mb={2}>Contributors</Heading>
-                <Text color={mutedColor}>
+                <Heading size="2xl" mb={2} bgGradient="linear(to-r, blue.400, purple.500)" bgClip="text">
+                  🌟 Contributors
+                </Heading>
+                <Text color={mutedColor} fontSize="lg">
                   Discover and explore contributors to Ethereum proposals
                 </Text>
               </Box>
               <Link as={NextLink} href="/contributors/rankings">
-                <Button colorScheme="blue" size="lg">
+                <Button colorScheme="blue" size="lg" leftIcon={<Icon as={FiTrendingUp} />}>
                   View Rankings
                 </Button>
               </Link>
             </Flex>
+
+            {/* Stats Summary */}
+            {totalContributors > 0 && (
+              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+                <Card bg={cardBg}>
+                  <CardBody>
+                    <Stat>
+                      <StatLabel>
+                        <Icon as={FiUsers} mr={2} color="blue.500" />
+                        Total Contributors
+                      </StatLabel>
+                      <StatNumber>{totalContributors}</StatNumber>
+                      <StatHelpText>Across all repositories</StatHelpText>
+                    </Stat>
+                  </CardBody>
+                </Card>
+                <Card bg={cardBg}>
+                  <CardBody>
+                    <Stat>
+                      <StatLabel>Current Page</StatLabel>
+                      <StatNumber>{page} of {totalPages}</StatNumber>
+                      <StatHelpText>Showing {contributors.length} contributors</StatHelpText>
+                    </Stat>
+                  </CardBody>
+                </Card>
+                <Card bg={cardBg}>
+                  <CardBody>
+                    <Stat>
+                      <StatLabel>Active Filter</StatLabel>
+                      <StatNumber fontSize="lg">{repoFilter || 'All Repos'}</StatNumber>
+                      <StatHelpText>Repository filter</StatHelpText>
+                    </Stat>
+                  </CardBody>
+                </Card>
+              </SimpleGrid>
+            )}
+
+            {/* FAQ Section */}
+            <Card bg={cardBg} borderWidth="2px" borderColor={useColorModeValue('blue.200', 'blue.600')}>
+              <CardBody>
+                <Flex justify="space-between" align="center" cursor="pointer" onClick={() => setShowFAQ(!showFAQ)}>
+                  <Heading size="md" color={useColorModeValue('blue.700', 'blue.300')}>
+                    📚 Frequently Asked Questions
+                  </Heading>
+                  <IconButton
+                    icon={showFAQ ? <ChevronUpIcon boxSize={5} /> : <ChevronDownIcon boxSize={5} />}
+                    variant="ghost"
+                    colorScheme="blue"
+                    aria-label="Toggle FAQ"
+                    size="sm"
+                  />
+                </Flex>
+                <Collapse in={showFAQ} animateOpacity>
+                  <VStack align="stretch" spacing={3} mt={4}>
+                    <Box p={3} bg={useColorModeValue('blue.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="blue.500">
+                      <Heading size="sm" mb={2}>💡 What is this page?</Heading>
+                      <Text fontSize="sm" color={mutedColor}>
+                        This page displays all contributors to Ethereum Improvement Proposals (EIPs), Ethereum Request for Comments (ERCs), and RollUp Improvement Proposals (RIPs). You can search, filter, and sort contributors based on their activity.
+                      </Text>
+                    </Box>
+                    <Box p={3} bg={useColorModeValue('purple.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="purple.500">
+                      <Heading size="sm" mb={2}>🔍 How do I find a specific contributor?</Heading>
+                      <Text fontSize="sm" color={mutedColor}>
+                        Use the search bar to find contributors by username or name. You can also filter by repository (EIPs, ERCs, RIPs) and sort by different metrics like activity score, commits, PRs, or reviews.
+                      </Text>
+                    </Box>
+                    <Box p={3} bg={useColorModeValue('green.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="green.500">
+                      <Heading size="sm" mb={2}>📊 What do the numbers mean?</Heading>
+                      <Text fontSize="sm" color={mutedColor}>
+                        Each contributor card shows their commits, pull requests, reviews, and comments. Click on any contributor to view their detailed profile with activity trends and repository contributions.
+                      </Text>
+                    </Box>
+                    <Box p={3} bg={useColorModeValue('orange.50', 'gray.700')} borderRadius="md" borderLeftWidth="3px" borderLeftColor="orange.500">
+                      <Heading size="sm" mb={2}>⚙️ How is the data updated?</Heading>
+                      <Text fontSize="sm" color={mutedColor}>
+                        The contributor data is automatically updated every 24 hours. Activity scores are calculated based on commits, pull requests, reviews, and other contributions across all repositories.
+                      </Text>
+                    </Box>
+                  </VStack>
+                </Collapse>
+              </CardBody>
+            </Card>
 
             {/* Filters */}
             <Card bg={cardBg}>
@@ -198,29 +316,67 @@ const ContributorsPage: React.FC = () => {
                   >
                     <Card
                       bg={cardBg}
-                      borderWidth="1px"
-                      borderColor={borderColor}
+                      borderWidth="2px"
+                      borderColor="transparent"
                       _hover={{
-                        transform: 'translateY(-4px)',
-                        shadow: 'lg',
+                        transform: 'translateY(-8px)',
+                        shadow: 'xl',
                         borderColor: 'blue.400',
+                        bgGradient: useColorModeValue(
+                          'linear(to-br, blue.50, purple.50)',
+                          'linear(to-br, gray.700, gray.800)'
+                        ),
                       }}
-                      transition="all 0.2s"
+                      transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
                       h="full"
+                      position="relative"
+                      overflow="hidden"
                     >
-                      <CardBody>
+                      {/* Gradient Overlay on Hover */}
+                      <Box
+                        position="absolute"
+                        top="0"
+                        left="0"
+                        right="0"
+                        height="4px"
+                        bgGradient="linear(to-r, blue.400, purple.500)"
+                        opacity={0}
+                        _groupHover={{ opacity: 1 }}
+                        transition="opacity 0.3s"
+                      />
+                      <CardBody pt={6}>
                         <VStack spacing={4} align="stretch">
                           <Flex align="center" justify="space-between">
-                            <Avatar
-                              src={contributor.avatarUrl}
-                              name={contributor.username}
-                              size="lg"
-                            />
+                            <Box position="relative">
+                              <Avatar
+                                src={contributor.avatarUrl}
+                                name={contributor.username}
+                                size="xl"
+                                borderWidth="3px"
+                                borderColor={useColorModeValue('white', 'gray.700')}
+                                shadow="md"
+                              />
+                              {/* Activity Score Badge */}
+                              {contributor.totals?.activityScore && contributor.totals.activityScore > 0 && (
+                                <Badge
+                                  position="absolute"
+                                  bottom="-2"
+                                  right="-2"
+                                  colorScheme="yellow"
+                                  borderRadius="full"
+                                  px={2}
+                                  fontSize="xs"
+                                  fontWeight="bold"
+                                >
+                                  {contributor.totals.activityScore}
+                                </Badge>
+                              )}
+                            </Box>
                             {getActivityBadge(contributor.activityStatus)}
                           </Flex>
 
                           <Box>
-                            <Text fontWeight="bold" fontSize="lg" noOfLines={1}>
+                            <Text fontWeight="bold" fontSize="xl" noOfLines={1} mb={1}>
                               {contributor.name || contributor.username}
                             </Text>
                             <Text color={mutedColor} fontSize="sm" noOfLines={1}>
@@ -228,82 +384,93 @@ const ContributorsPage: React.FC = () => {
                             </Text>
                           </Box>
 
-                          <Divider />
+                          <Divider borderColor={useColorModeValue('gray.300', 'gray.600')} />
 
-                          <VStack spacing={2} align="stretch">
-                            <HStack justify="space-between">
-                              <HStack>
-                                <Icon as={FiGitCommit} color="purple.500" />
-                                <Text fontSize="sm">Commits</Text>
-                              </HStack>
-                              <Link
-                                as={NextLink}
-                                href={`/contributors/${contributor.username}/commits?period=all`}
-                                fontWeight="bold"
-                                color="blue.500"
-                                _hover={{ textDecoration: 'underline' }}
-                              >
-                                {contributor.totals?.commits || 0}
-                              </Link>
-                            </HStack>
+                          <SimpleGrid columns={2} spacing={3}>
+                            <Box
+                              p={3}
+                              borderRadius="md"
+                              bg={useColorModeValue('purple.50', 'purple.900')}
+                              borderWidth="1px"
+                              borderColor={useColorModeValue('purple.200', 'purple.700')}
+                            >
+                              <VStack spacing={1}>
+                                <Icon as={FiGitCommit} color="purple.500" boxSize={5} />
+                                <Text fontSize="xs" color={mutedColor}>Commits</Text>
+                                <Text fontWeight="bold" fontSize="lg" color="purple.600">
+                                  {contributor.totals?.commits || 0}
+                                </Text>
+                              </VStack>
+                            </Box>
 
-                            <HStack justify="space-between">
-                              <HStack>
-                                <Icon as={FiGitPullRequest} color="blue.500" />
-                                <Text fontSize="sm">PRs</Text>
-                              </HStack>
-                              <Link
-                                as={NextLink}
-                                href={`/contributors/${contributor.username}/prs?period=all`}
-                                fontWeight="bold"
-                                color="blue.500"
-                                _hover={{ textDecoration: 'underline' }}
-                              >
-                                {contributor.totals?.prsOpened || 0}
-                              </Link>
-                            </HStack>
+                            <Box
+                              p={3}
+                              borderRadius="md"
+                              bg={useColorModeValue('blue.50', 'blue.900')}
+                              borderWidth="1px"
+                              borderColor={useColorModeValue('blue.200', 'blue.700')}
+                            >
+                              <VStack spacing={1}>
+                                <Icon as={FiGitPullRequest} color="blue.500" boxSize={5} />
+                                <Text fontSize="xs" color={mutedColor}>PRs</Text>
+                                <Text fontWeight="bold" fontSize="lg" color="blue.600">
+                                  {contributor.totals?.prsOpened || 0}
+                                </Text>
+                              </VStack>
+                            </Box>
 
-                            <HStack justify="space-between">
-                              <HStack>
-                                <Icon as={FiEye} color="green.500" />
-                                <Text fontSize="sm">Reviews</Text>
-                              </HStack>
-                              <Link
-                                as={NextLink}
-                                href={`/contributors/${contributor.username}/reviews?period=all`}
-                                fontWeight="bold"
-                                color="blue.500"
-                                _hover={{ textDecoration: 'underline' }}
-                              >
-                                {contributor.totals?.reviews || 0}
-                              </Link>
-                            </HStack>
+                            <Box
+                              p={3}
+                              borderRadius="md"
+                              bg={useColorModeValue('green.50', 'green.900')}
+                              borderWidth="1px"
+                              borderColor={useColorModeValue('green.200', 'green.700')}
+                            >
+                              <VStack spacing={1}>
+                                <Icon as={FiEye} color="green.500" boxSize={5} />
+                                <Text fontSize="xs" color={mutedColor}>Reviews</Text>
+                                <Text fontWeight="bold" fontSize="lg" color="green.600">
+                                  {contributor.totals?.reviews || 0}
+                                </Text>
+                              </VStack>
+                            </Box>
 
-                            <HStack justify="space-between">
-                              <HStack>
-                                <Icon as={FiMessageSquare} color="orange.500" />
-                                <Text fontSize="sm">Comments</Text>
-                              </HStack>
-                              <Link
-                                as={NextLink}
-                                href={`/contributors/${contributor.username}/comments?period=all`}
-                                fontWeight="bold"
-                                color="blue.500"
-                                _hover={{ textDecoration: 'underline' }}
-                              >
-                                {contributor.totals?.comments || 0}
-                              </Link>
-                            </HStack>
-                          </VStack>
+                            <Box
+                              p={3}
+                              borderRadius="md"
+                              bg={useColorModeValue('orange.50', 'orange.900')}
+                              borderWidth="1px"
+                              borderColor={useColorModeValue('orange.200', 'orange.700')}
+                            >
+                              <VStack spacing={1}>
+                                <Icon as={FiMessageSquare} color="orange.500" boxSize={5} />
+                                <Text fontSize="xs" color={mutedColor}>Comments</Text>
+                                <Text fontWeight="bold" fontSize="lg" color="orange.600">
+                                  {contributor.totals?.comments || 0}
+                                </Text>
+                              </VStack>
+                            </Box>
+                          </SimpleGrid>
 
                           {contributor.repos && contributor.repos.length > 0 && (
-                            <Flex gap={1} wrap="wrap">
-                              {contributor.repos.map((repo) => (
-                                <Badge key={repo.name} colorScheme="blue" fontSize="xs">
-                                  {repo.name}
-                                </Badge>
-                              ))}
-                            </Flex>
+                            <>
+                              <Divider borderColor={useColorModeValue('gray.300', 'gray.600')} />
+                              <HStack spacing={2} wrap="wrap" justify="center">
+                                {contributor.repos.map((repo) => (
+                                  <Badge 
+                                    key={repo.name} 
+                                    colorScheme={getRepoColor(repo.name)}
+                                    fontSize="xs"
+                                    px={2}
+                                    py={1}
+                                    borderRadius="md"
+                                    fontWeight="semibold"
+                                  >
+                                    {repo.name}
+                                  </Badge>
+                                ))}
+                              </HStack>
+                            </>
                           )}
                         </VStack>
                       </CardBody>
@@ -333,14 +500,47 @@ const ContributorsPage: React.FC = () => {
             </>
           )}
 
-          {/* Empty State */}
-          {!loading && contributors.length === 0 && (
-            <Alert status="info">
+          {/* Error State */}
+          {!loading && error && (
+            <Alert status="error" borderRadius="md" mb={4}>
               <AlertIcon />
-              No contributors found. Try adjusting your filters.
+              <Box flex="1">
+                <Text fontWeight="bold">Error Loading Contributors</Text>
+                <Text fontSize="sm">{error}</Text>
+              </Box>
+              <Button size="sm" onClick={fetchContributors} colorScheme="red" variant="outline">
+                Retry
+              </Button>
             </Alert>
           )}
-        </Box>
+
+          {/* Empty State */}
+          {!loading && !error && contributors.length === 0 && (
+            <Card bg={cardBg} p={8} textAlign="center">
+              <CardBody>
+                <Icon as={FiUsers} boxSize={16} color={mutedColor} mb={4} />
+                <Heading size="lg" mb={2} color={mutedColor}>No Contributors Found</Heading>
+                <Text color={mutedColor} mb={4}>
+                  {searchQuery || repoFilter
+                    ? 'Try adjusting your search or filter criteria'
+                    : 'No contributor data available at the moment'}
+                </Text>
+                {(searchQuery || repoFilter) && (
+                  <Button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setRepoFilter('');
+                      setPage(1);
+                    }}
+                    colorScheme="blue"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </CardBody>
+            </Card>
+          )}
+        </Container>
       </Box>
     </AllLayout>
   );

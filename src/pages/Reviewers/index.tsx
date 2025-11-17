@@ -115,10 +115,19 @@ const ReviewTracker = () => {
     const currentYear = new Date().getFullYear();
     const currentMonth = String(new Date().getMonth() + 1).padStart(2, "0");
 
-    // Use combined data when activeTab is 'all' for consistency
-    let dataSource = chart1data;
+    // ALWAYS use eipdata, ercdata, ripdata for consistency
+    let dataSource: PRData[];
+    
     if (activeTab === 'all') {
       dataSource = [...eipdata, ...ercdata, ...ripdata];
+    } else if (activeTab === 'eips') {
+      dataSource = eipdata;
+    } else if (activeTab === 'ercs') {
+      dataSource = ercdata;
+    } else if (activeTab === 'rips') {
+      dataSource = ripdata;
+    } else {
+      dataSource = chart1data;
     }
 
     // Set default values for start and end dates
@@ -762,18 +771,30 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   // List of reviewers (others are editors)
   const reviewersList = helpers.REVIEWERS_LIST;
 
-  // Use combined data from all repos when activeTab is 'all' for consistency
-  let dataToUse = data;
+  // ALWAYS use eipdata, ercdata, ripdata for consistency with Repository Distribution
+  let dataToUse: PRData[];
+  
   if (activeTab === 'all') {
-    // Combine eipdata, ercdata, and ripdata to ensure consistency
-    const combinedData = [...eipdata, ...ercdata, ...ripdata];
-    dataToUse = combinedData;
-    console.log(`Data consistency check - EIP records: ${eipdata.length}, ERC records: ${ercdata.length}, RIP records: ${ripdata.length}, Combined: ${combinedData.length}`);
+    // Combine all repos
+    dataToUse = [...eipdata, ...ercdata, ...ripdata];
+  } else if (activeTab === 'eips') {
+    dataToUse = eipdata;
+  } else if (activeTab === 'ercs') {
+    dataToUse = ercdata;
+  } else if (activeTab === 'rips') {
+    dataToUse = ripdata;
+  } else {
+    dataToUse = data;
   }
 
   // Get yearly data and format it
   const yearlyData = helpers.getYearlyData(dataToUse, showReviewer);
   const yearlyChartData = helpers.formatChartData(yearlyData);
+
+  // Verification logging for data consistency
+  console.log(`[Leaderboard] Active Tab: ${activeTab}, Total entries in dataToUse: ${dataToUse.length}`);
+  const totalCount = yearlyChartData.reduce((sum: number, item: any) => sum + item.count, 0);
+  console.log(`[Leaderboard] Total aggregated count: ${totalCount}`);
 
   // Separate data into reviewers and editors
   const reviewersData = yearlyChartData?.filter((item: any) => reviewersList.includes(item.reviewer));
@@ -841,11 +862,19 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
   // List of reviewers (others are editors)
   const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
 
-  // Use combined data when activeTab is 'all' for consistency
-  let dataToUse = data;
+  // ALWAYS use eipdata, ercdata, ripdata for consistency
+  let dataToUse: PRData[];
+  
   if (activeTab === 'all') {
-    const combinedData = [...eipdata, ...ercdata, ...ripdata];
-    dataToUse = combinedData;
+    dataToUse = [...eipdata, ...ercdata, ...ripdata];
+  } else if (activeTab === 'eips') {
+    dataToUse = eipdata;
+  } else if (activeTab === 'ercs') {
+    dataToUse = ercdata;
+  } else if (activeTab === 'rips') {
+    dataToUse = ripdata;
+  } else {
+    dataToUse = data;
   }
 
   let monthlyChartData: any; // Declare monthlyChartData
@@ -1084,10 +1113,19 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
       .includes(item.reviewer)
   );
 
-  // Use combined data when activeTab is 'all' for consistency
-  let reviewsdataToUse = reviewsdata;
+  // ALWAYS use eipdata, ercdata, ripdata for consistency
+  let reviewsdataToUse: PRData[];
+  
   if (activeTab === 'all') {
     reviewsdataToUse = [...eipdata, ...ercdata, ...ripdata];
+  } else if (activeTab === 'eips') {
+    reviewsdataToUse = eipdata;
+  } else if (activeTab === 'ercs') {
+    reviewsdataToUse = ercdata;
+  } else if (activeTab === 'rips') {
+    reviewsdataToUse = ripdata;
+  } else {
+    reviewsdataToUse = reviewsdata;
   }
 
   const yearlyData = helpers.getYearlyData(reviewsdataToUse, showReviewer);
@@ -1763,6 +1801,13 @@ const renderEditorRepoGrid = () => {
       timeSeriesData: timeSeriesData.sort((a, b) => a.monthYear.localeCompare(b.monthYear)),
     };
   }).sort((a, b) => b.total - a.total);
+
+  // Verification logging for data consistency
+  const totalEIPs = allData.reduce((sum, item) => sum + item.eips, 0);
+  const totalERCs = allData.reduce((sum, item) => sum + item.ercs, 0);
+  const totalRIPs = allData.reduce((sum, item) => sum + item.rips, 0);
+  const grandTotal = totalEIPs + totalERCs + totalRIPs;
+  console.log(`[Repository Distribution] EIPs: ${totalEIPs}, ERCs: ${totalERCs}, RIPs: ${totalRIPs}, Total: ${grandTotal}`);
 
   const editorsData = allData.filter(item => !reviewersList.includes(item.reviewer));
   const reviewersData = allData.filter(item => reviewersList.includes(item.reviewer));

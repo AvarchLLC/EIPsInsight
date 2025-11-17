@@ -49,6 +49,7 @@ const RankingsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<'all' | 'weekly' | 'monthly'>('all');
   const [activeMode, setActiveMode] = useState<keyof Rankings>('overall');
+  const [error, setError] = useState<string | null>(null);
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -61,17 +62,23 @@ const RankingsPage: React.FC = () => {
 
   const fetchRankings = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await axios.get('/api/rankings', {
         params: { period, limit: 100 },
       });
-      console.log('[Frontend] API Response:', response.data);
-      console.log('[Frontend] Rankings data:', response.data.rankings);
-      console.log('[Frontend] Commits count:', response.data.rankings?.commits?.length || 0);
-      console.log('[Frontend] Sample commits item:', response.data.rankings?.commits?.[0]);
+      
+      if (!response.data || !response.data.rankings) {
+        setError('No ranking data available');
+        setRankings(null);
+        return;
+      }
+      
       setRankings(response.data.rankings);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch rankings:', error);
+      setError(error.response?.data?.message || 'Failed to load rankings data');
+      setRankings(null);
     } finally {
       setLoading(false);
     }
@@ -468,39 +475,66 @@ const RankingsPage: React.FC = () => {
         <Box maxW="7xl" mx="auto">
           {/* Header */}
           <VStack spacing={6} align="stretch" mb={8}>
-            <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
-              <Box>
-                <Heading size="xl" mb={2}>
-                  <Icon as={FiAward} mr={2} />
-                  Contributor Rankings
-                </Heading>
-                <Text color={mutedColor}>
-                  Discover top contributors across all categories
-                </Text>
-              </Box>
+            <Card bg={cardBg} overflow="hidden">
+              <CardHeader bgGradient="linear(to-r, yellow.500, orange.600)" py={8}>
+                <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
+                  <VStack align="flex-start" spacing={2}>
+                    <Heading size="2xl" color="white">
+                      🏆 Contributor Rankings
+                    </Heading>
+                    <Text color="whiteAlpha.900" fontSize="lg">
+                      Discover top contributors across all categories
+                    </Text>
+                  </VStack>
 
-              <HStack>
-                <Select
-                  value={period}
-                  onChange={(e) => setPeriod(e.target.value as any)}
-                  maxW="200px"
-                >
-                  <option value="all">All Time</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="weekly">Weekly</option>
-                </Select>
-                <Link as={NextLink} href="/contributors">
-                  <Button colorScheme="blue">View All Contributors</Button>
-                </Link>
-              </HStack>
-            </Flex>
+                  <HStack>
+                    <Select
+                      value={period}
+                      onChange={(e) => setPeriod(e.target.value as any)}
+                      maxW="250px"
+                      size="lg"
+                      bg="whiteAlpha.300"
+                      color="white"
+                      borderColor="whiteAlpha.400"
+                      _hover={{ bg: 'whiteAlpha.400' }}
+                    >
+                      <option value="all" style={{ color: 'black' }}>⌛ All Time</option>
+                      <option value="monthly" style={{ color: 'black' }}>📅 Monthly</option>
+                      <option value="weekly" style={{ color: 'black' }}>📆 Weekly</option>
+                    </Select>
+                    <Link as={NextLink} href="/contributors">
+                      <Button colorScheme="whiteAlpha" size="lg" variant="solid">
+                        View All Contributors
+                      </Button>
+                    </Link>
+                  </HStack>
+                </Flex>
+              </CardHeader>
+            </Card>
           </VStack>
 
           {/* Loading State */}
           {loading && (
             <Flex justify="center" align="center" minH="400px">
-              <Spinner size="xl" />
+              <VStack spacing={4}>
+                <Spinner size="xl" thickness="4px" speed="0.65s" color="blue.500" />
+                <Text color={mutedColor} fontSize="lg">Loading rankings...</Text>
+              </VStack>
             </Flex>
+          )}
+
+          {/* Error State */}
+          {!loading && error && (
+            <Alert status="error" borderRadius="md">
+              <AlertIcon />
+              <Box flex="1">
+                <Text fontWeight="bold">Error Loading Rankings</Text>
+                <Text fontSize="sm">{error}</Text>
+              </Box>
+              <Button size="sm" onClick={fetchRankings} colorScheme="red" variant="outline">
+                Retry
+              </Button>
+            </Alert>
           )}
 
           {/* Rankings Tabs */}
