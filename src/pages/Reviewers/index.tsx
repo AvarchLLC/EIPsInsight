@@ -1594,7 +1594,48 @@ const fetchDataspeciality = async () => {
     const formattedData1: { monthYear: string; reviewer: string; count: number }[] = await response1.json();
     const formattedData2: { monthYear: string; reviewer: string; count: number }[] = await response2.json();
     const formattedData3: { monthYear: string; reviewer: string; count: number }[] = await response3.json();
-    // console.log("eip data:",formattedData1)
+    
+    // Data validation logging
+    console.log("[DATA VALIDATION] EIPs data entries:", formattedData1.length);
+    console.log("[DATA VALIDATION] ERCs data entries:", formattedData2.length);
+    console.log("[DATA VALIDATION] RIPs data entries:", formattedData3.length);
+    
+    // Calculate total counts for each repository
+    const totalEIPs = formattedData1.reduce((sum, item) => sum + item.count, 0);
+    const totalERCs = formattedData2.reduce((sum, item) => sum + item.count, 0);
+    const totalRIPs = formattedData3.reduce((sum, item) => sum + item.count, 0);
+    
+    console.log("[DATA VALIDATION] Total EIPs reviews:", totalEIPs);
+    console.log("[DATA VALIDATION] Total ERCs reviews:", totalERCs);
+    console.log("[DATA VALIDATION] Total RIPs reviews:", totalRIPs);
+    console.log("[DATA VALIDATION] Grand Total:", totalEIPs + totalERCs + totalRIPs);
+    
+    // Check for duplicates within each dataset
+    const checkDuplicates = (data: any[], repoName: string) => {
+      const seen = new Map<string, number>();
+      let duplicateCount = 0;
+      
+      data.forEach(item => {
+        const key = `${item.monthYear}-${item.reviewer}`;
+        if (seen.has(key)) {
+          duplicateCount++;
+          console.warn(`[DUPLICATE FOUND] ${repoName}: ${key} appears multiple times (count: ${item.count})`);
+        }
+        seen.set(key, (seen.get(key) || 0) + 1);
+      });
+      
+      if (duplicateCount > 0) {
+        console.error(`[DATA VALIDATION] ${repoName} has ${duplicateCount} duplicate entries!`);
+      } else {
+        console.log(`[DATA VALIDATION] ${repoName} - No duplicates found ✓`);
+      }
+      
+      return duplicateCount;
+    };
+    
+    checkDuplicates(formattedData1, "EIPs");
+    checkDuplicates(formattedData2, "ERCs");
+    checkDuplicates(formattedData3, "RIPs");
 
     seteipData(formattedData1);
     setercData(formattedData2);
@@ -1732,6 +1773,12 @@ const renderEditorRepoGrid = () => {
   const reviewerTimeSeriesMap: { [key: string]: any[] } = {};
   const reviewerRepoTotals: { [key: string]: { eips: number; ercs: number; rips: number } } = {};
   
+  console.log("[Repository Distribution DEBUG] Raw data lengths:", {
+    eipdata: eipdata.length,
+    ercdata: ercdata.length,
+    ripdata: ripdata.length
+  });
+  
   // Process EIP data
   eipdata.forEach(item => {
     if (showReviewer[item.reviewer]) {
@@ -1808,6 +1855,13 @@ const renderEditorRepoGrid = () => {
   const totalRIPs = allData.reduce((sum, item) => sum + item.rips, 0);
   const grandTotal = totalEIPs + totalERCs + totalRIPs;
   console.log(`[Repository Distribution] EIPs: ${totalEIPs}, ERCs: ${totalERCs}, RIPs: ${totalRIPs}, Total: ${grandTotal}`);
+  
+  // Log individual reviewer data for ERCs specifically to debug the issue
+  const ercReviewers = allData.filter(item => item.ercs > 0).sort((a, b) => b.ercs - a.ercs);
+  console.log(`[Repository Distribution] Top ERC Reviewers:`, ercReviewers.slice(0, 10).map(r => ({
+    reviewer: r.reviewer,
+    ercs: r.ercs
+  })));
 
   const editorsData = allData.filter(item => !reviewersList.includes(item.reviewer));
   const reviewersData = allData.filter(item => reviewersList.includes(item.reviewer));
