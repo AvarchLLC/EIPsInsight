@@ -120,17 +120,18 @@ const rawData = [
   { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-2028" },
   { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-2200" },
 
-  // Constantinople — February 28, 2019
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-145" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1014" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1052" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1234" },
   // (Petersburg hard fork was simultaneous; repeat EIPs where relevant)
   { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1283" },
   { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-145" },
   { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1014" },
   { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1052" },
   { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1234" },
+
+    // Constantinople — February 28, 2019
+  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-145" },
+  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1014" },
+  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1052" },
+  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1234" },
 
   // Byzantium — October 16, 2017
   { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-100" },
