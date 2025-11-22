@@ -143,11 +143,17 @@ export default function GrantList() {
                   (() => {
                     const tier = getTier(grant.amount);
                     if (tier === 'Significant' || tier === 'Small') {
+                      const tipLabel = tier === 'Significant'
+                        ? '>= $20000'
+                        : '< $2000';
+
                       return (
                         <ChakraLink as={NLink} href="/donate" _hover={{ textDecoration: 'none' }}>
-                          <Badge as="span" colorScheme={tierColor(tier)} variant="subtle" px={3} py={1} cursor="pointer">
-                            {tier}
-                          </Badge>
+                          <Tooltip label={tipLabel} placement="top" hasArrow>
+                            <Badge as="span" colorScheme={tierColor(tier)} variant="subtle" px={3} py={1} cursor="pointer">
+                              {tier}
+                            </Badge>
+                          </Tooltip>
                         </ChakraLink>
                       );
                     }
@@ -198,7 +204,20 @@ export default function GrantList() {
           </Box>
         ))}
       </SimpleGrid>
-      
+      <Box as="footer" mt={6} py={4} textAlign="center">
+        <Text fontSize="sm" color={textColor} mb={2}>
+          If you find EIPsInsight useful, please consider supporting the project.
+        </Text>
+        <ChakraLink
+          as={NLink}
+          href="/donate"
+          color="blue.500"
+          fontWeight="semibold"
+          _hover={{ textDecoration: 'underline' }}
+        >
+          Donate
+        </ChakraLink>
+      </Box>
     </VStack>
   );
 }

@@ -58,7 +58,7 @@ const CloseableAdCard: React.FC = () => {
       borderColor={primaryBorder}
       p={1}
       w="100%"
-      maxW="500px"
+      maxW="900px"
       minH="50px"
       mx="auto"
       cursor="pointer"
@@ -123,7 +123,7 @@ const CloseableAdCard: React.FC = () => {
           <Image 
             src={etherWorldLogo} 
             alt="EtherWorld logo" 
-            boxSize={{ base: "14px", md: "18px" }} 
+            boxSize="18px" 
             borderRadius="sm"
             fallback={
               <Box
@@ -131,8 +131,8 @@ const CloseableAdCard: React.FC = () => {
                 color="white"
                 fontSize="10px"
                 fontWeight="bold"
-                w={{ base: "14px", md: "18px" }}
-                h={{ base: "14px", md: "18px" }}
+                w="18px"
+                h="18px"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -143,7 +143,7 @@ const CloseableAdCard: React.FC = () => {
               }
             />
           <Text 
-            fontSize={{ base: "xs", md: "sm" }}
+            fontSize="sm"
             fontWeight="bold"
             color={useColorModeValue("gray.900", "white")}
             lineHeight="1"
@@ -155,7 +155,7 @@ const CloseableAdCard: React.FC = () => {
         {/* Center: Dense Info Stack */}
         <Flex direction="column" flex={1} px={1.5} justify="center" overflow="hidden" position="relative" gap={0}>
           <Text 
-            fontSize={{ base: "9px", md: "12px", lg: "11px" }}
+            fontSize="12px"
             fontWeight="bold"
             color={useColorModeValue("gray.900", "white")}
             lineHeight="1.1"
@@ -165,21 +165,21 @@ const CloseableAdCard: React.FC = () => {
           >
             Global ETH News • ACD Updates • Security Alerts • Protocol Analysis
           </Text>
-          <Flex align="center" gap={1} fontSize={{ base: "7px", md: "8px" }} color={useColorModeValue("gray.600", "gray.300")} flexWrap="nowrap">
+          <Flex align="center" gap={1} fontSize="8px" color={useColorModeValue("gray.600", "gray.300")} flexWrap="nowrap">
             <Flex align="center" gap={0.5}>
-              <Icon as={FiShield} boxSize={{ base: "6px", md: "8px" }} />
+              <Icon as={FiShield} boxSize="8px" />
               <Text>Grant-Backed</Text>
             </Flex>
             <Text>•</Text>
             <Flex align="center" gap={0.5}>
-              <Icon as={FiTrendingUp} boxSize={{ base: "6px", md: "8px" }} />
+              <Icon as={FiTrendingUp} boxSize="8px" />
               <Text>Real-time</Text>
             </Flex>
             <Text>•</Text>
             <Text fontWeight="bold">15k+ Readers</Text>
             <Text>•</Text>
             <Flex align="center" gap={0.5}>
-              <Icon as={FiClock} boxSize={{ base: "6px", md: "8px" }} />
+              <Icon as={FiClock} boxSize="8px" />
               <Text>24/7</Text>
             </Flex>
             <Text>•</Text>
@@ -193,7 +193,7 @@ const CloseableAdCard: React.FC = () => {
             <Badge 
               colorScheme="orange"
               variant="solid"
-              fontSize={{ base: "6px", md: "7px" }}
+              fontSize="7px"
               px={1}
               py={0.5}
               borderRadius="sm"
@@ -205,7 +205,7 @@ const CloseableAdCard: React.FC = () => {
             <Badge 
               colorScheme="red"
               variant="solid"
-              fontSize={{ base: "6px", md: "7px" }}
+              fontSize="7px"
               px={1}
               py={0.5}
               borderRadius="sm"
@@ -215,7 +215,7 @@ const CloseableAdCard: React.FC = () => {
               HOT
             </Badge>
           </Flex>
-          <Flex gap={1} fontSize={{ base: "6px", md: "7px" }} color={useColorModeValue("gray.600", "gray.400")} fontWeight="medium">
+          <Flex gap={1} fontSize="7px" color={useColorModeValue("gray.600", "gray.400")} fontWeight="medium">
             <Text>📈 +2.5k</Text>
             <Text>•</Text>
             <Text>⭐ 4.9/5</Text>
@@ -227,7 +227,7 @@ const CloseableAdCard: React.FC = () => {
             px={1.5}
             py={0.5}
             borderRadius="md"
-            fontSize={{ base: "2xs", md: "xs" }}
+            fontSize="xs"
             fontWeight="bold"
             cursor="pointer"
             position="relative"
@@ -253,8 +253,8 @@ const CloseableAdCard: React.FC = () => {
             }}
           >
             <Flex align="center" gap={0.5}>
-              <Text fontSize={{ base: "2xs", md: "xs" }} fontWeight="bold">READ</Text>
-              <Icon as={FiExternalLink} boxSize={{ base: "8px", md: "10px" }} />
+              <Text fontSize="xs" fontWeight="bold">READ</Text>
+              <Icon as={FiExternalLink} boxSize="10px" />
             </Flex>
           </Box>
         </Flex>

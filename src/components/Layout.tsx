@@ -24,7 +24,7 @@ import { sidebarConfig } from "./Sidebar/slidebarConfig";
 import { useSidebarStore } from "@/stores/useSidebarStore";
 import AppSidebar from "./Sidebar/AppSidebar";
 import UniversalFeedbackSystem from "./UniversalFeedbackSystem";
-import CookieConsentBanner from "./CookieConsentBanner";
+import CookieConsent from "./CookieConsent";
 import analytics from "@/utils/analytics";
 
 const mont = Rajdhani({
@@ -178,7 +178,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
             </Box>
             
             {/* Cookie Consent Banner */}
-            <CookieConsentBanner />
+            <CookieConsent />
           </BookmarkProvider>
       </motion.div>
   );
