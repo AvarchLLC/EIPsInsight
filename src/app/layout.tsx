@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import CookieConsent from '@/components/CookieConsent';
+import CookieConsentBanner from '@/components/CookieConsentBanner';
 import FloatingContributionIcon from '@/components/FloatingContributionIcon';
 import SessionWrapper from '@/components/SessionWrapper';
 import { SidebarProvider } from '@/components/Sidebar/SideBarContext';
@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Providers>
                 <SidebarProvider>
                   <ClientContent>{children}</ClientContent>
-                  <CookieConsent />
+                  <CookieConsentBanner />
                 </SidebarProvider>
               </Providers>
             </motion.div>

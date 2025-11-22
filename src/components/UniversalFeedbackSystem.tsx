@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Box, 
   useToast, 
@@ -46,20 +46,13 @@ const CombinedThumbsIcon = ({ size = "20px" }: { size?: string }) => (
 const UniversalFeedbackSystem = () => {
   const [isVisible, setIsVisible] = useState(false); // Always false - popup disabled
   const [isExpanded, setIsExpanded] = useState(false); // Always false - popup disabled
-  const [hasGivenRating, setHasGivenRating] = useState(false);
   const [selectedRating, setSelectedRating] = useState<'positive' | 'neutral' | 'negative' | null>(null);
-  const [showCommentBox, setShowCommentBox] = useState(false);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(5); // 5 second timer
   const [showTriggerButton, setShowTriggerButton] = useState(true); // Always show trigger button
   
   const toast = useToast();
   const router = useRouter();
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const scrolledTo75Ref = useRef(false);
 
   // Color mode values
   const bgColor = useColorModeValue("white", "gray.800");
@@ -87,99 +80,32 @@ const UniversalFeedbackSystem = () => {
     return;
   }, []);
 
-  // Timer management
-  const startTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    
-    setTimeLeft(5);
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          handleTimeout();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const pauseTimer = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  };
-
-  const resumeTimer = () => {
-    if (!isHovered && !isTyping && hasGivenRating && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            handleTimeout();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-  };
-
-  // Handle timer pause/resume based on hover and typing states
-  useEffect(() => {
-    if (hasGivenRating) {
-      if (isHovered || isTyping) {
-        pauseTimer();
-      } else {
-        resumeTimer();
-      }
-    }
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isHovered, isTyping, hasGivenRating, timeLeft]);
-
   const handleRating = async (rating: 'positive' | 'neutral' | 'negative') => {
     setSelectedRating(rating);
-    setHasGivenRating(true);
-    setShowCommentBox(true);
-    startTimer();
-
-    // Submit rating immediately
+    
+    // Submit rating immediately without comment (silently, no toast)
     await submitFeedback(rating, "");
-  };
 
-  const handleTimeout = () => {
-    const sessionKey = getSessionKey();
-    sessionStorage.setItem(sessionKey, 'true');
-    
-    // Smooth exit animation
-    setIsExpanded(false);
-    setTimeout(() => {
-      setIsVisible(false);
-      // Show trigger button after main popup is dismissed
-      setTimeout(() => setShowTriggerButton(true), 500);
-    }, 300); // Wait for collapse animation
-    
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    toast({
-      title: "Thank you for your feedback!",
-      description: "Your input helps us improve.",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
+    // Keep the widget open so user can optionally add a comment
+    // Widget will only close if user clicks X or submits a comment
   };
 
   const handleCommentSubmit = async () => {
-    if (comment.trim()) {
-      await submitFeedback(selectedRating!, comment);
+    if (comment.trim() && selectedRating) {
+      // Submit feedback with the selected rating and comment
+      await submitFeedback(selectedRating, comment);
+      
+      toast({
+        title: "Thanks for your feedback!",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+        position: "bottom-right",
+      });
+
+      // Dismiss the feedback widget after successful submission
+      handleDismiss();
     }
-    handleTimeout(); // Close after comment submission
   };
 
   const submitFeedback = async (rating: 'positive' | 'neutral' | 'negative', commentText: string) => {
@@ -217,6 +143,8 @@ const UniversalFeedbackSystem = () => {
     const sessionKey = getSessionKey();
     sessionStorage.setItem(sessionKey, 'true');
     
+    // No toast when just closing - rating was already saved silently
+    
     // Smooth exit animation
     setIsExpanded(false);
     setTimeout(() => {
@@ -229,11 +157,8 @@ const UniversalFeedbackSystem = () => {
   // Handle trigger button click to reopen feedback widget
   const handleTriggerClick = () => {
     // Reset the widget state
-    setHasGivenRating(false);
     setSelectedRating(null);
-    setShowCommentBox(false);
     setComment("");
-    setTimeLeft(5);
     setShowTriggerButton(false);
     
     // Clear session storage temporarily to allow re-showing
@@ -257,36 +182,45 @@ const UniversalFeedbackSystem = () => {
             bottom="20px"
             left="50%"
             transform="translateX(-50%)"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
           >
         <ScaleFade initialScale={0.8} in={isExpanded}>
           <Box
             bg={bgColor}
             border={`1px solid ${borderColor}`}
-            borderRadius="16px"
-            boxShadow="0 20px 60px rgba(0, 0, 0, 0.15)"
-            p="20px"
+            borderRadius="20px"
+            boxShadow={useColorModeValue(
+              '0 10px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06)',
+              '0 10px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)'
+            )}
+            p={{ base: 5, md: 6 }}
             backdropFilter="blur(10px)"
-            minW="320px"
-            transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+            minW={{ base: "300px", md: "380px" }}
+            maxW="90vw"
+            transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
             transform={isExpanded ? "scale(1)" : "scale(0.95)"}
             opacity={isExpanded ? 1 : 0}
             _hover={{
-              transform: isExpanded ? "scale(1.02)" : "scale(0.95)",
-              boxShadow: "0 25px 70px rgba(0, 0, 0, 0.2)",
+              transform: isExpanded ? "scale(1.01)" : "scale(0.95)",
+              boxShadow: useColorModeValue(
+                '0 20px 60px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)',
+                '0 20px 60px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4)'
+              ),
             }}
           >
-          {!hasGivenRating ? (
-            // Show rating options (no minimized state anymore)
-            <VStack spacing={3}>
-              <HStack spacing="16px" align="center">
+            {/* Show rating options with comment box always visible */}
+            <VStack spacing={4}>
+              <HStack spacing="12px" align="center" w="100%">
                 <Box flex="1">
-                  <Text fontSize="sm" fontWeight="medium" color={textColor}>
-                    How's your experience with this page?
+                  <Text 
+                    fontSize={{ base: "md", md: "lg" }} 
+                    fontWeight="700" 
+                    color={textColor}
+                    letterSpacing="-0.01em"
+                  >
+                    How's your experience?
                   </Text>
-                  <Text fontSize="xs" color="gray.500" mt="2px">
-                    Quick feedback helps us improve
+                  <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")} mt="4px">
+                    Your feedback helps us improve
                   </Text>
                 </Box>
                 
@@ -296,95 +230,139 @@ const UniversalFeedbackSystem = () => {
                   size="sm"
                   variant="ghost"
                   onClick={handleDismiss}
-                  color="gray.400"
-                  _hover={{ color: "gray.600" }}
+                  color={useColorModeValue("gray.400", "gray.500")}
+                  borderRadius="full"
+                  _hover={{ 
+                    color: useColorModeValue("gray.700", "gray.300"),
+                    bg: useColorModeValue("gray.100", "gray.700")
+                  }}
                 />
               </HStack>
               
-              <HStack spacing="8px">
+              <HStack spacing={3} w="100%">
                 <Button
-                  size="sm"
-                  variant="ghost"
-                  leftIcon={<Icon as={FiThumbsUp} />}
+                  size="md"
+                  variant={selectedRating === 'positive' ? "solid" : "outline"}
+                  leftIcon={<Icon as={FiThumbsUp} boxSize={4} />}
                   colorScheme="green"
-                  isLoading={isSubmitting}
+                  isLoading={isSubmitting && selectedRating === 'positive'}
                   onClick={() => handleRating('positive')}
-                  _hover={{ bg: "green.50" }}
+                  flex={1}
+                  borderRadius="xl"
+                  fontWeight="600"
+                  bg={selectedRating === 'positive' ? "green.500" : "transparent"}
+                  borderWidth="2px"
+                  borderColor={selectedRating === 'positive' ? "green.500" : useColorModeValue("gray.200", "gray.600")}
+                  _hover={{ 
+                    bg: selectedRating === 'positive' ? "green.600" : useColorModeValue("green.50", "green.900"),
+                    borderColor: "green.500",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 12px rgba(72, 187, 120, 0.3)"
+                  }}
+                  transition="all 0.2s"
                 >
                   Good
                 </Button>
                 
                 <Button
-                  size="sm"
-                  variant="ghost"
-                  leftIcon={<Icon as={FiMeh} />}
+                  size="md"
+                  variant={selectedRating === 'neutral' ? "solid" : "outline"}
+                  leftIcon={<Icon as={FiMeh} boxSize={4} />}
                   colorScheme="orange"
-                  isLoading={isSubmitting}
+                  isLoading={isSubmitting && selectedRating === 'neutral'}
                   onClick={() => handleRating('neutral')}
-                  _hover={{ bg: "orange.50" }}
+                  flex={1}
+                  borderRadius="xl"
+                  fontWeight="600"
+                  bg={selectedRating === 'neutral' ? "orange.500" : "transparent"}
+                  borderWidth="2px"
+                  borderColor={selectedRating === 'neutral' ? "orange.500" : useColorModeValue("gray.200", "gray.600")}
+                  _hover={{ 
+                    bg: selectedRating === 'neutral' ? "orange.600" : useColorModeValue("orange.50", "orange.900"),
+                    borderColor: "orange.500",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 12px rgba(237, 137, 54, 0.3)"
+                  }}
+                  transition="all 0.2s"
                 >
                   Okay
                 </Button>
                 
                 <Button
-                  size="sm"
-                  variant="ghost"
-                  leftIcon={<Icon as={FiThumbsDown} />}
+                  size="md"
+                  variant={selectedRating === 'negative' ? "solid" : "outline"}
+                  leftIcon={<Icon as={FiThumbsDown} boxSize={4} />}
                   colorScheme="red"
-                  isLoading={isSubmitting}
+                  isLoading={isSubmitting && selectedRating === 'negative'}
                   onClick={() => handleRating('negative')}
-                  _hover={{ bg: "red.50" }}
+                  flex={1}
+                  borderRadius="xl"
+                  fontWeight="600"
+                  bg={selectedRating === 'negative' ? "red.500" : "transparent"}
+                  borderWidth="2px"
+                  borderColor={selectedRating === 'negative' ? "red.500" : useColorModeValue("gray.200", "gray.600")}
+                  _hover={{ 
+                    bg: selectedRating === 'negative' ? "red.600" : useColorModeValue("red.50", "red.900"),
+                    borderColor: "red.500",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 12px rgba(245, 101, 101, 0.3)"
+                  }}
+                  transition="all 0.2s"
                 >
                   Poor
                 </Button>
               </HStack>
+
+              {/* Comment box always visible */}
+              <VStack spacing={3} w="100%">
+                <Textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Share your thoughts (optional)..."
+                  size="md"
+                  rows={3}
+                  resize="none"
+                  borderRadius="xl"
+                  borderWidth="2px"
+                  borderColor={useColorModeValue("gray.200", "gray.600")}
+                  _focus={{ 
+                    borderColor: "blue.400",
+                    boxShadow: "0 0 0 1px var(--chakra-colors-blue-400)"
+                  }}
+                  _hover={{
+                    borderColor: useColorModeValue("gray.300", "gray.500")
+                  }}
+                  transition="all 0.2s"
+                />
+                
+                {comment.trim() && (
+                  <Button
+                    size="md"
+                    bgGradient="linear(135deg, #30A0E0, #4FD1FF)"
+                    color="white"
+                    onClick={handleCommentSubmit}
+                    isLoading={isSubmitting}
+                    loadingText="Sending..."
+                    w="100%"
+                    isDisabled={!selectedRating}
+                    borderRadius="xl"
+                    fontWeight="600"
+                    boxShadow="0 4px 12px rgba(48, 160, 224, 0.3)"
+                    _hover={{
+                      bgGradient: "linear(135deg, #2890D0, #3FC1EF)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 6px 20px rgba(48, 160, 224, 0.4)"
+                    }}
+                    _active={{
+                      transform: "translateY(0)"
+                    }}
+                    transition="all 0.2s"
+                  >
+                    Send Feedback
+                  </Button>
+                )}
+              </VStack>
             </VStack>
-          ) : (
-            // After rating - show comment box with timer
-            <VStack spacing={3}>
-              <HStack justify="space-between" w="100%">
-                <Text fontSize="sm" color={textColor}>
-                  Thanks! Any additional comments?
-                </Text>
-                <Text fontSize="xs" color="gray.500">
-                  {timeLeft}s
-                </Text>
-              </HStack>
-              
-              <Textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                onFocus={() => setIsTyping(true)}
-                onBlur={() => setIsTyping(false)}
-                placeholder="Optional feedback..."
-                size="sm"
-                rows={2}
-                resize="none"
-                _focus={{ borderColor: "blue.400" }}
-              />
-              
-              <HStack spacing={2} w="100%">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleTimeout}
-                  flex={1}
-                >
-                  Skip
-                </Button>
-                <Button
-                  size="sm"
-                  colorScheme="blue"
-                  onClick={handleCommentSubmit}
-                  isLoading={isSubmitting}
-                  loadingText="Sending..."
-                  flex={1}
-                >
-                  Send
-                </Button>
-              </HStack>
-            </VStack>
-          )}
         </Box>
       </ScaleFade>
     </Box>
@@ -396,52 +374,43 @@ const UniversalFeedbackSystem = () => {
         <Fade in={showTriggerButton}>
           <Box
             position="fixed"
-            right="20px"
-            bottom="100px"
+            right={{ base: "16px", md: "20px" }}
+            bottom={{ base: "80px", md: "90px" }}
             zIndex="1400"
           >
             <Tooltip 
-              label="Give feedback about this page" 
+              label="Feedback" 
               placement="left" 
               hasArrow
-              bg={useColorModeValue("gray.800", "gray.200")}
+              bg={useColorModeValue("gray.700", "gray.300")}
               color={useColorModeValue("white", "gray.800")}
+              fontSize="xs"
+              px={2}
+              py={1}
+              borderRadius="md"
             >
               <IconButton
                 aria-label="Give feedback"
-                icon={
-                  <Box display="flex" alignItems="center" justifyContent="center" w="100%" h="100%">
-                    <Icon as={FiMessageSquare} boxSize={5} />
-                  </Box>
-                }
-                size="md"
+                icon={<Icon as={FiMessageSquare} boxSize={4} />}
+                size="sm"
                 colorScheme="blue"
                 variant="solid"
                 borderRadius="full"
-                boxShadow="0 4px 12px rgba(0, 0, 0, 0.25)"
+                bgGradient="linear(135deg, #30A0E0, #4FD1FF)"
+                boxShadow="0 2px 8px rgba(48, 160, 224, 0.3)"
                 onClick={handleTriggerClick}
+                w="40px"
+                h="40px"
                 _hover={{ 
-                  transform: "scale(1.15)",
-                  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)"
+                  transform: "scale(1.05)",
+                  bgGradient: "linear(135deg, #2890D0, #3FC1EF)",
+                  boxShadow: "0 4px 12px rgba(48, 160, 224, 0.4)"
+                }}
+                _active={{ 
+                  transform: "scale(0.95)" 
                 }}
                 transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-                bg={useColorModeValue("blue.500", "blue.400")}
                 color="white"
-                _active={{ transform: "scale(0.95)" }}
-                border={`2px solid ${useColorModeValue("white", "gray.700")}`}
-                w="48px"
-                h="48px"
-                animation="pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
-                css={{
-                  '@keyframes pulse': {
-                    '0%, 100%': {
-                      opacity: 1,
-                    },
-                    '50%': {
-                      opacity: .7,
-                    },
-                  },
-                }}
               />
             </Tooltip>
           </Box>
