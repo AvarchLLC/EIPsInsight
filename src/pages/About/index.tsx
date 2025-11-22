@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import Head from "next/head";
+import CloseableAdCard from "@/components/CloseableAdCard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContributorsGrid from "@/components/ContributorsGrid";
+import Stats from "@/components/AboutStats";
 import FundingDetails from "@/components/FundingDetails";
 import GrantList from "@/components/GrantList";
 import Partners from "@/components/Partners";
@@ -42,23 +44,22 @@ export default function AboutPage() {
   const glassHover = useColorModeValue("rgba(243, 244, 246, 0.8)", "rgba(55, 65, 81, 0.8)");
 
   const featuresList = [
-    { icon: FaChartLine, title: 'Monthly Insight', desc: 'Follow the status changes of proposals under different types and categories with our beautiful charts and tables providing comprehensive details.', color: '#30A0E0' },
-    { icon: FaTools, title: 'Advanced Toolings', desc: 'Make use of our different toolings such as "Editor Review Tracker" and "Issues and PRs Trackers" for comprehensive proposal management.', color: '#4FD1FF' },
+    { icon: FaChartLine, title: 'Monthly Insight', desc: 'Follow the status change of proposals under different types and categories with beautiful charts and tables providing details.', color: '#30A0E0' },
+    { icon: FaTools, title: 'Advanced Toolings', desc: 'Make use of different toolings such as "Editor Review Tracker" and "Issues and PRs Trackers" for comprehensive proposal management.', color: '#4FD1FF' },
     { icon: FaDatabase, title: 'Detailed EIP Database', desc: 'Explore our extensive database of EIPs, complete with detailed descriptions, statuses, and relevant discussions.', color: '#7B61FF' },
-    { icon: FaComments, title: 'Expert Analysis', desc: 'We provide expert commentary and analysis on significant EIPs and their potential impacts on the Ethereum ecosystem.', color: '#FF6FD8' },
+    { icon: FaComments, title: 'Expert Analysis', desc: 'Gain access to expert commentary and analysis on significant EIPs and their potential impacts on the Ethereum ecosystem.', color: '#FF6FD8' },
     { icon: FaUsers, title: 'Community Engagement', desc: 'Join our vibrant community of Ethereum enthusiasts, developers, and stakeholders in meaningful discussions.', color: '#2AC7FF' },
-    { icon: FaGraduationCap, title: 'Educational Resources', desc: 'We offer comprehensive learning materials designed to help you understand the proposal process and technical details.', color: '#30A0E0' },
+    { icon: FaGraduationCap, title: 'Educational Resources', desc: 'Comprehensive learning materials designed to help you understand the proposal process and technical details.', color: '#30A0E0' },
   ];
 
   return (
     <>
       <Head>
-        <title>About — EIPs Insights</title>
-        <meta name="description" content="EIPs Insights — analytics, tools and community for Ethereum Improvement Proposals, ERCs and RIPs." />
-        <meta property="og:title" content="About — EIPs Insights" />
-        <meta property="og:description" content="EIPs Insights — analytics, tools and community for Ethereum Improvement Proposals, ERCs and RIPs." />
-        <meta property="og:image" content="/EIPsInsights.gif" />
-        <link rel="icon" href="/eipFavicon.png" />
+        <title>About — EIPs Insight</title>
+        <meta name="description" content="EIPs Insight — analytics, tools and community for Ethereum Improvement Proposals, ERCs and RIPs." />
+        <meta property="og:title" content="About — EIPs Insight" />
+        <meta property="og:description" content="EIPs Insight — analytics, tools and community for Ethereum Improvement Proposals, ERCs and RIPs." />
+        <meta property="og:image" content="/EIPsInsightsDark.gif" />
       </Head>
 
   {/* Render site Navbar for pages router so about page matches site header */}
@@ -299,22 +300,22 @@ export default function AboutPage() {
             >
             <Heading
               as="h1"
-              fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
-              fontWeight="700"
+              fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
+              fontWeight="bold"
               className="gradient-text"
-              mb={8}
+              mb={6}
               textAlign="left"
             >
-              About Us
+              About EIPsInsight
             </Heading>
 
             <Text
-              fontSize={{ base: "md", md: "lg" }}
+              fontSize={{ base: "md", md: "lg", lg: "xl" }}
               color={textColor}
-              lineHeight="1.6"
-              fontWeight="400"
+              lineHeight="tall"
+              fontWeight="medium"
             >
-              We specialize in toolings designed to provide clear, visual insights into the activity of{" "}
+              EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of{" "}
               <Link
                 href="https://github.com/ethereum/EIPs"
                 color={linkColor}
@@ -345,7 +346,7 @@ export default function AboutPage() {
               >
                 Rollup Improvement Proposals (RIPs)
               </Link>{" "}
-              over a specified period. Our data is used for tracking the progress and workload distribution among
+              over a specified period. Data provided is used for tracking the progress and workload distribution among
               EIP Editors, ensuring transparency and efficiency in the proposal review process.
             </Text>
             {/* Read more toggle to show Key Features inline */}
@@ -380,12 +381,12 @@ export default function AboutPage() {
                         transition="transform 180ms, box-shadow 180ms"
                       >
                         <Box as={feature.icon} size="28px" color={feature.color} mb={2} />
-                        <Heading as="h3" fontSize="lg" className="gradient-text" mb={2} fontWeight="600">{feature.title}</Heading>
-                        <Text color={textColor} fontSize="sm" lineHeight="1.6" opacity={0.9}>{feature.desc}</Text>
+                        <Heading as="h3" size="sm" color={headingColor} mb={1} fontWeight="bold">{feature.title}</Heading>
+                        <Text color={textColor} fontSize="sm" lineHeight="tall" opacity={0.9}>{feature.desc}</Text>
 
                         {expanded === feature.title && (
                           <Box mt={3} p={3} bg={useColorModeValue('rgba(243, 244, 246, 0.8)', 'rgba(55, 65, 81, 0.8)')} borderRadius="md" borderLeft="3px solid" borderColor={feature.color}>
-                            <Text fontSize="xs" color={textColor} fontStyle="italic" lineHeight="1.5">We provide detailed dashboards with charts, filters, and export options to help you analyze trends and insights.</Text>
+                            <Text fontSize="xs" color={textColor} fontStyle="italic">Explore detailed dashboards with charts, filters, and export options to analyze trends and insights.</Text>
                           </Box>
                         )}
                       </Box>
@@ -415,6 +416,11 @@ export default function AboutPage() {
           >
             <ContributorsGrid />
           </Box>
+        </Container>
+
+        {/* Stats Section */}
+  <Container maxW="7xl" py={-20} id="stats">
+          <Stats />
         </Container>
 
         {/* Funding Section */}
@@ -455,10 +461,12 @@ export default function AboutPage() {
           >
             <Heading
               as="h2"
-              fontSize={{ base: "2xl", md: "3xl" }}
-              className="gradient-text"
+              fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
+              bgGradient="linear(135deg, #30A0E0 0%, #4FD1FF 100%)"
+              bgClip="text"
+              color="transparent"
               mb={6}
-              fontWeight="600"
+              fontWeight="bold"
               textAlign="left"
             >
               Grants
@@ -473,7 +481,178 @@ export default function AboutPage() {
   {/* Partners Section */}
   <Partners />
 
+  {/* FAQ Section */}
+  <Container maxW="7xl" py={1} id="faq">
+          <Box
+            className="section-container"
+            bg={cardBg}
+            p={{ base: 6, md: 8 }}
+            borderRadius="xl"
+            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+            style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+            _hover={{
+              transform: 'translateY(-2px)',
+              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+            }}
+          >
+            <Heading
+              as="h2"
+              fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
+              className="gradient-text"
+              mb={3}
+              fontWeight="bold"
+              textAlign="left"
+            >
+              Frequently Asked Questions
+            </Heading>
+            <Text
+              fontSize={{ base: "sm", md: "md" }}
+              color={textColor}
+              opacity={0.8}
+              mb={6}
+            >
+              Get answers to common questions about our platform and services
+            </Text>
 
+            <Stack spacing={4}>
+              {/* Data source */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">Where does the data come from?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        We aggregate public GitHub data from the official Ethereum repositories (EIPs, ERCs, RIPs), partner repositories, and community submissions. We fetch commits, PRs, and proposal files using GitHub's API, normalize labels and timestamps into monthly buckets, and persist processed records in MongoDB. Public API endpoints (for example, <code>/api/stats</code> and PR snapshot APIs) expose the aggregated metrics; when the database is unavailable the UI shows a friendly fallback.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+              {/* Contribution */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">How can I contribute?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        We welcome contributions. Please open issues or pull requests in our GitHub repository. Smaller documentation fixes, typo corrections, and feature ideas are a great place to start. For larger changes, open an issue first to discuss scope and design with maintainers.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+            {/* EtherWorld Advertisement */}
+            <Box my={6} width="100%">
+              <CloseableAdCard />
+            </Box>
+
+              {/* Labels */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">What do the labels and statuses mean?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        We normalize GitHub labels into a smaller set of "customLabels" for analytics (e.g., review, consensus, stagnant). Statuses like Draft, Review, Last Call, and Final follow the EIP repository conventions — where possible we map repo statuses to our visualizations and explain them in charts/tooltips.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+              {/* Exports & API */}
+              {/* Export/API question removed per request */}
+
+              {/* Reporting & feature requests */}
+              <Box
+                className="section-container"
+                bg={cardBg}
+                borderRadius="xl"
+                overflow="hidden"
+                border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
+                boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
+                style={{ backdropFilter: useColorModeValue('', 'saturate(180%) blur(6px)') }}
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)')
+                }}
+              >
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton p={6} transition="all 0.2s" _hover={{ bg: glassHover }}>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="semibold" fontSize="md">How do I report a bug or request a feature?</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={6} px={6}>
+                      <Text color={textColor} lineHeight="tall" fontSize="sm">
+                        Please open an issue on our GitHub repository with reproduction steps, screenshots, and expected behavior. For feature requests, include use-cases and any data or API needs; maintainers will triage and respond with suggested approaches.
+                      </Text>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </Box>
+
+              {/* Privacy */}
+              
+            </Stack>
+          </Box>
+        </Container>
 
         {/* CTA removed as requested */}
       </Box>
