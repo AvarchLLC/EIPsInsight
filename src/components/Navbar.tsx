@@ -276,7 +276,7 @@ const Navbar: React.FC = () => {
                   display="flex"
                   alignItems="center"
                 >
-                  EIPs Insights
+                  EIPsInsight
                 </Text>
               </NextLink>
             </Flex>
@@ -532,7 +532,7 @@ const Navbar: React.FC = () => {
                   mt={6}
                   className="font-bold hover:opacity-25 cursor-pointer ease-in duration-150 pt-1"
                 >
-                  EIPs Insights
+                  EIPs <br /> Insights
                 </Text>
               </NextLink>
             </Box>
