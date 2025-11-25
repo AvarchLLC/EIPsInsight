@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { MongoClient } from "mongodb";
 
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEB";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEB;
 
 async function sendDiscordNotification(feedbackData: any) {
   try {

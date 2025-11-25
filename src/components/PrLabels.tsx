@@ -121,6 +121,7 @@ export default function PRAnalyticsCard() {
   const [labelSet, setLabelSet] = useState<"customLabels" | "githubLabels">("customLabels");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string>(''); // For CSV download
 
   // Select correct label spec
   const labelSpecs: LabelSpec[] = useMemo(() => {
@@ -286,6 +287,13 @@ export default function PRAnalyticsCard() {
     return Array.from(monthSet).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }, [filteredData]);
 
+  // Set selected month to latest month when months change
+  useEffect(() => {
+    if (months.length > 0 && !selectedMonth) {
+      setSelectedMonth(months[months.length - 1]);
+    }
+  }, [months, selectedMonth]);
+
   const chartData = useMemo(() => ({
     months,
     displayMonths: months.map(formatMonthLabel),
@@ -435,10 +443,15 @@ export default function PRAnalyticsCard() {
         combined = rows;
       }
 
-      // Get current/latest month key from filteredData
-      const latestMonthKey = months.length > 0 ? months[months.length - 1] : null;
+      // Use selected month for filtering
+      const downloadMonthKey = selectedMonth || (months.length > 0 ? months[months.length - 1] : null);
 
-      // Filter only PRs from the latest month and apply selected label filter
+      if (!downloadMonthKey) {
+        console.error("No month selected for download");
+        return;
+      }
+
+      // Filter only PRs from the selected month and apply selected label filter
       const filteredRows = combined
         .map((pr: any) => {
           // For custom labels, categorize based on ALL labels (from Labels field)
@@ -473,7 +486,7 @@ export default function PRAnalyticsCard() {
         })
         .filter((pr: any) => {
           const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
-          if (mk !== latestMonthKey) return false;
+          if (mk !== downloadMonthKey) return false;
 
           // For 'all' view, check if the normalized DisplayLabel is in selectedLabels
           // For individual repos, check if the ActualLabel is in selectedLabels
@@ -509,7 +522,7 @@ export default function PRAnalyticsCard() {
 
       const a = document.createElement("a");
       a.href = urlObj;
-      a.download = `${repoKey}_${labelSet}_current_month_prs.csv`;
+      a.download = `${repoKey}_${labelSet}_${downloadMonthKey}_prs.csv`;
       a.style.display = "none";
       document.body.appendChild(a);
       a.click();
@@ -587,7 +600,28 @@ export default function PRAnalyticsCard() {
                 </Stack>
               </MenuList>
             </Menu>
-            <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md">
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="green" minW={160}>
+                {selectedMonth ? formatMonthLabel(selectedMonth) : 'Select Month'}
+              </MenuButton>
+              <MenuList maxHeight="300px" overflowY="auto" minWidth="160px">
+                <Stack>
+                  {months.slice().reverse().map(month => (
+                    <Button
+                      key={month}
+                      variant="ghost"
+                      size="sm"
+                      justifyContent="flex-start"
+                      colorScheme={selectedMonth === month ? "green" : undefined}
+                      onClick={() => setSelectedMonth(month)}
+                    >
+                      {formatMonthLabel(month)}
+                    </Button>
+                  ))}
+                </Stack>
+              </MenuList>
+            </Menu>
+            <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md" isDisabled={!selectedMonth}>
               Download CSV
             </Button>
           </Flex>
@@ -641,7 +675,7 @@ export default function PRAnalyticsCard() {
             }
           </Text>
           <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={1}>
-            (Based on {selectedLabels.length} selected label{selectedLabels.length !== 1 ? 's' : ''} - This is what will be downloaded)
+            (Based on {selectedLabels.length} selected label{selectedLabels.length !== 1 ? 's' : ''} - CSV downloads {selectedMonth ? formatMonthLabel(selectedMonth) : 'selected month'} data)
           </Text>
         </Box>
         <Divider my={3} />

@@ -53,6 +53,8 @@ const EipsLabelChart = () => {
   const [showLabels, setShowLabels] = useState<Record<string, boolean>>(
     initialLabels?.reduce((acc, label) => ({ ...acc, [label]: true }), {})
   );
+  const [selectedMonth, setSelectedMonth] = useState<string>(''); // Will be set to current month
+  const [availableMonths, setAvailableMonths] = useState<string[]>([]);
   const toast = useToast();
 
   // Dark mode color values
@@ -114,6 +116,14 @@ const EipsLabelChart = () => {
         const earliestMonth = monthYears[0];
         const latestMonth = monthYears[monthYears.length - 1];
         console.log(`📊 Loaded ${transformedData.length} records from ${earliestMonth} to ${latestMonth}`);
+        
+        // Set available months and default to current month
+        const uniqueMonths = Array.from(new Set(monthYears)).sort().reverse(); // Most recent first
+        setAvailableMonths(uniqueMonths);
+        
+        // Set selected month to current month (YYYY-MM format)
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        setSelectedMonth(currentMonth);
         
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -177,18 +187,10 @@ const EipsLabelChart = () => {
         return;
       }
 
-      // Create CSV from current chart data
-      const csvRows = [];
-      const headers = ['Month', 'MonthYear', 'Label', 'Count', 'Repo'];
-      csvRows.push(headers.join(','));
-
-      // Filter chart data by selected labels
-      const filteredData = chartData.filter(item => showLabels[item.label]);
-      
-      if (filteredData.length === 0) {
+      if (!selectedMonth) {
         toast({
-          title: 'No data to download',
-          description: 'No data matches the currently selected labels',
+          title: 'No month selected',
+          description: 'Please select a month to download data',
           status: 'warning',
           duration: 3000,
           isClosable: true,
@@ -197,27 +199,42 @@ const EipsLabelChart = () => {
         return;
       }
 
-      filteredData.forEach(item => {
-        const monthName = item.monthYear ? 
-          new Date(item.monthYear + '-01').toLocaleString('default', { month: 'long', year: 'numeric' }) : 
-          '';
-        
-        const row = [
-          monthName,
-          item.monthYear || '',
-          item.label || '',
-          item.count || 0,
-          selectedRepo.toUpperCase()
-        ];
-        csvRows.push(row.join(','));
-      });
+      // Fetch detailed PR data for the selected month
+      const response = await fetch(
+        `/api/AnalyticsCharts/labels/${selectedRepo}/details?month=${selectedMonth}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      const detailedData: PRDetails[] = result.data || [];
+      
+      // Filter by selected labels
+      const filteredData = detailedData.filter(pr => 
+        selectedLabels.includes(pr.Label)
+      );
+      
+      if (filteredData.length === 0) {
+        toast({
+          title: 'No data to download',
+          description: `No PRs found for ${selectedMonth} with selected labels`,
+          status: 'warning',
+          duration: 3000,
+          isClosable: true,
+        });
+        setLoading(false);
+        return;
+      }
 
-      const csvData = csvRows.join('\n');
+      // Convert to CSV using the existing function
+      const csvData = convertToCSV(filteredData);
       const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${selectedRepo}-raw-labels-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `${selectedRepo}-pr-labels-${selectedMonth}.csv`;
       document.body?.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -225,7 +242,7 @@ const EipsLabelChart = () => {
       
       toast({
         title: 'Download successful',
-        description: `Downloaded ${filteredData.length} label count records`,
+        description: `Downloaded ${filteredData.length} PR records for ${selectedMonth}`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -234,7 +251,7 @@ const EipsLabelChart = () => {
       console.error('Download error:', error);
       toast({
         title: 'Download failed',
-        description: 'Could not download label data',
+        description: 'Could not download PR data. The details endpoint may not be available yet.',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -514,6 +531,38 @@ const EipsLabelChart = () => {
               </Menu>
             </Box>
 
+            {/* Month Selector */}
+            <Box minW="200px">
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  rightIcon={<ChevronDownIcon />}
+                  colorScheme="blue"
+                  size="md"
+                  width="200px"
+                >
+                  {selectedMonth ? 
+                    new Date(selectedMonth + '-01').toLocaleString('default', { month: 'short', year: 'numeric' }) : 
+                    'Select Month'
+                  }
+                </MenuButton>
+                <MenuList maxHeight="300px" overflowY="auto" bg={bgColor} borderColor={borderColor}>
+                  {availableMonths.map(month => (
+                    <MenuItem 
+                      key={month}
+                      onClick={() => setSelectedMonth(month)}
+                      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                      bg={selectedMonth === month ? useColorModeValue("blue.50", "blue.900") : "transparent"}
+                    >
+                      <Box color={textColor}>
+                        {new Date(month + '-01').toLocaleString('default', { month: 'long', year: 'numeric' })}
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+            </Box>
+
             {/* Labels Selector */}
             <Box minW="200px">
               <Menu closeOnSelect={false}>
@@ -585,8 +634,9 @@ const EipsLabelChart = () => {
               leftIcon={<DownloadIcon />} 
               onClick={handleDownload}
               size="md"
+              isDisabled={!selectedMonth}
             >
-              Download Label Data
+              Download PRs CSV
             </Button>
           </Flex>
         </Flex>

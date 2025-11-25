@@ -501,7 +501,7 @@ const GitHubPRTracker: React.FC = () => {
             color={useColorModeValue("gray.600", "gray.400")}
             mt={1}
           >
-            (Based on selected filters - This is what will be downloaded)
+            (Based on selected category filters below - Click categories to toggle)
           </Text>
         </Box>
 
@@ -1164,20 +1164,20 @@ const GitHubPRTracker: React.FC = () => {
 
     // console.log("review data:",filteredData);
 
-    // Combine arrays and pass them to the CSV function
+    // Combine arrays and pass them to the CSV function - ONLY include selected categories
     const combinedData =
       activeTab === "PRs"
         ? {
-            created: filteredData.created,
-            closed: filteredData.closed,
-            merged: "merged" in filteredData ? filteredData.merged : [],
-            reviewed: "review" in filteredData ? filteredData.review : [],
-            open: filteredData.open,
+            created: showCategory.created ? filteredData.created : [],
+            closed: showCategory.closed ? filteredData.closed : [],
+            merged: showCategory.merged && "merged" in filteredData ? filteredData.merged : [],
+            reviewed: showCategory.review && "review" in filteredData ? filteredData.review : [],
+            open: showCategory.open ? filteredData.open : [],
           }
         : {
-            created: filteredData.created,
-            closed: filteredData.closed,
-            open: filteredData.open,
+            created: showCategory.created ? filteredData.created : [],
+            closed: showCategory.closed ? filteredData.closed : [],
+            open: showCategory.open ? filteredData.open : [],
           };
 
     downloadCSV(combinedData, activeTab);
@@ -1208,65 +1208,81 @@ const GitHubPRTracker: React.FC = () => {
       const currentData = allData[key];
 
       if (activeTab === "PRs") {
-        // Add each record with 'key' and 'tag' to combinedPRData
-        combinedPRData.created.push(
-          ...(currentData as { created: PR[] }).created?.map((item) => ({
-            ...item,
-            key,
-            tag: "created",
-          }))
-        );
-        combinedPRData.closed.push(
-          ...(currentData as { closed: PR[] }).closed?.map((item) => ({
-            ...item,
-            key,
-            tag: "closed",
-          }))
-        );
-        combinedPRData.open.push(
-          ...(currentData as { open: PR[] }).open?.map((item) => ({
-            ...item,
-            key,
-            tag: "open",
-          }))
-        );
-        combinedPRData.merged.push(
-          ...((currentData as { merged: PR[] }).merged || [])?.map((item) => ({
-            ...item,
-            key,
-            tag: "merged",
-          }))
-        );
-        combinedPRData.reviewed.push(
-          ...((currentData as { review: PR[] }).review || [])?.map((item) => ({
-            ...item,
-            key,
-            tag: "reviewed",
-          }))
-        );
+        // Add each record with 'key' and 'tag' to combinedPRData - ONLY if category is selected
+        if (showCategory.created) {
+          combinedPRData.created.push(
+            ...(currentData as { created: PR[] }).created?.map((item) => ({
+              ...item,
+              key,
+              tag: "created",
+            }))
+          );
+        }
+        if (showCategory.closed) {
+          combinedPRData.closed.push(
+            ...(currentData as { closed: PR[] }).closed?.map((item) => ({
+              ...item,
+              key,
+              tag: "closed",
+            }))
+          );
+        }
+        if (showCategory.open) {
+          combinedPRData.open.push(
+            ...(currentData as { open: PR[] }).open?.map((item) => ({
+              ...item,
+              key,
+              tag: "open",
+            }))
+          );
+        }
+        if (showCategory.merged) {
+          combinedPRData.merged.push(
+            ...((currentData as { merged: PR[] }).merged || [])?.map((item) => ({
+              ...item,
+              key,
+              tag: "merged",
+            }))
+          );
+        }
+        if (showCategory.review) {
+          combinedPRData.reviewed.push(
+            ...((currentData as { review: PR[] }).review || [])?.map((item) => ({
+              ...item,
+              key,
+              tag: "reviewed",
+            }))
+          );
+        }
       } else {
-        // Add each record with 'key' and 'tag' to combinedIssueData
-        combinedIssueData.created.push(
-          ...(currentData as { created: Issue[] }).created?.map((item) => ({
-            ...item,
-            key,
-            tag: "created",
-          }))
-        );
-        combinedIssueData.closed.push(
-          ...(currentData as { closed: Issue[] }).closed?.map((item) => ({
-            ...item,
-            key,
-            tag: "closed",
-          }))
-        );
-        combinedIssueData.open.push(
-          ...(currentData as { open: Issue[] }).open?.map((item) => ({
-            ...item,
-            key,
-            tag: "open",
-          }))
-        );
+        // Add each record with 'key' and 'tag' to combinedIssueData - ONLY if category is selected
+        if (showCategory.created) {
+          combinedIssueData.created.push(
+            ...(currentData as { created: Issue[] }).created?.map((item) => ({
+              ...item,
+              key,
+              tag: "created",
+            }))
+          );
+        }
+        if (showCategory.closed) {
+          combinedIssueData.closed.push(
+            ...(currentData as { closed: Issue[] }).closed?.map((item) => ({
+              ...item,
+              key,
+              tag: "closed",
+            }))
+          );
+        }
+        if (showCategory.open) {
+          combinedIssueData.open.push(
+            ...(currentData as { open: Issue[] }).open?.map((item) => ({
+              ...item,
+              key,
+              tag: "open",
+            }))
+          );
+        }
       }
     });
 
@@ -1315,10 +1331,16 @@ const GitHubPRTracker: React.FC = () => {
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
 
+    // Generate filename with active categories
+    const activeCategories = Object.entries(showCategory)
+      .filter(([_, isActive]) => isActive)
+      .map(([category, _]) => category)
+      .join('_');
+
     const a = document.createElement("a");
     a.setAttribute("hidden", "");
     a.setAttribute("href", url);
-    a.setAttribute("download", `${type}_since_2015.csv`);
+    a.setAttribute("download", `${selectedRepo}_${type}_${activeCategories}_since_2015.csv`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1740,7 +1762,7 @@ const GitHubPRTracker: React.FC = () => {
                     link={`https://eipsinsight.com//Analytics#GithubAnalytics`}
                   />
                 </Heading>
-                {/* Assuming a download option exists for the yearly data as well */}
+                {/* Download all data button */}
                 <Button
                   colorScheme="blue"
                   variant="solid"
@@ -1763,8 +1785,9 @@ const GitHubPRTracker: React.FC = () => {
                   fontSize={{ base: "0.6rem", md: "md" }}
                   _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
                   transition="all 0.2s"
+                  title="Download all data with selected filters"
                 >
-                  {loading3 ? <Spinner size="sm" /> : "Download CSV"}
+                  {loading3 ? <Spinner size="sm" /> : "Download All Data (CSV)"}
                 </Button>
               </Flex>
               <Flex justify="center" mb={8}>
@@ -1886,6 +1909,17 @@ const GitHubPRTracker: React.FC = () => {
                   </Checkbox>
                 )}
               </Flex>
+              <Box
+                bg={useColorModeValue("blue.50", "gray.700")}
+                p={3}
+                borderRadius="md"
+                textAlign="center"
+                mt={4}
+              >
+                <Text fontSize="sm" color={useColorModeValue("blue.700", "blue.300")} fontWeight="medium">
+                  💡 Tip: The checkboxes above control both the chart display and CSV downloads
+                </Text>
+              </Box>
             </Box>
           </Box>
 
@@ -1967,14 +2001,10 @@ const GitHubPRTracker: React.FC = () => {
           )}
 
           {selectedYear && selectedMonth && (
-            <Box mt={8} display="flex" justifyContent="flex-end">
-              {/* Download CSV section */}
-              {/* <Box padding={4} bg="blue.50" borderRadius="md" marginBottom={8}> */}
-              {/* <Text fontSize="lg"
-                    marginBottom={2}
-                    color={useColorModeValue("gray.800", "gray.200")}>
-                        You can download the data here:
-                      </Text> */}
+            <Box mt={8} display="flex" justifyContent="flex-end" flexDirection="column" alignItems="flex-end" gap={2}>
+              <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                Download filtered data for {selectedMonth} {selectedYear}
+              </Text>
               <Button
                 colorScheme="blue"
                 onClick={async () => {
@@ -1989,11 +2019,10 @@ const GitHubPRTracker: React.FC = () => {
                   }
                 }}
                 disabled={loading2}
+                leftIcon={<DownloadIcon />}
               >
-                <DownloadIcon marginEnd={"1.5"} />{" "}
-                {loading2 ? <Spinner size="sm" /> : "Download CSV"}
+                {loading2 ? <Spinner size="sm" /> : `Download ${selectedMonth} ${selectedYear} CSV`}
               </Button>
-              {/* </Box> */}
             </Box>
           )}
           {showDropdown && (

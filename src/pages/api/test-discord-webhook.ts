@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEB";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEB;
 
 export default async function handler(
   req: NextApiRequest,
