@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1423745692366672044/65Y9iEFzVKFBN0cXbZWmEYOAV5kqAiX0wuYLlh4KjyXAtS5JlCN6uSV954NfDK-DUjEV";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEB";
 
 export default async function handler(
   req: NextApiRequest,
