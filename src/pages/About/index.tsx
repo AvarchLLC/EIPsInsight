@@ -512,7 +512,7 @@ export default function AboutPage() {
               opacity={0.8}
               mb={6}
             >
-              Get answers to common questions about our platform and services
+              Get answers to frequently asked questions about our platform and services
             </Text>
 
             <Stack spacing={4}>
