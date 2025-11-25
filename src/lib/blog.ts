@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { z } from "zod";
+import { supabaseAdmin, Blog as DBBlog } from "./supabase";
 // import "server-only";
 
 const POSTS_DIRECTORY = path.join(process.cwd(), "src", "blogs");
@@ -84,42 +85,98 @@ export function readPostFromFile(filename: string, postsDirectory = POSTS_DIRECT
 }
 
 /**
- * Gets all blog posts with frontmatter and content
+ * Convert database blog to frontmatter format
  */
-export async function getAllPosts() {
-  const postsDirectory = path.join(process.cwd(), "src", "blogs");
-  const files = await fs.promises.readdir(postsDirectory);
-
-  // Filter only .md files and process each file
-  const posts = files
-  .filter((filename) => filename.endsWith(".md"))
-  .map((filename) => {
-    try {
-      return readPostFromFile(filename, postsDirectory);
-    } catch (error) {
-      if (error instanceof FrontmatterValidationError) {
-        console.warn(error.message);
-        return null;
-      }
-      throw error;
-    }
-  })
-  .filter((post): post is NonNullable<typeof post> => post !== null) // ✅ Tells TS the type is now non-null
-  .sort(
-    (a, b) => b.frontmatter.date.getTime() - a.frontmatter.date.getTime()
-  );
-
-
-  return posts;
+function convertDBBlogToPost(blog: DBBlog) {
+  return {
+    slug: blog.slug,
+    filename: `${blog.slug}.md`,
+    frontmatter: {
+      title: blog.title,
+      author: blog.author,
+      date: new Date(blog.published_at || blog.created_at),
+      image: blog.image,
+      avatar: blog.author_avatar,
+      role: blog.author_role,
+      category: blog.category,
+      tags: blog.tags,
+    },
+    content: blog.content,
+  };
 }
 
 /**
- * Gets a single blog post by slug
+ * Gets all blog posts with frontmatter and content (from both static files and database)
+ */
+export async function getAllPosts() {
+  const postsDirectory = path.join(process.cwd(), "src", "blogs");
+  
+  // Get static file posts
+  const files = await fs.promises.readdir(postsDirectory);
+  const staticPosts = files
+    .filter((filename) => filename.endsWith(".md"))
+    .map((filename) => {
+      try {
+        return readPostFromFile(filename, postsDirectory);
+      } catch (error) {
+        if (error instanceof FrontmatterValidationError) {
+          console.warn(error.message);
+          return null;
+        }
+        throw error;
+      }
+    })
+    .filter((post): post is NonNullable<typeof post> => post !== null);
+
+  // Get database posts (only published ones)
+  let dbPosts: ReturnType<typeof convertDBBlogToPost>[] = [];
+  try {
+    const { data: blogs, error } = await supabaseAdmin
+      .from('blogs')
+      .select('*')
+      .eq('published', true)
+      .order('published_at', { ascending: false });
+
+    if (!error && blogs) {
+      dbPosts = blogs.map(convertDBBlogToPost);
+    }
+  } catch (error) {
+    console.error('Error fetching database blogs:', error);
+  }
+
+  // Combine and sort by date
+  const allPosts = [...staticPosts, ...dbPosts].sort(
+    (a, b) => b.frontmatter.date.getTime() - a.frontmatter.date.getTime()
+  );
+
+  return allPosts;
+}
+
+/**
+ * Gets a single blog post by slug (checks database first, then static files)
  * @param slug The post slug (filename without extension)
  * @throws {PostNotFoundError} When the post with the given slug doesn't exist
  * @throws {FrontmatterValidationError} When the post's frontmatter is invalid
  */
 export async function getPostBySlug(slug: string) {
+  // Try database first
+  try {
+    const { data: blog, error } = await supabaseAdmin
+      .from('blogs')
+      .select('*')
+      .eq('slug', slug)
+      .eq('published', true)
+      .single();
+
+    if (!error && blog) {
+      return convertDBBlogToPost(blog);
+    }
+  } catch (error) {
+    // If not in database, try static files
+    console.log('Blog not found in database, trying static files');
+  }
+
+  // Fall back to static file
   const filename = `${slug}.md`;
   return readPostFromFile(filename);
 }
