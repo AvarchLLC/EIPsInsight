@@ -40,6 +40,9 @@ import FeedbackWidget from "./FeedbackWidget";
 
 const ResourcesPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
+  const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
+  const [loadingBlogs, setLoadingBlogs] = useState(false);
+  
   const bg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.700", "gray.200");
@@ -50,7 +53,30 @@ const ResourcesPage: React.FC = () => {
   const tabSize = useBreakpointValue({ base: "sm", md: "md" });
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  // const posts = await getAllPosts();
+  // Fetch recent database blogs
+  useEffect(() => {
+    const fetchRecentBlogs = async () => {
+      setLoadingBlogs(true);
+      try {
+        const response = await fetch('/api/admin/blogs');
+        if (response.ok) {
+          const data = await response.json();
+          // Get published blogs only, sorted by date, limit to 6 most recent
+          const publishedBlogs = data.blogs
+            ?.filter((blog: any) => blog.published)
+            ?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            ?.slice(0, 6) || [];
+          setRecentBlogs(publishedBlogs);
+        }
+      } catch (error) {
+        console.error('Failed to fetch recent blogs:', error);
+      } finally {
+        setLoadingBlogs(false);
+      }
+    };
+
+    fetchRecentBlogs();
+  }, []);
 
   const handleSelection = (hash: any) => {
     const upperHash = hash.toUpperCase();
@@ -528,14 +554,44 @@ const ResourcesPage: React.FC = () => {
       icon: FaBlog,
       content: (
         <Box>
-          <Heading size="lg" mb={6} display="flex" alignItems="center" gap={2}>
-            <Icon as={FaBlog} color={accentColor} /> Latest Blog Posts
-          </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-            {BLOGS?.map((item, index) => (
-              <Card key={index} {...item} />
-            ))}
-          </SimpleGrid>
+          {/* Recent Database Blogs Section */}
+          {recentBlogs.length > 0 && (
+            <Box mb={10}>
+              <Heading size="lg" mb={2} display="flex" alignItems="center" gap={2}>
+                <Icon as={FaBlog} color={accentColor} /> Recent Blog Posts
+              </Heading>
+              <Text fontSize="sm" color={textColor} mb={4}>
+                Latest updates from our database
+              </Text>
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                {recentBlogs.map((blog) => (
+                  <Card
+                    key={blog.id}
+                    image={blog.image || "/default-blog.png"}
+                    title={blog.title}
+                    content={blog.summary || blog.content?.substring(0, 150) + "..."}
+                    link={`/Blogs/${blog.slug}`}
+                    tag={blog.category || "Blog"}
+                  />
+                ))}
+              </SimpleGrid>
+            </Box>
+          )}
+
+          {/* Static Blog Posts Section */}
+          <Box>
+            <Heading size="lg" mb={2} display="flex" alignItems="center" gap={2}>
+              <Icon as={FaBlog} color={accentColor} /> Featured Articles
+            </Heading>
+            <Text fontSize="sm" color={textColor} mb={4}>
+              In-depth guides and technical deep-dives
+            </Text>
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+              {BLOGS?.map((item, index) => (
+                <Card key={index} {...item} />
+              ))}
+            </SimpleGrid>
+          </Box>
         </Box>
       ),
     },

@@ -1,44 +1,43 @@
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { useToast } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { Box, Spinner, Flex } from '@chakra-ui/react';
 
-// Define allowed editor/admin emails
-const EDITORS: string[] = ["dhanushlnaik@gmail.com"];
-
-const AdminPage: React.FC = () => {
-  const { data: session, status } = useSession();
+const AdminRedirect: React.FC = () => {
   const router = useRouter();
-  const toast = useToast();
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (status === "loading") return;
-    // Type guard: session?.user?.email is string
-    console.log(!session?.user?.email)
-    if (!session || !session.user?.email || !EDITORS.includes(session.user.email)) {
-      
-      toast({
-        title: "Access Denied",
-        description: "You are not admin/editor!",
-        status: "error",
-        isClosable: true,
-        duration: 3000,
-      });
-      router.replace("/");
-    }
-  }, [session, status, router, toast]);
+    const checkAuthAndRedirect = async () => {
+      try {
+        // Check if user has valid admin session
+        const response = await fetch('/api/admin/auth/session');
+        
+        if (response.ok) {
+          // User is authenticated, redirect to dashboard
+          router.replace('/admin/dashboard');
+        } else {
+          // User is not authenticated, redirect to login
+          router.replace('/admin/login');
+        }
+      } catch (error) {
+        // On error, redirect to login
+        router.replace('/admin/login');
+      } finally {
+        setChecking(false);
+      }
+    };
 
-  // Prevent rendering until the check is done
-  if (status === "loading" || !session || !session.user?.email || !EDITORS.includes(session.user.email)) {
-    return null;
-  }
+    checkAuthAndRedirect();
+  }, [router]);
 
+  // Show loading spinner while checking
   return (
-    <div style={{ padding: 32 }}>
-      <h1>Admin Dashboard</h1>
-      <p>Welcome, {session.user.email}</p>
-    </div>
+    <Flex minH="100vh" align="center" justify="center">
+      <Box textAlign="center">
+        <Spinner size="xl" color="blue.500" thickness="4px" />
+      </Box>
+    </Flex>
   );
 };
 
-export default AdminPage;
+export default AdminRedirect;
