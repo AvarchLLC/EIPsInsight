@@ -1184,6 +1184,13 @@ const GitHubPRTracker: React.FC = () => {
   };
 
   const handleDownload2 = () => {
+    // Check if at least one category is selected
+    const hasSelectedCategory = Object.values(showCategory).some(v => v);
+    if (!hasSelectedCategory) {
+      alert("Please select at least one category (Created, Open, Closed, Merged) to download.");
+      return;
+    }
+
     // Initialize combined data arrays for PRs and Issues separately
     const combinedPRData = {
       created: [] as Array<PR & { key: string; tag: string }>,
@@ -1202,6 +1209,14 @@ const GitHubPRTracker: React.FC = () => {
     // Determine if we're handling PRs or Issues
     const allData =
       activeTab === "PRs" ? downloaddata.PRs : downloaddata.Issues;
+
+    // Check if data is loaded
+    if (!allData || Object.keys(allData).length === 0) {
+      alert("Data is still loading. Please wait a moment and try again.");
+      return;
+    }
+
+    console.log("Download data keys:", Object.keys(allData).length);
 
     // Iterate over all keys in the selected dataset (PRs or Issues)
     Object.keys(allData)?.forEach((key) => {
@@ -1286,24 +1301,30 @@ const GitHubPRTracker: React.FC = () => {
       }
     });
 
-    // Check if there's data to download
-    const noData =
-      activeTab === "PRs"
-        ? combinedPRData.created?.length === 0 &&
-          combinedPRData.closed?.length === 0 &&
-          combinedPRData.open?.length === 0 &&
-          combinedPRData.merged?.length === 0 &&
-          combinedPRData.reviewed?.length === 0
-        : combinedIssueData.created?.length === 0 &&
-          combinedIssueData.closed?.length === 0 &&
-          combinedIssueData.open?.length === 0;
+    // Check if there's data to download based on selected categories
+    const totalRecords = activeTab === "PRs"
+      ? combinedPRData.created.length +
+        combinedPRData.closed.length +
+        combinedPRData.open.length +
+        combinedPRData.merged.length +
+        combinedPRData.reviewed.length
+      : combinedIssueData.created.length +
+        combinedIssueData.closed.length +
+        combinedIssueData.open.length;
 
-    if (noData) {
-      alert("No data available.");
+    console.log("Total records to download:", totalRecords);
+    console.log("Selected categories:", Object.entries(showCategory).filter(([_, v]) => v).map(([k, _]) => k));
+
+    if (totalRecords === 0) {
+      const selectedCategories = Object.entries(showCategory)
+        .filter(([_, isActive]) => isActive)
+        .map(([category, _]) => category)
+        .join(', ');
+      alert(`No data available for the selected categories (${selectedCategories}). The repository might not have any ${activeTab.toLowerCase()} in these categories, or the data is still loading.`);
       return;
     }
 
-    // console.log("Combined data with keys and tags:", activeTab === 'PRs' ? combinedPRData : combinedIssueData);
+    console.log("Combined data with keys and tags:", activeTab === 'PRs' ? combinedPRData : combinedIssueData);
 
     // Pass the appropriate combined data to the CSV download function
     downloadCSV2(
@@ -1766,7 +1787,7 @@ const GitHubPRTracker: React.FC = () => {
                 <Button
                   colorScheme="blue"
                   variant="solid"
-                  leftIcon={<DownloadIcon />}
+                  leftIcon={loading3 ? undefined : <DownloadIcon />}
                   onClick={async () => {
                     try {
                       // Trigger the CSV conversion and download
@@ -1785,9 +1806,15 @@ const GitHubPRTracker: React.FC = () => {
                   fontSize={{ base: "0.6rem", md: "md" }}
                   _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
                   transition="all 0.2s"
-                  title="Download all data with selected filters"
+                  title={loading3 ? "Loading data..." : "Download all historical data with selected category filters"}
                 >
-                  {loading3 ? <Spinner size="sm" /> : "Download All Data (CSV)"}
+                  {loading3 ? (
+                    <>
+                      <Spinner size="sm" mr={2} /> Loading...
+                    </>
+                  ) : (
+                    "Download All Data (CSV)"
+                  )}
                 </Button>
               </Flex>
               <Flex justify="center" mb={8}>

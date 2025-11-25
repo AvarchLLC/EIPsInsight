@@ -171,7 +171,7 @@ export default function LargeWithAppLinksAndSocial() {
                   </Box>
                   
                   <Box>
-                    <NextLink href="/about">
+                    <NextLink href="/About">
                       <Text 
                         _hover={{ color: useColorModeValue("blue.600", "blue.300"), transform: "translateX(2px)" }} 
                         cursor="pointer"

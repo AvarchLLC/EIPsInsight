@@ -61,8 +61,9 @@ const networks: Record<string, NetworkConfig> = {
   mainnet: {
     beaconApi: "https://ethereum-beacon-api.publicnode.com",
     rpc: "https://ethereum-rpc.publicnode.com",
-    target: Number.MAX_SAFE_INTEGER,
-    targetepoch: Number.MAX_SAFE_INTEGER,
+    // Fusaka activation
+    target: 13164544,
+    targetepoch: Math.floor(13164544 / 32), // 411454
     name: "Mainnet",
   },
 };
@@ -70,18 +71,18 @@ const networks: Record<string, NetworkConfig> = {
 const FUSAKA_INFO = {
   title: "FUSAKA Network Upgrade",
   description:
-    "Ethereum's next major upgrade focusing on enhanced blob throughput and network efficiency.",
+    "Ethereum's major hard fork focused on improving scalability, efficiency, and security through PeerDAS and increased capacity.",
   features: [
-    "Increased blob capacity for Layer 2 scaling",
-    "Improved data availability for rollups",
-    "Network optimization and efficiency improvements",
-    "Enhanced security and validator performance",
+    "PeerDAS: Peer Data Availability Sampling for efficient data verification",
+    "Block gas limit increased from 30M to 150M units",
+    "Doubled blob capacity through BPO (Blob Parameter Only) forks",
+    "Reduced network congestion and lower transaction fees for L2 rollups",
   ],
   schedule: {
     holesky: "October 1, 2025 - 08:48 UTC",
     sepolia: "October 14, 2025 - 07:36 UTC",
     hoodi: "October 28, 2025 - 18:53 UTC",
-    mainnet: "To be announced after testnet completion",
+    mainnet: "December 4, 2025 - 05:49:11 UTC",
   },
   readMore: {
     label: "Read more about FUSAKA",
@@ -100,6 +101,7 @@ const getAccent = (network: string, light: boolean) => {
   if (network === "holesky") return light ? "blue.600" : "blue.300";
   if (network === "sepolia") return light ? "purple.600" : "purple.300";
   if (network === "hoodi") return light ? "orange.600" : "orange.300";
+  if (network === "mainnet") return light ? "blue.700" : "blue.400";
   return light ? "gray.700" : "gray.200";
 };
 
@@ -108,7 +110,7 @@ const SlotCountdown: React.FC = () => {
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
   const [currentBlock, setCurrentBlock] = useState<number>(0);
   const [timer, setTimer] = useState<number>(13);
-  const [network, setNetwork] = useState<keyof typeof networks>("hoodi");
+  const [network, setNetwork] = useState<keyof typeof networks>("mainnet");
   const [loading, setLoading] = useState<boolean>(true);
   const [countdown, setCountdown] = useState<string>("");
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false);
@@ -742,8 +744,8 @@ const SlotCountdown: React.FC = () => {
           <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold" color={useColorModeValue("gray.800", "white")}>
             Live Countdown — {networks[network].name} Network
           </Text>
-          <Badge colorScheme={network === "mainnet" ? "gray" : "green"} fontSize="xs" px={2}>
-            {network === "mainnet" ? "TBD" : "TESTNET"}
+          <Badge colorScheme={network === "mainnet" ? "blue" : "green"} fontSize="xs" px={2}>
+            {network === "mainnet" ? "MAINNET" : "TESTNET"}
           </Badge>
         </HStack>
         <Select
@@ -768,7 +770,7 @@ const SlotCountdown: React.FC = () => {
           {(["holesky", "sepolia", "hoodi", "mainnet"] as (keyof typeof networks)[]).map((net) => (
             <Button
               key={net}
-              colorScheme={network === net ? (net === "mainnet" ? "gray" : net === "hoodi" ? "orange" : net === "sepolia" ? "purple" : "blue") : "gray"}
+              colorScheme={network === net ? (net === "mainnet" ? "blue" : net === "hoodi" ? "orange" : net === "sepolia" ? "purple" : "blue") : "gray"}
               onClick={() => handleNetworkChange(net)}
               variant={network === net ? "solid" : "outline"}
               size="sm"
@@ -777,7 +779,7 @@ const SlotCountdown: React.FC = () => {
             >
               {net.charAt(0).toUpperCase() + net.slice(1)}
               {net === "holesky" && <Badge ml={1} colorScheme="orange" fontSize="9px" variant="subtle">FINAL</Badge>}
-              {net === "mainnet" && <Badge ml={1} colorScheme="gray" fontSize="9px" variant="subtle">TBD</Badge>}
+              {net === "mainnet" && <Badge ml={1} colorScheme="blue" fontSize="9px" variant="subtle">DEC 4</Badge>}
             </Button>
           ))}
         </HStack>
@@ -790,26 +792,6 @@ const SlotCountdown: React.FC = () => {
           <Text color={useColorModeValue("gray.600", "gray.400")} fontSize="sm">
             Loading {networks[network].name} network data...
           </Text>
-        </VStack>
-      ) : network === "mainnet" ? (
-        <VStack spacing={4}>
-          <HStack justify="center" spacing={4} flexWrap="wrap" py={2}>
-            <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-              Mainnet Date: TBD
-            </Text>
-            <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>•</Text>
-            <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-              Block: {currentBlock.toLocaleString()}
-            </Text>
-            <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>•</Text>
-            <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-              Epoch: {currentEpoch.toLocaleString()}
-            </Text>
-          </HStack>
-          
-          <Box width="100%" bg={useColorModeValue("gray.50", "gray.800")} p={4} borderRadius="md" border="1px solid" borderColor={useColorModeValue("gray.200", "gray.700")}>
-            {viewMode === "slots" ? renderSlotsView() : renderEpochsView()}
-          </Box>
         </VStack>
       ) : isUpgradeLive || slotsRemaining <= 0 ? (
         <VStack spacing={4}>

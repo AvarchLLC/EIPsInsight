@@ -242,7 +242,7 @@ const ResourcesPage: React.FC = () => {
       title: "What is EIPsInsight?",
       content:
         "EIPsInsight is specialized in toolings designed to provide clear, visual insights into the activity of Ethereum Improvement Proposals (EIPs), Ethereum Request for Comments (ERCs), and Rollup Improvement Proposals (RIPs) over a specified period.",
-      link: "/about",
+      link: "/About",
       tag: "About",
     },
   ];

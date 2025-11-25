@@ -15,6 +15,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/Analytics', request.url));
   }
 
+  if (path.toLowerCase() === '/about') {
+    console.log("redirected");
+    return NextResponse.redirect(new URL('/About', request.url));
+  }
+
 
   return NextResponse.next();
 }
