@@ -10,6 +10,10 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
+  if (!DISCORD_WEBHOOK_URL) {
+    return res.status(500).json({ message: "Discord webhook URL not configured" });
+  }
+
   try {
     const embed = {
       title: "🧪 Test Notification",

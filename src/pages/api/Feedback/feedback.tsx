@@ -4,6 +4,11 @@ import { MongoClient } from "mongodb";
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEB;
 
 async function sendDiscordNotification(feedbackData: any) {
+  if (!DISCORD_WEBHOOK_URL) {
+    console.warn("Discord webhook URL not configured, skipping notification");
+    return;
+  }
+
   try {
     const embed = {
       title: "🔔 New Feedback Received",

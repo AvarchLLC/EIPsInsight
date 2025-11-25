@@ -12,6 +12,11 @@ interface FeedbackData {
 
 async function sendDiscordNotification(feedbackData: any) {
   try {
+    if (!DISCORD_WEBHOOK_URL) {
+      console.log("Discord webhook URL not configured, skipping notification");
+      return;
+    }
+
     // Map ratings to emojis and colors
     const ratingMap: Record<string, { emoji: string; color: number; text: string }> = {
       'positive': { emoji: '👍', color: 0x00ff00, text: 'Positive' },
@@ -61,6 +66,7 @@ async function sendDiscordNotification(feedbackData: any) {
         inline: false
       });
     }
+    
 
     await fetch(DISCORD_WEBHOOK_URL, {
       method: "POST",
