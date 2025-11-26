@@ -1,3 +1,4 @@
+import './polyfills'; // Load polyfills for older Node.js versions
 import { supabaseAdmin } from './supabase';
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
