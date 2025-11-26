@@ -1,12 +1,18 @@
 ---
 title: "Join EIPsInsight.com as a Full-Stack Developer (Remote)"
 date: 2025-06-29
-author: Yash Kamal Chaturvedi
-avatar: https://avatars.githubusercontent.com/u/76512851?v=4
-role: Blockchain Technical Writer
-category: Hiring
-tags: [Job Opening, Full Stack, Remote, Ethereum]
-image: https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/hiring-full-stack-developer.png
+author: "Yash Kamal Chaturvedi"
+image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/hiring-full-stack-developer.png"
+authorAvatar : "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
+authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
+authorTwitter: "https://x.com/YashKamalChatu1"
+authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
+authorGithub: "https://github.com/yashkamalchaturvedi"
+summaryPoints:
+  - "Remote. Full-time. Help shape Ethereum’s documentation future!"
+  - "Use Next.js, TypeScript, Chakra UI, MongoDB & more."
+  - "Work on open-access tools for the Ethereum ecosystem."
+  - "Great for devs passionate about web3, standards, or blockchain data."
 ---
 
 # 

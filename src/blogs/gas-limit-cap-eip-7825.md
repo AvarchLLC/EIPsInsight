@@ -1,12 +1,18 @@
 ---
 title: "Importance of Transaction Gas Limit Cap (EIP-7825)"
 date: 2025-06-29
-author: Yash Kamal Chaturvedi
-avatar: https://avatars.githubusercontent.com/u/76512851?v=4
-role: Blockchain Technical Writer
-category: Protocol Upgrade
-tags: [EIP-7825, Gas Limit, DoS Protection, Transaction Security]
-image: https://etherworld.co/content/images/2025/07/Gas-Limit-Cap.jpg
+author: "Yash Kamal Chaturvedi"
+image: "https://etherworld.co/content/images/2025/07/Gas-Limit-Cap.jpg"
+authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
+authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
+authorTwitter: "https://x.com/YashKamalChatu1"
+authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
+authorGithub: "https://github.com/yashkamalchaturvedi"
+summaryPoints:
+  - "Why Ethereum needs a per-transaction gas ceiling"
+  - "How EIP-7825 enforces the 30M gas cap"
+  - "Impact on developers, node operators, and UX"
+  - "Community debates and comparisons with other chains"
 ---
 
 As Ethereum scales, unchecked gas consumption threatens network health and user trust. EIP-7825 tackles this by enforcing a 30 million gas cap per transaction at the protocol level, rejecting oversized transactions at the RPC, mempool and consensus stages. This EIP helps in avoiding DoS attempts, curbs state bloat and brings predictability to fee estimation and node resource planning. 
