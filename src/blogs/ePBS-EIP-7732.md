@@ -1,12 +1,19 @@
 ---
 title: "Enshrined Proposer Builder Separation (ePBS) (EIP-7732)"
-date: 2025-06-16
-author: Yash Kamal Chaturvedi
-avatar: https://avatars.githubusercontent.com/u/76512851?v=4
-role: Blockchain Technical Writer
-category: Protocol Upgrade
-tags: [EIP-7732, ePBS, MEV, Consensus Layer]
-image: https://etherworld.co/content/images/2025/06/ePBS.jpg
+date: "2025-06-16"
+author: "Yash Kamal Chaturvedi"
+image: "https://etherworld.co/content/images/2025/06/ePBS.jpg"
+authorAvatar : "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
+authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
+authorTwitter: "https://x.com/YashKamalChatu1"
+authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
+authorGithub: "https://github.com/yashkamalchaturvedi"
+summaryPoints:
+  - "ePBS (EIP-7732) enshrines proposer-builder separation directly into Ethereum’s protocol, replacing off-chain MEV-Boost."
+  - "Makes block building more decentralized and removes reliance on third-party relays, improving censorship resistance."
+  - "Validators process consensus and execution in pipeline stages, boosting efficiency and supporting future stateless upgrades."
+  - "Builder activity, auction models, and Payload Timeless Committee (PTC) add transparency, cryptographic accountability, and modular upgrade compatibility."
+  - "Major design debates remain on auction types, inclusion list rollout, payload incentives, and fork choice complexity—collaboration needed for safe mainnet launch."
 ---
 
 Ethereum is getting ready for one of its most practical upgrades yet with ePBS, or Enshrined Proposer Builder Separation, under [EIP-7732](https://youtu.be/Wo7IEUCGRxU?si=fp955F0ZwLAiROix). This change rethinks how blocks are built and confirmed by separating the roles of proposing and executing blocks within the protocol itself. 

@@ -9,6 +9,7 @@ import { FaTwitter, FaLinkedin, FaGithub, FaRegHeart, FaRegLightbulb, FaRegSmile
 import BorderedImage from '@/components/BorderImage';
 import { ScrollToHashOnLoad } from '@/components/ScrollToHashOnLoad';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import BlogEngagement from '@/components/Blog/BlogEngagement';
 
 function AuthorBio({ frontmatter }: { frontmatter: any }) {
   return (
@@ -211,6 +212,7 @@ export default function BlogPostView({
           top="0"
         >
           <StickySummary summaryPoints={summaryPoints} />
+          <BlogEngagement slug={frontmatter.slug || ''} userId={undefined} />
         </Box>
       </Flex>
     </Box>

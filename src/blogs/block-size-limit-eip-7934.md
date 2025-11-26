@@ -1,12 +1,18 @@
 ---
 title: "Importance of Block Size Limit (EIP-7934)"
 date: 2025-06-23
-author: Yash Kamal Chaturvedi
-avatar: https://avatars.githubusercontent.com/u/76512851?v=4
-role: Blockchain Technical Writer
-category: Protocol Upgrade
-tags: [EIP-7934, Block Size, Network Security, Fusaka]
-image: https://etherworld.co/content/images/2025/07/Importance-of-Block-Size-Limit--EIP-7934-.jpg
+author: "Yash Kamal Chaturvedi"
+image: "https://etherworld.co/content/images/2025/07/Importance-of-Block-Size-Limit--EIP-7934-.jpg"
+authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
+authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
+authorTwitter: "https://x.com/YashKamalChatu1"
+authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
+authorGithub: "https://github.com/yashkamalchaturvedi"
+summaryPoints:
+  - "Why oversized blocks threaten Ethereum stability"
+  - "How EIP-7934 enforces a 10 MiB cap with a 2 MiB buffer"
+  - "Impact on propagation, forks, and DoS resistance"
+  - "Developer, node operator, and community perspectives"
 ---
 
 As Ethereum’s usage and on chain activity surge, the size of execution blocks has become a critical factor in network health. Oversized blocks slow down propagation, fracture peer connectivity, and consume excessive CPU and bandwidth, creating “invisible” forks and opening the door to denial of service attacks. 
