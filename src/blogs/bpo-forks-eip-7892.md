@@ -1,12 +1,19 @@
 ---
 title: "Blob Parameter Only (BPO) Forks (EIP-7892)"
-date: 2025-06-07
-author: Yash Kamal Chaturvedi
-avatar: https://avatars.githubusercontent.com/u/76512851?v=4
-role: Blockchain Technical Writer
-category: Scaling
-tags: [EIP-7892, BPO, Blobs, Layer 2, Data Availability]
-image: https://etherworld.co/content/images/2025/06/Your-paragraph-text--1-.jpg
+date: "2025-06-07"
+author: "Yash Kamal Chaturvedi"
+image: "https://etherworld.co/content/images/2025/06/Your-paragraph-text--1-.jpg"
+authorAvatar : "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
+authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
+authorTwitter: "https://x.com/YashKamalChatu1"
+authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
+authorGithub: "https://github.com/yashkamalchaturvedi"
+summaryPoints:
+  - "BPO forks offer rapid scaling for Ethereum data availability, ideal for blob congestion."
+  - "Upgrades affect only blob target and limit: simpler, safer, more responsive than traditional hard forks."
+  - "Keeps pace with L2 network growth while protecting decentralization and home validators."
+  - "Real-world bandwidth constraints and solo staker diversity remain a critical consideration."
+  - "Proposed options for the next upgrade: maintain, modestly increase, or aggressively expand blob capacity."
 ---
 
 

@@ -31,13 +31,13 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
   const descriptionColor = useColorModeValue("black", "white");
 
   return (
-    <Box id="Ethereum Improvement" mb={{ base: 4, lg: 6 }}>
-      <Flex alignItems={center ? 'center' : 'center'} mb={3} gap={3} direction={center ? 'column' : 'row'} textAlign={center ? 'center' : 'left'}>
+    <Box id="Ethereum Improvement" mb={{ base: 6, lg: 8 }}>
+      <Flex alignItems={center ? 'center' : 'center'} mb={4} gap={4} direction={center ? 'column' : 'row'} textAlign={center ? 'center' : 'left'}>
         <Text
           as={motion.div}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          fontSize={{ base: "2xl", sm: "3xl", md: "4xl", lg: "4xl", xl: "5xl" }}
+          fontSize={{ base: "2xl", sm: "3xl", md: "4xl", lg: "5xl", xl: "6xl" }}
           fontWeight="extrabold"
           color={useColorModeValue(headingColorLight, headingColorDark)}
           bgGradient={useColorModeValue(effectiveHeadingBgGradientLight, headingBgGradientDark)}
@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
         )}
         {sectionId && center && (
           // when centering, show copy button beneath the title
-          <Box mt={2}>
+          <Box mt={3}>
             <CopyLink link={dynamicLink} />
           </Box>
         )}
@@ -68,21 +68,21 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, description, sectionId
         transition={{ duration: 0.5, delay: 0.2 } as any}
       >
         <Text
-          fontSize={{ base: "md", md: "lg", lg: "xl" }}
+          fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
           fontWeight="bold"
           color={subtitleColor}
-          mb={2}
+          mb={3}
         >
           {subtitle}
         </Text>
         
         <Text 
-          fontSize={{ base: "sm", md: "md", lg: "lg" }}
+          fontSize={{ base: "md", md: "lg", lg: "xl" }}
           color={descriptionColor}
-          lineHeight="1.5"
-          maxWidth="600px"
+          lineHeight="1.6"
+          maxWidth="800px"
           opacity={0.9}
-          mt={1}
+          mt={2}
         >
           {description}
         </Text>

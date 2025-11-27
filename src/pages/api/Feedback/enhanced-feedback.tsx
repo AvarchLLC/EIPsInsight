@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { MongoClient } from "mongodb";
 
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1423745692366672044/65Y9iEFzVKFBN0cXbZWmEYOAV5kqAiX0wuYLlh4KjyXAtS5JlCN6uSV954NfDK-DUjEV";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEB;
 
 interface FeedbackData {
   rating: 'positive' | 'neutral' | 'negative';
@@ -12,6 +12,11 @@ interface FeedbackData {
 
 async function sendDiscordNotification(feedbackData: any) {
   try {
+    if (!DISCORD_WEBHOOK_URL) {
+      console.log("Discord webhook URL not configured, skipping notification");
+      return;
+    }
+
     // Map ratings to emojis and colors
     const ratingMap: Record<string, { emoji: string; color: number; text: string }> = {
       'positive': { emoji: '👍', color: 0x00ff00, text: 'Positive' },
@@ -61,6 +66,7 @@ async function sendDiscordNotification(feedbackData: any) {
         inline: false
       });
     }
+    
 
     await fetch(DISCORD_WEBHOOK_URL, {
       method: "POST",

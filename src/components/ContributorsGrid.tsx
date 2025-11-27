@@ -142,23 +142,16 @@ export default function ContributorsGrid() {
     : computeItems();
 
   return (
-    <>
-      <style jsx>{`
-        .gradient-text {
-          background: linear-gradient(135deg, #30A0E0 0%, #4FD1FF 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-      `}</style>
-      <Box mt={4}>
+    <Box mt={4}>
       <Heading 
         as="h2" 
-        fontSize={{ base: "2xl", md: "3xl" }} 
+        fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }} 
         mb={6} 
         textAlign="left" 
-        fontWeight="600" 
-        className="gradient-text"
+        fontWeight="bold" 
+        bgGradient="linear(135deg, #30A0E0 0%, #4FD1FF 100%)"
+        bgClip="text"
+        color="transparent"
       >
         Team
       </Heading>
@@ -316,6 +309,5 @@ export default function ContributorsGrid() {
         </ModalContent>
       </Modal>
     </Box>
-    </>
   );
 }

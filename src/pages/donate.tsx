@@ -160,10 +160,10 @@ const fundingData: FundingData[] = [
 ];
 
 const tierLegend = [
-  { label: 'Significant', range: 'Above $15,000', color: 'purple', tooltip: 'Significant support'},
-  { label: 'Major', range: '$8,000–$15,000', color: 'blue', tooltip: 'Major grants' },
-  { label: 'Standard', range: '$2,000–$8,000', color: 'green', tooltip: 'Standard support' },
-  { label: 'Small', range: 'Below $2,000', color: 'gray', tooltip: 'Micro contributions' },
+  { label: 'Significant', range: 'Above $15,000', color: 'purple', tooltip: 'Significant support, updated annually.' },
+  { label: 'Major', range: '$8,000–$15,000', color: 'blue', tooltip: 'Major grants, updated annually.' },
+  { label: 'Standard', range: '$2,000–$8,000', color: 'green', tooltip: 'Standard support, updated quarterly.' },
+  { label: 'Micro', range: 'Below $2,000', color: 'gray', tooltip: 'Micro contributions, updated monthly.' },
 ];
 
 // --- Components ---
@@ -305,7 +305,7 @@ export default function DonatePage(): JSX.Element {
     'linear-gradient(135deg, #2d3748 0%, #1a202c 100%)'
   );
 
-  const address = '0x68B1C495096710Ab5D3aD137F5024221aAf35B7d';
+  const address = '0x2A505a987cB41A2e2c235D851e3d74Fa24206229';
   const { hasCopied, onCopy } = useClipboard(address);
   const [selectedNetwork, setSelectedNetwork] = useState('Ethereum');
 
@@ -316,12 +316,8 @@ export default function DonatePage(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Donate — EIPs Insights</title>
-        <meta name="description" content="Support EIPs Insights, open-source analytics for EIPs, ERCs and RIPs." />
-        <meta property="og:title" content="Donate — EIPs Insights" />
-        <meta property="og:description" content="Support EIPs Insights, open-source analytics for EIPs, ERCs and RIPs." />
-        <meta property="og:image" content="/EIPsInsights.gif" />
-        <link rel="icon" href="/eipFavicon.png" />
+        <title>Donate, EIPs Insight</title>
+        <meta name="description" content="Support EIPsInsight, open-source analytics for EIPs, ERCs and RIPs." />
       </Head>
 
       <Navbar />
@@ -395,7 +391,7 @@ export default function DonatePage(): JSX.Element {
                 gap={4}
               >
                 <Heading as="h2" size="lg" color={accent} mb={2} textAlign="left">
-                  Donate
+                  Donate Crypto
                 </Heading>
                 <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={4} w="full">
                   <Box
@@ -493,7 +489,7 @@ export default function DonatePage(): JSX.Element {
                     transition="all 0.3s"
                     _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
                   >
-                    <VStack spacing={3} textAlign="center">
+                    <VStack spacing={2} textAlign="center">
                       <Heading as="h3" size="lg" color={accent}>
                         Scan to Donate
                       </Heading>
@@ -505,8 +501,8 @@ export default function DonatePage(): JSX.Element {
                         borderColor={borderColor}
                       >
                         <Image
-                          src="/qr-wallet.png"
-                          alt="QR Code for Wallet Address"
+                          src="/qr.png"
+                          alt="QR Code"
                           boxSize={{ base: '200px', md: '240px' }}
                           objectFit="contain"
                         />

@@ -1,12 +1,19 @@
 ---
-title: "Purr-suit of Ethereum #3"
-date: 2025-01-26
-author: Pooja Ranjan
-avatar: https://avatars.githubusercontent.com/u/22412996?v=4
-role: Ethereum Cat Herders PM
-category: Newsletter
-tags: [Ethereum, Pectra, EIP Updates, Community]
-image: https://hackmd.io/_uploads/HyG8GJEO1g.png
+title: "Purr-suit of Ethereum 🐾 #3"
+date: "2025-01-26"
+author: "Pooja Ranjan"
+image: "https://hackmd.io/_uploads/HyG8GJEO1g.png"
+authorAvatar: "https://avatars.githubusercontent.com/u/29681685?v=4"
+authorBio: "EthCatHerders.com | WiEP | EtherWorld.co | EIPsInsight.com"
+authorTwitter: "https://x.com/poojaranjan19?lang=en"
+authorLinkedin: "https://www.linkedin.com/in/pooja-r-072899114/"
+authorGithub: "https://github.com/poojaranjan"
+summaryPoints:
+  - "Ethereum Pectra upgrade timelines and devnet-6 details"
+  - "Key takeaways from All Core Devs Consensus & Implementers calls"
+  - "EIPs, ERCs, and RIPs status update: Latest transitions and drafts"
+  - "ECH Public Goods Challenge and Octant Epoch 6 roundup"
+  - "Upcoming protocol calls and community events for builders"
 ---
 
 #### Your Weekly Dose of Blockchain Updates and Meows!

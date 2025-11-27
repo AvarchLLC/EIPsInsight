@@ -91,7 +91,7 @@ jobs:
             mv $TEMP_DIR/.next .next
 
             # Reload PM2 gracefully
-            if ! pm2 reload 39; then
+            if ! pm2 reload eip-client; then
               echo "⚠️ PM2 reload failed, trying to start..."
               pm2 start npm --name "eips-insight" -- start
             fi
