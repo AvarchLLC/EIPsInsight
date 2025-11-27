@@ -264,12 +264,9 @@ const EipsLabelChart = () => {
   const renderChart = () => {
       if (!Array?.isArray(chartData)) return null;
   
-      // Filter chartData by selectedMonth if a month is selected
-      const filteredChartData = selectedMonth 
-        ? chartData.filter(item => item.monthYear === selectedMonth)
-        : chartData;
-  
-      const transformedData = filteredChartData?.reduce<{
+      // Chart shows ALL timeline data (not filtered by selectedMonth)
+      // The selectedMonth is only used for CSV downloads
+      const transformedData = chartData?.reduce<{
         [key: string]: { [key: string]: number };
       }>((acc, { monthYear, label, count }) => {
         // Determine the actual label to use
@@ -291,7 +288,7 @@ const EipsLabelChart = () => {
         return acc;
       }, {});
 
-      console.log("transformed data for selected month:",transformedData);
+      console.log("transformed data (full timeline):",transformedData);
   
       // Convert to array format for the chart
       const finalData = Object?.keys(transformedData).flatMap(monthYear => {
