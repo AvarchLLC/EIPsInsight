@@ -95,8 +95,65 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ]
     }) + 1;
 
+    // Aggregate repo-specific data from timeline
+    const timeline = contributor.timeline || [];
+    const repoStats: Record<string, any> = {};
+    let totalPrsMerged = 0;
+    
+    timeline.forEach((item: any) => {
+      const repo = item.repo || 'Unknown';
+      if (!repoStats[repo]) {
+        repoStats[repo] = {
+          name: repo,
+          commits: 0,
+          prs: 0,
+          prsMerged: 0,
+          reviews: 0,
+          comments: 0,
+          issues: 0,
+        };
+      }
+      
+      switch (item.type) {
+        case 'commit':
+          repoStats[repo].commits++;
+          break;
+        case 'pr':
+          repoStats[repo].prs++;
+          // Check if PR is merged
+          if (item.metadata?.state === 'merged' || item.metadata?.merged === true || item.state === 'merged') {
+            repoStats[repo].prsMerged++;
+            totalPrsMerged++;
+          }
+          break;
+        case 'review':
+          repoStats[repo].reviews++;
+          break;
+        case 'comment':
+          repoStats[repo].comments++;
+          break;
+        case 'issue':
+          repoStats[repo].issues++;
+          break;
+      }
+    });
+    
+    const repos = Object.values(repoStats).filter((r: any) => 
+      r.commits > 0 || r.prs > 0 || r.reviews > 0 || r.comments > 0 || r.issues > 0
+    );
+
     // Transform to expected format
     const hasFlatStructure = contributor.totalCommits !== undefined;
+    
+    // Calculate totals from timeline if nested structure
+    let calculatedTotals = null;
+    if (!hasFlatStructure && contributor.totals) {
+      calculatedTotals = {
+        ...contributor.totals,
+        prsMerged: totalPrsMerged || contributor.totals.prsMerged || 0,
+      };
+    }
+    
     const transformedContributor = {
       username: contributor.githubUsername || contributor.username || contributor.login,
       name: contributor.name || contributor.githubUsername || contributor.username,
@@ -107,13 +164,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       totals: hasFlatStructure ? {
         commits: contributor.totalCommits || 0,
         prsOpened: contributor.totalPRs || 0,
-        prsMerged: 0,
+        prsMerged: totalPrsMerged || contributor.prsMerged || 0,
         reviews: contributor.totalReviews || 0,
         comments: contributor.totalComments || 0,
         issuesOpened: contributor.totalIssues || 0,
         activityScore,
-      } : contributor.totals,
-      repos: contributor.repos || [],
+      } : (calculatedTotals || contributor.totals),
+      repos: repos.length > 0 ? repos : (contributor.repos || []),
       activityStatus: contributor.activityStatus || 'Active',
       lastActivityDate: contributor.lastFetchedAt || contributor.lastActivityDate,
       firstContributionDate: contributor.firstContributionDate,
@@ -121,7 +178,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       expertise: contributor.expertise,
       languageBreakdown: contributor.languageBreakdown,
       avgResponseTime: contributor.avgResponseTime,
-      timeline: contributor.timeline || [],
+      timeline: timeline,
     };
 
     return res.status(200).json({

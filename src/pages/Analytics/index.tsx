@@ -1119,7 +1119,7 @@ const GitHubPRTracker: React.FC = () => {
               (item as PR).merged_at
                 ? new Date((item as PR).merged_at!).toLocaleDateString()
                 : "-",
-              `https://github.com/ethereum/${selectedRepo}/${
+              `https://github.com/ethereum/${(item as PR).repo}/${
                 type === "PRs" ? "pull" : "issues"
               }/${(item as PR).prNumber}`,
             ].join(",")
@@ -1132,7 +1132,7 @@ const GitHubPRTracker: React.FC = () => {
               item.closed_at
                 ? new Date(item.closed_at).toLocaleDateString()
                 : "-",
-              `https://github.com/ethereum/${selectedRepo}/issues/${
+              `https://github.com/ethereum/${(item as Issue).repo}/issues/${
                 (item as Issue).IssueNumber
               }`,
             ].join(",");
@@ -1726,36 +1726,47 @@ const GitHubPRTracker: React.FC = () => {
             ]}
           />
 
-          {/* EtherWorld Advertisement */}
-          <Box my={5}>
-            <CloseableAdCard />
-          </Box>
+          {/* Tabs and Advertisement in same row */}
+          <Flex 
+            direction={{ base: "column", md: "row" }} 
+            justify="space-between" 
+            align="center" 
+            mb={4} 
+            gap={4}
+            my={5}
+          >
+            {/* EIPs/ERCs Tabs - Left side */}
+            <Flex justify={{ base: "center", md: "flex-start" }} gap={4} flex="1">
+              <Button
+                colorScheme="blue"
+                onClick={() => setActiveTab("PRs")}
+                isActive={activeTab === "PRs"}
+                variant={activeTab === "PRs" ? "solid" : "outline"}
+                fontWeight="semibold"
+                px={8}
+                _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                transition="all 0.2s"
+              >
+                PRs
+              </Button>
+              <Button
+                colorScheme="blue"
+                onClick={() => setActiveTab("Issues")}
+                isActive={activeTab === "Issues"}
+                variant={activeTab === "Issues" ? "solid" : "outline"}
+                fontWeight="semibold"
+                px={8}
+                _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                transition="all 0.2s"
+              >
+                Issues
+              </Button>
+            </Flex>
 
-          <Flex justify="center" mb={4} gap={4}>
-            <Button
-              colorScheme="blue"
-              onClick={() => setActiveTab("PRs")}
-              isActive={activeTab === "PRs"}
-              variant={activeTab === "PRs" ? "solid" : "outline"}
-              fontWeight="semibold"
-              px={8}
-              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-              transition="all 0.2s"
-            >
-              PRs
-            </Button>
-            <Button
-              colorScheme="blue"
-              onClick={() => setActiveTab("Issues")}
-              isActive={activeTab === "Issues"}
-              variant={activeTab === "Issues" ? "solid" : "outline"}
-              fontWeight="semibold"
-              px={8}
-              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-              transition="all 0.2s"
-            >
-              Issues
-            </Button>
+            {/* Advertisement - Right side */}
+            <Box flex={{ base: "1", md: "0 0 auto" }} w={{ base: "100%", md: "auto" }}>
+              <CloseableAdCard />
+            </Box>
           </Flex>
 
           <Box

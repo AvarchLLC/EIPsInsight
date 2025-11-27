@@ -35,6 +35,13 @@ const nextConfig = withMDX(
 
     images: {
       domains: ['hackmd.io', 'etherworld.co'],
+      unoptimized: true, // Required for Chakra UI Image components with static assets
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: '**',
+        },
+      ],
     },
 
     // Add the redirects method here

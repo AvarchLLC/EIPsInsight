@@ -50,6 +50,7 @@ const RankingsPage: React.FC = () => {
   const [period, setPeriod] = useState<'all' | 'weekly' | 'monthly'>('all');
   const [activeMode, setActiveMode] = useState<keyof Rankings>('overall');
   const [error, setError] = useState<string | null>(null);
+  const [extendedPeriod, setExtendedPeriod] = useState(false);
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -75,6 +76,7 @@ const RankingsPage: React.FC = () => {
       }
       
       setRankings(response.data.rankings);
+      setExtendedPeriod(response.data.extendedPeriod || false);
     } catch (error: any) {
       console.error('Failed to fetch rankings:', error);
       setError(error.response?.data?.message || 'Failed to load rankings data');
@@ -485,6 +487,11 @@ const RankingsPage: React.FC = () => {
                     <Text color="whiteAlpha.900" fontSize="lg">
                       Discover top contributors across all categories
                     </Text>
+                    {extendedPeriod && (
+                      <Badge colorScheme="orange" fontSize="md" px={4} py={2}>
+                        ⚠️ Using extended period - no recent data found for exact {period === 'weekly' ? '7 days' : '30 days'}
+                      </Badge>
+                    )}
                   </VStack>
 
                   <HStack>

@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { username, type } = req.query;
     const {
       page = '1',
-      limit = '50',
+      limit = '100',
       repo,
       period = 'all',
       sortBy = 'timestamp',
@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const pageNum = parseInt(page as string) || 1;
-    const limitNum = parseInt(limit as string) || 50;
+    const limitNum = Math.min(parseInt(limit as string) || 100, 500); // Max 500 items
     const skip = (pageNum - 1) * limitNum;
 
     const client = await connectToDatabase();
@@ -89,10 +89,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Filter by type
     timeline = timeline.filter((item: any) => item.type === timelineType);
     
-    // Filter by period (using extended ranges for testing with older data)
+    // Filter by period
     if (period === 'weekly' || period === 'monthly') {
       const now = new Date();
-      const daysToSubtract = period === 'weekly' ? 90 : 120; // Extended for testing
+      const daysToSubtract = period === 'weekly' ? 7 : 30; // Exact 7 days or 30 days
       const startDate = new Date(now.getTime() - daysToSubtract * 24 * 60 * 60 * 1000);
       
       timeline = timeline.filter((item: any) => {
@@ -116,6 +116,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const total = timeline.length;
     const paginatedTimeline = timeline.slice(skip, skip + limitNum);
 
+    // Calculate stats for this activity type
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    
+    const stats = {
+      total: timeline.length,
+      thisWeek: timeline.filter((item: any) => new Date(item.timestamp) >= weekAgo).length,
+      thisMonth: timeline.filter((item: any) => new Date(item.timestamp) >= monthAgo).length,
+      avgPerMonth: timeline.length > 0 ? Math.round(timeline.length / Math.max(1, 
+        Math.ceil((now.getTime() - new Date(timeline[timeline.length - 1]?.timestamp || now).getTime()) / (30 * 24 * 60 * 60 * 1000))
+      )) : 0,
+    };
+
     // If CSV format requested
     if (format === 'csv') {
       const csv = generateCSV(paginatedTimeline, type, username);
@@ -130,6 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       repo: repo || null,
       period: period || 'all',
       data: paginatedTimeline,
+      stats,
       pagination: {
         page: pageNum,
         limit: limitNum,

@@ -36,6 +36,7 @@ function transformContributor(contributor: any, rank: number) {
   // Handle both aggregated (singular: commit, pr) and flat (plural: totalCommits, totalPRs) formats
   const commits = contributor.totalCommits || contributor.commit || 0;
   const prs = contributor.totalPRs || contributor.pr || 0;
+  const prsMerged = contributor.prsMerged || contributor.totalPRsMerged || 0;
   const reviews = contributor.totalReviews || contributor.review || 0;
   const comments = contributor.totalComments || contributor.comment || 0;
   const issues = contributor.totalIssues || contributor.issue || 0;
@@ -48,7 +49,7 @@ function transformContributor(contributor: any, rank: number) {
     commits,
     prs,
     prsOpened: prs,
-    prsMerged: 0,
+    prsMerged,
     reviews,
     comments,
     issues,
@@ -56,7 +57,7 @@ function transformContributor(contributor: any, rank: number) {
     totals: {
       commits,
       prsOpened: prs,
-      prsMerged: 0,
+      prsMerged,
       reviews,
       comments,
       issuesOpened: issues,
@@ -84,13 +85,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // For weekly/monthly, we need to aggregate from timeline, not use total counts
     let isTimePeriod = period === 'weekly' || period === 'monthly';
     let startDate: Date | null = null;
+    let extendedPeriod = false;
     
     if (period === 'weekly') {
       startDate = new Date();
-      startDate.setDate(startDate.getDate() - 90); // Use 90 days for testing
+      startDate.setDate(startDate.getDate() - 7); // Exact 7 days
     } else if (period === 'monthly') {
       startDate = new Date();
-      startDate.setDate(startDate.getDate() - 120); // Use 120 days for testing
+      startDate.setDate(startDate.getDate() - 30); // Exact 30 days
+    }
+
+    // Helper to check if we have recent data
+    const hasRecentData = async () => {
+      if (!startDate) return true;
+      const recentCount = await contributors.countDocuments({
+        'timeline.timestamp': { $gte: startDate.toISOString() }
+      });
+      console.log(`[Rankings] Recent data check for ${period}: ${recentCount} contributors with data since ${startDate.toISOString()}`);
+      return recentCount > 0;
+    };
+
+    // If no recent data, use extended periods for testing with older data
+    if (isTimePeriod && !(await hasRecentData())) {
+      console.log(`[Rankings] No recent data found, extending period for ${period}`);
+      extendedPeriod = true;
+      if (period === 'weekly') {
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 90); // Extended: 90 days
+      } else if (period === 'monthly') {
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 180); // Extended: 180 days
+      }
     }
 
     // Helper to get rankings from aggregated timeline data
@@ -122,13 +147,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         avatarUrl: { $first: '$avatarUrl' },
         activityStatus: { $first: '$activityStatus' },
         avgResponseTime: { $first: '$avgResponseTime' },
+        login: { $first: '$login' },
       };
       
       if (type) {
+        // For specific type, use singular form (commit, pr, review, etc.)
         groupStage[type] = {
           $sum: { $cond: [{ $eq: ['$timeline.type', type] }, 1, 0] }
         };
       } else {
+        // For overall, count all types
         groupStage.totalCommits = { $sum: { $cond: [{ $eq: ['$timeline.type', 'commit'] }, 1, 0] } };
         groupStage.totalPRs = { $sum: { $cond: [{ $eq: ['$timeline.type', 'pr'] }, 1, 0] } };
         groupStage.totalReviews = { $sum: { $cond: [{ $eq: ['$timeline.type', 'review'] }, 1, 0] } };
@@ -186,76 +214,195 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       getTimelineRankings(undefined, 'ERCs'),
       getTimelineRankings(undefined, 'RIPs'),
     ]) : await Promise.all([
-      // Overall ranking
-      contributors
-        .find({})
-        .sort({ totalCommits: -1 }) // Sort by commits as proxy for activity
-        .limit(limitNum)
-        .toArray()
+      // Overall ranking - aggregate from timeline for better accuracy
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          avgResponseTime: { $first: '$avgResponseTime' },
+          totalCommits: { $sum: { $cond: [{ $eq: ['$timeline.type', 'commit'] }, 1, 0] } },
+          totalPRs: { $sum: { $cond: [{ $eq: ['$timeline.type', 'pr'] }, 1, 0] } },
+          totalReviews: { $sum: { $cond: [{ $eq: ['$timeline.type', 'review'] }, 1, 0] } },
+          totalComments: { $sum: { $cond: [{ $eq: ['$timeline.type', 'comment'] }, 1, 0] } },
+          totalIssues: { $sum: { $cond: [{ $eq: ['$timeline.type', 'issue'] }, 1, 0] } },
+        }},
+        { $sort: { totalCommits: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
 
       // Top Committers
-      contributors
-        .find({})
-        .sort({ totalCommits: -1 })
-        .limit(limitNum)
-        .toArray()
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $match: { 'timeline.type': 'commit' } },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          totalCommits: { $sum: 1 },
+        }},
+        { $sort: { totalCommits: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
 
       // Top PR Contributors
-      contributors
-        .find({})
-        .sort({ totalPRs: -1 })
-        .limit(limitNum)
-        .toArray()
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $match: { 'timeline.type': 'pr' } },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          totalPRs: { $sum: 1 },
+        }},
+        { $sort: { totalPRs: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
 
       // Top Reviewers
-      contributors
-        .find({})
-        .sort({ totalReviews: -1 })
-        .limit(limitNum)
-        .toArray()
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $match: { 'timeline.type': 'review' } },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          avgResponseTime: { $first: '$avgResponseTime' },
+          totalReviews: { $sum: 1 },
+        }},
+        { $sort: { totalReviews: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
 
       // Top Commenters
-      contributors
-        .find({})
-        .sort({ totalComments: -1 })
-        .limit(limitNum)
-        .toArray()
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $match: { 'timeline.type': 'comment' } },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          totalComments: { $sum: 1 },
+        }},
+        { $sort: { totalComments: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
 
       // Top Issue Creators
-      contributors
-        .find({})
-        .sort({ totalIssues: -1 })
-        .limit(limitNum)
-        .toArray()
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $match: { 'timeline.type': 'issue' } },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          totalIssues: { $sum: 1 },
+        }},
+        { $sort: { totalIssues: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
 
-      // EIPs Contributors
-      contributors
-        .find({ 'timeline.repo': 'EIPs' })
-        .sort({ totalCommits: -1 })
-        .limit(limitNum)
-        .toArray()
+      // EIPs Contributors - aggregate from timeline
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $match: { 'timeline.repo': 'EIPs' } },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          totalCommits: { $sum: { $cond: [{ $eq: ['$timeline.type', 'commit'] }, 1, 0] } },
+          totalPRs: { $sum: { $cond: [{ $eq: ['$timeline.type', 'pr'] }, 1, 0] } },
+          totalReviews: { $sum: { $cond: [{ $eq: ['$timeline.type', 'review'] }, 1, 0] } },
+        }},
+        { $sort: { totalCommits: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
 
-      // ERCs Contributors
-      contributors
-        .find({ 'timeline.repo': 'ERCs' })
-        .sort({ totalCommits: -1 })
-        .limit(limitNum)
-        .toArray()
+      // ERCs Contributors - aggregate from timeline
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $match: { 'timeline.repo': 'ERCs' } },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          totalCommits: { $sum: { $cond: [{ $eq: ['$timeline.type', 'commit'] }, 1, 0] } },
+          totalPRs: { $sum: { $cond: [{ $eq: ['$timeline.type', 'pr'] }, 1, 0] } },
+          totalReviews: { $sum: { $cond: [{ $eq: ['$timeline.type', 'review'] }, 1, 0] } },
+        }},
+        { $sort: { totalCommits: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
 
-      // Repository-specific rankings (RIPs)
-      contributors
-        .find({ 'timeline.repo': 'RIPs' })
-        .sort({ totalCommits: -1 })
-        .limit(limitNum)
-        .toArray()
+      // RIPs Contributors - aggregate from timeline
+      contributors.aggregate([
+        { $match: { timeline: { $exists: true, $ne: [] } } },
+        { $unwind: '$timeline' },
+        { $match: { 'timeline.repo': 'RIPs' } },
+        { $group: {
+          _id: '$_id',
+          githubUsername: { $first: '$githubUsername' },
+          username: { $first: '$username' },
+          login: { $first: '$login' },
+          name: { $first: '$name' },
+          avatarUrl: { $first: '$avatarUrl' },
+          activityStatus: { $first: '$activityStatus' },
+          totalCommits: { $sum: { $cond: [{ $eq: ['$timeline.type', 'commit'] }, 1, 0] } },
+          totalPRs: { $sum: { $cond: [{ $eq: ['$timeline.type', 'pr'] }, 1, 0] } },
+          totalReviews: { $sum: { $cond: [{ $eq: ['$timeline.type', 'review'] }, 1, 0] } },
+        }},
+        { $sort: { totalCommits: -1 } },
+        { $limit: limitNum }
+      ]).toArray()
         .then((data) => data.map((c: any, index: number) => transformContributor(c, index + 1))),
     ]);
 
@@ -263,6 +410,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       period,
+      extendedPeriod, // Indicates if we used extended period due to old data
       rankings: {
         overall,
         commits,
@@ -270,9 +418,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         reviews,
         comments,
         issues,
-        eips,
-        ercs,
-        rips,
+        repos: {
+          eips,
+          ercs,
+          rips,
+        },
       },
     });
 

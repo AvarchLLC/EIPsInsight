@@ -16,6 +16,7 @@ import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import AllLayout from '@/components/Layout';
 import axios from 'axios';
+import { format } from 'date-fns';
 
 interface Activity {
   type: string;
@@ -148,15 +149,45 @@ const ActivityDetailPage: React.FC = () => {
     return titles[type as string] || type;
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const formatDate = (timestamp: string) => {
+    return format(new Date(timestamp), 'MMM dd, yyyy · HH:mm');
+  };
+
+  const getActivityDetails = (activity: any, type: string) => {
+    const metadata = activity.metadata || {};
+    
+    switch (type) {
+      case 'comments':
+        return {
+          title: metadata.comment || metadata.body || metadata.message || 'Comment',
+          subtitle: metadata.prTitle || metadata.issueTitle || null,
+        };
+      case 'prs':
+        return {
+          title: metadata.title || `Pull Request #${activity.number || ''}`,
+          subtitle: metadata.body || metadata.description || null,
+        };
+      case 'commits':
+        return {
+          title: metadata.message || metadata.title || 'Commit',
+          subtitle: metadata.body || null,
+        };
+      case 'reviews':
+        return {
+          title: `Review: ${metadata.body || metadata.comment || 'Left a review'}`,
+          subtitle: `On: ${metadata.prTitle || `PR #${metadata.prNumber || activity.number || ''}`}`,
+        };
+      case 'issues':
+        return {
+          title: metadata.title || `Issue #${activity.number || ''}`,
+          subtitle: metadata.body || metadata.description || null,
+        };
+      default:
+        return {
+          title: metadata.title || metadata.message || metadata.body || 'Activity',
+          subtitle: null,
+        };
+    }
   };
 
   const getRepoColor = (repo: string) => {
@@ -419,19 +450,38 @@ const ActivityDetailPage: React.FC = () => {
                             </Badge>
                           </Td>
                         )}
-                        <Td maxW="400px">
-                          <Text noOfLines={2} fontSize="sm">
-                            {activity.metadata?.title || activity.metadata?.message || 'No details available'}
-                          </Text>
-                          {activity.metadata?.state && (
-                            <Badge
-                              mt={1}
-                              colorScheme={activity.metadata.state === 'open' ? 'green' : 'purple'}
-                              size="sm"
-                            >
-                              {activity.metadata.state}
-                            </Badge>
-                          )}
+                        <Td maxW="500px">
+                          {(() => {
+                            const details = getActivityDetails(activity, activityType as string);
+                            return (
+                              <VStack align="flex-start" spacing={1}>
+                                <Text noOfLines={3} fontSize="sm" fontWeight="medium">
+                                  {activityType === 'comments' ? `"${details.title}"` : details.title}
+                                </Text>
+                                {details.subtitle && (
+                                  <Text noOfLines={2} fontSize="xs" color={mutedColor}>
+                                    {details.subtitle}
+                                  </Text>
+                                )}
+                                {activity.metadata?.state && (
+                                  <Badge
+                                    mt={1}
+                                    colorScheme={
+                                      activity.metadata.state === 'merged' || activity.metadata.state === 'approved' ? 'green' :
+                                      activity.metadata.state === 'closed' ? 'red' :
+                                      activity.metadata.state === 'changes_requested' ? 'orange' :
+                                      activity.metadata.state === 'open' ? 'blue' :
+                                      'gray'
+                                    }
+                                    size="sm"
+                                    textTransform="capitalize"
+                                  >
+                                    {activity.metadata.state.replace('_', ' ')}
+                                  </Badge>
+                                )}
+                              </VStack>
+                            );
+                          })()}
                         </Td>
                         <Td>
                           {activity.url && (

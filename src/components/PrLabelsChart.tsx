@@ -264,7 +264,12 @@ const EipsLabelChart = () => {
   const renderChart = () => {
       if (!Array?.isArray(chartData)) return null;
   
-      const transformedData = chartData?.reduce<{
+      // Filter chartData by selectedMonth if a month is selected
+      const filteredChartData = selectedMonth 
+        ? chartData.filter(item => item.monthYear === selectedMonth)
+        : chartData;
+  
+      const transformedData = filteredChartData?.reduce<{
         [key: string]: { [key: string]: number };
       }>((acc, { monthYear, label, count }) => {
         // Determine the actual label to use
@@ -286,7 +291,7 @@ const EipsLabelChart = () => {
         return acc;
       }, {});
 
-      console.log("transformed data:",transformedData);
+      console.log("transformed data for selected month:",transformedData);
   
       // Convert to array format for the chart
       const finalData = Object?.keys(transformedData).flatMap(monthYear => {

@@ -73,6 +73,7 @@ const ContributorProfile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [repoFilter, setRepoFilter] = useState('');
   const [timelineFilter, setTimelineFilter] = useState('all');
+  const [timelineLimit, setTimelineLimit] = useState(50);
   const [showFAQ, setShowFAQ] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -127,12 +128,61 @@ const ContributorProfile: React.FC = () => {
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case 'commit': return FiGitCommit;
-      case 'pr': return FiGitPullRequest;
-      case 'review': return FiEye;
-      case 'comment': return FiMessageSquare;
-      case 'issue': return FiAlertCircle;
-      default: return FiGitCommit;
+      case 'commit':
+        return FiGitCommit;
+      case 'pr':
+        return FiGitPullRequest;
+      case 'review':
+        return FiEye;
+      case 'comment':
+        return FiMessageSquare;
+      case 'issue':
+        return FiAlertCircle;
+      default:
+        return FiTrendingUp;
+    }
+  };
+
+  const getActivityDescription = (activity: any) => {
+    const metadata = activity.metadata || {};
+    
+    switch (activity.type) {
+      case 'pr':
+        return {
+          title: metadata.title || `Pull Request #${activity.number || ''}`,
+          description: metadata.body || metadata.description || null,
+          status: metadata.state || metadata.status,
+        };
+      case 'commit':
+        return {
+          title: metadata.message || metadata.title || 'Commit',
+          description: metadata.body || null,
+          status: null,
+        };
+      case 'comment':
+        return {
+          title: 'Comment',
+          description: metadata.body || metadata.comment || metadata.message || 'Left a comment',
+          status: null,
+        };
+      case 'review':
+        return {
+          title: `Review on ${metadata.prTitle || `PR #${metadata.prNumber || activity.number || ''}`}`,
+          description: metadata.body || metadata.comment || null,
+          status: metadata.state,
+        };
+      case 'issue':
+        return {
+          title: metadata.title || `Issue #${activity.number || ''}`,
+          description: metadata.body || metadata.description || null,
+          status: metadata.state,
+        };
+      default:
+        return {
+          title: metadata.title || metadata.message || 'Activity',
+          description: metadata.body || null,
+          status: null,
+        };
     }
   };
 
@@ -181,7 +231,7 @@ const ContributorProfile: React.FC = () => {
       filtered = filtered.filter(item => item.type === timelineFilter);
     }
     
-    return filtered.slice(0, 100); // Show up to 100 activities
+    return filtered.slice(0, timelineLimit); // Show exactly the specified number
   };
 
   if (loading) {
@@ -677,47 +727,78 @@ const ContributorProfile: React.FC = () => {
           {contributor.timeline && contributor.timeline.length > 0 && (
             <Card bg={cardBg} overflow="hidden">
               <CardHeader bgGradient="linear(to-r, blue.500, purple.600)" py={6}>
-                <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
-                  <VStack align="flex-start" spacing={1}>
-                    <Heading size="lg" color="white">
-                      📅 Overall Activity Timeline
-                    </Heading>
-                    <Text color="whiteAlpha.900" fontSize="sm">
-                      Complete contribution history
+                <VStack align="flex-start" spacing={1}>
+                  <Heading size="lg" color="white">
+                    📅 Overall Activity Timeline
+                  </Heading>
+                  <Text color="whiteAlpha.900" fontSize="sm">
+                    Complete contribution history
+                  </Text>
+                </VStack>
+              </CardHeader>
+              
+              {/* Filter dropdowns */}
+              <Box bg={useColorModeValue('gray.50', 'gray.700')} px={6} py={4}>
+                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+                  <Box>
+                    <Text fontSize="sm" fontWeight="semibold" color={mutedColor} mb={2}>
+                      Repository Filter
                     </Text>
-                  </VStack>
-                  <HStack>
                     <Select
                       value={repoFilter}
                       onChange={(e) => setRepoFilter(e.target.value)}
-                      maxW="200px"
-                      size="sm"
-                      bg="white"
-                      color="gray.800"
+                      placeholder="All Repositories"
+                      size="md"
+                      bg={cardBg}
                     >
                       <option value="">All Repos</option>
-                      <option value="EIPs">EIPs</option>
-                      <option value="ERCs">ERCs</option>
-                      <option value="RIPs">RIPs</option>
+                      <option value="EIPs">📜 EIPs</option>
+                      <option value="ERCs">🎨 ERCs</option>
+                      <option value="RIPs">⚡ RIPs</option>
                     </Select>
+                  </Box>
+
+                  <Box>
+                    <Text fontSize="sm" fontWeight="semibold" color={mutedColor} mb={2}>
+                      Activity Type
+                    </Text>
                     <Select
                       value={timelineFilter}
                       onChange={(e) => setTimelineFilter(e.target.value)}
-                      maxW="200px"
-                      size="sm"
-                      bg="white"
-                      color="gray.800"
+                      size="md"
+                      bg={cardBg}
                     >
-                      <option value="all">All Types</option>
-                      <option value="commit">Commits</option>
-                      <option value="pr">Pull Requests</option>
-                      <option value="review">Reviews</option>
-                      <option value="comment">Comments</option>
-                      <option value="issue">Issues</option>
+                      <option value="all">All Activity</option>
+                      <option value="commit">📝 Commits</option>
+                      <option value="pr">🔀 Pull Requests</option>
+                      <option value="review">👁️ Reviews</option>
+                      <option value="comment">💬 Comments</option>
+                      <option value="issue">⚠️ Issues</option>
                     </Select>
-                  </HStack>
-                </Flex>
-              </CardHeader>
+                  </Box>
+
+                  <Box>
+                    <Text fontSize="sm" fontWeight="semibold" color={mutedColor} mb={2}>
+                      Number of Items
+                    </Text>
+                    <Select
+                      value={timelineLimit}
+                      onChange={(e) => setTimelineLimit(parseInt(e.target.value))}
+                      size="md"
+                      bg={cardBg}
+                    >
+                      <option value={5}>5 items</option>
+                      <option value={7}>7 items</option>
+                      <option value={10}>10 items</option>
+                      <option value={20}>20 items</option>
+                      <option value={50}>50 items</option>
+                      <option value={100}>100 items</option>
+                      <option value={200}>200 items</option>
+                      <option value={500}>500 items (All)</option>
+                    </Select>
+                  </Box>
+                </SimpleGrid>
+              </Box>
               <CardBody p={6}>
                 <VStack align="stretch" spacing={0} position="relative">
                   {/* Vertical Timeline Line */}
@@ -806,9 +887,47 @@ const ContributorProfile: React.FC = () => {
                                       </Badge>
                                     )}
                                   </HStack>
-                                  <Text fontSize="md" fontWeight="medium" lineHeight="1.5">
-                                    {activity.metadata?.title || activity.metadata?.message || 'Activity'}
-                                  </Text>
+                                  {(() => {
+                                    const desc = getActivityDescription(activity);
+                                    return (
+                                      <>
+                                        <Text fontSize="md" fontWeight="semibold" lineHeight="1.5">
+                                          {desc.title}
+                                        </Text>
+                                        {desc.description && (
+                                          <Box
+                                            mt={2}
+                                            p={3}
+                                            bg={useColorModeValue('gray.50', 'gray.600')}
+                                            borderLeftWidth="3px"
+                                            borderLeftColor={useColorModeValue('gray.300', 'gray.500')}
+                                            borderRadius="md"
+                                            fontSize="sm"
+                                            color={mutedColor}
+                                          >
+                                            <Text noOfLines={3} whiteSpace="pre-wrap">
+                                              {activity.type === 'comment' ? `"${desc.description}"` : desc.description}
+                                            </Text>
+                                          </Box>
+                                        )}
+                                        {desc.status && (
+                                          <Badge
+                                            mt={2}
+                                            colorScheme={
+                                              desc.status === 'merged' || desc.status === 'approved' ? 'green' :
+                                              desc.status === 'closed' ? 'red' :
+                                              desc.status === 'changes_requested' ? 'orange' :
+                                              'gray'
+                                            }
+                                            fontSize="xs"
+                                            textTransform="capitalize"
+                                          >
+                                            {desc.status.replace('_', ' ')}
+                                          </Badge>
+                                        )}
+                                      </>
+                                    );
+                                  })()}
                                   <HStack fontSize="xs" color={mutedColor}>
                                     <Icon as={FiCalendar} />
                                     <Text>
@@ -840,16 +959,23 @@ const ContributorProfile: React.FC = () => {
                 </VStack>
                 
                 {/* Show more indicator */}
-                {contributor.timeline.length > 100 && (
-                  <Box textAlign="center" mt={6} pt={6} borderTopWidth="1px" borderColor={borderColor}>
-                    <Text color={mutedColor} fontSize="sm" mb={2}>
-                      Showing first 100 activities · Total: {contributor.timeline.length} activities
+                <Box textAlign="center" mt={6} pt={6} borderTopWidth="1px" borderColor={borderColor}>
+                  <VStack spacing={2}>
+                    <Text fontSize="lg" fontWeight="bold" color={accentColor}>
+                      Showing {getFilteredTimeline().length} of {contributor.timeline.length} activities
                     </Text>
-                    <Text color={mutedColor} fontSize="xs">
-                      Use filters above to refine results
-                    </Text>
-                  </Box>
-                )}
+                    {getFilteredTimeline().length < contributor.timeline.length && (
+                      <Text color={mutedColor} fontSize="sm">
+                        Adjust the "Number of Items" filter above to see more
+                      </Text>
+                    )}
+                    {(repoFilter || timelineFilter !== 'all') && (
+                      <Badge colorScheme="blue" fontSize="sm">
+                        Filters Active: {repoFilter && `Repo: ${repoFilter}`} {timelineFilter !== 'all' && `Type: ${timelineFilter}`}
+                      </Badge>
+                    )}
+                  </VStack>
+                </Box>
               </CardBody>
             </Card>
           )}
