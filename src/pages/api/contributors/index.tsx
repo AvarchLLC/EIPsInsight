@@ -163,37 +163,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Check if data has flat structure (totalCommits) or nested (totals.commits)
       const hasFlatStructure = contributor.totalCommits !== undefined;
       
+      // Calculate merged PRs from timeline
+      const timeline = contributor.timeline || [];
+      let prsMerged = 0;
+      timeline.forEach((item: any) => {
+        if (item.type === 'pr' && (item.metadata?.state === 'merged' || item.metadata?.merged === true || item.state === 'merged')) {
+          prsMerged++;
+        }
+      });
+      
+      // Calculate totals
+      const totals = hasFlatStructure ? {
+        commits: contributor.totalCommits || 0,
+        prsOpened: contributor.totalPRs || 0,
+        prsMerged: prsMerged || contributor.prsMerged || 0,
+        reviews: contributor.totalReviews || 0,
+        comments: contributor.totalComments || 0,
+        issuesOpened: contributor.totalIssues || 0,
+        activityScore: (
+          (contributor.totalCommits || 0) * 3 +
+          (contributor.totalPRs || 0) * 5 +
+          (contributor.totalReviews || 0) * 4 +
+          (contributor.totalComments || 0) * 2 +
+          (contributor.totalIssues || 0) * 3
+        ),
+      } : (contributor.totals ? {
+        ...contributor.totals,
+        prsMerged: prsMerged || contributor.totals.prsMerged || 0,
+      } : {
+        commits: 0,
+        prsOpened: 0,
+        prsMerged: 0,
+        reviews: 0,
+        comments: 0,
+        issuesOpened: 0,
+        activityScore: 0,
+      });
+      
       return {
         username,
         name: contributor.name || username,
         avatarUrl: contributor.avatarUrl || contributor.avatar_url || null,
-        totals: hasFlatStructure ? {
-          commits: contributor.totalCommits || 0,
-          prsOpened: contributor.totalPRs || 0,
-          prsMerged: 0, // Not in current schema
-          reviews: contributor.totalReviews || 0,
-          comments: contributor.totalComments || 0,
-          issuesOpened: contributor.totalIssues || 0,
-          activityScore: (
-            (contributor.totalCommits || 0) * 3 +
-            (contributor.totalPRs || 0) * 5 +
-            (contributor.totalReviews || 0) * 4 +
-            (contributor.totalComments || 0) * 2 +
-            (contributor.totalIssues || 0) * 3
-          ),
-        } : (contributor.totals || {
-          commits: 0,
-          prsOpened: 0,
-          prsMerged: 0,
-          reviews: 0,
-          comments: 0,
-          issuesOpened: 0,
-          activityScore: 0,
-        }),
+        totals,
         repos: contributor.repos || [],
         activityStatus: contributor.activityStatus || 'Active',
         lastActivityDate: contributor.lastFetchedAt || contributor.lastActivityDate || contributor.last_updated || null,
-        timeline: contributor.timeline || [],
+        timeline: timeline,
       };
     });
 
@@ -208,6 +223,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         page: pageNum,
         limit: limitNum,
         total,
+        totalCount: total, // Add for backward compatibility
         totalPages: Math.ceil(total / limitNum),
         hasNextPage: skip + limitNum < total,
         hasPrevPage: pageNum > 1,
