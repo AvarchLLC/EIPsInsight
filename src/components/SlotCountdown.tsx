@@ -14,6 +14,15 @@ import {
   Collapse,
   useColorModeValue,
   chakra,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Stack,
+  Divider,
 } from "@chakra-ui/react";
 import { keyframes } from "@chakra-ui/system";
 import { motion } from "framer-motion";
@@ -24,8 +33,13 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaBook,
+  FaTwitter,
+  FaShare,
+  FaCheckCircle,
+  FaRocket,
 } from "react-icons/fa";
 import DateTime from "./DateTime";
+import confetti from "canvas-confetti";
 
 interface NetworkConfig {
   beaconApi: string;
@@ -71,23 +85,25 @@ const networks: Record<string, NetworkConfig> = {
 const FUSAKA_INFO = {
   title: "FUSAKA Network Upgrade",
   description:
-    "Ethereum's major hard fork focused on improving scalability, efficiency, and security through PeerDAS and increased capacity.",
+    "Fusaka follows this year's Pectra upgrade, representing a major step forward in Ethereum's scaling roadmap that improves L1 performance, increases blob throughput, and enhances user experience. The Fusaka network upgrade is scheduled to activate on the Ethereum mainnet at slot 13,164,544 (December 3, 2025, 21:49:11 UTC). Fusaka also introduces Blob Parameter Only (BPO) forks to safely scale blob throughput after PeerDAS activation.",
   features: [
-    "PeerDAS: Peer Data Availability Sampling for efficient data verification",
-    "Block gas limit increased from 30M to 150M units",
-    "Doubled blob capacity through BPO (Blob Parameter Only) forks",
-    "Reduced network congestion and lower transaction fees for L2 rollups",
+    "PeerDAS: Peer Data Availability Sampling for efficient data verification (EIP-7594)",
+    "Gas Limit Increase: Raising default gas limit to 60M (EIP-7935)",
+    "BPO Forks: Safely scale blob throughput to 10/15 (BPO1) and 14/21 (BPO2)",
+    "ModExp Optimization: Accurate pricing for cryptographic operations (EIP-7883 & EIP-7823)",
+    "Transaction Gas Limit Cap: Protocol-level cap of 16.7M gas (EIP-7825)",
+    "secp256r1 Precompile: Native support for modern secure hardware (EIP-7951)"
   ],
   schedule: {
-    holesky: "October 1, 2025 - 08:48 UTC",
-    sepolia: "October 14, 2025 - 07:36 UTC",
-    hoodi: "October 28, 2025 - 18:53 UTC",
-    mainnet: "December 4, 2025 - 05:49:11 UTC",
+    holesky: "October 1, 2025 - 08:48 UTC ✅ MERGED",
+    sepolia: "October 14, 2025 - 07:36 UTC ✅ MERGED",
+    hoodi: "October 28, 2025 - 18:53 UTC ✅ MERGED",
+    mainnet: "December 3, 2025 - 21:49:11 UTC 🚀",
   },
   readMore: {
     label: "Read more about FUSAKA",
     href:
-      "https://etherworld.co/2025/10/01/bpo-forks-explained-how-fusaka-gradually-scales-blob-capacity/",
+      "https://eipsinsight.com/upgrade/fusaka",
   },
 };
 
@@ -116,11 +132,301 @@ const SlotCountdown: React.FC = () => {
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"slots" | "epochs">("epochs");
   const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [mergedNetworks, setMergedNetworks] = useState<Set<string>>(new Set());
+  const { isOpen: isCelebrationOpen, onOpen: onCelebrationOpen, onClose: onCelebrationClose } = useDisclosure();
 
   const accent = getAccent(network, useColorModeValue(true, false));
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Confetti celebration function
+  const triggerConfetti = () => {
+    const duration = 3 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval: any = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      
+      // Shoot confetti from left side
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+      // Shoot confetti from right side
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 250);
+  };
+
+  // Twitter share function with direct image sharing
+  const shareOnTwitter = async () => {
+    const baseUrl = "https://eipsinsight.com";
+    const networkUrl = `${baseUrl}/upgrade?selected=fusaka#fusaka`;
+    
+    const text = network === 'mainnet' 
+      ? `🚀 FUSAKA is now live on Ethereum Mainnet! 
+PeerDAS activated, 60M gas limit, BPO forks incoming!
+The future of Ethereum scaling is here! 🎉
+
+📊 Track all EIPs: ${networkUrl}
+
+#FUSAKA #Ethereum #PeerDAS #EIPsInsight`
+      : `✅ FUSAKA successfully merged on ${networks[network].name}! 
+Testing complete, ready for mainnet! 🎯
+
+📊 Track all EIPs: ${networkUrl}
+
+#FUSAKA #Ethereum #${network.charAt(0).toUpperCase() + network.slice(1)} #EIPsInsight`;
+    
+    // Generate custom image with confetti
+    const imageUrl = await generateShareImage();
+    
+    if (imageUrl) {
+      // Convert image to base64 for Twitter sharing
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        
+        reader.onloadend = async () => {
+          const base64data = reader.result;
+          
+          // Create a more comprehensive share experience
+          const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(networkUrl)}`;
+          
+          // Open Twitter with pre-filled content
+          window.open(twitterUrl, '_blank');
+          
+          // Show notification about the image
+          setTimeout(() => {
+            console.log('📸 Celebration image ready! Upload it to your Twitter post for maximum impact!');
+          }, 1000);
+        };
+        
+        reader.readAsDataURL(blob);
+      } catch (error) {
+        console.error('Error preparing image for sharing:', error);
+        // Fallback to just text sharing
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(networkUrl)}`;
+        window.open(twitterUrl, '_blank');
+      }
+    } else {
+      // Fallback if image generation fails
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(networkUrl)}`;
+      window.open(twitterUrl, '_blank');
+    }
+  };
+
+  // Generate custom share image with confetti
+  const generateShareImage = async () => {
+    try {
+      // Create canvas element
+      const canvas = document.createElement('canvas');
+      canvas.width = 1200;
+      canvas.height = 630;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) return null;
+      
+      // Professional dark blue gradient background
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#0f172a');  // Dark blue-black
+      gradient.addColorStop(0.3, '#1e293b'); // Medium dark blue
+      gradient.addColorStop(0.7, '#334155'); // Lighter blue
+      gradient.addColorStop(1, '#475569');   // Gray-blue
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Add subtle grid pattern for tech feel
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < canvas.width; i += 30) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+      }
+      for (let i = 0; i < canvas.height; i += 30) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+      }
+      
+      // Add decorative circles in background
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.1)'; // Blue with opacity
+      ctx.beginPath();
+      ctx.arc(150, 150, 100, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = 'rgba(139, 92, 246, 0.1)'; // Purple with opacity
+      ctx.beginPath();
+      ctx.arc(canvas.width - 150, canvas.height - 150, 120, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Add confetti effect - more vibrant and visible
+      const confettiColors = [
+        '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+        '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
+        '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
+        '#ec4899', '#f43f5e'
+      ];
+      
+      for (let i = 0; i < 80; i++) {
+        ctx.fillStyle = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const width = Math.random() * 12 + 6;
+        const height = Math.random() * 6 + 3;
+        const opacity = Math.random() * 0.8 + 0.2;
+        ctx.globalAlpha = opacity;
+        
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(Math.random() * Math.PI * 2);
+        ctx.fillRect(-width/2, -height/2, width, height);
+        ctx.restore();
+      }
+      
+      ctx.globalAlpha = 1; // Reset opacity
+      
+      // Main title with strong shadow for visibility
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 4;
+      ctx.shadowOffsetY = 4;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 100px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      const mainText = network === 'mainnet' ? 'FUSAKA IS LIVE!' : 'FUSAKA MERGED!';
+      ctx.fillText(mainText, canvas.width / 2, canvas.height / 2 - 60);
+      
+      // Reset shadow for other elements
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      
+      // Subtitle with good contrast
+      ctx.font = '40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      ctx.fillStyle = '#e2e8f0';
+      const subtitle = network === 'mainnet' 
+        ? 'Ethereum Mainnet Upgrade Successful' 
+        : `${networks[network].name} Testnet Success`;
+      ctx.fillText(subtitle, canvas.width / 2, canvas.height / 2 + 30);
+      
+      // Network badge with gradient and border
+      const badgeX = canvas.width / 2 - 120;
+      const badgeY = canvas.height / 2 + 70;
+      const badgeWidth = 240;
+      const badgeHeight = 60;
+      
+      // Badge background gradient
+      const badgeGradient = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeWidth, badgeY + badgeHeight);
+      if (network === 'mainnet') {
+        badgeGradient.addColorStop(0, '#3b82f6');
+        badgeGradient.addColorStop(1, '#1d4ed8');
+      } else {
+        badgeGradient.addColorStop(0, '#10b981');
+        badgeGradient.addColorStop(1, '#047857');
+      }
+      
+      ctx.fillStyle = badgeGradient;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+      
+      // Rounded rectangle for badge
+      const radius = 30;
+      ctx.beginPath();
+      ctx.moveTo(badgeX + radius, badgeY);
+      ctx.lineTo(badgeX + badgeWidth - radius, badgeY);
+      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + radius);
+      ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - radius);
+      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - radius, badgeY + badgeHeight);
+      ctx.lineTo(badgeX + radius, badgeY + badgeHeight);
+      ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - radius);
+      ctx.lineTo(badgeX, badgeY + radius);
+      ctx.quadraticCurveTo(badgeX, badgeY, badgeX + radius, badgeY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      
+      // Network text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      const networkText = network === 'mainnet' ? 'MAINNET' : networks[network].name.toUpperCase();
+      ctx.fillText(networkText, canvas.width / 2, badgeY + badgeHeight / 2 + 5);
+      
+      // EIPs Insight branding section - enhanced
+      const brandingY = canvas.height - 100;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.fillRect(50, brandingY, canvas.width - 100, 80);
+      
+      // Add subtle border to branding box
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(50, brandingY, canvas.width - 100, 80);
+      
+      // EIPs Insight text
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      ctx.fillText('📊 EIPs Insight', canvas.width / 2 - 180, brandingY + 35);
+      
+      ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      ctx.fillText('Track all Ethereum EIPs', canvas.width / 2 - 180, brandingY + 65);
+      
+      ctx.fillStyle = '#3b82f6';
+      ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      ctx.fillText('eipsinsight.com', canvas.width / 2 + 80, brandingY + 50);
+      
+      // Add timestamp
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      const timestamp = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      ctx.fillText(timestamp, canvas.width / 2, canvas.height - 20);
+      
+      // Convert to blob
+      return new Promise<string | null>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            resolve(url);
+          } else {
+            resolve(null);
+          }
+        }, 'image/png');
+      });
+    } catch (error) {
+      console.error('Error generating share image:', error);
+      return null;
+    }
+  };
+
+  // Download image helper
+  const downloadShareImage = async () => {
+    const imageUrl = await generateShareImage();
+    if (imageUrl) {
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `fusaka-${network}-celebration.png`;
+      link.click();
+      URL.revokeObjectURL(imageUrl);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -151,13 +457,24 @@ const SlotCountdown: React.FC = () => {
       setCurrentEpoch(epoch);
       setCurrentBlock(blockNumber);
 
-      if (target !== 999999999 && slot >= target) {
+      // Check if upgrade just went live and trigger celebration
+      if (target !== 999999999 && slot >= target && !mergedNetworks.has(network)) {
         setIsUpgradeLive(true);
         setCountdown("");
+        setMergedNetworks(prev => new Set(prev).add(network));
+        
+        // Trigger confetti celebration
+        triggerConfetti();
+        
+        // Open celebration modal for testnets, or special modal for mainnet
+        if (network === 'mainnet') {
+          setTimeout(() => onCelebrationOpen(), 500);
+        }
+        
         if (countdownIntervalRef.current)
           clearInterval(countdownIntervalRef.current);
         return;
-      } else {
+      } else if (target !== 999999999 && slot < target) {
         setIsUpgradeLive(false);
       }
 
@@ -243,7 +560,7 @@ const SlotCountdown: React.FC = () => {
         </Text>
         
         <VStack spacing={2}>
-          <HStack spacing={1.5} wrap="wrap" justify="center">
+          <HStack spacing={2} wrap="wrap" justify="center" px={2}>
             {firstRowSlots.map((slot) => {
               const isProcessed = slot < currentSlot;
               const isCurrent = slot === currentSlot;
@@ -267,8 +584,8 @@ const SlotCountdown: React.FC = () => {
                   whiteSpace="pre-line"
                 >
                   <Box
-                    w="55px"
-                    h="55px"
+                    w="85px"
+                    h="85px"
                     borderRadius="md"
                     display="flex"
                     alignItems="center"
@@ -285,7 +602,7 @@ const SlotCountdown: React.FC = () => {
                         ? "white"
                         : useColorModeValue("gray.600", "gray.300")
                     }
-                    fontSize="12px"
+                    fontSize="15px"
                     fontWeight="bold"
                     animation={isCurrent ? "blink 1.5s infinite" : "none"}
                     border="2px solid"
@@ -307,7 +624,7 @@ const SlotCountdown: React.FC = () => {
             })}
           </HStack>
           
-          <HStack spacing={1.5} wrap="wrap" justify="center">
+          <HStack spacing={2} wrap="wrap" justify="center" px={2}>
             {secondRowSlots.map((slot) => {
               const isProcessed = slot < currentSlot;
               const isCurrent = slot === currentSlot;
@@ -331,8 +648,8 @@ const SlotCountdown: React.FC = () => {
                   whiteSpace="pre-line"
                 >
                   <Box
-                    w="55px"
-                    h="55px"
+                    w="85px"
+                    h="85px"
                     borderRadius="md"
                     display="flex"
                     alignItems="center"
@@ -349,7 +666,7 @@ const SlotCountdown: React.FC = () => {
                         ? "white"
                         : useColorModeValue("gray.600", "gray.300")
                     }
-                    fontSize="12px"
+                    fontSize="15px"
                     fontWeight="bold"
                     animation={isCurrent ? "blink 1.5s infinite" : "none"}
                     border="2px solid"
@@ -388,8 +705,8 @@ const SlotCountdown: React.FC = () => {
                   whiteSpace="pre-line"
                 >
                   <Box
-                    w="55px"
-                    h="55px"
+                    w="85px"
+                    h="85px"
                     borderRadius="md"
                     display="flex"
                     alignItems="center"
@@ -428,7 +745,7 @@ const SlotCountdown: React.FC = () => {
         </Text>
         
         <VStack spacing={2}>
-          <HStack spacing={1.5} wrap="wrap" justify="center">
+          <HStack spacing={2} wrap="wrap" justify="center" px={2}>
             {epochs.slice(0, 8).map((epoch) => {
               const isCurrent = epoch === currentEpoch;
               const isTarget = epoch === networks[network].targetepoch;
@@ -473,8 +790,8 @@ const SlotCountdown: React.FC = () => {
                   whiteSpace="pre-line"
                 >
                   <Box
-                    w="55px"
-                    h="55px"
+                    w="85px"
+                    h="85px"
                     borderRadius="md"
                     display="flex"
                     alignItems="center"
@@ -493,7 +810,7 @@ const SlotCountdown: React.FC = () => {
                         ? "white"
                         : useColorModeValue("gray.600", "gray.300")
                     }
-                    fontSize="12px"
+                    fontSize="15px"
                     fontWeight="bold"
                     animation={isCurrent ? "blink 1.5s infinite" : "none"}
                     border="2px solid"
@@ -518,7 +835,7 @@ const SlotCountdown: React.FC = () => {
             
           </HStack>
           
-          <HStack spacing={1.5} wrap="wrap" justify="center">
+          <HStack spacing={2} wrap="wrap" justify="center" px={2}>
             {epochs.slice(8).map((epoch) => {
               const isCurrent = epoch === currentEpoch;
               const isTarget = epoch === networks[network].targetepoch;
@@ -563,8 +880,8 @@ const SlotCountdown: React.FC = () => {
                   whiteSpace="pre-line"
                 >
                   <Box
-                    w="55px"
-                    h="55px"
+                    w="85px"
+                    h="85px"
                     borderRadius="md"
                     display="flex"
                     alignItems="center"
@@ -583,7 +900,7 @@ const SlotCountdown: React.FC = () => {
                         ? "white"
                         : useColorModeValue("gray.600", "gray.300")
                     }
-                    fontSize="12px"
+                    fontSize="15px"
                     fontWeight="bold"
                     animation={isCurrent ? "blink 1.5s infinite" : "none"}
                     border="2px solid"
@@ -626,8 +943,8 @@ const SlotCountdown: React.FC = () => {
                   whiteSpace="pre-line"
                 >
                   <Box
-                    w="55px"
-                    h="55px"
+                    w="85px"
+                    h="85px"
                     borderRadius="md"
                     display="flex"
                     alignItems="center"
@@ -766,8 +1083,8 @@ const SlotCountdown: React.FC = () => {
         <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("gray.600", "gray.400")} mb={2} textAlign="center">
           Select Network to Track
         </Text>
-        <HStack spacing={2} justify="center" flexWrap="wrap">
-          {(["holesky", "sepolia", "hoodi", "mainnet"] as (keyof typeof networks)[]).map((net) => (
+        <HStack spacing={3} justify="center" wrap="wrap">
+          {Object.keys(networks).map((net) => (
             <Button
               key={net}
               colorScheme={network === net ? (net === "mainnet" ? "blue" : net === "hoodi" ? "orange" : net === "sepolia" ? "purple" : "blue") : "gray"}
@@ -776,13 +1093,68 @@ const SlotCountdown: React.FC = () => {
               size="sm"
               _hover={{ transform: "translateY(-1px)", shadow: "md" }}
               transition="all 0.2s"
+              position="relative"
+              overflow="hidden"
             >
               {net.charAt(0).toUpperCase() + net.slice(1)}
-              {net === "holesky" && <Badge ml={1} colorScheme="orange" fontSize="9px" variant="subtle">FINAL</Badge>}
-              {net === "mainnet" && <Badge ml={1} colorScheme="blue" fontSize="9px" variant="subtle">DEC 4</Badge>}
+              {(net === "holesky" || net === "sepolia" || net === "hoodi") && (
+                <Badge ml={1} colorScheme="green" fontSize="9px" variant="solid">
+                  ✅ MERGED
+                </Badge>
+              )}
+              {net === "mainnet" && <Badge ml={1} colorScheme="blue" fontSize="9px" variant="solid">DEC 3</Badge>}
+              {mergedNetworks.has(net) && (
+                <Box
+                  position="absolute"
+                  top="-2px"
+                  right="-2px"
+                  width="4px"
+                  height="4px"
+                  bg="green.400"
+                  borderRadius="full"
+                  animation="pulse 2s infinite"
+                />
+              )}
             </Button>
           ))}
         </HStack>
+
+        {/* Twitter Share Button - Show when any network is merged, but only show for mainnet AFTER merge */}
+        {(mergedNetworks.size > 0 && network !== 'mainnet') || (mergedNetworks.has('mainnet') && network === 'mainnet') ? (
+          <Box mt={6} mb={4}>
+            <VStack spacing={4}>
+              <Button
+                leftIcon={<FaTwitter />}
+                bg="#1DA1F2"
+                color="white"
+                size="lg"
+                onClick={shareOnTwitter}
+                borderRadius="12px"
+                px={10}
+                py={6}
+                _hover={{ 
+                  transform: "translateY(-2px)", 
+                  shadow: "2xl",
+                  bg: "#1a8cd8"
+                }}
+                _active={{
+                  transform: "translateY(0)",
+                  bg: "#1a8cd8"
+                }}
+                transition="all 0.2s"
+                boxShadow="0 4px 12px rgba(29, 161, 242, 0.3)"
+                border="2px solid"
+                borderColor="#1DA1F2"
+                minW="280px"
+                height="56px"
+              >
+                <Text fontSize="16px" fontWeight="700" letterSpacing="tight">
+                  Share on Twitter 🎉
+                </Text>
+              </Button>
+            </VStack>
+          </Box>
+        ) : null}
       </Box>
 
       {/* COUNTDOWN STATUS - ONE LINE */}
@@ -861,6 +1233,164 @@ const SlotCountdown: React.FC = () => {
           }
         `}
       </style>
+
+      {/* Celebration Modal */}
+      <Modal 
+        isOpen={isCelebrationOpen} 
+        onClose={onCelebrationClose} 
+        size="lg"
+        isCentered
+        motionPreset="slideInBottom"
+      >
+        <ModalOverlay backdropFilter="blur(8px)" />
+        <ModalContent
+          bg={useColorModeValue("white", "gray.800")}
+          borderRadius="2xl"
+          border="2px solid"
+          borderColor={useColorModeValue("blue.200", "blue.600")}
+          boxShadow="2xl"
+        >
+          <ModalHeader 
+            textAlign="center"
+            bg={useColorModeValue("blue.50", "blue.900")}
+            borderTopRadius="2xl"
+            py={6}
+          >
+            <VStack spacing={2}>
+              <Icon as={FaRocket} boxSize={12} color="blue.500" />
+              <Text 
+                fontSize="3xl" 
+                fontWeight="bold" 
+                bgGradient="linear(to-r, blue.500, purple.500)"
+                bgClip="text"
+              >
+                🎉 FUSAKA IS LIVE! 🎉
+              </Text>
+              <Text fontSize="lg" color={useColorModeValue("gray.600", "gray.300")}>
+                Ethereum Mainnet Upgrade Successful
+              </Text>
+            </VStack>
+          </ModalHeader>
+          <ModalCloseButton size="lg" />
+          <ModalBody py={8}>
+            <VStack spacing={6}>
+              <Box
+                bg={useColorModeValue("green.50", "green.900")}
+                p={6}
+                borderRadius="xl"
+                width="100%"
+                border="1px solid"
+                borderColor={useColorModeValue("green.200", "green.600")}
+              >
+                <HStack spacing={3} mb={3}>
+                  <Icon as={FaCheckCircle} color="green.500" boxSize={6} />
+                  <Text fontSize="xl" fontWeight="bold" color="green.500">
+                    Upgrade Complete
+                  </Text>
+                </HStack>
+                <Text fontSize="md" color={useColorModeValue("gray.700", "gray.300")}>
+                  Slot {networks[network].target.toLocaleString()} has been successfully activated at {FUSAKA_INFO.schedule.mainnet}
+                </Text>
+              </Box>
+
+              <Divider />
+
+              <VStack spacing={4}>
+                <Text fontSize="lg" fontWeight="semibold">
+                  What's Now Available:
+                </Text>
+                <VStack align="start" spacing={2}>
+                  {FUSAKA_INFO.features.map((feature, index) => (
+                    <HStack key={index} spacing={2}>
+                      <Text color="green.500" fontSize="lg">✓</Text>
+                      <Text fontSize="md">{feature}</Text>
+                    </HStack>
+                  ))}
+                </VStack>
+              </VStack>
+
+              <Divider />
+
+              <Stack direction={{ base: "column", md: "row" }} spacing={4} width="100%">
+                <Button
+                  leftIcon={<FaTwitter />}
+                  bg="#1DA1F2"
+                  color="white"
+                  size="lg"
+                  onClick={shareOnTwitter}
+                  borderRadius="12px"
+                  px={12}
+                  py={8}
+                  _hover={{ 
+                    transform: "translateY(-2px)", 
+                    shadow: "2xl",
+                    bg: "#1a8cd8"
+                  }}
+                  _active={{
+                    transform: "translateY(0)",
+                    bg: "#1a8cd8"
+                  }}
+                  transition="all 0.2s"
+                  boxShadow="0 4px 12px rgba(29, 161, 242, 0.3)"
+                  border="2px solid"
+                  borderColor="#1DA1F2"
+                  height="64px"
+                >
+                  <Text fontSize="18px" fontWeight="700" letterSpacing="tight">
+                    Share on Twitter 🎉
+                  </Text>
+                </Button>
+                <Button
+                  leftIcon={<FaShare />}
+                  bg="#6b7280"
+                  color="white"
+                  size="lg"
+                  onClick={() => navigator.clipboard.writeText(window.location.href)}
+                  borderRadius="12px"
+                  px={12}
+                  py={8}
+                  _hover={{ 
+                    transform: "translateY(-2px)", 
+                    shadow: "2xl",
+                    bg: "#4b5563"
+                  }}
+                  _active={{
+                    transform: "translateY(0)",
+                    bg: "#4b5563"
+                  }}
+                  transition="all 0.2s"
+                  boxShadow="0 4px 12px rgba(107, 114, 128, 0.3)"
+                  border="2px solid"
+                  borderColor="#6b7280"
+                  height="64px"
+                >
+                  <Text fontSize="18px" fontWeight="700" letterSpacing="tight">
+                    Copy Link
+                  </Text>
+                </Button>
+              </Stack>
+
+              <VStack spacing={3} mt={6}>
+                <Box 
+                  bg="blue.50"
+                  p={4}
+                  borderRadius="xl"
+                  width="100%"
+                  border="1px solid"
+                  borderColor="blue.200"
+                >
+                  <Text fontSize="md" color="blue.700" textAlign="center" fontWeight="semibold">
+                    🎉 Share this historic moment with the Ethereum community!
+                  </Text>
+                  <Text fontSize="sm" color="blue.600" textAlign="center" mt={2}>
+                    Your celebration image is ready for Twitter sharing with EIPs Insight branding 📸
+                  </Text>
+                </Box>
+              </VStack>
+            </VStack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </VStack>
   );
 };

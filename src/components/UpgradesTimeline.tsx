@@ -1007,8 +1007,8 @@ const processedData2 = data2.map((entry, index, arr) => {
 
   return {
     ...entry,
-    // Use actual declined from input if present, else computed
-    declined: entry.declined.length ? entry.declined : declined,
+    // Use actual declined from input
+    declined: entry.declined,
     proposed: entry.proposed ?? [],
   };
 });
