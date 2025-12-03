@@ -301,6 +301,14 @@ const defaultGlamsterdam: DeclinedEIP[] = [
   eipsLink: "/eips/eip-7942",
   discussionLink: "https://ethereum-magicians.org/t/eip-7942-available-attestation-a-reorg-resilient-solution-for-ethereum/23927",
 },
+  {
+  id: "EIP-8068",
+  title: "EIP-7942: Neutral effective balance design",
+  description: "Make the effective balance calculation neutral so that 0x01 and 0x02 validators receive the same yield, thus facilitating consolidation.",
+  eipsLink: "/eips/eip-8068",
+  discussionLink: "https://ethereum-magicians.org/t/eip-8068-neutral-effective-balance-design/26015",
+},
+
 ]
 
 
