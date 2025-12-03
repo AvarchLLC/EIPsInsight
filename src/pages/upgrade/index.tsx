@@ -18,7 +18,8 @@ import {
   Badge,
   AspectRatio,
   Grid,
-  GridItem
+  GridItem,
+  Select
 } from "@chakra-ui/react";
 import SlotCountdown from "@/components/SlotCountdown";
 import NLink from "next/link";
@@ -747,7 +748,7 @@ const glamsterDamData = [
     date: '2025-11-26',
     included: [],
     scheduled: ['EIP-7732', 'EIP-7928'],
-    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942', 'EIP-8068',],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942', 'EIP-8068'],
     considered: ['EIP-7805'],
     proposed: [
       'EIP-2780',
@@ -1130,6 +1131,7 @@ const All = () => {
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
   const [recentGlamsterdamData, setRecentGlamsterdamData] = useState<any>(null);
   const [isLoadingGlamsterdamData, setIsLoadingGlamsterdamData] = useState(false);
+  const [glamsterdamEipCategory, setGlamsterdamEipCategory] = useState<'scheduled' | 'considered'>('scheduled');
   // const selectedOption = selectedUpgrade;       // just alias so rest of code works
   // const setSelectedOption = setSelectedUpgrade;
   const optionArr = [
@@ -2120,14 +2122,9 @@ return (
               width="100%"
               wrap="wrap"
             >
-              <Text
-                flex="1"
-                fontSize={{ base: "md", md: "lg", lg: "xl" }}
-                lineHeight="1.75"
-                textAlign="justify"
-              >
+              <Box flex="1">
                 {selectedOption === 'pectra' ? (
-                  <>
+                  <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
                     Ethereum developers are moving toward the next major network upgrade, Prague and Electra,
                     collectively known as{" "}
                     <NLink href="https://eipsinsight.com/eips/eip-7600">
@@ -2155,85 +2152,52 @@ return (
                         Devnet 6
                       </Text>
                     </NLink>.
-                  </>
-                  
+                  </Text>
                 ) : selectedOption === 'fusaka' ? (
-                  <>
-                    <NLink href="https://eipsinsight.com/eips/eip-7607">
+                  <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
+                    <NLink href="https://eipsinsight.com/upgrade/fusaka">
                       <Text as="span" color="blue.500" textDecor="underline">
                         Fusaka
                       </Text>
-                    </NLink> is Ethereum's upcoming upgrade expected in late 2025. It focuses on scalability, efficiency, and cryptographic improvements. It introduces <NLink href="https://eipsinsight.com/eips/eip-7594">
+                    </NLink>{" "}follows the Pectra upgrade, focusing on scaling and efficiency. Its headlining feature is{" "}
+                    <NLink href="https://eipsinsight.com/eips/eip-7594">
                       <Text as="span" color="blue.500" textDecor="underline">
                         PeerDAS
                       </Text>
-                    </NLink>, BPO, and ModExp precompiles (
-                    <NLink href="https://eipsinsight.com/eips/eip-7823">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        EIP-7823
-                      </Text>
-                    </NLink> & <NLink href="https://eipsinsight.com/eips/eip-7883">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        EIP-7883
-                      </Text>
-                    </NLink>). Testing is ongoing with{" "}
-                    <NLink href="https://notes.ethereum.org/@ethpandaops/fusaka-devnet-0">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Devnet 0
-                      </Text>
-                    </NLink>. It will pave the way for the{" "}
-                    <NLink href="https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/">
+                    </NLink>{" "}(Peer Data Availability Sampling), enabling significant blob throughput scaling. Fusaka also raises the L1 gas limit to 60M and introduces "Blob Parameter Only" (BPO) forks to safely scale blob capacity. Scheduled for Mainnet activation at slot <Text as="span" fontWeight="bold">13,164,544</Text> (Dec 3, 2025), it includes optimizations for L1 performance and UX improvements.
+                  </Text>
+                ) : (
+                  <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
+                    Ethereum developers are now preparing for the next major network upgrade, known as{" "}
+                    <NLink href="/eips/eip-7773">
                       <Text as="span" color="blue.500" textDecor="underline">
                         Glamsterdam
                       </Text>
-                    </NLink> upgrade.
-                  </>
-
-                ) : (
-                  <>
-  Ethereum developers are now preparing for the next major network upgrade, known as{" "}
-  <NLink href="/eips/eip-7773">
-    <Text as="span" color="blue.500" textDecor="underline">
-      Glamsterdam
-    </Text>
-  </NLink>. This upgrade will introduce key changes to both the{" "}
-  <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
-    <Text as="span" color="blue.500" textDecor="underline">
-      Execution and Consensus layers
-    </Text>
-  </NLink>{" "}on mainnet. The name combines{" "}
-  <Text as="span" fontWeight="bold">
-    Amsterdam
-  </Text>{" "}(execution layer, from the previous Devconnect location) and{" "}
-  <Text as="span" fontWeight="bold">
-    Gloas
-  </Text>{" "}(consensus layer, named after a star), highlighting its focus on both core protocol areas. The headliner feature for Glamsterdam is still being decided, with several{" "}
-  <NLink href="https://github.com/ethereum/EIPs/pulls?q=is%3Apr+is%3Aopen+milestone%3A%22Glamsterdam%22">
-    <Text as="span" color="blue.500" textDecor="underline">
-      Ethereum Improvement Proposals (EIPs)
-    </Text>
-  </NLink>{" "}under review and active community discussions ongoing. Coordination and planning are being carried out through the{" "}
-  <NLink href="https://ethereum.foundation/forkcast">
-    <Text as="span" color="blue.500" textDecor="underline">
-      Forkcast
-    </Text>
-  </NLink>{" "}process. Feedback is welcome—reach out to{" "}
-  <NLink href="mailto:nixo@ethereum.org">
-    <Text as="span" color="blue.500" textDecor="underline">
-      nixo
-    </Text>
-  </NLink>{" "}or{" "}
-  <NLink href="https://x.com/wolovim">
-    <Text as="span" color="blue.500" textDecor="underline">
-      @wolovim
-    </Text>
-  </NLink>.
-</>
-
-                )
-                
-                }
-              </Text>
+                    </NLink>. This upgrade will introduce key changes to both the{" "}
+                    <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+                      <Text as="span" color="blue.500" textDecor="underline">
+                        Execution and Consensus layers
+                      </Text>
+                    </NLink>{" "}on mainnet. The name combines{" "}
+                    <Text as="span" fontWeight="bold">
+                      Amsterdam
+                    </Text>{" "}(execution layer, from the previous Devconnect location) and{" "}
+                    <Text as="span" fontWeight="bold">
+                      Gloas
+                    </Text>{" "}(consensus layer, named after a star), highlighting its focus on both core protocol areas. The headliner feature for Glamsterdam is still being decided, with several{" "}
+                    <NLink href="https://github.com/ethereum/EIPs/pulls?q=is%3Apr+is%3Aopen+milestone%3A%22Glamsterdam%22">
+                      <Text as="span" color="blue.500" textDecor="underline">
+                        Ethereum Improvement Proposals (EIPs)
+                      </Text>
+                    </NLink>{" "}under review and active community discussions ongoing. Coordination and planning are being carried out through the{" "}
+                    <NLink href="https://ethereum.foundation/forkcast">
+                      <Text as="span" color="blue.500" textDecor="underline">
+                        Forkcast
+                      </Text>
+                    </NLink>.
+                  </Text>
+                )}
+              </Box>
             </Flex>
             
             {/* Network Upgrade Inclusion Stages Chart (FUSAKA) */}
@@ -2328,6 +2292,105 @@ return (
                 />
               </Box>
             )}
+
+            {/* Recent Glamsterdam Data with Proposed EIPs */}
+            {selectedOption === 'glamsterdam' && recentGlamsterdamData && (
+              <Box
+                bg={useColorModeValue('white', 'gray.800')}
+                borderRadius="xl"
+                boxShadow="sm"
+                border="1px solid"
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
+                mb={8}
+                px={6}
+                py={8}
+              >
+                <Box mb={6}>
+                  <Flex justify="space-between" align="center" mb={2}>
+                    <Text
+                      fontSize={{ base: '2xl', md: '3xl' }}
+                      fontWeight="bold"
+                      color="#00CED1"
+                      textAlign="left"
+                    >
+                      Recent Glamsterdam EIPs
+                    </Text>
+                    <Select
+                      value={glamsterdamEipCategory}
+                      onChange={(e) => setGlamsterdamEipCategory(e.target.value as 'scheduled' | 'considered')}
+                      w={{ base: '150px', md: '180px' }}
+                      size="md"
+                      borderColor="#00CED1"
+                      focusBorderColor="#00CED1"
+                    >
+                      <option value="scheduled">Scheduled</option>
+                      <option value="considered">Considered</option>
+                    </Select>
+                  </Flex>
+                  <Text fontSize="sm" color="gray.500" mt={2}>
+                    Data from {recentGlamsterdamData.date} - Showing {recentGlamsterdamData[glamsterdamEipCategory]?.length || 0} {glamsterdamEipCategory} EIPs
+                  </Text>
+                </Box>
+                
+                {isLoadingGlamsterdamData ? (
+                  <Flex justify="center" align="center" minH="200px">
+                    <Spinner size="xl" color="#00CED1" />
+                  </Flex>
+                ) : recentGlamsterdamData[glamsterdamEipCategory]?.length > 0 ? (
+                  <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
+                    {recentGlamsterdamData[glamsterdamEipCategory]?.map((eip: any, index: number) => (
+                      <Box
+                        key={index}
+                        bg={useColorModeValue('gray.50', 'gray.700')}
+                        p={4}
+                        borderRadius="lg"
+                        border="1px solid"
+                        borderColor={useColorModeValue('gray.200', 'gray.600')}
+                        _hover={{
+                          borderColor: '#00CED1',
+                          boxShadow: 'md',
+                          transform: 'translateY(-2px)',
+                        }}
+                        transition="all 0.2s ease-in-out"
+                      >
+                        <Flex justify="space-between" align="start" mb={2}>
+                          <Text fontWeight="bold" fontSize="lg" color="#00CED1">
+                            {eip}
+                          </Text>
+                          <Badge
+                            colorScheme={
+                              glamsterdamEipCategory === 'scheduled' ? 'green' : 'yellow'
+                            }
+                            variant="solid"
+                            fontSize="xs"
+                          >
+                            {glamsterdamEipCategory}
+                          </Badge>
+                        </Flex>
+                        <Text fontSize="sm" color="gray.600" noOfLines={3}>
+                          {eip}
+                        </Text>
+                        <a 
+                          href={`https://eips.ethereum.org/EIPS/eip-${eip.replace(/^EIP-/i, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Text fontSize="xs" color="#00CED1" mt={2} _hover={{ textDecoration: 'underline' }}>
+                            View EIP Details →
+                          </Text>
+                        </a>
+                      </Box>
+                    ))}
+                  </SimpleGrid>
+                ) : (
+                  <Flex justify="center" align="center" minH="200px">
+                    <Text fontSize="md" color="gray.500">
+                      No {glamsterdamEipCategory} EIPs available for this date
+                    </Text>
+                  </Flex>
+                )}
+              </Box>
+            )}
           </Box>
 
           {/* EtherWorld Advertisement */}
@@ -2382,136 +2445,6 @@ return (
               <Graph />
             </Box>
           </Box>
-
-          {/* Recent Glamsterdam Data with Proposed EIPs */}
-          {selectedOption === 'glamsterdam' && recentGlamsterdamData && (
-            <Box
-              bg={useColorModeValue('white', 'gray.800')}
-              borderRadius="xl"
-              boxShadow="sm"
-              border="1px solid"
-              borderColor={useColorModeValue('gray.200', 'gray.700')}
-              mb={8}
-              px={6}
-              py={8}
-            >
-              <Box mb={6}>
-                <Text
-                  fontSize={{ base: '2xl', md: '3xl' }}
-                  fontWeight="bold"
-                  color="#00CED1"
-                  textAlign="left"
-                >
-                  Recent Glamsterdam Proposed EIPs
-                </Text>
-                <Text fontSize="sm" color="gray.500" mt={2}>
-                  Data from {recentGlamsterdamData.date} - Showing {recentGlamsterdamData.proposed?.length || 0} proposed EIPs
-                </Text>
-              </Box>
-              
-              {isLoadingGlamsterdamData ? (
-                <Flex justify="center" align="center" minH="200px">
-                  <Spinner size="xl" color="#00CED1" />
-                </Flex>
-              ) : (
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-                  {recentGlamsterdamData.proposed?.map((eip: any, index: number) => (
-                    <Box
-                      key={index}
-                      bg={useColorModeValue('gray.50', 'gray.700')}
-                      p={4}
-                      borderRadius="lg"
-                      border="1px solid"
-                      borderColor={useColorModeValue('gray.200', 'gray.600')}
-                      _hover={{
-                        borderColor: '#00CED1',
-                        boxShadow: 'md',
-                        transform: 'translateY(-2px)',
-                      }}
-                      transition="all 0.2s ease-in-out"
-                    >
-                      <Flex justify="space-between" align="start" mb={2}>
-                        <Text fontWeight="bold" fontSize="lg" color="#00CED1">
-                          EIP-{eip.eip}
-                        </Text>
-                        <Badge
-                          colorScheme={
-                            eip.type === 'Core' ? 'blue' :
-                            eip.type === 'Meta' ? 'purple' :
-                            eip.type === 'Standards Track' ? 'green' :
-                            'gray'
-                          }
-                          variant="solid"
-                          fontSize="xs"
-                        >
-                          {eip.type || 'Unknown'}
-                        </Badge>
-                      </Flex>
-                      
-                      <Text fontWeight="semibold" fontSize="md" mb={2} noOfLines={2}>
-                        {eip.title || 'Title not available'}
-                      </Text>
-                      
-                      <Text fontSize="xs" color="gray.500" mb={1} noOfLines={1}>
-                        {eip.author || 'Author not available'}
-                      </Text>
-                      
-                      <Flex justify="space-between" align="center" mt={3}>
-                        <Badge
-                          colorScheme={
-                            eip.category === 'Core' ? 'red' :
-                            eip.category === 'Networking' ? 'orange' :
-                            eip.category === 'Interface' ? 'cyan' :
-                            'gray'
-                          }
-                          variant="outline"
-                          fontSize="xs"
-                        >
-                          {eip.category || 'Uncategorized'}
-                        </Badge>
-                        
-                        {eip.status && (
-                          <Badge
-                            colorScheme={
-                              eip.status === 'Draft' ? 'yellow' :
-                              eip.status === 'Review' ? 'orange' :
-                              eip.status === 'Last Call' ? 'blue' :
-                              eip.status === 'Final' ? 'green' :
-                              'gray'
-                            }
-                            variant="subtle"
-                            fontSize="xs"
-                          >
-                            {eip.status}
-                          </Badge>
-                        )}
-                      </Flex>
-                      
-                      {eip.created && (
-                        <Text fontSize="xs" color="gray.400" mt={2}>
-                          Created: {new Date(eip.created).toLocaleDateString()}
-                        </Text>
-                      )}
-                      
-                      {eip.discussion && (
-                        <Link
-                          href={eip.discussion}
-                          isExternal
-                          color="#00CED1"
-                          fontSize="xs"
-                          mt={2}
-                          display="block"
-                          _hover={{ textDecoration: 'underline' }}
-                        >
-                          View Discussion →
-                        </Link>
-                      )}
-                    </Box>
-                  ))}
-                </SimpleGrid>
-              )}
-            </Box>
-          )}
 
           </motion.div>
         )}

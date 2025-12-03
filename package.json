@@ -57,6 +57,7 @@
     "autoprefixer": "^10.4.20",
     "axios": "^1.4.0",
     "bcryptjs": "^3.0.2",
+    "canvas-confetti": "^1.9.4",
     "chart.js": "^4.3.0",
     "cheerio": "^1.0.0-rc.12",
     "class-variance-authority": "^0.7.0",
