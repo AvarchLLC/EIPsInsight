@@ -47,6 +47,812 @@ import { useScrollSpy } from "@/hooks/useScrollSpy";
 import DeclinedEIPListPage from "@/components/DeclinedCardsPage";
 import PlaceYourAdCard from "@/components/PlaceYourAdCard";
 
+// Import glamsterDamData from UpgradesTimeline (we'll need to extract it or access it differently)
+// For now, let's define the glamsterDamData here since it's not exported from UpgradesTimeline
+const glamsterDamData = [
+  {
+    date: '2024-09-28',
+    included: [],
+    scheduled: [],
+    declined: [],
+    considered: ['EIP-4762', 'EIP-6800', 'EIP-6873', 'EIP-7545', 'EIP-7667'],
+    proposed: []
+  },
+  {
+    date: '2025-06-09',
+    included: [],
+    scheduled: [],
+    declined: [],
+    considered: ['EIP-4762', 'EIP-6800', 'EIP-6873', 'EIP-7545', 'EIP-7667'],
+    proposed: ['EIP-7793', 'EIP-7843']
+  },
+  {
+    date: '2025-06-10',
+    included: [],
+    scheduled: [],
+    declined: [],
+    considered: ['EIP-4762', 'EIP-6800', 'EIP-6873', 'EIP-7545', 'EIP-7667'],
+    proposed: ['EIP-7793', 'EIP-7843', 'EIP-7919']
+  },
+  {
+    date: '2025-07-04',
+    included: [],
+    scheduled: [],
+    declined: [],
+    considered: [],
+    proposed : ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7843', 'EIP-7919']
+  },
+  {
+    date: '2025-07-25',
+    included: [],
+    scheduled: [],
+    declined: [],
+    considered: ['EIP-7732', 'EIP-7782', 'EIP-7805'],
+    proposed: ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7819', 'EIP-7843', 'EIP-7919']
+  },
+  {
+    date: '2025-07-31',
+    included: [],
+    scheduled: [],
+    declined: [],
+    considered: ['EIP-7732', 'EIP-7782', 'EIP-7805', 'EIP-7928'],
+    proposed: ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7819', 'EIP-7843', 'EIP-7919']  
+  },
+  {
+    date: '2025-08-11',
+    included: [],
+    scheduled: [],
+    declined: [],
+    considered: ['EIP-7732', 'EIP-7782', 'EIP-7805', 'EIP-7928'],
+    proposed: ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7819', 'EIP-7843', 'EIP-7919', 'EIP-5920', 'EIP-7791', 'EIP-7903', 'EIP-7907', 'EIP-7923' ]  
+  },
+  {
+    date: '2025-08-14',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+    proposed: [
+      'EIP-2926',
+      'EIP-6873',
+      'EIP-7667',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7919',
+      'EIP-5920',
+      'EIP-7791',
+      'EIP-7903',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7997'
+    ]
+  },
+  {
+    date: '2025-08-27',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+    proposed: [
+      'EIP-2926',
+      'EIP-6873',
+      'EIP-7667',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7919',
+      'EIP-5920',
+      'EIP-7791',
+      'EIP-7903',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7979',
+      'EIP-7980',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-7999'
+    ]
+  },
+  {
+    date: '2025-09-04',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+    proposed: [
+      'EIP-2926',
+      'EIP-6873',
+      'EIP-7667',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7919',
+      'EIP-5920',
+      'EIP-7791',
+      'EIP-7903',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7979',
+      'EIP-7980',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-7999',
+      'EIP-7778',
+      'EIP-7976',
+      'EIP-7688',
+    ]
+  },
+  {
+    date: '2025-09-12',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+    proposed: [
+      'EIP-2926',
+      'EIP-6873',
+      'EIP-7667',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7919',
+      'EIP-5920',
+      'EIP-7791',
+      'EIP-7903',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7979',
+      'EIP-7980',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-7999',
+      'EIP-7778',
+      'EIP-7976',
+      'EIP-7688',
+      'EIP-2780',
+    ]
+  },
+  {
+    date: '2025-09-24',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7782'],
+    considered: [ 'EIP-7805'],
+    proposed: [
+      'EIP-2926',
+      'EIP-6873',
+      'EIP-7667',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7919',
+      'EIP-5920',
+      'EIP-7791',
+      'EIP-7903',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7979',
+      'EIP-7980',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-7999',
+      'EIP-7778',
+      'EIP-7976',
+      'EIP-7688',
+      'EIP-2780',
+      'EIP-7610'
+    ]
+  },
+  {
+    date: '2025-10-15',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7692','EIP-7782','EIP-7886','EIP-7919','EIP-7937','EIP-7942'],
+    considered: [ 'EIP-7805'],
+    proposed: [
+      'EIP-2926',
+      'EIP-6873',
+      'EIP-7667',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-6466',
+      'EIP-5920',
+      'EIP-7791',
+      'EIP-7903',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7979',
+      'EIP-8030',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-7999',
+      'EIP-7778',
+      'EIP-7976',
+      'EIP-7688',
+      'EIP-2780',
+      'EIP-7610',
+      'EIP-7668',
+      'EIP-8032',
+    ]
+  },
+  {
+    date: '2025-10-16',
+    included: [],
+    scheduled: ['EIP-7732',  'EIP-7928'],
+    declined: ['EIP-7692','EIP-7782','EIP-7886','EIP-7919','EIP-7937','EIP-7942'],
+    considered: [ 'EIP-7805'],
+    proposed: [
+      'EIP-2926',
+      'EIP-6873',
+      'EIP-7667',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-6466',
+      'EIP-5920',
+      'EIP-7791',
+      'EIP-7903',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7979',
+      'EIP-8030',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-7999',
+      'EIP-7778',
+      'EIP-7976',
+      'EIP-7688',
+      'EIP-2780',
+      'EIP-7610',
+      'EIP-7668',
+      'EIP-7904',
+      'EIP-8011',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8032',
+    ]
+  },
+  {
+    date: '2025-10-21',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6466',
+      'EIP-6873',
+      'EIP-7610',
+      'EIP-7667',
+      'EIP-7668',
+      'EIP-7688',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-7999',
+      'EIP-8011',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038'
+    ]
+  },
+  {
+    date: '2025-10-23',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6466',
+      'EIP-6873',
+      'EIP-7610',
+      'EIP-7667',
+      'EIP-7668',
+      'EIP-7688',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-7999',
+      'EIP-8011',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045'
+    ]
+  },
+  {
+    date: '2025-10-29',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6466',
+      'EIP-6873',
+      'EIP-7610',
+      'EIP-7667',
+      'EIP-7668',
+      'EIP-7688',
+      'EIP-7708',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7872',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7949',
+      'EIP-7973',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-8011',
+      'EIP-8024',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045',
+      'EIP-8057',
+      'EIP-8061'
+    ]
+  },
+  {
+    date: '2025-10-30',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6466',
+      'EIP-6873',
+      'EIP-7610',
+      'EIP-7667',
+      'EIP-7668',
+      'EIP-7688',
+      'EIP-7708',
+      'EIP-7745',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7872',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7949',
+      'EIP-7973',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-8011',
+      'EIP-8024',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045',
+      'EIP-8057',
+      'EIP-8061'
+    ]
+  },
+  {
+    date: '2025-11-2',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6466',
+      'EIP-6873',
+      'EIP-7610',
+      'EIP-7667',
+      'EIP-7668',
+      'EIP-7688',
+      'EIP-7708',
+      'EIP-7745',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7872',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7949',
+      'EIP-7973',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-8011',
+      'EIP-8024',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045',
+      'EIP-8057',
+      'EIP-8058',
+      'EIP-8061'
+    ]
+  },
+  {
+    date: '2025-10-30',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6466',
+      'EIP-6873',
+      'EIP-7610',
+      'EIP-7667',
+      'EIP-7668',
+      'EIP-7688',
+      'EIP-7708',
+      'EIP-7745',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7872',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7949',
+      'EIP-7973',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7971',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-8011',
+      'EIP-8024',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045',
+      'EIP-8053',
+      'EIP-8059',
+      'EIP-8057',
+      'EIP-8061'
+    ]
+  },
+  {
+    date: '2025-11-11',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6466',
+      'EIP-7610',
+      'EIP-7668',
+      'EIP-7686',
+      'EIP-7688',
+      'EIP-7708',
+      'EIP-7745',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7872',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7949',
+      'EIP-7971',
+      'EIP-7973',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-8011',
+      'EIP-8024',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045',
+      'EIP-8053',
+      'EIP-8057',
+      'EIP-8058',
+      'EIP-8061',
+      'EIP-8062',
+      'EIP-8068',
+      'EIP-8071'
+    ]
+  },
+  {
+    date: '2025-11-13',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6466',
+      'EIP-7610',
+      'EIP-7668',
+      'EIP-7686',
+      'EIP-7688',
+      'EIP-7708',
+      'EIP-7745',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7872',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7949',
+      'EIP-7971',
+      'EIP-7973',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-8011',
+      'EIP-8013',
+      'EIP-8024',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045',
+      'EIP-8053',
+      'EIP-8057',
+      'EIP-8058',
+      'EIP-8061',
+      'EIP-8062',
+      'EIP-8068',
+      'EIP-8070',
+      'EIP-8071'
+    ]
+  },
+  {
+    date: '2025-11-26',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942'],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6404',
+      'EIP-6466',
+      'EIP-7610',
+      'EIP-7668',
+      'EIP-7686',
+      'EIP-7688',
+      'EIP-7708',
+      'EIP-7745',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7872',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7949',
+      'EIP-7971',
+      'EIP-7973',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-8011',
+      'EIP-8013',
+      'EIP-8024',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045',
+      'EIP-8053',
+      'EIP-8057',
+      'EIP-8058',
+      'EIP-8061',
+      'EIP-8062',
+      'EIP-8068',
+      'EIP-8070',
+      'EIP-8071',
+      'EIP-8080',
+    ]
+  },
+  {
+    date: '2025-11-26',
+    included: [],
+    scheduled: ['EIP-7732', 'EIP-7928'],
+    declined: ['EIP-7692', 'EIP-7782', 'EIP-7886', 'EIP-7919', 'EIP-7937', 'EIP-7942', 'EIP-8068',],
+    considered: ['EIP-7805'],
+    proposed: [
+      'EIP-2780',
+      'EIP-2926',
+      'EIP-5920',
+      'EIP-6404',
+      'EIP-6466',
+      'EIP-7610',
+      'EIP-7668',
+      'EIP-7686',
+      'EIP-7688',
+      'EIP-7708',
+      'EIP-7745',
+      'EIP-7778',
+      'EIP-7791',
+      'EIP-7793',
+      'EIP-7819',
+      'EIP-7843',
+      'EIP-7872',
+      'EIP-7903',
+      'EIP-7904',
+      'EIP-7907',
+      'EIP-7923',
+      'EIP-7932',
+      'EIP-7949',
+      'EIP-7971',
+      'EIP-7973',
+      'EIP-7976',
+      'EIP-7979',
+      'EIP-7981',
+      'EIP-7997',
+      'EIP-8011',
+      'EIP-8013',
+      'EIP-8024',
+      'EIP-8030',
+      'EIP-8032',
+      'EIP-8037',
+      'EIP-8038',
+      'EIP-8045',
+      'EIP-8053',
+      'EIP-8057',
+      'EIP-8058',
+      'EIP-8061',
+      'EIP-8062',
+      'EIP-8070',
+      'EIP-8071',
+      'EIP-8080',
+    ]
+  }
+];
+
+// Function to get recent glamsterdamData entry and fetch additional EIP data
+const getRecentGlamsterdamDataWithProposedEIPs = async (glamsterDamData: any[]) => {
+  // Get the most recent entry (last one) from glamsterDamData
+  const recentEntry = glamsterDamData[glamsterDamData.length - 1];
+  
+  if (!recentEntry || !recentEntry.proposed || recentEntry.proposed.length === 0) {
+    return recentEntry;
+  }
+
+  // Fetch additional data for each proposed EIP from the API
+  const proposedEIPsData = await Promise.all(
+    recentEntry.proposed.map(async (eipNumber: string) => {
+      try {
+        // Extract just the number from EIP-XXXX format
+        const number = eipNumber.replace('EIP-', '');
+        const response = await fetch(`/api/eips/${number}`);
+        if (response.ok) {
+          const eipData = await response.json();
+          return {
+            eip: number,
+            title: eipData.title || '',
+            author: eipData.author || '',
+            type: eipData.type || '',
+            category: eipData.category || '',
+            status: eipData.status || '',
+            created: eipData.created || '',
+            discussion: eipData.discussion || ''
+          };
+        }
+      } catch (error) {
+        console.error(`Error fetching data for ${eipNumber}:`, error);
+      }
+      
+      // Return fallback data if API call fails
+      return {
+        eip: eipNumber.replace('EIP-', ''),
+        title: '',
+        author: '',
+        type: '',
+        category: '',
+        status: '',
+        created: '',
+        discussion: ''
+      };
+    })
+  );
+
+  // Return the recent entry with enhanced proposed EIPs data
+  return {
+    ...recentEntry,
+    proposed: proposedEIPsData
+  };
+};
+
 const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
 // Type for a Declined EIP entry
@@ -318,6 +1124,8 @@ const All = () => {
   
   const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam'>('fusaka');
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
+  const [recentGlamsterdamData, setRecentGlamsterdamData] = useState<any>(null);
+  const [isLoadingGlamsterdamData, setIsLoadingGlamsterdamData] = useState(false);
   // const selectedOption = selectedUpgrade;       // just alias so rest of code works
   // const setSelectedOption = setSelectedUpgrade;
   const optionArr = [
@@ -361,6 +1169,23 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     return () => {
       window.removeEventListener('resize', checkWidth);
     };
+  }, []);
+
+  // Fetch recent glamsterdam data with proposed EIPs from API
+  useEffect(() => {
+    const fetchRecentGlamsterdamData = async () => {
+      setIsLoadingGlamsterdamData(true);
+      try {
+        const data = await getRecentGlamsterdamDataWithProposedEIPs(glamsterDamData);
+        setRecentGlamsterdamData(data);
+      } catch (error) {
+        console.error('Error fetching recent glamsterdam data:', error);
+      } finally {
+        setIsLoadingGlamsterdamData(false);
+      }
+    };
+
+    fetchRecentGlamsterdamData();
   }, []);
 
 
@@ -1151,7 +1976,7 @@ return (
           >
             <Box id="upgrade-table" display={{ base: "none", md: "block" }}>
               <PectraTable
-                PectraData={selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : glamsterdamData}
+                PectraData={selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : (recentGlamsterdamData || glamsterdamData)}
                 title={selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : "Glamsterdam"}
               />
             </Box>
@@ -1226,6 +2051,136 @@ return (
               <Graph />
             </Box>
           </Box>
+
+          {/* Recent Glamsterdam Data with Proposed EIPs */}
+          {selectedOption === 'glamsterdam' && recentGlamsterdamData && (
+            <Box
+              bg={useColorModeValue('white', 'gray.800')}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue('gray.200', 'gray.700')}
+              mb={8}
+              px={6}
+              py={8}
+            >
+              <Box mb={6}>
+                <Text
+                  fontSize={{ base: '2xl', md: '3xl' }}
+                  fontWeight="bold"
+                  color="#00CED1"
+                  textAlign="left"
+                >
+                  Recent Glamsterdam Proposed EIPs
+                </Text>
+                <Text fontSize="sm" color="gray.500" mt={2}>
+                  Data from {recentGlamsterdamData.date} - Showing {recentGlamsterdamData.proposed?.length || 0} proposed EIPs
+                </Text>
+              </Box>
+              
+              {isLoadingGlamsterdamData ? (
+                <Flex justify="center" align="center" minH="200px">
+                  <Spinner size="xl" color="#00CED1" />
+                </Flex>
+              ) : (
+                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
+                  {recentGlamsterdamData.proposed?.map((eip: any, index: number) => (
+                    <Box
+                      key={index}
+                      bg={useColorModeValue('gray.50', 'gray.700')}
+                      p={4}
+                      borderRadius="lg"
+                      border="1px solid"
+                      borderColor={useColorModeValue('gray.200', 'gray.600')}
+                      _hover={{
+                        borderColor: '#00CED1',
+                        boxShadow: 'md',
+                        transform: 'translateY(-2px)',
+                      }}
+                      transition="all 0.2s ease-in-out"
+                    >
+                      <Flex justify="space-between" align="start" mb={2}>
+                        <Text fontWeight="bold" fontSize="lg" color="#00CED1">
+                          EIP-{eip.eip}
+                        </Text>
+                        <Badge
+                          colorScheme={
+                            eip.type === 'Core' ? 'blue' :
+                            eip.type === 'Meta' ? 'purple' :
+                            eip.type === 'Standards Track' ? 'green' :
+                            'gray'
+                          }
+                          variant="solid"
+                          fontSize="xs"
+                        >
+                          {eip.type || 'Unknown'}
+                        </Badge>
+                      </Flex>
+                      
+                      <Text fontWeight="semibold" fontSize="md" mb={2} noOfLines={2}>
+                        {eip.title || 'Title not available'}
+                      </Text>
+                      
+                      <Text fontSize="xs" color="gray.500" mb={1} noOfLines={1}>
+                        {eip.author || 'Author not available'}
+                      </Text>
+                      
+                      <Flex justify="space-between" align="center" mt={3}>
+                        <Badge
+                          colorScheme={
+                            eip.category === 'Core' ? 'red' :
+                            eip.category === 'Networking' ? 'orange' :
+                            eip.category === 'Interface' ? 'cyan' :
+                            'gray'
+                          }
+                          variant="outline"
+                          fontSize="xs"
+                        >
+                          {eip.category || 'Uncategorized'}
+                        </Badge>
+                        
+                        {eip.status && (
+                          <Badge
+                            colorScheme={
+                              eip.status === 'Draft' ? 'yellow' :
+                              eip.status === 'Review' ? 'orange' :
+                              eip.status === 'Last Call' ? 'blue' :
+                              eip.status === 'Final' ? 'green' :
+                              'gray'
+                            }
+                            variant="subtle"
+                            fontSize="xs"
+                          >
+                            {eip.status}
+                          </Badge>
+                        )}
+                      </Flex>
+                      
+                      {eip.created && (
+                        <Text fontSize="xs" color="gray.400" mt={2}>
+                          Created: {new Date(eip.created).toLocaleDateString()}
+                        </Text>
+                      )}
+                      
+                      {eip.discussion && (
+                        <Link
+                          href={eip.discussion}
+                          isExternal
+                          color="#00CED1"
+                          fontSize="xs"
+                          mt={2}
+                          display="block"
+                          _hover={{ textDecoration: 'underline' }}
+                        >
+                          View Discussion →
+                        </Link>
+                      )}
+                    </Box>
+                  ))}
+                </SimpleGrid>
+              )}
+            </Box>
+          )}
 
           </motion.div>
         )}
