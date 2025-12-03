@@ -817,16 +817,20 @@ const getRecentGlamsterdamDataWithProposedEIPs = async (glamsterDamData: any[]) 
         const response = await fetch(`/api/eips/${number}`);
         if (response.ok) {
           const eipData = await response.json();
+          // Access the actual EIP data from the _doc field
+          const docData = eipData._doc || eipData;
           return {
             eip: number,
-            title: eipData.title || '',
-            author: eipData.author || '',
-            type: eipData.type || '',
-            category: eipData.category || '',
-            status: eipData.status || '',
-            created: eipData.created || '',
-            discussion: eipData.discussion || ''
+            title: docData.title || '',
+            author: docData.author || '',
+            type: docData.type || '',
+            category: docData.category || '',
+            status: docData.status || '',
+            created: docData.created || '',
+            discussion: docData.discussion || ''
           };
+        } else {
+          console.warn(`Failed to fetch EIP ${number}: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
         console.error(`Error fetching data for ${eipNumber}:`, error);
@@ -1174,12 +1178,16 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   // Fetch recent glamsterdam data with proposed EIPs from API
   useEffect(() => {
     const fetchRecentGlamsterdamData = async () => {
+      console.log('Starting to fetch recent glamsterdam data...');
       setIsLoadingGlamsterdamData(true);
       try {
         const data = await getRecentGlamsterdamDataWithProposedEIPs(glamsterDamData);
+        console.log('Fetched recent glamsterdam data:', data);
         setRecentGlamsterdamData(data);
       } catch (error) {
         console.error('Error fetching recent glamsterdam data:', error);
+        // Set fallback data to ensure table still shows
+        setRecentGlamsterdamData(glamsterDamData[glamsterDamData.length - 1]);
       } finally {
         setIsLoadingGlamsterdamData(false);
       }
