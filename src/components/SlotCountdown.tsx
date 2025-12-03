@@ -130,7 +130,7 @@ const SlotCountdown: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [countdown, setCountdown] = useState<string>("");
   const [isUpgradeLive, setIsUpgradeLive] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<"slots" | "epochs">("epochs");
+  const [viewMode, setViewMode] = useState<"slots" | "epochs">("slots");
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [mergedNetworks, setMergedNetworks] = useState<Set<string>>(new Set());
   const { isOpen: isCelebrationOpen, onOpen: onCelebrationOpen, onClose: onCelebrationClose } = useDisclosure();
@@ -745,7 +745,7 @@ Testing complete, ready for mainnet! 🎯
         </Text>
         
         <VStack spacing={2}>
-          <HStack spacing={2} wrap="wrap" justify="center" px={2}>
+          <HStack spacing={2} wrap="wrap" justify="center">
             {epochs.slice(0, 8).map((epoch) => {
               const isCurrent = epoch === currentEpoch;
               const isTarget = epoch === networks[network].targetepoch;
@@ -835,7 +835,7 @@ Testing complete, ready for mainnet! 🎯
             
           </HStack>
           
-          <HStack spacing={2} wrap="wrap" justify="center" px={2}>
+          <HStack spacing={2} wrap="wrap" justify="center">
             {epochs.slice(8).map((epoch) => {
               const isCurrent = epoch === currentEpoch;
               const isTarget = epoch === networks[network].targetepoch;
@@ -1073,8 +1073,8 @@ Testing complete, ready for mainnet! 🎯
           width="120px"
           size="sm"
         >
-          <option value="epochs">Epochs</option>
           <option value="slots">Slots</option>
+          <option value="epochs">Epochs</option>
         </Select>
       </Flex>
 
