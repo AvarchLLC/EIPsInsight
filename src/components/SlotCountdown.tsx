@@ -133,6 +133,10 @@ const SlotCountdown: React.FC = () => {
   const [viewMode, setViewMode] = useState<"slots" | "epochs">("slots");
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [mergedNetworks, setMergedNetworks] = useState<Set<string>>(new Set());
+  const [showFeatures, setShowFeatures] = useState<boolean>(false);
+  const [celebrationSeen, setCelebrationSeen] = useState<boolean>(() => {
+    return localStorage.getItem('fusaka-celebration-seen') === 'true';
+  });
   const { isOpen: isCelebrationOpen, onOpen: onCelebrationOpen, onClose: onCelebrationClose } = useDisclosure();
 
   const accent = getAccent(network, useColorModeValue(true, false));
@@ -466,8 +470,8 @@ Testing complete, ready for mainnet! 🎯
         // Trigger confetti celebration
         triggerConfetti();
         
-        // Open celebration modal for testnets, or special modal for mainnet
-        if (network === 'mainnet') {
+        // Open celebration modal for mainnet once, unless already seen and closed
+        if (network === 'mainnet' && !celebrationSeen) {
           setTimeout(() => onCelebrationOpen(), 500);
         }
         
@@ -479,7 +483,6 @@ Testing complete, ready for mainnet! 🎯
       }
 
       if (target !== 999999999 && !isUpgradeLive) {
-        let slotsRemaining: number = target - slot;
         let totalSecondsRemaining: number = slotsRemaining * 12;
 
         if (countdownIntervalRef.current)
@@ -537,6 +540,12 @@ Testing complete, ready for mainnet! 🎯
     };
     // eslint-disable-next-line
   }, [network]);
+
+  const handleCelebrationClose = () => {
+    setCelebrationSeen(true);
+    localStorage.setItem('fusaka-celebration-seen', 'true');
+    onCelebrationClose();
+  };
 
   const handleNetworkChange = (newNetwork: keyof typeof networks) => {
     setNetwork(newNetwork);
@@ -1123,35 +1132,15 @@ Testing complete, ready for mainnet! 🎯
         {(mergedNetworks.size > 0 && network !== 'mainnet') || (mergedNetworks.has('mainnet') && network === 'mainnet') ? (
           <Box mt={6} mb={4}>
             <VStack spacing={4}>
-              <Button
-                leftIcon={<FaTwitter />}
-                bg="#1DA1F2"
-                color="white"
-                size="lg"
+              <button
                 onClick={shareOnTwitter}
-                borderRadius="12px"
-                px={10}
-                py={6}
-                _hover={{ 
-                  transform: "translateY(-2px)", 
-                  shadow: "2xl",
-                  bg: "#1a8cd8"
-                }}
-                _active={{
-                  transform: "translateY(0)",
-                  bg: "#1a8cd8"
-                }}
-                transition="all 0.2s"
-                boxShadow="0 4px 12px rgba(29, 161, 242, 0.3)"
-                border="2px solid"
-                borderColor="#1DA1F2"
-                minW="280px"
-                height="56px"
+                className="group relative overflow-hidden bg-gradient-to-br from-[#1DA1F2] to-[#1a8cd8] text-white font-bold text-lg px-8 py-4 rounded-2xl min-w-[300px] h-16 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] active:translate-y-0 active:scale-[1.01] border-2 border-white/20 flex items-center justify-center gap-2 before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:transition-all before:duration-500 hover:before:left-[100%]"
               >
-                <Text fontSize="16px" fontWeight="700" letterSpacing="tight">
-                  Share on Twitter 🎉
-                </Text>
-              </Button>
+                <FaTwitter className="w-5 h-5" />
+                <span>Share on Twitter</span>
+                <span className="text-xl">✨</span>
+                <span className="text-lg">🎉</span>
+              </button>
             </VStack>
           </Box>
         ) : null}
@@ -1165,7 +1154,8 @@ Testing complete, ready for mainnet! 🎯
             Loading {networks[network].name} network data...
           </Text>
         </VStack>
-      ) : isUpgradeLive || slotsRemaining <= 0 ? (
+      ) : /* CELEBRATION CONTENT - INLINE */
+      (isUpgradeLive || slotsRemaining <= 0) ? (
         <VStack spacing={4}>
           <Text
             fontSize="xl"
@@ -1181,6 +1171,16 @@ Testing complete, ready for mainnet! 🎯
           <Badge colorScheme="green" px={3} py={1} fontSize="sm">
             Successfully Activated
           </Badge>
+          
+          <button
+            onClick={triggerConfetti}
+            className="group relative overflow-hidden bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white font-bold text-lg px-8 py-4 rounded-2xl min-w-[300px] h-16 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] active:translate-y-0 active:scale-[1.01] border-2 border-white/20 flex items-center justify-center gap-2 before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:transition-all before:duration-500 hover:before:left-[100%]"
+          >
+            <FaRocket className="w-5 h-5" />
+            <span>Trigger Celebration</span>
+            <span className="text-xl">🎊</span>
+            <span className="text-lg">🎉</span>
+          </button>
         </VStack>
       ) : (
         <VStack spacing={4}>
@@ -1234,163 +1234,6 @@ Testing complete, ready for mainnet! 🎯
         `}
       </style>
 
-      {/* Celebration Modal */}
-      <Modal 
-        isOpen={isCelebrationOpen} 
-        onClose={onCelebrationClose} 
-        size="lg"
-        isCentered
-        motionPreset="slideInBottom"
-      >
-        <ModalOverlay backdropFilter="blur(8px)" />
-        <ModalContent
-          bg={useColorModeValue("white", "gray.800")}
-          borderRadius="2xl"
-          border="2px solid"
-          borderColor={useColorModeValue("blue.200", "blue.600")}
-          boxShadow="2xl"
-        >
-          <ModalHeader 
-            textAlign="center"
-            bg={useColorModeValue("blue.50", "blue.900")}
-            borderTopRadius="2xl"
-            py={6}
-          >
-            <VStack spacing={2}>
-              <Icon as={FaRocket} boxSize={12} color="blue.500" />
-              <Text 
-                fontSize="3xl" 
-                fontWeight="bold" 
-                bgGradient="linear(to-r, blue.500, purple.500)"
-                bgClip="text"
-              >
-                🎉 FUSAKA IS LIVE! 🎉
-              </Text>
-              <Text fontSize="lg" color={useColorModeValue("gray.600", "gray.300")}>
-                Ethereum Mainnet Upgrade Successful
-              </Text>
-            </VStack>
-          </ModalHeader>
-          <ModalCloseButton size="lg" />
-          <ModalBody py={8}>
-            <VStack spacing={6}>
-              <Box
-                bg={useColorModeValue("green.50", "green.900")}
-                p={6}
-                borderRadius="xl"
-                width="100%"
-                border="1px solid"
-                borderColor={useColorModeValue("green.200", "green.600")}
-              >
-                <HStack spacing={3} mb={3}>
-                  <Icon as={FaCheckCircle} color="green.500" boxSize={6} />
-                  <Text fontSize="xl" fontWeight="bold" color="green.500">
-                    Upgrade Complete
-                  </Text>
-                </HStack>
-                <Text fontSize="md" color={useColorModeValue("gray.700", "gray.300")}>
-                  Slot {networks[network].target.toLocaleString()} has been successfully activated at {FUSAKA_INFO.schedule.mainnet}
-                </Text>
-              </Box>
-
-              <Divider />
-
-              <VStack spacing={4}>
-                <Text fontSize="lg" fontWeight="semibold">
-                  What's Now Available:
-                </Text>
-                <VStack align="start" spacing={2}>
-                  {FUSAKA_INFO.features.map((feature, index) => (
-                    <HStack key={index} spacing={2}>
-                      <Text color="green.500" fontSize="lg">✓</Text>
-                      <Text fontSize="md">{feature}</Text>
-                    </HStack>
-                  ))}
-                </VStack>
-              </VStack>
-
-              <Divider />
-
-              <Stack direction={{ base: "column", md: "row" }} spacing={4} width="100%">
-                <Button
-                  leftIcon={<FaTwitter />}
-                  bg="#1DA1F2"
-                  color="white"
-                  size="lg"
-                  onClick={shareOnTwitter}
-                  borderRadius="12px"
-                  px={12}
-                  py={8}
-                  _hover={{ 
-                    transform: "translateY(-2px)", 
-                    shadow: "2xl",
-                    bg: "#1a8cd8"
-                  }}
-                  _active={{
-                    transform: "translateY(0)",
-                    bg: "#1a8cd8"
-                  }}
-                  transition="all 0.2s"
-                  boxShadow="0 4px 12px rgba(29, 161, 242, 0.3)"
-                  border="2px solid"
-                  borderColor="#1DA1F2"
-                  height="64px"
-                >
-                  <Text fontSize="18px" fontWeight="700" letterSpacing="tight">
-                    Share on Twitter 🎉
-                  </Text>
-                </Button>
-                <Button
-                  leftIcon={<FaShare />}
-                  bg="#6b7280"
-                  color="white"
-                  size="lg"
-                  onClick={() => navigator.clipboard.writeText(window.location.href)}
-                  borderRadius="12px"
-                  px={12}
-                  py={8}
-                  _hover={{ 
-                    transform: "translateY(-2px)", 
-                    shadow: "2xl",
-                    bg: "#4b5563"
-                  }}
-                  _active={{
-                    transform: "translateY(0)",
-                    bg: "#4b5563"
-                  }}
-                  transition="all 0.2s"
-                  boxShadow="0 4px 12px rgba(107, 114, 128, 0.3)"
-                  border="2px solid"
-                  borderColor="#6b7280"
-                  height="64px"
-                >
-                  <Text fontSize="18px" fontWeight="700" letterSpacing="tight">
-                    Copy Link
-                  </Text>
-                </Button>
-              </Stack>
-
-              <VStack spacing={3} mt={6}>
-                <Box 
-                  bg="blue.50"
-                  p={4}
-                  borderRadius="xl"
-                  width="100%"
-                  border="1px solid"
-                  borderColor="blue.200"
-                >
-                  <Text fontSize="md" color="blue.700" textAlign="center" fontWeight="semibold">
-                    🎉 Share this historic moment with the Ethereum community!
-                  </Text>
-                  <Text fontSize="sm" color="blue.600" textAlign="center" mt={2}>
-                    Your celebration image is ready for Twitter sharing with EIPs Insight branding 📸
-                  </Text>
-                </Box>
-              </VStack>
-            </VStack>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
     </VStack>
   );
 };
