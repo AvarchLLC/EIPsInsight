@@ -302,6 +302,20 @@ const defaultGlamsterdam: DeclinedEIP[] = [
   discussionLink: "https://ethereum-magicians.org/t/eip-7942-available-attestation-a-reorg-resilient-solution-for-ethereum/23927",
 },
   {
+  id: "EIP-8062",
+  title: "EIP-8062: Add sweep withdrawal fee for 0x01 validators",
+  description: "Improve stake consolidation and fairness by imposing a 'sweep' withdrawal fee for `0x01` validators set to 0.05% of the withdrawn amount.",
+  eipsLink: "/eips/eip-8062",
+  discussionLink: "https://ethereum-magicians.org/t/eip-8062-add-sweep-withdrawal-fee-for-0x01-validators/26003",
+},
+  {
+  id: "EIP-8071",
+  title: "EIP-8071: Prevent using consolidations as withdrawals",
+  description: "Cancels consolidation if the max effective balance of the target validator will be exceeded, preventing the withdrawal of the unused balance",
+  eipsLink: "/eips/eip-8071",
+  discussionLink: "https://ethereum-magicians.org/t/eip-8071-prevent-using-consolidations-as-withdrawals/26037",
+},
+  {
   id: "EIP-8068",
   title: "EIP-7942: Neutral effective balance design",
   description: "Make the effective balance calculation neutral so that 0x01 and 0x02 validators receive the same yield, thus facilitating consolidation.",
