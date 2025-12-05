@@ -532,13 +532,13 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                           </Box>
 
                           {/* Fusaka Countdown Badge - Enhanced */}
-                          <Box
+                          {/* <Box
                             as={motion.div}
                             whileHover={{ scale: 1.02 }}
                             transition={{ type: "spring", stiffness: 400, damping: 17 } as any}
                           >
                             <FusakaCountdownBadge variant="compact" />
-                          </Box>
+                          </Box> */}
                         </Stack>
 
                         {/* Enhanced Dropdown */}
@@ -702,9 +702,9 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                   </Stack>
                   
                   {/* Fusaka Countdown Badge - Mobile */}
-                  <Box mt={6} display="flex" justifyContent="center">
+                  {/* <Box mt={6} display="flex" justifyContent="center">
                     <FusakaCountdownBadge variant="detailed" />
-                  </Box>
+                  </Box> */}
                   
                   <div className="mt-6">
                     <AllChart type="Total" dataset={data} />

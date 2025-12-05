@@ -95,10 +95,10 @@ const FUSAKA_INFO = {
     "secp256r1 Precompile: Native support for modern secure hardware (EIP-7951)"
   ],
   schedule: {
-    holesky: "October 1, 2025 - 08:48 UTC ✅ MERGED",
-    sepolia: "October 14, 2025 - 07:36 UTC ✅ MERGED",
-    hoodi: "October 28, 2025 - 18:53 UTC ✅ MERGED",
-    mainnet: "December 3, 2025 - 21:49:11 UTC 🚀",
+    holesky: "October 1, 2025 - 08:48 UTC ✅",
+    sepolia: "October 14, 2025 - 07:36 UTC ✅",
+    hoodi: "October 28, 2025 - 18:53 UTC ✅",
+    mainnet: "December 3, 2025 - 21:49:11 UTC ✅",
   },
   readMore: {
     label: "Read more about FUSAKA",
@@ -312,7 +312,7 @@ Testing complete, ready for mainnet! 🎯
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
-      const mainText = network === 'mainnet' ? 'FUSAKA IS LIVE!' : 'FUSAKA MERGED!';
+      const mainText = network === 'mainnet' ? 'FUSAKA IS LIVE!' : 'FUSAKA!';
       ctx.fillText(mainText, canvas.width / 2, canvas.height / 2 - 60);
       
       // Reset shadow for other elements
@@ -1108,10 +1108,10 @@ Testing complete, ready for mainnet! 🎯
               {net.charAt(0).toUpperCase() + net.slice(1)}
               {(net === "holesky" || net === "sepolia" || net === "hoodi") && (
                 <Badge ml={1} colorScheme="green" fontSize="9px" variant="solid">
-                  ✅ MERGED
+                  ✅ FINAL
                 </Badge>
               )}
-              {net === "mainnet" && <Badge ml={1} colorScheme="blue" fontSize="9px" variant="solid">DEC 3</Badge>}
+              {net === "mainnet" && <Badge ml={1} colorScheme="blue" fontSize="9px" variant="solid">FINAL</Badge>}
               {mergedNetworks.has(net) && (
                 <Box
                   position="absolute"
