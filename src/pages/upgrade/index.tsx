@@ -1178,7 +1178,7 @@ const All = () => {
     setIsLoading(false);
   }, []);
   
-  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam'>('fusaka');
+  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam'>('glamsterdam');
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
   const [recentGlamsterdamData, setRecentGlamsterdamData] = useState<any>(null);
   const [isLoadingGlamsterdamData, setIsLoadingGlamsterdamData] = useState(false);
