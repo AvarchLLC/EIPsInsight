@@ -22,6 +22,7 @@ interface UpgradeData {
 
 
 const professionalColorMap: Record<string, string> = {
+  "Fusaka": "#10B981",            // Emerald 500 (2025-12-03)
   "Pectra": "#DC2626",            // Red 600 (2025-05-07)
   "Dencun": "#2563EB",            // Blue 600 (2024-03-13)
   "Shanghai": "#059669",          // Emerald 600 (2023-04-12)
@@ -49,6 +50,21 @@ const professionalColorMap: Record<string, string> = {
 
 // Original data set
 const rawData = [
+  // Fusaka (Fulu-Osaka) — December 3, 2025
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7594" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7823" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7825" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7883" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7892" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7910" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7917" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7918" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7934" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7935" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7939" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7951" },
+  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7642" },
+
   // Pectra (Prague-Electra) — May 7, 2025
   { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-2537" },
   { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-2935" },
