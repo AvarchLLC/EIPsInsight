@@ -47,6 +47,7 @@
     "@tanstack/query-core": "^5.69.0",
     "@tanstack/react-query": "^5.69.0",
     "@tanstack/react-table": "^8.10.7",
+    "@tryghost/admin-api": "^1.14.2",
     "@types/mdx": "^2.0.10",
     "@types/react": "18.2.12",
     "@types/react-dom": "18.2.5",

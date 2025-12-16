@@ -1128,22 +1128,6 @@ Testing complete, ready for mainnet! 🎯
           ))}
         </HStack>
 
-        {/* Twitter Share Button - Show when any network is merged, but only show for mainnet AFTER merge */}
-        {(mergedNetworks.size > 0 && network !== 'mainnet') || (mergedNetworks.has('mainnet') && network === 'mainnet') ? (
-          <Box mt={6} mb={4}>
-            <VStack spacing={4}>
-              <button
-                onClick={shareOnTwitter}
-                className="group relative overflow-hidden bg-gradient-to-br from-[#1DA1F2] to-[#1a8cd8] text-white font-bold text-lg px-8 py-4 rounded-2xl min-w-[300px] h-16 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] active:translate-y-0 active:scale-[1.01] border-2 border-white/20 flex items-center justify-center gap-2 before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:transition-all before:duration-500 hover:before:left-[100%]"
-              >
-                <FaTwitter className="w-5 h-5" />
-                <span>Share on Twitter</span>
-                <span className="text-xl">✨</span>
-                <span className="text-lg">🎉</span>
-              </button>
-            </VStack>
-          </Box>
-        ) : null}
       </Box>
 
       {/* COUNTDOWN STATUS - ONE LINE */}
@@ -1156,30 +1140,27 @@ Testing complete, ready for mainnet! 🎯
         </VStack>
       ) : /* CELEBRATION CONTENT - INLINE */
       (isUpgradeLive || slotsRemaining <= 0) ? (
-        <VStack spacing={4}>
-          <Text
-            fontSize="xl"
-            fontWeight="bold"
-            color="green.700"
-            animation={`${celebrateAnimation} 1s infinite`}
-          >
-            FUSAKA IS LIVE ON {networks[network].name.toUpperCase()}!
-          </Text>
-          <Text color="green.600" fontSize="sm">
-            The upgrade is now active on the {networks[network].name} network
-          </Text>
-          <Badge colorScheme="green" px={3} py={1} fontSize="sm">
-            Successfully Activated
-          </Badge>
+        <VStack spacing={2}>
+          <HStack spacing={2} align="center">
+            <Text
+              fontSize="md"
+              fontWeight="bold"
+              color="green.700"
+            >
+              FUSAKA IS LIVE ON {networks[network].name.toUpperCase()}!
+            </Text>
+            <Badge colorScheme="green" px={2} py={1} fontSize="xs">
+              Successfully Activated
+            </Badge>
+          </HStack>
           
           <button
             onClick={triggerConfetti}
-            className="group relative overflow-hidden bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white font-bold text-lg px-8 py-4 rounded-2xl min-w-[300px] h-16 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] active:translate-y-0 active:scale-[1.01] border-2 border-white/20 flex items-center justify-center gap-2 before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:transition-all before:duration-500 hover:before:left-[100%]"
+            className="group relative overflow-hidden bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white font-medium text-sm px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 border border-white/20 flex items-center justify-center gap-2"
           >
-            <FaRocket className="w-5 h-5" />
+            <FaRocket className="w-3 h-3" />
             <span>Trigger Celebration</span>
-            <span className="text-xl">🎊</span>
-            <span className="text-lg">🎉</span>
+            <span className="text-sm">🎉</span>
           </button>
         </VStack>
       ) : (
