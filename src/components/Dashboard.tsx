@@ -1047,7 +1047,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                             fontSize={{ base: "10", lg: "15" }}
                           />
                         }
-                        url="alltable"
+                        url="draft"
                       />
                     </div>
 
@@ -1061,7 +1061,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                       icon={
                         <Icon as={Anchor} fontSize={{ lg: "15", sm: "10" }} />
                       }
-                      url="alltable"
+                      url="review"
                     />
 
                     <StatBox
@@ -1074,7 +1074,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                       icon={
                         <Icon as={BookOpen} fontSize={{ lg: "15", sm: "10" }} />
                       }
-                      url="alltable"
+                      url="last-call"
                     />
 
                     <StatBox
@@ -1086,7 +1086,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                       icon={
                         <Icon as={Radio} fontSize={{ lg: "15", sm: "10" }} />
                       }
-                      url="alltable"
+                      url="final"
                     />
 
                     <StatBox
@@ -1099,7 +1099,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                       icon={
                         <Icon as={Link} fontSize={{ lg: "15", sm: "10" }} />
                       }
-                      url="alltable"
+                      url="withdrawn"
                     />
 
                     <StatBox
@@ -1115,7 +1115,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                           fontSize={{ base: "10", lg: "15" }}
                         />
                       }
-                      url="alltable"
+                      url="stagnant"
                     />
 
                     <StatBox
@@ -1131,7 +1131,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                           fontSize={{ base: "10", lg: "15" }}
                         />
                       }
-                      url="alltable"
+                      url="living"
                     />
                   </div>
                 </Box>

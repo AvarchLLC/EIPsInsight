@@ -151,15 +151,14 @@
 
 // export default Meta;
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import CloseableAdCard from "@/components/CloseableAdCard";
 import AllLayout from "@/components/Layout";
 import {
   Box,
-  Tabs,
-  TabList,
-  Tab,
-  useColorModeValue
+  useColorModeValue,
+  SimpleGrid,
+  Grid
 } from "@chakra-ui/react";
 import FlexBetween from "@/components/FlexBetween";
 import Header from "@/components/Header";
@@ -167,7 +166,12 @@ import TableStatus from "@/components/TableStatus";
 import StatusColumnChart from "@/components/StatusColumnChart";
 import LoaderComponent from "@/components/Loader";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import StatusTabNavigation from "@/components/StatusTabNavigation";
+import AnalyticsStatCard from "@/components/AnalyticsStatCard";
+import CategoryDistributionChart from "@/components/CategoryDistributionChart";
+import StatusInsightsCard from "@/components/StatusInsightsCard";
+import FAQSection from "@/components/FAQSection";
+import { FiFileText, FiCheckCircle, FiUsers, FiSettings, FiGitPullRequest } from "react-icons/fi";
 
 interface EIP {
   _id: string;
@@ -215,6 +219,45 @@ const Meta = () => {
     fetchData();
   }, []);
 
+  const metaData = useMemo(() => data.filter(item => item.type === "Meta"), [data]);
+  const statusDistribution = useMemo(() => {
+    const statuses: { [key: string]: number } = {};
+    metaData.forEach(item => {
+      statuses[item.status] = (statuses[item.status] || 0) + 1;
+    });
+    const total = metaData.length;
+    const colorMap: { [key: string]: string } = { Draft: "orange", Review: "cyan", "Last Call": "yellow", Final: "green", Stagnant: "gray", Withdrawn: "red", Living: "blue" };
+    return Object.entries(statuses).map(([status, count]) => ({ category: status, count, percentage: (count / total) * 100, color: colorMap[status] || "gray" }));
+  }, [metaData]);
+  const uniqueAuthors = useMemo(() => {
+    const authors = new Set<string>();
+    metaData.forEach(item => item.author.split(",").forEach(author => authors.add(author.trim())));
+    return authors.size;
+  }, [metaData]);
+
+  const withDiscussions = useMemo(() => {
+    return metaData.filter(item => item.discussion && item.discussion.trim() !== "").length;
+  }, [metaData]);
+
+  const faqs = [
+    {
+      question: "What are Meta EIPs?",
+      answer: "Meta EIPs describe changes to the EIP process itself, including guidelines, procedures, or information about how the EIP system works. They don't propose changes to Ethereum protocol or applications."
+    },
+    {
+      question: "How are Meta EIPs different from other EIPs?",
+      answer: "Meta EIPs are about the process, not the product. They govern how proposals are submitted, reviewed, and approved, rather than proposing technical changes to Ethereum."
+    },
+    {
+      question: "Who should read Meta EIPs?",
+      answer: "Anyone interested in contributing to Ethereum through the EIP process should read Meta EIPs. They explain the rules, best practices, and procedures for creating and advancing proposals."
+    },
+    {
+      question: "What metrics are shown for Meta EIPs?",
+      answer: "We track total Meta process documents, Final approved guidelines, Living evolving documents, contributors, status distribution, and proposals with active discussions."
+    }
+  ];
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsLoading(false);
@@ -246,56 +289,54 @@ const Meta = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Box px={[4, 8, 16]} py={[4, 8, 12]}>
-            <Tabs isFitted variant="enclosed">
-              <TabList>
-                {categories.map((category) => (
-                  <Link key={category.name} href={category.path} passHref>
-                    <Tab as="a">{category.name}</Tab>
-                  </Link>
-                ))}
-              </TabList>
-            </Tabs>
-
-            <FlexBetween>
+          <Box px={{ base: 4, md: 8, lg: 16 }} py={{ base: 4, lg: 8 }} maxW="1600px" mx="auto">
+            <StatusTabNavigation tabs={categories} />
+            <FlexBetween mb={8}>
               <Header
-                title={`Meta [ ${
-                  data?.filter((item) => item.type === "Meta")?.length
-                } ]`}
+                title={`Meta [ ${metaData.length} ]`}
                 subtitle="Meta EIPs describe changes to the EIP process, or other non-optional changes."
                 description="Meta EIPs are used for process changes, guidelines, or information relevant to the EIP process itself."
               />
             </FlexBetween>
-
-            <Box mt={2}>
+            <Box mt={2} mb={6}>
               <p className="text-gray-500 italic">
                 * EIP-1 is available both on EIP GitHub and ERC GitHub, so the count can vary by 1.
               </p>
             </Box>
-
-            {/* EtherWorld Advertisement */}
-            <Box my={6}>
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={8}>
+              <AnalyticsStatCard label="Meta EIPs" value={metaData.length} icon={FiSettings} colorScheme="cyan" helpText="Process docs" />
+              <AnalyticsStatCard label="Final" value={metaData.filter(item => item.status === "Final").length} icon={FiCheckCircle} colorScheme="green" helpText="Approved" />
+              <AnalyticsStatCard label="Living" value={metaData.filter(item => item.status === "Living").length} icon={FiFileText} colorScheme="teal" helpText="Evolving docs" />
+              <AnalyticsStatCard label="With Discussions" value={withDiscussions} icon={FiGitPullRequest} colorScheme="purple" helpText="Active input" />
+            </SimpleGrid>
+            <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap={6} mb={8}>
+              <CategoryDistributionChart data={statusDistribution} title="Meta EIPs by Status" />
+              <StatusInsightsCard title="Process Standards Insights" insights={[{ label: "Top Status", value: statusDistribution[0]?.category || "N/A", icon: FiFileText, colorScheme: "cyan" }, { label: "Draft Meta", value: metaData.filter(item => item.status === "Draft").length, icon: FiFileText, colorScheme: "orange" }, { label: "Under Review", value: metaData.filter(item => item.status === "Review").length, icon: FiFileText, colorScheme: "blue" }, { label: "Contributors", value: uniqueAuthors, icon: FiUsers, colorScheme: "purple" }]} />
+            </Grid>
+            <Box mb={6}>
+              <FAQSection title="About Meta EIPs" faqs={faqs} />
+            </Box>
+            <Box mb={6}>
               <CloseableAdCard />
             </Box>
-
             <TableStatus cat="Meta" />
-
             <Box
-              mt={"2rem"}
-              bg={bg}
-              p="0.5rem"
-              borderRadius="0.55rem"
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-              height={400}
-              _hover={{ border: "1px", borderColor: "#30A0E0" }}
               as={motion.div}
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 } as any}
-              className="hover: cursor-pointer ease-in duration-200"
+              transition={{ duration: 0.3, delay: 0.3 } as any}
+              mt={8}
+              bg={useColorModeValue("white", "gray.800")}
+              p={6}
+              borderRadius="xl"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              boxShadow="sm"
+              _hover={{
+                boxShadow: "md",
+                borderColor: "#30A0E0",
+              }}
+              transition="all 0.3s"
             >
               <StatusColumnChart category={"Meta"} type={"EIPs"} />
             </Box>
