@@ -19,7 +19,8 @@ import {
   AspectRatio,
   Grid,
   GridItem,
-  Select
+  Select,
+  VStack
 } from "@chakra-ui/react";
 import SlotCountdown from "@/components/SlotCountdown";
 import NLink from "next/link";
@@ -47,6 +48,8 @@ import { useSidebar } from '@/components/Sidebar/SideBarContext';
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import DeclinedEIPListPage from "@/components/DeclinedCardsPage";
 import PlaceYourAdCard from "@/components/PlaceYourAdCard";
+import UpgradeEIPsShowcase from "@/components/UpgradeEIPsShowcase";
+import HorizontalUpgradeTimeline from "@/components/HorizontalUpgradeTimeline";
 
 // Import glamsterDamData from UpgradesTimeline (we'll need to extract it or access it differently)
 // For now, let's define the glamsterDamData here since it's not exported from UpgradesTimeline
@@ -911,6 +914,21 @@ const getRecentGlamsterdamDataWithProposedEIPs = async (glamsterDamData: any[]) 
 
 const sepolia_key = process.env.NEXT_PUBLIC_SEPOLIA_API as string;
 
+// Upgrade color mapping for consistent theming
+const upgradeColors: Record<string, string> = {
+  'pectra': '#DC2626',
+  'fusaka': '#10B981',
+  'glamsterdam': '#8B5CF6',
+  'hekabogota': '#F59E0B'
+};
+
+const upgradeDates: Record<string, string> = {
+  'pectra': '2025-05-07',
+  'fusaka': '2025-12-03',
+  'glamsterdam': '2026-06-01',
+  'hekabogota': 'TBD'
+};
+
 // Type for a Declined EIP entry
 interface DeclinedEIP {
   id: string;
@@ -1178,7 +1196,7 @@ const All = () => {
     setIsLoading(false);
   }, []);
   
-  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam'>('glamsterdam');
+  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam' | 'hekabogota'>('glamsterdam');
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
   const [recentGlamsterdamData, setRecentGlamsterdamData] = useState<any>(null);
   const [isLoadingGlamsterdamData, setIsLoadingGlamsterdamData] = useState(false);
@@ -1202,14 +1220,14 @@ const { selected } = router.query;
 
 // 🔄 Sync dropdown state with URL query param
 useEffect(() => {
-  if (selected === 'pectra' || selected === 'fusaka' || selected === 'glamsterdam') {
+  if (selected === 'pectra' || selected === 'fusaka' || selected === 'glamsterdam' || selected === 'hekabogota') {
     setSelectedOption(selected);
   }
 }, [selected]);
 
 // 🔼 Also update the URL when dropdown changes
 const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const value = e.target.value as 'pectra' | 'fusaka' | 'glamsterdam';
+  const value = e.target.value as 'pectra' | 'fusaka' | 'glamsterdam' | 'hekabogota';
   setSelectedOption(value);
   router.push(`/upgrade?selected=${value}#${value}`, undefined, { shallow: true });
 };
@@ -1904,13 +1922,13 @@ const glamsterdamData = [
 
   const fusakaData = [
     {
-      eip: "7723",
-      title: "Network Upgrade Inclusion Stages",
-      author: "Tim Beiko (@timbeiko)",
-      link: "https://eipsinsight.com/eips/eip-7723",
+      eip: "7607",
+      title: "Hardfork Meta - Fusaka",
+      author: "Tim Beiko (@timbeiko), Alex Stokes (@ralexstokes), Ansgar Dietrichs (@adietrichs)",
+      link: "https://eipsinsight.com/eips/eip-7607",
       type: "Meta",
       category: "",
-      discussion: "https://ethereum-magicians.org/t/eip-7723-network-upgrade-inclusion-stages/20281"
+      discussion: "https://ethereum-magicians.org/t/eip-7607-fusaka-meta-eip/18693"
     },
     {
       eip: "7594",
@@ -1918,7 +1936,7 @@ const glamsterdamData = [
       author: "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
       link: "https://eipsinsight.com/eips/eip-7594",
       type: "Standards Track",
-      category: "Networking",
+      category: "Core",
       discussion: "https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
     },
     {
@@ -1949,13 +1967,13 @@ const glamsterdamData = [
       discussion: "https://ethereum-magicians.org/t/eip-7883-modexp-gas-cost-increase/22841"
     },
     {
-      eip: "7892",
-      title: "Blob Parameter Only Hardforks",
-      author: "Mark Mackey (@ethDreamer)",
-      link: "https://eipsinsight.com/eips/eip-7892",
-      type: "Informational",
-      category: "",
-      discussion: "https://ethereum-magicians.org/t/eip-7892-blob-parameter-only-hardforks/23018"
+      eip: "7917",
+      title: "Deterministic proposer lookahead",
+      author: "Lin Oshitani (@linoscope), Justin Drake (@JustinDrake)",
+      link: "https://eipsinsight.com/eips/eip-7917",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7917-deterministic-proposer-lookahead/23259"
     },
     {
       eip: "7918",
@@ -1967,51 +1985,6 @@ const glamsterdamData = [
       discussion: "https://ethereum-magicians.org/t/eip-blob-base-fee-bounded-by-price-of-blob-carrying-transaction/23271"
     },
     {
-      eip: "7935",
-      title: "Set default gas limit to XX0M",
-      author: "Sophia Gold (@sophia-gold), Parithosh Jayanthi (@parithoshj), Toni Wahrstätter (@nerolation), Carl Beekhuizen (@CarlBeek), Ansgar Dietrichs (@adietrichs), Dankrad Feist (@dankrad), Alex Stokes (@ralexstokes), Josh Rudolph (@jrudolph), Giulio Rebuffo (@Giulio2002), Storm Slivkoff (@sslivkoff)",
-      link: "https://eipsinsight.com/eips/eip-7935",
-      type: "Informational",
-      category: "",
-      discussion: "https://ethereum-magicians.org/t/eip-7935-set-default-gas-limit-to-xx0m/23789"
-    },
-    {
-      eip: "7642",
-      title: "eth/69 - history expiry and simpler receipts",
-      author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
-      link: "https://eipsinsight.com/eips/eip-7642",
-      type: "Standards Track",
-      category: "Networking",
-      discussion: "https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
-    },
-    {
-      eip: "7212",
-      title: "Precompile for secp256r1 Curve Support",
-      author: "Ulaş Erdoğan (@ulerdogan), Doğan Alpaslan (@doganalpaslan)",
-      link: "https://eipsinsight.com/eips/eip-7212",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-7212-precompiled-for-secp256r1-curve-support/14789"
-    },
-    {
-      eip: "7907",
-      title: "Meter Contract Code Size And Increase Limit",
-      author: "Charles Cooper (@charles-cooper), Qi Zhou (@qizhou)",
-      link: "https://eipsinsight.com/eips/eip-7907",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156"
-    },
-    {
-      eip: "7917",
-      title: "Deterministic proposer lookahead",
-      author: "Lin Oshitani (@linoscope) <lin@nethermind.io>, Justin Drake (@JustinDrake) <justin@ethereum.org>",
-      link: "https://eipsinsight.com/eips/eip-7917",
-      type: "Standards Track",
-      category: "Core",
-      discussion: "https://ethereum-magicians.org/t/eip-7917-deterministic-proposer-lookahead/23259"
-    },
-    {
       eip: "7934",
       title: "RLP Execution Block Size Limit",
       author: "Giulio Rebuffo (@Giulio2002), Ben Adams (@benaadams), Storm Slivkoff (@sslivkoff)",
@@ -2019,6 +1992,72 @@ const glamsterdamData = [
       type: "Standards Track",
       category: "Core",
       discussion: "https://ethereum-magicians.org/t/eip-7934-add-bytesize-limit-to-blocks/23589"
+    },
+    {
+      eip: "7939",
+      title: "Count leading zeros (CLZ) opcode",
+      author: "Charles Cooper (@charles-cooper)",
+      link: "https://eipsinsight.com/eips/eip-7939",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7939-clz-count-leading-zeros-opcode/23605"
+    },
+    {
+      eip: "7951",
+      title: "Precompile for secp256r1 Curve Support",
+      author: "Ulaş Erdoğan (@ulerdogan), Doğan Alpaslan (@doganalpaslan)",
+      link: "https://eipsinsight.com/eips/eip-7951",
+      type: "Standards Track",
+      category: "Core",
+      discussion: "https://ethereum-magicians.org/t/eip-7951-precompiled-for-secp256r1-curve-support/23890"
+    },
+    {
+      eip: "7892",
+      title: "Blob Parameter Only Hardforks",
+      author: "Mark Mackey (@ethDreamer)",
+      link: "https://eipsinsight.com/eips/eip-7892",
+      type: "Informational",
+      category: "",
+      discussion: "https://ethereum-magicians.org/t/eip-7892-blob-parameter-only-hardforks/23018"
+    },
+    {
+      eip: "7642",
+      title: "eth/69 - Drop pre-merge fields",
+      author: "Marius van der Wijden (@MariusVanDerWijden), Felix Lange, Ahmad Bitar (@smartprogrammer93)",
+      link: "https://eipsinsight.com/eips/eip-7642",
+      type: "Standards Track",
+      category: "Networking",
+      discussion: "https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+    },
+    {
+      eip: "7910",
+      title: "eth_config JSON-RPC Method",
+      author: "lightclient (@lightclient)",
+      link: "https://eipsinsight.com/eips/eip-7910",
+      type: "Standards Track",
+      category: "Interface",
+      discussion: "https://ethereum-magicians.org/t/eip-7910-eth-config-json-rpc-method/23149"
+    },
+    {
+      eip: "7935",
+      title: "Set default gas limit to 60M",
+      author: "Sophia Gold (@sophia-gold), Parithosh Jayanthi (@parithoshj), Toni Wahrstätter (@nerolation), Carl Beekhuizen (@CarlBeek), Ansgar Dietrichs (@adietrichs), Dankrad Feist (@dankrad), Alex Stokes (@ralexstokes), Josh Rudolph (@jrudolph), Giulio Rebuffo (@Giulio2002), Storm Slivkoff (@sslivkoff)",
+      link: "https://eipsinsight.com/eips/eip-7935",
+      type: "Informational",
+      category: "",
+      discussion: "https://ethereum-magicians.org/t/eip-7935-set-default-gas-limit-to-xx0m/23789"
+    }
+  ];
+
+  const hekabogotaData = [
+    {
+      eip: "8081",
+      title: "Hardfork Meta - Heka/Bogotá",
+      author: "Tim Beiko (@timbeiko), Alex Stokes (@ralexstokes)",
+      link: "https://eipsinsight.com/eips/eip-8081",
+      type: "Meta",
+      category: "",
+      discussion: "https://ethereum-magicians.org/t/eip-8081-heka-bogota-network-upgrade-meta-thread/26876"
     }
   ];
 
@@ -2048,14 +2087,15 @@ const glamsterdamData = [
   }, [router]);
 
 
-  const currentPosts = selectedOption === 'pectra' ? PectraPosts : selectedOption === 'fusaka' ? FusakaPosts : GlamsterdamPosts;
-  const currentData = selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : glamsterdamData;
-  const upgradeName = selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : "Glamsterdam";
+  const currentPosts = selectedOption === 'pectra' ? PectraPosts : selectedOption === 'fusaka' ? FusakaPosts : selectedOption === 'hekabogota' ? [] : GlamsterdamPosts;
+  const currentData = selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : selectedOption === 'hekabogota' ? hekabogotaData : glamsterdamData;
+  const upgradeName = selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : selectedOption === 'hekabogota' ? "Heka/Bogotá" : "Glamsterdam";
 
   useScrollSpy([
     "pectra",
     "fusaka",
     "glamsterdam",
+    "hekabogota",
     "NetworkUpgradesChart",
     "upgrade-blogs",
     "NetworkUpgrades",
@@ -2129,9 +2169,21 @@ return (
                 }}
               >
                 <option value="glamsterdam">Glamsterdam</option>
+                <option value="hekabogota">Heka/Bogotá</option>
                 <option value="fusaka">Fusaka</option>
                 <option value="pectra">Pectra</option>
               </select>
+            </Box>
+
+            {/* Horizontal Upgrade Timeline */}
+            <Box mb={8}>
+              <HorizontalUpgradeTimeline
+                selectedUpgrade={selectedOption}
+                onUpgradeClick={(upgrade) => {
+                  setSelectedOption(upgrade);
+                  router.push(`/upgrade?selected=${upgrade}#${upgrade}`, undefined, { shallow: true });
+                }}
+              />
             </Box>
             
             {/* FUSAKA Countdown - Only show when Fusaka is selected */}
@@ -2142,14 +2194,16 @@ return (
             )}
             
             {/* Network Upgrade Timeline (UpgradesTimeline) */}
-            <Box id="NetworkUpgrades" mt={8}>
-              <UpgradesTimeline
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-                pectraData={pectraData}
-                fusakaData={fusakaData}
-              />
-            </Box>
+            {selectedOption !== 'hekabogota' && (
+              <Box id="NetworkUpgrades" mt={8}>
+                <UpgradesTimeline
+                  selectedOption={selectedOption}
+                  setSelectedOption={setSelectedOption}
+                  pectraData={pectraData}
+                  fusakaData={fusakaData}
+                />
+              </Box>
+            )}
           </Box>
           
 
@@ -2217,6 +2271,26 @@ return (
                       </Text>
                     </NLink>{" "}(Peer Data Availability Sampling), enabling significant blob throughput scaling. Fusaka also raises the L1 gas limit to 60M and introduces "Blob Parameter Only" (BPO) forks to safely scale blob capacity. Scheduled for Mainnet activation at slot <Text as="span" fontWeight="bold">13,164,544</Text> (Dec 3, 2025), it includes optimizations for L1 performance and UX improvements.
                   </Text>
+                ) : selectedOption === 'hekabogota' ? (
+                  <Box>
+                    <VStack spacing={4} align="stretch">
+                      <Badge colorScheme="orange" fontSize="md" px={3} py={1} alignSelf="flex-start" borderRadius="full">
+                        Early Planning Stage
+                      </Badge>
+                      <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
+                        <NLink href="https://eipsinsight.com/eips/eip-8081">
+                          <Text as="span" color="blue.500" textDecor="underline" fontWeight="bold">
+                            Heka/Bogotá
+                          </Text>
+                        </NLink>{" "}is in early planning. The headliner proposal window will open soon. Check back for updates as the upgrade planning process begins.
+                      </Text>
+                      <Text fontSize={{ base: "sm", md: "md" }} color={useColorModeValue("gray.600", "gray.400")} lineHeight="1.75" textAlign="justify">
+                        Future network upgrade currently in early planning stages. Named after the combination of{" "}
+                        <Text as="span" fontWeight="semibold">"Heka"</Text> (consensus layer upgrade, named after a star) and{" "}
+                        <Text as="span" fontWeight="semibold">"Bogotá"</Text> (execution layer upgrade, named after a Devcon location).
+                      </Text>
+                    </VStack>
+                  </Box>
                 ) : (
                   <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
                     Ethereum developers are now preparing for the next major network upgrade, known as{" "}
@@ -2252,22 +2326,46 @@ return (
             </Flex>
             
             {/* Network Upgrade Inclusion Stages Chart (FUSAKA) */}
-            <Box id="NetworkUpgradeschart" mt={8}>  
-              <NetworkUpgradesChart />
-            </Box>
+            {selectedOption !== 'hekabogota' && (
+              <Box id="NetworkUpgradeschart" mt={8}>  
+                <NetworkUpgradesChart />
+              </Box>
+            )}
           </Box>
 
+          {/* Container: EIP Showcase Section */}
+          {selectedOption !== 'hekabogota' && (
+            <Box
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              mb={8}
+              px={6}
+              py={8}
+            >
+              <UpgradeEIPsShowcase
+                upgradeName={upgradeName}
+                upgradeDate={upgradeDates[selectedOption]}
+                eips={currentData}
+                upgradeColor={upgradeColors[selectedOption]}
+              />
+            </Box>
+          )}
+
           {/* Container 4: Blog Cards Section */}
-          <Box
-            bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
-            boxShadow="sm"
-            border="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={8}
-            px={6}
-            py={8}
-          >
+          {selectedOption !== 'hekabogota' && currentPosts.length > 0 && (
+            <Box
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              mb={8}
+              px={6}
+              py={8}
+            >
             <Box maxH="450px" overflowY="auto" width="100%" id="upgrade-blogs">
               <Grid
                 templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
@@ -2307,23 +2405,25 @@ return (
                 })}
               </Grid>
             </Box>
-          </Box>
+            </Box>
+          )}
 
           {/* Container 5: Upgrade Table + Declined EIPs */}
-          <Box
-            bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
-            boxShadow="sm"
-            border="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={8}
-            px={6}
-            py={8}
-          >
+          {selectedOption !== 'hekabogota' && (
+            <Box
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              mb={8}
+              px={6}
+              py={8}
+            >
             <Box id="upgrade-table" display={{ base: "none", md: "block" }}>
               <PectraTable
-                PectraData={selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : glamsterdamData}
-                title={selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : "Glamsterdam"}
+                PectraData={currentData}
+                title={upgradeName}
               />
             </Box>
 
@@ -2442,12 +2542,15 @@ return (
                 )}
               </Box>
             )}
-          </Box>
+            </Box>
+          )}
 
           {/* EtherWorld Advertisement */}
-          <Box my={6}>
-            <CloseableAdCard />
-          </Box>
+          {selectedOption !== 'hekabogota' && (
+            <Box my={6}>
+              <CloseableAdCard />
+            </Box>
+          )}
 
           {/* Container 6: Author Contributions */}
           <Box

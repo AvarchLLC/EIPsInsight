@@ -50,22 +50,18 @@ const professionalColorMap: Record<string, string> = {
 
 // Original data set
 const rawData = [
-  // Fusaka (Fulu-Osaka) — December 3, 2025
+  // Fusaka (Fulu-Osaka) — December 3, 2025 (Core EIPs only)
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7594" },
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7823" },
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7825" },
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7883" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7892" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7910" },
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7917" },
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7918" },
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7934" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7935" },
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7939" },
   { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7951" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7642" },
 
-  // Pectra (Prague-Electra) — May 7, 2025
+  // Pectra (Prague-Electra) — May 7, 2025 (Core EIPs only)
   { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-2537" },
   { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-2935" },
   { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-6110" },
@@ -479,14 +475,11 @@ const NetworkUpgradesChart: React.FC = () => {
                     y={y}
                     width={xScale.bandwidth()}
                     height={18}
-                    fill={hoveredNetwork === upgrade ? colorMap[upgrade] : `${colorMap[upgrade]}E6`}
+                    fill={colorMap[upgrade]}
                     rx={2}
                     style={{ 
                       cursor: 'pointer',
-                      filter: hoveredNetwork === upgrade ? `drop-shadow(0px 2px 8px ${colorMap[upgrade]}40)` : 'none',
-                      transition: 'all 0.3s ease-out',
-                      stroke: hoveredNetwork === upgrade ? colorMap[upgrade] : 'none',
-                      strokeWidth: hoveredNetwork === upgrade ? 1 : 0
+                      opacity: hoveredData?.eip === eip ? 1 : 0.9
                     }}
                     {...hoverHandlers}
                   />
@@ -494,14 +487,13 @@ const NetworkUpgradesChart: React.FC = () => {
                     x={x + xScale.bandwidth() / 2}
                     y={y + 13}
                     textAnchor="middle"
-                    fill={hoveredNetwork === upgrade ? "white" : "#FFFFFF"}
+                    fill="#FFFFFF"
                     fontSize={9}
                     fontWeight="600"
                     style={{ 
                       pointerEvents: 'none',
                       fontFamily: 'system-ui, -apple-system, sans-serif',
-                      textShadow: hoveredNetwork === upgrade ? '0 1px 2px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.2)',
-                      transition: 'all 0.3s ease-out'
+                      textShadow: '0 1px 2px rgba(0,0,0,0.2)'
                     }}
                   >
                     {eip}
@@ -516,54 +508,69 @@ const NetworkUpgradesChart: React.FC = () => {
       {hoveredData && (
         <Box
           position="absolute"
-          top={`${Math.min(mousePos.y + 10, height - 160)}px`}
-          left={`${Math.min(mousePos.x + 10, width - 200)}px`}
-          bg={tooltipBg}
+          top={`${Math.min(mousePos.y + 15, height - 120)}px`}
+          left={`${Math.min(mousePos.x + 15, width - 240)}px`}
+          bg={useColorModeValue('white', 'gray.800')}
           color={useColorModeValue('gray.800', 'white')}
-          px={4}
-          py={3}
-          borderRadius="lg"
-          boxShadow="lg"
-          fontSize="sm"
+          px={5}
+          py={4}
+          borderRadius="xl"
+          boxShadow={useColorModeValue('0 10px 30px rgba(0,0,0,0.15)', '0 10px 30px rgba(0,0,0,0.5)')}
           zIndex={20}
-          border="1px solid"
-          borderColor={useColorModeValue('gray.200', 'gray.600')}
-          width="180px"
+          border="2px solid"
+          borderColor={useColorModeValue('gray.100', 'gray.700')}
           pointerEvents="none"
+          minW="220px"
         >
-          <VStack align="start" spacing={2} width="100%">
-            <Box>
-              <Text fontSize="sm" fontWeight="bold" color="teal.400">
-                EIP: {hoveredData.eip}
-              </Text>
-              <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} fontStyle="italic">
-                Click to view details →
-              </Text>
-            </Box>
-            <Text fontSize="sm" fontWeight="semibold" color={useColorModeValue('gray.700', 'gray.200')}>
-              {hoveredData.upgrade}
-            </Text>
+          <VStack align="start" spacing={3} width="100%">
+            <HStack spacing={2} align="center">
+              <Box
+                bg="teal.500"
+                color="white"
+                px={3}
+                py={1}
+                borderRadius="full"
+                fontSize="sm"
+                fontWeight="bold"
+              >
+                EIP-{hoveredData.eip}
+              </Box>
+            </HStack>
             
-            <Box 
-              width="100%" 
-              p={2} 
-              bg={useColorModeValue('blue.50', 'blue.900')} 
-              borderRadius="md" 
-              border="1px solid" 
-              borderColor={useColorModeValue('blue.200', 'blue.600')}
-            >
-              <Text fontSize="xs" fontWeight="bold" color={useColorModeValue('blue.600', 'blue.300')} mb={1}>
-                📅 LAUNCH DATE
+            <Box>
+              <Text 
+                fontSize="md" 
+                fontWeight="semibold" 
+                color={useColorModeValue('gray.800', 'gray.100')}
+                lineHeight="1.4"
+              >
+                {hoveredData.upgrade} Upgrade
               </Text>
-              <Text fontSize="xs" fontWeight="bold" color={useColorModeValue('blue.800', 'blue.100')} mb={1}>
+              <Text 
+                fontSize="xs" 
+                color={useColorModeValue('gray.500', 'gray.400')}
+                mt={1}
+              >
                 {new Date(hoveredData.date).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
                   month: 'long', 
-                  day: 'numeric' 
+                  day: 'numeric',
+                  year: 'numeric' 
                 })}
               </Text>
-              <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')}>
-                {Math.floor((new Date().getTime() - new Date(hoveredData.date).getTime()) / (1000 * 60 * 60 * 24 * 365.25))} years ago
+            </Box>
+
+            <Box
+              w="100%"
+              pt={2}
+              borderTop="1px solid"
+              borderColor={useColorModeValue('gray.200', 'gray.600')}
+            >
+              <Text 
+                fontSize="xs" 
+                color={useColorModeValue('blue.600', 'blue.400')}
+                fontWeight="medium"
+              >
+                💡 Click to view full details
               </Text>
             </Box>
           </VStack>
