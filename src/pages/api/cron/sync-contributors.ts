@@ -75,7 +75,7 @@ export default async function handler(
     await syncService.updateActivityTimestamps();
 
     const client = await clientPromise;
-    const db = client.db("eipsinsight-contributors");
+    const db = client.db("test");
 
     const totalContributors = await db
       .collection("contributors")
