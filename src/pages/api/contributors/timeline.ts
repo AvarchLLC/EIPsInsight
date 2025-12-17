@@ -30,7 +30,7 @@ export default async function handler(
     const offset = (pageNum - 1) * limitNum;
 
     const client = await clientPromise;
-    const db = client.db("eipsinsight-contributors");
+    const db = client.db("test");
 
     const filter: any = { username };
 

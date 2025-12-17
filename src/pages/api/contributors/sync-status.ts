@@ -21,7 +21,7 @@ export default async function handler(
 
   try {
     const client = await clientPromise;
-    const db = client.db("eipsinsight-contributors");
+    const db = client.db("test");
 
     const syncStates = await db
       .collection("sync_state")

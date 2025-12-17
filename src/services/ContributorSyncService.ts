@@ -66,7 +66,7 @@ export class ContributorSyncService {
   private async getDb(): Promise<Db> {
     if (!this.db) {
       const client = await clientPromise;
-      this.db = client.db("eipsinsight-contributors");
+      this.db = client.db("test");
     }
     return this.db;
   }

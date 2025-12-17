@@ -33,7 +33,7 @@ export default async function handler(
 
   try {
     const client = await clientPromise;
-    const db = client.db("eipsinsight-contributors");
+    const db = client.db("test");
 
     const now = new Date();
     const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
