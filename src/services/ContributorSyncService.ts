@@ -548,7 +548,7 @@ export class ContributorSyncService {
             entityRef,
             timestamp: new Date(review.submitted_at || new Date()),
             metadata: {
-              url: review.url || review.html_url,
+              url: review.html_url,
               htmlUrl: review.html_url,
               number: pr.number,
               repositoryFullName: repository,
