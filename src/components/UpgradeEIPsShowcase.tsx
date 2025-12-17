@@ -50,7 +50,7 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
   const subtextColor = useColorModeValue('gray.600', 'gray.400');
 
   const getCategoryColor = (category: string, type: string) => {
-    if (category === 'Core') return 'red';
+    if (category === 'Core') return 'green';
     if (category === 'Networking') return 'blue';
     if (category === 'Interface') return 'purple';
     if (type === 'Informational') return 'orange';
@@ -190,7 +190,7 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
               <Heading size="md" color={textColor}>
                 Core EIPs
               </Heading>
-              <Badge colorScheme="red" fontSize="md" px={3} py={1} borderRadius="full">
+              <Badge colorScheme="green" fontSize="md" px={3} py={1} borderRadius="full">
                 {coreEIPs.length}
               </Badge>
             </Flex>
