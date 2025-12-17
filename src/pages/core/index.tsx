@@ -148,11 +148,11 @@ const Core = () => {
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
               boxShadow="sm"
+              sx={{ transition: "all 0.3s" }}
               _hover={{
                 boxShadow: "md",
                 borderColor: "#30A0E0",
               }}
-              transition="all 0.3s"
             >
               <StatusColumnChart category={"Core"} type={"EIPs"} />
             </Box>

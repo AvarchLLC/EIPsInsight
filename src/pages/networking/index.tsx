@@ -179,7 +179,7 @@ const Networking = () => {
                 boxShadow: "md",
                 borderColor: "#30A0E0",
               }}
-              transition="all 0.3s"
+                            sx={{ transition: "all 0.3s" }}
             >
               <StatusColumnChart category={"Networking"} type={"EIPs"} />
             </Box>

@@ -126,11 +126,19 @@ const ResourcesPage: React.FC = () => {
     >
       {image && (
         <AspectRatio ratio={16 / 9} mb={4} borderRadius="lg" overflow="hidden">
-          <Image src={image} alt={title} objectFit="cover" />
+          <Image 
+            src={image} 
+            alt={title} 
+            objectFit="cover"
+            fallbackSrc="/blog-placeholder.png"
+            onError={(e: any) => {
+              e.target.style.display = 'none';
+            }}
+          />
         </AspectRatio>
       )}
       {tag && (
-        <Badge colorScheme="blue" mb={2}>
+        <Badge colorScheme="blue" mb={2} fontSize="xs">
           {tag}
         </Badge>
       )}
@@ -567,11 +575,11 @@ const ResourcesPage: React.FC = () => {
                 {recentBlogs.map((blog) => (
                   <Card
                     key={blog.id}
-                    image={blog.image || "/default-blog.png"}
+                    image={blog.image || undefined}
                     title={blog.title}
-                    content={blog.summary || blog.content?.substring(0, 150) + "..."}
+                    content={blog.summary || blog.content?.substring(0, 150) + "..." || "No description available"}
                     link={`/Blogs/${blog.slug}`}
-                    tag={blog.category || "Blog"}
+                    tag={blog.category || "Article"}
                   />
                 ))}
               </SimpleGrid>

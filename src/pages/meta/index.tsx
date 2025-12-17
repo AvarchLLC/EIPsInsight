@@ -330,13 +330,13 @@ const Meta = () => {
               p={6}
               borderRadius="xl"
               border="1px solid"
+              sx={{ transition: "all 0.3s" }}
               borderColor={useColorModeValue("gray.200", "gray.700")}
               boxShadow="sm"
               _hover={{
                 boxShadow: "md",
                 borderColor: "#30A0E0",
               }}
-              transition="all 0.3s"
             >
               <StatusColumnChart category={"Meta"} type={"EIPs"} />
             </Box>

@@ -22,18 +22,61 @@ import {
   useColorModeValue,
   Text,
   IconButton,
+  Select,
+  Image,
 } from '@chakra-ui/react';
-import { ArrowBackIcon } from '@chakra-ui/icons';
-import { FaImage, FaEye, FaEdit } from 'react-icons/fa';
+import { ArrowBackIcon, DeleteIcon } from '@chakra-ui/icons';
+import { FaImage, FaEye, FaEdit, FaUpload } from 'react-icons/fa';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+
+// Author profiles
+const AUTHORS = {
+  dhanush: {
+    name: 'Dhanush L Naik',
+    avatar: 'https://avatars.githubusercontent.com/u/127545282?v=4',
+    role: 'Founder & Developer',
+    bio: 'Full-stack developer passionate about Ethereum ecosystem',
+    twitter: 'https://x.com/dhanushlnaik',
+    linkedin: 'https://www.linkedin.com/in/dhanushlnaik/',
+    github: 'https://github.com/dhanushlnaik'
+  },
+  yash: {
+    name: 'Yash Kamal Chaturvedi',
+    avatar: 'https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg',
+    role: 'Blockchain Content & Ops Specialist',
+    bio: 'Blockchain Content & Ops Specialist, Avarch LLC',
+    twitter: 'https://x.com/YashKamalChatu1',
+    linkedin: 'https://www.linkedin.com/in/yash-kamal-chaturvedi/',
+    github: 'https://github.com/yashkamalchaturvedi'
+  },
+  ayush: {
+    name: 'Ayush Gupta',
+    avatar: 'https://avatars.githubusercontent.com/u/83240803?v=4',
+    role: 'Developer',
+    bio: 'Ethereum developer and researcher',
+    twitter: '',
+    linkedin: '',
+    github: 'https://github.com/ayush4345'
+  },
+  pooja: {
+    name: 'Pooja Ranjan',
+    avatar: 'https://avatars.githubusercontent.com/u/29681685?v=4',
+    role: 'Community Manager',
+    bio: 'EthCatHerders.com | WiEP | EtherWorld.co | EIPsInsight.com',
+    twitter: 'https://x.com/poojaranjan19?lang=en',
+    linkedin: 'https://www.linkedin.com/in/pooja-r-072899114/',
+    github: 'https://github.com/poojaranjan'
+  }
+};
 
 export default function NewBlogPost() {
   const router = useRouter();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const bgColor = useColorModeValue('white', 'gray.800');
@@ -45,11 +88,17 @@ export default function NewBlogPost() {
     author: '',
     authorAvatar: '',
     authorRole: '',
+    authorBio: '',
+    authorTwitter: '',
+    authorLinkedin: '',
+    authorGithub: '',
     category: '',
     tags: '',
     image: '',
     content: '',
   });
+
+  const [selectedAuthor, setSelectedAuthor] = useState<string>('');
 
   const checkAuth = async () => {
     try {
@@ -84,6 +133,60 @@ export default function NewBlogPost() {
       title,
       slug: generateSlug(title),
     });
+  };
+
+  const handleAuthorSelect = (authorKey: string) => {
+    setSelectedAuthor(authorKey);
+    if (authorKey && AUTHORS[authorKey as keyof typeof AUTHORS]) {
+      const author = AUTHORS[authorKey as keyof typeof AUTHORS];
+      setFormData({
+        ...formData,
+        author: author.name,
+        authorAvatar: author.avatar,
+        authorRole: author.role,
+        authorBio: author.bio,
+        authorTwitter: author.twitter,
+        authorLinkedin: author.linkedin,
+        authorGithub: author.github,
+      });
+    }
+  };
+
+  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingCover(true);
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('file', file);
+
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formDataObj,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFormData((prev) => ({
+          ...prev,
+          image: data.url,
+        }));
+        toast({
+          title: 'Cover image uploaded',
+          status: 'success',
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Upload failed',
+        status: 'error',
+        duration: 3000,
+      });
+    } finally {
+      setUploadingCover(false);
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,8 +243,19 @@ export default function NewBlogPost() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
+          title: formData.title,
+          slug: formData.slug,
+          author: formData.author,
+          author_avatar: formData.authorAvatar,
+          author_role: formData.authorRole,
+          author_bio: formData.authorBio,
+          author_twitter: formData.authorTwitter,
+          author_linkedin: formData.authorLinkedin,
+          author_github: formData.authorGithub,
+          category: formData.category,
           tags: tagsArray,
+          image: formData.image,
+          content: formData.content,
           published: publish,
         }),
       });
@@ -226,40 +340,50 @@ export default function NewBlogPost() {
                     />
                   </FormControl>
 
-                  <HStack spacing={4} width="100%">
-                    <FormControl isRequired flex={1}>
-                      <FormLabel>Author</FormLabel>
-                      <Input
-                        value={formData.author}
-                        onChange={(e) =>
-                          setFormData({ ...formData, author: e.target.value })
-                        }
-                        placeholder="Author name"
-                      />
-                    </FormControl>
-
-                    <FormControl flex={1}>
-                      <FormLabel>Author Role</FormLabel>
-                      <Input
-                        value={formData.authorRole}
-                        onChange={(e) =>
-                          setFormData({ ...formData, authorRole: e.target.value })
-                        }
-                        placeholder="e.g., Editor"
-                      />
-                    </FormControl>
-                  </HStack>
-
-                  <FormControl>
-                    <FormLabel>Author Avatar URL</FormLabel>
-                    <Input
-                      value={formData.authorAvatar}
-                      onChange={(e) =>
-                        setFormData({ ...formData, authorAvatar: e.target.value })
-                      }
-                      placeholder="https://..."
-                    />
+                  <FormControl isRequired>
+                    <FormLabel>Select Author</FormLabel>
+                    <Select
+                      placeholder="Select an author"
+                      value={selectedAuthor}
+                      onChange={(e) => handleAuthorSelect(e.target.value)}
+                      size="lg"
+                    >
+                      <option value="dhanush">Dhanush L Naik</option>
+                      <option value="yash">Yash Kamal Chaturvedi</option>
+                      <option value="ayush">Ayush Gupta</option>
+                      <option value="pooja">Pooja Ranjan</option>
+                    </Select>
                   </FormControl>
+
+                  {selectedAuthor && (
+                    <Box
+                      w="100%"
+                      p={4}
+                      borderRadius="lg"
+                      bg={useColorModeValue('blue.50', 'blue.900')}
+                      borderWidth="1px"
+                      borderColor={useColorModeValue('blue.200', 'blue.700')}
+                    >
+                      <HStack spacing={4}>
+                        <Image
+                          src={formData.authorAvatar}
+                          alt={formData.author}
+                          boxSize="60px"
+                          borderRadius="full"
+                          objectFit="cover"
+                        />
+                        <VStack align="flex-start" spacing={1} flex={1}>
+                          <Text fontWeight="bold" fontSize="lg">{formData.author}</Text>
+                          <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')}>
+                            {formData.authorRole}
+                          </Text>
+                          <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')}>
+                            {formData.authorBio}
+                          </Text>
+                        </VStack>
+                      </HStack>
+                    </Box>
+                  )}
 
                   <HStack spacing={4} width="100%">
                     <FormControl flex={1}>
@@ -286,14 +410,62 @@ export default function NewBlogPost() {
                   </HStack>
 
                   <FormControl>
-                    <FormLabel>Featured Image URL</FormLabel>
-                    <Input
-                      value={formData.image}
-                      onChange={(e) =>
-                        setFormData({ ...formData, image: e.target.value })
-                      }
-                      placeholder="https://..."
-                    />
+                    <FormLabel>Cover Image</FormLabel>
+                    <VStack align="stretch" spacing={3}>
+                      <HStack>
+                        <Button
+                          leftIcon={<FaUpload />}
+                          isLoading={uploadingCover}
+                          onClick={() => document.getElementById('cover-upload')?.click()}
+                          colorScheme="blue"
+                          variant="outline"
+                        >
+                          Upload Cover Image
+                        </Button>
+                        <input
+                          id="cover-upload"
+                          type="file"
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={handleCoverImageUpload}
+                        />
+                        {formData.image && (
+                          <Button
+                            size="sm"
+                            leftIcon={<DeleteIcon />}
+                            colorScheme="red"
+                            variant="ghost"
+                            onClick={() => setFormData({ ...formData, image: '' })}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </HStack>
+                      {formData.image && (
+                        <Box
+                          borderWidth="1px"
+                          borderRadius="lg"
+                          overflow="hidden"
+                          maxW="400px"
+                        >
+                          <Image
+                            src={formData.image}
+                            alt="Cover preview"
+                            objectFit="cover"
+                            width="100%"
+                            height="200px"
+                          />
+                        </Box>
+                      )}
+                      <Input
+                        value={formData.image}
+                        onChange={(e) =>
+                          setFormData({ ...formData, image: e.target.value })
+                        }
+                        placeholder="Or paste image URL directly"
+                        size="sm"
+                      />
+                    </VStack>
                   </FormControl>
                 </VStack>
               </Box>
