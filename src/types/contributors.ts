@@ -12,11 +12,14 @@ export enum ActivityType {
 
 export interface RepositoryStats {
   repository: string;
-  score: number;
+  totalActivities: number;
   commits: number;
-  pullRequests: number;
+  prsOpened: number;
+  prsMerged: number;
+  prsClosed: number;
   reviews: number;
   comments: number;
+  score: number;
   lastActivityAt: Date;
 }
 
