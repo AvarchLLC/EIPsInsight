@@ -11,7 +11,7 @@ export default async function handler(
 
   try {
     const client = await clientPromise;
-    const db = client.db('EIPsInsight');
+    const db = client.db('test');
     
     // Fetch all sync_state documents
     const syncStates = await db
