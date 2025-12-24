@@ -1,5 +1,7 @@
 import React from "react";
+import { useColorModeValue } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 
 interface RepositoryBreakdownChartProps {
   data: {
@@ -20,6 +22,16 @@ const RepositoryBreakdownChart: React.FC<RepositoryBreakdownChartProps> = ({
   data,
 }) => {
   const COLORS = ["#3B82F6", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444"];
+  const tooltipBg = useColorModeValue("#FFFFFF", "#1F2937");
+  const tooltipBorder = useColorModeValue("#E5E7EB", "#374151");
+  const tooltipLabel = useColorModeValue("#111827", "#F3F4F6");
+  const tooltipText = useColorModeValue("#4B5563", "#9CA3AF");
+  const bgColor = useColorModeValue("#FFFFFF", "#1A202C");
+  const borderColor = useColorModeValue("#E5E7EB", "#374151");
+  const textColor = useColorModeValue("#111827", "#F3F4F6");
+  const textSecondary = useColorModeValue("#6B7280", "#9CA3AF");
+  const cardBg = useColorModeValue("#F9FAFB", "#1F2937");
+  const cardHover = useColorModeValue("#F3F4F6", "#374151");
 
   const chartData = data.map((stat) => ({
     name: stat.repository.split("/")[1],
@@ -27,12 +39,12 @@ const RepositoryBreakdownChart: React.FC<RepositoryBreakdownChartProps> = ({
   }));
 
   return (
-    <div className="bg-green-50/30 dark:bg-green-950/20 border-2 border-green-200 dark:border-green-900 rounded-lg shadow-sm col-span-full">
-      <div className="px-8 py-6 border-b-2 border-green-200 dark:border-green-900 bg-green-100/20 dark:bg-green-900/10">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Repository Breakdown</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Contribution distribution</p>
+    <div className="rounded-lg shadow-sm col-span-full" style={{ backgroundColor: bgColor, border: `1px solid ${borderColor}` }}>
+      <div className="px-6 py-4" style={{ borderBottom: `1px solid ${borderColor}` }}>
+        <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: textColor }}>Repository Breakdown</h3>
+        <p className="text-xs mt-1" style={{ color: textSecondary }}>Contribution distribution</p>
       </div>
-      <div className="p-8">
+      <div className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
             <ResponsiveContainer width="100%" height={300}>
@@ -53,13 +65,29 @@ const RepositoryBreakdownChart: React.FC<RepositoryBreakdownChartProps> = ({
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #F3F4F6',
-                    borderRadius: '4px',
-                    boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
-                    padding: '8px 12px',
+                    backgroundColor: 'transparent',
+                    border: 'none',
                   }}
-                  labelStyle={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div style={{
+                          backgroundColor: tooltipBg,
+                          border: `1px solid ${tooltipBorder}`,
+                          borderRadius: '8px',
+                          padding: '12px',
+                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                        }}>
+                          <p style={{ fontSize: '11px', fontWeight: 600, color: tooltipLabel, marginBottom: '8px' }}>{payload[0].name}</p>
+                          <p style={{ fontSize: '11px', color: tooltipText }}>
+                            <span style={{ fontWeight: 600 }}>Contributors: </span>
+                            <span>{payload[0].value}</span>
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
                 <Legend 
                   wrapperStyle={{ fontSize: '11px' }}
@@ -73,30 +101,32 @@ const RepositoryBreakdownChart: React.FC<RepositoryBreakdownChartProps> = ({
             {data.map((stat, index) => (
               <div
                 key={stat.repository}
-                className="p-5 border-l-[3px] bg-gray-50 dark:bg-gray-800/50 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-                style={{ borderLeftColor: COLORS[index % COLORS.length] }}
+                className="p-5 border-l-[3px] transition-colors"
+                style={{ backgroundColor: cardBg, borderLeftColor: COLORS[index % COLORS.length] }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = cardHover}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = cardBg}
               >
                 <div className="flex justify-between items-start mb-3">
-                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-100">{stat.repository.split("/")[1]}</h4>
-                  <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  <h4 className="font-semibold text-base" style={{ color: textColor }}>{stat.repository.split("/")[1]}</h4>
+                  <span className="text-xl font-bold" style={{ color: textColor }}>
                     {stat.score || stat.totalScore || 0}
                   </span>
                 </div>
-                <div className="grid grid-cols-4 gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <div className="grid grid-cols-4 gap-3 text-xs" style={{ color: textSecondary }}>
                   <div className="flex flex-col">
-                    <span className="font-medium text-gray-900 dark:text-gray-100">{stat.commits}</span>
+                    <span className="font-medium" style={{ color: textColor }}>{stat.commits}</span>
                     <span className="uppercase tracking-wide text-[10px]">Commits</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-medium text-gray-900 dark:text-gray-100">{(stat.prsOpened || 0) + (stat.prsMerged || 0) + (stat.prsClosed || 0)}</span>
+                    <span className="font-medium" style={{ color: textColor }}>{(stat.prsOpened || 0) + (stat.prsMerged || 0) + (stat.prsClosed || 0)}</span>
                     <span className="uppercase tracking-wide text-[10px]">PRs</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-medium text-gray-900 dark:text-gray-100">{stat.reviews}</span>
+                    <span className="font-medium" style={{ color: textColor }}>{stat.reviews}</span>
                     <span className="uppercase tracking-wide text-[10px]">Reviews</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-medium text-gray-900 dark:text-gray-100">{stat.comments}</span>
+                    <span className="font-medium" style={{ color: textColor }}>{stat.comments}</span>
                     <span className="uppercase tracking-wide text-[10px]">Comments</span>
                   </div>
                 </div>
@@ -105,6 +135,7 @@ const RepositoryBreakdownChart: React.FC<RepositoryBreakdownChartProps> = ({
           </div>
         </div>
       </div>
+      <LastUpdatedDateTime name="Repository Breakdown" />
     </div>
   );
 };

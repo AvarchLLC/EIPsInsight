@@ -495,7 +495,7 @@ export default function ContributorDetailPage() {
                   </Card>
                 </TabPanel>
 
-                <TabPanel px={0}>
+                <TabPanel px={0} id="activity-timeline">
                   <Card>
                     <CardBody>
                       <Heading size="md" mb={4}>

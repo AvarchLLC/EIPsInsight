@@ -10,7 +10,7 @@ export default async function handler(
   }
 
   try {
-    const { username, repository } = req.query;
+    const { username, repository, timeline } = req.query;
 
     const client = await clientPromise;
     const db = client.db("test");
@@ -123,11 +123,36 @@ export default async function handler(
     const last30d = new Date();
     last30d.setDate(last30d.getDate() - 30);
 
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+    const lastYear = new Date();
+    lastYear.setFullYear(lastYear.getFullYear() - 1);
+
+    // Determine timeline filter
+    let timelineFilter: Date | undefined;
+    switch (timeline) {
+      case "30d":
+        timelineFilter = last30d;
+        break;
+      case "month":
+        timelineFilter = lastMonth;
+        break;
+      case "year":
+        timelineFilter = lastYear;
+        break;
+      case "all":
+        timelineFilter = undefined; // No filter for all time
+        break;
+      default:
+        timelineFilter = last30d;
+    }
+
     const recentActivities = await db
       .collection("activities")
-      .find({
-        timestamp: { $gte: last30d },
-      })
+      .find(
+        timelineFilter ? { timestamp: { $gte: timelineFilter } } : {}
+      )
       .toArray();
 
     const activityByDate: Record<string, any> = {};
@@ -166,6 +191,9 @@ export default async function handler(
             contributors: 0,
             totalScore: 0,
             commits: 0,
+            prsOpened: 0,
+            prsMerged: 0,
+            prsClosed: 0,
             pullRequests: 0,
             reviews: 0,
             comments: 0,
@@ -174,7 +202,9 @@ export default async function handler(
         repoBreakdown[stat.repository].contributors++;
         repoBreakdown[stat.repository].totalScore += stat.score || 0;
         repoBreakdown[stat.repository].commits += stat.commits || 0;
-        // Aggregate all PR types
+        repoBreakdown[stat.repository].prsOpened += stat.prsOpened || 0;
+        repoBreakdown[stat.repository].prsMerged += stat.prsMerged || 0;
+        repoBreakdown[stat.repository].prsClosed += stat.prsClosed || 0;
         repoBreakdown[stat.repository].pullRequests += 
           (stat.prsOpened || 0) + (stat.prsMerged || 0) + (stat.prsClosed || 0);
         repoBreakdown[stat.repository].reviews += stat.reviews || 0;
@@ -183,13 +213,10 @@ export default async function handler(
     });
 
     const activityTypeCount: Record<string, number> = {};
-    await db
-      .collection("activities")
-      .find({})
-      .forEach((activity: any) => {
-        activityTypeCount[activity.activityType] =
-          (activityTypeCount[activity.activityType] || 0) + 1;
-      });
+    recentActivities.forEach((activity: any) => {
+      activityTypeCount[activity.activityType] =
+        (activityTypeCount[activity.activityType] || 0) + 1;
+    });
 
     return res.status(200).json({
       activityTimeline: Object.values(activityByDate).sort((a: any, b: any) =>
@@ -202,6 +229,7 @@ export default async function handler(
           count,
         })
       ),
+      rawActivities: recentActivities,
     });
   } catch (error) {
     console.error("Analytics error:", error);

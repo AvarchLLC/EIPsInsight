@@ -70,14 +70,64 @@ export default async function handler(
     const repositories = ["ethereum/EIPs", "ethereum/ERCs", "ethereum/RIPs"];
     const repositoryBreakdown = await Promise.all(
       repositories.map(async (repo) => {
-        const [contributors, activities] = await Promise.all([
+        const [contributors, activities, activityBreakdown] = await Promise.all([
           db.collection("contributors").countDocuments({
             repositories: repo,
             isBot: false,
           }),
           db.collection("activities").countDocuments({ repository: repo }),
+          db.collection("activities").find({ repository: repo }).toArray(),
         ]);
-        return { repository: repo, contributors, activities };
+        
+        // Count activities by type
+        let commits = 0;
+        let prsOpened = 0;
+        let prsMerged = 0;
+        let prsClosed = 0;
+        let reviews = 0;
+        let comments = 0;
+        
+        activityBreakdown.forEach((activity: any) => {
+          switch (activity.activityType) {
+            case 'COMMIT':
+              commits++;
+              break;
+            case 'PR_OPENED':
+              prsOpened++;
+              break;
+            case 'PR_MERGED':
+              prsMerged++;
+              break;
+            case 'PR_CLOSED':
+              prsClosed++;
+              break;
+            case 'REVIEW_APPROVED':
+            case 'REVIEW_COMMENTED':
+            case 'REVIEW_CHANGES_REQUESTED':
+              reviews++;
+              break;
+            case 'ISSUE_COMMENT':
+            case 'PR_COMMENT':
+              comments++;
+              break;
+          }
+        });
+        
+        // Calculate total score (same as contributor scoring)
+        const totalScore = commits * 10 + (prsOpened + prsMerged + prsClosed) * 20 + reviews * 15 + comments * 5;
+        
+        return { 
+          repository: repo, 
+          contributors, 
+          activities,
+          commits,
+          prsOpened,
+          prsMerged,
+          prsClosed,
+          reviews,
+          comments,
+          totalScore,
+        };
       })
     );
 
