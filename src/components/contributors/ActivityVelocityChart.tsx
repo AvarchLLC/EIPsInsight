@@ -13,7 +13,7 @@ import {
   TooltipProps,
 } from "recharts";
 import { FiInfo, FiChevronDown, FiChevronUp } from "react-icons/fi";
-import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import ContributorLastUpdatedDateTime from "@/components/ContributorLastUpdatedDateTime";
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
   const bgColor = useColorModeValue("#FFFFFF", "#1F2937");
@@ -148,7 +148,7 @@ export const ActivityVelocityChart: React.FC<ActivityVelocityChartProps> = ({
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <LastUpdatedDateTime name="Activity Velocity" />
+      <ContributorLastUpdatedDateTime name="Activity Velocity" />
     </div>
   );
 };

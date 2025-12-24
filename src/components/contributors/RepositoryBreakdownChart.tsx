@@ -1,7 +1,7 @@
 import React from "react";
 import { useColorModeValue } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import ContributorLastUpdatedDateTime from "@/components/ContributorLastUpdatedDateTime";
 
 interface RepositoryBreakdownChartProps {
   data: {
@@ -135,7 +135,7 @@ const RepositoryBreakdownChart: React.FC<RepositoryBreakdownChartProps> = ({
           </div>
         </div>
       </div>
-      <LastUpdatedDateTime name="Repository Breakdown" />
+      <ContributorLastUpdatedDateTime name="Repository Breakdown" />
     </div>
   );
 };

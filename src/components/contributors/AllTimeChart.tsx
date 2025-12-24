@@ -10,7 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import ContributorLastUpdatedDateTime from "@/components/ContributorLastUpdatedDateTime";
 
 interface AllTimeChartProps {
   data: {
@@ -151,7 +151,7 @@ export const AllTimeChart: React.FC<AllTimeChartProps> = ({ data }) => {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <LastUpdatedDateTime name="All-Time Activity" />
+      <ContributorLastUpdatedDateTime name="All-Time Activity" />
     </div>
   );
 };

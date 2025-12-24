@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Brush,
 } from "recharts";
-import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import ContributorLastUpdatedDateTime from "@/components/ContributorLastUpdatedDateTime";
 
 interface ActivityTimelineChartProps {
   data: {
@@ -291,7 +291,7 @@ export const ActivityTimelineChart: React.FC<ActivityTimelineChartProps> = ({
           </AreaChart>
         </ResponsiveContainer>
       </div>
-      <LastUpdatedDateTime name="Activity Timeline" />
+      <ContributorLastUpdatedDateTime name="Activity Timeline" />
     </div>
   );
 };
