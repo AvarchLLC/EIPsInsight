@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import ContributorLastUpdatedDateTime from "@/components/ContributorLastUpdatedDateTime";
 
 type ActivityType = "COMMIT" | "PR_OPENED" | "PR_MERGED" | "PR_CLOSED" | "REVIEW_APPROVED";
 
@@ -291,7 +291,7 @@ export const ActivityDistributionChart: React.FC<ActivityDistributionChartProps>
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <LastUpdatedDateTime name="Activity Distribution" />
+      <ContributorLastUpdatedDateTime name="Activity Distribution" />
     </div>
   );
 };

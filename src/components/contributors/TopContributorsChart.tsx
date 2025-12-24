@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import { useRouter } from "next/router";
 import { FiInfo, FiChevronDown, FiChevronUp } from "react-icons/fi";
-import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import ContributorLastUpdatedDateTime from "@/components/ContributorLastUpdatedDateTime";
 
 interface TopContributorsChartProps {
   data: {
@@ -184,7 +184,7 @@ export const TopContributorsChart: React.FC<TopContributorsChartProps> = ({
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <LastUpdatedDateTime name="Top Contributors" />
+      <ContributorLastUpdatedDateTime name="Top Contributors" />
     </div>
   );
 };

@@ -12,7 +12,7 @@ import {
   TooltipProps,
 } from "recharts";
 import { FiInfo, FiChevronDown, FiChevronUp } from "react-icons/fi";
-import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
+import ContributorLastUpdatedDateTime from "@/components/ContributorLastUpdatedDateTime";
 
 const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
   const bgColor = useColorModeValue("#FFFFFF", "#1F2937");
@@ -142,7 +142,7 @@ export const ActivityComparisonChart: React.FC<ActivityComparisonChartProps> = (
           </RadarChart>
         </ResponsiveContainer>
       </div>
-      <LastUpdatedDateTime name="Activity Comparison" />
+      <ContributorLastUpdatedDateTime name="Activity Comparison" />
     </div>
   );
 };
