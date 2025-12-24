@@ -44,6 +44,15 @@ const nextConfig = withMDX(
       ],
     },
 
+    webpack: (config, { isServer }) => {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+        ignored: ['**/node_modules', '**/.git', '**/.next'],
+      };
+      return config;
+    },
+
     // Add the redirects method here
     async redirects() {
       return [

@@ -1,4 +1,5 @@
 import React from "react";
+import { useColorModeValue } from "@chakra-ui/react";
 import {
   LineChart,
   Line,
@@ -9,6 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 
 interface AllTimeChartProps {
   data: {
@@ -21,17 +23,27 @@ interface AllTimeChartProps {
 }
 
 export const AllTimeChart: React.FC<AllTimeChartProps> = ({ data }) => {
+  const tooltipBg = useColorModeValue("#FFFFFF", "#1F2937");
+  const tooltipBorder = useColorModeValue("#E5E7EB", "#374151");
+  const tooltipLabel = useColorModeValue("#111827", "#F3F4F6");
+  const tooltipText = useColorModeValue("#4B5563", "#9CA3AF");
+  const gridColor = useColorModeValue("#E5E7EB", "#374151");
+  const axisColor = useColorModeValue("#9CA3AF", "#6B7280");
+  const bgColor = useColorModeValue("#FFFFFF", "#1A202C");
+  const borderColor = useColorModeValue("#E5E7EB", "#374151");
+  const textColor = useColorModeValue("#111827", "#F3F4F6");
+  const textSecondary = useColorModeValue("#6B7280", "#9CA3AF");
   return (
-    <div className="bg-violet-50/30 dark:bg-violet-950/20 border-2 border-violet-200 dark:border-violet-900 rounded-lg shadow-sm col-span-full">
-      <div className="px-8 py-6 border-b-2 border-violet-200 dark:border-violet-900 bg-violet-100/20 dark:bg-violet-900/10">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
+    <div className="rounded-lg shadow-sm col-span-full" style={{ backgroundColor: bgColor, border: `1px solid ${borderColor}` }}>
+      <div className="px-6 py-4" style={{ borderBottom: `1px solid ${borderColor}` }}>
+        <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: textColor }}>
           All-Time Activity Trends
         </h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs mt-1" style={{ color: textSecondary }}>
           Historical activity data by month
         </p>
       </div>
-      <div className="p-8">
+      <div className="p-6">
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={data}>
             <defs>
@@ -52,37 +64,48 @@ export const AllTimeChart: React.FC<AllTimeChartProps> = ({ data }) => {
                 <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.1} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" opacity={0.5} />
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} opacity={0.5} />
             <XAxis
               dataKey="monthYear"
-              tick={{ fontSize: 10, fill: "#9CA3AF" }}
-              stroke="#F3F4F6"
+              tick={{ fontSize: 10, fill: axisColor }}
+              stroke={gridColor}
               axisLine={false}
               angle={-45}
               textAnchor="end"
               height={80}
             />
             <YAxis
-              tick={{ fontSize: 10, fill: "#9CA3AF" }}
-              stroke="#F3F4F6"
+              tick={{ fontSize: 10, fill: axisColor }}
+              stroke={gridColor}
               axisLine={false}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#FFFFFF",
-                border: "1px solid #F3F4F6",
-                borderRadius: "4px",
-                boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)",
-                padding: "8px 12px",
+                backgroundColor: 'transparent',
+                border: 'none',
               }}
-              labelStyle={{
-                fontSize: "11px",
-                fontWeight: 600,
-                marginBottom: "6px",
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div style={{
+                      backgroundColor: tooltipBg,
+                      border: `1px solid ${tooltipBorder}`,
+                      borderRadius: '8px',
+                      padding: '12px',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                    }}>
+                      <p style={{ fontSize: '11px', fontWeight: 600, color: tooltipLabel, marginBottom: '8px' }}>{label}</p>
+                      {payload.map((entry, index) => (
+                        <p key={index} style={{ fontSize: '11px', color: tooltipText }}>
+                          <span style={{ color: entry.color }}>{entry.name}: </span>
+                          <span style={{ fontWeight: 600 }}>{entry.value}</span>
+                        </p>
+                      ))}
+                    </div>
+                  );
+                }
+                return null;
               }}
-              itemStyle={{ fontSize: "12px", padding: "2px 0" }}
             />
             <Legend
               wrapperStyle={{ paddingTop: "20px", fontSize: "11px" }}
@@ -128,6 +151,7 @@ export const AllTimeChart: React.FC<AllTimeChartProps> = ({ data }) => {
           </LineChart>
         </ResponsiveContainer>
       </div>
+      <LastUpdatedDateTime name="All-Time Activity" />
     </div>
   );
 };

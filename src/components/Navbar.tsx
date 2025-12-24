@@ -81,8 +81,8 @@ const Navbar: React.FC = () => {
           href: `/proposalbuilder`,
         },
         {
-          label: "Transaction Tracker",
-          href: `/txtracker`,
+          label: "Contributors Analysis",
+          href: `/contributors`,
         },
         // {
         //   label: "Search by author",
