@@ -33,10 +33,10 @@ const ContributorLastUpdatedDateTime: React.FC<ContributorLastUpdatedDateTimePro
         const data = await response.json();
         setSyncData(data);
         
-        // Calculate next update time (24 hours from last sync)
+        // Calculate next update time (4 hours from last sync)
         if (data.lastSyncAt) {
           const lastSync = new Date(data.lastSyncAt);
-          const nextUpdate = new Date(lastSync.getTime() + 24 * 60 * 60 * 1000);
+          const nextUpdate = new Date(lastSync.getTime() + 4 * 60 * 60 * 1000);
           setNextUpdateTime(nextUpdate.toISOString());
         }
         

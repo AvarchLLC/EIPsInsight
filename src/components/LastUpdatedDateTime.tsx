@@ -19,9 +19,9 @@ const LastUpdatedDateTime: React.FC<DateTimeProps> = ({ name }) => {
         const data = await response.json();
         setLastUpdatedTime(data.lastUpdatedTime);
         
-        // Calculate next update time (5 minutes from now)
-        const now = new Date();
-        const nextUpdate = new Date(now.getTime() + 5 * 60 * 1000);
+        // Calculate next update time (4 hours from last update)
+        const lastUpdate = new Date(data.lastUpdatedTime);
+        const nextUpdate = new Date(lastUpdate.getTime() + 4 * 60 * 60 * 1000);
         setNextUpdateTime(nextUpdate.toISOString());
         
       } catch (err:any) {
