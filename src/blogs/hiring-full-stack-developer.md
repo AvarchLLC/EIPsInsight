@@ -2,8 +2,13 @@
 title: "Join EIPsInsight.com as a Full-Stack Developer (Remote)"
 date: 2025-06-29
 author: "Yash Kamal Chaturvedi"
+category: "Career"
+tags: ["hiring", "full-stack", "remote", "web3", "nextjs"]
+readTime: 3
+featured: false
+excerpt: "Join our team as a Full-Stack Developer to build the next generation of open-access tools for the Ethereum ecosystem. Remote, full-time position."
 image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/hiring-full-stack-developer.png"
-authorAvatar : "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
+authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
 authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
 authorTwitter: "https://x.com/YashKamalChatu1"
 authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
