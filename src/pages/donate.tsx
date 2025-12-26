@@ -34,8 +34,7 @@ import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { FaHeart, FaRegCopy, FaInfoCircle, FaEthereum, FaShieldAlt, FaUsers, FaRocket, FaAward, FaHandshake, FaCodeBranch } from 'react-icons/fa';
 import Partners from '@/components/Partners';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Layout from '@/components/Layout';
 
 // --- Types ---
 // ...existing code...
@@ -314,7 +313,7 @@ export default function DonatePage(): JSX.Element {
   ];
 
   return (
-    <>
+    <Layout>
       <Head>
         <title>Donate — EIPs Insights</title>
         <meta name="description" content="Support EIPs Insights, open-source analytics for EIPs, ERCs and RIPs." />
@@ -324,46 +323,44 @@ export default function DonatePage(): JSX.Element {
         <link rel="icon" href="/eipFavicon.png" />
       </Head>
 
-      <Navbar />
-
       {/* Hero Section */}
       <Box
         bg={gradientBg}
         color="white"
-        py={{ base: 1, md: 2 }}
-        px={{ base: 0, md: 1 }}
+        py={{ base: 12, md: 16 }}
+        px={{ base: 6, md: 8 }}
         position="relative"
         overflow="hidden"
       >
-        <Container maxW="6xl" position="relative" zIndex={1}>
+        <Container maxW="full" position="relative" zIndex={1}>
           <VStack spacing={1} textAlign="center">
             <Icon as={FaHeart} boxSize={{ base: 6, md: 8 }} color="pink.300" />
             <Heading
               as="h1"
-              size={{ base: "md", md: "lg" }}
-              fontWeight="bold"
-              lineHeight="1.05"
-              mb={0}
+              size={{ base: "xl", md: "2xl" }}
+              fontWeight="extrabold"
+              lineHeight="1.1"
+              mb={4}
             >
               Support EIPs Insight
             </Heading>
             <Text
-              fontSize={{ base: "sm", md: "md" }}
-              maxW="xl"
-              opacity={0.9}
-              lineHeight="1.3"
-              mb={0}
+              fontSize={{ base: "md", md: "lg" }}
+              maxW="2xl"
+              opacity={0.95}
+              lineHeight="1.6"
+              mb={6}
             >
               Your contributions help maintain open-source analytics for Ethereum Improvement Proposals,
               keeping the ecosystem transparent and accessible for everyone.
             </Text>
-            <HStack spacing={1} pt={1}>
-              <Badge colorScheme="pink" px={1.5} py={0.5} borderRadius="full" fontSize="xs">
-                <Icon as={FaUsers} mr={0.5} />
+            <HStack spacing={3} pt={2}>
+              <Badge colorScheme="pink" px={4} py={2} borderRadius="full" fontSize="sm" fontWeight="bold">
+                <Icon as={FaUsers} mr={2} />
                 Community Driven
               </Badge>
-              <Badge colorScheme="blue" px={1.5} py={0.5} borderRadius="full" fontSize="xs">
-                <Icon as={FaShieldAlt} mr={0.5} />
+              <Badge colorScheme="blue" px={4} py={2} borderRadius="full" fontSize="sm" fontWeight="bold">
+                <Icon as={FaShieldAlt} mr={2} />
                 Open Source
               </Badge>
             </HStack>
@@ -371,31 +368,22 @@ export default function DonatePage(): JSX.Element {
         </Container>
       </Box>
 
-  <Box as="main" py={{ base: 2, md: 4 }} px={{ base: 1, md: 2 }} bg={sectionBg}>
-        <Container maxW="6xl" px={0}>
-          <Stack spacing={3}>
+  <Box as="main" py={{ base: 8, md: 12 }} px={{ base: 4, md: 8 }} bg={sectionBg}>
+        <Container maxW="full" px={0}>
+          <Stack spacing={8}>
             {/* Donation Section */}
-            <Container maxW="6xl" px={0} py={1}
+            <Box
               bg={cardBg}
-              borderRadius="xl"
+              borderRadius="2xl"
               border="1px solid"
               borderColor={useColorModeValue('gray.200', 'gray.700')}
-              boxShadow="md"
-              p={{ base: 2, md: 3 }}
-              mb={0.5}
+              boxShadow="xl"
+              p={{ base: 6, md: 8 }}
             >
-              <Box
-                bg={useColorModeValue('gray.100', 'gray.800')}
-                borderRadius="md"
-                p={4}
-                w="full"
-                display="flex"
-                flexDirection="column"
-                alignItems="stretch"
-                gap={4}
-              >
-                <Heading as="h2" size="lg" color={accent} mb={2} textAlign="left">
-                  Donate
+              <VStack spacing={6} align="stretch" w="full">
+                <Heading as="h2" size="xl" color={accent} mb={2} textAlign="center">
+                  <Icon as={FaHeart} mr={3} color="pink.400" />
+                  Donate to Support Our Mission
                 </Heading>
                 <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={4} w="full">
                   <Box
@@ -522,71 +510,50 @@ export default function DonatePage(): JSX.Element {
                     </VStack>
                   </Box>
                 </SimpleGrid>
-              </Box>
-            </Container>
+              </VStack>
+            </Box>
 
             {/* Partners Section */}
-            <Container maxW="6xl" px={0} py={1}
+            <Box
               bg={cardBg}
-              borderRadius="xl"
+              borderRadius="2xl"
               border="1px solid"
               borderColor={useColorModeValue('gray.200', 'gray.700')}
-              boxShadow="md"
-              p={{ base: 2, md: 3 }}
-              mb={0.5}
+              boxShadow="xl"
+              p={{ base: 6, md: 8 }}
             >
-              <Box
-                bg={useColorModeValue('gray.100', 'gray.800')}
-                borderRadius="md"
-                p={4}
-                w="full"
-                display="flex"
-                flexDirection="column"
-                alignItems="stretch"
-                gap={4}
-              >
-                <HStack align="center" spacing={3}>
-                  <Icon as={FaHandshake} color={accent} boxSize={8} />
-                  <Heading as="h2" size="lg" color={accent} mb={0}>
-                    Our Partners
-                  </Heading>
-                </HStack>
-                <Text fontSize="md" color={textColor} maxW="3xl">
+              <VStack spacing={6} align="stretch" w="full">
+                <Heading as="h2" size="xl" color={accent} textAlign="center">
+                  <Icon as={FaHandshake} mr={3} color={accent} />
+                  Our Partners
+                </Heading>
+                <Text fontSize="lg" color={textColor} textAlign="center" maxW="4xl" mx="auto">
                   EIPs Insight is supported by a growing community of organizations and contributors who share our vision for transparent and accessible Ethereum governance.
                 </Text>
                 <Box w="full">
                   <Partners />
                 </Box>
-              </Box>
-            </Container>
+              </VStack>
+            </Box>
 
             {/* Funding & Support Section */}
-            <Container maxW="6xl" px={0} py={1}
+            <Box
               bg={cardBg}
-              borderRadius="xl"
+              borderRadius="2xl"
               border="1px solid"
               borderColor={useColorModeValue('gray.200', 'gray.700')}
-              boxShadow="md"
-              p={{ base: 2, md: 3 }}
-              mb={0.5}
+              boxShadow="xl"
+              p={{ base: 6, md: 8 }}
             >
-              <Box
-                bg={useColorModeValue('gray.100', 'gray.800')}
-                borderRadius="md"
-                p={4}
-                w="full"
-                display="flex"
-                flexDirection="column"
-                alignItems="stretch"
-                gap={4}
-              >
-                <Heading as="h2" size="lg" color={accent} mb={1}>
+              <VStack spacing={6} align="stretch" w="full">
+                <Heading as="h2" size="xl" color={accent} textAlign="center">
+                  <Icon as={FaAward} mr={3} color={accent} />
                   Funding & Support
                 </Heading>
-                <Text fontSize="md" color={textColor} maxW="3xl" mb={1}>
+                <Text fontSize="lg" color={textColor} textAlign="center" maxW="4xl" mx="auto">
                   We transparently publish every material contribution that sustains our public-goods work. Your support enables us to maintain and improve EIPs Insight for the entire community.
                 </Text>
-                <Box w="full" mb={1}>
+                <Box w="full">
                   <TierLegend />
                 </Box>
                 <Box w="full">
@@ -634,16 +601,11 @@ export default function DonatePage(): JSX.Element {
                     className="gitcoin-grants-card"
                   />
                 </Box>
-              </Box>
-            </Container>
+              </VStack>
+            </Box>
           </Stack>
         </Container>
       </Box>
-
-      {/* Footer */}
-      <Box mt={8}>
-        <Footer />
-      </Box>
-    </>
+    </Layout>
   );
 }
