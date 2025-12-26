@@ -296,46 +296,10 @@ export default function ContributorsGrid() {
                       {contrib.role}
                     </Badge>
                   )}
-                  {contrib.duration && (
-                    <Text 
-                      fontSize="2xs" 
-                      color={useColorModeValue('gray.500', 'gray.400')}
-                      fontWeight="500"
-                    >
-                      {contrib.duration}
-                    </Text>
-                  )}
                 </VStack>
               </VStack>
 
-              {contrib.bio && (
-                <Text 
-                  fontSize="xs" 
-                  color={textColor}
-                  textAlign="center"
-                  lineHeight="short"
-                  noOfLines={3}
-                  px={2}
-                >
-                  {contrib.bio}
-                </Text>
-              )}
 
-              {contrib.expertise && (
-                <HStack spacing={1} justify="center" flexWrap="wrap">
-                  {contrib.expertise.map((skill : string) => (
-                    <Badge 
-                      key={skill}
-                      size="sm"
-                      colorScheme="blue"
-                      variant="outline"
-                      fontSize="2xs"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-                </HStack>
-              )}
 
               <HStack spacing={3} pt={2} justify="center">
                 {contrib.github && (
@@ -441,63 +405,16 @@ export default function ContributorsGrid() {
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <VStack spacing={6} align="stretch">
-              <HStack spacing={6}>
-                <Avatar 
-                  src={selected?.avatar} 
-                  name={selected?.name} 
-                  size="2xl"
-                  borderWidth="3px"
-                  borderColor={accent}
-                />
-                <VStack align="start" flex={1} spacing={2}>
-                  {selected?.duration && (
-                    <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
-                      {selected?.duration}
-                    </Text>
-                  )}
-                  {selected?.bio && (
-                    <Text fontSize="sm" color={textColor} lineHeight="tall">
-                      {selected?.bio}
-                    </Text>
-                  )}
-                </VStack>
-              </HStack>
+            <VStack spacing={6} align="center">
+              <Avatar 
+                src={selected?.avatar} 
+                name={selected?.name} 
+                size="2xl"
+                borderWidth="3px"
+                borderColor={accent}
+              />
 
-              {selected?.expertise && (
-                <VStack align="start" spacing={2}>
-                  <Text fontSize="sm" fontWeight="700" color={headingColor}>
-                    Expertise
-                  </Text>
-                  <HStack spacing={2} flexWrap="wrap">
-                    {selected?.expertise.map((skill : string) => (
-                      <Badge key={skill} colorScheme="blue" variant="subtle">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </HStack>
-                </VStack>
-              )}
-
-              {selected?.highlights && selected.highlights.length > 0 && (
-                <VStack align="start" spacing={3}>
-                  <Text fontSize="sm" fontWeight="700" color={headingColor}>
-                    Key Contributions
-                  </Text>
-                  <VStack align="start" spacing={2} pl={2}>
-                    {selected.highlights.map((highlight: string, idx: number) => (
-                      <HStack key={idx} align="start" spacing={2}>
-                        <Text color={accent} fontSize="lg">•</Text>
-                        <Text fontSize="sm" color={textColor}>
-                          {highlight}
-                        </Text>
-                      </HStack>
-                    ))}
-                  </VStack>
-                </VStack>
-              )}
-
-              <HStack spacing={4} justify="center" pt={4}>
+              <HStack spacing={4} justify="center">
                 {selected?.github && (
                   <IconButton
                     as="a"
