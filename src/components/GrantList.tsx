@@ -7,14 +7,14 @@ import {
   Image,
   Text,
   Badge,
-  Divider,
   Tag,
   Button,
   Link as ChakraLink,
-  Tooltip,
   useColorModeValue,
+  Heading,
+  Icon,
 } from '@chakra-ui/react';
-import { FaExternalLinkAlt } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaAward } from 'react-icons/fa';
 import NLink from 'next/link';
 
 type Grant = {
@@ -109,35 +109,54 @@ const tierColor = (tier: string) => {
 };
 
 export default function GrantList() {
-  const cardBg = useColorModeValue('white', '#2d3748');
-  const textColor = useColorModeValue('gray.700', 'gray.200');
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const textColor = useColorModeValue('gray.700', 'gray.300');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   return (
-    <VStack spacing={6} align="stretch">
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+    <Box
+      bg={cardBg}
+      p={{ base: 4, md: 6 }}
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor={borderColor}
+      boxShadow={useColorModeValue('sm', 'md')}
+    >
+      <HStack spacing={3} mb={6}>
+        <Icon as={FaAward} boxSize={8} color={useColorModeValue('purple.500', 'purple.400')} />
+        <Heading 
+          as="h2" 
+          fontSize={{ base: "2xl", md: "3xl" }} 
+          color={textColor}
+          fontWeight="800"
+          letterSpacing="tight"
+        >
+          Grants & Funding
+        </Heading>
+      </HStack>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={3}>
         {grants.map((grant) => (
           <Box
             key={grant.id}
-            bg={cardBg}
-            p={6}
-            borderRadius="xl"
-            border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-            boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-            transition="transform 180ms, box-shadow 180ms"
+            bg={useColorModeValue('white', 'gray.700')}
+            p={4}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor={borderColor}
+            boxShadow={useColorModeValue('sm', 'md')}
+            transition="all 0.2s ease"
             _hover={{
-              transform: 'translateY(-2px)',
-              boxShadow: useColorModeValue('0 8px 25px rgba(2,6,23,0.08)', '0 12px 32px rgba(2,6,23,0.8)'),
+              boxShadow: useColorModeValue('md', 'lg'),
+              borderColor: useColorModeValue('blue.400', 'blue.500'),
             }}
           >
-            <VStack align="start" spacing={4}>
+            <VStack align="start" spacing={3}>
               <HStack justify="space-between" w="full">
-                <HStack spacing={3}>
-                  {grant.logo && <Image src={grant.logo} alt={grant.organization} h={10} objectFit="contain" />}
-                  <VStack align="start" spacing={0}>
-                    <Text as="div" fontSize="lg" fontWeight="bold" color={textColor}>
-                      {grant.organization}
-                    </Text>
-                  </VStack>
+                <HStack spacing={2}>
+                  {grant.logo && <Image src={grant.logo} alt={grant.organization} h={8} objectFit="contain" />}
+                  <Text fontSize="md" fontWeight="600" color={textColor}>
+                    {grant.organization}
+                  </Text>
                 </HStack>
                 {
                   (() => {
@@ -160,45 +179,41 @@ export default function GrantList() {
                 }
               </HStack>
 
-              <Divider />
-
-              <VStack align="start" spacing={3} w="full">
-                <Text as="div" fontSize="md" fontWeight="semibold" color={textColor}>
-                  {grant.title}
+              <Text fontSize="sm" fontWeight="600" color={textColor}>
+                {grant.title}
+              </Text>
+              {grant.impact && (
+                <Text fontSize="xs" color={textColor} lineHeight="short" noOfLines={3}>
+                  {grant.impact}
                 </Text>
-                {grant.impact && (
-                  <Text as="div" fontSize="sm" color={textColor} lineHeight="tall">
-                    {grant.impact}
-                  </Text>
-                )}
-                <HStack spacing={2} flexWrap="wrap">
-                  {grant.tags.map((tag) => (
-                    <Tag key={tag} size="sm" variant="subtle" colorScheme="blue">
-                      {tag}
-                    </Tag>
-                  ))}
-                </HStack>
+              )}
+              <HStack spacing={1} flexWrap="wrap">
+                {grant.tags.map((tag) => (
+                  <Tag key={tag} size="sm" variant="subtle" colorScheme="blue">
+                    {tag}
+                  </Tag>
+                ))}
+              </HStack>
 
-                {grant.link && (
-                  <Button
-                    as={ChakraLink}
-                    href={grant.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="sm"
-                    variant="outline"
-                    colorScheme="blue"
-                    rightIcon={<FaExternalLinkAlt size={12} />}
-                  >
-                    Learn More
-                  </Button>
-                )}
-              </VStack>
+              {grant.link && (
+                <Button
+                  as={ChakraLink}
+                  href={grant.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  size="xs"
+                  variant="outline"
+                  colorScheme="blue"
+                  rightIcon={<FaExternalLinkAlt size={10} />}
+                  w="full"
+                >
+                  Learn More
+                </Button>
+              )}
             </VStack>
           </Box>
         ))}
       </SimpleGrid>
-      
-    </VStack>
+    </Box>
   );
 }

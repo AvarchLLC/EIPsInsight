@@ -1,8 +1,6 @@
 import React from 'react';
-import { Box, Container, Heading, Text, Flex, Image, useColorModeValue, VStack, Link as ChakraLink } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
-
-const MotionBox = motion(Box);
+import { Box, Heading, Flex, Image, useColorModeValue, VStack, Link as ChakraLink, HStack, Icon } from '@chakra-ui/react';
+import { FaHandshake } from 'react-icons/fa';
 
 const Partners: React.FC = () => {
   const cardBg = useColorModeValue('white', '#2d3748');
@@ -21,95 +19,68 @@ const Partners: React.FC = () => {
   ];
 
   return (
-    <>
-      <style jsx>{`
-        .gradient-text {
-          background: linear-gradient(135deg, #30A0E0 0%, #4FD1FF 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-      `}</style>
-      <Container maxW="7xl" py={4} id="partners">
-      <Box
-        className="section-container"
-        bg={cardBg}
-        p={{ base: 6, md: 8 }}
-        borderRadius="xl"
-        border={useColorModeValue('1px solid rgba(2,6,23,0.04)', '1px solid rgba(255,255,255,0.04)')}
-        boxShadow={useColorModeValue('0 6px 18px rgba(2,6,23,0.03)', '0 8px 24px rgba(2,6,23,0.6)')}
-      >
-        <VStack spacing={8} align="stretch">
-          {/* Clean Header */}
-          <VStack spacing={2} align="flex-start">
-            <Heading
-              as="h2"
-              fontSize={{ base: '2xl', md: '3xl' }}
-              className="gradient-text"
-              fontWeight="600"
-              textAlign="left"
-            >
-              Partners
-            </Heading>
-            <Text 
-              fontSize="sm" 
-              color={useColorModeValue('gray.600', 'gray.400')}
-            >
-              Ecosystem collaborators
-            </Text>
-          </VStack>
-
-          {/* Partners Display */}
-          <Flex
-            justify="center"
-            align="flex-start"
-            gap={{ base: 8, md: 12 }}
-            wrap="wrap"
+    <Box
+      bg={cardBg}
+      p={{ base: 4, md: 6 }}
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor={useColorModeValue('gray.200', 'gray.700')}
+      boxShadow={useColorModeValue('sm', 'md')}
+    >
+      <VStack spacing={4} align="stretch">
+        <HStack spacing={3}>
+          <Icon as={FaHandshake} boxSize={8} color={useColorModeValue('blue.500', 'blue.400')} />
+          <Heading
+            as="h2"
+            fontSize={{ base: '2xl', md: '3xl' }}
+            color={useColorModeValue('gray.900', 'white')}
+            fontWeight="800"
+            textAlign="left"
+            letterSpacing="tight"
           >
-            {partners.map((partner, index) => (
-              <MotionBox
-                key={partner.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.4 }}
-                whileHover={{ y: -4 }}
+            Our Partners
+          </Heading>
+        </HStack>
+
+        <Flex
+          justify="center"
+          align="center"
+          gap={4}
+          wrap="wrap"
+        >
+          {partners.map((partner, index) => (
+            <ChakraLink 
+              key={partner.name}
+              href={partner.url} 
+              isExternal 
+              _hover={{ textDecoration: 'none' }}
+            >
+              <Box
+                p={2}
+                borderRadius="md"
+                bg={useColorModeValue('white', 'gray.700')}
+                borderWidth="1px"
+                borderColor={useColorModeValue('gray.200', 'gray.600')}
+                boxShadow={useColorModeValue('sm', 'md')}
+                _hover={{
+                  borderColor: useColorModeValue('blue.400', 'blue.500'),
+                  boxShadow: useColorModeValue('md', 'lg'),
+                }}
+                transition="all 0.2s ease"
               >
-                <ChakraLink 
-                  href={partner.url} 
-                  isExternal 
-                  _hover={{ textDecoration: 'none' }}
-                >
-                  {/* Partner container with larger GIF */}
-                  <Box
-                    p={2}
-                    borderRadius="xl"
-                    bg={useColorModeValue('white', 'gray.800')}
-                    border="1px solid"
-                    borderColor={useColorModeValue('gray.200', 'gray.600')}
-                    boxShadow={useColorModeValue('0 4px 12px rgba(0,0,0,0.05)', '0 4px 12px rgba(0,0,0,0.2)')}
-                    _hover={{
-                      borderColor: useColorModeValue('blue.300', 'blue.400'),
-                      boxShadow: useColorModeValue('0 8px 25px rgba(59, 130, 246, 0.15)', '0 8px 25px rgba(59, 130, 246, 0.25)'),
-                      transform: 'translateY(-2px)'
-                    }}
-                    transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                  >
-                    <Image
-                      src={partner.gif}
-                      alt={`${partner.name} logo`}
-                      boxSize={{ base: "200px", md: "240px", lg: "280px" }}
-                      objectFit="contain"
-                      fallbackSrc="/logos/octant.svg"
-                    />
-                  </Box>
-                </ChakraLink>
-              </MotionBox>
-            ))}
-          </Flex>
-        </VStack>
-      </Box>
-    </Container>
-    </>
+                <Image
+                  src={partner.gif}
+                  alt={`${partner.name} logo`}
+                  boxSize={{ base: "120px", md: "150px" }}
+                  objectFit="contain"
+                  fallbackSrc="/logos/octant.svg"
+                />
+              </Box>
+            </ChakraLink>
+          ))}
+        </Flex>
+      </VStack>
+    </Box>
   );
 };
 
