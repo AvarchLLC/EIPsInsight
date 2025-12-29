@@ -8,7 +8,7 @@ tags: ["Ethereum", "Glamsterdam", "FOCIL", "Censorship Resistance", "Governance"
 readTime: 6
 featured: true
 excerpt: "Ethereum core developers confirmed that FOCIL will not ship in the Glamsterdam upgrade, not due to technical failure but because of Ethereum’s evolving governance model, prioritizing process discipline and predictable upgrade cycles."
-image: "https://private-user-images.githubusercontent.com/69413160/528232247-f3aa23af-39c5-48d5-aa42-df84b70d0437.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjY2ODU5MjUsIm5iZiI6MTc2NjY4NTYyNSwicGF0aCI6Ii82OTQxMzE2MC81MjgyMzIyNDctZjNhYTIzYWYtMzljNS00OGQ1LWFhNDItZGY4NGI3MGQwNDM3LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMjUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjI1VDE4MDAyNVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTU3NzNmMDU2OTgxNzdlMDBiYTNhOWZkN2ZlZTM4MmRjM2I1Yzg1OTAyNGVkNDViYjYwNzY1ZDYwZDY1ZGFkMWMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.kWSWP2i7qq0bF1FKXJwSBWytW-b2vRS9kuev6AJKRMc"
+image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/why-ethereum-core.png"
 authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
 authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
 authorTwitter: "https://x.com/YashKamalChatu1"

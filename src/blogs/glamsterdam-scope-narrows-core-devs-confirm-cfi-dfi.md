@@ -8,7 +8,7 @@ tags: ["Ethereum", "Glamsterdam", "CFI", "DFI", "Core Devs", "Governance", "Prot
 readTime: 5
 featured: true
 excerpt: "Ethereum core developers have narrowed the Glamsterdam upgrade scope by designating key proposals as CFI or DFI, providing clearer direction for client teams and aligning Ethereum’s next major upgrade toward manageable and high-impact priorities."
-image: "https://private-user-images.githubusercontent.com/69413160/524271577-56da3e42-9467-4911-af9b-30c80042973d.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjY2ODU3ODAsIm5iZiI6MTc2NjY4NTQ4MCwicGF0aCI6Ii82OTQxMzE2MC81MjQyNzE1NzctNTZkYTNlNDItOTQ2Ny00OTExLWFmOWItMzBjODAwNDI5NzNkLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMjUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjI1VDE3NTgwMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTlhODBhMWJjNDY3Yjk3ZGJhZjM4OWUwNzUzMjI3OGNmNjYzMmJjMzk1ZDI3OGJhNzM4YzRjNjgwY2QzOGM1MWYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.GKISguq2gTz7U3qslo_E6idfXTixq7_xoCkM9QDeHGY"
+image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/glamsterdam-scope.png"
 authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
 authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
 authorTwitter: "https://x.com/YashKamalChatu1"
