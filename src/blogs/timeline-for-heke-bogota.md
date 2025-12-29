@@ -7,7 +7,7 @@ tags: ["Ethereum", "Heka", "Bogotá", "EIP-8081", "Core Devs", "Governance", "Ro
 readTime: 5
 featured: true
 excerpt: "Ethereum core developers introduce a tentative scoping timeline for the Heka/Bogotá upgrade via EIP-8081, outlining how headliners will be selected, when proposals will be evaluated, and how upgrade decisions will be finalized."
-image: "https://private-user-images.githubusercontent.com/69413160/526356313-e39e0c5a-586b-4d20-bae7-f070a3cbab79.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjY2ODQ4ODAsIm5iZiI6MTc2NjY4NDU4MCwicGF0aCI6Ii82OTQxMzE2MC81MjYzNTYzMTMtZTM5ZTBjNWEtNTg2Yi00ZDIwLWJhZTctZjA3MGEzY2JhYjc5LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMjUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjI1VDE3NDMwMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTlkY2ZhMmQ5Y2RhOTQxYTYzODYxNDY1YWIxNmQxNjZjOWUxOTdmNWFmM2VmN2UzOTdmZWU1MzllZThhMjRlODImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.jf3Yok3BmsQZ5mVCGjpS0QTN7uOH1dE6D4El5Oi9rGQ"
+image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/tentative-scoping.png"
 authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
 authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
 authorTwitter: "https://x.com/YashKamalChatu1"
