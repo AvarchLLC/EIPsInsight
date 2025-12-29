@@ -375,21 +375,21 @@ const ResourcesPage: React.FC = () => {
 
   const BLOGS = [
     {
-      image: "https://private-user-images.githubusercontent.com/69413160/526356313-e39e0c5a-586b-4d20-bae7-f070a3cbab79.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjY2ODQ4ODAsIm5iZiI6MTc2NjY4NDU4MCwicGF0aCI6Ii82OTQxMzE2MC81MjYzNTYzMTMtZTM5ZTBjNWEtNTg2Yi00ZDIwLWJhZTctZjA3MGEzY2JhYjc5LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMjUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjI1VDE3NDMwMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTlkY2ZhMmQ5Y2RhOTQxYTYzODYxNDY1YWIxNmQxNjZjOWUxOTdmNWFmM2VmN2UzOTdmZWU1MzllZThhMjRlODImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.jf3Yok3BmsQZ5mVCGjpS0QTN7uOH1dE6D4El5Oi9rGQ",
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/tentative-scoping.png",
       title: "Tentative Scoping Timeline for Ethereum's Heka/Bogotá Upgrade",
       content: "Ethereum core developers introduce a tentative scoping timeline for the Heka/Bogotá upgrade via EIP-8081, outlining how headliners will be selected, when proposals will be evaluated, and how upgrade decisions will be finalized.",
       link: "Blogs/timeline-for-heke-bogota",
       tag: "Ethereum Upgrades"
     },
     {
-      image: "https://private-user-images.githubusercontent.com/69413160/524271577-56da3e42-9467-4911-af9b-30c80042973d.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjY2ODU3ODAsIm5iZiI6MTc2NjY4NTQ4MCwicGF0aCI6Ii82OTQxMzE2MC81MjQyNzE1NzctNTZkYTNlNDItOTQ2Ny00OTExLWFmOWItMzBjODAwNDI5NzNkLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMjUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjI1VDE3NTgwMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTlhODBhMWJjNDY3Yjk3ZGJhZjM4OWUwNzUzMjI3OGNmNjYzMmJjMzk1ZDI3OGJhNzM4YzRjNjgwY2QzOGM1MWYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.GKISguq2gTz7U3qslo_E6idfXTixq7_xoCkM9QDeHGY",
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/glamsterdam-scope.png",
       title: "Glamsterdam Scope Narrows as Core Devs Confirm CFI & DFI",
       content: "Ethereum core developers have narrowed the Glamsterdam upgrade scope by designating key proposals as CFI or DFI, providing clearer direction for client teams and aligning Ethereum's next major upgrade toward manageable and high-impact priorities.",
       link: "Blogs/glamsterdam-scope-narrows-core-devs-confirm-cfi-dfi",
       tag: "Ethereum Upgrades"
     },
     {
-      image: "https://private-user-images.githubusercontent.com/69413160/528232247-f3aa23af-39c5-48d5-aa42-df84b70d0437.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjY2ODU5MjUsIm5iZiI6MTc2NjY4NTYyNSwicGF0aCI6Ii82OTQxMzE2MC81MjgyMzIyNDctZjNhYTIzYWYtMzljNS00OGQ1LWFhNDItZGY4NGI3MGQwNDM3LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMjUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjI1VDE4MDAyNVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTU3NzNmMDU2OTgxNzdlMDBiYTNhOWZkN2ZlZTM4MmRjM2I1Yzg1OTAyNGVkNDViYjYwNzY1ZDYwZDY1ZGFkMWMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.kWSWP2i7qq0bF1FKXJwSBWytW-b2vRS9kuev6AJKRMc",
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/why-ethereum-core.png",
       title: "Why Ethereum Core Developers Removed FOCIL from the Glamsterdam Upgrade",
       content: "Ethereum core developers confirmed that FOCIL will not ship in the Glamsterdam upgrade, not due to technical failure but because of Ethereum's evolving governance model, prioritizing process discipline and predictable upgrade cycles.",
       link: "Blogs/why-ethereum-core-devs-removed-focil-from-glamsterdam-upgrade",
