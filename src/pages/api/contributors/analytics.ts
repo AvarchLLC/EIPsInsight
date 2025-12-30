@@ -10,7 +10,7 @@ export default async function handler(
   }
 
   try {
-    const { username, repository, timeline } = req.query;
+    const { username, repository, timeline, startDate, endDate } = req.query;
 
     const client = await clientPromise;
     const db = client.db("test");
@@ -131,28 +131,49 @@ export default async function handler(
 
     // Determine timeline filter
     let timelineFilter: Date | undefined;
-    switch (timeline) {
-      case "30d":
-        timelineFilter = last30d;
-        break;
-      case "month":
-        timelineFilter = lastMonth;
-        break;
-      case "year":
-        timelineFilter = lastYear;
-        break;
-      case "all":
-        timelineFilter = undefined; // No filter for all time
-        break;
-      default:
-        timelineFilter = last30d;
+    let queryFilter: any = {};
+    
+    if (timeline === "custom" && startDate && endDate) {
+      // Custom date range
+      const start = new Date(startDate as string);
+      start.setDate(1); // Start of month
+      
+      const end = new Date(endDate as string);
+      end.setMonth(end.getMonth() + 1); // Move to next month
+      end.setDate(0); // Last day of the selected month
+      end.setHours(23, 59, 59, 999); // End of day
+      
+      queryFilter = {
+        timestamp: {
+          $gte: start,
+          $lte: end
+        }
+      };
+    } else {
+      // Preset timelines
+      switch (timeline) {
+        case "30d":
+          timelineFilter = last30d;
+          break;
+        case "month":
+          timelineFilter = lastMonth;
+          break;
+        case "year":
+          timelineFilter = lastYear;
+          break;
+        case "all":
+          timelineFilter = undefined; // No filter for all time
+          break;
+        default:
+          timelineFilter = last30d;
+      }
+      
+      queryFilter = timelineFilter ? { timestamp: { $gte: timelineFilter } } : {};
     }
 
     const recentActivities = await db
       .collection("activities")
-      .find(
-        timelineFilter ? { timestamp: { $gte: timelineFilter } } : {}
-      )
+      .find(queryFilter)
       .toArray();
 
     const activityByDate: Record<string, any> = {};

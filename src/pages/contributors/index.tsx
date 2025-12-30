@@ -95,12 +95,14 @@ export default function ContributorsPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [activeTab, setActiveTab] = useState<"analytics" | "rankings" | "contributors">("analytics");
-  const [timelineFilter, setTimelineFilter] = useState<"30d" | "month" | "year" | "all">("30d");
+  const [timelineFilter, setTimelineFilter] = useState<"30d" | "month" | "year" | "all" | "custom">("30d");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
 
   useEffect(() => {
     fetchStats();
     fetchAnalytics();
-  }, [timelineFilter]);
+  }, [timelineFilter, customStartDate, customEndDate]);
 
   useEffect(() => {
     fetchContributors();
@@ -123,6 +125,12 @@ export default function ContributorsPage() {
     try {
       setAnalyticsLoading(true);
       const params = new URLSearchParams({ timeline: timelineFilter });
+      
+      if (timelineFilter === "custom" && customStartDate && customEndDate) {
+        params.set("startDate", customStartDate);
+        params.set("endDate", customEndDate);
+      }
+      
       const response = await fetch(`/api/contributors/analytics?${params}`);
       const data = await response.json();
       setAnalytics(data);
@@ -321,83 +329,190 @@ export default function ContributorsPage() {
               <>
                 {/* Timeline Filters */}
                 <div className="mx-auto px-8 pt-8 pb-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: textLabel }}>Timeline:</span>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setTimelineFilter("30d")}
-                        className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
-                        style={{
-                          backgroundColor: timelineFilter === "30d" ? buttonActiveBg : buttonInactiveBg,
-                          border: `2px solid ${timelineFilter === "30d" ? buttonActiveBorder : buttonInactiveBorder}`,
-                          color: timelineFilter === "30d" ? buttonActiveText : buttonInactiveText
-                        }}
-                        onMouseEnter={(e) => timelineFilter !== "30d" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
-                        onMouseLeave={(e) => timelineFilter !== "30d" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
-                      >
-                        30 Days
-                      </button>
-                      <button
-                        onClick={() => setTimelineFilter("month")}
-                        className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
-                        style={{
-                          backgroundColor: timelineFilter === "month" ? buttonActiveBg : buttonInactiveBg,
-                          border: `2px solid ${timelineFilter === "month" ? buttonActiveBorder : buttonInactiveBorder}`,
-                          color: timelineFilter === "month" ? buttonActiveText : buttonInactiveText
-                        }}
-                        onMouseEnter={(e) => timelineFilter !== "month" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
-                        onMouseLeave={(e) => timelineFilter !== "month" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
-                      >
-                        Last Month
-                      </button>
-                      <button
-                        onClick={() => setTimelineFilter("year")}
-                        className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
-                        style={{
-                          backgroundColor: timelineFilter === "year" ? buttonActiveBg : buttonInactiveBg,
-                          border: `2px solid ${timelineFilter === "year" ? buttonActiveBorder : buttonInactiveBorder}`,
-                          color: timelineFilter === "year" ? buttonActiveText : buttonInactiveText
-                        }}
-                        onMouseEnter={(e) => timelineFilter !== "year" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
-                        onMouseLeave={(e) => timelineFilter !== "year" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
-                      >
-                        Last Year
-                      </button>
-                      <button
-                        onClick={() => setTimelineFilter("all")}
-                        className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
-                        style={{
-                          backgroundColor: timelineFilter === "all" ? buttonActiveBg : buttonInactiveBg,
-                          border: `2px solid ${timelineFilter === "all" ? buttonActiveBorder : buttonInactiveBorder}`,
-                          color: timelineFilter === "all" ? buttonActiveText : buttonInactiveText
-                        }}
-                        onMouseEnter={(e) => timelineFilter !== "all" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
-                        onMouseLeave={(e) => timelineFilter !== "all" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
-                      >
-                        All Time
-                      </button>
+                  <div className="flex flex-col gap-4">
+                    {/* Preset Filters */}
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: textLabel }}>Timeline:</span>
+                      <div className="flex gap-2 flex-wrap">
+                        <button
+                          onClick={() => setTimelineFilter("30d")}
+                          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
+                          style={{
+                            backgroundColor: timelineFilter === "30d" ? buttonActiveBg : buttonInactiveBg,
+                            border: `2px solid ${timelineFilter === "30d" ? buttonActiveBorder : buttonInactiveBorder}`,
+                            color: timelineFilter === "30d" ? buttonActiveText : buttonInactiveText
+                          }}
+                          onMouseEnter={(e) => timelineFilter !== "30d" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
+                          onMouseLeave={(e) => timelineFilter !== "30d" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
+                        >
+                          30 Days
+                        </button>
+                        <button
+                          onClick={() => setTimelineFilter("month")}
+                          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
+                          style={{
+                            backgroundColor: timelineFilter === "month" ? buttonActiveBg : buttonInactiveBg,
+                            border: `2px solid ${timelineFilter === "month" ? buttonActiveBorder : buttonInactiveBorder}`,
+                            color: timelineFilter === "month" ? buttonActiveText : buttonInactiveText
+                          }}
+                          onMouseEnter={(e) => timelineFilter !== "month" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
+                          onMouseLeave={(e) => timelineFilter !== "month" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
+                        >
+                          Last Month
+                        </button>
+                        <button
+                          onClick={() => setTimelineFilter("year")}
+                          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
+                          style={{
+                            backgroundColor: timelineFilter === "year" ? buttonActiveBg : buttonInactiveBg,
+                            border: `2px solid ${timelineFilter === "year" ? buttonActiveBorder : buttonInactiveBorder}`,
+                            color: timelineFilter === "year" ? buttonActiveText : buttonInactiveText
+                          }}
+                          onMouseEnter={(e) => timelineFilter !== "year" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
+                          onMouseLeave={(e) => timelineFilter !== "year" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
+                        >
+                          Last Year
+                        </button>
+                        <button
+                          onClick={() => setTimelineFilter("all")}
+                          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
+                          style={{
+                            backgroundColor: timelineFilter === "all" ? buttonActiveBg : buttonInactiveBg,
+                            border: `2px solid ${timelineFilter === "all" ? buttonActiveBorder : buttonInactiveBorder}`,
+                            color: timelineFilter === "all" ? buttonActiveText : buttonInactiveText
+                          }}
+                          onMouseEnter={(e) => timelineFilter !== "all" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
+                          onMouseLeave={(e) => timelineFilter !== "all" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
+                        >
+                          All Time
+                        </button>
+                        <button
+                          onClick={() => setTimelineFilter("custom")}
+                          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-all"
+                          style={{
+                            backgroundColor: timelineFilter === "custom" ? buttonActiveBg : buttonInactiveBg,
+                            border: `2px solid ${timelineFilter === "custom" ? buttonActiveBorder : buttonInactiveBorder}`,
+                            color: timelineFilter === "custom" ? buttonActiveText : buttonInactiveText
+                          }}
+                          onMouseEnter={(e) => timelineFilter !== "custom" && (e.currentTarget.style.borderColor = buttonHoverBorder)}
+                          onMouseLeave={(e) => timelineFilter !== "custom" && (e.currentTarget.style.borderColor = buttonInactiveBorder)}
+                        >
+                          Custom Range
+                        </button>
+                      </div>
                     </div>
-                    <div className="ml-auto">
+
+                    {/* Custom Date Range Picker */}
+                    {timelineFilter === "custom" && (
+                      <div className="flex items-center gap-4 pl-24">
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: textLabel }}>From:</label>
+                          <input
+                            type="month"
+                            value={customStartDate}
+                            onChange={(e) => setCustomStartDate(e.target.value)}
+                            className="px-3 py-2 text-sm rounded transition-colors"
+                            style={{
+                              backgroundColor: inputBg,
+                              border: `1px solid ${inputBorder}`,
+                              color: inputText
+                            }}
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: textLabel }}>To:</label>
+                          <input
+                            type="month"
+                            value={customEndDate}
+                            onChange={(e) => setCustomEndDate(e.target.value)}
+                            className="px-3 py-2 text-sm rounded transition-colors"
+                            style={{
+                              backgroundColor: inputBg,
+                              border: `1px solid ${inputBorder}`,
+                              color: inputText
+                            }}
+                          />
+                        </div>
+                        {customStartDate && customEndDate && (
+                          <button
+                            onClick={() => fetchAnalytics()}
+                            className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-colors"
+                            style={{
+                              backgroundColor: buttonActiveBg,
+                              border: `2px solid ${buttonActiveBorder}`,
+                              color: buttonActiveText
+                            }}
+                          >
+                            Apply
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Download CSV Button */}
+                    <div className="flex justify-end">
                       <button
-                        onClick={() => {
-                          if (!analytics) return;
-                          const csvContent = [
-                            ['Date', 'Commits', 'Pull Requests', 'Reviews', 'Comments'],
-                            ...analytics.activityTimeline.map((item: any) => [
-                              item.date,
-                              item.commits,
-                              item.pullRequests,
-                              item.reviews,
-                              item.comments
-                            ])
-                          ].map(row => row.join(',')).join('\n');
-                          const blob = new Blob([csvContent], { type: 'text/csv' });
-                          const url = window.URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `contributors-analytics-${timelineFilter}-${new Date().toISOString().split('T')[0]}.csv`;
-                          a.click();
-                          window.URL.revokeObjectURL(url);
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`/api/contributors/export-detailed?timeline=${timelineFilter}`);
+                            const data = await response.json();
+                            
+                            if (!data.activities || data.activities.length === 0) {
+                              alert('No activities found for the selected timeline');
+                              return;
+                            }
+                            
+                            // Create detailed CSV with essential metadata
+                            const headers = [
+                              'Activity ID', 'Activity Type', 'Repository', 'Username', 'Contributor Name',
+                              'Commit SHA', 'Commit Author Name',
+                              'PR Title', 'PR State', 'PR Labels', 'PR Merged At', 'PR Closed At',
+                              'Review ID', 'Review URL',
+                              'Comment ID', 'Comment URL', 'Comment Created At', 'Comment Updated At'
+                            ];
+                            
+                            const escapeCSV = (value: any) => {
+                              if (value === null || value === undefined || value === '') return '';
+                              const stringValue = String(value);
+                              if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                                return `"${stringValue.replace(/"/g, '""')}"`;
+                              }
+                              return stringValue;
+                            };
+                            
+                            const rows = data.activities.map((activity: any) => [
+                              activity.activityId,
+                              activity.activityType,
+                              activity.repository,
+                              activity.username,
+                              activity.contributorName,
+                              activity.commitSha,
+                              activity.commitAuthorName,
+                              activity.prTitle,
+                              activity.prState,
+                              activity.prLabels,
+                              activity.prMergedAt,
+                              activity.prClosedAt,
+                              activity.reviewId,
+                              activity.reviewUrl,
+                              activity.commentId,
+                              activity.commentUrl,
+                              activity.commentCreatedAt,
+                              activity.commentUpdatedAt
+                            ].map(escapeCSV));
+                            
+                            const csvContent = [headers.join(','), ...rows.map((row: string[]) => row.join(','))].join('\n');
+                            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `contributors-detailed-activities-${timelineFilter}-${new Date().toISOString().split('T')[0]}.csv`;
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                          } catch (error) {
+                            console.error('Failed to download CSV:', error);
+                            alert('Failed to download CSV. Please try again.');
+                          }
                         }}
                         className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-colors"
                         style={{
@@ -406,7 +521,7 @@ export default function ContributorsPage() {
                           color: textPrimary
                         }}
                       >
-                        Download CSV
+                        Download Detailed CSV
                       </button>
                     </div>
                   </div>
@@ -422,7 +537,18 @@ export default function ContributorsPage() {
                   <>
                     {/* Primary Charts Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <ActivityTimelineChart data={analytics.activityTimeline || []} timelineLabel={timelineFilter === "30d" ? "Last 30 days" : timelineFilter === "month" ? "Last month" : timelineFilter === "year" ? "Last year" : "All time"} />
+                      <ActivityTimelineChart 
+                        data={analytics.activityTimeline || []} 
+                        rawActivities={analytics.rawActivities || []} 
+                        timelineLabel={
+                          timelineFilter === "30d" ? "Last 30 days" : 
+                          timelineFilter === "month" ? "Last month" : 
+                          timelineFilter === "year" ? "Last year" : 
+                          timelineFilter === "custom" && customStartDate && customEndDate ? 
+                            `${customStartDate} to ${customEndDate}` : 
+                          "All time"
+                        } 
+                      />
                       <ActivityDistributionChart 
                         data={analytics.activityDistribution || []} 
                         rawActivities={analytics.rawActivities || []}
@@ -495,6 +621,90 @@ export default function ContributorsPage() {
 
             {activeTab === "rankings" && (
               <div className="pt-6">
+                {/* Download CSV Button for Rankings */}
+                <div className="mb-6 flex justify-end">
+                  <button
+                    onClick={async () => {
+                      try {
+                        if (!contributors || contributors.length === 0) {
+                          alert('No contributors data available');
+                          return;
+                        }
+                        
+                        const escapeCSV = (value: any) => {
+                          if (value === null || value === undefined || value === '') return '';
+                          const stringValue = String(value);
+                          if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                            return `"${stringValue.replace(/"/g, '""')}"`;
+                          }
+                          return stringValue;
+                        };
+                        
+                        // Flatten contributor data with repository stats
+                        const detailedRows: string[][] = [];
+                        
+                        contributors.forEach((contributor: Contributor) => {
+                          // For each repository, create a separate row
+                          if (contributor.repositoryStats && contributor.repositoryStats.length > 0) {
+                            contributor.repositoryStats.forEach((repoStat: any) => {
+                              detailedRows.push([
+                                contributor.username,
+                                contributor.name || '',
+                                contributor.company || '',
+                                contributor.location || '',
+                                contributor.totalScore.toString(),
+                                contributor.totalActivities.toString(),
+                                contributor.lastActivityAt ? new Date(contributor.lastActivityAt).toISOString() : '',
+                                repoStat.repository,
+                                `${repoStat.commits || 0} commits`,
+                                `${repoStat.prsOpened || 0} opened, ${repoStat.prsMerged || 0} merged, ${repoStat.prsClosed || 0} closed`,
+                                `${repoStat.reviews || 0} reviews`,
+                                `${repoStat.comments || 0} comments`
+                              ].map(escapeCSV));
+                            });
+                          } else {
+                            // Contributor with no repo stats
+                            detailedRows.push([
+                              contributor.username,
+                              contributor.name || '',
+                              contributor.company || '',
+                              contributor.location || '',
+                              contributor.totalScore.toString(),
+                              contributor.totalActivities.toString(),
+                              contributor.lastActivityAt ? new Date(contributor.lastActivityAt).toISOString() : '',
+                              '', 'No commits', 'No PRs', 'No reviews', 'No comments'
+                            ].map(escapeCSV));
+                          }
+                        });
+                        
+                        const headers = [
+                          'Username', 'Name', 'Company', 'Location', 'Total Score', 'Total Activities',
+                          'Last Activity', 'Repository', 'Commits', 'Pull Requests', 'Reviews', 'Comments'
+                        ];
+                        
+                        const csvContent = [headers.join(','), ...detailedRows.map((row: string[]) => row.join(','))].join('\n');
+                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `contributors-rankings-detailed-${new Date().toISOString().split('T')[0]}.csv`;
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                      } catch (error) {
+                        console.error('Failed to download CSV:', error);
+                        alert('Failed to download CSV. Please try again.');
+                      }
+                    }}
+                    className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-colors"
+                    style={{
+                      backgroundColor: buttonInactiveBg,
+                      border: `2px solid ${buttonInactiveBorder}`,
+                      color: textPrimary
+                    }}
+                  >
+                    Download Detailed CSV
+                  </button>
+                </div>
                 <ContributorRankings contributors={contributors} />
               </div>
             )}
@@ -550,6 +760,95 @@ export default function ContributorsPage() {
                         </option>
                       ))}
                     </select>
+                  </div>
+                  
+                  {/* Download CSV Button */}
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={async () => {
+                        try {
+                          if (!contributors || contributors.length === 0) {
+                            alert('No contributors data available');
+                            return;
+                          }
+                          
+                          const escapeCSV = (value: any) => {
+                            if (value === null || value === undefined || value === '') return '';
+                            const stringValue = String(value);
+                            if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                              return `"${stringValue.replace(/"/g, '""')}"`;
+                            }
+                            return stringValue;
+                          };
+                          
+                          // Flatten contributor data with repository stats
+                          const detailedRows: string[][] = [];
+                          
+                          contributors.forEach((contributor: Contributor) => {
+                            // For each repository, create a separate row
+                            if (contributor.repositoryStats && contributor.repositoryStats.length > 0) {
+                              contributor.repositoryStats.forEach((repoStat: any) => {
+                                detailedRows.push([
+                                  contributor.username,
+                                  contributor.name || '',
+                                  contributor.company || '',
+                                  contributor.location || '',
+                                  contributor.bio || '',
+                                  contributor.totalScore.toString(),
+                                  contributor.totalActivities.toString(),
+                                  contributor.lastActivityAt ? new Date(contributor.lastActivityAt).toISOString() : '',
+                                  contributor.repositories.join('; '),
+                                  repoStat.repository,
+                                  `${repoStat.commits || 0} commits`,
+                                  `${repoStat.prsOpened || 0} opened, ${repoStat.prsMerged || 0} merged, ${repoStat.prsClosed || 0} closed`,
+                                  `${repoStat.reviews || 0} reviews`,
+                                  `${repoStat.comments || 0} comments`
+                                ].map(escapeCSV));
+                              });
+                            } else {
+                              // Contributor with no repo stats
+                              detailedRows.push([
+                                contributor.username,
+                                contributor.name || '',
+                                contributor.company || '',
+                                contributor.location || '',
+                                contributor.bio || '',
+                                contributor.totalScore.toString(),
+                                contributor.totalActivities.toString(),
+                                contributor.lastActivityAt ? new Date(contributor.lastActivityAt).toISOString() : '',
+                                contributor.repositories.join('; '),
+                                '', 'No commits', 'No PRs', 'No reviews', 'No comments'
+                              ].map(escapeCSV));
+                            }
+                          });
+                          
+                          const headers = [
+                            'Username', 'Name', 'Company', 'Location', 'Bio', 'Total Score', 'Total Activities',
+                            'Last Activity', 'All Repositories', 'Repository', 'Commits', 'Pull Requests', 'Reviews', 'Comments'
+                          ];
+                          
+                          const csvContent = [headers.join(','), ...detailedRows.map((row: string[]) => row.join(','))].join('\n');
+                          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `contributors-list-detailed-${new Date().toISOString().split('T')[0]}.csv`;
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                        } catch (error) {
+                          console.error('Failed to download CSV:', error);
+                          alert('Failed to download CSV. Please try again.');
+                        }
+                      }}
+                      className="px-4 py-2 text-xs font-semibold uppercase tracking-wide rounded transition-colors"
+                      style={{
+                        backgroundColor: buttonInactiveBg,
+                        border: `2px solid ${buttonInactiveBorder}`,
+                        color: textPrimary
+                      }}
+                    >
+                      Download Detailed CSV
+                    </button>
                   </div>
                 </div>
 

@@ -22,6 +22,7 @@ interface ActivityTimelineChartProps {
     comments: number;
   }[];
   timelineLabel?: string;
+  rawActivities?: any[];
 }
 
 const METRIC_LABELS: Record<string, string> = {
@@ -34,6 +35,7 @@ const METRIC_LABELS: Record<string, string> = {
 export const ActivityTimelineChart: React.FC<ActivityTimelineChartProps> = ({
   data,
   timelineLabel = "Last 30 days",
+  rawActivities = [],
 }) => {
   const tooltipBg = useColorModeValue("#FFFFFF", "#1F2937");
   const tooltipBorder = useColorModeValue("#E5E7EB", "#374151");
@@ -74,20 +76,76 @@ export const ActivityTimelineChart: React.FC<ActivityTimelineChartProps> = ({
   };
 
   const downloadCSV = () => {
+    // If we have raw activities, export detailed data
+    if (rawActivities && rawActivities.length > 0) {
+      const filteredActivities = selectedMetrics.size > 0
+        ? rawActivities.filter((a: any) => {
+            const type = a.activityType;
+            if (selectedMetrics.has('commits') && type === 'COMMIT') return true;
+            if (selectedMetrics.has('pullRequests') && (type === 'PR_OPENED' || type === 'PR_MERGED' || type === 'PR_CLOSED')) return true;
+            if (selectedMetrics.has('reviews') && (type === 'REVIEW_APPROVED' || type === 'REVIEW_COMMENTED' || type === 'REVIEW_CHANGES_REQUESTED')) return true;
+            if (selectedMetrics.has('comments') && (type === 'ISSUE_COMMENT' || type === 'PR_COMMENT')) return true;
+            return false;
+          })
+        : rawActivities;
+
+      const escapeCSV = (value: any) => {
+        if (value === null || value === undefined || value === '') return '';
+        const stringValue = String(value);
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+        return stringValue;
+      };
+
+      const csvContent = [
+        ['Date', 'Activity Type', 'Repository', 'Username', 'Contributor Name', 'Commit SHA', 'Commit Author', 'PR Title', 'PR State', 'PR Labels', 'Review ID', 'Comment URL'],
+        ...filteredActivities.map((activity: any) => [
+          new Date(activity.timestamp).toISOString().split('T')[0],
+          activity.activityType,
+          activity.repository || '',
+          activity.username || '',
+          activity.metadata?.contributorName || '',
+          activity.metadata?.sha || '',
+          activity.metadata?.commitAuthorName || activity.metadata?.authorName || '',
+          activity.metadata?.title || '',
+          activity.metadata?.state || '',
+          Array.isArray(activity.metadata?.labels) ? activity.metadata.labels.join('; ') : '',
+          activity.metadata?.reviewId || '',
+          activity.metadata?.commentUrl || activity.metadata?.htmlUrl || ''
+        ].map(escapeCSV))
+      ].map((row: string[]) => row.join(',')).join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const filterLabel = selectedMetrics.size > 0 ? `-filtered-${selectedMetrics.size}-metrics` : '-all-detailed';
+      a.download = `activity-timeline${filterLabel}-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      return;
+    }
+
+    // Fallback to aggregated export if no raw activities
     const headers = ['Date'];
     const metricsToExport = selectedMetrics.size > 0 ? Array.from(selectedMetrics) : metricKeys;
     
     metricsToExport.forEach(metric => {
-      headers.push(METRIC_LABELS[metric] || metric);
+      headers.push(`${METRIC_LABELS[metric] || metric} Count`);
     });
 
     const csvContent = [
       headers,
       ...data.map(item => [
         item.date,
-        ...metricsToExport.map(metric => (item as any)[metric] || 0)
+        ...metricsToExport.map(metric => {
+          const count = (item as any)[metric] || 0;
+          const label = METRIC_LABELS[metric] || metric;
+          return `${count} ${label.toLowerCase()}`;
+        })
       ])
-    ].map(row => row.join(',')).join('\n');
+    ].map((row: (string | number)[]) => row.join(',')).join('\n');
     
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);

@@ -120,17 +120,31 @@ export const ActivityDistributionChart: React.FC<ActivityDistributionChartProps>
       ? rawActivities.filter(a => selectedTypes.has(a.activityType))
       : rawActivities;
 
+    const escapeCSV = (value: any) => {
+      if (value === null || value === undefined || value === '') return '';
+      const stringValue = String(value);
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    };
+
     const csvContent = [
-      ['Activity Type', 'Username', 'Repository', 'Title', 'PR Number', 'Timestamp'],
-      ...filteredActivities.map(activity => [
+      ['Activity Type', 'Repository', 'Username', 'Contributor Name', 'Commit SHA', 'Commit Author', 'PR Title', 'PR State', 'PR Labels', 'Review ID', 'Comment URL'],
+      ...filteredActivities.map((activity: any) => [
         ACTIVITY_LABELS[activity.activityType] || activity.activityType,
-        activity.username || '',
         activity.repository || '',
-        (activity.metadata?.title || activity.metadata?.message || '').replace(/,/g, ';'),
-        activity.metadata?.prNumber || '',
-        new Date(activity.timestamp).toISOString()
-      ])
-    ].map(row => row.join(',')).join('\n');
+        activity.username || '',
+        activity.metadata?.contributorName || '',
+        activity.metadata?.sha || '',
+        activity.metadata?.commitAuthorName || activity.metadata?.authorName || '',
+        activity.metadata?.title || '',
+        activity.metadata?.state || '',
+        Array.isArray(activity.metadata?.labels) ? activity.metadata.labels.join('; ') : '',
+        activity.metadata?.reviewId || '',
+        activity.metadata?.commentUrl || activity.metadata?.htmlUrl || ''
+      ].map(escapeCSV))
+    ].map((row: string[]) => row.join(',')).join('\n');
     
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
