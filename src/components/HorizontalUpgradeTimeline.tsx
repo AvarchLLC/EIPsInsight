@@ -60,6 +60,7 @@ const HorizontalUpgradeTimeline: React.FC<HorizontalUpgradeTimelineProps> = ({
   ];
 
   const currentIndex = upgrades.findIndex(u => u.key === 'fusaka');
+  const currentTransitionIndex = currentIndex; // Between Fusaka and Glamsterdam
 
   return (
     <div className={`relative p-6 rounded-2xl ${isDark ? 'bg-gray-800/50' : 'bg-white'} border ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -105,36 +106,15 @@ const HorizontalUpgradeTimeline: React.FC<HorizontalUpgradeTimelineProps> = ({
                   {upgrade.date}
                 </div>
                 
-                {/* "We are here" indicator */}
-                {isCurrent && (
-                  <MotionBox
-                    className="mt-2"
-                    animate={{ y: [0, -6, 0] }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    } as any}
-                  >
-                    <div
-                      className="text-white text-xs font-bold px-3 py-1 rounded-full"
-                      style={{
-                        backgroundColor: upgrade.color,
-                        boxShadow: `0 4px 12px ${upgrade.color}60`,
-                      }}
-                    >
-                      🚀 we are here
-                    </div>
-                  </MotionBox>
-                )}
+                {/* No individual "We are here" indicator on nodes anymore */}
               </MotionBox>
 
               {/* Connecting Line */}
               {index < upgrades.length - 1 && (
-                <div className="flex-1 h-1 relative mx-2 md:mx-4 rounded-full overflow-hidden" style={{
+                <div className="flex-1 h-1 relative mx-2 md:mx-4 rounded-full" style={{
                   backgroundColor: isDark ? '#4A5568' : '#E2E8F0'
                 }}>
-                  {/* Progress line */}
+                  {/* Progress line - full green for completed transitions */}
                   {isBeforeCurrent && (
                     <MotionBox
                       className="absolute top-0 left-0 h-full rounded-full"
@@ -143,6 +123,41 @@ const HorizontalUpgradeTimeline: React.FC<HorizontalUpgradeTimelineProps> = ({
                       animate={{ width: '100%' }}
                       transition={{ duration: 0.8, ease: "easeOut" } as any}
                     />
+                  )}
+                  {/* Half-green line for current transition (between Fusaka and Glamsterdam) */}
+                  {index === currentTransitionIndex && (
+                    <MotionBox
+                      className="absolute top-0 left-0 h-full rounded-full"
+                      style={{ backgroundColor: '#10B981' }}
+                      initial={{ width: '0%' }}
+                      animate={{ width: '50%' }}
+                      transition={{ duration: 0.8, ease: "easeOut" } as any}
+                    />
+                  )}
+                  {/* "We are here" indicator on the transition line */}
+                  {index === currentTransitionIndex && (
+                    <MotionBox
+                      className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
+                      style={{ 
+                        zIndex: 10
+                      }}
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      } as any}
+                    >
+                      <div
+                        className="text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap"
+                        style={{
+                          backgroundColor: '#10B981',
+                          boxShadow: `0 4px 12px #10B98160`,
+                        }}
+                      >
+                        🚀 we are here
+                      </div>
+                    </MotionBox>
                   )}
                 </div>
               )}
