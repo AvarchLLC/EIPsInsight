@@ -90,8 +90,8 @@ const rawData: UpgradeData[] = [
     eips: ["EIP-7594", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7939", "EIP-7951"]
   },
 
-  // Osaka — December 3, 2025 (Consensus layer)
-  { date: "2025-12-03", upgrade: "Osaka", layer: "consensus", eips: ["CONSENSUS"] },
+  // // Osaka — December 3, 2025 (Consensus layer)
+  // { date: "2025-12-03", upgrade: "Osaka", layer: "consensus", eips: ["CONSENSUS"] },
 
   // Pectra (Prague-Electra) — May 7, 2025 (Execution layer)
   { 
@@ -102,7 +102,7 @@ const rawData: UpgradeData[] = [
   },
 
   // Electra — May 7, 2025 (Consensus layer)
-  { date: "2025-05-07", upgrade: "Electra", layer: "consensus", eips: ["CONSENSUS"] },
+  // { date: "2025-05-07", upgrade: "Electra", layer: "consensus", eips: ["CONSENSUS"] },
 
   // Dencun (Cancun-Deneb) — March 13, 2024 (Execution layer)
   { 
@@ -113,7 +113,7 @@ const rawData: UpgradeData[] = [
   },
 
   // Deneb — March 13, 2024 (Consensus layer)
-  { date: "2024-03-13", upgrade: "Deneb", layer: "consensus", eips: ["CONSENSUS"] },
+  // { date: "2024-03-13", upgrade: "Deneb", layer: "consensus", eips: ["CONSENSUS"] },
 
   // Shanghai — April 12, 2023 (Execution layer)
   { 
