@@ -1,0 +1,110 @@
+[
+  {
+    "eip": "2537",
+    "title": "Precompile for BLS12-381 curve operations",
+    "author": "Alex Vlasov (@shamatar), Kelly Olson (@ineffectualproperty), Alex Stokes (@ralexstokes), Antonio Sanso (@asanso)",
+    "link": "https://eipsinsight.com/eips/eip-2537",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip2537-bls12-precompile-discussion-thread/4187"
+  },
+  {
+    "eip": "2935",
+    "title": "Serve historical block hashes from state",
+    "author": "Vitalik Buterin (@vbuterin), Tomasz Stanczak (@tkstanczak), Guillaume Ballet (@gballet), Gajinder Singh (@g11tech), Tanishq Jasoria (@tanishqjasoria), Ignacio Hagopian (@jsign), Jochem Brouwer (@jochem-brouwer)",
+    "link": "https://eipsinsight.com/eips/eip-2935",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-2935-save-historical-block-hashes-in-state/4565"
+  },
+  {
+    "eip": "6110",
+    "title": "Supply validator deposits on chain",
+    "author": "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo), Peter Davies (@petertdavies)",
+    "link": "https://eipsinsight.com/eips/eip-6110",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-6110-supply-validator-deposits-on-chain/12072"
+  },
+  {
+    "eip": "7002",
+    "title": "Execution layer triggerable withdrawals",
+    "author": "Danny Ryan (@djrtwo), Mikhail Kalinin (@mkalinin), Ansgar Dietrichs (@adietrichs), Hsiao-Wei Wang (@hwwhww), lightclient (@lightclient)",
+    "link": "https://eipsinsight.com/eips/eip-7002",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7002-execution-layer-triggerable-exits/14195"
+  },
+  {
+    "eip": "7251",
+    "title": "Increase the MAX_EFFECTIVE_BALANCE",
+    "author": "mike (@michaelneuder), Francesco (@fradamt), dapplion (@dapplion), Mikhail (@mkalinin), Aditya (@adiasg), Justin (@justindrake), lightclient (@lightclient)",
+    "link": "https://eipsinsight.com/eips/eip-2251",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7251-increase-the-max-effective-balance/15982"
+  },
+  {
+    "eip": "7549",
+    "title": "Move committee index outside Attestation",
+    "author": "dapplion (@dapplion)",
+    "link": "https://eipsinsight.com/eips/eip-7549",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7549-move-committee-index-outside-attestation/16390"
+  },
+  {
+    "eip": "7685",
+    "title": "General purpose execution layer requests",
+    "author": "lightclient (@lightclient)",
+    "link": "https://eipsinsight.com/eips/eip-7685",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7685-general-purpose-execution-layer-requests/19668"
+  },
+  {
+    "eip": "7702",
+    "title": "Set EOA account code",
+    "author": "Vitalik Buterin (@vbuterin), Sam Wilson (@SamWilsn), Ansgar Dietrichs (@adietrichs), Matt Garnett (@lightclient)",
+    "link": "https://eipsinsight.com/eips/eip-7702",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-set-eoa-account-code-for-one-transaction/19923"
+  },
+  {
+    "eip": "7691",
+    "title": "Blob throughput increase",
+    "author": "Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation), Sam Calder-Mason (@samcm), Andrew Davis (@savid), Ansgar Dietrichs (@adietrichs)",
+    "link": "https://eipsinsight.com/eips/eip-7691",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7691-blob-throughput-increase/19694"
+  },
+  {
+    "eip": "7642",
+    "title": "eth/69 - history expiry and simpler receipts",
+    "author": "Marius van der Wijden (@MariusVanDerWijden), Felix Lange <fjl@ethereum.org>, Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>",
+    "link": "https://eipsinsight.com/eips/eip-7642",
+    "type": "Standards Track",
+    "category": "Networking",
+    "discussion": "https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+  },
+  {
+    "eip": "7623",
+    "title": "Increase calldata cost",
+    "author": "Toni Wahrstätter (@nerolation), Vitalik Buterin (@vbuterin)",
+    "link": "https://eipsinsight.com/eips/eip-7623",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7623-increase-calldata-cost/18647"
+  },
+  {
+    "eip": "7840",
+    "title": "Add blob schedule to EL config files",
+    "author": "lightclient (@lightclient)",
+    "link": "https://eipsinsight.com/eips/eip-7840",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182"
+  }
+]

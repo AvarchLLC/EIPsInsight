@@ -2,9 +2,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Box, Button, Flex, Heading, HStack, IconButton, Text, VStack, Wrap, WrapItem,
-  useColorModeValue
+  useColorModeValue,
+  Badge,
+  Collapse
 } from '@chakra-ui/react';
-import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
+import { AddIcon, MinusIcon, RepeatIcon, ChevronDownIcon, ChevronUpIcon, InfoIcon } from '@chakra-ui/icons';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { scaleBand, scaleLinear } from '@visx/scale';
 import { Group } from '@visx/group';
@@ -13,19 +15,51 @@ import { useRouter } from 'next/router';
 import CopyLink from './CopyLink'; // Ensure this component exists
 import DateTime from "@/components/DateTime";
 
+
 interface UpgradeData {
   date: string;
   upgrade: string;
   eips: string[];
-  
+  layer?: 'execution' | 'consensus';
+  description?: string;
 }
 
+const upgradeDescriptions: Record<string, string> = {
+  "Fusaka": "Fulu-Osaka: PeerDAS for blob scaling, gas limit increase to 60M",
+  "Osaka": "Consensus layer: Future scaling improvements",
+  "Pectra": "Prague-Electra: Account abstraction (EIP-7702), validator improvements",
+  "Electra": "Consensus layer: Validator consolidation & staking enhancements",
+  "Dencun": "Cancun-Deneb: Proto-danksharding (EIP-4844) for L2 scaling",
+  "Deneb": "Consensus layer: Blob infrastructure support",
+  "Shanghai": "Execution layer: Staking withdrawals enabled",
+  "Capella": "Consensus layer: Validator exit & withdrawal support",
+  "Paris": "The Merge: Transition to Proof of Stake",
+  "Bellatrix": "Consensus layer: Merge preparation",
+  "Gray Glacier": "Difficulty bomb delay",
+  "Arrow Glacier": "Difficulty bomb delay",
+  "Altair": "First Beacon Chain upgrade: Sync committees",
+  "London": "EIP-1559 fee market reform",
+  "Berlin": "Gas cost optimizations",
+  "Muir Glacier": "Difficulty bomb delay",
+  "Istanbul": "Privacy & interoperability improvements",
+  "Constantinople": "EVM improvements & efficiency",
+  "Petersburg": "Constantinople hotfix",
+  "Byzantium": "Privacy & security enhancements",
+  "Spurious Dragon": "DoS attack mitigation",
+  "Tangerine Whistle": "DoS attack response",
+  "DAO Fork": "Irregular state change to recover DAO funds",
+  "Homestead": "First planned protocol upgrade",
+};
 
 const professionalColorMap: Record<string, string> = {
   "Fusaka": "#10B981",            // Emerald 500 (2025-12-03)
+  "Osaka": "#10B981",             // Emerald 500 (Consensus layer)
   "Pectra": "#DC2626",            // Red 600 (2025-05-07)
+  "Electra": "#DC2626",           // Red 600 (Consensus layer)
   "Dencun": "#2563EB",            // Blue 600 (2024-03-13)
+  "Deneb": "#2563EB",             // Blue 600 (Consensus layer)
   "Shanghai": "#059669",          // Emerald 600 (2023-04-12)
+  "Capella": "#059669",           // Emerald 600 (Consensus layer)
   "Paris": "#7C3AED",             // Violet 600 (2022-09-15)
   "Bellatrix": "#EA580C",         // Orange 600 (2022-09-06)
   "Gray Glacier": "#4F46E5",      // Indigo 600 (2022-06-30)
@@ -42,165 +76,148 @@ const professionalColorMap: Record<string, string> = {
   "Tangerine Whistle": "#CA8A04", // Yellow 600 (2016-10-18)
   "DAO Fork": "#C2410C",          // Orange 700 (2016-07-20)
   "Homestead": "#7C2D12",         // Orange 800 (2016-03-14)
-  "Frontier Thawing": "#1E40AF",  // Blue 800 (2015-09-07)
-  "Frontier": "#1E3A8A",          // Blue 900 (2015-07-30)
 };
 
 
 
-// Original data set
-const rawData = [
-  // Fusaka (Fulu-Osaka) — December 3, 2025 (Core EIPs only)
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7594" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7823" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7825" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7883" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7917" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7918" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7934" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7939" },
-  { date: "2025-12-03", upgrade: "Fusaka", eip: "EIP-7951" },
+// Grouped data structure - each upgrade has its EIPs in an array
+const rawData: UpgradeData[] = [
+  // Fusaka (Fulu-Osaka) — December 3, 2025 (Execution layer)
+  { 
+    date: "2025-12-03", 
+    upgrade: "Fusaka", 
+    layer: "execution",
+    eips: ["EIP-7594", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7939", "EIP-7951"]
+  },
 
-  // Pectra (Prague-Electra) — May 7, 2025 (Core EIPs only)
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-2537" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-2935" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-6110" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7002" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7251" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7549" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7623" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7685" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7691" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7702" },
-  { date: "2025-05-07", upgrade: "Pectra", eip: "EIP-7840" },
+  // Osaka — December 3, 2025 (Consensus layer)
+  { date: "2025-12-03", upgrade: "Osaka", layer: "consensus", eips: ["CONSENSUS"] },
 
-  // Dencun (Cancun-Deneb) — March 13, 2024
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-1153" },
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-4788" },
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-4844" },
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-5656" },
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-6780" },
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7044" },
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7045" },
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7514" },
-  { date: "2024-03-13", upgrade: "Dencun", eip: "EIP-7516" },
+  // Pectra (Prague-Electra) — May 7, 2025 (Execution layer)
+  { 
+    date: "2025-05-07", 
+    upgrade: "Pectra", 
+    layer: "execution",
+    eips: ["EIP-2537", "EIP-2935", "EIP-6110", "EIP-7002", "EIP-7251", "EIP-7549", "EIP-7623", "EIP-7685", "EIP-7691", "EIP-7702", "EIP-7840"]
+  },
 
-  // Shanghai/Capella ("Shapella") — April 12, 2023
-  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3651" },
-  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3855" },
-  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-3860" },
-  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-4895" },
-  { date: "2023-04-12", upgrade: "Shanghai", eip: "EIP-6049" },
+  // Electra — May 7, 2025 (Consensus layer)
+  { date: "2025-05-07", upgrade: "Electra", layer: "consensus", eips: ["CONSENSUS"] },
 
-  // Paris (The Merge) — September 15, 2022
-  { date: "2022-09-15", upgrade: "Paris", eip: "EIP-3675" },
-  { date: "2022-09-15", upgrade: "Paris", eip: "EIP-4399" },
+  // Dencun (Cancun-Deneb) — March 13, 2024 (Execution layer)
+  { 
+    date: "2024-03-13", 
+    upgrade: "Dencun", 
+    layer: "execution",
+    eips: ["EIP-1153", "EIP-4788", "EIP-4844", "EIP-5656", "EIP-6780", "EIP-7044", "EIP-7045", "EIP-7514", "EIP-7516"]
+  },
 
-  // Bellatrix — September 6, 2022 [Consensus layer upgrade]
-  // No EIPs directly, consensus-side upgrade for The Merge preparation
+  // Deneb — March 13, 2024 (Consensus layer)
+  { date: "2024-03-13", upgrade: "Deneb", layer: "consensus", eips: ["CONSENSUS"] },
 
-  // Gray Glacier — June 30, 2022
-  { date: "2022-06-30", upgrade: "Gray Glacier", eip: "EIP-5133" },
+  // Shanghai — April 12, 2023 (Execution layer)
+  { 
+    date: "2023-04-12", 
+    upgrade: "Shanghai", 
+    layer: "execution",
+    eips: ["EIP-3651", "EIP-3855", "EIP-3860", "EIP-4895", "EIP-6049"]
+  },
 
-  // Arrow Glacier — December 9, 2021
-  { date: "2021-12-09", upgrade: "Arrow Glacier", eip: "EIP-4345" },
+  // Capella — April 12, 2023 (Consensus layer)
+  { date: "2023-04-12", upgrade: "Capella", layer: "consensus", eips: ["CONSENSUS"] },
 
-  // Altair — October 27, 2021 [Consensus layer upgrade]
-  // No EIPs directly, consensus-side upgrade for Beacon Chain
+  // Paris (The Merge) — September 15, 2022 (Execution layer)
+  { date: "2022-09-15", upgrade: "Paris", layer: "execution", eips: ["EIP-3675", "EIP-4399"] },
 
-  // London — August 5, 2021
-  { date: "2021-08-05", upgrade: "London", eip: "EIP-1559" },
-  { date: "2021-08-05", upgrade: "London", eip: "EIP-3198" },
-  { date: "2021-08-05", upgrade: "London", eip: "EIP-3529" },
-  { date: "2021-08-05", upgrade: "London", eip: "EIP-3541" },
-  { date: "2021-08-05", upgrade: "London", eip: "EIP-3554" },
+  // Bellatrix — September 6, 2022 (Consensus layer)
+  { date: "2022-09-06", upgrade: "Bellatrix", layer: "consensus", eips: ["CONSENSUS"] },
 
-  // Berlin — April 15, 2021
-  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2565" },
-  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2929" },
-  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2718" },
-  { date: "2021-04-15", upgrade: "Berlin", eip: "EIP-2930" },
+  // Gray Glacier — June 30, 2022 (Execution layer)
+  { date: "2022-06-30", upgrade: "Gray Glacier", layer: "execution", eips: ["EIP-5133"] },
 
-  // Muir Glacier — January 2, 2020
-  { date: "2020-01-02", upgrade: "Muir Glacier", eip: "EIP-2384" },
+  // Arrow Glacier — December 9, 2021 (Execution layer)
+  { date: "2021-12-09", upgrade: "Arrow Glacier", layer: "execution", eips: ["EIP-4345"] },
 
-  // Istanbul — December 8, 2019
-  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-152" },
-  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-1108" },
-  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-1344" },
-  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-1884" },
-  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-2028" },
-  { date: "2019-12-08", upgrade: "Istanbul", eip: "EIP-2200" },
+  // Altair — October 27, 2021 (Consensus layer)
+  { date: "2021-10-27", upgrade: "Altair", layer: "consensus", eips: ["CONSENSUS"] },
 
-  // (Petersburg hard fork was simultaneous; repeat EIPs where relevant)
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1283" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-145" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1014" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1052" },
-  { date: "2019-02-28", upgrade: "Petersburg", eip: "EIP-1234" },
+  // London — August 5, 2021 (Execution layer)
+  { 
+    date: "2021-08-05", 
+    upgrade: "London", 
+    layer: "execution",
+    eips: ["EIP-1559", "EIP-3198", "EIP-3529", "EIP-3541", "EIP-3554"]
+  },
 
-    // Constantinople — February 28, 2019
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-145" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1014" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1052" },
-  { date: "2019-02-28", upgrade: "Constantinople", eip: "EIP-1234" },
+  // Berlin — April 15, 2021 (Execution layer)
+  { 
+    date: "2021-04-15", 
+    upgrade: "Berlin", 
+    layer: "execution",
+    eips: ["EIP-2565", "EIP-2929", "EIP-2718", "EIP-2930"]
+  },
 
-  // Byzantium — October 16, 2017
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-100" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-140" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-196" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-197" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-198" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-211" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-214" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-649" },
-  { date: "2017-10-16", upgrade: "Byzantium", eip: "EIP-658" },
+  // Muir Glacier — January 2, 2020 (Execution layer)
+  { date: "2020-01-02", upgrade: "Muir Glacier", layer: "execution", eips: ["EIP-2384"] },
 
-  // Homestead — March 14, 2016
-  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-2" },
-  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-7" },
-  { date: "2016-03-14", upgrade: "Homestead", eip: "EIP-8" },
+  // Istanbul — December 8, 2019 (Execution layer)
+  { 
+    date: "2019-12-08", 
+    upgrade: "Istanbul", 
+    layer: "execution",
+    eips: ["EIP-152", "EIP-1108", "EIP-1344", "EIP-1884", "EIP-2028", "EIP-2200"]
+  },
 
-  // DAO Fork — July 20, 2016
-  // No specific EIP, was an irregular state change to recover DAO funds
+  // Petersburg — February 28, 2019 (Execution layer)
+  { 
+    date: "2019-02-28", 
+    upgrade: "Petersburg", 
+    layer: "execution",
+    eips: ["EIP-1283", "EIP-145", "EIP-1014", "EIP-1052"]
+  },
 
-  // Tangerine Whistle — October 18, 2016
-  { date: "2016-10-18", upgrade: "Tangerine Whistle", eip: "EIP-150" },
+  // Constantinople — February 28, 2019 (Execution layer)
+  { 
+    date: "2019-02-28", 
+    upgrade: "Constantinople", 
+    layer: "execution",
+    eips: ["EIP-145", "EIP-1014", "EIP-1052", "EIP-1234"]
+  },
 
-  // Spurious Dragon — November 23, 2016
-  { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-155" },
-  { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-160" },
-  { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-161" },
-  { date: "2016-11-23", upgrade: "Spurious Dragon", eip: "EIP-170" },
+  // Byzantium — October 16, 2017 (Execution layer)
+  { 
+    date: "2017-10-16", 
+    upgrade: "Byzantium", 
+    layer: "execution",
+    eips: ["EIP-100", "EIP-140", "EIP-196", "EIP-197", "EIP-198", "EIP-211", "EIP-214", "EIP-649", "EIP-658"]
+  },
+
+  // Spurious Dragon — November 23, 2016 (Execution layer)
+  { 
+    date: "2016-11-23", 
+    upgrade: "Spurious Dragon", 
+    layer: "execution",
+    eips: ["EIP-155", "EIP-160", "EIP-161", "EIP-170"]
+  },
+
+  // Tangerine Whistle — October 18, 2016 (Execution layer)
+  { date: "2016-10-18", upgrade: "Tangerine Whistle", layer: "execution", eips: ["EIP-150"] },
 
   // DAO Fork — July 20, 2016 (Irregular state change)
-  { date: "2016-07-20", upgrade: "DAO Fork", eip: "EIP-779" },
+  { date: "2016-07-20", upgrade: "DAO Fork", layer: "execution", eips: ["NO-EIP"] },
 
-  // Frontier Thawing — September 7, 2015
-  { date: "2015-09-07", upgrade: "Frontier Thawing", eip: "EIP-3" },
-
-  // Frontier — July 30, 2015 (Genesis mainnet launch)  
-  { date: "2015-07-30", upgrade: "Frontier", eip: "EIP-1" },
+  // Homestead — March 14, 2016 (Execution layer)
+  { date: "2016-03-14", upgrade: "Homestead", layer: "execution", eips: ["EIP-2", "EIP-7", "EIP-8"] },
 ];
 
-// Group data by date-upgrade combination (keeping duplicates)
-const upgradeMap: Record<string, { date: string, upgrade: string, eips: string[] }> = {};
-for (const { date, upgrade, eip } of rawData) {
-  // Only process actual EIP entries (must start with "EIP-" or be a number)
-  const isValidEIP = eip.startsWith("EIP-") || /^\d+$/.test(eip);
-  if (!isValidEIP) continue;
-  
-  const baseKey = `${date}-${upgrade}`;
-  let key = baseKey;
-  let counter = 1;
-  while (upgradeMap[key] && upgradeMap[key].eips.includes(eip.replace("EIP-", ""))) {
-    key = `${baseKey}-${counter++}`;
-  }
-  if (!upgradeMap[key]) upgradeMap[key] = { date, upgrade, eips: [] };
-  if (eip) upgradeMap[key].eips.push(eip.replace("EIP-", ""));
-}
-
-const upgradeRows = Object.values(upgradeMap)
+// Process and format EIP display names
+const upgradeRows = rawData
+  .map(item => ({
+    ...item,
+    eips: item.eips.map(eip => 
+      eip === "NO-EIP" || eip === "CONSENSUS" ? eip : eip.replace("EIP-", "")
+    )
+  }))
   .filter(row => row.eips.length > 0) // Only include upgrades that have actual EIPs
   .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -220,6 +237,7 @@ const NetworkUpgradesChart: React.FC = () => {
   const [hoveredNetwork, setHoveredNetwork] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [dimensions, setDimensions] = useState({ width: 1400, height: 500 });
+  const [showLayerInfo, setShowLayerInfo] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const bg = useColorModeValue('gray.50', 'gray.800');
@@ -355,6 +373,82 @@ const NetworkUpgradesChart: React.FC = () => {
               </Button>
             </HStack>
           </Flex>
+
+          {/* Collapsible Info Section */}
+          <Box mt={4}>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowLayerInfo(!showLayerInfo)}
+              rightIcon={showLayerInfo ? <ChevronUpIcon /> : <ChevronDownIcon />}
+              leftIcon={<InfoIcon />}
+              colorScheme="blue"
+              fontWeight="500"
+            >
+              {showLayerInfo ? 'Hide' : 'Show'} Layer Information
+            </Button>
+            
+            <Collapse in={showLayerInfo} animateOpacity>
+              <Box
+                mt={3}
+                p={5}
+                bg={useColorModeValue('blue.50', 'gray.700')}
+                borderRadius="lg"
+                border="1px solid"
+                borderColor={useColorModeValue('blue.200', 'blue.600')}
+                boxShadow="sm"
+              >
+                <VStack align="start" spacing={4}>
+                  <Box>
+                    <Heading size="sm" mb={2} color={useColorModeValue('gray.900', 'white')}>
+                      Understanding Layer Badges
+                    </Heading>
+                    <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.7">
+                      Network upgrades are categorized by the layer of the Ethereum protocol they modify:
+                    </Text>
+                  </Box>
+
+                  <HStack spacing={8} flexWrap="wrap">
+                    <Box>
+                      <HStack mb={2}>
+                        <Badge colorScheme="teal" fontSize="sm" px={2} py={1}>⚙️ Execution Layer</Badge>
+                      </HStack>
+                      <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} maxW="400px" lineHeight="1.7">
+                        Protocol changes implemented through Ethereum Improvement Proposals (EIPs). These affect transaction execution, gas mechanics, smart contracts, and the Ethereum Virtual Machine (EVM).
+                      </Text>
+                      <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} mt={1} fontStyle="italic">
+                        Examples: London (EIP-1559), Shanghai (EIP-3651, EIP-3855)
+                      </Text>
+                    </Box>
+
+                    <Box>
+                      <HStack mb={2}>
+                        <Badge colorScheme="purple" fontSize="sm" px={2} py={1}>⛓️ Consensus Layer</Badge>
+                      </HStack>
+                      <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} maxW="400px" lineHeight="1.7">
+                        Beacon Chain upgrades that don't have formal EIP numbers. These affect proof-of-stake consensus, validators, attestations, and the beacon chain protocol.
+                      </Text>
+                      <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} mt={1} fontStyle="italic">
+                        Examples: Altair (sync committees), Capella (withdrawals), Deneb (Proto-Danksharding)
+                      </Text>
+                    </Box>
+                  </HStack>
+
+                  <Box 
+                    bg={useColorModeValue('yellow.50', 'gray.600')} 
+                    p={3} 
+                    borderRadius="md"
+                    border="1px solid"
+                    borderColor={useColorModeValue('yellow.200', 'yellow.700')}
+                  >
+                    <Text fontSize="xs" color={useColorModeValue('gray.700', 'gray.200')} lineHeight="1.6">
+                      <strong>Note:</strong> Some network upgrades like Shanghai and Cancun contain changes to both layers, coordinated at the same activation time. The badge indicates the primary layer affected by each specific EIP or upgrade component.
+                    </Text>
+                  </Box>
+                </VStack>
+              </Box>
+            </Collapse>
+          </Box>
         </Box>
 
         {/* Main Content Area */}
@@ -508,24 +602,25 @@ const NetworkUpgradesChart: React.FC = () => {
       {hoveredData && (
         <Box
           position="absolute"
-          top={`${Math.min(mousePos.y + 15, height - 120)}px`}
-          left={`${Math.min(mousePos.x + 15, width - 240)}px`}
+          top={`${Math.min(mousePos.y + 15, height - 180)}px`}
+          left={`${Math.min(mousePos.x + 15, width - 320)}px`}
           bg={useColorModeValue('white', 'gray.800')}
           color={useColorModeValue('gray.800', 'white')}
-          px={5}
-          py={4}
+          px={6}
+          py={5}
           borderRadius="xl"
-          boxShadow={useColorModeValue('0 10px 30px rgba(0,0,0,0.15)', '0 10px 30px rgba(0,0,0,0.5)')}
+          boxShadow={useColorModeValue('0 10px 40px rgba(0,0,0,0.2)', '0 10px 40px rgba(0,0,0,0.6)')}
           zIndex={20}
           border="2px solid"
-          borderColor={useColorModeValue('gray.100', 'gray.700')}
+          borderColor={colorMap[hoveredData.upgrade]}
           pointerEvents="none"
-          minW="220px"
+          minW="280px"
+          maxW="320px"
         >
           <VStack align="start" spacing={3} width="100%">
-            <HStack spacing={2} align="center">
+            <HStack spacing={2} align="center" wrap="wrap">
               <Box
-                bg="teal.500"
+                bg={hoveredData.eip === "CONSENSUS" ? "purple.500" : hoveredData.eip === "NO-EIP" ? "orange.500" : "teal.500"}
                 color="white"
                 px={3}
                 py={1}
@@ -533,25 +628,47 @@ const NetworkUpgradesChart: React.FC = () => {
                 fontSize="sm"
                 fontWeight="bold"
               >
-                EIP-{hoveredData.eip}
+                {hoveredData.eip === "CONSENSUS" ? "🔗 Consensus" : hoveredData.eip === "NO-EIP" ? "⚠️ Irregular" : `EIP-${hoveredData.eip}`}
               </Box>
+              {upgradeRows.find(r => r.upgrade === hoveredData.upgrade)?.layer && (
+                <Badge
+                  colorScheme={upgradeRows.find(r => r.upgrade === hoveredData.upgrade)?.layer === "consensus" ? "purple" : "blue"}
+                  fontSize="xs"
+                  px={2}
+                  py={0.5}
+                  borderRadius="md"
+                >
+                  {upgradeRows.find(r => r.upgrade === hoveredData.upgrade)?.layer === "consensus" ? "⛓️ Consensus" : "⚙️ Execution"}
+                </Badge>
+              )}
             </HStack>
             
             <Box>
               <Text 
-                fontSize="md" 
-                fontWeight="semibold" 
-                color={useColorModeValue('gray.800', 'gray.100')}
-                lineHeight="1.4"
+                fontSize="lg" 
+                fontWeight="bold" 
+                color={useColorModeValue('gray.900', 'white')}
+                lineHeight="1.3"
               >
-                {hoveredData.upgrade} Upgrade
+                {hoveredData.upgrade}
               </Text>
+              {upgradeDescriptions[hoveredData.upgrade] && (
+                <Text 
+                  fontSize="sm" 
+                  color={useColorModeValue('gray.600', 'gray.300')}
+                  mt={2}
+                  lineHeight="1.5"
+                >
+                  {upgradeDescriptions[hoveredData.upgrade]}
+                </Text>
+              )}
               <Text 
                 fontSize="xs" 
                 color={useColorModeValue('gray.500', 'gray.400')}
-                mt={1}
+                mt={2}
+                fontWeight="600"
               >
-                {new Date(hoveredData.date).toLocaleDateString('en-US', { 
+                📅 {new Date(hoveredData.date).toLocaleDateString('en-US', { 
                   month: 'long', 
                   day: 'numeric',
                   year: 'numeric' 
@@ -559,20 +676,22 @@ const NetworkUpgradesChart: React.FC = () => {
               </Text>
             </Box>
 
-            <Box
-              w="100%"
-              pt={2}
-              borderTop="1px solid"
-              borderColor={useColorModeValue('gray.200', 'gray.600')}
-            >
-              <Text 
-                fontSize="xs" 
-                color={useColorModeValue('blue.600', 'blue.400')}
-                fontWeight="medium"
+            {hoveredData.eip !== "CONSENSUS" && hoveredData.eip !== "NO-EIP" && (
+              <Box
+                w="100%"
+                pt={2}
+                borderTop="1px solid"
+                borderColor={useColorModeValue('gray.200', 'gray.600')}
               >
-                💡 Click to view full details
-              </Text>
-            </Box>
+                <Text 
+                  fontSize="xs" 
+                  color={useColorModeValue('blue.600', 'blue.400')}
+                  fontWeight="medium"
+                >
+                  💡 Click to view EIP details
+                </Text>
+              </Box>
+            )}
           </VStack>
         </Box>
       )}

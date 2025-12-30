@@ -1,0 +1,138 @@
+[
+  {
+    "date": "2024-02-15",
+    "included": [],
+    "scheduled": [],
+    "declined": [],
+    "considered": ["EIP-4762", "EIP-6800", "EIP-6873", "EIP-7545"],
+    "proposed": []
+  },
+  {
+    "date": "2024-04-11",
+    "included": [],
+    "scheduled": [],
+    "declined": [],
+    "considered": ["EIP-4762", "EIP-6800", "EIP-6873", "EIP-7545", "EIP-7667"],
+    "proposed": []
+  },
+  {
+    "date": "2025-03-27",
+    "included": [],
+    "scheduled": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7594", "EIP-7620", "EIP-7692", "EIP-7698", "EIP-7873"],
+    "declined": [],
+    "considered": ["EIP-5920", "EIP-7692", "EIP-7761", "EIP-7834", "EIP-7880", "EIP-7883"],
+    "proposed": []
+  },
+  {
+    "date": "2025-04-14",
+    "included": [],
+    "scheduled": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7594", "EIP-7620", "EIP-7642", "EIP-7692", "EIP-7698", "EIP-7873"],
+    "declined": ["EIP-7666", "EIP-7668", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7843", "EIP-7889", "EIP-7903", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7692", "EIP-7761", "EIP-7762", "EIP-7823", "EIP-7825", "EIP-7834", "EIP-7880", "EIP-7883", "EIP-7892", "EIP-7907", "EIP-7918"],
+    "proposed": []
+  },
+  {
+    "date": "2025-04-19",
+    "included": [],
+    "scheduled": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7594", "EIP-7620", "EIP-7642", "EIP-7692", "EIP-7698", "EIP-7873", "EIP-7892"],
+    "declined": ["EIP-7666", "EIP-7668", "EIP-7688", "EIP-7732", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7843", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7692", "EIP-7761", "EIP-7762", "EIP-7823", "EIP-7825", "EIP-7834", "EIP-7880", "EIP-7883", "EIP-7907", "EIP-7917", "EIP-7918"],
+    "proposed": []
+  },
+  {
+    "date": "2025-04-28",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7892"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7762", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7907", "EIP-7917", "EIP-7918"],
+    "proposed": []
+  },
+  {
+    "date": "2025-05-05",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7892"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7762", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7907", "EIP-7917", "EIP-7918"],
+    "proposed": []
+  },
+  {
+    "date": "2025-05-09",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7892", "EIP-7935"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7762", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7907", "EIP-7917", "EIP-7918", "EIP-7934"],
+    "proposed": []
+  },
+  {
+    "date": "2025-05-13",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7892", "EIP-7935"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7762", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7907", "EIP-7917", "EIP-7918", "EIP-7934"],
+    "proposed": []
+  },
+  {
+    "date": "2025-05-21",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7883", "EIP-7892", "EIP-7935"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7762", "EIP-7825", "EIP-7907", "EIP-7917", "EIP-7918", "EIP-7934"],
+    "proposed": []
+  },
+  {
+    "date": "2025-05-22",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7892", "EIP-7918", "EIP-7935"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7762", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7907", "EIP-7917", "EIP-7934"],
+    "proposed": []
+  },
+  {
+    "date": "2025-06-02",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7892", "EIP-7917", "EIP-7918", "EIP-7935"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7762", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": ["EIP-5920", "EIP-7907", "EIP-7934"],
+    "proposed": []
+  },
+  {
+    "date": "2025-06-05",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7892", "EIP-7917", "EIP-7918", "EIP-7935"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-5920", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7762", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": ["EIP-7907", "EIP-7934"],
+    "proposed": []
+  },
+  {
+    "date": "2025-07-02",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7892", "EIP-7907", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7935", "EIP-7939", "EIP-7951"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-5920", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7762", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": [],
+    "proposed": []
+  },
+  {
+    "date": "2025-07-10",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7892", "EIP-7907", "EIP-7910", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7935", "EIP-7939", "EIP-7951"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-5920", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7692", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7762", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": [],
+    "proposed": []
+  },
+  {
+    "date": "2025-07-17",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7892", "EIP-7910", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7935", "EIP-7939", "EIP-7951"],
+    "declined": ["EIP-663", "EIP-3540", "EIP-3670", "EIP-4200", "EIP-4750", "EIP-5450", "EIP-5920", "EIP-6206", "EIP-7069", "EIP-7480", "EIP-7620", "EIP-7666", "EIP-7668", "EIP-7688", "EIP-7698", "EIP-7732", "EIP-7761", "EIP-7762", "EIP-7783", "EIP-7791", "EIP-7793", "EIP-7805", "EIP-7819", "EIP-7834", "EIP-7843", "EIP-7873", "EIP-7880", "EIP-7889", "EIP-7898", "EIP-7903", "EIP-7912", "EIP-7919"],
+    "considered": [],
+    "proposed": []
+  },
+  {
+    "date": "2025-09-16",
+    "included": [],
+    "scheduled": ["EIP-7594", "EIP-7642", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7892", "EIP-7910", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7935", "EIP-7939", "EIP-7951"],
+    "declined": [],
+    "considered": [],
+    "proposed": []
+  }
+]

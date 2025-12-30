@@ -811,41 +811,27 @@ const glamsterDamData = [
     'EIP-2780',
     'EIP-2926',
     'EIP-5920',
-    'EIP-6404',
-    'EIP-6466',
     'EIP-7610',
     'EIP-7668',
     'EIP-7686',
     'EIP-7688',
-    'EIP-7708',
     'EIP-7745',
-    'EIP-7778',
-    'EIP-7791',
     'EIP-7793',
-    'EIP-7819',
-    'EIP-7843',
     'EIP-7872',
     'EIP-7903',
     'EIP-7904',
     'EIP-7907',
     'EIP-7923',
-    'EIP-7932',
     'EIP-7949',
     'EIP-7971',
     'EIP-7973',
     'EIP-7976',
-    'EIP-7979',
     'EIP-7981',
     'EIP-7997',
-    'EIP-8011',
-    'EIP-8013',
-    'EIP-8024',
-    'EIP-8030',
     'EIP-8032',
     'EIP-8037',
     'EIP-8038',
-    'EIP-8053',
-    'EIP-8057',
+    'EIP-8051',
     'EIP-8058',
     'EIP-8061',
     'EIP-8070',
@@ -919,14 +905,14 @@ const upgradeColors: Record<string, string> = {
   'pectra': '#DC2626',
   'fusaka': '#10B981',
   'glamsterdam': '#8B5CF6',
-  'hekabogota': '#F59E0B'
+  'hegota': '#F59E0B'
 };
 
 const upgradeDates: Record<string, string> = {
   'pectra': '2025-05-07',
   'fusaka': '2025-12-03',
   'glamsterdam': '2026-06-01',
-  'hekabogota': 'TBD'
+  'hegota': 'TBD'
 };
 
 // Type for a Declined EIP entry
@@ -1196,7 +1182,7 @@ const All = () => {
     setIsLoading(false);
   }, []);
   
-  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam' | 'hekabogota'>('glamsterdam');
+  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam' | 'hegota'>('glamsterdam');
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
   const [recentGlamsterdamData, setRecentGlamsterdamData] = useState<any>(null);
   const [isLoadingGlamsterdamData, setIsLoadingGlamsterdamData] = useState(false);
@@ -1220,14 +1206,14 @@ const { selected } = router.query;
 
 // 🔄 Sync dropdown state with URL query param
 useEffect(() => {
-  if (selected === 'pectra' || selected === 'fusaka' || selected === 'glamsterdam' || selected === 'hekabogota') {
+  if (selected === 'pectra' || selected === 'fusaka' || selected === 'glamsterdam' || selected === 'hegota') {
     setSelectedOption(selected);
   }
 }, [selected]);
 
 // 🔼 Also update the URL when dropdown changes
 const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const value = e.target.value as 'pectra' | 'fusaka' | 'glamsterdam' | 'hekabogota';
+  const value = e.target.value as 'pectra' | 'fusaka' | 'glamsterdam' | 'hegota';
   setSelectedOption(value);
   router.push(`/upgrade?selected=${value}#${value}`, undefined, { shallow: true });
 };
@@ -1506,13 +1492,72 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       title: "Add blob schedule to EL config files",
       author: "lightclient (@lightclient)",
       link: "https://eipsinsight.com/eips/eip-7840",
-      type: "Standards Track",
-      category: "Core",
+      type: "Informational",
+      category: "Informational",
       discussion: "https://ethereum-magicians.org/t/add-blob-schedule-to-execution-client-configuration-files/22182"
     },
   ];
 
+// CFI (Considered for Inclusion) EIPs for Glamsterdam
 const glamsterdamData = [
+  {
+    eip: "7708",
+    title: "ETH transfers emit a log",
+    author: "Vitalik Buterin (@vbuterin), Peter Davies (@petertdavies)",
+    link: "https://eipsinsight.com/eips/eip-7708",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7708-eth-transfers-emit-a-log/20034"
+  },
+  {
+    eip: "7778",
+    title: "Block Gas Accounting without Refunds",
+    author: "Ben Adams (@benaadams), Toni Wahrstätter (@nerolation)",
+    link: "https://eipsinsight.com/eips/eip-7778",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7778-prevent-block-gas-smuggling/21234"
+  },
+  {
+    eip: "7805",
+    title: "Fork-choice enforced Inclusion Lists (FOCIL)",
+    author: "Thomas Thiery (@soispoke), Vitalik Buterin (@vbuterin), Mike Neuder (@michaelneuder), Justin Drake (@justindrake), Francesco D'Amato (@fradamt)",
+    link: "https://eipsinsight.com/eips/eip-7805",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7805-fork-choice-enforced-inclusion-lists-focil/21208"
+  },
+  {
+    eip: "7843",
+    title: "SLOTNUM opcode",
+    author: "Marc Harvey-Hill (@Marchhill)",
+    link: "https://eipsinsight.com/eips/eip-7843",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7843-slotnum-opcode/22234"
+  },
+  {
+    eip: "8024",
+    title: "Backward compatible SWAPN, DUPN, EXCHANGE",
+    author: "Francisco Giordano (@frangio), Charles Cooper (@charles-cooper), Alex Beregszaszi (@axic)",
+    link: "https://eipsinsight.com/eips/eip-8024",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-8024-backward-compatible-swapn-dupn-exchange/25486"
+  },
+  {
+    eip: "8045",
+    title: "Exclude slashed validators from proposing",
+    author: "Francesco D'Amato (@fradamt), Barnabas Busa (@barnabasbusa)",
+    link: "https://eipsinsight.com/eips/eip-8045",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-8045-exclude-slashed-validators-from-proposing/25850"
+  }
+];
+
+// PFI (Proposed for Inclusion) EIPs for Glamsterdam
+const glamsterdamProposedData = [
   {
     eip: "2780",
     title: "Reduce intrinsic transaction gas",
@@ -1524,8 +1569,8 @@ const glamsterdamData = [
   },
   {
     eip: "2926",
-    title: "Chunk-Based Code Merkleization",
-    author: "Sina Mahmoodi (@s1na), Alex Beregszaszi (@axic), Guillaume Ballet (@gballet), Jochem Brouwer (@jochem-brouwer), Ignacio Hagopian (@jsign)",
+    title: "Chunk-based code merkelization",
+    author: "Alexey Akhunov (@AlexeyAkhunov), Sina Mahmoodi (@s1na)",
     link: "https://eipsinsight.com/eips/eip-2926",
     type: "Standards Track",
     category: "Core",
@@ -1534,38 +1579,20 @@ const glamsterdamData = [
   {
     eip: "5920",
     title: "PAY opcode",
-    author: "Gavin John (@Pandapip1), Zainan Victor Zhou (@xinbenlv), Sam Wilson (@SamWilsn), Jochem Brouwer (@jochem-brouwer), Charles Cooper (@charles-cooper)",
+    author: "Gavin John (@Pandapip1), Zainan Victor Zhou (@xinbenlv)",
     link: "https://eipsinsight.com/eips/eip-5920",
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-5920-pay-opcode/11717"
   },
   {
-    eip: "6404",
-    title: "SSZ transactions",
-    author: "Etan Kissling (@etan-status), Gajinder Singh (@g11tech), Vitalik Buterin (@vbuterin)",
-    link: "https://eipsinsight.com/eips/eip-6404",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-6404-ssz-transactions/12783"
-  },
-  {
-    eip: "6466",
-    title: "SSZ receipts",
-    author: "Etan Kissling (@etan-status), Gajinder Singh (@g11tech), Vitalik Buterin (@vbuterin)",
-    link: "https://eipsinsight.com/eips/eip-6466",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-6466-ssz-receipts/12884"
-  },
-  {
     eip: "7610",
     title: "Revert creation in case of non-empty storage",
-    author: "Gary Rong (@rjl493456442), Martin Holst Swende (@holiman)",
+    author: "Andrei Maiboroda (@gumb0)",
     link: "https://eipsinsight.com/eips/eip-7610",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-revert-creation-in-case-of-non-empty-storage/18452"
+    discussion: "https://ethereum-magicians.org/t/eip-7610-revert-creation-in-case-of-non-empty-storage/18938"
   },
   {
     eip: "7668",
@@ -1579,92 +1606,47 @@ const glamsterdamData = [
   {
     eip: "7686",
     title: "Linear EVM memory limits",
-    author: "Vitalik Buterin (@vbuterin)",
+    author: "Sam Wilson (@SamWilsn)",
     link: "https://eipsinsight.com/eips/eip-7686",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7686-linear-evm-memory-limits/19448"
+    discussion: "https://ethereum-magicians.org/t/eip-7686-linear-evm-memory-limits/19695"
   },
   {
     eip: "7688",
     title: "Forward compatible consensus data structures",
-    author: "Etan Kissling (@etan-status), Cayman (@wemeetagain)",
+    author: "Etan Kissling (@ekissling), Consensus Layer Developers",
     link: "https://eipsinsight.com/eips/eip-7688",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7688-forward-compatible-consensus-data-structures/19673"
-  },
-  {
-    eip: "7708",
-    title: "ETH transfers emit a log",
-    author: "Vitalik Buterin (@vbuterin), Peter Davies (@petertdavies)",
-    link: "https://eipsinsight.com/eips/eip-7708",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7708-eth-transfers-emit-a-log/20034"
+    discussion: "https://ethereum-magicians.org/t/eip-7688-forward-compatible-consensus-data-structures/22215"
   },
   {
     eip: "7745",
-    title: "Light client and DHT friendly log index",
-    author: "Zsolt Felföldi (@zsfelfoldi)",
+    title: "Trustless log index",
+    author: "Péter Garamvölgyi (@chfast), Matt Garnett (@lightclient)",
     link: "https://eipsinsight.com/eips/eip-7745",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7745-two-dimensional-log-filter-data-structure/20580"
-  },
-  {
-    eip: "7778",
-    title: "Block Gas Accounting without Refunds",
-    author: "Ben Adams (@benaadams), Toni Wahrstätter (@nerolation)",
-    link: "https://eipsinsight.com/eips/eip-7778",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7778-prevent-block-gas-smuggling/21234"
-  },
-  {
-    eip: "7791",
-    title: "GAS2ETH opcode",
-    author: "Charles Cooper (@charles-cooper), Pascal Caversaccio (@pcaversaccio)",
-    link: "https://eipsinsight.com/eips/eip-7791",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7791-gas2eth-opcode/21418"
+    discussion: "https://ethereum-magicians.org/t/eip-7745-two-dimensional-log-filter-data-structure/21313"
   },
   {
     eip: "7793",
     title: "Conditional Transactions",
-    author: "Marc Harvey-Hill (@Marchhill), Ahmad Bitar (@smartprogrammer93)",
+    author: "lightclient (@lightclient)",
     link: "https://eipsinsight.com/eips/eip-7793",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7793-asserttxindex-opcode/21513"
-  },
-  {
-    eip: "7819",
-    title: "SETDELEGATE instruction",
-    author: "Hadrien Croubois (@amxx)",
-    link: "https://eipsinsight.com/eips/eip-7819",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7819-create-delegate/21763"
-  },
-  {
-    eip: "7843",
-    title: "SLOTNUM opcode",
-    author: "Marc Harvey-Hill (@Marchhill)",
-    link: "https://eipsinsight.com/eips/eip-7843",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7843-slotnum-opcode/22234"
+    discussion: "https://ethereum-magicians.org/t/eip-7793-eip-7702-lifetime-extension/22244"
   },
   {
     eip: "7872",
     title: "Max blob flag for local builders",
-    author: "Francesco D'Amato <francesco.damato@ethereum.org>, Kevaundray Wedderburn (@kevaundray), Toni Wahrstätter (@nerolation), Alex Stokes (@ralexstokes), Ben Adams (@benaadams), Gajinder Singh (@g11tech), Dustin (@tersec)",
+    author: "Vitalik Buterin (@vbuterin)",
     link: "https://eipsinsight.com/eips/eip-7872",
-    type: "Meta",
-    category: "Meta",
-    discussion: "https://ethereum-magicians.org/t/max-blob-flags-for-local-builders/22734"
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7872-separate-gas-for-call-data/22755"
   },
   {
     eip: "7903",
@@ -1687,7 +1669,7 @@ const glamsterdamData = [
   {
     eip: "7907",
     title: "Meter Contract Code Size And Increase Limit",
-    author: "Charles Cooper (@charles-cooper), Qi Zhou (@qizhou), Matt (@lightclient), Dragan Rakita (@rakita)",
+    author: "Jacek Glen (@JacekGlen)",
     link: "https://eipsinsight.com/eips/eip-7907",
     type: "Standards Track",
     category: "Core",
@@ -1696,29 +1678,20 @@ const glamsterdamData = [
   {
     eip: "7923",
     title: "Linear, Page-Based Memory Costing",
-    author: "Charles Cooper (@charles-cooper), Qi Zhou (@qizhou)",
+    author: "lightclient (@lightclient)",
     link: "https://eipsinsight.com/eips/eip-7923",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-linearize-memory-costing/23290"
-  },
-  {
-    eip: "7932",
-    title: "Secondary Signature Algorithms",
-    author: "James Kempton (@SirSpudlington)",
-    link: "https://eipsinsight.com/eips/eip-7932",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7932-secondary-signature-algorithms/23514"
+    discussion: "https://ethereum-magicians.org/t/eip-7923-increase-blob-throughput-during-surge/23351"
   },
   {
     eip: "7949",
-    title: "Genesis File Format",
-    author: "Justin Florentine (@jflo) <justin@florentine.us>, Jochem Brouwer (@jochem-brouwer) <jochem@ethereum.org>",
+    title: "Schema for genesis.json files",
+    author: "Ulaş Erdoğan (@ulerdogan), Doğan Alpaslan (@doganalpaslan)",
     link: "https://eipsinsight.com/eips/eip-7949",
-    type: "Informational",
-    category: "Informational",
-    discussion: "https://ethereum-magicians.org/t/eip-xxxx-genesis-json-standardization/24271"
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7949-precompiled-for-secp256r1-curve-support/23890"
   },
   {
     eip: "7971",
@@ -1732,11 +1705,11 @@ const glamsterdamData = [
   {
     eip: "7973",
     title: "Warm Account Write Metering",
-    author: "Charles Cooper (@charles-cooper), Maria Silva (@misilva73), Ben Adams (@benaadams)",
+    author: "Pascal Caversaccio (@pcaversaccio)",
     link: "https://eipsinsight.com/eips/eip-7973",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7973-warm-account-write-metering/25907"
+    discussion: "https://ethereum-magicians.org/t/eip-7973-prevent-overwriting-existing-storage-keys-in-the-same-transaction/24571"
   },
   {
     eip: "7976",
@@ -1748,17 +1721,8 @@ const glamsterdamData = [
     discussion: "https://ethereum-magicians.org/t/eip-7976-further-increase-calldata-cost/24597"
   },
   {
-    eip: "7979",
-    title: "Call and Return Opcodes for the EVM",
-    author: "Greg Colvin (@gcolvin), Martin Holst Swende (@holiman), Brooklyn Zelenka (@expede), John Max Skaller <skaller@internode.on.net>",
-    link: "https://eipsinsight.com/eips/eip-7979",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7951-call-and-return-opcodes-for-the-evm/24615"
-  },
-  {
     eip: "7981",
-    title: "Increase access list cost",
+    title: "Increase Access List Cost",
     author: "Toni Wahrstätter (@nerolation)",
     link: "https://eipsinsight.com/eips/eip-7981",
     type: "Standards Track",
@@ -1768,69 +1732,33 @@ const glamsterdamData = [
   {
     eip: "7997",
     title: "Deterministic Factory Predeploy",
-    author: "Francisco Giordano (@frangio)",
+    author: "Danno Ferrin (@shemnon)",
     link: "https://eipsinsight.com/eips/eip-7997",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7997-deterministic-factory-predeploy/24998"
-  },
-  {
-    eip: "8011",
-    title: "Multidimensional Gas Metering",
-    author: "Maria Silva (@misilva73), Davide Crapis (@dcrapis), Anders Elowsson (@anderselowsson), Toni Wahrstätter (@nerolation)",
-    link: "https://eipsinsight.com/eips/eip-8011",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8011-multidimensional-gas-metering/25256"
-  },
-  {
-    eip: "8013",
-    title: "Static relative jumps and calls for the EVM",
-    author: "Greg Colvin (@gcolvin), Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
-    link: "https://eipsinsight.com/eips/eip-8013",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8013-static-relative-jumps-and-calls-for-the-evm/25222"
-  },
-  {
-    eip: "8024",
-    title: "Backward compatible SWAPN, DUPN, EXCHANGE",
-    author: "Francisco Giordano (@frangio), Charles Cooper (@charles-cooper), Alex Beregszaszi (@axic)",
-    link: "https://eipsinsight.com/eips/eip-8024",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8024-backward-compatible-swapn-dupn-exchange/25486"
-  },
-  {
-    eip: "8030",
-    title: "P256 transaction support",
-    author: "James Kempton (@SirSpudlington)",
-    link: "https://eipsinsight.com/eips/eip-8030",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/discussion-topic-for-eip-8030/25557"
+    discussion: "https://ethereum-magicians.org/t/eip-7997-disallow-create-and-create2-to-deploy-empty-initcode/25021"
   },
   {
     eip: "8032",
     title: "Size-Based Storage Gas Pricing",
-    author: "Guillaume Ballet (@gballet), Carlos Perez (@CPerezz), Matan Prasma (@KanExtension), Wei Han Ng (@weiihann)",
+    author: "Guillaume Ballet (@gballet), Ignacio Hagopian (@jsign), Gottfried Herold (@GottfriedHerold), Jamie Lokier (@jlokier)",
     link: "https://eipsinsight.com/eips/eip-8032",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/the-case-for-eip-8032-in-glamsterdam-tree-depth-based-storage-gas-pricing/25619"
+    discussion: "https://ethereum-magicians.org/t/eip-8032-verkle-state-transition-mechanics/25542"
   },
   {
     eip: "8037",
     title: "State Creation Gas Cost Increase",
-    author: "Maria Silva (@misilva73), Carlos Perez (@CPerezz), Jochem Brouwer (@jochem-brouwer), Ansgar Dietrichs (@adietrichs)",
+    author: "Mikhail Kalinin (@mkalinin), Francesco D'Amato (@fradamt), Aditya Asgaonkar (@adiasg)",
     link: "https://eipsinsight.com/eips/eip-8037",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8037-state-creation-gas-cost-increase/25694"
+    discussion: "https://ethereum-magicians.org/t/uncouple-execution-payload-from-beacon-block/23029"
   },
   {
     eip: "8038",
-    title: "State-access gas cost update",
+    title: "State-access gas cost increase",
     author: "Maria Silva (@misilva73), Wei Han Ng (@weiihann), Ansgar Dietrichs (@adietrichs)",
     link: "https://eipsinsight.com/eips/eip-8038",
     type: "Standards Track",
@@ -1838,40 +1766,22 @@ const glamsterdamData = [
     discussion: "https://ethereum-magicians.org/t/eip-8038-state-access-gas-cost-update/25693"
   },
   {
-    eip: "8045",
-    title: "Exclude slashed validators from proposing",
-    author: "Francesco D'Amato (@fradamt), Barnabas Busa (@barnabasbusa)",
-    link: "https://eipsinsight.com/eips/eip-8045",
+    eip: "8051",
+    title: "Precompile for ML-DSA signature verification",
+    author: "lightclient (@lightclient)",
+    link: "https://eipsinsight.com/eips/eip-8051",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8045-exclude-slashed-validators-from-proposing/25850"
-  },
-  {
-    eip: "8053",
-    title: "Milli-gas for High-precision Gas Metering",
-    author: "Maria Silva (@misilva73)",
-    link: "https://eipsinsight.com/eips/eip-8053",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8053-milli-gas-counter-for-high-precision-gas-metering/25946"
-  },
-  {
-    eip: "8057",
-    title: "Inter-Block Temporal Locality Gas Discounts",
-    author: "Ben Adams (@benaadams), Toni Wahrstätter (@nerolation), Maria Inês Silva (@misilva73), Amirul Ashraf (@asdacap)",
-    link: "https://eipsinsight.com/eips/eip-8057",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8057-block-temporal-locality-gas-discounts/25912"
+    discussion: "https://ethereum-magicians.org/t/eip-8051-precompile-for-ml-dsa/25800"
   },
   {
     eip: "8058",
     title: "Contract Bytecode Deduplication Discount",
-    author: "Carlos Perez (@CPerezz), Wei Han Ng (@weiihann), Guillaume Ballet (@gballet)",
+    author: "Danno Ferrin (@shemnon)",
     link: "https://eipsinsight.com/eips/eip-8058",
     type: "Standards Track",
     category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8058-contract-bytecode-deduplication-discount/25933"
+    discussion: "https://ethereum-magicians.org/t/eip-8058-restrict-initcode-to-2-24/25947"
   },
   {
     eip: "8061",
@@ -1883,15 +1793,6 @@ const glamsterdamData = [
     discussion: "https://ethereum-magicians.org/t/eip-8061-increase-churn-limits/25991"
   },
   {
-    eip: "8062",
-    title: "Add sweep withdrawal fee for 0x01 validators",
-    author: "Anders Elowsson (@anderselowsson), Toni Wahrstätter (@nerolation), Francesco D'Amato (@fradamt), Ben Adams (@benaadams), Maria Inês Silva (@misilva73)",
-    link: "https://eipsinsight.com/eips/eip-8062",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8062-add-sweep-withdrawal-fee-for-0x01-validators/26003"
-  },
-  {
     eip: "8070",
     title: "Sparse Blobpool",
     author: "Raúl Kripalani (@raulk), Bosul Mun (@healthykim), Francesco D'Amato (@fradamt), Csaba Kiraly (@cskiraly), Felix Lange (@fjl), Marios Ioannou (@mariosioannou-create), Alex Stokes (@ralexstokes)",
@@ -1899,15 +1800,6 @@ const glamsterdamData = [
     type: "Standards Track",
     category: "Networking",
     discussion: "https://ethereum-magicians.org/t/eip-8070-sparse-blobpool/26023"
-  },
-  {
-    eip: "8071",
-    title: "Prevent using consolidations as withdrawals",
-    author: "Mikhail Kalinin (@mkalinin), Francesco D'Amato (@fradamt)",
-    link: "https://eipsinsight.com/eips/eip-8071",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8071-prevent-using-consolidations-as-withdrawals/26037"
   },
   {
     eip: "8080",
@@ -1921,15 +1813,6 @@ const glamsterdamData = [
 ];
 
   const fusakaData = [
-    {
-      eip: "7607",
-      title: "Hardfork Meta - Fusaka",
-      author: "Tim Beiko (@timbeiko), Alex Stokes (@ralexstokes), Ansgar Dietrichs (@adietrichs)",
-      link: "https://eipsinsight.com/eips/eip-7607",
-      type: "Meta",
-      category: "",
-      discussion: "https://ethereum-magicians.org/t/eip-7607-fusaka-meta-eip/18693"
-    },
     {
       eip: "7594",
       title: "PeerDAS - Peer Data Availability Sampling",
@@ -2049,10 +1932,10 @@ const glamsterdamData = [
     }
   ];
 
-  const hekabogotaData = [
+  const hegotaData = [
     {
       eip: "8081",
-      title: "Hardfork Meta - Heka/Bogotá",
+      title: "Hardfork Meta - Hegotá Upgrade",
       author: "Tim Beiko (@timbeiko), Alex Stokes (@ralexstokes)",
       link: "https://eipsinsight.com/eips/eip-8081",
       type: "Meta",
@@ -2087,15 +1970,15 @@ const glamsterdamData = [
   }, [router]);
 
 
-  const currentPosts = selectedOption === 'pectra' ? PectraPosts : selectedOption === 'fusaka' ? FusakaPosts : selectedOption === 'hekabogota' ? [] : GlamsterdamPosts;
-  const currentData = selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : selectedOption === 'hekabogota' ? hekabogotaData : glamsterdamData;
-  const upgradeName = selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : selectedOption === 'hekabogota' ? "Heka/Bogotá" : "Glamsterdam";
+  const currentPosts = selectedOption === 'pectra' ? PectraPosts : selectedOption === 'fusaka' ? FusakaPosts : selectedOption === 'hegota' ? [] : GlamsterdamPosts;
+  const currentData = selectedOption === 'pectra' ? pectraData : selectedOption === 'fusaka' ? fusakaData : selectedOption === 'hegota' ? hegotaData : glamsterdamData;
+  const upgradeName = selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : selectedOption === 'hegota' ? "Hegotá" : "Glamsterdam";
 
   useScrollSpy([
     "pectra",
     "fusaka",
     "glamsterdam",
-    "hekabogota",
+    "hegota",
     "NetworkUpgradesChart",
     "upgrade-blogs",
     "NetworkUpgrades",
@@ -2169,7 +2052,7 @@ return (
                 }}
               >
                 <option value="glamsterdam">Glamsterdam</option>
-                <option value="hekabogota">Heka/Bogotá</option>
+                <option value="hegota">Hegotá</option>
                 <option value="fusaka">Fusaka</option>
                 <option value="pectra">Pectra</option>
               </select>
@@ -2194,7 +2077,7 @@ return (
             )}
             
             {/* Network Upgrade Timeline (UpgradesTimeline) */}
-            {selectedOption !== 'hekabogota' && (
+            {selectedOption !== 'hegota' && (
               <Box id="NetworkUpgrades" mt={8}>
                 <UpgradesTimeline
                   selectedOption={selectedOption}
@@ -2271,7 +2154,7 @@ return (
                       </Text>
                     </NLink>{" "}(Peer Data Availability Sampling), enabling significant blob throughput scaling. Fusaka also raises the L1 gas limit to 60M and introduces "Blob Parameter Only" (BPO) forks to safely scale blob capacity. Scheduled for Mainnet activation at slot <Text as="span" fontWeight="bold">13,164,544</Text> (Dec 3, 2025), it includes optimizations for L1 performance and UX improvements.
                   </Text>
-                ) : selectedOption === 'hekabogota' ? (
+                ) : selectedOption === 'hegota' ? (
                   <Box>
                     <VStack spacing={4} align="stretch">
                       <Badge colorScheme="orange" fontSize="md" px={3} py={1} alignSelf="flex-start" borderRadius="full">
@@ -2280,13 +2163,13 @@ return (
                       <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
                         <NLink href="https://eipsinsight.com/eips/eip-8081">
                           <Text as="span" color="blue.500" textDecor="underline" fontWeight="bold">
-                            Heka/Bogotá
+                            Hegotá
                           </Text>
                         </NLink>{" "}is in early planning. The headliner proposal window will open soon. Check back for updates as the upgrade planning process begins.
                       </Text>
                       <Text fontSize={{ base: "sm", md: "md" }} color={useColorModeValue("gray.600", "gray.400")} lineHeight="1.75" textAlign="justify">
                         Future network upgrade currently in early planning stages. Named after the combination of{" "}
-                        <Text as="span" fontWeight="semibold">"Heka"</Text> (consensus layer upgrade, named after a star) and{" "}
+                        <Text as="span" fontWeight="semibold">"Heze"</Text> (consensus layer upgrade, named after a star) and{" "}
                         <Text as="span" fontWeight="semibold">"Bogotá"</Text> (execution layer upgrade, named after a Devcon location).
                       </Text>
                     </VStack>
@@ -2314,27 +2197,22 @@ return (
                       <Text as="span" color="blue.500" textDecor="underline">
                         Ethereum Improvement Proposals (EIPs)
                       </Text>
-                    </NLink>{" "}under review and active community discussions ongoing. Coordination and planning are being carried out through the{" "}
-                    <NLink href="https://ethereum.foundation/forkcast">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Forkcast
-                      </Text>
-                    </NLink>.
+                    </NLink>{" "}under review and active community discussions ongoing.
                   </Text>
                 )}
               </Box>
             </Flex>
             
             {/* Network Upgrade Inclusion Stages Chart (FUSAKA) */}
-            {selectedOption !== 'hekabogota' && (
+
               <Box id="NetworkUpgradeschart" mt={8}>  
                 <NetworkUpgradesChart />
               </Box>
-            )}
+
           </Box>
 
           {/* Container: EIP Showcase Section */}
-          {selectedOption !== 'hekabogota' && (
+          {selectedOption !== 'hegota' && (
             <Box
               bg={useColorModeValue("white", "gray.800")}
               borderRadius="xl"
@@ -2345,17 +2223,39 @@ return (
               px={6}
               py={8}
             >
-              <UpgradeEIPsShowcase
-                upgradeName={upgradeName}
-                upgradeDate={upgradeDates[selectedOption]}
-                eips={currentData}
-                upgradeColor={upgradeColors[selectedOption]}
-              />
+              {selectedOption === 'glamsterdam' ? (
+                <VStack spacing={12} align="stretch">
+                  {/* CFI Section */}
+                  <UpgradeEIPsShowcase
+                    upgradeName={upgradeName}
+                    upgradeDate={upgradeDates[selectedOption]}
+                    eips={currentData}
+                    upgradeColor={upgradeColors[selectedOption]}
+                    sectionTitle="Glamsterdam (Confirmed for Inclusion)"
+                  />
+                  
+                  {/* PFI Section */}
+                  <UpgradeEIPsShowcase
+                    upgradeName={upgradeName}
+                    upgradeDate={upgradeDates[selectedOption]}
+                    eips={glamsterdamProposedData}
+                    upgradeColor={upgradeColors[selectedOption]}
+                    sectionTitle="Glamsterdam (Proposed for Inclusion)"
+                  />
+                </VStack>
+              ) : (
+                <UpgradeEIPsShowcase
+                  upgradeName={upgradeName}
+                  upgradeDate={upgradeDates[selectedOption]}
+                  eips={currentData}
+                  upgradeColor={upgradeColors[selectedOption]}
+                />
+              )}
             </Box>
           )}
 
           {/* Container 4: Blog Cards Section */}
-          {selectedOption !== 'hekabogota' && currentPosts.length > 0 && (
+          {selectedOption !== 'hegota' && currentPosts.length > 0 && (
             <Box
               bg={useColorModeValue("white", "gray.800")}
               borderRadius="xl"
@@ -2409,7 +2309,7 @@ return (
           )}
 
           {/* Container 5: Upgrade Table + Declined EIPs */}
-          {selectedOption !== 'hekabogota' && (
+          {selectedOption !== 'hegota' && (
             <Box
               bg={useColorModeValue("white", "gray.800")}
               borderRadius="xl"
@@ -2546,7 +2446,7 @@ return (
           )}
 
           {/* EtherWorld Advertisement */}
-          {selectedOption !== 'hekabogota' && (
+          {selectedOption !== 'hegota' && (
             <Box my={6}>
               <CloseableAdCard />
             </Box>

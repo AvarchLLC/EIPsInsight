@@ -1,0 +1,416 @@
+[
+  {
+    "eip": "2780",
+    "title": "Reduce intrinsic transaction gas",
+    "author": "Matt Garnett (@lightclient), Uri Klarman (@uriklarman), Ben Adams (@benaadams)",
+    "link": "https://eipsinsight.com/eips/eip-2780",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-2780-reduce-intrinsic-cost-of-transactions/4413"
+  },
+  {
+    "eip": "2926",
+    "title": "Chunk-Based Code Merkleization",
+    "author": "Sina Mahmoodi (@s1na), Alex Beregszaszi (@axic), Guillaume Ballet (@gballet), Jochem Brouwer (@jochem-brouwer), Ignacio Hagopian (@jsign)",
+    "link": "https://eipsinsight.com/eips/eip-2926",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-2926-chunk-based-code-merkleization/4555"
+  },
+  {
+    "eip": "5920",
+    "title": "PAY opcode",
+    "author": "Gavin John (@Pandapip1), Zainan Victor Zhou (@xinbenlv), Sam Wilson (@SamWilsn), Jochem Brouwer (@jochem-brouwer), Charles Cooper (@charles-cooper)",
+    "link": "https://eipsinsight.com/eips/eip-5920",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-5920-pay-opcode/11717"
+  },
+  {
+    "eip": "6404",
+    "title": "SSZ transactions",
+    "author": "Etan Kissling (@etan-status), Gajinder Singh (@g11tech), Vitalik Buterin (@vbuterin)",
+    "link": "https://eipsinsight.com/eips/eip-6404",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-6404-ssz-transactions/12783"
+  },
+  {
+    "eip": "6466",
+    "title": "SSZ receipts",
+    "author": "Etan Kissling (@etan-status), Gajinder Singh (@g11tech), Vitalik Buterin (@vbuterin)",
+    "link": "https://eipsinsight.com/eips/eip-6466",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-6466-ssz-receipts/12884"
+  },
+  {
+    "eip": "7610",
+    "title": "Revert creation in case of non-empty storage",
+    "author": "Gary Rong (@rjl493456442), Martin Holst Swende (@holiman)",
+    "link": "https://eipsinsight.com/eips/eip-7610",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-revert-creation-in-case-of-non-empty-storage/18452"
+  },
+  {
+    "eip": "7668",
+    "title": "Remove bloom filters",
+    "author": "Vitalik Buterin (@vbuterin)",
+    "link": "https://eipsinsight.com/eips/eip-7668",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7653-remove-bloom-filters/19447"
+  },
+  {
+    "eip": "7686",
+    "title": "Linear EVM memory limits",
+    "author": "Vitalik Buterin (@vbuterin)",
+    "link": "https://eipsinsight.com/eips/eip-7686",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7686-linear-evm-memory-limits/19448"
+  },
+  {
+    "eip": "7688",
+    "title": "Forward compatible consensus data structures",
+    "author": "Etan Kissling (@etan-status), Cayman (@wemeetagain)",
+    "link": "https://eipsinsight.com/eips/eip-7688",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7688-forward-compatible-consensus-data-structures/19673"
+  },
+  {
+    "eip": "7708",
+    "title": "ETH transfers emit a log",
+    "author": "Vitalik Buterin (@vbuterin), Peter Davies (@petertdavies)",
+    "link": "https://eipsinsight.com/eips/eip-7708",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7708-eth-transfers-emit-a-log/20034"
+  },
+  {
+    "eip": "7745",
+    "title": "Light client and DHT friendly log index",
+    "author": "Zsolt Felföldi (@zsfelfoldi)",
+    "link": "https://eipsinsight.com/eips/eip-7745",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7745-two-dimensional-log-filter-data-structure/20580"
+  },
+  {
+    "eip": "7778",
+    "title": "Block Gas Accounting without Refunds",
+    "author": "Ben Adams (@benaadams), Toni Wahrstätter (@nerolation)",
+    "link": "https://eipsinsight.com/eips/eip-7778",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7778-prevent-block-gas-smuggling/21234"
+  },
+  {
+    "eip": "7791",
+    "title": "GAS2ETH opcode",
+    "author": "Charles Cooper (@charles-cooper), Pascal Caversaccio (@pcaversaccio)",
+    "link": "https://eipsinsight.com/eips/eip-7791",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7791-gas2eth-opcode/21418"
+  },
+  {
+    "eip": "7793",
+    "title": "Conditional Transactions",
+    "author": "Marc Harvey-Hill (@Marchhill), Ahmad Bitar (@smartprogrammer93)",
+    "link": "https://eipsinsight.com/eips/eip-7793",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7793-asserttxindex-opcode/21513"
+  },
+  {
+    "eip": "7819",
+    "title": "SETDELEGATE instruction",
+    "author": "Hadrien Croubois (@amxx)",
+    "link": "https://eipsinsight.com/eips/eip-7819",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7819-create-delegate/21763"
+  },
+  {
+    "eip": "7843",
+    "title": "SLOTNUM opcode",
+    "author": "Marc Harvey-Hill (@Marchhill)",
+    "link": "https://eipsinsight.com/eips/eip-7843",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7843-slotnum-opcode/22234"
+  },
+  {
+    "eip": "7872",
+    "title": "Max blob flag for local builders",
+    "author": "Francesco D'Amato <francesco.damato@ethereum.org>, Kevaundray Wedderburn (@kevaundray), Toni Wahrstätter (@nerolation), Alex Stokes (@ralexstokes), Ben Adams (@benaadams), Gajinder Singh (@g11tech), Dustin (@tersec)",
+    "link": "https://eipsinsight.com/eips/eip-7872",
+    "type": "Meta",
+    "category": "Meta",
+    "discussion": "https://ethereum-magicians.org/t/max-blob-flags-for-local-builders/22734"
+  },
+  {
+    "eip": "7903",
+    "title": "Remove Initcode Size Limit",
+    "author": "Charles Cooper (@charles-cooper)",
+    "link": "https://eipsinsight.com/eips/eip-7903",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/remove-initcode-size-limit/23066"
+  },
+  {
+    "eip": "7904",
+    "title": "General Repricing",
+    "author": "Jacek Glen (@JacekGlen), Lukasz Glen (@lukasz-glen), Maria Silva (@misilva73)",
+    "link": "https://eipsinsight.com/eips/eip-7904",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/gas-cost-repricing-to-reflect-computational-complexity/23067"
+  },
+  {
+    "eip": "7907",
+    "title": "Meter Contract Code Size And Increase Limit",
+    "author": "Charles Cooper (@charles-cooper), Qi Zhou (@qizhou), Matt (@lightclient), Dragan Rakita (@rakita)",
+    "link": "https://eipsinsight.com/eips/eip-7907",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156"
+  },
+  {
+    "eip": "7923",
+    "title": "Linear, Page-Based Memory Costing",
+    "author": "Charles Cooper (@charles-cooper), Qi Zhou (@qizhou)",
+    "link": "https://eipsinsight.com/eips/eip-7923",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-linearize-memory-costing/23290"
+  },
+  {
+    "eip": "7932",
+    "title": "Secondary Signature Algorithms",
+    "author": "James Kempton (@SirSpudlington)",
+    "link": "https://eipsinsight.com/eips/eip-7932",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7932-secondary-signature-algorithms/23514"
+  },
+  {
+    "eip": "7949",
+    "title": "Genesis File Format",
+    "author": "Justin Florentine (@jflo) <justin@florentine.us>, Jochem Brouwer (@jochem-brouwer) <jochem@ethereum.org>",
+    "link": "https://eipsinsight.com/eips/eip-7949",
+    "type": "Informational",
+    "category": "Informational",
+    "discussion": "https://ethereum-magicians.org/t/eip-xxxx-genesis-json-standardization/24271"
+  },
+  {
+    "eip": "7971",
+    "title": "Hard Limits for Transient Storage",
+    "author": "Charles Cooper (@charles-cooper), Ben Adams (@benaadams), Maria Silva (@misilva73), Jochem Brouwer (@jochem-brouwer)",
+    "link": "https://eipsinsight.com/eips/eip-7971",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/add-eip-hard-limit-and-cost-reduction-for-transient-storage-allocation/24542"
+  },
+  {
+    "eip": "7973",
+    "title": "Warm Account Write Metering",
+    "author": "Charles Cooper (@charles-cooper), Maria Silva (@misilva73), Ben Adams (@benaadams)",
+    "link": "https://eipsinsight.com/eips/eip-7973",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7973-warm-account-write-metering/25907"
+  },
+  {
+    "eip": "7976",
+    "title": "Increase Calldata Floor Cost",
+    "author": "Toni Wahrstätter (@nerolation)",
+    "link": "https://eipsinsight.com/eips/eip-7976",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7976-further-increase-calldata-cost/24597"
+  },
+  {
+    "eip": "7979",
+    "title": "Call and Return Opcodes for the EVM",
+    "author": "Greg Colvin (@gcolvin), Martin Holst Swende (@holiman), Brooklyn Zelenka (@expede), John Max Skaller <skaller@internode.on.net>",
+    "link": "https://eipsinsight.com/eips/eip-7979",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7951-call-and-return-opcodes-for-the-evm/24615"
+  },
+  {
+    "eip": "7981",
+    "title": "Increase access list cost",
+    "author": "Toni Wahrstätter (@nerolation)",
+    "link": "https://eipsinsight.com/eips/eip-7981",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7981-increase-access-list-cost/24680"
+  },
+  {
+    "eip": "7997",
+    "title": "Deterministic Factory Predeploy",
+    "author": "Francisco Giordano (@frangio)",
+    "link": "https://eipsinsight.com/eips/eip-7997",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7997-deterministic-factory-predeploy/24998"
+  },
+  {
+    "eip": "8011",
+    "title": "Multidimensional Gas Metering",
+    "author": "Maria Silva (@misilva73), Davide Crapis (@dcrapis), Anders Elowsson (@anderselowsson), Toni Wahrstätter (@nerolation)",
+    "link": "https://eipsinsight.com/eips/eip-8011",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8011-multidimensional-gas-metering/25256"
+  },
+  {
+    "eip": "8013",
+    "title": "Static relative jumps and calls for the EVM",
+    "author": "Greg Colvin (@gcolvin), Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
+    "link": "https://eipsinsight.com/eips/eip-8013",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8013-static-relative-jumps-and-calls-for-the-evm/25222"
+  },
+  {
+    "eip": "8024",
+    "title": "Backward compatible SWAPN, DUPN, EXCHANGE",
+    "author": "Francisco Giordano (@frangio), Charles Cooper (@charles-cooper), Alex Beregszaszi (@axic)",
+    "link": "https://eipsinsight.com/eips/eip-8024",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8024-backward-compatible-swapn-dupn-exchange/25486"
+  },
+  {
+    "eip": "8030",
+    "title": "P256 transaction support",
+    "author": "James Kempton (@SirSpudlington)",
+    "link": "https://eipsinsight.com/eips/eip-8030",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/discussion-topic-for-eip-8030/25557"
+  },
+  {
+    "eip": "8032",
+    "title": "Size-Based Storage Gas Pricing",
+    "author": "Guillaume Ballet (@gballet), Carlos Perez (@CPerezz), Matan Prasma (@KanExtension), Wei Han Ng (@weiihann)",
+    "link": "https://eipsinsight.com/eips/eip-8032",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/the-case-for-eip-8032-in-glamsterdam-tree-depth-based-storage-gas-pricing/25619"
+  },
+  {
+    "eip": "8037",
+    "title": "State Creation Gas Cost Increase",
+    "author": "Maria Silva (@misilva73), Carlos Perez (@CPerezz), Jochem Brouwer (@jochem-brouwer), Ansgar Dietrichs (@adietrichs)",
+    "link": "https://eipsinsight.com/eips/eip-8037",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8037-state-creation-gas-cost-increase/25694"
+  },
+  {
+    "eip": "8038",
+    "title": "State-access gas cost update",
+    "author": "Maria Silva (@misilva73), Wei Han Ng (@weiihann), Ansgar Dietrichs (@adietrichs)",
+    "link": "https://eipsinsight.com/eips/eip-8038",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8038-state-access-gas-cost-update/25693"
+  },
+  {
+    "eip": "8045",
+    "title": "Exclude slashed validators from proposing",
+    "author": "Francesco D'Amato (@fradamt), Barnabas Busa (@barnabasbusa)",
+    "link": "https://eipsinsight.com/eips/eip-8045",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8045-exclude-slashed-validators-from-proposing/25850"
+  },
+  {
+    "eip": "8053",
+    "title": "Milli-gas for High-precision Gas Metering",
+    "author": "Maria Silva (@misilva73)",
+    "link": "https://eipsinsight.com/eips/eip-8053",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8053-milli-gas-counter-for-high-precision-gas-metering/25946"
+  },
+  {
+    "eip": "8057",
+    "title": "Inter-Block Temporal Locality Gas Discounts",
+    "author": "Ben Adams (@benaadams), Toni Wahrstätter (@nerolation), Maria Inês Silva (@misilva73), Amirul Ashraf (@asdacap)",
+    "link": "https://eipsinsight.com/eips/eip-8057",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8057-block-temporal-locality-gas-discounts/25912"
+  },
+  {
+    "eip": "8058",
+    "title": "Contract Bytecode Deduplication Discount",
+    "author": "Carlos Perez (@CPerezz), Wei Han Ng (@weiihann), Guillaume Ballet (@gballet)",
+    "link": "https://eipsinsight.com/eips/eip-8058",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8058-contract-bytecode-deduplication-discount/25933"
+  },
+  {
+    "eip": "8061",
+    "title": "Increase exit and consolidation churn",
+    "author": "Francesco D'Amato (@fradamt), Anders Elowsson (@anderselowsson)",
+    "link": "https://eipsinsight.com/eips/eip-8061",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8061-increase-churn-limits/25991"
+  },
+  {
+    "eip": "8062",
+    "title": "Add sweep withdrawal fee for 0x01 validators",
+    "author": "Anders Elowsson (@anderselowsson), Toni Wahrstätter (@nerolation), Francesco D'Amato (@fradamt), Ben Adams (@benaadams), Maria Inês Silva (@misilva73)",
+    "link": "https://eipsinsight.com/eips/eip-8062",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8062-add-sweep-withdrawal-fee-for-0x01-validators/26003"
+  },
+  {
+    "eip": "8070",
+    "title": "Sparse Blobpool",
+    "author": "Raúl Kripalani (@raulk), Bosul Mun (@healthykim), Francesco D'Amato (@fradamt), Csaba Kiraly (@cskiraly), Felix Lange (@fjl), Marios Ioannou (@mariosioannou-create), Alex Stokes (@ralexstokes)",
+    "link": "https://eipsinsight.com/eips/eip-8070",
+    "type": "Standards Track",
+    "category": "Networking",
+    "discussion": "https://ethereum-magicians.org/t/eip-8070-sparse-blobpool/26023"
+  },
+  {
+    "eip": "8071",
+    "title": "Prevent using consolidations as withdrawals",
+    "author": "Mikhail Kalinin (@mkalinin), Francesco D'Amato (@fradamt)",
+    "link": "https://eipsinsight.com/eips/eip-8071",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8071-prevent-using-consolidations-as-withdrawals/26037"
+  },
+  {
+    "eip": "8080",
+    "title": "Let exits use the consolidation queue",
+    "author": "Francesco D'Amato (@fradamt)",
+    "link": "https://eipsinsight.com/eips/eip-8080",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-8080-let-exits-use-the-consolidation-queue/26552"
+  },
+  {
+    "eip": "7919",
+    "title": "Pureth - Provable RPC responses",
+    "author": "",
+    "link": "",
+    "type": "",
+    "category": "",
+    "discussion": ""
+  }
+]
