@@ -1,0 +1,128 @@
+[
+  {
+    "eip": "7607",
+    "title": "Hardfork Meta - Fusaka",
+    "author": "Tim Beiko (@timbeiko), Alex Stokes (@ralexstokes), Ansgar Dietrichs (@adietrichs)",
+    "link": "https://eipsinsight.com/eips/eip-7607",
+    "type": "Meta",
+    "category": "",
+    "discussion": "https://ethereum-magicians.org/t/eip-7607-fusaka-meta-eip/18693"
+  },
+  {
+    "eip": "7594",
+    "title": "PeerDAS - Peer Data Availability Sampling",
+    "author": "Danny Ryan (@djrtwo), Dankrad Feist (@dankrad), Francesco D'Amato (@fradamt), Hsiao-Wei Wang (@hwwhww)",
+    "link": "https://eipsinsight.com/eips/eip-7594",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7594-peerdas-peer-data-availability-sampling/18215"
+  },
+  {
+    "eip": "7823",
+    "title": "Set upper bounds for MODEXP",
+    "author": "Alex Beregszaszi (@axic), Radoslaw Zagorowicz (@rodiazet)",
+    "link": "https://eipsinsight.com/eips/eip-7823",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7823-set-upper-bounds-for-modexp/21798"
+  },
+  {
+    "eip": "7825",
+    "title": "Transaction Gas Limit Cap",
+    "author": "Giulio Rebuffo (@Giulio2002)",
+    "link": "https://eipsinsight.com/eips/eip-7825",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7825-transaction-gas-limit-cap/21848"
+  },
+  {
+    "eip": "7883",
+    "title": "ModExp Gas Cost Increase",
+    "author": "Marcin Sobczak (@marcindsobczak), Marek Moraczyński (@MarekM25), Marcos Maceo (@stdevMac)",
+    "link": "https://eipsinsight.com/eips/eip-7883",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7883-modexp-gas-cost-increase/22841"
+  },
+  {
+    "eip": "7917",
+    "title": "Deterministic proposer lookahead",
+    "author": "Lin Oshitani (@linoscope), Justin Drake (@JustinDrake)",
+    "link": "https://eipsinsight.com/eips/eip-7917",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7917-deterministic-proposer-lookahead/23259"
+  },
+  {
+    "eip": "7918",
+    "title": "Blob base fee bounded by execution cost",
+    "author": "Anders Elowsson (@anderselowsson), Ben Adams (@benaadams), Francesco D'Amato (@fradamt)",
+    "link": "https://eipsinsight.com/eips/eip-7918",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-blob-base-fee-bounded-by-price-of-blob-carrying-transaction/23271"
+  },
+  {
+    "eip": "7934",
+    "title": "RLP Execution Block Size Limit",
+    "author": "Giulio Rebuffo (@Giulio2002), Ben Adams (@benaadams), Storm Slivkoff (@sslivkoff)",
+    "link": "https://eipsinsight.com/eips/eip-7934",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7934-add-bytesize-limit-to-blocks/23589"
+  },
+  {
+    "eip": "7939",
+    "title": "Count leading zeros (CLZ) opcode",
+    "author": "Charles Cooper (@charles-cooper)",
+    "link": "https://eipsinsight.com/eips/eip-7939",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7939-clz-count-leading-zeros-opcode/23605"
+  },
+  {
+    "eip": "7951",
+    "title": "Precompile for secp256r1 Curve Support",
+    "author": "Ulaş Erdoğan (@ulerdogan), Doğan Alpaslan (@doganalpaslan)",
+    "link": "https://eipsinsight.com/eips/eip-7951",
+    "type": "Standards Track",
+    "category": "Core",
+    "discussion": "https://ethereum-magicians.org/t/eip-7951-precompiled-for-secp256r1-curve-support/23890"
+  },
+  {
+    "eip": "7892",
+    "title": "Blob Parameter Only Hardforks",
+    "author": "Mark Mackey (@ethDreamer)",
+    "link": "https://eipsinsight.com/eips/eip-7892",
+    "type": "Informational",
+    "category": "",
+    "discussion": "https://ethereum-magicians.org/t/eip-7892-blob-parameter-only-hardforks/23018"
+  },
+  {
+    "eip": "7642",
+    "title": "eth/69 - Drop pre-merge fields",
+    "author": "Marius van der Wijden (@MariusVanDerWijden), Felix Lange, Ahmad Bitar (@smartprogrammer93)",
+    "link": "https://eipsinsight.com/eips/eip-7642",
+    "type": "Standards Track",
+    "category": "Networking",
+    "discussion": "https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005"
+  },
+  {
+    "eip": "7910",
+    "title": "eth_config JSON-RPC Method",
+    "author": "lightclient (@lightclient)",
+    "link": "https://eipsinsight.com/eips/eip-7910",
+    "type": "Standards Track",
+    "category": "Interface",
+    "discussion": "https://ethereum-magicians.org/t/eip-7910-eth-config-json-rpc-method/23149"
+  },
+  {
+    "eip": "7935",
+    "title": "Set default gas limit to 60M",
+    "author": "Sophia Gold (@sophia-gold), Parithosh Jayanthi (@parithoshj), Toni Wahrstätter (@nerolation), Carl Beekhuizen (@CarlBeek), Ansgar Dietrichs (@adietrichs), Dankrad Feist (@dankrad), Alex Stokes (@ralexstokes), Josh Rudolph (@jrudolph), Giulio Rebuffo (@Giulio2002), Storm Slivkoff (@sslivkoff)",
+    "link": "https://eipsinsight.com/eips/eip-7935",
+    "type": "Informational",
+    "category": "",
+    "discussion": "https://ethereum-magicians.org/t/eip-7935-set-default-gas-limit-to-xx0m/23789"
+  }
+]

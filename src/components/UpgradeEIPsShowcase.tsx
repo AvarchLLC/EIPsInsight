@@ -11,10 +11,11 @@ import {
   Flex,
   Icon,
   Tooltip,
+  Button,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { ExternalLinkIcon, ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 
 interface EIPData {
   eip: string;
@@ -31,6 +32,8 @@ interface UpgradeEIPsShowcaseProps {
   upgradeDate: string;
   eips: EIPData[];
   upgradeColor: string;
+  sectionTitle?: string;
+  showInitialRows?: number;
 }
 
 const MotionBox = motion(Box);
@@ -40,9 +43,12 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
   upgradeDate,
   eips,
   upgradeColor,
+  sectionTitle,
+  showInitialRows = 2,
 }) => {
   const router = useRouter();
   const [hoveredEip, setHoveredEip] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   const bgCard = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
@@ -64,6 +70,13 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
   const handleEIPClick = (eipNumber: string) => {
     router.push(`/eips/eip-${eipNumber}`);
   };
+
+  // Calculate visible items based on showAll state
+  const cardsPerRow = 3;
+  const initialVisibleCount = showInitialRows * cardsPerRow;
+  const visibleCoreEIPs = showAll ? coreEIPs : coreEIPs.slice(0, Math.min(initialVisibleCount, coreEIPs.length));
+  const visibleOtherEIPs = showAll ? otherEIPs : otherEIPs.slice(0, Math.max(0, initialVisibleCount - coreEIPs.length));
+  const hasMoreItems = (coreEIPs.length + otherEIPs.length) > initialVisibleCount;
 
   const EIPCard = ({ eip }: { eip: EIPData }) => (
     <MotionBox
@@ -163,7 +176,7 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
               bgClip="text"
               fontWeight="700"
             >
-              {upgradeName} Network Upgrade
+              {sectionTitle || `${upgradeName} Network Upgrade`}
             </Heading>
             <Badge
               colorScheme="green"
@@ -180,11 +193,11 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
             </Badge>
           </Flex>
           <Text fontSize="sm" color={subtextColor}>
-            Complete list of Ethereum Improvement Proposals included in this upgrade
+            Complete list of Ethereum Improvement Proposals {sectionTitle ? sectionTitle.toLowerCase() : 'included in this upgrade'}
           </Text>
         </Box>
 
-        {coreEIPs.length > 0 && (
+        {visibleCoreEIPs.length > 0 && (
           <Box>
             <Flex align="center" gap={3} mb={4}>
               <Heading size="md" color={textColor}>
@@ -195,14 +208,14 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
               </Badge>
             </Flex>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
-              {coreEIPs.map((eip) => (
+              {visibleCoreEIPs.map((eip) => (
                 <EIPCard key={eip.eip} eip={eip} />
               ))}
             </SimpleGrid>
           </Box>
         )}
 
-        {otherEIPs.length > 0 && (
+        {visibleOtherEIPs.length > 0 && (
           <Box>
             <Flex align="center" gap={3} mb={4}>
               <Heading size="md" color={textColor}>
@@ -216,11 +229,25 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
               </Text>
             </Flex>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
-              {otherEIPs.map((eip) => (
+              {visibleOtherEIPs.map((eip) => (
                 <EIPCard key={eip.eip} eip={eip} />
               ))}
             </SimpleGrid>
           </Box>
+        )}
+
+        {hasMoreItems && (
+          <Flex justify="center" mt={4}>
+            <Button
+              onClick={() => setShowAll(!showAll)}
+              colorScheme="teal"
+              variant="outline"
+              size="md"
+              rightIcon={showAll ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            >
+              {showAll ? 'Show Less' : 'Show More'}
+            </Button>
+          </Flex>
         )}
 
         <Box

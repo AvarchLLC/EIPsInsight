@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 interface TimelineUpgrade {
   name: string;
-  key: 'pectra' | 'fusaka' | 'glamsterdam' | 'hekabogota';
+  key: 'pectra' | 'fusaka' | 'glamsterdam' | 'hegota';
   date: string;
   color: string;
   bgColor: string;
@@ -12,8 +12,8 @@ interface TimelineUpgrade {
 }
 
 interface HorizontalUpgradeTimelineProps {
-  selectedUpgrade: 'pectra' | 'fusaka' | 'glamsterdam' | 'hekabogota';
-  onUpgradeClick: (upgrade: 'pectra' | 'fusaka' | 'glamsterdam' | 'hekabogota') => void;
+  selectedUpgrade: 'pectra' | 'fusaka' | 'glamsterdam' | 'hegota';
+  onUpgradeClick: (upgrade: 'pectra' | 'fusaka' | 'glamsterdam' | 'hegota') => void;
 }
 
 const MotionBox = motion(Box);
@@ -50,8 +50,8 @@ const HorizontalUpgradeTimeline: React.FC<HorizontalUpgradeTimelineProps> = ({
       isPast: false,
     },
     {
-      name: 'Heka/Bogotá',
-      key: 'hekabogota',
+      name: 'Hegotá Upgrade',
+      key: 'hegota',
       date: 'TBD',
       color: '#F59E0B',
       bgColor: '#FEF3C7',
