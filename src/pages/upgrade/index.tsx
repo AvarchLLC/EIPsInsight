@@ -50,6 +50,8 @@ import DeclinedEIPListPage from "@/components/DeclinedCardsPage";
 import PlaceYourAdCard from "@/components/PlaceYourAdCard";
 import UpgradeEIPsShowcase from "@/components/UpgradeEIPsShowcase";
 import HorizontalUpgradeTimeline from "@/components/HorizontalUpgradeTimeline";
+import EthereumUpgradesFAQ from "@/components/EthereumUpgradesFAQ";
+
 
 // Import glamsterDamData from UpgradesTimeline (we'll need to extract it or access it differently)
 // For now, let's define the glamsterDamData here since it's not exported from UpgradesTimeline
@@ -1167,7 +1169,11 @@ const declinedEIPs: DeclinedEIP[] = [
 ];
 
 
-const All = () => {
+interface AllProps {
+  initialUpgrade?: string;
+}
+
+const All = ({ initialUpgrade }: AllProps) => {
   // Homepage-style theme values
   
   // Use exact same pattern as Dashboard component
@@ -1182,7 +1188,7 @@ const All = () => {
     setIsLoading(false);
   }, []);
   
-  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam' | 'hegota'>('glamsterdam');
+  const [selectedOption, setSelectedOption] = useState<'pectra' | 'fusaka' | 'glamsterdam' | 'hegota'>(initialUpgrade as any || 'glamsterdam');
   const { selectedUpgrade, setSelectedUpgrade } = useSidebar();
   const [recentGlamsterdamData, setRecentGlamsterdamData] = useState<any>(null);
   const [isLoadingGlamsterdamData, setIsLoadingGlamsterdamData] = useState(false);
@@ -1201,21 +1207,12 @@ const All = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMediumOrLarger, setIsMediumOrLarger] = useState(false);
   const router = useRouter();
-const { selected } = router.query;
 
-
-// 🔄 Sync dropdown state with URL query param
-useEffect(() => {
-  if (selected === 'pectra' || selected === 'fusaka' || selected === 'glamsterdam' || selected === 'hegota') {
-    setSelectedOption(selected);
-  }
-}, [selected]);
-
-// 🔼 Also update the URL when dropdown changes
+// Update the URL when dropdown changes
 const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   const value = e.target.value as 'pectra' | 'fusaka' | 'glamsterdam' | 'hegota';
   setSelectedOption(value);
-  router.push(`/upgrade?selected=${value}#${value}`, undefined, { shallow: true });
+  router.push(`/upgrade/${value}`);
 };
 
 
@@ -2014,6 +2011,20 @@ return (
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
+          {/* Container 0: FAQ Section */}
+          <Box
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue("gray.200", "gray.700")}
+            mb={8}
+            px={6}
+            py={8}
+          >
+            <EthereumUpgradesFAQ />
+          </Box>
+
           {/* Container 1: Page Header + Selector + Countdown */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
@@ -2064,7 +2075,7 @@ return (
                 selectedUpgrade={selectedOption}
                 onUpgradeClick={(upgrade) => {
                   setSelectedOption(upgrade);
-                  router.push(`/upgrade?selected=${upgrade}#${upgrade}`, undefined, { shallow: true });
+                  router.push(`/upgrade/${upgrade}`);
                 }}
               />
             </Box>
@@ -2204,10 +2215,6 @@ return (
             </Flex>
             
             {/* Network Upgrade Inclusion Stages Chart (FUSAKA) */}
-
-              <Box id="NetworkUpgradeschart" mt={8}>  
-                <NetworkUpgradesChart />
-              </Box>
 
           </Box>
 

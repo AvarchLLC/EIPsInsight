@@ -81,17 +81,17 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
   const EIPCard = ({ eip }: { eip: EIPData }) => (
     <MotionBox
       bg={bgCard}
-      borderRadius="xl"
-      p={5}
-      border="2px solid"
+      borderRadius="lg"
+      p={3}
+      border="1px solid"
       borderColor={hoveredEip === eip.eip ? upgradeColor : borderColor}
       cursor="pointer"
       onClick={() => handleEIPClick(eip.eip)}
       onMouseEnter={() => setHoveredEip(eip.eip)}
       onMouseLeave={() => setHoveredEip(null)}
-      whileHover={{ y: -4, scale: 1.02 }}
+      whileHover={{ y: -2, scale: 1.01 }}
       transition={{ duration: 0.2 } as any}
-      boxShadow={hoveredEip === eip.eip ? 'lg' : 'sm'}
+      boxShadow={hoveredEip === eip.eip ? 'md' : 'sm'}
       position="relative"
       overflow="hidden"
     >
@@ -100,19 +100,19 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
         top={0}
         left={0}
         right={0}
-        height="4px"
+        height="3px"
         bg={upgradeColor}
         opacity={hoveredEip === eip.eip ? 1 : 0.3}
       />
       
-      <VStack align="stretch" spacing={3} mt={1}>
+      <VStack align="stretch" spacing={2} mt={1}>
         <Flex justify="space-between" align="flex-start">
           <HStack spacing={2}>
             <Badge
               colorScheme={getCategoryColor(eip.category, eip.type)}
-              fontSize="sm"
-              px={3}
-              py={1}
+              fontSize="xs"
+              px={2}
+              py={0.5}
               borderRadius="full"
               fontWeight="600"
             >
@@ -122,31 +122,31 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
               <Badge
                 variant="subtle"
                 colorScheme={getCategoryColor(eip.category, eip.type)}
-                fontSize="xs"
-                px={2}
-                py={1}
+                fontSize="2xs"
+                px={1.5}
+                py={0.5}
                 borderRadius="full"
               >
                 {eip.category}
               </Badge>
             )}
           </HStack>
-          <Icon as={ExternalLinkIcon} color={subtextColor} boxSize={4} />
+          <Icon as={ExternalLinkIcon} color={subtextColor} boxSize={3} />
         </Flex>
 
         <Box>
           <Text
-            fontSize="md"
+            fontSize="sm"
             fontWeight="bold"
             color={textColor}
-            lineHeight="1.4"
+            lineHeight="1.3"
             noOfLines={2}
           >
             {eip.title}
           </Text>
         </Box>
 
-        <Text fontSize="xs" color={subtextColor} noOfLines={1}>
+        <Text fontSize="2xs" color={subtextColor} noOfLines={1}>
           {eip.author.split(',')[0]}
           {eip.author.split(',').length > 1 && ' et al.'}
         </Text>
@@ -207,7 +207,7 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
                 {coreEIPs.length}
               </Badge>
             </Flex>
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={3}>
               {visibleCoreEIPs.map((eip) => (
                 <EIPCard key={eip.eip} eip={eip} />
               ))}
@@ -228,7 +228,7 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
                 (Networking, Interface, Informational, Meta)
               </Text>
             </Flex>
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={3}>
               {visibleOtherEIPs.map((eip) => (
                 <EIPCard key={eip.eip} eip={eip} />
               ))}
