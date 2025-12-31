@@ -460,14 +460,6 @@ export default function DeclinedEIPListPage({
       >
         <VStack spacing={4} align="start">
           <Flex align="center" gap={4} wrap="wrap">
-            <Text 
-              fontSize={{ base: "xl", md: "2xl" }} 
-              fontWeight="700" 
-              color={useColorModeValue('gray.900', 'white')}
-              fontFamily="system-ui, -apple-system, sans-serif"
-            >
-              Declined for Inclusion
-            </Text>
             <Badge 
               colorScheme="red" 
               variant="solid" 
