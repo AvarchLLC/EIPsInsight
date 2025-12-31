@@ -11,6 +11,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "bash -lc 'shopt -s globstar; node --test --loader ts-node/esm tests/**/*.test.ts'",
     "create-admin": "node scripts/create-admin.mjs",
     "migrate-blogs": "node scripts/migrate-static-blogs.mjs"
   },
