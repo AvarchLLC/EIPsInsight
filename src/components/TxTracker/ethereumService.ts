@@ -102,9 +102,9 @@ export const getBlockDetails = async (blockNumber: string | number, isSepolia: b
 };
 
 /**
- * Fetches the last 7200 blocks using batch requests.
+ * Fetches the last 10 blocks using batch requests.
  * @param isSepolia - Whether to use the Sepolia network.
- * @returns The last 7200 blocks.
+ * @returns The last 10 blocks.
  */
 export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
     const provider = isSepolia ? sepoliaWeb3 : web3;
@@ -143,7 +143,11 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
       }
     }
   
-    return allBlocks;
+    const sortedBlocks = allBlocks.sort(
+      (a, b) => Number(b?.number ?? 0) - Number(a?.number ?? 0)
+    ); // Sorted by block number (desc)
+
+    return sortedBlocks;
   };
 
 // services/ethereumService.ts
