@@ -128,7 +128,7 @@ export default function AboutPage() {
                 color={textColor}
                 lineHeight="base"
               >
-                We specialize in toolings designed to provide clear, visual insights into the activity of{" "}
+                We specialize in tools designed to provide clear, visual insights into the activity of{" "}
                 <Link
                   href="https://github.com/ethereum/EIPs"
                   color={linkColor}
