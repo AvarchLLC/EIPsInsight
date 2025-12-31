@@ -15,14 +15,16 @@ import {
   Collapse,
   Image,
 } from '@chakra-ui/react';
-import { FaNetworkWired, FaCode, FaRocket, FaLayerGroup, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaNetworkWired, FaCode, FaRocket, FaLayerGroup, FaChevronDown, FaChevronUp, FaProjectDiagram } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import NetworkUpgradesChart from './NetworkUpgradesChart';
+import ZoomableTimeline from './ZoomableTimeline';
 
 const MotionBox = motion(Box);
 
 const EthereumUpgradesFAQ: React.FC = () => {
   const [isFlowchartOpen, setIsFlowchartOpen] = useState(false);
+  const [isTimelineOpen, setIsTimelineOpen] = useState(false);
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const textColor = useColorModeValue('gray.800', 'white');
@@ -115,6 +117,36 @@ const EthereumUpgradesFAQ: React.FC = () => {
             </MotionBox>
           ))}
         </SimpleGrid>
+
+        {/* Ethereum Upgrade Timeline SVG */}
+        <Box>
+          <HStack spacing={2} mb={2}>
+            <Icon as={FaProjectDiagram} boxSize={4} color="blue.500" />
+            <Text fontWeight="600" fontSize="md" color={textColor}>
+              Ethereum Upgrade Timeline (Interactive)
+            </Text>
+            <Icon 
+              as={isTimelineOpen ? FaChevronUp : FaChevronDown} 
+              boxSize={4} 
+              color={subtextColor}
+              cursor="pointer"
+              onClick={() => setIsTimelineOpen(!isTimelineOpen)}
+              _hover={{ color: textColor }}
+            />
+          </HStack>
+          <Text fontSize="xs" color={subtextColor} mb={2}>
+            Explore the complete history of Ethereum upgrades from genesis to present. Use zoom controls to examine details.
+          </Text>
+
+          <Collapse in={isTimelineOpen} animateOpacity>
+            <Box mb={2}>
+              <ZoomableTimeline 
+                svgPath="/ethupgradetimeline.svg" 
+                alt="Ethereum Upgrade Timeline"
+              />
+            </Box>
+          </Collapse>
+        </Box>
 
         {/* EIP Inclusion Process Flowchart */}
         <Box>
