@@ -4,7 +4,10 @@ export function extractHeadingsFromMarkdown(markdown: string) {
   return headingLines.map(line => {
     const depth = line.match(/^#+/)![0].length;
     const text = line.replace(/^#+\s?/, '').trim();
-    const id = text.toLowerCase().replace(/[^\w]+/g, '-'); // Simple slugify
+    const id = text
+      .toLowerCase()
+      .replace(/[^\w]+/g, '-')
+      .replace(/^-+|-+$/g, ''); // Simple slugify
     return { depth, text, id };
   });
 }
