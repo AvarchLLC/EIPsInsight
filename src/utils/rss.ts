@@ -41,13 +41,16 @@ export function generateRSSFeed({ title, items, id, link }: GenerateFeedParams) 
 
 // Added export to fix build error in sync.ts
 export function buildFeedItemsFromEvents(events: ChangeEvent[], baseLink: string): FeedItem[] {
-  return events.map(e => ({
-    title:
-      e.kind === 'status' && e.statusFrom && e.statusTo
-        ? `Status: ${e.statusFrom} → ${e.statusTo}`
-        : e.summary,
-    link: e.url,
-    description: e.message || e.summary,
-    date: new Date(e.date)
-  }));
+  return events.map(e => {
+    const link = e.url || baseLink;
+    return {
+      title:
+        e.kind === 'status' && e.statusFrom && e.statusTo
+          ? `Status: ${e.statusFrom} → ${e.statusTo}`
+          : e.summary,
+      link,
+      description: e.message || e.summary,
+      date: new Date(e.date)
+    };
+  });
 }
