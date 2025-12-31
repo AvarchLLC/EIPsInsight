@@ -103,7 +103,7 @@ const EthereumV2 = () => {
       setLast10Blocks(limitedBlocks);
       
       // Process transactions from the latest block only to reduce memory usage
-      const latestBlockTxs = limitedBlocks[0]?.transactions || [];
+      const latestBlockTxs = limitedBlocks[0]?.transactions || []; // latest block after sorting by block number
       setRecentTransactions(limitArraySize(latestBlockTxs, MAX_TRANSACTION_HISTORY));
       setLoadingTxs(false);
       setLoadingBlocksTable(false);
