@@ -48,16 +48,8 @@ The codebase uses a large UI and data stack:
 
 ---
 
-## 5. Useful scripts
-From `package.json`:
-- `npm run dev` — local dev server
-- `npm run lint` — linting
-- `npm run create-admin` — admin creation
-- `npm run migrate-blogs` — blog migration
 
----
-
-## 6. Suggested learning path for new contributors
+## 5. Suggested learning path for new contributors
 1. **Routing:**
    Start with `src/app/layout.tsx` and a couple of major pages in `src/pages/` to understand navigation and layout.
 2. **UI building blocks:**
@@ -70,6 +62,130 @@ From `package.json`:
    Browse `src/hooks/` and `src/utils/` for reusable logic patterns.
 
 ---
+
+Added by @dhanushlnaik
+
+# ===========================================
+# EIPs Insight - Environment Variables
+# ===========================================
+# Copy this file to .env.local and fill in the values
+# Never commit .env.local to version control
+
+# ===========================================
+# Database Configuration
+# ===========================================
+
+# Main MongoDB Connection URI for application data
+MONGODB_URI=mongodb://localhost:27017/eipsinsight
+
+# MongoDB URI for open PRs analytics and tracking
+OPENPRS_MONGODB_URI=mongodb://localhost:27017/openprs
+
+# Database name for open PRs (optional, defaults to "test")
+OPENPRS_DATABASE=openprs
+
+# MongoDB URI for contributor rankings (optional, falls back to OPENPRS_MONGODB_URI)
+CONTRI_URI=mongodb://localhost:27017/contributors
+
+# ===========================================
+# Authentication - NextAuth.js
+# ===========================================
+
+# NextAuth Secret - Generate with: openssl rand -base64 32
+NEXTAUTH_SECRET=your-nextauth-secret-here
+
+# NextAuth URL - Your application URL
+NEXTAUTH_URL=http://localhost:3000
+
+# GitHub OAuth Provider
+GITHUB_ID=your-github-oauth-client-id
+GITHUB_SECRET=your-github-oauth-client-secret
+
+# Google OAuth Provider
+GOOGLE_CLIENT_ID=your-google-oauth-client-id
+GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
+
+# ===========================================
+# GitHub API Integration
+# ===========================================
+
+# GitHub Personal Access Token for API calls
+# Required for fetching EIPs/ERCs/RIPs data from GitHub
+GITHUB_TOKEN=your-github-personal-access-token
+
+# Alternative GitHub token name (used in some API routes)
+ACCESS_TOKEN=your-github-personal-access-token
+
+# Public GitHub access token (exposed to client-side)
+NEXT_PUBLIC_ACCESS_TOKEN=your-public-github-token
+
+# ===========================================
+# Email Configuration
+# ===========================================
+
+# SMTP Server Configuration
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USERNAME=your-email@example.com
+EMAIL_PASSWORD=your-email-password
+EMAIL_FROM=noreply@eipsinsight.com
+
+# ===========================================
+# Payment Integration - Stripe
+# ===========================================
+
+# Stripe Secret Key (server-side)
+STRIPE_SECRET_KEY=sk_test_your-stripe-secret-key
+
+# Stripe Webhook Secret for event verification
+STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
+
+# ===========================================
+# External APIs
+# ===========================================
+
+# Cohere AI API Key for AI summary generation
+COHERE_API_KEY=your-cohere-api-key
+
+# Sepolia (Ethereum Testnet) API Key
+NEXT_PUBLIC_SEPOLIA_API=your-sepolia-api-key
+
+# ===========================================
+# Notifications
+# ===========================================
+
+# Discord Webhook URL for notifications and feedback
+DISCORD_WEB=https://discord.com/api/webhooks/your-webhook-url
+
+# ===========================================
+# Development & CI/CD
+# ===========================================
+
+# GitHub Repository for CI/CD workflows
+GITHUB_REPOSITORY=ethereum/EIPs
+
+# ===========================================
+# Notes
+# ===========================================
+# 
+# Required Variables for Core Functionality:
+# - MONGODB_URI
+# - NEXTAUTH_SECRET
+# - NEXTAUTH_URL
+# - GITHUB_TOKEN or ACCESS_TOKEN
+#
+# Optional but Recommended:
+# - OPENPRS_MONGODB_URI (for PR analytics)
+# - Email settings (for notifications)
+# - OAuth providers (for social login)
+#
+# For Production:
+# - Use strong, unique values for all secrets
+# - Set NEXTAUTH_URL to your production domain
+# - Enable OAuth providers for better UX
+# - Configure email for transactional messages
+# - Set up Stripe for payment features
+#
 
 ## 7. Where to add new work
 - **New UI component:** `src/components/`
