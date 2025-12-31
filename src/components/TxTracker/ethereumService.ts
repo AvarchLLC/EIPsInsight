@@ -102,9 +102,9 @@ export const getBlockDetails = async (blockNumber: string | number, isSepolia: b
 };
 
 /**
- * Fetches the last 7200 blocks using batch requests.
+ * Fetches the last 10 blocks using batch requests.
  * @param isSepolia - Whether to use the Sepolia network.
- * @returns The last 7200 blocks.
+ * @returns The last 10 blocks.
  */
 export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
     const provider = isSepolia ? sepoliaWeb3 : web3;
