@@ -143,7 +143,11 @@ export const fetchLast10Blocks = async (isSepolia: boolean = false) => {
       }
     }
   
-    return allBlocks;
+    const sortedBlocks = allBlocks.sort(
+      (a, b) => Number(b?.number ?? 0) - Number(a?.number ?? 0)
+    ); // Sorted by block number (desc)
+
+    return sortedBlocks;
   };
 
 // services/ethereumService.ts
