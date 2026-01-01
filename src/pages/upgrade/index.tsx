@@ -1495,28 +1495,6 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     },
   ];
 
-// SFI (Scheduled for Inclusion) EIPs for Glamsterdam
-const glamsterdamScheduledData = [
-  {
-    eip: "7732",
-    title: "Enshrined Proposer-Builder Separation (ePBS)",
-    author: "Terence (@terencechain), Potuz (@potuz), Mike Neuder (@michaelneuder), Francesco D'Amato (@fradamt)",
-    link: "https://eipsinsight.com/eips/eip-7732",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7732-enshrined-proposer-builder-separation-epbs/20207"
-  },
-  {
-    eip: "7928",
-    title: "Increase blob throughput",
-    author: "Toni Wahrstätter (@nerolation)",
-    link: "https://eipsinsight.com/eips/eip-7928",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7928-increase-blob-throughput/23523"
-  }
-];
-
 // CFI (Considered for Inclusion) EIPs for Glamsterdam
 const glamsterdamData = [
   {
@@ -1575,7 +1553,7 @@ const glamsterdamData = [
   }
 ];
 
-// PFI (PFI) EIPs for Glamsterdam
+// PFI (Proposed for Inclusion) EIPs for Glamsterdam
 const glamsterdamProposedData = [
   {
     eip: "2780",
@@ -2254,22 +2232,13 @@ return (
             >
               {selectedOption === 'glamsterdam' ? (
                 <VStack spacing={12} align="stretch">
-                  {/* SFI Section */}
-                  <UpgradeEIPsShowcase
-                    upgradeName={upgradeName}
-                    upgradeDate={upgradeDates[selectedOption]}
-                    eips={glamsterdamScheduledData}
-                    upgradeColor={upgradeColors[selectedOption]}
-                    sectionTitle="Glamsterdam (SFI)"
-                  />
-                  
                   {/* CFI Section */}
                   <UpgradeEIPsShowcase
                     upgradeName={upgradeName}
                     upgradeDate={upgradeDates[selectedOption]}
                     eips={currentData}
                     upgradeColor={upgradeColors[selectedOption]}
-                    sectionTitle="Glamsterdam (CFI)"
+                    sectionTitle="Glamsterdam (Confirmed for Inclusion)"
                   />
                   
                   {/* PFI Section */}
@@ -2278,7 +2247,7 @@ return (
                     upgradeDate={upgradeDates[selectedOption]}
                     eips={glamsterdamProposedData}
                     upgradeColor={upgradeColors[selectedOption]}
-                    sectionTitle="Glamsterdam (PFI)"
+                    sectionTitle="Glamsterdam (Proposed for Inclusion)"
                   />
                 </VStack>
               ) : (
@@ -2358,9 +2327,15 @@ return (
               px={6}
               py={8}
             >
+            <Box id="upgrade-table" display={{ base: "none", md: "block" }}>
+              <PectraTable
+                PectraData={currentData}
+                title={upgradeName}
+              />
+            </Box>
 
             {(selectedOption === 'fusaka' || selectedOption === 'glamsterdam') && (
-              <Box>
+              <Box mt={8}>
                 <Text
                   fontSize={{ base: '2xl', md: '3xl' }}
                   fontWeight="bold"
@@ -2376,7 +2351,104 @@ return (
               </Box>
             )}
 
-
+            {/* Recent Glamsterdam Data with Proposed EIPs */}
+            {selectedOption === 'glamsterdam' && recentGlamsterdamData && (
+              <Box
+                bg={useColorModeValue('white', 'gray.800')}
+                borderRadius="xl"
+                boxShadow="sm"
+                border="1px solid"
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
+                mb={8}
+                px={6}
+                py={8}
+              >
+                <Box mb={6}>
+                  <Flex justify="space-between" align="center" mb={2}>
+                    <Text
+                      fontSize={{ base: '2xl', md: '3xl' }}
+                      fontWeight="bold"
+                      color="#00CED1"
+                      textAlign="left"
+                    >
+                      Recent Glamsterdam EIPs
+                    </Text>
+                    <Select
+                      value={glamsterdamEipCategory}
+                      onChange={(e) => setGlamsterdamEipCategory(e.target.value as 'scheduled' | 'considered')}
+                      w={{ base: '150px', md: '180px' }}
+                      size="md"
+                      borderColor="#00CED1"
+                      focusBorderColor="#00CED1"
+                    >
+                      <option value="scheduled">Scheduled</option>
+                      <option value="considered">Considered</option>
+                    </Select>
+                  </Flex>
+                  <Text fontSize="sm" color="gray.500" mt={2}>
+                    Data from {recentGlamsterdamData.date} - Showing {recentGlamsterdamData[glamsterdamEipCategory]?.length || 0} {glamsterdamEipCategory} EIPs
+                  </Text>
+                </Box>
+                
+                {isLoadingGlamsterdamData ? (
+                  <Flex justify="center" align="center" minH="200px">
+                    <Spinner size="xl" color="#00CED1" />
+                  </Flex>
+                ) : recentGlamsterdamData[glamsterdamEipCategory]?.length > 0 ? (
+                  <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
+                    {recentGlamsterdamData[glamsterdamEipCategory]?.map((eip: any, index: number) => (
+                      <Box
+                        key={index}
+                        bg={useColorModeValue('gray.50', 'gray.700')}
+                        p={4}
+                        borderRadius="lg"
+                        border="1px solid"
+                        borderColor={useColorModeValue('gray.200', 'gray.600')}
+                        _hover={{
+                          borderColor: '#00CED1',
+                          boxShadow: 'md',
+                          transform: 'translateY(-2px)',
+                        }}
+                        transition="all 0.2s ease-in-out"
+                      >
+                        <Flex justify="space-between" align="start" mb={2}>
+                          <Text fontWeight="bold" fontSize="lg" color="#00CED1">
+                            {eip}
+                          </Text>
+                          <Badge
+                            colorScheme={
+                              glamsterdamEipCategory === 'scheduled' ? 'green' : 'yellow'
+                            }
+                            variant="solid"
+                            fontSize="xs"
+                          >
+                            {glamsterdamEipCategory}
+                          </Badge>
+                        </Flex>
+                        <Text fontSize="sm" color="gray.600" noOfLines={3}>
+                          {eip}
+                        </Text>
+                        <a 
+                          href={`https://eips.ethereum.org/EIPS/eip-${eip.replace(/^EIP-/i, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Text fontSize="xs" color="#00CED1" mt={2} _hover={{ textDecoration: 'underline' }}>
+                            View EIP Details →
+                          </Text>
+                        </a>
+                      </Box>
+                    ))}
+                  </SimpleGrid>
+                ) : (
+                  <Flex justify="center" align="center" minH="200px">
+                    <Text fontSize="md" color="gray.500">
+                      No {glamsterdamEipCategory} EIPs available for this date
+                    </Text>
+                  </Flex>
+                )}
+              </Box>
+            )}
             </Box>
           )}
 
