@@ -2036,13 +2036,13 @@ return (
           {/* Container 0: FAQ Section */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
+            borderRadius={{ base: "lg", md: "xl" }}
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={8}
-            px={6}
-            py={8}
+            mb={{ base: 4, md: 6, lg: 8 }}
+            px={{ base: 3, sm: 4, md: 6 }}
+            py={{ base: 4, sm: 6, md: 8 }}
           >
             <EthereumUpgradesFAQ />
           </Box>
@@ -2050,34 +2050,36 @@ return (
           {/* Container 1: Page Header + Selector + Countdown */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
+            borderRadius={{ base: "lg", md: "xl" }}
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={8}
-            px={6}
-            py={8}
+            mb={{ base: 4, md: 6, lg: 8 }}
+            px={{ base: 3, sm: 4, md: 6 }}
+            py={{ base: 4, sm: 6, md: 8 }}
           >
             <Text
               as={motion.div}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 } as any}
-              fontSize={{ base: "2xl", md: "4xl", lg: "5xl" }}
+              fontSize={{ base: "xl", sm: "2xl", md: "3xl", lg: "4xl" }}
               fontWeight="bold"
               color="#00CED1"
               id="pectrafusaka"
               textAlign="center"
-              mb={6}
+              mb={{ base: 4, md: 6 }}
             >
               Ethereum Network Upgrades
             </Text>
             
-            <Box mb={4}>
+            <Box mb={{ base: 3, md: 4 }}>
               <select
                 value={selectedOption}
                 onChange={handleSelectChange}
                 style={{
+                  width: '100%',
+                  maxWidth: '300px',
                   padding: '10px 16px',
                   fontSize: '16px',
                   borderRadius: '8px',
@@ -2092,7 +2094,7 @@ return (
             </Box>
 
             {/* Horizontal Upgrade Timeline */}
-            <Box mb={8}>
+            <Box mb={{ base: 4, md: 6, lg: 8 }}>
               <HorizontalUpgradeTimeline
                 selectedUpgrade={selectedOption}
                 onUpgradeClick={(upgrade) => {
@@ -2111,7 +2113,7 @@ return (
             
             {/* Network Upgrade Timeline (UpgradesTimeline) */}
             {selectedOption !== 'hegota' && (
-              <Box id="NetworkUpgrades" mt={8}>
+              <Box id="NetworkUpgrades" mt={{ base: 4, md: 6, lg: 8 }}>
                 <UpgradesTimeline
                   selectedOption={selectedOption}
                   setSelectedOption={setSelectedOption}
@@ -2127,14 +2129,14 @@ return (
           {/* Container 3: Description */}
           <Box
             bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
+            borderRadius={{ base: "lg", md: "xl" }}
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue("gray.200", "gray.700")}
             transition="background-color .15s ease, border-color .15s ease"
-            mb={8}
-            px={6}
-            py={8}
+            mb={{ base: 4, md: 6, lg: 8 }}
+            px={{ base: 3, sm: 4, md: 6 }}
+            py={{ base: 4, sm: 6, md: 8 }}
           >
             <Flex
               direction={{ base: "column", md: "row" }}
@@ -2145,7 +2147,7 @@ return (
             >
               <Box flex="1">
                 {selectedOption === 'pectra' ? (
-                  <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
+                  <Text fontSize={{ base: "sm", md: "md", lg: "lg" }} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
                     Ethereum developers are moving toward the next major network upgrade, Prague and Electra,
                     collectively known as{" "}
                     <NLink href="https://eipsinsight.com/eips/eip-7600">
@@ -2175,7 +2177,7 @@ return (
                     </NLink>.
                   </Text>
                 ) : selectedOption === 'fusaka' ? (
-                  <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
+                  <Text fontSize={{ base: "sm", md: "md", lg: "lg" }} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
                     <NLink href="https://eipsinsight.com/upgrade/fusaka">
                       <Text as="span" color="blue.500" textDecor="underline">
                         Fusaka
@@ -2193,14 +2195,14 @@ return (
                       <Badge colorScheme="orange" fontSize="md" px={3} py={1} alignSelf="flex-start" borderRadius="full">
                         Early Planning Stage
                       </Badge>
-                      <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
+                      <Text fontSize={{ base: "sm", md: "md", lg: "lg" }} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
                         <NLink href="https://eipsinsight.com/eips/eip-8081">
                           <Text as="span" color="blue.500" textDecor="underline" fontWeight="bold">
                             Hegotá
                           </Text>
                         </NLink>{" "}is in early planning. The headliner proposal window will open soon. Check back for updates as the upgrade planning process begins.
                       </Text>
-                      <Text fontSize={{ base: "sm", md: "md" }} color={useColorModeValue("gray.600", "gray.400")} lineHeight="1.75" textAlign="justify">
+                      <Text fontSize={{ base: "xs", md: "sm" }} color={useColorModeValue("gray.600", "gray.400")} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
                         Future network upgrade currently in early planning stages. Named after the combination of{" "}
                         <Text as="span" fontWeight="semibold">"Heze"</Text> (consensus layer upgrade, named after a star) and{" "}
                         <Text as="span" fontWeight="semibold">"Bogotá"</Text> (execution layer upgrade, named after a Devcon location).
@@ -2208,7 +2210,7 @@ return (
                     </VStack>
                   </Box>
                 ) : (
-                  <Text fontSize={{ base: "md", md: "lg", lg: "xl" }} lineHeight="1.75" textAlign="justify">
+                  <Text fontSize={{ base: "sm", md: "md", lg: "lg" }} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
                     Ethereum developers are now preparing for the next major network upgrade, known as{" "}
                     <NLink href="/eips/eip-7773">
                       <Text as="span" color="blue.500" textDecor="underline">
@@ -2244,13 +2246,13 @@ return (
           {selectedOption !== 'hegota' && (
             <Box
               bg={useColorModeValue("white", "gray.800")}
-              borderRadius="xl"
+              borderRadius={{ base: "lg", md: "xl" }}
               boxShadow="sm"
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
-              mb={8}
-              px={6}
-              py={8}
+              mb={{ base: 4, md: 6, lg: 8 }}
+              px={{ base: 3, sm: 4, md: 6 }}
+              py={{ base: 4, sm: 6, md: 8 }}
             >
               {selectedOption === 'glamsterdam' ? (
                 <VStack spacing={12} align="stretch">
@@ -2296,18 +2298,18 @@ return (
           {selectedOption !== 'hegota' && currentPosts.length > 0 && (
             <Box
               bg={useColorModeValue("white", "gray.800")}
-              borderRadius="xl"
+              borderRadius={{ base: "lg", md: "xl" }}
               boxShadow="sm"
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
-              mb={8}
-              px={6}
-              py={8}
+              mb={{ base: 4, md: 6, lg: 8 }}
+              px={{ base: 3, sm: 4, md: 6 }}
+              py={{ base: 4, sm: 6, md: 8 }}
             >
-            <Box maxH="450px" overflowY="auto" width="100%" id="upgrade-blogs">
+            <Box maxH={{ base: "600px", md: "450px" }} overflowY="auto" width="100%" id="upgrade-blogs">
               <Grid
-                templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
-                gap={6}
+                templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}
+                gap={{ base: 4, md: 6 }}
               >
                 {currentPosts?.map((post, index) => {
                   const isLastRow =
@@ -2350,23 +2352,23 @@ return (
           {selectedOption !== 'hegota' && (
             <Box
               bg={useColorModeValue("white", "gray.800")}
-              borderRadius="xl"
+              borderRadius={{ base: "lg", md: "xl" }}
               boxShadow="sm"
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
-              mb={8}
-              px={6}
-              py={8}
+              mb={{ base: 4, md: 6, lg: 8 }}
+              px={{ base: 3, sm: 4, md: 6 }}
+              py={{ base: 4, sm: 6, md: 8 }}
             >
 
             {(selectedOption === 'fusaka' || selectedOption === 'glamsterdam') && (
               <Box>
                 <Text
-                  fontSize={{ base: '2xl', md: '3xl' }}
+                  fontSize={{ base: 'xl', md: '2xl', lg: '3xl' }}
                   fontWeight="bold"
                   color="#00CED1"
                   textAlign="left"
-                  mb={6}
+                  mb={{ base: 4, md: 6 }}
                 >
                   Declined for Inclusion
                 </Text>
@@ -2382,7 +2384,7 @@ return (
 
           {/* EtherWorld Advertisement */}
           {selectedOption !== 'hegota' && (
-            <Box my={6}>
+            <Box my={{ base: 4, md: 6 }}>
               <CloseableAdCard />
             </Box>
           )}
@@ -2390,13 +2392,13 @@ return (
           {/* Container 6: Author Contributions */}
           <Box
             bg={useColorModeValue('white', 'gray.800')}
-            borderRadius="xl"
+            borderRadius={{ base: "lg", md: "xl" }}
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue('gray.200', 'gray.700')}
-            mb={8}
-            px={6}
-            py={8}
+            mb={{ base: 4, md: 6, lg: 8 }}
+            px={{ base: 3, sm: 4, md: 6 }}
+            py={{ base: 4, sm: 6, md: 8 }}
           >
             <Box id="AuthorContributions">
               <NetworkUpgradesChart2 />
@@ -2406,17 +2408,17 @@ return (
           {/* Container 7: Network Upgrades and EIPs Relationship Graph */}
           <Box
             bg={useColorModeValue('white', 'gray.800')}
-            borderRadius="xl"
+            borderRadius={{ base: "lg", md: "xl" }}
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue('gray.200', 'gray.700')}
-            mb={8}
-            px={6}
-            py={6}
+            mb={{ base: 4, md: 6, lg: 8 }}
+            px={{ base: 3, sm: 4, md: 6 }}
+            py={{ base: 4, sm: 6, md: 8 }}
           >
-            <Box mb={6}>
+            <Box mb={{ base: 4, md: 6 }}>
               <Text
-                fontSize={{ base: '2xl', md: '3xl' }}
+                fontSize={{ base: 'xl', md: '2xl', lg: '3xl' }}
                 fontWeight="bold"
                 color="#00CED1"
                 textAlign="left"
@@ -2428,7 +2430,7 @@ return (
             <Box 
               width="100%" 
               position="relative"
-              minH="550px"
+              minH={{ base: "400px", md: "500px", lg: "550px" }}
               overflow="hidden"
             >
               <Graph />
@@ -2439,7 +2441,7 @@ return (
         )}
 
         {/* Place Your Ad Card - No Container */}
-        <Box my={8}>
+        <Box my={{ base: 4, md: 6, lg: 8 }}>
           <PlaceYourAdCard />
         </Box>
       </Box>

@@ -137,9 +137,9 @@ const executionSpecsLinks: Record<string, string> = {
   'Arrow Glacier': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/arrow-glacier.md',
   'Gray Glacier': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/gray-glacier.md',
   'Paris': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/paris.md',
-  'Shapella': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/shanghai.md',
-  'Dencun': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/cancun.md',
-  'Pectra': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/prague.md',
+  'Shanghai': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/shanghai.md',
+  'Cancun': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/cancun.md',
+  'Prague': 'https://github.com/ethereum/execution-specs/tree/master/network-upgrades/mainnet-upgrades/prague.md',
 };
 
 const upgradeMetaEIPs: Record<string, string> = {
@@ -157,21 +157,21 @@ const upgradeMetaEIPs: Record<string, string> = {
   'Arrow Glacier': 'EIP-7568',
   'Gray Glacier': 'EIP-7568',
   'Paris': 'EIP-7568',
-  'Shapella': 'EIP-7568',
-  'Dencun': 'EIP-7569',
-  'Pectra': 'EIP-7600',
-  'Fusaka': 'EIP-7607',
+  'Shanghai': 'EIP-6987',
+  'Cancun': 'EIP-7569',
+  'Prague': 'EIP-7600',
+  'Osaka': 'EIP-7607',
 };
 
 const upgradeDescriptions: Record<string, string> = {
-  "Fusaka": "Fulu-Osaka: PeerDAS for blob scaling, gas limit increase to 60M",
-  "Osaka": "Consensus layer: Future scaling improvements",
-  "Pectra": "Prague-Electra: Account abstraction (EIP-7702), validator improvements",
-  "Electra": "Consensus layer: Validator consolidation & staking enhancements",
-  "Dencun": "Cancun-Deneb: Proto-danksharding (EIP-4844) for L2 scaling",
-  "Deneb": "Consensus layer: Blob infrastructure support",
-  "Shapella": "Shanghai-Capella: Staking withdrawals enabled",
-  "Capella": "Consensus layer: Validator exit & withdrawal support",
+  "Osaka": "Osaka (Fusaka execution): PeerDAS for blob scaling, gas limit increase to 60M",
+  "Fulu": "Fulu (Fusaka consensus): PeerDAS consensus layer support",
+  "Prague": "Prague (Pectra execution): Account abstraction (EIP-7702)",
+  "Electra": "Electra (Pectra consensus): Validator consolidation & staking enhancements",
+  "Cancun": "Cancun (Dencun execution): Proto-danksharding (EIP-4844) for L2 scaling",
+  "Deneb": "Deneb (Dencun consensus): Blob infrastructure support",
+  "Shanghai": "Shanghai (Shapella execution): Staking withdrawals enabled",
+  "Capella": "Capella (Shapella consensus): Validator exit & withdrawal support",
   "Paris": "The Merge: Transition to Proof of Stake",
   "Bellatrix": "Consensus layer: Merge preparation",
   "Gray Glacier": "Difficulty bomb delay",
@@ -192,14 +192,14 @@ const upgradeDescriptions: Record<string, string> = {
 };
 
 const professionalColorMap: Record<string, string> = {
-  "Fusaka": "#10B981",            // Emerald 500 (2025-12-03)
-  "Osaka": "#10B981",             // Emerald 500 (Consensus layer)
-  "Pectra": "#DC2626",            // Red 600 (2025-05-07)
-  "Electra": "#DC2626",           // Red 600 (Consensus layer)
-  "Dencun": "#2563EB",            // Blue 600 (2024-03-13)
-  "Deneb": "#2563EB",             // Blue 600 (Consensus layer)
-  "Shapella": "#059669",          // Emerald 600 (2023-04-12)
-  "Capella": "#059669",           // Emerald 600 (Consensus layer)
+  "Osaka": "#10B981",             // Emerald 500 (2025-12-03) Execution
+  "Fulu": "#10B981",              // Emerald 500 (2025-12-03) Consensus
+  "Prague": "#DC2626",            // Red 600 (2025-05-07) Execution
+  "Electra": "#DC2626",           // Red 600 (2025-05-07) Consensus
+  "Cancun": "#2563EB",            // Blue 600 (2024-03-13) Execution
+  "Deneb": "#2563EB",             // Blue 600 (2024-03-13) Consensus
+  "Shanghai": "#059669",          // Emerald 600 (2023-04-12) Execution
+  "Capella": "#059669",           // Emerald 600 (2023-04-12) Consensus
   "Paris": "#7C3AED",             // Violet 600 (2022-09-15)
   "Bellatrix": "#EA580C",         // Orange 600 (2022-09-06)
   "Gray Glacier": "#4F46E5",      // Indigo 600 (2022-06-30)
@@ -219,14 +219,22 @@ const professionalColorMap: Record<string, string> = {
   "Frontier Thawing": "#92400E",  // Amber 900 (2015-09-07)
 };
 
+// Paired upgrade name mapping for display
+const pairedUpgradeNames: Record<string, string> = {
+  "2025-12-03": "Fusaka",
+  "2025-05-07": "Pectra",
+  "2024-03-13": "Dencun",
+  "2023-04-12": "Shapella",
+};
+
 
 
 // Grouped data structure - each upgrade has its EIPs in an array
 const rawData: UpgradeData[] = [
-  // Fusaka (Fulu-Osaka) — December 3, 2025 (Execution layer)
+  // Osaka — December 3, 2025 (Execution layer)
   { 
     date: "2025-12-03", 
-    upgrade: "Fusaka", 
+    upgrade: "Osaka", 
     layer: "execution",
     eips: ["EIP-7594", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7939", "EIP-7951"]
   },
@@ -234,10 +242,10 @@ const rawData: UpgradeData[] = [
   // Fulu — December 3, 2025 (Consensus layer)
   { date: "2025-12-03", upgrade: "Fulu", layer: "consensus", forkEpoch: 411392, eips: ["CONSENSUS"] },
 
-  // Pectra (Prague-Electra) — May 7, 2025 (Execution layer)
+  // Prague — May 7, 2025 (Execution layer)
   { 
     date: "2025-05-07", 
-    upgrade: "Pectra", 
+    upgrade: "Prague", 
     layer: "execution",
     blockNumber: 22431084,
     eips: ["EIP-2537", "EIP-2935", "EIP-6110", "EIP-7002", "EIP-7251", "EIP-7549", "EIP-7623", "EIP-7685", "EIP-7691", "EIP-7702"]
@@ -246,22 +254,22 @@ const rawData: UpgradeData[] = [
   // Electra — May 7, 2025 (Consensus layer)
   { date: "2025-05-07", upgrade: "Electra", layer: "consensus", forkEpoch: 364032, eips: ["CONSENSUS"] },
 
-  // Dencun (Cancun-Deneb) — March 13, 2024 (Execution layer)
+  // Cancun — March 13, 2024 (Execution layer)
   { 
     date: "2024-03-13", 
-    upgrade: "Dencun", 
+    upgrade: "Cancun", 
     layer: "execution",
     blockNumber: 19426587,
     eips: ["EIP-1153", "EIP-4788", "EIP-4844", "EIP-5656", "EIP-6780", "EIP-7516"]
   },
 
   // Deneb — March 13, 2024 (Consensus layer)
-  { date: "2024-03-13", upgrade: "Deneb", layer: "consensus", forkEpoch: 269568, eips: ["CONSENSUS"] },
+  { date: "2024-03-13", upgrade: "Deneb", layer: "consensus", forkEpoch: 269568, eips: ["CONSENSUS","EIP-7044", "EIP-7045", "EIP-7514"] },
 
-  // Shapella (Shanghai-Capella) — April 12, 2023 (Execution layer)
+  // Shanghai — April 12, 2023 (Execution layer)
   { 
     date: "2023-04-12", 
-    upgrade: "Shapella", 
+    upgrade: "Shanghai", 
     layer: "execution",
     blockNumber: 17034870,
     eips: ["EIP-3651", "EIP-3855", "EIP-3860", "EIP-4895"]
@@ -321,7 +329,7 @@ const rawData: UpgradeData[] = [
     upgrade: "Petersburg", 
     layer: "execution",
     blockNumber: 7280000,
-    eips: ["EIP-1234-removed"]
+    eips: ["EIP-1283-removed"]
   },
 
   // Constantinople — February 28, 2019 (Execution layer)
@@ -439,12 +447,13 @@ const NetworkUpgradesChart: React.FC = () => {
   const { width, height } = dimensions;
 
   // Create mapping from dates to upgrade names for x-axis labels
-  // Handle multiple upgrades on same date by combining them
+  // Use paired names for post-merge upgrades, combine multiple upgrades on same date
   const dateToUpgradeMap = upgradeRows.reduce((acc, row) => {
     if (!acc[row.date]) {
-      acc[row.date] = row.upgrade;
-    } else if (!acc[row.date].includes(row.upgrade)) {
-      // If multiple upgrades on same date, combine them
+      // Use paired name if available, otherwise use upgrade name
+      acc[row.date] = pairedUpgradeNames[row.date] || row.upgrade;
+    } else if (!pairedUpgradeNames[row.date] && !acc[row.date].includes(row.upgrade)) {
+      // If not a paired upgrade and multiple upgrades on same date, combine them
       acc[row.date] = `${acc[row.date]} / ${row.upgrade}`;
     }
     return acc;
@@ -478,11 +487,135 @@ const NetworkUpgradesChart: React.FC = () => {
   };
 
   const downloadReport = () => {
-    const headers = ['Date', 'Network Upgrade', 'EIPs'];
-    const rows = upgradeRows.map(row => [row.date, row.upgrade, row.eips.join(', ')]);
-    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const headers = [
+      '#',
+      'Upgrade (Code Name)',
+      'Execution Layer',
+      'Consensus Layer',
+      'Block No.',
+      'Epoch No.',
+      'Date (UTC)',
+      'Meta EIP',
+      'EIP Count',
+      'Included (Standards Track – Core EIPs)',
+      'Included (Standards Track – Interface EIPs)',
+      'Included (Standards Track – Networking EIPs)',
+      'Included (Informational EIPs)'
+    ];
+
+    // Group data by date to combine paired upgrades
+    const dateGroups = allDates.map(date => {
+      const upgradesOnDate = rawData.filter(u => u.date === date);
+      const pairedName = pairedUpgradeNames[date];
+      
+      // Get execution and consensus layer upgrades
+      const executionUpgrades = upgradesOnDate.filter(u => u.layer === 'execution');
+      const consensusUpgrades = upgradesOnDate.filter(u => u.layer === 'consensus');
+      
+      // Combine all EIPs from both layers
+      const allEips = upgradesOnDate.flatMap(u => u.eips);
+      
+      // Get block number and epoch
+      const blockNumber = executionUpgrades[0]?.blockNumber || '';
+      const forkEpoch = consensusUpgrades[0]?.forkEpoch || '';
+      
+      // Get meta EIP (from execution layer upgrade)
+      const metaEIP = executionUpgrades[0] ? upgradeMetaEIPs[executionUpgrades[0].upgrade] : '';
+      
+      // Count EIPs by category
+      const eipsByCategory = {
+        core: [] as string[],
+        interface: [] as string[],
+        networking: [] as string[],
+        informational: [] as string[]
+      };
+      
+      allEips.forEach(eip => {
+        if (eip === 'NO-EIP' || eip === 'CONSENSUS') return;
+        
+        const isRemoved = eip.includes('-removed');
+        const eipNumber = eip.replace('EIP-', '').replace('-removed', '');
+        const eipInfo = eipTitles[eipNumber];
+        
+        if (eipInfo) {
+          const fullEipName = isRemoved ? `EIP-${eipNumber} (removed in Petersburg)` : `EIP-${eipNumber}`;
+          
+          // Don't count removed EIPs in the active lists, but note them separately
+          if (!isRemoved) {
+            if (eipInfo.category === 'Core') {
+              eipsByCategory.core.push(fullEipName);
+            } else if (eipInfo.category === 'ERC') {
+              eipsByCategory.interface.push(fullEipName);
+            } else if (eipInfo.category === 'Networking') {
+              eipsByCategory.networking.push(fullEipName);
+            } else if (eipInfo.category === 'Informational') {
+              eipsByCategory.informational.push(fullEipName);
+            }
+          } else {
+            // Add removed EIPs as a note in the core section
+            if (eipInfo.category === 'Core') {
+              eipsByCategory.core.push(fullEipName);
+            }
+          }
+        }
+      });
+      
+      // Determine upgrade name
+      let upgradeName = pairedName || executionUpgrades.map(u => u.upgrade).join(' / ');
+      
+      // Execution and consensus layer names
+      const executionLayerNames = executionUpgrades.map(u => u.upgrade).join(' / ') || '-';
+      const consensusLayerNames = consensusUpgrades.map(u => u.upgrade).join(' / ') || '-';
+      
+      return {
+        date,
+        upgradeName,
+        executionLayer: executionLayerNames,
+        consensusLayer: consensusLayerNames,
+        blockNumber,
+        forkEpoch,
+        metaEIP: metaEIP || '-',
+        eipCount: Object.values(eipsByCategory).flat().length,
+        coreEips: eipsByCategory.core.join(', ') || '-',
+        interfaceEips: eipsByCategory.interface.join(', ') || '-',
+        networkingEips: eipsByCategory.networking.join(', ') || '-',
+        informationalEips: eipsByCategory.informational.join(', ') || '-'
+      };
+    });
+
+    // Create CSV rows
+    const rows = dateGroups.map((group, index) => [
+      index + 1,
+      group.upgradeName,
+      group.executionLayer,
+      group.consensusLayer,
+      group.blockNumber,
+      group.forkEpoch,
+      group.date,
+      group.metaEIP,
+      group.eipCount,
+      group.coreEips,
+      group.interfaceEips,
+      group.networkingEips,
+      group.informationalEips
+    ]);
+
+    // Escape CSV fields that contain commas
+    const escapeCsvField = (field: any) => {
+      const strField = String(field);
+      if (strField.includes(',') || strField.includes('"') || strField.includes('\n')) {
+        return `"${strField.replace(/"/g, '""')}"`;
+      }
+      return strField;
+    };
+
+    const csv = [
+      headers.map(escapeCsvField).join(','),
+      ...rows.map(row => row.map(escapeCsvField).join(','))
+    ].join('\n');
+    
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    saveAs(blob, 'network_upgrade_timeline.csv');
+    saveAs(blob, 'ethereum_network_upgrades.csv');
   };
 
   const handleEipClick = (eip: string, upgrade: string) => {
@@ -519,57 +652,83 @@ const NetworkUpgradesChart: React.FC = () => {
       borderColor={useColorModeValue('gray.200', 'gray.700')}
     >
       {/* Outer Container */}
-      <Box p={8}>
+      <Box p={{ base: 4, sm: 6, md: 8 }}>
         {/* Header Section */}
         <Box 
-          mb={8} 
-          pb={6} 
+          mb={{ base: 4, md: 8 }} 
+          pb={{ base: 4, md: 6 }} 
           borderBottom="1px solid" 
           borderColor={useColorModeValue('gray.200', 'gray.700')}
         >
-          <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
-            <Box>
-              <Heading size="xl" color={useColorModeValue('gray.900', 'white')} mb={3} fontWeight="600" letterSpacing="-0.025em">
+          <Flex direction={{ base: 'column', lg: 'row' }} justify="space-between" align={{ base: 'stretch', lg: 'center' }} gap={{ base: 3, md: 4 }}>
+            <Box flex="1">
+              <Heading 
+                size={{ base: 'lg', md: 'xl' }} 
+                color={useColorModeValue('gray.900', 'white')} 
+                mb={{ base: 2, md: 3 }} 
+                fontWeight="600" 
+                letterSpacing="-0.025em"
+              >
                 Ethereum Network Upgrade Timeline <CopyLink link="https://eipsinsight.com/upgrade#NetworkUpgrades" />
               </Heading>
-              <Text fontSize="lg" color={useColorModeValue('gray.600', 'gray.400')} fontWeight="400" lineHeight="1.6">
+              <Text 
+                fontSize={{ base: 'sm', md: 'lg' }} 
+                color={useColorModeValue('gray.600', 'gray.400')} 
+                fontWeight="400" 
+                lineHeight="1.6"
+              >
                 Comprehensive timeline of Ethereum network upgrades and their associated EIP implementations
               </Text>
             </Box>
-            <HStack spacing={4}>
-              <Box bg={useColorModeValue('white', 'gray.700')} p={2} borderRadius="lg" boxShadow="sm" border="1px solid" borderColor={useColorModeValue('gray.200', 'gray.600')}>
-                <HStack spacing={2}>
+            <Flex 
+              direction={{ base: 'column', sm: 'row' }} 
+              gap={{ base: 2, sm: 3 }} 
+              width={{ base: '100%', lg: 'auto' }}
+              flexShrink={0}
+            >
+              <Box 
+                bg={useColorModeValue('white', 'gray.700')} 
+                p={2} 
+                borderRadius="lg" 
+                boxShadow="sm" 
+                border="1px solid" 
+                borderColor={useColorModeValue('gray.200', 'gray.600')}
+                width={{ base: '100%', sm: 'auto' }}
+              >
+                <HStack spacing={2} justify={{ base: 'center', sm: 'flex-start' }}>
                   <IconButton aria-label="Zoom In" icon={<AddIcon />} size="sm" onClick={() => setZoomLevel(z => Math.min(z * 1.2, 3))} variant="ghost" colorScheme="gray" />
                   <IconButton aria-label="Zoom Out" icon={<MinusIcon />} size="sm" onClick={() => setZoomLevel(z => Math.max(z / 1.2, 0.5))} variant="ghost" colorScheme="gray" />
                   <IconButton aria-label="Reset Zoom" icon={<RepeatIcon />} size="sm" onClick={resetZoom} variant="ghost" colorScheme="gray" />
                 </HStack>
               </Box>
               <Button 
-                size="md" 
+                size={{ base: 'sm', md: 'md' }} 
                 bg={useColorModeValue('blue.600', 'blue.500')}
                 color="white"
                 onClick={downloadReport}
                 fontWeight="500"
-                px={6}
+                px={{ base: 4, md: 6 }}
+                width={{ base: '100%', sm: 'auto' }}
                 _hover={{ bg: useColorModeValue('blue.700', 'blue.600'), transform: 'translateY(-1px)' }}
                 _active={{ transform: 'translateY(0)' }}
                 boxShadow="sm"
               >
                 Export Data
               </Button>
-            </HStack>
+            </Flex>
           </Flex>
 
           {/* Collapsible Info Section */}
-          <Box mt={4}>
+          <Box mt={{ base: 3, md: 4 }}>
             <Button
-              size="sm"
+              size={{ base: 'xs', md: 'sm' }}
               variant="ghost"
               onClick={() => setShowLayerInfo(!showLayerInfo)}
               rightIcon={showLayerInfo ? <ChevronUpIcon /> : <ChevronDownIcon />}
               leftIcon={<InfoIcon />}
               colorScheme="blue"
               fontWeight="500"
+              fontSize={{ base: 'xs', md: 'sm' }}
             >
               {showLayerInfo ? 'Hide' : 'Show'} Layer Information
             </Button>
@@ -577,58 +736,68 @@ const NetworkUpgradesChart: React.FC = () => {
             <Collapse in={showLayerInfo} animateOpacity>
               <Box
                 mt={3}
-                p={5}
+                p={{ base: 3, md: 5 }}
                 bg={useColorModeValue('blue.50', 'gray.700')}
                 borderRadius="lg"
                 border="1px solid"
                 borderColor={useColorModeValue('blue.200', 'blue.600')}
                 boxShadow="sm"
               >
-                <VStack align="start" spacing={4}>
+                <VStack align="start" spacing={{ base: 3, md: 4 }}>
                   <Box>
-                    <Heading size="sm" mb={2} color={useColorModeValue('gray.900', 'white')}>
+                    <Heading size={{ base: 'xs', md: 'sm' }} mb={2} color={useColorModeValue('gray.900', 'white')}>
                       Understanding Layer Badges
                     </Heading>
-                    <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.7">
+                    <Text fontSize={{ base: 'xs', md: 'sm' }} color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.7">
                       Network upgrades are categorized by the layer of the Ethereum protocol they modify:
                     </Text>
                   </Box>
 
-                  <HStack spacing={8} flexWrap="wrap">
+                  <VStack spacing={{ base: 3, md: 4 }} align="stretch" width="100%">
                     <Box>
                       <HStack mb={2}>
-                        <Badge colorScheme="teal" fontSize="sm" px={2} py={1}>⚙️ Execution Layer</Badge>
+                        <Badge colorScheme="teal" fontSize={{ base: 'xs', md: 'sm' }} px={2} py={1}>⚙️ Execution Layer</Badge>
                       </HStack>
-                      <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} maxW="400px" lineHeight="1.7">
+                      <Text fontSize={{ base: 'xs', md: 'sm' }} color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.7">
                         Protocol changes implemented through Ethereum Improvement Proposals (EIPs). These affect transaction execution, gas mechanics, smart contracts, and the Ethereum Virtual Machine (EVM).
                       </Text>
-                      <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} mt={1} fontStyle="italic">
+                      <Text fontSize="2xs" color={useColorModeValue('gray.500', 'gray.400')} mt={1} fontStyle="italic">
                         Examples: London (EIP-1559), Shanghai (EIP-3651, EIP-3855)
                       </Text>
                     </Box>
 
                     <Box>
                       <HStack mb={2}>
-                        <Badge colorScheme="purple" fontSize="sm" px={2} py={1}>⛓️ Consensus Layer</Badge>
+                        <Badge colorScheme="purple" fontSize={{ base: 'xs', md: 'sm' }} px={2} py={1}>⛓️ Consensus Layer</Badge>
                       </HStack>
-                      <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')} maxW="400px" lineHeight="1.7">
-                        Beacon Chain upgrades that don't have formal EIP numbers. These affect proof-of-stake consensus, validators, attestations, and the beacon chain protocol.
+                      <Text fontSize={{ base: 'xs', md: 'sm' }} color={useColorModeValue('gray.600', 'gray.300')} lineHeight="1.7">
+                        Beacon Chain upgrades that don't have formal EIP numbers. These affect proof-of-stake consensus, validators, attestations, and the beacon chain protocol. The consensus layer has had 6 upgrades total.
                       </Text>
-                      <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.400')} mt={1} fontStyle="italic">
-                        Examples: Altair (sync committees), Capella (withdrawals), Deneb (Proto-Danksharding)
+                      <Text fontSize="2xs" color={useColorModeValue('gray.500', 'gray.400')} mt={1} fontStyle="italic">
+                        All 6 upgrades: Altair, Bellatrix, Capella, Deneb, Electra, Fulu
                       </Text>
                     </Box>
-                  </HStack>
+                  </VStack>
 
                   <Box 
                     bg={useColorModeValue('yellow.50', 'gray.600')} 
-                    p={3} 
+                    p={{ base: 2, md: 3 }} 
                     borderRadius="md"
                     border="1px solid"
                     borderColor={useColorModeValue('yellow.200', 'yellow.700')}
                   >
-                    <Text fontSize="xs" color={useColorModeValue('gray.700', 'gray.200')} lineHeight="1.6">
-                      <strong>Note:</strong> Some network upgrades like Shanghai and Cancun contain changes to both layers, coordinated at the same activation time. The badge indicates the primary layer affected by each specific EIP or upgrade component.
+                    <Text fontSize={{ base: '2xs', md: 'xs' }} color={useColorModeValue('gray.700', 'gray.200')} lineHeight="1.6" mb={2}>
+                      <strong>Evolution of Ethereum Upgrades:</strong>
+                    </Text>
+                    <Text fontSize={{ base: '2xs', md: 'xs' }} color={useColorModeValue('gray.700', 'gray.200')} lineHeight="1.6">
+                      • <strong>Pre-Merge (2021-2022):</strong> Standalone consensus upgrades — <strong>Altair</strong> (Oct 2021, first Beacon Chain upgrade) and <strong>Bellatrix</strong> (Sept 2022, Merge preparation)
+                    </Text>
+                    <Text fontSize={{ base: '2xs', md: 'xs' }} color={useColorModeValue('gray.700', 'gray.200')} lineHeight="1.6" mt={1}>
+                      • <strong>Post-Merge (2023+):</strong> Coordinated paired upgrades affecting both layers simultaneously:
+                      <br />  - <strong>Shanghai/Capella</strong> ("Shapella") — Apr 2023
+                      <br />  - <strong>Cancun/Deneb</strong> ("Dencun") — Mar 2024
+                      <br />  - <strong>Prague/Electra</strong> ("Pectra") — May 2025
+                      <br />  - <strong>Osaka/Fulu</strong> ("Fusaka") — Dec 2025
                     </Text>
                   </Box>
                 </VStack>
@@ -642,8 +811,8 @@ const NetworkUpgradesChart: React.FC = () => {
           {/* Chart Container */}
           <Box 
             bg={useColorModeValue('gray.50', 'gray.800')} 
-            borderRadius="xl" 
-            p={6} 
+            borderRadius={{ base: 'lg', md: 'xl' }} 
+            p={{ base: 3, sm: 4, md: 6 }} 
             position="relative"
             border="1px solid"
             borderColor={useColorModeValue('gray.200', 'gray.600')}
@@ -651,6 +820,7 @@ const NetworkUpgradesChart: React.FC = () => {
             flex="1"
             overflowX="auto" 
             overflowY="hidden"
+            width="100%"
           >
           <svg
         width={width}
@@ -730,9 +900,13 @@ const NetworkUpgradesChart: React.FC = () => {
           />
 
           {(() => {
-            // Calculate totals for each upgrade - only Core category EIPs
-            const upgradeTotals: Record<string, { core: number; meta: number }> = {};
+            // Calculate totals for each DATE (paired upgrades combined)
+            const dateTotals: Record<string, { core: number; meta: number; execution: number; consensus: number }> = {};
             rawData.forEach(item => {
+              if (!dateTotals[item.date]) {
+                dateTotals[item.date] = { core: 0, meta: 0, execution: 0, consensus: 0 };
+              }
+              
               const metaEIP = upgradeMetaEIPs[item.upgrade];
               const coreCount = item.eips.filter(eip => {
                 if (eip === 'NO-EIP' || eip === 'CONSENSUS') return false;
@@ -740,24 +914,45 @@ const NetworkUpgradesChart: React.FC = () => {
                 const eipInfo = eipTitles[eipNumber];
                 return eipInfo && eipInfo.category === 'Core';
               }).length;
-              upgradeTotals[item.upgrade] = {
-                core: coreCount,
-                meta: metaEIP ? 1 : 0
-              };
+              
+              dateTotals[item.date].core += coreCount;
+              if (metaEIP) dateTotals[item.date].meta += 1;
+              
+              if (item.layer === 'execution') {
+                dateTotals[item.date].execution += coreCount;
+              } else if (item.layer === 'consensus') {
+                dateTotals[item.date].consensus += coreCount;
+              }
             });
             
-            return upgradeRows.map(({ date, upgrade, eips, isMeta }, i) => {
+            return upgradeRows.map(({ date, upgrade, eips, isMeta, layer }, i) => {
               const x = xScale(date);
               if (x == null) return null;
               
-              // Get the base row for this upgrade (non-meta rows)
-              const baseRows = upgradeRows.filter(r => r.date === date && r.upgrade === upgrade && !r.isMeta);
-              const baseEipCount = baseRows.reduce((sum, r) => sum + r.eips.length, 0);
+              // Get all rows for this date (both execution and consensus)
+              const allRowsForDate = upgradeRows.filter(r => r.date === date && !r.isMeta);
+              const baseEipCount = allRowsForDate.reduce((sum, r) => sum + r.eips.length, 0);
+              
+              // Calculate position for this specific EIP
+              let yPosition = 0;
+              if (!isMeta) {
+                // Count all EIPs before this one on the same date
+                let countBefore = 0;
+                for (const row of allRowsForDate) {
+                  if (row.upgrade === upgrade) {
+                    const indexInRow = row.eips.indexOf(eips[0]);
+                    if (indexInRow >= 0) {
+                      yPosition = countBefore + indexInRow + 1;
+                      break;
+                    }
+                  }
+                  countBefore += row.eips.length;
+                }
+              }
               
               return eips.map((eip, j) => {
-                // Calculate y position: if meta, place at top; otherwise stack normally
-                const yPosition = isMeta ? 0 : j + 1;
-                const y = yScale(yPosition);
+                const finalYPosition = isMeta ? 0 : yPosition + j;
+                const y = yScale(finalYPosition);
                 const isRemoved = eip.includes('-removed');
                 
                 const hoverHandlers = {
@@ -777,21 +972,21 @@ const NetworkUpgradesChart: React.FC = () => {
                 
                 return (
                   <Group key={`${date}-${upgrade}-${eip}-${j}-${isMeta}`}>
-                    {/* Show total count at the top of each stack - Core EIPs only */}
-                    {!isMeta && j === 0 && upgradeTotals[upgrade] && upgradeTotals[upgrade].core > 0 && (
+                    {/* Show combined total count at the top for first EIP of first upgrade on this date */}
+                    {!isMeta && i === upgradeRows.findIndex(r => r.date === date && !r.isMeta) && j === 0 && dateTotals[date] && dateTotals[date].core > 0 && (
                       <text
                         x={x + xScale.bandwidth() / 2}
                         y={yScale(baseEipCount + 1.5)}
                         textAnchor="middle"
                         fill={useColorModeValue('#4B5563', '#9CA3AF')}
-                        fontSize={8}
+                        fontSize={9}
                         fontWeight="700"
                         style={{ 
                           pointerEvents: 'none',
                           fontFamily: 'system-ui, -apple-system, sans-serif'
                         }}
                       >
-                        {upgradeTotals[upgrade].core} Core
+                        {dateTotals[date].core} Core Total
                       </text>
                     )}
                     <rect
@@ -810,6 +1005,22 @@ const NetworkUpgradesChart: React.FC = () => {
                       }}
                       {...hoverHandlers}
                     />
+                    {/* Small layer badge on each EIP */}
+                    {!isMeta && layer && eip !== 'NO-EIP' && eip !== 'CONSENSUS' && (
+                      <text
+                        x={x + 3}
+                        y={y + 6}
+                        fontSize={5}
+                        fill="#FFFFFF"
+                        fontWeight="600"
+                        style={{ 
+                          pointerEvents: 'none',
+                          opacity: 0.7
+                        }}
+                      >
+                        {layer === 'execution' ? 'E' : 'C'}
+                      </text>
+                    )}
                     {isRemoved && (
                       <line
                         x1={x + 2}
