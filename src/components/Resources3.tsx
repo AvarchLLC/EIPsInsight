@@ -375,6 +375,13 @@ const ResourcesPage: React.FC = () => {
 
   const BLOGS = [
     {
+      image: "https://github.com/user-attachments/assets/aec9e416-7f4d-4d16-8d86-50fd3567f881",
+      title: "Top 10 EIPs That Defined Ethereum in 2025",
+      content: "In 2025, Ethereum stopped rebuilding itself and started refining itself. Across Pectra and Fusaka upgrades, Ethereum shifted from heavy architectural work toward removing friction for users, developers, and operators through targeted improvements.",
+      link: "Blogs/top-ten-eips-2025",
+      tag: "Ethereum"
+    },
+    {
       image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/tentative-scoping.png",
       title: "Tentative Scoping Timeline for Ethereum's Heka/Bogotá Upgrade",
       content: "Ethereum core developers introduce a tentative scoping timeline for the Heka/Bogotá upgrade via EIP-8081, outlining how headliners will be selected, when proposals will be evaluated, and how upgrade decisions will be finalized.",
