@@ -121,7 +121,7 @@ const Navbar: React.FC = () => {
         },
         {
           label: "2025",
-          children: getMonthsTillCurrentYear(),
+          children: getMonthsTillYear(2025),
         },
         {
           label: "2024",
