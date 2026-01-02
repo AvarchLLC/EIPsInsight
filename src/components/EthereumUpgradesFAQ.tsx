@@ -34,7 +34,7 @@ const EthereumUpgradesFAQ: React.FC = () => {
   const stats = [
     {
       label: 'Total Network Upgrades',
-      value: '25',
+      value: '21',
       helpText: 'Since Frontier Thawing (2015)',
       icon: FaRocket,
       color: 'blue.500',
@@ -55,7 +55,7 @@ const EthereumUpgradesFAQ: React.FC = () => {
     },
     {
       label: 'Total Core EIPs',
-      value: '77+',
+      value: '62',
       helpText: 'Implemented in upgrades',
       icon: FaNetworkWired,
       color: 'orange.500',
@@ -123,7 +123,7 @@ const EthereumUpgradesFAQ: React.FC = () => {
           <HStack spacing={2} mb={2}>
             <Icon as={FaProjectDiagram} boxSize={4} color="blue.500" />
             <Text fontWeight="600" fontSize="md" color={textColor}>
-              Ethereum Upgrade Timeline (Interactive)
+              Ethereum Upgrade Timeline
             </Text>
             <Icon 
               as={isTimelineOpen ? FaChevronUp : FaChevronDown} 
