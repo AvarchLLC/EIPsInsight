@@ -67,42 +67,12 @@ const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Tim
   };
 
   return (
-    <VStack spacing={3} align="stretch">
-      {/* Zoom Controls */}
-      <HStack justify="flex-end" spacing={2}>
-        <Tooltip label="Zoom In">
-          <IconButton
-            aria-label="Zoom in"
-            icon={<AddIcon />}
-            size="sm"
-            onClick={handleZoomIn}
-            isDisabled={scale >= 3}
-          />
-        </Tooltip>
-        <Tooltip label="Zoom Out">
-          <IconButton
-            aria-label="Zoom out"
-            icon={<MinusIcon />}
-            size="sm"
-            onClick={handleZoomOut}
-            isDisabled={scale <= 0.5}
-          />
-        </Tooltip>
-        <Tooltip label="Reset">
-          <IconButton
-            aria-label="Reset zoom"
-            icon={<RepeatIcon />}
-            size="sm"
-            onClick={handleReset}
-          />
-        </Tooltip>
-      </HStack>
-
+    <Box position="relative">
       {/* Timeline Container */}
       <Box
         ref={containerRef}
         bg={bgColor}
-        border="1px solid"
+        border="2px solid"
         borderColor={borderColor}
         borderRadius="lg"
         overflow="hidden"
@@ -115,13 +85,68 @@ const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Tim
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
+        _hover={{
+          borderColor: useColorModeValue('blue.400', 'blue.500'),
+          boxShadow: useColorModeValue('0 4px 12px rgba(0,0,0,0.1)', '0 4px 12px rgba(0,0,0,0.3)')
+        }}
+        transition="all 0.2s ease"
+        boxShadow="sm"
       >
+        {/* Zoom Controls - Overlaid on image */}
+        <HStack 
+          position="absolute" 
+          top={3} 
+          right={3} 
+          spacing={1.5} 
+          zIndex={10} 
+          bg={useColorModeValue('rgba(255,255,255,0.95)', 'rgba(26,32,44,0.95)')}
+          borderRadius="md" 
+          p={1.5} 
+          boxShadow="lg"
+          backdropFilter="blur(10px)"
+          border="1px solid"
+          borderColor={useColorModeValue('gray.200', 'gray.600')}
+        >
+          <Tooltip label="Zoom In">
+            <IconButton
+              aria-label="Zoom in"
+              icon={<AddIcon />}
+              size="xs"
+              onClick={handleZoomIn}
+              isDisabled={scale >= 3}
+              variant="ghost"
+              colorScheme="blue"
+            />
+          </Tooltip>
+          <Tooltip label="Zoom Out">
+            <IconButton
+              aria-label="Zoom out"
+              icon={<MinusIcon />}
+              size="xs"
+              onClick={handleZoomOut}
+              isDisabled={scale <= 0.5}
+              variant="ghost"
+              colorScheme="blue"
+            />
+          </Tooltip>
+          <Tooltip label="Reset">
+            <IconButton
+              aria-label="Reset zoom"
+              icon={<RepeatIcon />}
+              size="xs"
+              onClick={handleReset}
+              variant="ghost"
+              colorScheme="blue"
+            />
+          </Tooltip>
+        </HStack>
+
         <Box
           position="absolute"
           top="50%"
           left="50%"
           transform={`translate(-50%, -50%) translate(${position.x}px, ${position.y}px) scale(${scale})`}
-          transition={isDragging ? 'none' : 'transform 0.2s ease-out'}
+          transition={isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'}
           width="100%"
           maxWidth="100%"
         >
@@ -139,7 +164,7 @@ const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Tim
           />
         </Box>
       </Box>
-    </VStack>
+    </Box>
   );
 };
 

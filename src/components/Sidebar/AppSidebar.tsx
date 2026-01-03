@@ -162,24 +162,89 @@ const sidebarStructure = [
     id: "upgrade-section",
     children: [
       {
-        label: "Upgrade Details",
+        label: "Overview",
+        id: "upgrade-overview",
+        href: "/upgrade",
+        description: "Ethereum network upgrades timeline and statistics"
+      },
+      {
+        label: "Upgrade Timeline",
+        id: "upgrade-timeline",
+        href: "/upgrade#upgrade-timeline",
+        description: "Visual timeline of all Ethereum network upgrades"
+      },
+      {
+        label: "Network Statistics",
+        id: "network-stats",
+        href: "/upgrade#network-stats",
+        description: "Key metrics and statistics for Ethereum upgrades"
+      },
+      {
+        label: "Horizontal Timeline",
+        id: "horizontal-timeline",
+        href: "/upgrade#horizontal-timeline",
+        description: "Interactive horizontal upgrade timeline"
+      },
+      {
+        label: "Upgrade Chart",
+        id: "upgrade-chart",
+        href: "/upgrade#upgrade-chart",
+        description: "Network upgrades overview and comparison chart"
+      },
+      {
+        label: "Select Upgrade",
+        id: "select-upgrade",
+        href: "/upgrade#select-upgrade",
+        description: "Choose and explore specific network upgrades",
         children: [
-          { label: "PECTRA", id: "pectra", href: "/upgrade?selected=pectra#pectra" },
-          { label: "FUSAKA", id: "fusaka", href: "/upgrade?selected=fusaka#fusaka" },
-          { label: "GLAMSTERDAM", id: "glamsterdam", href: "/upgrade?selected=glamsterdam#glamsterdam" },
+          { label: "Hegotá", id: "hegota", href: "/upgrade/hegota#select-upgrade" },
+          { label: "Glamsterdam", id: "glamsterdam", href: "/upgrade/glamsterdam#select-upgrade" },
+          { label: "Fusaka", id: "fusaka", href: "/upgrade/fusaka#select-upgrade" },
+          { label: "Pectra", id: "pectra", href: "/upgrade/pectra#select-upgrade" },
         ],
       },
-      { label: "Network Upgrades Graph", id: "NetworkUpgrades", href: "/upgrade#NetworkUpgrades" },
-      { label: "Upgrade Blogs", id: "upgrade-blogs", href: "/upgrade#upgrade-blogs" },
-      { label: "Upgrade Table", id: "upgrade-table", href: "/upgrade#upgrade-table" },
       {
-        label: "Network Upgrades and EIPs Relationship Graph",
+        label: "Inclusion Stages",
+        id: "NetworkUpgrades",
+        href: "/upgrade#NetworkUpgrades",
+        description: "Track EIP progression through upgrade stages"
+      },
+      {
+        label: "Upgrade Description",
+        id: "upgrade-description",
+        href: "/upgrade#upgrade-description",
+        description: "Detailed information about selected upgrade"
+      },
+      {
+        label: "Related Articles",
+        id: "upgrade-blogs",
+        href: "/upgrade#upgrade-blogs",
+        description: "Latest news and articles about upgrades"
+      },
+      {
+        label: "EIP Status Overview",
+        id: "eip-status",
+        href: "/upgrade#eip-status",
+        description: "Status breakdown of EIPs in upgrades (SFI/CFI/PFI/DFI)"
+      },
+      {
+        label: "Declined EIPs",
+        id: "declined-eips",
+        href: "/upgrade#declined-eips",
+        description: "EIPs declined for inclusion in upgrades"
+      },
+      {
+        label: "Author Contributions",
+        id: "AuthorContributions",
+        href: "/upgrade#AuthorContributions",
+        description: "Contributors and their impact on upgrades"
+      },
+      {
+        label: "EIPs Relationship Graph",
         id: "NetworkUpgradesChartp",
         href: "/upgrade#NetworkUpgradesChartp",
+        description: "3D visualization of upgrade and EIP relationships"
       },
-      { label: "Network Upgrades Chart", id: "NetworkUpgradeschart", href: "/upgrade#NetworkUpgradeschart" },
-      { label: "Author Contributions", id: "AuthorContributions", href: "/upgrade#AuthorContributions" },
-
     ],
   },
   {
