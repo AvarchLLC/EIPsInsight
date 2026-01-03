@@ -26,6 +26,7 @@ interface UpgradeData {
   forkEpoch?: number;
   specsLink?: string;
   blogLink?: string;
+  sr_number?: number;
 }
 
 interface EIPInfo {
@@ -152,9 +153,11 @@ const upgradeMetaEIPs: Record<string, string> = {
   'Petersburg': 'EIP-1716',
   'Istanbul': 'EIP-1679',
   'Muir Glacier': 'EIP-2387',
+  'Altair': 'EIP-7568',
   'Berlin': 'EIP-7568',
   'London': 'EIP-7568',
   'Arrow Glacier': 'EIP-7568',
+  'Bellatrix': 'EIP-7568',
   'Gray Glacier': 'EIP-7568',
   'Paris': 'EIP-7568',
   'Shanghai': 'EIP-6987',
@@ -236,6 +239,7 @@ const rawData: UpgradeData[] = [
     date: "2025-12-03", 
     upgrade: "Osaka", 
     layer: "execution",
+    blockNumber: 23935694,
     eips: ["EIP-7594", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7939", "EIP-7951"]
   },
 
@@ -370,6 +374,12 @@ const rawData: UpgradeData[] = [
 
   // Frontier Thawing — September 7, 2015 (Execution layer)
   { date: "2015-09-07", upgrade: "Frontier Thawing", layer: "execution", blockNumber: 200000, eips: ["NO-EIP"] },
+
+  // Frontier — July 30, 2015 (Execution layer - Genesis)
+  { date: "2015-07-30", upgrade: "Frontier", layer: "execution", blockNumber: 0, eips: ["NO-EIP"], sr_number: 0 },
+
+  // Phase 0 (Beacon Chain Genesis) — December 1, 2020 (Consensus layer)
+  { date: "2020-12-01", upgrade: "Phase 0 (Genesis)", layer: "consensus", forkEpoch: 0, eips: ["CONSENSUS"], sr_number: 0 },
 ];
 
 // Process and format EIP display names, add meta EIP as separate entry
@@ -487,7 +497,74 @@ const NetworkUpgradesChart: React.FC = () => {
   };
 
   const downloadReport = () => {
-    const headers = [
+    // Sort rawData by date in descending order (newest first)
+    const sortedData = [...rawData].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    // Group paired upgrades (same date), except Petersburg/Constantinople
+    const groupedUpgrades: any[] = [];
+    const processedDates = new Set<string>();
+
+    sortedData.forEach((upgrade) => {
+      if (processedDates.has(upgrade.date)) return;
+      
+      const upgradesOnDate = sortedData.filter(u => u.date === upgrade.date);
+      processedDates.add(upgrade.date);
+      
+      // Special handling: keep Petersburg and Constantinople separate
+      if (upgrade.date === "2019-02-28") {
+        upgradesOnDate.forEach(singleUpgrade => {
+          groupedUpgrades.push({
+            date: singleUpgrade.date,
+            upgradeName: singleUpgrade.upgrade,
+            executionLayer: singleUpgrade.upgrade,
+            consensusLayer: '-',
+            blockNumber: singleUpgrade.blockNumber ?? '-',
+            forkEpoch: '-',
+            metaEIP: upgradeMetaEIPs[singleUpgrade.upgrade] || '',
+            eips: singleUpgrade.eips,
+            sr_number: (singleUpgrade as any).sr_number
+          });
+        });
+      } else if (upgradesOnDate.length > 1) {
+        // Paired upgrade
+        const execUpgrade = upgradesOnDate.find(u => u.layer === 'execution');
+        const consUpgrade = upgradesOnDate.find(u => u.layer === 'consensus');
+        
+        groupedUpgrades.push({
+          date: upgrade.date,
+          upgradeName: pairedUpgradeNames[upgrade.date] || upgradesOnDate.map(u => u.upgrade).join(' / '),
+          executionLayer: execUpgrade?.upgrade || '-',
+          consensusLayer: consUpgrade?.upgrade || '-',
+          blockNumber: execUpgrade?.blockNumber ?? '-',
+          forkEpoch: consUpgrade?.forkEpoch ?? '-',
+          metaEIP: execUpgrade ? upgradeMetaEIPs[execUpgrade.upgrade] : '',
+          eips: upgradesOnDate.flatMap(u => u.eips),
+          sr_number: execUpgrade?.sr_number ?? consUpgrade?.sr_number ?? undefined
+        });
+      } else {
+        // Single upgrade
+        groupedUpgrades.push({
+          date: upgrade.date,
+          upgradeName: upgrade.upgrade,
+          executionLayer: upgrade.layer === 'execution' ? upgrade.upgrade : '-',
+          consensusLayer: upgrade.layer === 'consensus' ? upgrade.upgrade : '-',
+          blockNumber: upgrade.blockNumber ?? '-',
+          forkEpoch: upgrade.forkEpoch ?? '-',
+          metaEIP: upgradeMetaEIPs[upgrade.upgrade] || '',
+          eips: upgrade.eips,
+          sr_number: (upgrade as any).sr_number
+        });
+      }
+    });
+
+    // Count non-genesis upgrades for SR numbering
+    const nonGenesisCount = groupedUpgrades.filter(u => u.sr_number !== 0).length;
+
+    // First pass: determine maximum number of EIPs in any upgrade
+    const maxEips = Math.max(...groupedUpgrades.map(u => u.eips.filter((eip: string) => eip !== 'NO-EIP' && eip !== 'CONSENSUS').length), 1);
+
+    // Build headers
+    const baseHeaders = [
       '#',
       'Upgrade (Code Name)',
       'Execution Layer',
@@ -495,179 +572,67 @@ const NetworkUpgradesChart: React.FC = () => {
       'Block No.',
       'Epoch No.',
       'Date (UTC)',
-      'Meta EIP',
-      'EIP Count',
-      'Included (Standards Track – Core EIPs)',
-      'Included (Standards Track – Interface EIPs)',
-      'Included (Standards Track – Networking EIPs)',
-      'Included (Informational EIPs)'
+      'Meta EIP Link'
     ];
 
-    // Group data by date to combine paired upgrades, but split Petersburg and Constantinople
-    const dateGroups: any[] = [];
-    
-    allDates.forEach(date => {
-      const upgradesOnDate = rawData.filter(u => u.date === date);
+    // Add numbered EIP columns without labels
+    const eipHeaders: string[] = [];
+    for (let i = 1; i <= maxEips; i++) {
+      eipHeaders.push(`EIP ${i}`);
+    }
+
+    const headers = [...baseHeaders, ...eipHeaders];
+
+    const csvRows: any[][] = [];
+    let srNumber = nonGenesisCount;
+
+    groupedUpgrades.forEach((upgrade) => {
+      const metaEIPLink = upgrade.metaEIP ? `https://eipsinsight.com/eips/${upgrade.metaEIP.toLowerCase()}` : '-';
       
-      // Special handling for Petersburg and Constantinople (same date, should be separate rows)
-      if (date === "2019-02-28") {
-        upgradesOnDate.forEach(upgrade => {
-          const metaEIP = upgradeMetaEIPs[upgrade.upgrade] || '';
-          
-          // Count EIPs by category
-          const eipsByCategory = {
-            core: [] as string[],
-            interface: [] as string[],
-            networking: [] as string[],
-            informational: [] as string[]
-          };
-          
-          upgrade.eips.forEach(eip => {
-            if (eip === 'NO-EIP' || eip === 'CONSENSUS') return;
-            
-            const isRemoved = eip.includes('-removed');
-            const eipNumber = eip.replace('EIP-', '').replace('-removed', '');
-            const eipInfo = eipTitles[eipNumber];
-            
-            if (eipInfo) {
-              const fullEipName = isRemoved ? `EIP-${eipNumber} (removed in Petersburg)` : `EIP-${eipNumber}`;
-              
-              if (!isRemoved) {
-                if (eipInfo.category === 'Core') {
-                  eipsByCategory.core.push(fullEipName);
-                } else if (eipInfo.category === 'ERC') {
-                  eipsByCategory.interface.push(fullEipName);
-                } else if (eipInfo.category === 'Networking') {
-                  eipsByCategory.networking.push(fullEipName);
-                } else if (eipInfo.category === 'Informational') {
-                  eipsByCategory.informational.push(fullEipName);
-                }
-              } else {
-                if (eipInfo.category === 'Core') {
-                  eipsByCategory.core.push(fullEipName);
-                }
-              }
-            }
-          });
-          
-          dateGroups.push({
-            date,
-            upgradeName: upgrade.upgrade,
-            executionLayer: upgrade.upgrade,
-            consensusLayer: '-',
-            blockNumber: upgrade.blockNumber || '',
-            forkEpoch: '',
-            metaEIP: metaEIP || '-',
-            eipCount: Object.values(eipsByCategory).flat().length,
-            coreEips: eipsByCategory.core.join(', ') || '-',
-            interfaceEips: eipsByCategory.interface.join(', ') || '-',
-            networkingEips: eipsByCategory.networking.join(', ') || '-',
-            informationalEips: eipsByCategory.informational.join(', ') || '-'
-          });
-        });
-      } else {
-        // Normal grouping for all other dates
-        const pairedName = pairedUpgradeNames[date];
-        
-        // Get execution and consensus layer upgrades
-        const executionUpgrades = upgradesOnDate.filter(u => u.layer === 'execution');
-        const consensusUpgrades = upgradesOnDate.filter(u => u.layer === 'consensus');
-        
-        // Combine all EIPs from both layers
-        const allEips = upgradesOnDate.flatMap(u => u.eips);
-        
-        // Get block number and epoch
-        const blockNumber = executionUpgrades[0]?.blockNumber || '';
-        const forkEpoch = consensusUpgrades[0]?.forkEpoch || '';
-        
-        // Get meta EIP (from execution layer upgrade)
-        const metaEIP = executionUpgrades[0] ? upgradeMetaEIPs[executionUpgrades[0].upgrade] : '';
-        
-        // Count EIPs by category
-        const eipsByCategory = {
-          core: [] as string[],
-          interface: [] as string[],
-          networking: [] as string[],
-          informational: [] as string[]
-        };
-        
-        allEips.forEach(eip => {
-          if (eip === 'NO-EIP' || eip === 'CONSENSUS') return;
-          
+      // Filter out NO-EIP and CONSENSUS
+      const validEips = upgrade.eips.filter((eip: string) => eip !== 'NO-EIP' && eip !== 'CONSENSUS');
+      
+      // Determine sr_number (0 for Frontier and Phase 0, else decrement)
+      const currentSrNumber = upgrade.sr_number === 0 ? 0 : srNumber;
+      
+      const row: any[] = [
+        currentSrNumber,
+        upgrade.upgradeName,
+        upgrade.executionLayer,
+        upgrade.consensusLayer,
+        upgrade.blockNumber,
+        upgrade.forkEpoch,
+        upgrade.date,
+        metaEIPLink
+      ];
+
+      // Add EIP numbers only
+      if (validEips.length > 0) {
+        validEips.forEach((eip: string) => {
           const isRemoved = eip.includes('-removed');
           const eipNumber = eip.replace('EIP-', '').replace('-removed', '');
-          const eipInfo = eipTitles[eipNumber];
-          
-          if (eipInfo) {
-            const fullEipName = isRemoved ? `EIP-${eipNumber} (removed in Petersburg)` : `EIP-${eipNumber}`;
-            
-            if (!isRemoved) {
-              if (eipInfo.category === 'Core') {
-                eipsByCategory.core.push(fullEipName);
-              } else if (eipInfo.category === 'ERC') {
-                eipsByCategory.interface.push(fullEipName);
-              } else if (eipInfo.category === 'Networking') {
-                eipsByCategory.networking.push(fullEipName);
-              } else if (eipInfo.category === 'Informational') {
-                eipsByCategory.informational.push(fullEipName);
-              }
-            } else {
-              if (eipInfo.category === 'Core') {
-                eipsByCategory.core.push(fullEipName);
-              }
-            }
-          }
+          row.push(isRemoved ? `${eipNumber} (removed)` : eipNumber);
         });
-        
-        // Determine upgrade name
-        let upgradeName = pairedName;
-        if (!upgradeName) {
-          // If no paired name, combine execution and consensus upgrade names
-          const execNames = executionUpgrades.map(u => u.upgrade);
-          const consNames = consensusUpgrades.map(u => u.upgrade);
-          const allNames = [...execNames, ...consNames];
-          upgradeName = allNames.join(' / ');
-        }
-        
-        // Execution and consensus layer names
-        const executionLayerNames = executionUpgrades.map(u => u.upgrade).join(' / ') || '-';
-        const consensusLayerNames = consensusUpgrades.map(u => u.upgrade).join(' / ') || '-';
-        
-        dateGroups.push({
-          date,
-          upgradeName,
-          executionLayer: executionLayerNames,
-          consensusLayer: consensusLayerNames,
-          blockNumber,
-          forkEpoch,
-          metaEIP: metaEIP || '-',
-          eipCount: Object.values(eipsByCategory).flat().length,
-          coreEips: eipsByCategory.core.join(', ') || '-',
-          interfaceEips: eipsByCategory.interface.join(', ') || '-',
-          networkingEips: eipsByCategory.networking.join(', ') || '-',
-          informationalEips: eipsByCategory.informational.join(', ') || '-'
-        });
+      } else {
+        // For upgrades with NO-EIP or CONSENSUS only
+        row.push(upgrade.eips.includes('CONSENSUS') ? 'Consensus' : 'No EIP');
+      }
+
+      // Fill remaining EIP columns with empty strings
+      const remainingEips = maxEips - (validEips.length || 1);
+      for (let i = 0; i < remainingEips; i++) {
+        row.push('');
+      }
+
+      csvRows.push(row);
+      
+      // Only decrement srNumber if not a genesis upgrade
+      if (upgrade.sr_number !== 0) {
+        srNumber--;
       }
     });
 
-    // Create CSV rows
-    const rows = dateGroups.map((group, index) => [
-      index + 1,
-      group.upgradeName,
-      group.executionLayer,
-      group.consensusLayer,
-      group.blockNumber,
-      group.forkEpoch,
-      group.date,
-      group.metaEIP,
-      group.eipCount,
-      group.coreEips,
-      group.interfaceEips,
-      group.networkingEips,
-      group.informationalEips
-    ]);
-
-    // Escape CSV fields that contain commas
+    // Escape CSV fields that contain commas, quotes, or newlines
     const escapeCsvField = (field: any) => {
       const strField = String(field);
       if (strField.includes(',') || strField.includes('"') || strField.includes('\n')) {
@@ -678,7 +643,7 @@ const NetworkUpgradesChart: React.FC = () => {
 
     const csv = [
       headers.map(escapeCsvField).join(','),
-      ...rows.map(row => row.map(escapeCsvField).join(','))
+      ...csvRows.map(row => row.map(escapeCsvField).join(','))
     ].join('\n');
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
