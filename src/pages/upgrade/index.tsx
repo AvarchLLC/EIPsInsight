@@ -843,6 +843,115 @@ const glamsterDamData = [
     'EIP-8070',
     'EIP-8080',
   ]
+},
+{
+  date: '2025-12-18',
+  included: [],
+  scheduled: ['EIP-7732', 'EIP-7928'],
+  declined: ['EIP-6404', 'EIP-6466','EIP-7619','EIP-7692',  'EIP-7782', 'EIP-7791', 'EIP-7819','EIP-7886', 'EIP-7919','EIP-7932', 'EIP-7937', 'EIP-7942','EIP-7979','EIP-8011','EIP-8013','EIP-8030', 'EIP-8053','EIP-8057','EIP-8059','EIP-8062', 'EIP-8068','EIP-8071'],
+  considered: ['EIP-7708', 'EIP-7778', 'EIP-7805', 'EIP-7843','EIP-8024', 'EIP-8045'],
+  proposed: [
+    'EIP-2780',
+    'EIP-2926',
+    'EIP-5920',
+    'EIP-7610',
+    'EIP-7668',
+    'EIP-7686',
+    'EIP-7688',
+    'EIP-7745',
+    'EIP-7793',
+    'EIP-7872',
+    'EIP-7903',
+    'EIP-7904',
+    'EIP-7907',
+    'EIP-7923',
+    'EIP-7949',
+    'EIP-7971',
+    'EIP-7973',
+    'EIP-7976',
+    'EIP-7981',
+    'EIP-7997',
+    'EIP-8032',
+    'EIP-8037',
+    'EIP-8038',
+    'EIP-8051',
+    'EIP-8058',
+    'EIP-8061',
+    'EIP-8070',
+    'EIP-8080',
+  ]
+},
+{
+  date: '2025-12-19',
+  included: [],
+  scheduled: ['EIP-7732', 'EIP-7928'],
+  declined: ['EIP-6404', 'EIP-6466','EIP-7619','EIP-7692',  'EIP-7782', 'EIP-7791', 'EIP-7819','EIP-7886', 'EIP-7919','EIP-7932', 'EIP-7937', 'EIP-7942','EIP-7979','EIP-8011','EIP-8013','EIP-8030', 'EIP-8053','EIP-8057','EIP-8059','EIP-8062', 'EIP-8068','EIP-8071'],
+  considered: ['EIP-7708', 'EIP-7778', 'EIP-7805', 'EIP-7843','EIP-8024', 'EIP-8045'],
+  proposed: [
+    'EIP-2780',
+    'EIP-2926',
+    'EIP-5920',
+    'EIP-7610',
+    'EIP-7668',
+    'EIP-7686',
+    'EIP-7688',
+    'EIP-7745',
+    'EIP-7793',
+    'EIP-7872',
+    'EIP-7903',
+    'EIP-7904',
+    'EIP-7907',
+    'EIP-7923',
+    'EIP-7949',
+    'EIP-7971',
+    'EIP-7973',
+    'EIP-7976',
+    'EIP-7981',
+    'EIP-7997',
+    'EIP-8032',
+    'EIP-8037',
+    'EIP-8038',
+    'EIP-8051',
+    'EIP-8058',
+    'EIP-8061',
+    'EIP-8070',
+    'EIP-8080',
+  ]
+},
+{
+  date: '2026-01-03',
+  included: [],
+  scheduled: ['EIP-7732', 'EIP-7928'],
+  declined: ['EIP-2926', 'EIP-6404', 'EIP-6466', 'EIP-7619', 'EIP-7686', 'EIP-7692', 'EIP-7782', 'EIP-7791', 'EIP-7819', 'EIP-7886', 'EIP-7919', 'EIP-7923', 'EIP-7932', 'EIP-7937', 'EIP-7942', 'EIP-7973', 'EIP-7979', 'EIP-8011', 'EIP-8013'],
+  considered: ['EIP-2780', 'EIP-7708', 'EIP-7778', 'EIP-7805', 'EIP-7843', 'EIP-7904', 'EIP-7976', 'EIP-7981', 'EIP-8024', 'EIP-8038', 'EIP-8045'],
+  proposed: [
+    'EIP-2780',
+    'EIP-2926',
+    'EIP-5920',
+    'EIP-7610',
+    'EIP-7668',
+    'EIP-7688',
+    'EIP-7745',
+    'EIP-7793',
+    'EIP-7872',
+    'EIP-7903',
+    'EIP-7904',
+    'EIP-7907',
+    'EIP-7949',
+    'EIP-7971',
+    'EIP-7973',
+    'EIP-7976',
+    'EIP-7981',
+    'EIP-7997',
+    'EIP-8032',
+    'EIP-8037',
+    'EIP-8038',
+    'EIP-8051',
+    'EIP-8058',
+    'EIP-8061',
+    'EIP-8070',
+    'EIP-8080',
+  ]
 }
 ];
 
@@ -1524,6 +1633,15 @@ const glamsterdamScheduledData = [
 // CFI (Considered for Inclusion) EIPs for Glamsterdam
 const glamsterdamData = [
   {
+    eip: "2780",
+    title: "Reduce intrinsic transaction gas",
+    author: "Matt Garnett (@lightclient), Uri Klarman (@uriklarman), Ben Adams (@benaadams)",
+    link: "https://eipsinsight.com/eips/eip-2780",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-2780-reduce-intrinsic-cost-of-transactions/4413"
+  },
+  {
     eip: "7708",
     title: "ETH transfers emit a log",
     author: "Vitalik Buterin (@vbuterin), Peter Davies (@petertdavies)",
@@ -1560,6 +1678,33 @@ const glamsterdamData = [
     discussion: "https://ethereum-magicians.org/t/eip-7843-slotnum-opcode/22234"
   },
   {
+    eip: "7904",
+    title: "General Repricing",
+    author: "Jacek Glen (@JacekGlen), Lukasz Glen (@lukasz-glen), Maria Silva (@misilva73)",
+    link: "https://eipsinsight.com/eips/eip-7904",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/gas-cost-repricing-to-reflect-computational-complexity/23067"
+  },
+  {
+    eip: "7976",
+    title: "Increase Calldata Floor Cost",
+    author: "Toni Wahrstätter (@nerolation)",
+    link: "https://eipsinsight.com/eips/eip-7976",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7976-further-increase-calldata-cost/24597"
+  },
+  {
+    eip: "7981",
+    title: "Increase Access List Cost",
+    author: "Toni Wahrstätter (@nerolation)",
+    link: "https://eipsinsight.com/eips/eip-7981",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7981-increase-access-list-cost/24680"
+  },
+  {
     eip: "8024",
     title: "Backward compatible SWAPN, DUPN, EXCHANGE",
     author: "Francisco Giordano (@frangio), Charles Cooper (@charles-cooper), Alex Beregszaszi (@axic)",
@@ -1567,6 +1712,15 @@ const glamsterdamData = [
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-8024-backward-compatible-swapn-dupn-exchange/25486"
+  },
+  {
+    eip: "8038",
+    title: "State-access gas cost increase",
+    author: "Maria Silva (@misilva73), Wei Han Ng (@weiihann), Ansgar Dietrichs (@adietrichs)",
+    link: "https://eipsinsight.com/eips/eip-8038",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-8038-state-access-gas-cost-update/25693"
   },
   {
     eip: "8045",
@@ -1579,7 +1733,7 @@ const glamsterdamData = [
   }
 ];
 
-// PFI (PFI) EIPs for Glamsterdam
+// PFI (Proposed for Inclusion) EIPs for Glamsterdam
 const glamsterdamProposedData = [
   {
     eip: "2780",
@@ -1625,15 +1779,6 @@ const glamsterdamProposedData = [
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-7653-remove-bloom-filters/19447"
-  },
-  {
-    eip: "7686",
-    title: "Linear EVM memory limits",
-    author: "Sam Wilson (@SamWilsn)",
-    link: "https://eipsinsight.com/eips/eip-7686",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7686-linear-evm-memory-limits/19695"
   },
   {
     eip: "7688",
@@ -1697,15 +1842,6 @@ const glamsterdamProposedData = [
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-remove-contract-size-limit/23156"
-  },
-  {
-    eip: "7923",
-    title: "Linear, Page-Based Memory Costing",
-    author: "lightclient (@lightclient)",
-    link: "https://eipsinsight.com/eips/eip-7923",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7923-increase-blob-throughput-during-surge/23351"
   },
   {
     eip: "7949",
