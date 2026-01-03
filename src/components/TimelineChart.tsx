@@ -169,9 +169,6 @@ const linkHref =
   return (
     <Box bg={bg} p={4} borderRadius="lg" boxShadow="lg">
       <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
-        <Heading size="md" color={headingColor}>
-          Network Upgrade Inclusion Stages
-        </Heading>
         <HStack>
           <IconButton aria-label="Zoom In" icon={<AddIcon />} size="sm" onClick={() => setZoomLevel(z => z * 1.2)} />
           <IconButton aria-label="Zoom Out" icon={<MinusIcon />} size="sm" onClick={() => setZoomLevel(z => z / 1.2)} />

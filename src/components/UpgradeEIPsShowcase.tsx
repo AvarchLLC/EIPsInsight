@@ -25,6 +25,7 @@ interface EIPData {
   type: string;
   category: string;
   discussion: string;
+  created?: string;
 }
 
 interface UpgradeEIPsShowcaseProps {
@@ -66,6 +67,21 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
 
   const coreEIPs = eips.filter(eip => eip.category === 'Core');
   const otherEIPs = eips.filter(eip => eip.category !== 'Core');
+
+  // Get latest EIP date from all EIPs
+  const getLatestEIPDate = () => {
+    const datesWithEIPs = eips
+      .filter(eip => eip.created)
+      .map(eip => new Date(eip.created!));
+    
+    if (datesWithEIPs.length === 0) {
+      return new Date(upgradeDate);
+    }
+    
+    return new Date(Math.max(...datesWithEIPs.map(d => d.getTime())));
+  };
+
+  const latestEIPDate = getLatestEIPDate();
 
   const handleEIPClick = (eipNumber: string) => {
     router.push(`/eips/eip-${eipNumber}`);
@@ -178,19 +194,19 @@ const UpgradeEIPsShowcase: React.FC<UpgradeEIPsShowcaseProps> = ({
             >
               {sectionTitle || `${upgradeName} Network Upgrade`}
             </Heading>
-            <Badge
+            {/* <Badge
               colorScheme="green"
               fontSize="sm"
               px={3}
               py={1}
               borderRadius="full"
             >
-              {new Date(upgradeDate).toLocaleDateString('en-US', {
+              {latestEIPDate.toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',
               })}
-            </Badge>
+            </Badge> */}
           </Flex>
           <Text fontSize="sm" color={subtextColor}>
             Complete list of Ethereum Improvement Proposals {sectionTitle ? sectionTitle.toLowerCase() : 'included in this upgrade'}

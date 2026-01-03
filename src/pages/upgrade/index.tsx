@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import AllLayout from "@/components/Layout";
 import CloseableAdCard from "@/components/CloseableAdCard";
+import AdHeader from "@/components/AdHeader";
+import CopyLink from "@/components/CopyLink";
 import {
   Box,
   Spinner,
   useColorModeValue,
-  Wrap,
-  WrapItem,
   Text,
   List,
   UnorderedList,
@@ -20,26 +20,25 @@ import {
   Grid,
   GridItem,
   Select,
-  VStack
+  VStack,
+  HStack,
+  Icon,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText
 } from "@chakra-ui/react";
+import { FaProjectDiagram } from 'react-icons/fa';
+import ZoomableTimeline from "@/components/ZoomableTimeline";
 import SlotCountdown from "@/components/SlotCountdown";
 import NLink from "next/link";
-import CatTable from "@/components/CatTable";
-import Header from "@/components/Header";
-import SearchBox from "@/components/SearchBox";
-import { CCardBody, CSmartTable } from "@coreui/react-pro";
 import { motion } from "framer-motion";
-import PectraTable from "@/components/PectraTable";
-import { Table, Thead, Tbody, Tr, Th, Td, Link, TableContainer } from "@chakra-ui/react";
-import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
-import { FaSyncAlt } from "react-icons/fa";
+import { FaSyncAlt, FaNetworkWired, FaCode, FaRocket, FaLayerGroup } from "react-icons/fa";
 import { useRouter } from "next/router";
 import Graph from "@/components/EIP3DWrapper"
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { IconButton } from '@chakra-ui/react';
 import { useRef } from 'react';
 import UpgradesTimeline from "@/components/UpgradesTimeline";
 import { Card } from "@/components/pectraCards";
@@ -50,8 +49,13 @@ import DeclinedEIPListPage from "@/components/DeclinedCardsPage";
 import PlaceYourAdCard from "@/components/PlaceYourAdCard";
 import UpgradeEIPsShowcase from "@/components/UpgradeEIPsShowcase";
 import HorizontalUpgradeTimeline from "@/components/HorizontalUpgradeTimeline";
-import EthereumUpgradesFAQ from "@/components/EthereumUpgradesFAQ";
+import { Rajdhani } from "next/font/google";
 
+const mont = Rajdhani({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
 
 // Import glamsterDamData from UpgradesTimeline (we'll need to extract it or access it differently)
 // For now, let's define the glamsterDamData here since it's not exported from UpgradesTimeline
@@ -1994,17 +1998,23 @@ const glamsterdamProposedData = [
   const upgradeName = selectedOption === 'pectra' ? "Pectra" : selectedOption === 'fusaka' ? "Fusaka" : selectedOption === 'hegota' ? "Hegotá" : "Glamsterdam";
 
   useScrollSpy([
+    "upgrade-overview",
+    "upgrade-timeline",
+    "network-stats",
+    "horizontal-timeline",
+    "upgrade-chart",
+    "select-upgrade",
     "pectra",
     "fusaka",
     "glamsterdam",
     "hegota",
-    "NetworkUpgradesChart",
-    "upgrade-blogs",
     "NetworkUpgrades",
-    "dfi",
-    "upgrade-table",
-    "NetworkUpgradesChartp",
+    "upgrade-description",
+    "upgrade-blogs",
+    "eip-status",
+    "declined-eips",
     "AuthorContributions",
+    "NetworkUpgradesChartp",
   ]);
 
   useEffect(() => {
@@ -2016,7 +2026,7 @@ const glamsterdamProposedData = [
 return (
   <>
     <AllLayout>
-      <Box px={{ base: 3, md: 5, lg: 8 }} py={{ base: 3, md: 4, lg: 6 }}>
+      <Box className={`${mont.className}`} px={{ base: 3, md: 5, lg: 8 }} py={{ base: 3, md: 4, lg: 6 }}>
         {isLoading ? (
           <Flex justify="center" align="center" minH="70vh">
             <motion.div
@@ -2033,229 +2043,551 @@ return (
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-          {/* Container 0: FAQ Section */}
-          <Box
-            bg={useColorModeValue("white", "gray.800")}
-            borderRadius={{ base: "lg", md: "xl" }}
-            boxShadow="sm"
-            border="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={{ base: 4, md: 6, lg: 8 }}
-            px={{ base: 3, sm: 4, md: 6 }}
-            py={{ base: 4, sm: 6, md: 8 }}
-          >
-            <EthereumUpgradesFAQ />
-          </Box>
+          {/* AdHeader */}
+          <AdHeader
+            title="Ethereum Network Upgrades"
+            emoji="⚡"
+            headingLevel="h2"
+          />
 
-          {/* Container 1: Page Header + Selector + Countdown */}
+          {/* Timeline Section */}
           <Box
+            id="upgrade-timeline"
             bg={useColorModeValue("white", "gray.800")}
-            borderRadius={{ base: "lg", md: "xl" }}
+            borderRadius="xl"
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue("gray.200", "gray.700")}
-            mb={{ base: 4, md: 6, lg: 8 }}
-            px={{ base: 3, sm: 4, md: 6 }}
-            py={{ base: 4, sm: 6, md: 8 }}
+            mb={5}
+            p={4}
           >
-            <Text
-              as={motion.div}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 } as any}
-              fontSize={{ base: "xl", sm: "2xl", md: "3xl", lg: "4xl" }}
-              fontWeight="bold"
-              color="#00CED1"
-              id="pectrafusaka"
-              textAlign="center"
-              mb={{ base: 4, md: 6 }}
-            >
-              Ethereum Network Upgrades
-            </Text>
-            
-            <Box mb={{ base: 3, md: 4 }}>
-              <select
-                value={selectedOption}
-                onChange={handleSelectChange}
-                style={{
-                  width: '100%',
-                  maxWidth: '300px',
-                  padding: '10px 16px',
-                  fontSize: '16px',
-                  borderRadius: '8px',
-                  border: '1px solid gray',
-                }}
+            <VStack align="stretch" spacing={3}>
+              {/* <HStack spacing={2}>
+                <Icon as={FaProjectDiagram} boxSize={4} color="blue.500" />
+                <Heading 
+                  size="lg"
+                  color={useColorModeValue("gray.800", "white")}
+                  fontWeight="700"
+                  
+                >
+                  Ethereum Network Upgrade Timeline
+                </Heading>
+              </HStack>
+              <Text 
+                fontSize="md" 
+                color={useColorModeValue("gray.600", "gray.400")}
+                lineHeight="1.5"
+                
               >
-                <option value="glamsterdam">Glamsterdam</option>
-                <option value="hegota">Hegotá</option>
-                <option value="fusaka">Fusaka</option>
-                <option value="pectra">Pectra</option>
-              </select>
-            </Box>
-
-            {/* Horizontal Upgrade Timeline */}
-            <Box mb={{ base: 4, md: 6, lg: 8 }}>
-              <HorizontalUpgradeTimeline
-                selectedUpgrade={selectedOption}
-                onUpgradeClick={(upgrade) => {
-                  setSelectedOption(upgrade);
-                  router.push(`/upgrade/${upgrade}`);
-                }}
-              />
-            </Box>
-            
-            {/* FUSAKA Countdown - Only show when Fusaka is selected */}
-            {selectedOption === 'fusaka' && (
+                Comprehensive timeline of Ethereum network upgrades and their associated EIP implementations
+              </Text> */}
               <Box>
-                <SlotCountdown />
-              </Box>
-            )}
-            
-            {/* Network Upgrade Timeline (UpgradesTimeline) */}
-            {selectedOption !== 'hegota' && (
-              <Box id="NetworkUpgrades" mt={{ base: 4, md: 6, lg: 8 }}>
-                <UpgradesTimeline
-                  selectedOption={selectedOption}
-                  setSelectedOption={setSelectedOption}
-                  pectraData={pectraData}
-                  fusakaData={fusakaData}
+                <ZoomableTimeline 
+                  svgPath="/stages/ethupgradetimeline.png" 
+                  alt="Ethereum Upgrade Timeline"
                 />
               </Box>
-            )}
+            </VStack>
           </Box>
-          
 
+          {/* Stats Cards & Flowchart Section */}
+          <Grid
+            id="network-stats"
+            templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
+            gap={5}
+            mb={5}
+            alignItems="start"
+          >
+            {/* Left: Stats Cards */}
+            <GridItem display="flex">
+              <VStack spacing={4} w="100%">
+                <Box
+                  as={motion.div}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  transition={{ duration: 0.2 } as any}
+                  bg={useColorModeValue('white', 'gray.800')}
+                  p={4}
+                  borderRadius="xl"
+                  border="2px solid"
+                  borderColor={useColorModeValue('gray.200', 'gray.700')}
+                  boxShadow="md"
+                  _hover={{
+                    borderColor: 'blue.500',
+                    boxShadow: 'xl'
+                  }}
+                  w="100%"
+                >
+                  <Stat>
+                    <HStack spacing={2} mb={2}>
+                      <Icon as={FaRocket} boxSize={5} color="blue.500" />
+                      <StatLabel fontSize="md" fontWeight="600" color={useColorModeValue('gray.600', 'gray.400')} >
+                        Total Network Upgrades
+                      </StatLabel>
+                    </HStack>
+                    <StatNumber fontSize="3xl" fontWeight="bold" color={useColorModeValue('gray.800', 'white')} >
+                      21
+                    </StatNumber>
+                    <StatHelpText fontSize="sm" color={useColorModeValue('gray.500', 'gray.500')} mt={1} >
+                      Since Frontier Thawing (2015)
+                    </StatHelpText>
+                  </Stat>
+                </Box>
 
-          {/* Container 3: Description */}
+                <SimpleGrid columns={2} spacing={4} w="100%">
+                  <Box
+                    as={motion.div}
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    transition={{ duration: 0.2 } as any}
+                    bg={useColorModeValue('white', 'gray.800')}
+                    p={4}
+                    borderRadius="xl"
+                    border="2px solid"
+                    borderColor={useColorModeValue('gray.200', 'gray.700')}
+                    boxShadow="md"
+                    _hover={{
+                      borderColor: 'green.500',
+                      boxShadow: 'xl'
+                    }}
+                  >
+                    <Stat>
+                      <HStack spacing={2} mb={2}>
+                        <Icon as={FaCode} boxSize={5} color="green.500" />
+                        <StatLabel fontSize="md" fontWeight="600" color={useColorModeValue('gray.600', 'gray.400')} >
+                          Execution Layer
+                        </StatLabel>
+                      </HStack>
+                      <StatNumber fontSize="3xl" fontWeight="bold" color={useColorModeValue('gray.800', 'white')} >
+                        19
+                      </StatNumber>
+                      <StatHelpText fontSize="sm" color={useColorModeValue('gray.500', 'gray.500')} mt={1} >
+                        Protocol & EVM
+                      </StatHelpText>
+                    </Stat>
+                  </Box>
+
+                  <Box
+                    as={motion.div}
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    transition={{ duration: 0.2 } as any}
+                    bg={useColorModeValue('white', 'gray.800')}
+                    p={4}
+                    borderRadius="xl"
+                    border="2px solid"
+                    borderColor={useColorModeValue('gray.200', 'gray.700')}
+                    boxShadow="md"
+                    _hover={{
+                      borderColor: 'purple.500',
+                      boxShadow: 'xl'
+                    }}
+                  >
+                    <Stat>
+                      <HStack spacing={2} mb={2}>
+                        <Icon as={FaLayerGroup} boxSize={5} color="purple.500" />
+                        <StatLabel fontSize="md" fontWeight="600" color={useColorModeValue('gray.600', 'gray.400')} >
+                          Consensus Layer
+                        </StatLabel>
+                      </HStack>
+                      <StatNumber fontSize="3xl" fontWeight="bold" color={useColorModeValue('gray.800', 'white')} >
+                        6
+                      </StatNumber>
+                      <StatHelpText fontSize="sm" color={useColorModeValue('gray.500', 'gray.500')} mt={1} >
+                        Beacon Chain
+                      </StatHelpText>
+                    </Stat>
+                  </Box>
+                </SimpleGrid>
+
+                <Box
+                  as={motion.div}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  transition={{ duration: 0.2 } as any}
+                  bg={useColorModeValue('white', 'gray.800')}
+                  p={4}
+                  borderRadius="xl"
+                  border="2px solid"
+                  borderColor={useColorModeValue('gray.200', 'gray.700')}
+                  boxShadow="md"
+                  _hover={{
+                    borderColor: 'orange.500',
+                    boxShadow: 'xl'
+                  }}
+                  w="100%"
+                >
+                  <Stat>
+                    <HStack spacing={2} mb={2}>
+                      <Icon as={FaNetworkWired} boxSize={5} color="orange.500" />
+                      <StatLabel fontSize="md" fontWeight="600" color={useColorModeValue('gray.600', 'gray.400')} >
+                        Total Core EIPs
+                      </StatLabel>
+                    </HStack>
+                    <StatNumber fontSize="3xl" fontWeight="bold" color={useColorModeValue('gray.800', 'white')} >
+                      62
+                    </StatNumber>
+                    <StatHelpText fontSize="sm" color={useColorModeValue('gray.500', 'gray.500')} mt={1} >
+                      Implemented in upgrades
+                    </StatHelpText>
+                  </Stat>
+                </Box>
+              </VStack>
+            </GridItem>
+
+            {/* Right: EIP Inclusion Flowchart */}
+            <GridItem display={{ base: 'none', lg: 'block' }}>
+              <Box
+                bg={useColorModeValue('gray.50', 'gray.900')}
+                borderRadius="xl"
+                overflow="hidden"
+                border="2px solid"
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
+                boxShadow="md"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                w="100%"
+                h="100%"
+                maxH="500px"
+                position="relative"
+              >
+                <Image
+                  src="/stages/eip-incl.png"
+                  alt="EIP Inclusion Process Flowchart"
+                  w="100%"
+                  h="100%"
+                  objectFit="cover"
+                  objectPosition="center"
+                  fallback={
+                    <Box
+                      w="100%"
+                      h="100%"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      border="1px dashed"
+                      borderColor={useColorModeValue('gray.300', 'gray.600')}
+                      borderRadius="lg"
+                    >
+                      <Text fontSize="md" color={useColorModeValue('gray.500', 'gray.400')} textAlign="center" >
+                        EIP inclusion flowchart unavailable
+                      </Text>
+                    </Box>
+                  }
+                />
+              </Box>
+            </GridItem>
+
+            {/* Mobile: EIP Inclusion Flowchart */}
+            <GridItem display={{ base: 'block', lg: 'none' }} colSpan={1}>
+              <Box
+                bg={useColorModeValue('gray.50', 'gray.900')}
+                borderRadius="xl"
+                overflow="hidden"
+                border="2px solid"
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
+                boxShadow="md"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                p={4}
+                minH="300px"
+              >
+                <Image
+                  src="/stages/eip-incl.png"
+                  alt="EIP Inclusion Process Flowchart"
+                  maxW="100%"
+                  h="auto"
+                  objectFit="contain"
+                  borderRadius="lg"
+                />
+              </Box>
+            </GridItem>
+          </Grid>
+
+          {/* Horizontal Upgrade Timeline */}
           <Box
+            id="horizontal-timeline"
+            pt={4}
+            pb={4}
+            mb={5}
+          >
+            <HorizontalUpgradeTimeline
+              selectedUpgrade={selectedOption}
+              onUpgradeClick={(upgrade) => {
+                setSelectedOption(upgrade);
+                router.push(`/upgrade/${upgrade}`);
+              }}
+            />
+          </Box>
+
+          {/* Network Upgrades Overview Chart */}
+          <Box
+            id="upgrade-chart"
+            pt={4}
+            pb={4}
+            mb={5}
+          >
+            <NetworkUpgradesChart />
+          </Box>
+
+          {/* Upgrade Selector Section */}
+          <Box
+            id="select-upgrade"
             bg={useColorModeValue("white", "gray.800")}
-            borderRadius={{ base: "lg", md: "xl" }}
+            borderRadius="xl"
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue("gray.200", "gray.700")}
-            transition="background-color .15s ease, border-color .15s ease"
-            mb={{ base: 4, md: 6, lg: 8 }}
-            px={{ base: 3, sm: 4, md: 6 }}
-            py={{ base: 4, sm: 6, md: 8 }}
+            p={4}
+            mb={5}
           >
-            <Flex
-              direction={{ base: "column", md: "row" }}
-              align="flex-start"
-              gap={{ base: 6, md: 8 }}
-              width="100%"
-              wrap="wrap"
+            <Flex alignItems="center" mb={4}>
+              <Heading size="md" mr={2}>Select Network Upgrade</Heading>
+              <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#select-upgrade`} />
+            </Flex>
+            
+            <Flex 
+              direction={{ base: 'column', lg: 'row' }} 
+              gap={4}
+              align={{ base: 'stretch', lg: 'flex-start' }}
+              justify="space-between"
             >
-              <Box flex="1">
-                {selectedOption === 'pectra' ? (
-                  <Text fontSize={{ base: "sm", md: "md", lg: "lg" }} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
-                    Ethereum developers are moving toward the next major network upgrade, Prague and Electra,
-                    collectively known as{" "}
-                    <NLink href="https://eipsinsight.com/eips/eip-7600">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Pectra
-                      </Text>
-                    </NLink>. This upgrade will involve significant changes to the{" "}
-                    <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Execution and Consensus layers
-                      </Text>
-                    </NLink>{" "}on the mainnet. Due to the complexity of testing and scope involving 11{" "}
-                    <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Ethereum Improvement Proposals (EIPs)
-                      </Text>
-                    </NLink>, some EIPs were deferred to{" "}
-                    <NLink href="https://eipsinsight.com/eips/eip-7607">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Fusaka
-                      </Text>
-                    </NLink>. Testing is ongoing on{" "}
-                    <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Devnet 6
-                      </Text>
-                    </NLink>.
-                  </Text>
-                ) : selectedOption === 'fusaka' ? (
-                  <Text fontSize={{ base: "sm", md: "md", lg: "lg" }} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
-                    <NLink href="https://eipsinsight.com/upgrade/fusaka">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Fusaka
-                      </Text>
-                    </NLink>{" "}follows the Pectra upgrade, focusing on scaling and efficiency. Its headlining feature is{" "}
-                    <NLink href="https://eipsinsight.com/eips/eip-7594">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        PeerDAS
-                      </Text>
-                    </NLink>{" "}(Peer Data Availability Sampling), enabling significant blob throughput scaling. Fusaka also raises the L1 gas limit to 60M and introduces "Blob Parameter Only" (BPO) forks to safely scale blob capacity. Scheduled for Mainnet activation at slot <Text as="span" fontWeight="bold">13,164,544</Text> (Dec 3, 2025), it includes optimizations for L1 performance and UX improvements.
-                  </Text>
-                ) : selectedOption === 'hegota' ? (
-                  <Box>
-                    <VStack spacing={4} align="stretch">
-                      <Badge colorScheme="orange" fontSize="md" px={3} py={1} alignSelf="flex-start" borderRadius="full">
-                        Early Planning Stage
-                      </Badge>
-                      <Text fontSize={{ base: "sm", md: "md", lg: "lg" }} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
-                        <NLink href="https://eipsinsight.com/eips/eip-8081">
-                          <Text as="span" color="blue.500" textDecor="underline" fontWeight="bold">
-                            Hegotá
-                          </Text>
-                        </NLink>{" "}is in early planning. The headliner proposal window will open soon. Check back for updates as the upgrade planning process begins.
-                      </Text>
-                      <Text fontSize={{ base: "xs", md: "sm" }} color={useColorModeValue("gray.600", "gray.400")} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
-                        Future network upgrade currently in early planning stages. Named after the combination of{" "}
-                        <Text as="span" fontWeight="semibold">"Heze"</Text> (consensus layer upgrade, named after a star) and{" "}
-                        <Text as="span" fontWeight="semibold">"Bogotá"</Text> (execution layer upgrade, named after a Devcon location).
-                      </Text>
-                    </VStack>
-                  </Box>
-                ) : (
-                  <Text fontSize={{ base: "sm", md: "md", lg: "lg" }} lineHeight={{ base: "1.6", md: "1.75" }} textAlign="justify">
-                    Ethereum developers are now preparing for the next major network upgrade, known as{" "}
-                    <NLink href="/eips/eip-7773">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Glamsterdam
-                      </Text>
-                    </NLink>. This upgrade will introduce key changes to both the{" "}
-                    <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Execution and Consensus layers
-                      </Text>
-                    </NLink>{" "}on mainnet. The name combines{" "}
-                    <Text as="span" fontWeight="bold">
-                      Amsterdam
-                    </Text>{" "}(execution layer, from the previous Devconnect location) and{" "}
-                    <Text as="span" fontWeight="bold">
-                      Gloas
-                    </Text>{" "}(consensus layer, named after a star), highlighting its focus on both core protocol areas. The headliner feature for Glamsterdam is still being decided, with several{" "}
-                    <NLink href="https://github.com/ethereum/EIPs/pulls?q=is%3Apr+is%3Aopen+milestone%3A%22Glamsterdam%22">
-                      <Text as="span" color="blue.500" textDecor="underline">
-                        Ethereum Improvement Proposals (EIPs)
-                      </Text>
-                    </NLink>{" "}under review and active community discussions ongoing.
-                  </Text>
-                )}
+              <Box flex={{ base: '1', lg: '0 0 auto' }}>
+                <Select
+                  value={selectedOption}
+                  onChange={handleSelectChange}
+                  size="md"
+                  maxW="300px"
+                  borderRadius="md"
+                >
+                  <option value="hegota">Hegotá</option>
+                  <option value="glamsterdam">Glamsterdam</option>
+                  <option value="fusaka">Fusaka</option>
+                  <option value="pectra">Pectra</option>
+                </Select>
+              </Box>
+              
+              <Box flex={{ base: '1', lg: '1' }} maxW={{ base: '100%', lg: '400px' }}>
+                <CloseableAdCard />
               </Box>
             </Flex>
             
-            {/* Network Upgrade Inclusion Stages Chart (FUSAKA) */}
-
+            {/* FUSAKA Countdown - Only show when Fusaka is selected */}
+            {/* {selectedOption === 'fusaka' && (
+              <Box mt={4}>
+                <SlotCountdown />
+              </Box>
+            )} */}
           </Box>
 
-          {/* Container: EIP Showcase Section */}
+          {/* Network Upgrade Inclusion Stages */}
           {selectedOption !== 'hegota' && (
             <Box
               bg={useColorModeValue("white", "gray.800")}
-              borderRadius={{ base: "lg", md: "xl" }}
+              borderRadius="xl"
               boxShadow="sm"
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
-              mb={{ base: 4, md: 6, lg: 8 }}
-              px={{ base: 3, sm: 4, md: 6 }}
-              py={{ base: 4, sm: 6, md: 8 }}
+              p={4}
+              mb={5}
+              id="NetworkUpgrades"
             >
+              <Flex alignItems="center" mb={4}>
+                <Heading size="lg" mr={2}>Network Upgrade Inclusion Stages</Heading>
+                <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#NetworkUpgrades`} />
+              </Flex>
+              <UpgradesTimeline
+                selectedOption={selectedOption}
+                setSelectedOption={setSelectedOption}
+                pectraData={pectraData}
+                fusakaData={fusakaData}
+              />
+            </Box>
+          )}
+          
+
+
+          {/* Upgrade Description Section */}
+          <Box
+            id="upgrade-description"
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="xl"
+            boxShadow="sm"
+            border="1px solid"
+            borderColor={useColorModeValue("gray.200", "gray.700")}
+            p={4}
+            mb={5}
+          >
+            <Flex alignItems="center" mb={4}>
+              <Heading size="lg" mr={2}>About {selectedOption === 'pectra' ? 'Pectra' : selectedOption === 'fusaka' ? 'Fusaka' : selectedOption === 'hegota' ? 'Hegotá' : 'Glamsterdam'}</Heading>
+              <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#upgrade-description`} />
+            </Flex>
+            {selectedOption === 'pectra' ? (
+              <Text fontSize="md" lineHeight="1.75" textAlign="justify" >
+                Ethereum developers are moving toward the next major network upgrade, Prague and Electra,
+                collectively known as{" "}
+                <NLink href="https://eipsinsight.com/eips/eip-7600">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Pectra
+                  </Text>
+                </NLink>. This upgrade will involve significant changes to the{" "}
+                <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Execution and Consensus layers
+                  </Text>
+                </NLink>{" "}on the mainnet. Due to the complexity of testing and scope involving 11{" "}
+                <NLink href="https://www.youtube.com/watch?v=AyidVR6X6J8">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Ethereum Improvement Proposals (EIPs)
+                  </Text>
+                </NLink>, some EIPs were deferred to{" "}
+                <NLink href="https://eipsinsight.com/eips/eip-7607">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Fusaka
+                  </Text>
+                </NLink>. Testing is ongoing on{" "}
+                <NLink href="https://notes.ethereum.org/@ethpandaops/pectra-devnet-6">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Devnet 6
+                  </Text>
+                </NLink>.
+              </Text>
+            ) : selectedOption === 'fusaka' ? (
+              <Text fontSize="md" lineHeight="1.75" textAlign="justify" >
+                <NLink href="https://eipsinsight.com/upgrade/fusaka">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Fusaka
+                  </Text>
+                </NLink>{" "}follows the Pectra upgrade, focusing on scaling and efficiency. Its headlining feature is{" "}
+                <NLink href="https://eipsinsight.com/eips/eip-7594">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    PeerDAS
+                  </Text>
+                </NLink>{" "}(Peer Data Availability Sampling), enabling significant blob throughput scaling. Fusaka also raises the L1 gas limit to 60M and introduces "Blob Parameter Only" (BPO) forks to safely scale blob capacity. Scheduled for Mainnet activation at slot <Text as="span" fontWeight="bold">13,164,544</Text> (Dec 3, 2025), it includes optimizations for L1 performance and UX improvements.
+              </Text>
+            ) : selectedOption === 'hegota' ? (
+              <VStack spacing={4} align="stretch">
+                <Badge colorScheme="orange" fontSize="md" px={3} py={1} alignSelf="flex-start" borderRadius="full" >
+                  Early Planning Stage
+                </Badge>
+                <Text fontSize="md" lineHeight="1.75" textAlign="justify" >
+                  <NLink href="https://eipsinsight.com/eips/eip-8081">
+                    <Text as="span" color="blue.500" textDecor="underline" fontWeight="bold">
+                      Hegotá
+                    </Text>
+                  </NLink>{" "}is in early planning. The headliner proposal window will open soon. Check back for updates as the upgrade planning process begins.
+                </Text>
+                <Text fontSize="xs" color={useColorModeValue("gray.600", "gray.400")} lineHeight="1.75" textAlign="justify">
+                  Future network upgrade currently in early planning stages. Named after the combination of{" "}
+                  <Text as="span" fontWeight="semibold">"Heze"</Text> (consensus layer upgrade, named after a star) and{" "}
+                  <Text as="span" fontWeight="semibold">"Bogotá"</Text> (execution layer upgrade, named after a Devcon location).
+                </Text>
+              </VStack>
+            ) : (
+              <Text fontSize="md" lineHeight="1.75" textAlign="justify" >
+                Ethereum developers are now preparing for the next major network upgrade, known as{" "}
+                <NLink href="/eips/eip-7773">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Glamsterdam
+                  </Text>
+                </NLink>. This upgrade will introduce key changes to both the{" "}
+                <NLink href="https://www.youtube.com/watch?v=nJ57mkttCH0">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Execution and Consensus layers
+                  </Text>
+                </NLink>{" "}on mainnet. The name combines{" "}
+                <Text as="span" fontWeight="bold">
+                  Amsterdam
+                </Text>{" "}(execution layer, from the previous Devconnect location) and{" "}
+                <Text as="span" fontWeight="bold">
+                  Gloas
+                </Text>{" "}(consensus layer, named after a star), highlighting its focus on both core protocol areas. The headliner feature for Glamsterdam is still being decided, with several{" "}
+                <NLink href="https://github.com/ethereum/EIPs/pulls?q=is%3Apr+is%3Aopen+milestone%3A%22Glamsterdam%22">
+                  <Text as="span" color="blue.500" textDecor="underline">
+                    Ethereum Improvement Proposals (EIPs)
+                  </Text>
+                </NLink>{" "}under review and active community discussions ongoing.
+              </Text>
+            )}
+          </Box>
+
+                   {/* Compact Blogs Section */}
+          {selectedOption !== 'hegota' && currentPosts.length > 0 && (
+            <Box
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              p={4}
+              mb={5}
+              id="upgrade-blogs"
+            >
+              <Flex alignItems="center" mb={3}>
+                <Heading size="lg" mr={2}>Related Articles</Heading>
+                <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#upgrade-blogs`} />
+              </Flex>
+              <Flex justify="flex-start" w="100%">
+                <SimpleGrid 
+                  columns={{ base: 1, sm: 2, lg: 4 }} 
+                  spacing={3}
+                  w="100%"
+                >
+                  {currentPosts.slice(0, 4).map((post, index) => (
+                    <Box
+                      key={index}
+                      as="a"
+                      href={post.link}
+                      borderRadius="lg"
+                      overflow="hidden"
+                      boxShadow="sm"
+                      border="1px solid"
+                      borderColor={useColorModeValue("gray.200", "gray.700")}
+                      _hover={{
+                        boxShadow: "md",
+                        transform: "translateY(-2px)",
+                        transition: "all 0.2s"
+                      }}
+                      cursor="pointer"
+                      h="100%"
+                      display="flex"
+                      flexDirection="column"
+                    >
+                      <AspectRatio ratio={16/9} w="100%">
+                        <Image 
+                          src={`/${post.image}`}
+                          alt={post.title}
+                          objectFit="cover"
+                        />
+                      </AspectRatio>
+                      <Box p={2.5} flex="1">
+                        <Text fontSize="sm" fontWeight="semibold" noOfLines={2} lineHeight="1.3">
+                          {post.title}
+                        </Text>
+                      </Box>
+                    </Box>
+                  ))}
+                </SimpleGrid>
+              </Flex>
+            </Box>
+          )}
+
+          {/* EIP Status Cards Section (SFI/CFI/PFI/DFI) */}
+          {selectedOption !== 'hegota' && (
+            <Box
+              id="eip-status"
+              bg={useColorModeValue("white", "gray.800")}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+              p={4}
+              mb={5}
+            >
+              <Flex alignItems="center" mb={4}>
+                <Heading size="lg" mr={2}>EIP Status Overview</Heading>
+                <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#eip-status`} />
+              </Flex>
               {selectedOption === 'glamsterdam' ? (
-                <VStack spacing={12} align="stretch">
+                <VStack spacing={6} align="stretch">
                   {/* SFI Section */}
                   <UpgradeEIPsShowcase
                     upgradeName={upgradeName}
@@ -2294,139 +2626,59 @@ return (
             </Box>
           )}
 
-          {/* Container 4: Blog Cards Section */}
-          {selectedOption !== 'hegota' && currentPosts.length > 0 && (
+ 
+
+          {/* Declined for Inclusion Section */}
+          {selectedOption !== 'hegota' && (selectedOption === 'fusaka' || selectedOption === 'glamsterdam') && (
             <Box
+              id="declined-eips"
               bg={useColorModeValue("white", "gray.800")}
-              borderRadius={{ base: "lg", md: "xl" }}
+              borderRadius="xl"
               boxShadow="sm"
               border="1px solid"
               borderColor={useColorModeValue("gray.200", "gray.700")}
-              mb={{ base: 4, md: 6, lg: 8 }}
-              px={{ base: 3, sm: 4, md: 6 }}
-              py={{ base: 4, sm: 6, md: 8 }}
+              p={4}
+              mb={5}
             >
-            <Box maxH={{ base: "600px", md: "450px" }} overflowY="auto" width="100%" id="upgrade-blogs">
-              <Grid
-                templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}
-                gap={{ base: 4, md: 6 }}
-              >
-                {currentPosts?.map((post, index) => {
-                  const isLastRow =
-                    index >= currentPosts.length - (currentPosts.length % 3 || 3);
-                  const lastRowCount = currentPosts.length % 3;
-                  const colSpan =
-                    lastRowCount === 2 && isLastRow && isMediumOrLarger ? 1.5 : 1;
-
-                  return (
-                    <GridItem
-                      key={index}
-                      colSpan={colSpan}
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="stretch"
-                    >
-                      <Box
-                        width="100%"
-                        borderWidth="1px"
-                        borderRadius="lg"
-                        overflow="hidden"
-                        shadow="md"
-                      >
-                        <Card
-                          image={post.image}
-                          title={post.title}
-                          content={post.content}
-                          link={post.link}
-                        />
-                      </Box>
-                    </GridItem>
-                  );
-                })}
-              </Grid>
-            </Box>
+              <Flex alignItems="center" mb={4}>
+                <Heading size="lg" mr={2}>Declined for Inclusion</Heading>
+                <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#declined-eips`} />
+              </Flex>
+              <DeclinedEIPListPage selectedUpgrade={selectedOption} />
             </Box>
           )}
 
-          {/* Container 5: Upgrade Table + Declined EIPs */}
-          {selectedOption !== 'hegota' && (
-            <Box
-              bg={useColorModeValue("white", "gray.800")}
-              borderRadius={{ base: "lg", md: "xl" }}
-              boxShadow="sm"
-              border="1px solid"
-              borderColor={useColorModeValue("gray.200", "gray.700")}
-              mb={{ base: 4, md: 6, lg: 8 }}
-              px={{ base: 3, sm: 4, md: 6 }}
-              py={{ base: 4, sm: 6, md: 8 }}
-            >
 
-            {(selectedOption === 'fusaka' || selectedOption === 'glamsterdam') && (
-              <Box>
-                <Text
-                  fontSize={{ base: 'xl', md: '2xl', lg: '3xl' }}
-                  fontWeight="bold"
-                  color="#00CED1"
-                  textAlign="left"
-                  mb={{ base: 4, md: 6 }}
-                >
-                  Declined for Inclusion
-                </Text>
-                <DeclinedEIPListPage
-                  selectedUpgrade={selectedOption}
-                />
-              </Box>
-            )}
-
-
-            </Box>
-          )}
-
-          {/* EtherWorld Advertisement */}
-          {selectedOption !== 'hegota' && (
-            <Box my={{ base: 4, md: 6 }}>
-              <CloseableAdCard />
-            </Box>
-          )}
-
-          {/* Container 6: Author Contributions */}
+          {/* Author Contributions Graph */}
           <Box
             bg={useColorModeValue('white', 'gray.800')}
-            borderRadius={{ base: "lg", md: "xl" }}
+            borderRadius="xl"
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue('gray.200', 'gray.700')}
-            mb={{ base: 4, md: 6, lg: 8 }}
-            px={{ base: 3, sm: 4, md: 6 }}
-            py={{ base: 4, sm: 6, md: 8 }}
+            p={4}
+            mb={5}
+            id="AuthorContributions"
           >
-            <Box id="AuthorContributions">
-              <NetworkUpgradesChart2 />
-            </Box>
+            <NetworkUpgradesChart2 />
           </Box>
 
-          {/* Container 7: Network Upgrades and EIPs Relationship Graph */}
+          {/* Network Upgrades and EIPs Relationship Graph */}
           <Box
             bg={useColorModeValue('white', 'gray.800')}
-            borderRadius={{ base: "lg", md: "xl" }}
+            borderRadius="xl"
             boxShadow="sm"
             border="1px solid"
             borderColor={useColorModeValue('gray.200', 'gray.700')}
-            mb={{ base: 4, md: 6, lg: 8 }}
-            px={{ base: 3, sm: 4, md: 6 }}
-            py={{ base: 4, sm: 6, md: 8 }}
+            p={4}
+            mb={5}
           >
-            <Box mb={{ base: 4, md: 6 }}>
-              <Text
-                fontSize={{ base: 'xl', md: '2xl', lg: '3xl' }}
-                fontWeight="bold"
-                color="#00CED1"
-                textAlign="left"
-                id="NetworkUpgradesChartp"
-              >
+            <Flex alignItems="center" mb={4} id="NetworkUpgradesChartp">
+              <Heading size="lg" mr={2} color="#00CED1">
                 Network Upgrades and EIPs Relationship Graph
-              </Text>
-            </Box>
+              </Heading>
+              <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#NetworkUpgradesChartp`} />
+            </Flex>
             <Box 
               width="100%" 
               position="relative"
@@ -2440,8 +2692,8 @@ return (
           </motion.div>
         )}
 
-        {/* Place Your Ad Card - No Container */}
-        <Box my={{ base: 4, md: 6, lg: 8 }}>
+        {/* Place Your Ad Card */}
+        <Box mb={5}>
           <PlaceYourAdCard />
         </Box>
       </Box>
