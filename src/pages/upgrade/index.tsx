@@ -34,6 +34,7 @@ import SlotCountdown from "@/components/SlotCountdown";
 import NLink from "next/link";
 import { motion } from "framer-motion";
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { Carousel } from 'react-responsive-carousel';
 import NetworkUpgradesChart from "@/components/NetworkUpgradesChart";
 import NetworkUpgradesChart2 from "@/components/NetworkUpgradesChart2";
 import { FaSyncAlt, FaNetworkWired, FaCode, FaRocket, FaLayerGroup } from "react-icons/fa";
@@ -1432,17 +1433,101 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   ];
   const GlamsterdamPosts = [
     {
-      image: "fusakaimg5.jpg",
+      image: "https://etherworld.co/content/images/size/w2000/2025/01/ewew_11zon--5-.jpg",
       title: "Glamsterdam: The Next Upgrade After Fusaka",
       content: "Glamsterdam merges the star Gloas with Amsterdam for Ethereum’s next upgrade. Explore its origins, naming traditions, and why Devconnect cities might shape future upgrade names.",
       link: "https://etherworld.co/2025/01/09/glamsterdam-the-next-upgrade-after-fusaka/",
     },
     {
 
-      image: "glamsterdamimg1.jpg",
+      image: "https://etherworld.co/content/images/size/w2000/2025/06/EW-Thumbnails--1-.jpg",
       title: "Ethereum Gears Up for Glamsterdam with these Proposals",
       content: "As Ethereum moves closer to its next scheduled hard fork, Glamsterdam, the core developer community is actively evaluating a shortlist of high-impact Ethereum Improvement Proposals (EIPs) referred to as headliners. ",
       link: "https://etherworld.co/2025/06/10/ethereum-gears-up-for-glamsterdam-with-these-proposals/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/07/EW-Thumbnails.jpg",
+      title: "All you need to know about Ethereum Glamsterdam Upgrade",
+      content: "Curated resources by EtherWorld for Glamsterdam Upgrade",
+      link: "https://etherworld.co/all-you-need-to-know-about-ethereum-glamsterdam-upgrade/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/07/EW-Thumbnails--1--1.jpg",
+      title: "Glamsterdam Timeline Extended for In-Depth EIP Review",
+      content: "Explore how Ethereum's Glamsterdam fork timeline was extended with ACDE review sessions, strengthened PFI processes & proposal tracking.",
+      link: "https://etherworld.co/glamsterdam-timeline-extended-for-in-depth-eip-review/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/07/EW-Thumbnails--3--1.jpg",
+      title: "Ethereum Devs Narrow Down Glamsterdam Headliner EIPs",
+      content: "Shortlisted Consensus-Layer Headliners, Divergent Viewpoints in Discussion, Feedback & Voting Timeline",
+      link: "https://etherworld.co/ethereum-devs-narrow-down-glamsterdam-headliner-eips/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/07/EW-Thumbnails--2--2.jpg",
+      title: "Ethereum Sets Sights on Glamsterdam Post-Fusaka Rollout",
+      content: "Ethereum's core devs have outlined a detailed roadmap from headliner selection to testnet audits to launch the Glamsterdam in H1 2026 following the Fusaka.",
+      link: "https://etherworld.co/ethereum-sets-sights-on-glamsterdam-post-fusaka-rollout/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/08/EW-Thumbnails--3-.jpg",
+      title: "EIP-7732 (ePBS) Selected as Glamsterdam Headliner",
+      content: "Ethereum selects EIP-7732 (ePBS) as Glamsterdam's consensus layer headliner, advancing censorship resistance, decentralization, & trustless block building.",
+      link: "https://etherworld.co/eip-7732-epbs-selected-as-glamsterdam-headliner/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/08/EW-Thumbnails-6.jpg",
+      title: "Glamsterdam Headliners Finalized",
+      content: "Ethereum developers at ACDE #218 selected ePBS (EIP-7732) & BAL (EIP-7928) as Glamsterdam headliners, defining the upgrade's core roadmap.",
+      link: "https://etherworld.co/glamsterdam-headliners-finalised/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/09/EW-Thumbnails--1-.jpg",
+      title: "Expected EIPs in Glamsterdam Upgrade (Execution Layer)",
+      content: "Glamsterdam upgrade brings key Execution Layer EIPs that boost Ethereum's scalability, developer experience, security & user usability.",
+      link: "https://etherworld.co/expected-eips-in-glamsterdam-upgrade-execution-layer/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/09/EW-Thumbnails--12-.jpg",
+      title: "Glamsterdam Roadmap: Why ePBS & BAL Testing Won't Be Rushed",
+      content: "Ethereum's Glamsterdam upgrade debates focus on staged rollout of ePBS & BALs, prioritizing sequential testing to reduce risks & ensure smooth client development.",
+      link: "https://etherworld.co/glamsterdam-roadmap-why-epbs-bal-testing-wont-be-rushed/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/09/EW-Thumbnails--5--1.jpg",
+      title: "BALs Ready, ePBS Next: Glamsterdam Devnet-0 on Horizon",
+      content: "Ethereum's Glamsterdam upgrade advances with BALs set for Devnet-0 & ePBS moving forward with new specs, prioritizing careful testing over rushed deployment.",
+      link: "https://etherworld.co/bals-ready-epbs-next-glamsterdam-devnet-0-on-horizon/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/10/EW-Thumbnails-2.jpg",
+      title: "Ethereum Governance Sets Course for Glamsterdam EIP Selection",
+      content: "Ethereum developers prepare for Glamsterdam's EIP selection phase, emphasizing modular governance, client autonomy & community participation ahead of Oct 23.",
+      link: "https://etherworld.co/ethereum-governance-sets-course-for-glamsterdam-eip-selection/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/10/EW-Thumbnails--2--1.jpg",
+      title: "Glamsterdam Prep Begins: 10 Repricing EIPs Take Spotlight",
+      content: "Ethereum developers introduce 10 major repricing EIPs under EIP-8007 to optimize compute, memory, & storage costs for the upcoming Glamsterdam upgrade, ensuring efficient scalability & fair gas pricing.",
+      link: "https://etherworld.co/glamsterdam-prep-begins-10-repricing-eips-take-spotlight/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/10/EW-Thumbnails-4.jpg",
+      title: "ePBS + Trustless Payments Locked for Glamsterdam V1",
+      content: "Ethereum locks Trustless Payments with ePBS for Glamsterdam V1, ensuring transparent on-chain settlements & reduced reliance on off-chain relays.",
+      link: "https://etherworld.co/epbs-trustless-payments-locked-for-glamsterdam-v1/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/10/EW-Thumbnails--4--2.jpg",
+      title: "Glamsterdam EIP Review Begins Ahead of Devcon",
+      content: "Ethereum developers begin the Glamsterdam upgrade planning phase, launching the non-headliner EIP process & a two-week review of 31 proposals ahead of Devcon week.",
+      link: "https://etherworld.co/glamsterdam-eip-review-begins-ahead-of-devcon/",
+    },
+    {
+      image: "https://etherworld.co/content/images/size/w2000/2025/11/EW-Thumbnails--3--1.jpg",
+      title: "Glamsterdam at Crossroads: What's In, What's Out & What's Still Uncertain",
+      content: "Glamsterdam's scope narrows as devs finalize inclusions, defer complex EIPs, and brace for a decisive ePBS breakout on December 5.",
+      link: "https://etherworld.co/glamsterdam-at-crossroads-whats-in-whats-out-whats-still-uncertain/",
     },
   ];
 
@@ -2657,52 +2742,94 @@ return (
               mb={5}
               id="upgrade-blogs"
             >
-              <Flex alignItems="center" mb={3}>
+              <Flex alignItems="center" mb={4}>
                 <Heading size="lg" mr={2}>Related Articles</Heading>
                 <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#upgrade-blogs`} />
               </Flex>
-              <Flex justify="flex-start" w="100%">
-                <SimpleGrid 
-                  columns={{ base: 1, sm: 2, lg: 4 }} 
-                  spacing={3}
-                  w="100%"
-                >
-                  {currentPosts.slice(0, 4).map((post, index) => (
-                    <Box
-                      key={index}
-                      as="a"
-                      href={post.link}
-                      borderRadius="lg"
-                      overflow="hidden"
-                      boxShadow="sm"
-                      border="1px solid"
-                      borderColor={useColorModeValue("gray.200", "gray.700")}
-                      _hover={{
-                        boxShadow: "md",
-                        transform: "translateY(-2px)",
-                        transition: "all 0.2s"
-                      }}
-                      cursor="pointer"
-                      h="100%"
-                      display="flex"
-                      flexDirection="column"
+              <Box w="100%" position="relative">
+                <Carousel
+                  showArrows={true}
+                  showStatus={false}
+                  showThumbs={false}
+                  infiniteLoop={false}
+                  autoPlay={false}
+                  swipeable={true}
+                  emulateTouch={true}
+                  centerMode={false}
+                  showIndicators={false}
+                  transitionTime={500}
+                  renderArrowPrev={(clickHandler, hasPrev) => (
+                    <button
+                      onClick={clickHandler}
+                      disabled={!hasPrev}
+                      className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-gray-700/90 rounded-full p-2 shadow-lg hover:bg-white dark:hover:bg-gray-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                      <AspectRatio ratio={16/9} w="100%">
-                        <Image 
-                          src={`/${post.image}`}
-                          alt={post.title}
-                          objectFit="cover"
-                        />
-                      </AspectRatio>
-                      <Box p={2.5} flex="1">
-                        <Text fontSize="sm" fontWeight="semibold" noOfLines={2} lineHeight="1.3">
-                          {post.title}
-                        </Text>
-                      </Box>
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  )}
+                  renderArrowNext={(clickHandler, hasNext) => (
+                    <button
+                      onClick={clickHandler}
+                      disabled={!hasNext}
+                      className="absolute -right-3 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-gray-700/90 rounded-full p-2 shadow-lg hover:bg-white dark:hover:bg-gray-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  )}
+                >
+                  {Array.from({ length: Math.max(1, currentPosts.length - 3) }).map((_, slideIndex) => (
+                    <Box key={slideIndex} px={2}>
+                      <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} spacing={3}>
+                        {[0, 1, 2, 3].map((offset) => {
+                          const postIndex = slideIndex + offset;
+                          if (postIndex >= currentPosts.length) return null;
+                          const post = currentPosts[postIndex];
+                          return (
+                            <Box
+                              key={postIndex}
+                              as="a"
+                              href={post.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              borderRadius="lg"
+                              overflow="hidden"
+                              boxShadow="sm"
+                              border="1px solid"
+                              borderColor={useColorModeValue("gray.200", "gray.700")}
+                              _hover={{
+                                boxShadow: "md",
+                                transform: "translateY(-2px)",
+                                transition: "all 0.2s"
+                              }}
+                              cursor="pointer"
+                              h="100%"
+                              display="flex"
+                              flexDirection="column"
+                            >
+                              <AspectRatio ratio={16/9} w="100%">
+                                <Image 
+                                  src={post.image.startsWith('http') ? post.image : `/${post.image}`}
+                                  alt={post.title}
+                                  objectFit="cover"
+                                />
+                              </AspectRatio>
+                              <Box p={2.5} flex="1">
+                                <Text fontSize="sm" fontWeight="semibold" noOfLines={2} lineHeight="1.3">
+                                  {post.title}
+                                </Text>
+                              </Box>
+                            </Box>
+                          );
+                        })}
+                      </SimpleGrid>
                     </Box>
                   ))}
-                </SimpleGrid>
-              </Flex>
+                </Carousel>
+              </Box>
             </Box>
           )}
 
