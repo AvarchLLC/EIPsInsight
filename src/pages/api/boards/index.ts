@@ -12,15 +12,16 @@ export default async function handler(
 
   try {
     const client = await clientPromise;
-    const db = client.db('eip_board');
+    const db = client.db('test');
 
-    // Fetch both EIP and ERC boards
-    const [eipBoards, ercBoards] = await Promise.all([
-      db.collection('eip_boards').find({}).sort({ priority_score: -1 }).toArray(),
-      db.collection('erc_boards').find({}).sort({ priority_score: -1 }).toArray(),
+    // Fetch EIP, ERC, and RIP boards from new analysis collections
+    const [eipBoards, ercBoards, ripBoards] = await Promise.all([
+      db.collection('eip_boards_analysis').find({}).toArray(),
+      db.collection('erc_boards_analysis').find({}).toArray(),
+      db.collection('rip_boards_analysis').find({}).toArray(),
     ]);
 
-    // Add type field to distinguish between EIP and ERC
+    // Add type field to distinguish between EIP, ERC, and RIP
     const eipData = eipBoards.map((item: WithId<Document>) => ({
       ...item,
       type: 'EIP',
@@ -33,8 +34,14 @@ export default async function handler(
       _id: item._id.toString(),
     }));
 
+    const ripData = ripBoards.map((item: WithId<Document>) => ({
+      ...item,
+      type: 'RIP',
+      _id: item._id.toString(),
+    }));
+
     // Combine and return
-    const allBoards = [...eipData, ...ercData];
+    const allBoards = [...eipData, ...ercData, ...ripData];
 
     res.status(200).json({
       success: true,
@@ -42,6 +49,7 @@ export default async function handler(
       count: {
         eips: eipData.length,
         ercs: ercData.length,
+        rips: ripData.length,
         total: allBoards.length,
       },
     });
