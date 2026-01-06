@@ -40,7 +40,7 @@ export default async (req: Request, res: Response) => {
         }
     
         // Increment the like count
-        likeDoc.likeCount++;
+        likeDoc.dislikeCount++;
         await likeDoc.save();
     
           res.json({ pageName, likeCount: likeDoc.likeCount, dislikeCount: likeDoc.dislikeCount });
@@ -49,5 +49,4 @@ export default async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
       }
 };
-
 
