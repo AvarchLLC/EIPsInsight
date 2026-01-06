@@ -50,9 +50,11 @@ export async function syncEipChanges() {
 
     // Mark latest SHA AFTER successful notifications
     const statusEvents = changes.events.filter((e) => e.kind === 'status');
+    const contentEvents = changes.events.filter((e) => e.kind === 'content');
+    const allEvents = [...statusEvents, ...contentEvents];
     for (const sub of groupSubs) {
       const relevant =
-        sub.filter === 'status' ? statusEvents : changes.events.filter((e) => sub.filter === 'all' || e.kind === 'status');
+        sub.filter === 'status' ? statusEvents : sub.filter === 'content' ? contentEvents : allEvents;
 
       if (!relevant.length) {
         console.log(`⚠️ No relevant events for ${sub.email} on ${key.type}-${key.id}`);
