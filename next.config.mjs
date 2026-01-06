@@ -55,15 +55,7 @@ const nextConfig = withMDX(
 
     // Add the redirects method here
     async redirects() {
-      return [
-        // Redirect lowercase 'reviewers' to properly cased 'Reviewers', only if the pathname is not already correct
-        {
-          source: '/pectra',
-          destination: '/upgrade',
-          permanent: true,
-          has: [{ type: 'header', key: 'x-original-path', value: '/pectra' }]
-        },
-      ];
+      return [];
     }
   })
 );
