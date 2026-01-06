@@ -7,8 +7,10 @@ const RedirectsPage = () => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { params } = context;
-  const path = params?.slug?.[0].toLowerCase(); // Get the path and convert it to lowercase
-  console.log(path);
+  const path =
+    typeof params?.redirects === 'string'
+      ? params.redirects.toLowerCase()
+      : undefined; // Get the path and convert it to lowercase
   if (path === 'reviewers') {
     return {
       redirect: {
