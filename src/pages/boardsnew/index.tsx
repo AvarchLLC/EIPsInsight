@@ -219,28 +219,63 @@ const labelColors: { [key: string]: { color: string; description: string } } = {
     color: "cyan.600",
     description: "Changes the status of an EIP/ERC.",
   },
+  
+  // Custom Labels
+  "custom:bump": {
+    color: "gray.500",
+    description: "Dependency bump PR.",
+  },
+  "custom:ci": {
+    color: "orange.500",
+    description: "CI/workflow related changes.",
+  },
+  "custom:website": {
+    color: "teal.500",
+    description: "Website or documentation changes.",
+  },
+  "custom:typo": {
+    color: "purple.400",
+    description: "Typo or grammar fixes.",
+  },
+  "custom:needs-editor-review": {
+    color: "blue.500",
+    description: "Needs editor review.",
+  },
+  "custom:needs-author-review": {
+    color: "yellow.500",
+    description: "Needs author review.",
+  },
+  
+  // Review Status
+  "needs-editor-review": {
+    color: "blue.500",
+    description: "Waiting for editor review.",
+  },
+  "needs-author-review": {
+    color: "yellow.500",
+    description: "Waiting for author response.",
+  },
 };
 
 interface BoardData {
   _id: string;
-  number: number;
+  prNumber: number;
   title: string;
-  url: string;
+  prUrl: string;
   author: string;
-  created_at: string;
-  waiting_since: string;
-  wait_duration_hours: number;
-  priority_score: number;
-  is_withdrawn: boolean;
-  labels: string[];
-  events_count: number;
-  commits_count: number;
-  comments_count: number;
-  review_count: number;
-  last_updated: string;
-  last_editor_interaction: string | null;
-  last_author_interaction: string | null;
-  type: 'EIP' | 'ERC';
+  createdAt: string;
+  updatedAt: string;
+  waitingSince: string;
+  waitTime: string;
+  reviewStatus: 'needs-editor-review' | 'needs-author-review';
+  actualLabels: string[];
+  customLabels: string[];
+  allLabels: string[];
+  draft: boolean;
+  additions: number;
+  deletions: number;
+  changedFiles: number;
+  type: 'EIP' | 'ERC' | 'RIP';
 }
 
 const DashboardPage = () => {
@@ -248,89 +283,100 @@ const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [activeTab, setActiveTab] = useState("EIPs");
-  const [show, setShow] = useState(false);
-  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<string>("needs-editor-review"); // Review status filter
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]); // Multi-select label filter
   const [searchQuery, setSearchQuery] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 20,
   });
 
-  // Labels available in the filter dropdown
-  const filterLabels = [
-    "w-ci", "c-new", "created-by-bot", "status-change", "typo-fix", "e-review"
+  // Review status options for the main dropdown
+  const filterOptions = [
+    { value: "needs-editor-review", label: "Needs Editor Review" },
+    { value: "needs-author-review", label: "Needs Author Review" },
   ];
 
-  // Normalized display names for filter labels
-  const labelDisplayNames: { [key: string]: string } = {
-    "w-ci": "Waiting on CI",
-    "c-new": "New Proposal",
-    "created-by-bot": "Created by Bot",
-    "status-change": "Status Change",
-    "typo-fix": "Typo Fix",
-    "e-review": "Editor Review"
-  };
+  // Label filter options (separate multi-select)
+  const labelFilterOptions = [
+    // Topic Labels
+    { value: "t-core", label: "Core" },
+    { value: "t-erc", label: "ERC" },
+    { value: "t-networking", label: "Networking" },
+    { value: "t-interface", label: "Interface" },
+    // Status Labels
+    { value: "s-draft", label: "Draft" },
+    { value: "s-review", label: "Review" },
+    { value: "s-lastcall", label: "Last Call" },
+    { value: "s-final", label: "Final" },
+    { value: "s-stagnant", label: "Stagnant" },
+    // Creation/Modification Labels
+    { value: "c-new", label: "New" },
+    { value: "c-update", label: "Update" },
+    { value: "c-status", label: "Status Change" },
+    // Editor Labels
+    { value: "e-review", label: "Editor Review" },
+    { value: "e-consensus", label: "Editor Consensus" },
+    // Waiting Labels
+    { value: "w-ci", label: "Waiting CI" },
+    { value: "w-response", label: "Waiting Response" },
+    // Custom Labels
+    { value: "custom:bump", label: "Bump" },
+    { value: "custom:ci", label: "CI/Workflow" },
+    { value: "custom:website", label: "Website/Docs" },
+    { value: "custom:typo", label: "Typo Fix" },
+  ];
 
   // All labels that can be displayed in the table
   const allowedLabels = [
-    "e-review", "e-consensus", "w-response", "w-ci", "w-stale", 
-    "bug", "enhancement", "c-new", "c-update", "c-status", "s-draft", 
-    "s-final", "s-lastcall", "s-review", "s-stagnant", "s-withdrawn",
-    "created-by-bot", "status-change"
+    "t-core", "t-erc", "t-networking", "t-interface",
+    "s-draft", "s-review", "s-lastcall", "s-final", "s-stagnant",
+    "c-new", "c-update", "c-status",
+    "e-review", "e-consensus",
+    "w-ci", "w-response",
+    "custom:bump", "custom:ci", "custom:website", "custom:typo",
+    "custom:needs-editor-review", "custom:needs-author-review",
+    "needs-editor-review", "needs-author-review",
   ];
 
 
-  const toggleCollapse = () => setShow(!show);
+  const handleFilterChange = (filterValue: string) => {
+    setSelectedFilter(filterValue);
+    setPagination({ pageIndex: 0, pageSize: 20 }); // Reset pagination on filter change
+  };
 
   const handleLabelToggle = (label: string) => {
     setSelectedLabels((prev) =>
-      prev.includes(label) ? prev?.filter((l) => l !== label) : [...prev, label]
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
     );
   };
 
-  const handleSelectAll = () => {
-    setSelectedLabels(allLabels);
+  const handleSelectAllLabels = () => {
+    setSelectedLabels(labelFilterOptions.map(opt => opt.value));
   };
 
-  const handleRemoveAll = () => {
+  const handleClearLabels = () => {
     setSelectedLabels([]);
   };
 
-  // Auto-add labels based on title
-  const addAutoLabels = (item: BoardData): string[] => {
-    const autoLabels = [...item.labels];
-    const titleLower = item.title.toLowerCase();
-    
-    // Add "typo fix" label if title contains "typo"
-    if (titleLower.includes('typo') && !autoLabels.includes('typo-fix')) {
-      autoLabels.push('typo-fix');
-    }
-    
-    // Add "status-change" label if title contains "move to"
-    if (titleLower.includes('move to') && !autoLabels.includes('status-change')) {
-      autoLabels.push('status-change');
-    }
-    
-    return autoLabels;
+  // Parse wait time string to hours for sorting
+  const parseWaitTime = (waitTime: string): number => {
+    const match = waitTime.match(/(\d+)\s*(day|hour|minute)s?/);
+    if (!match) return 0;
+    const value = parseInt(match[1]);
+    const unit = match[2];
+    if (unit === 'day') return value * 24;
+    if (unit === 'hour') return value;
+    if (unit === 'minute') return value / 60;
+    return 0;
   };
 
   const filteredData = useMemo(() => {
     let filtered = boardData.filter(item => {
-      // Filter by type
-      if (item.type !== activeTab.slice(0, 3).toUpperCase()) return false;
-      
-      // Remove PRs with 'a-review' label
-      const itemLabels = addAutoLabels(item);
-      if (itemLabels.some(label => label.toLowerCase() === 'a-review')) return false;
-      
-      // Filter out PRs starting with "CI" or "bump"
-      const titleLower = item.title.toLowerCase();
-      if (titleLower.startsWith('ci') || titleLower.startsWith('bump')) return false;
-      
-      // Filter out bot-generated stagnant PRs (pattern: EIP-XXXX stagnant (date) or ERC-XXXX stagnant (date))
-      // Keep author-generated stagnant PRs like "Update EIP-5003: Move to Stagnant"
-      const botStagnantPattern = /^(EIP|ERC)-\d+\s+stagnant\s+\(/i;
-      if (botStagnantPattern.test(item.title)) return false;
+      // Filter by type (EIP, ERC, or RIP)
+      const typeMatch = activeTab === "EIPs" ? "EIP" : 
+                        activeTab === "ERCs" ? "ERC" : "RIP";
+      if (item.type !== typeMatch) return false;
       
       return true;
     });
@@ -340,21 +386,29 @@ const DashboardPage = () => {
       filtered = filtered.filter(item => 
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.number.toString().includes(searchQuery)
+        item.prNumber.toString().includes(searchQuery)
       );
     }
     
-    // Label filter
-    if (selectedLabels.length > 0) {
-      filtered = filtered.filter(item => {
-        const itemLabels = addAutoLabels(item);
-        return itemLabels.some(label => selectedLabels.includes(label));
-      });
+    // Apply review status filter
+    if (selectedFilter) {
+      filtered = filtered.filter(item => item.reviewStatus === selectedFilter);
     }
     
-    // Sort by priority score (higher = more urgent)
-    return filtered.sort((a, b) => b.priority_score - a.priority_score);
-  }, [boardData, activeTab, searchQuery, selectedLabels]);
+    // Apply label filters (if any selected)
+    if (selectedLabels.length > 0) {
+      filtered = filtered.filter(item => 
+        selectedLabels.some(label => item.allLabels?.includes(label))
+      );
+    }
+    
+    // Sort by wait time (longer wait = higher priority)
+    return filtered.sort((a, b) => {
+      const aWaitHours = parseWaitTime(a.waitTime);
+      const bWaitHours = parseWaitTime(b.waitTime);
+      return bWaitHours - aWaitHours;
+    });
+  }, [boardData, activeTab, searchQuery, selectedFilter, selectedLabels]);
 
   // Fetch data from the new API
   useEffect(() => {
@@ -375,18 +429,16 @@ const DashboardPage = () => {
     fetchData();
   }, []);
 
-  // Extract unique labels for the filter dropdown (only filterLabels)
+  // Extract unique labels for the filter dropdown
   const allLabels = useMemo(() => {
     const labels = new Set<string>();
     boardData.forEach(item => {
-      addAutoLabels(item).forEach(label => {
-        if (filterLabels.includes(label.toLowerCase())) {
-          labels.add(label);
-        }
+      item.allLabels?.forEach(label => {
+        labels.add(label);
       });
     });
     return Array.from(labels).sort();
-  }, [boardData, filterLabels]);
+  }, [boardData]);
 
   const columnHelper = createColumnHelper<BoardData>();
 
@@ -402,12 +454,12 @@ const DashboardPage = () => {
         ),
         size: 60,
       }),
-      columnHelper.accessor('number', {
+      columnHelper.accessor('prNumber', {
         header: 'PR #',
         cell: (info) => {
           const row = info.row.original;
           return (
-            <Link href={row.url} isExternal _hover={{ textDecoration: 'none' }}>
+            <Link href={row.prUrl} isExternal _hover={{ textDecoration: 'none' }}>
               <HStack justify="center" spacing={1}>
                 <Icon as={BiGitPullRequest} color="blue.500" boxSize={5} />
                 <Text 
@@ -434,7 +486,7 @@ const DashboardPage = () => {
         cell: (info) => {
           const row = info.row.original;
           return (
-            <Link href={row.url} isExternal _hover={{ textDecoration: 'none' }}>
+            <Link href={row.prUrl} isExternal _hover={{ textDecoration: 'none' }}>
               <Tooltip label={info.getValue()} placement="top" hasArrow>
                 <Text
                   noOfLines={1}
@@ -455,7 +507,7 @@ const DashboardPage = () => {
           );
         },
       }),
-      columnHelper.accessor('created_at', {
+      columnHelper.accessor('createdAt', {
         header: 'Created',
         cell: (info) => (
           <Text
@@ -468,11 +520,12 @@ const DashboardPage = () => {
         ),
         size: 120,
       }),
-      columnHelper.accessor('wait_duration_hours', {
+      columnHelper.accessor('waitTime', {
         header: 'Wait Time',
         cell: (info) => {
-          const waitDays = Math.floor(info.getValue() / 24);
-          const waitHours = Math.floor(info.getValue() % 24);
+          const waitTime = info.getValue();
+          const daysMatch = waitTime.match(/(\d+)\s*days?/);
+          const waitDays = daysMatch ? parseInt(daysMatch[1]) : 0;
           return (
             <Badge
               colorScheme={
@@ -486,23 +539,22 @@ const DashboardPage = () => {
               borderRadius="md"
               fontWeight="bold"
             >
-              {waitDays}d {waitHours}h
+              {waitTime}
             </Badge>
           );
         },
         size: 120,
       }),
-      columnHelper.accessor('labels', {
+      columnHelper.accessor('allLabels', {
         header: 'Labels',
         cell: (info) => {
-          const row = info.row.original;
-          const itemLabels = addAutoLabels(row).filter(label =>
-            allowedLabels.includes(label.toLowerCase())
-          );
+          const itemLabels = info.getValue()?.filter((label: string) =>
+            allowedLabels.includes(label)
+          ) || [];
           return (
             <Wrap justify="center" spacing={1}>
               {itemLabels.length > 0 ? (
-                itemLabels.slice(0, 3).map((label, idx) => {
+                itemLabels.slice(0, 3).map((label: string, idx: number) => {
                   const { color } = labelColors[label.toLowerCase()] || { color: "gray.400" };
                   return (
                     <WrapItem key={idx}>
@@ -619,7 +671,7 @@ const DashboardPage = () => {
     if (statusGroups['Final'].length > 0) {
       markdown += '### To `Final` \n';
       statusGroups['Final'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
       });
       markdown += '\n';
     }
@@ -627,7 +679,7 @@ const DashboardPage = () => {
     if (statusGroups['Last Call'].length > 0) {
       markdown += '### To `Last Call` \n';
       statusGroups['Last Call'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
       });
       markdown += '\n';
     }
@@ -635,7 +687,7 @@ const DashboardPage = () => {
     if (statusGroups['Review'].length > 0) {
       markdown += '### To `Review` \n';
       statusGroups['Review'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
       });
       markdown += '\n';
     }
@@ -643,7 +695,7 @@ const DashboardPage = () => {
     if (statusGroups['Draft'].length > 0) {
       markdown += '### To `Draft` \n';
       statusGroups['Draft'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
       });
       markdown += '\n';
     }
@@ -651,7 +703,7 @@ const DashboardPage = () => {
     if (statusGroups['Other'].length > 0) {
       markdown += '#### Other\n';
       statusGroups['Other'].forEach(item => {
-        markdown += `* [${item.title} #${item.number}](${item.url})\n`;
+        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
       });
       markdown += '\n';
     }
@@ -683,7 +735,8 @@ const DashboardPage = () => {
       "PR Number",
       "PR Title",
       "Author",
-      "Wait Duration (hours)",
+      "Review Status",
+      "Wait Time",
       "Labels",
       "Created Date",
       "URL",
@@ -701,13 +754,14 @@ const DashboardPage = () => {
     data.forEach((item, index) => {
       const rowValues = [
         index + 1,
-        item.number,
+        item.prNumber,
         item.title,
         item.author,
-        item.wait_duration_hours.toFixed(1),
-        addAutoLabels(item).join("; "),
-        new Date(item.created_at).toLocaleDateString(),
-        item.url,
+        item.reviewStatus === "needs-editor-review" ? "Editor Review" : "Author Review",
+        item.waitTime,
+        item.allLabels?.join("; ") || "",
+        new Date(item.createdAt).toLocaleDateString(),
+        item.prUrl,
       ];
       csvRows.push(rowValues.map(escapeField).join(","));
     });
@@ -796,6 +850,14 @@ const DashboardPage = () => {
               >
                 ERCs
               </Button>
+              <Button
+                colorScheme="blue"
+                onClick={() => setActiveTab("RIPs")}
+                variant={activeTab === "RIPs" ? "solid" : "outline"}
+                size="lg"
+              >
+                RIPs
+              </Button>
             </HStack>
             
             <Box flex="1" maxW={{ base: "100%", md: "600px" }}>
@@ -816,68 +878,129 @@ const DashboardPage = () => {
             </InputGroup>
           </Flex>
 
-          {/* Board Header with Filters */}
+          {/* Board Header with Filter and Actions */}
           <Box p={4} id="EIPsBOARD">
-            <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
+            <Flex 
+              justify="space-between" 
+              align="center" 
+              mb={4} 
+              flexWrap="wrap" 
+              gap={4}
+              p={4}
+              borderRadius="lg"
+              boxShadow="md"
+            >
+              {/* Left: Board Title with Count */}
               <Heading
                 as="h2"
                 size="lg"
                 color={useColorModeValue("#3182CE", "blue.300")}
+                minW="200px"
               >
                 📋 {activeTab} BOARD ({filteredData.length})
               </Heading>
               
-              {/* Filters and Actions */}
-              <HStack spacing={2} flexWrap="wrap">
-                <LabelFilter
-                  labels={allLabels}
-                  selectedLabels={selectedLabels}
-                  onLabelToggle={handleLabelToggle}
-                  labelDisplayNames={labelDisplayNames}
-                />
-                <Menu>
+              {/* Center: Review Status Dropdown & Label Filter Menu */}
+              <HStack spacing={3} minW="300px">
+                <Select
+                  value={selectedFilter}
+                  onChange={(e) => handleFilterChange(e.target.value)}
+                  bg={useColorModeValue("blue.50", "gray.700")}
+                  borderColor={useColorModeValue("blue.300", "blue.500")}
+                  fontWeight="semibold"
+                  color={useColorModeValue("blue.700", "blue.200")}
+                  _hover={{ borderColor: useColorModeValue("blue.400", "blue.400") }}
+                  maxW="250px"
+                >
+                  {filterOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
+                
+                {/* Label Filter Dropdown */}
+                <Menu closeOnSelect={false}>
                   <MenuButton
                     as={Button}
-                    size="sm"
-                    colorScheme="purple"
-                    variant="outline"
                     rightIcon={<ChevronDownIcon />}
+                    bg={useColorModeValue("blue.50", "gray.700")}
+                    borderWidth="1px"
+                    borderColor={useColorModeValue("blue.300", "blue.500")}
+                    fontWeight="semibold"
+                    color={useColorModeValue("blue.700", "blue.200")}
+                    _hover={{ 
+                      bg: useColorModeValue("blue.100", "gray.600"),
+                      borderColor: useColorModeValue("blue.400", "blue.400")
+                    }}
+                    minW="150px"
                   >
-                    Label Actions
+                    {selectedLabels.length > 0 ? (
+                      <HStack spacing={2}>
+                        <Text>Labels</Text>
+                        <Badge colorScheme="blue" borderRadius="full" fontSize="xs">
+                          {selectedLabels.length}
+                        </Badge>
+                      </HStack>
+                    ) : (
+                      "Labels"
+                    )}
                   </MenuButton>
-                  <MenuList>
+                  <MenuList maxH="400px" overflowY="auto">
                     <MenuItem
-                      onClick={handleSelectAll}
-                      isDisabled={selectedLabels.length === allLabels.length}
                       icon={<Icon as={BiGitPullRequest} />}
+                      onClick={handleSelectAllLabels}
+                      fontWeight="semibold"
                     >
                       Select All Labels
                     </MenuItem>
                     <MenuItem
-                      onClick={handleRemoveAll}
+                      onClick={handleClearLabels}
                       isDisabled={selectedLabels.length === 0}
                       color="red.500"
+                      fontWeight="semibold"
                     >
                       Clear All Labels
                     </MenuItem>
+                    <MenuDivider />
+                    {labelFilterOptions.map((option) => (
+                      <MenuItem
+                        key={option.value}
+                        onClick={() => handleLabelToggle(option.value)}
+                        bg={selectedLabels.includes(option.value) ? useColorModeValue("blue.50", "blue.900") : undefined}
+                        _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                      >
+                        <HStack justify="space-between" w="100%">
+                          <Text>{option.label}</Text>
+                          {selectedLabels.includes(option.value) && (
+                            <Icon as={BiGitPullRequest} color="blue.500" />
+                          )}
+                        </HStack>
+                      </MenuItem>
+                    ))}
                   </MenuList>
                 </Menu>
-                
+              </HStack>
+              
+              {/* Right: Export Actions */}
+              <HStack spacing={2} flexWrap="wrap">
                 <Button
                   colorScheme="teal"
-                  variant="outline"
-                  fontSize={{ base: "xs", md: "md" }}
-                  fontWeight={"bold"}
+                  variant="solid"
+                  size="md"
+                  fontWeight="bold"
                   leftIcon={<CopyIcon />}
                   onClick={handleCopyAsMarkdown}
+                  _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
+                  transition="all 0.2s"
                 >
                   Copy as MD
                 </Button>
                 <Button
                   colorScheme="blue"
-                  variant="outline"
-                  fontSize={{ base: "xs", md: "md" }}
-                  fontWeight={"bold"}
+                  variant="solid"
+                  size="md"
+                  fontWeight="bold"
                   leftIcon={<DownloadIcon />}
                   onClick={async () => {
                     try {
@@ -887,8 +1010,10 @@ const DashboardPage = () => {
                       console.error("Error triggering download counter:", error);
                     }
                   }}
+                  _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
+                  transition="all 0.2s"
                 >
-                  Download Reports
+                  Download CSV
                 </Button>
               </HStack>
             </Flex>
@@ -953,11 +1078,12 @@ const DashboardPage = () => {
                 ) : (
                     table.getRowModel().rows.map((row) => {
                       const item = row.original;
+                      const isWithdrawn = item.allLabels?.includes('s-withdrawn') || false;
                       return (
                         <Tr
                           key={row.id}
-                          bg={item.is_withdrawn ? useColorModeValue("red.50", "red.900") : undefined}
-                          opacity={item.is_withdrawn ? 0.7 : 1}
+                          bg={isWithdrawn ? useColorModeValue("red.50", "red.900") : undefined}
+                          opacity={isWithdrawn ? 0.7 : 1}
                           _hover={{
                             bg: useColorModeValue("blue.50", "gray.700"),
                             transition: "all 0.2s"
