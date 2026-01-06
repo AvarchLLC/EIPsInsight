@@ -194,7 +194,7 @@ const All = () => {
       image: "pectraimg6.jpg",
       title: "Sepolia Pectra Incident Update",
       content: "At 7:29 UTC today, on epoch 222464, the Pectra network upgrade went live on the Sepolia testnet. Unfortunately, an issue with Sepolia's permissioned deposit contract prevented many execution layer clients from including transactions in blocks.",
-      link: "https://blog.ethereum.org/2025/03/05/sepolia-pectra-incident-update"
+      link: "https://blog.ethereum.org/2025/03/05/sepolia-pectra-incident"
     },
   ]
 
