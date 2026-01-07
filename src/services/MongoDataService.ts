@@ -40,6 +40,8 @@ class MongoDataService {
   
   private subscribers: Array<(data: LatestValues) => void> = [];
   private isRefreshing = false;
+  private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
+  private autoRefreshIntervalMs: number | null = null;
 
   static getInstance(): MongoDataService {
     if (!MongoDataService.instance) {
@@ -157,9 +159,16 @@ class MongoDataService {
     this.subscribers.push(callback);
     // Immediately call with current data
     callback(this.getLatestValues());
+
+    if (this.autoRefreshIntervalMs !== null && !this.refreshIntervalId) {
+      this.startAutoRefresh(this.autoRefreshIntervalMs);
+    }
     
     return () => {
       this.subscribers = this.subscribers.filter(sub => sub !== callback);
+      if (this.subscribers.length === 0) {
+        this.stopAutoRefresh();
+      }
     };
   }
 
@@ -181,13 +190,26 @@ class MongoDataService {
 
   // Start auto-refresh
   startAutoRefresh(intervalMs = 30000) {
+    this.autoRefreshIntervalMs = intervalMs;
+    if (this.refreshIntervalId || this.subscribers.length === 0) {
+      return;
+    }
     // Initial fetch
     this.fetchAllData();
     
     // Set up interval
-    setInterval(() => {
+    this.refreshIntervalId = setInterval(() => {
       this.fetchAllData();
     }, intervalMs);
+  }
+
+  stopAutoRefresh() {
+    if (!this.refreshIntervalId) {
+      return;
+    }
+
+    clearInterval(this.refreshIntervalId);
+    this.refreshIntervalId = null;
   }
 }
 
