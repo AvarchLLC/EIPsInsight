@@ -34,9 +34,12 @@ const fetchAllEipsData = async (): Promise<AllEipsResponse> => {
   return response.json();
 };
 
-export const useAllEipsData = () =>
-  useQuery<AllEipsResponse>({
+export const useAllEipsData = () => {
+  const { data, isLoading, error } = useQuery<AllEipsResponse>({
     queryKey: ['all-eips-data'],
     queryFn: fetchAllEipsData,
     staleTime: 5 * 60 * 1000,
   });
+
+  return { data, isLoading, error };
+};
