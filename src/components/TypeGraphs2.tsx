@@ -14,7 +14,7 @@ import { useAllEipsData } from "@/hooks/useAllEipsData";
   const { data: allEipsData } = useAllEipsData();
   const data = allEipsData?.eip ?? [];
   const allData =
-    allEipsData?.eip?.concat(allEipsData?.erc?.concat(allEipsData?.rip)) || [];
+    allEipsData?.eip?.concat(allEipsData?.erc?.concat(allEipsData?.rip)) ?? [];
 
   return (
     <>
