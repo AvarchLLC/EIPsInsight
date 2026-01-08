@@ -210,6 +210,7 @@ class MongoDataService {
 
     clearInterval(this.refreshIntervalId);
     this.refreshIntervalId = null;
+    this.autoRefreshIntervalMs = null;
   }
 }
 
