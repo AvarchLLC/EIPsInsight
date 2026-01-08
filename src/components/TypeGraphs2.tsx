@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, Grid, Text, useColorModeValue } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import StackedColumnChart from "@/components/StackedColumnChart";
@@ -7,60 +7,14 @@ import AreaC from "@/components/AreaStatus";
 import NextLink from "next/link";
 import StatusChart from "@/components/StatusColumnChart";
 import DateTime from "./DateTime";
+import { useAllEipsData } from "@/hooks/useAllEipsData";
 
-interface EIP {
-  _id: string;
-  eip: string;
-  title: string;
-  author: string;
-  status: string;
-  type: string;
-  category: string;
-  created: string;
-  discussion: string;
-  deadline: string;
-  requires: string;
-  unique_ID: number;
-  repo: string;
-  __v: number;
-}
-
-interface APIResponse {
-  eip: EIP[];
-  erc: EIP[];
-  rip: EIP[];
-}
-
-const TypeGraphs = () => {
+  const TypeGraphs = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
-
-  const [data, setData] = useState<EIP[]>([]); // Set initial state as an empty array
-  const [data2, setData2] = useState<APIResponse>({
-    eip: [],
-    erc: [],
-    rip: [],
-  });
-  const [isLoading, setIsLoading] = useState(true); // Loader state
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/all`);
-        console.log(response);
-        const jsonData = await response.json();
-        setData(jsonData.eip);
-        setData2(jsonData);
-        setIsLoading(false); // Set loader state to false after data is fetched
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsLoading(false); // Set loader state to false even if an error occurs
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const allData: EIP[] =
-    data2?.eip?.concat(data2?.erc?.concat(data2?.rip)) || [];
+  const { data: allEipsData } = useAllEipsData();
+  const data = allEipsData?.eip ?? [];
+  const allData =
+    allEipsData?.eip?.concat(allEipsData?.erc?.concat(allEipsData?.rip)) ?? [];
 
   return (
     <>
