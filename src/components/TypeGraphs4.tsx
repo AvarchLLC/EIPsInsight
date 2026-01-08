@@ -14,7 +14,7 @@ const TypeGraphs = () => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const { data: allEipsData } = useAllEipsData();
   const data = allEipsData?.erc ?? [];
-  const allData = allEipsData?.erc || [];
+  const allData = data;
 
   return (
     <>
