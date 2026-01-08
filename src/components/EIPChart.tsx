@@ -1,8 +1,7 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
-import Link from 'next/link';
-import { Spinner } from '@chakra-ui/react';
+import { useAllEipsData } from '@/hooks/useAllEipsData';
 
 const getCat = (cat: string): string => {
   switch (cat) {
@@ -57,20 +56,6 @@ const getStatus = (status: string): string => {
   }
 };
 
-const fetchEIPData = async () => {
-  try {
-    const response = await fetch('/api/new/all');
-    if (!response.ok) {
-      throw new Error('Failed to fetch data');
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching EIP data:', error);
-    return { eip: [], erc: [], rip: [] }; // Return empty data in case of an error
-  }
-};
-
 const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
   interface EIPData {
     created: string;
@@ -79,19 +64,18 @@ const EIPChartWrapper: React.FC<{ type: string }> = ({ type }) => {
     status: string;
   }
 
-  const [data, setData] = useState<EIPData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [chartType, setChartType] = useState('category');
-
-  useEffect(() => {
-    fetchEIPData().then((dataset) => {
-      if (type === 'EIP') setData(dataset.eip);
-      else if (type === 'ERC') setData(dataset.erc);
-      else if (type === 'RIP') setData(dataset.rip);
-      else setData([...dataset.eip, ...dataset.erc, ...dataset.rip]);
-      setIsLoading(false);
-    });
-  }, [type]);
+  const { data: allEipsData } = useAllEipsData();
+  const data: EIPData[] =
+    type === 'EIP'
+      ? allEipsData?.eip ?? []
+      : type === 'ERC'
+        ? allEipsData?.erc ?? []
+        : type === 'RIP'
+          ? allEipsData?.rip ?? []
+          : allEipsData
+            ? [...allEipsData.eip, ...allEipsData.erc, ...allEipsData.rip]
+            : [];
 
   const transformedData = data?.reduce(
     (acc, item) => {

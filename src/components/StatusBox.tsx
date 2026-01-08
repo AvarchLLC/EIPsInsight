@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Table,
@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 // import { getStatusColorScheme } from "@chakra-ui/alert/dist/alert-context";
 import NextLink from "next/link";
+import { useAllEipsData } from "@/hooks/useAllEipsData";
 
 const getStatus = (status: string) => {
   switch (status) {
@@ -39,31 +40,6 @@ const getStatus = (status: string) => {
   }
 };
 
-interface EIP {
-  _id: string;
-  eip: string;
-  title: string;
-  author: string;
-  status: string;
-  type: string;
-  category: string;
-  created: string;
-  discussion: string;
-  deadline: string;
-  requires: string;
-  unique_ID: number;
-  repo:string;
-  __v: number;
-}
-
-interface APIResponse {
-    eip: EIP[];
-    erc: EIP[];
-    rip: EIP[];
-}
-
-
-
 interface TableItems {
   status: string;
   count: number;
@@ -71,28 +47,8 @@ interface TableItems {
 }
 
 const StatusBox = () => {
-  const [data, setData] = useState<EIP[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/new/all`);
-        const jsonData: APIResponse = await response.json();
-        console.log("status box data:", jsonData);
-
-        // Safely set data if `eips` is defined
-        if (jsonData.eip) {
-          setData(jsonData.eip);
-        } else {
-          console.error("Error: `eip` data is missing from the response.");
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const { data: allEipsData } = useAllEipsData();
+  const data = allEipsData?.eip ?? [];
 
   // Add a fallback for empty data to avoid runtime errors
   const safeData = data || [];
