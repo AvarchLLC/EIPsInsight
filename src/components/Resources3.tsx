@@ -375,6 +375,20 @@ const ResourcesPage: React.FC = () => {
 
   const BLOGS = [
     {
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/ethereum-opens-hegota.png",
+      title: "Ethereum Opens Hegotá Proposal Window, Deadline Set for Feb 5",
+      content: "Ethereum core developers have formally initiated planning for the next network hard fork, Hegotá, with a proposal deadline of Feb 5, 2026, as Glamsterdam moves toward finalization.",
+      link: "Blogs/ethereum-opens-hegota-proposal-window",
+      tag: "Ethereum Upgrades"
+    },
+    {
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/ethereum-acdg.png",
+      title: "Ethereum Introduces ACDG to Bring Structure to Governance Discussions",
+      content: "Ethereum core developers introduce ACDG (All Core Devs Governance) to formalize governance discussions, bringing structure and visibility to decision-making processes that have historically been scattered across multiple platforms.",
+      link: "Blogs/ethereum-introduces-acdg-to-bring-structure-to-governance-discussions",
+      tag: "Ethereum Governance"
+    },
+    {
       image: "https://github.com/user-attachments/assets/aec9e416-7f4d-4d16-8d86-50fd3567f881",
       title: "Top 10 EIPs That Defined Ethereum in 2025",
       content: "In 2025, Ethereum stopped rebuilding itself and started refining itself. Across Pectra and Fusaka upgrades, Ethereum shifted from heavy architectural work toward removing friction for users, developers, and operators through targeted improvements.",
