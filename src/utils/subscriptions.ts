@@ -4,7 +4,7 @@ export interface SubscriptionInput {
   email: string;
   type: 'eips' | 'ercs' | 'rips';
   id: string | number;
-  filter: 'all' | 'status';
+  filter: 'all' | 'status' | 'content';
 }
 
 export async function addSubscription({ email, type, id, filter }: SubscriptionInput) {

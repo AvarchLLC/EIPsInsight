@@ -12,12 +12,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const session = await getServerSession(req, res, authOptions);
   let { email, type, id, filter } = req.body;
+  const allowedFilters = ['all', 'status', 'content'];
 
   // Use session email if available
   const userEmail = session?.user?.email || email;
 
   if (!userEmail || !type || !id || !filter) {
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+  if (!allowedFilters.includes(filter)) {
+    return res.status(400).json({ error: 'Invalid filter value' });
   }
 
   try {
