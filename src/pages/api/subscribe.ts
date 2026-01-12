@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Check if subscription already exists
-    const existingSub = await checkExistingSubscription(userEmail, type, id);
+    const existingSub = await checkExistingSubscription(userEmail, type, id, filter);
     
     if (existingSub) {
       return res.status(409).json({ 
@@ -55,7 +55,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function checkExistingSubscription(
   email: string, 
   type: string, 
-  id: string
+  id: string,
+  filter: string
 ) {
   const client = await connectToDatabase();
   const db = client.db('eipsinsight');
@@ -63,6 +64,7 @@ async function checkExistingSubscription(
   return await db.collection('subscriptions').findOne({ 
     email, 
     type, 
-    id 
+    id,
+    filter
   });
 }
