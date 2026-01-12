@@ -23,10 +23,15 @@ export async function getAllSubscriptions() {
   return db.collection('subscriptions').find({}).toArray();
 }
 
-export async function checkSubscriptionExists(email: string, type: string, id: string) {
+export async function checkSubscriptionExists(
+  email: string,
+  type: string,
+  id: string,
+  filter: string
+) {
   const client = await connectToDatabase();
   const db = client.db('eipsinsight');
-  return await db.collection('subscriptions').findOne({ email, type, id });
+  return await db.collection('subscriptions').findOne({ email, type, id, filter });
 }
 
 // State tracking (last processed commit per (type,id))
