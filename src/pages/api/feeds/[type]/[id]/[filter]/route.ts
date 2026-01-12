@@ -6,7 +6,7 @@ interface Params {
   params: {
     type: 'eips' | 'ercs' | 'rips';
     id: string;
-    filter: 'all' | 'status';
+    filter: 'all' | 'status' | 'content';
   };
 }
 
