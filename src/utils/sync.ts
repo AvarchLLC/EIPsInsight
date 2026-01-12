@@ -52,6 +52,7 @@ export async function syncEipChanges() {
     const statusEvents = changes.events.filter((e) => e.kind === 'status');
     const contentEvents = changes.events.filter((e) => e.kind === 'content');
     const allEvents = [...statusEvents, ...contentEvents];
+    const failedSubscribers: string[] = [];
     for (const sub of groupSubs) {
       const relevant =
         sub.filter === 'status' ? statusEvents : sub.filter === 'content' ? contentEvents : allEvents;
@@ -72,7 +73,13 @@ export async function syncEipChanges() {
         console.log(`✅ Notified ${sub.email} (${relevant.length} events)`);
       } catch (err) {
         console.error(`❌ Email failed for ${sub.email}`, err);
+        failedSubscribers.push(sub.email);
       }
+    }
+    if (failedSubscribers.length) {
+      console.warn(
+        `⚠️ Failed subscribers for ${key.type}-${key.id}: ${failedSubscribers.join(', ')}`
+      );
     }
 
     // RSS (per (type,id)) – you can persist this (DB/S3/public folder)
@@ -97,7 +104,7 @@ export async function syncEipChanges() {
       console.error('❌ RSS generation failed', err);
     }
 
-    if (changes.latestSha) {
+    if (changes.latestSha && failedSubscribers.length === 0) {
       await setLastProcessedSha(key.type, key.id, changes.latestSha);
     }
   }
