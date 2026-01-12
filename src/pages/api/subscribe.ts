@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Send confirmation email
-    await sendSubscriptionEmail(userEmail, id);
+    await sendSubscriptionEmail(userEmail, { type, id });
 
     return res.status(200).json({ success: true });
   } catch (err) {
