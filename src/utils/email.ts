@@ -8,6 +8,15 @@ interface EmailPayload {
   text?: string;
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export function buildChangeEmail(params: {
   type: 'eips' | 'ercs' | 'rips';
   id: string | number;
@@ -24,17 +33,23 @@ export function buildChangeEmail(params: {
 
   const rows = events
     .map(
-      (e) => `
+      (e) => {
+        const escapedSummary = escapeHtml(e.summary);
+        const escapedStatusFrom = e.statusFrom ? escapeHtml(e.statusFrom) : '';
+        const escapedStatusTo = e.statusTo ? escapeHtml(e.statusTo) : '';
+        const escapedMessage = escapeHtml(e.message);
+        return `
       <tr>
         <td style="padding:8px 12px;font-size:14px;">
           <strong>${e.kind === 'status' ? 'Status' : 'Content'}</strong>
         </td>
         <td style="padding:8px 12px;font-size:14px;">
           ${e.kind === 'status' && e.statusFrom && e.statusTo
-            ? `<span style="background:#eef;padding:2px 6px;border-radius:4px;">${e.statusFrom}</span>
+            ? `<span style="background:#eef;padding:2px 6px;border-radius:4px;">${escapedStatusFrom}</span>
                &rarr;
-               <span style="background:#e6ffe6;padding:2px 6px;border-radius:4px;">${e.statusTo}</span>`
-            : e.summary}
+               <span style="background:#e6ffe6;padding:2px 6px;border-radius:4px;">${escapedStatusTo}</span>`
+            : escapedSummary}
+          <div style="color:#6b7280;margin-top:6px;font-size:13px;">${escapedMessage}</div>
           <div style="color:#555;margin-top:4px;">
             <a href="${e.url}" style="color:#2563eb;text-decoration:none;">Commit</a>
             ${e.author ? ` • ${e.author}` : ''} • ${new Date(e.date).toLocaleString()}
@@ -42,6 +57,7 @@ export function buildChangeEmail(params: {
         </td>
       </tr>
     `
+      }
     )
     .join('');
 
@@ -77,11 +93,15 @@ export function buildChangeEmail(params: {
   const text = [
     `${title}`,
     '',
-    ...events.map((e) =>
-      e.kind === 'status' && e.statusFrom && e.statusTo
-        ? `STATUS: ${e.statusFrom} -> ${e.statusTo} (${e.url})`
-        : `CONTENT: ${e.summary} (${e.url})`
-    ),
+    ...events.map((e) => {
+      const escapedSummary = escapeHtml(e.summary);
+      const escapedStatusFrom = e.statusFrom ? escapeHtml(e.statusFrom) : '';
+      const escapedStatusTo = e.statusTo ? escapeHtml(e.statusTo) : '';
+      const escapedMessage = escapeHtml(e.message);
+      return e.kind === 'status' && e.statusFrom && e.statusTo
+        ? `STATUS: ${escapedStatusFrom} -> ${escapedStatusTo} | ${escapedMessage} (${e.url})`
+        : `CONTENT: ${escapedSummary} | ${escapedMessage} (${e.url})`;
+    }),
     '',
     `More: ${baseLink}`
   ].join('\n');
