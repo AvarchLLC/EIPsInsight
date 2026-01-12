@@ -95,7 +95,7 @@ import { useState, useEffect } from "react";
 interface SubscribeFormProps {
   type?: "eips" | "ercs" | "rips";
   id?: string | number;
-  filter?: "all" | "status";
+  filter?: "all" | "status" | "content";
 }
 
 export function SubscribeForm({ type = "eips", id = "", filter = "all" }: SubscribeFormProps) {
@@ -179,11 +179,12 @@ export function SubscribeForm({ type = "eips", id = "", filter = "all" }: Subscr
 
       <select
         value={selectedFilter}
-        onChange={(e) => setSelectedFilter(e.target.value as "all" | "status")}
+        onChange={(e) => setSelectedFilter(e.target.value as "all" | "status" | "content")}
         className="w-full p-2 border rounded"
       >
         <option value="all">All Changes</option>
         <option value="status">Status Only</option>
+        <option value="content">Content Only</option>
       </select>
 
       <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">

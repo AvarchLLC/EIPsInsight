@@ -15,18 +15,20 @@ export interface FeedData {
 
 /**
  * Build feed data for a given proposal.
- * filter: 'all' | 'status'
+ * filter: 'all' | 'status' | 'content'
  */
 export async function getFeedDataFor(
   type: 'eips' | 'ercs' | 'rips',
   id: string | number,
-  filter: 'all' | 'status' = 'all'
+  filter: 'all' | 'status' | 'content' = 'all'
 ): Promise<FeedData> {
   const { events } = await getChangeLog(type, id);
 
   const filteredEvents: ChangeEvent[] =
     filter === 'status'
       ? events.filter(e => e.kind === 'status')
+      : filter === 'content'
+      ? events.filter(e => e.kind === 'content')
       : events;
 
   const baseLink =
