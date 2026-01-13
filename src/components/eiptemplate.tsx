@@ -864,7 +864,7 @@ if (
     setValidated(true);
 
     toast({
-      title: "Succesfully Validated, you can download the template now!",
+      title: "Successfully Validated, you can download the template now!",
       status: "success",
       duration: 2000,
     });

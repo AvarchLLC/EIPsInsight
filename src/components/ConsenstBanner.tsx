@@ -1,7 +1,7 @@
 import CookieConsent from "react-cookie-consent";
 
 const ConsentBanner = () => {
-    console.log("consent request recieved");
+    console.log("consent request received");
   const handleAccept = () => {
     // Enable analytics if user consents
     window.gtag("consent", "update", {
