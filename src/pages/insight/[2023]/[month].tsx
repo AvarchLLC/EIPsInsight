@@ -23,7 +23,7 @@ import NextLink from "next/link";
 
 import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 
-import InsightsAllStats from "@/components/InsitghtAllstats";
+import InsightsAllStats from "@/components/InsightsAllStats";
 
 import { useRouter } from "next/router";
 
