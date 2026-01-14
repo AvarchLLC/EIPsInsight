@@ -22,14 +22,14 @@ First, clone this repository to your local machine using the following command:
 
 
 ```bash
-git clone https://github.com/Avarch-org/EIPUI
+git clone https://github.com/Avarch-org/EIPsInsight
 ```
 
 ## 2. Set Up the Development Environment
 Navigate to the project directory and install the required dependencies:
 
 ```bash
-cd EIPUI
+cd EIPsInsight
 npm install
 npm run dev
 ```

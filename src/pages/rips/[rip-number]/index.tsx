@@ -39,7 +39,7 @@ import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { Markdown } from "@/components/MarkdownEIP";
 import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
-import SingleSubscriptionButton from "@/components/SingleSubscribitionButton";
+import SingleSubscriptionButton from "@/components/SingleSubscriptionButton";
 
 interface EipMetadataJson {
   eip: number;

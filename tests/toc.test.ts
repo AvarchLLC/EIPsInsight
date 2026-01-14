@@ -41,3 +41,20 @@ test('generates a slug id from heading text', () => {
 
   assert.equal(headings[0].id, 'my-heading');
 });
+
+test('ignores headings inside fenced code blocks', () => {
+  const markdown = [
+    '# Real Heading',
+    '```',
+    '## Not a heading',
+    '```',
+    '#### Another Real Heading',
+  ].join('\n');
+
+  const headings = extractHeadingsFromMarkdown(markdown);
+
+  assert.deepEqual(headings.map(heading => heading.text), [
+    'Real Heading',
+    'Another Real Heading',
+  ]);
+});

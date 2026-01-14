@@ -25,7 +25,7 @@ import { useSidebarStore } from "@/stores/useSidebarStore";
 import AppSidebar from "./Sidebar/AppSidebar";
 import UniversalFeedbackSystem from "./UniversalFeedbackSystem";
 import CookieConsentBanner from "./CookieConsentBanner";
-import analytics from "@/utils/analytics";
+import { trackPageView } from "@/utils/analytics";
 
 const mont = Rajdhani({
   subsets: ["latin"],
@@ -47,7 +47,7 @@ const AllLayout = ({ children }: { children: React.ReactNode }) => {
   // Track page views automatically
   useEffect(() => {
     if (pathname) {
-      analytics.pageView(window.location.href, document.title);
+      trackPageView(window.location.href, document.title);
     }
   }, [pathname]);
 
