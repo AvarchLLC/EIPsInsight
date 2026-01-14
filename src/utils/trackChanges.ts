@@ -1,6 +1,7 @@
 import { Octokit } from 'octokit';
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const fileContentCache = new Map<string, string | null>();
 
 export interface ChangeEvent {
   kind: 'status' | 'content';
@@ -41,7 +42,16 @@ function resolveRepoAndPath(type: string, id: string | number) {
   };
 }
 
-async function fetchFileContent(repoPath: string, filePath: string, sha: string): Promise<string | null> {
+async function fetchFileContent(
+  repoPath: string,
+  filePath: string,
+  sha: string
+): Promise<string | null> {
+  const cacheKey = `${repoPath}:${filePath}:${sha}`;
+  if (fileContentCache.has(cacheKey)) {
+    return fileContentCache.get(cacheKey) ?? null;
+  }
+
   try {
     const resp = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner: repoPath.split('/')[0],
@@ -52,10 +62,14 @@ async function fetchFileContent(repoPath: string, filePath: string, sha: string)
     // @ts-ignore
     if (resp.data?.content && resp.data.encoding === 'base64') {
       // @ts-ignore
-      return Buffer.from(resp.data.content, 'base64').toString('utf8');
+      const content = Buffer.from(resp.data.content, 'base64').toString('utf8');
+      fileContentCache.set(cacheKey, content);
+      return content;
     }
+    fileContentCache.set(cacheKey, null);
     return null;
   } catch {
+    fileContentCache.set(cacheKey, null);
     return null;
   }
 }
