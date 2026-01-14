@@ -36,7 +36,7 @@ import {
   PopoverCloseButton,
   PopoverBody
 } from "@chakra-ui/react";
-import SingleSubscriptionButton from "@/components/SingleSubscribitionButton";
+import SingleSubscriptionButton from "@/components/SingleSubscriptionButton";
 import { Markdown } from "@/components/MarkdownEIP";
 import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
