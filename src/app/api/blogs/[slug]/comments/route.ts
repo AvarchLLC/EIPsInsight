@@ -45,20 +45,33 @@ export async function GET(
       );
     }
 
-    // Get upvote counts for each comment
-    const commentsWithUpvotes = await Promise.all(
-      (comments || []).map(async (comment) => {
-        const { data: upvotes } = await supabaseAdmin
-          .from('comment_upvotes')
-          .select('id', { count: 'exact' })
-          .eq('comment_id', comment.id);
+    const commentIds = (comments || []).map((comment) => comment.id);
+    const upvoteCounts = new Map<string, number>();
 
-        return {
-          ...comment,
-          upvote_count: upvotes?.length || 0,
-        };
-      })
-    );
+    if (commentIds.length > 0) {
+      const { data: upvotes, error: upvotesError } = await supabaseAdmin
+        .from('comment_upvotes')
+        .select('comment_id')
+        .in('comment_id', commentIds);
+
+      if (upvotesError) {
+        return NextResponse.json(
+          { error: upvotesError.message },
+          { status: 500 }
+        );
+      }
+
+      (upvotes || []).forEach((upvote) => {
+        const current = upvoteCounts.get(upvote.comment_id) || 0;
+        upvoteCounts.set(upvote.comment_id, current + 1);
+      });
+    }
+
+    // Get upvote counts for each comment
+    const commentsWithUpvotes = (comments || []).map((comment) => ({
+      ...comment,
+      upvote_count: upvoteCounts.get(comment.id) || 0,
+    }));
 
     // Organize comments into a tree structure (parent -> children)
     const commentMap = new Map();

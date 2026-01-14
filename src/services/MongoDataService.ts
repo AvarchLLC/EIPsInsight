@@ -42,6 +42,7 @@ class MongoDataService {
   private isRefreshing = false;
   private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
   private autoRefreshIntervalMs: number | null = null;
+  private pendingFetch: Promise<void> | null = null;
 
   static getInstance(): MongoDataService {
     if (!MongoDataService.instance) {
@@ -51,52 +52,59 @@ class MongoDataService {
   }
 
   async fetchAllData(): Promise<void> {
+    if (this.pendingFetch) {
+      return this.pendingFetch;
+    }
     if (this.isRefreshing) return;
     
     this.isRefreshing = true;
-    
-    try {
-      const [feesRes, gasBurntRes, gasUsedRes, priorityFeeRes, allBlocksRes] = await Promise.allSettled([
-        fetch('/api/txtracker/fetchData'),
-        fetch('/api/txtracker/fetchData1'),
-        fetch('/api/txtracker/fetchData2'),
-        fetch('/api/txtracker/fetchData3'),
-        fetch('/api/txtracker/fetchData4')
-      ]);
+    this.pendingFetch = (async () => {
+      try {
+        const [feesRes, gasBurntRes, gasUsedRes, priorityFeeRes, allBlocksRes] = await Promise.allSettled([
+          fetch('/api/txtracker/fetchData'),
+          fetch('/api/txtracker/fetchData1'),
+          fetch('/api/txtracker/fetchData2'),
+          fetch('/api/txtracker/fetchData3'),
+          fetch('/api/txtracker/fetchData4')
+        ]);
 
-      if (feesRes.status === 'fulfilled' && feesRes.value.ok) {
-        const feesData = await feesRes.value.json();
-        this.data.fees = feesData.fees || [];
+        if (feesRes.status === 'fulfilled' && feesRes.value.ok) {
+          const feesData = await feesRes.value.json();
+          this.data.fees = feesData.fees || [];
+        }
+
+        if (gasBurntRes.status === 'fulfilled' && gasBurntRes.value.ok) {
+          const gasBurntData = await gasBurntRes.value.json();
+          this.data.gasBurnt = gasBurntData.gasBurnt || [];
+        }
+
+        if (gasUsedRes.status === 'fulfilled' && gasUsedRes.value.ok) {
+          const gasUsedData = await gasUsedRes.value.json();
+          this.data.gasUsed = gasUsedData.gasUsed || [];
+        }
+
+        if (priorityFeeRes.status === 'fulfilled' && priorityFeeRes.value.ok) {
+          const priorityFeeData = await priorityFeeRes.value.json();
+          this.data.priorityFee = priorityFeeData.priorityFee || [];
+        }
+
+        if (allBlocksRes.status === 'fulfilled' && allBlocksRes.value.ok) {
+          const allBlocksData = await allBlocksRes.value.json();
+          this.data.allBlocks = allBlocksData.allBlocks || [];
+        }
+
+        this.data.lastUpdated = Date.now();
+        this.notifySubscribers();
+        
+      } catch (error) {
+        console.error('❌ Error fetching MongoDB data:', error);
+      } finally {
+        this.isRefreshing = false;
+        this.pendingFetch = null;
       }
+    })();
 
-      if (gasBurntRes.status === 'fulfilled' && gasBurntRes.value.ok) {
-        const gasBurntData = await gasBurntRes.value.json();
-        this.data.gasBurnt = gasBurntData.gasBurnt || [];
-      }
-
-      if (gasUsedRes.status === 'fulfilled' && gasUsedRes.value.ok) {
-        const gasUsedData = await gasUsedRes.value.json();
-        this.data.gasUsed = gasUsedData.gasUsed || [];
-      }
-
-      if (priorityFeeRes.status === 'fulfilled' && priorityFeeRes.value.ok) {
-        const priorityFeeData = await priorityFeeRes.value.json();
-        this.data.priorityFee = priorityFeeData.priorityFee || [];
-      }
-
-      if (allBlocksRes.status === 'fulfilled' && allBlocksRes.value.ok) {
-        const allBlocksData = await allBlocksRes.value.json();
-        this.data.allBlocks = allBlocksData.allBlocks || [];
-      }
-
-      this.data.lastUpdated = Date.now();
-      this.notifySubscribers();
-      
-    } catch (error) {
-      console.error('❌ Error fetching MongoDB data:', error);
-    } finally {
-      this.isRefreshing = false;
-    }
+    return this.pendingFetch;
   }
 
   // Get the most recent values from MongoDB data

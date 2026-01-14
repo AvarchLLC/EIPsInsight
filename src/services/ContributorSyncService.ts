@@ -43,6 +43,7 @@ export class ContributorSyncService {
   private octokit: Octokit;
   private logger: SyncLogger;
   private db: Db | null = null;
+  private profileCache = new Map<string, any | null>();
 
   constructor(tokens: string[], logger?: SyncLogger) {
     if (!tokens || tokens.length === 0) {
@@ -140,13 +141,19 @@ export class ContributorSyncService {
   }
 
   private async fetchUserProfile(username: string): Promise<any> {
+    if (this.profileCache.has(username)) {
+      return this.profileCache.get(username) ?? null;
+    }
+
     try {
       await this.checkRateLimit();
       const { data } = await this.octokit.users.getByUsername({ username });
+      this.profileCache.set(username, data);
       return data;
     } catch (error: any) {
       if (error.status === 404) {
         this.logger.warn(`User not found: ${username}`);
+        this.profileCache.set(username, null);
         return null;
       }
       throw error;
@@ -196,8 +203,6 @@ export class ContributorSyncService {
       lastActivityAt: new Date(),
     };
 
-    const existingContributor = await db.collection("contributors").findOne({ username });
-    
     const updateDoc: any = {
       $set: {
         githubId: profile.id,
@@ -216,11 +221,8 @@ export class ContributorSyncService {
         createdAt: new Date(),
         repositories: [],
       },
+      $addToSet: { repositories: repository },
     };
-
-    if (!existingContributor || !existingContributor.repositories?.includes(repository)) {
-      updateDoc.$addToSet = { repositories: repository };
-    }
 
     const result = await db.collection("contributors").findOneAndUpdate(
       { username },
@@ -231,7 +233,7 @@ export class ContributorSyncService {
     const contributorDoc: any = result?.value || result;
     const contributorId = contributorDoc?._id?.toString() || "";
 
-    await db.collection("contributors").updateOne(
+    const repoStatsUpdate = await db.collection("contributors").updateOne(
       { username, "repositoryStats.repository": repository },
       {
         $set: {
@@ -240,12 +242,7 @@ export class ContributorSyncService {
       }
     );
 
-    const updateResult = await db.collection("contributors").findOne({
-      username,
-      "repositoryStats.repository": repository,
-    });
-
-    if (!updateResult) {
+    if (repoStatsUpdate.matchedCount === 0) {
       await db.collection("contributors").updateOne(
         { username },
         {
@@ -256,28 +253,32 @@ export class ContributorSyncService {
       );
     }
 
-    const contributor = await db.collection("contributors").findOne({ username });
-    if (contributor) {
-      const totalScore = (contributor.repositoryStats || []).reduce(
-        (sum: number, stat: any) => sum + stat.score,
-        0
-      );
-      const totalActivities = (contributor.repositoryStats || []).reduce(
-        (sum: number, stat: any) =>
-          sum + stat.commits + stat.pullRequests + stat.reviews + stat.comments,
-        0
-      );
-
-      await db.collection("contributors").updateOne(
-        { username },
+    await db.collection("contributors").updateOne(
+      { username },
+      [
         {
           $set: {
-            totalScore,
-            totalActivities,
+            totalScore: { $sum: { $ifNull: ["$repositoryStats.score", []] } },
+            totalActivities: {
+              $sum: {
+                $map: {
+                  input: { $ifNull: ["$repositoryStats", []] },
+                  as: "stat",
+                  in: {
+                    $add: [
+                      "$$stat.commits",
+                      "$$stat.pullRequests",
+                      "$$stat.reviews",
+                      "$$stat.comments",
+                    ],
+                  },
+                },
+              },
+            },
           },
-        }
-      );
-    }
+        },
+      ]
+    );
 
     return contributorId;
   }
@@ -314,18 +315,20 @@ export class ContributorSyncService {
           break;
         }
 
+        const entityRefs = commits.map((commit) => `commit:${commit.sha}`);
+        const existingDocs = await db
+          .collection("activities")
+          .find({ entityRef: { $in: entityRefs }, repository })
+          .project<{ entityRef: string }>({ entityRef: 1 })
+          .toArray();
+        const existingRefs = new Set(existingDocs.map((doc) => doc.entityRef));
+
         for (const commit of commits) {
           const username = commit.author?.login || commit.committer?.login;
           if (!username || !commit.commit?.author?.date) continue;
 
           const entityRef = `commit:${commit.sha}`;
-
-          const existing = await db.collection("activities").findOne({
-            entityRef,
-            repository,
-          });
-
-          if (existing) continue;
+          if (existingRefs.has(entityRef)) continue;
 
           const contributorId = await this.upsertContributor(username, repository, {
             commits: 1,
@@ -417,6 +420,19 @@ export class ContributorSyncService {
           break;
         }
 
+        const entityRefs = prs.map((pr) => `pr:${pr.number}`);
+        const existingDocs = await db
+          .collection("activities")
+          .find({ entityRef: { $in: entityRefs }, repository })
+          .project<{ entityRef: string; metadata?: { state?: string } }>({
+            entityRef: 1,
+            "metadata.state": 1,
+          })
+          .toArray();
+        const existingByRef = new Map(
+          existingDocs.map((doc) => [doc.entityRef, doc])
+        );
+
         let shouldBreak = false;
 
         for (const pr of prs) {
@@ -429,11 +445,7 @@ export class ContributorSyncService {
           if (!username) continue;
 
           const entityRef = `pr:${pr.number}`;
-          const existing = await db.collection("activities").findOne({
-            entityRef,
-            repository,
-          });
-
+          const existing = existingByRef.get(entityRef);
           const stateChanged = existing?.metadata?.state !== pr.state;
 
           const contributorId = await this.upsertContributor(username, repository, {
@@ -565,18 +577,24 @@ export class ContributorSyncService {
               break;
             }
 
+            const entityRefs = reviews.map(
+              (review) => `review:${pr.number}:${review.id}`
+            );
+            const existingDocs = await db
+              .collection("activities")
+              .find({ entityRef: { $in: entityRefs }, repository })
+              .project<{ entityRef: string }>({ entityRef: 1 })
+              .toArray();
+            const existingRefs = new Set(
+              existingDocs.map((doc) => doc.entityRef)
+            );
+
             for (const review of reviews) {
               if (!review.user?.login) continue;
 
               const username = review.user.login;
               const entityRef = `review:${pr.number}:${review.id}`;
-
-              const existing = await db.collection("activities").findOne({
-                entityRef,
-                repository,
-              });
-
-              if (existing) continue;
+              if (existingRefs.has(entityRef)) continue;
 
               if (
                 review.state !== "APPROVED" &&
@@ -686,18 +704,20 @@ export class ContributorSyncService {
           break;
         }
 
+        const entityRefs = comments.map((comment) => `comment:${comment.id}`);
+        const existingDocs = await db
+          .collection("activities")
+          .find({ entityRef: { $in: entityRefs }, repository })
+          .project<{ entityRef: string }>({ entityRef: 1 })
+          .toArray();
+        const existingRefs = new Set(existingDocs.map((doc) => doc.entityRef));
+
         for (const comment of comments) {
           if (!comment.user?.login) continue;
 
           const username = comment.user.login;
           const entityRef = `comment:${comment.id}`;
-
-          const existing = await db.collection("activities").findOne({
-            entityRef,
-            repository,
-          });
-
-          if (existing) continue;
+          if (existingRefs.has(entityRef)) continue;
 
           const contributorId = await this.upsertContributor(username, repository, {
             comments: 1,
