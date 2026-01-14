@@ -177,7 +177,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
         const response2 = await fetch(`/api/new/graphsv4`);
         const jsonData5 = await response2.json();
 
-        // Function to filter only the first occurrence of each unique entry based on eip ID and changeDate
+        // Function to filter only the first (earliest) occurrence of each unique entry based on eip ID and changeDate
         function getEarliestEntries(data:any, key:any) {
           const uniqueEntries:any = {};
 
@@ -185,7 +185,7 @@ const Table: React.FC<TableProps> = ({ type }) => {
             const entryKey = entry[key];
             
             // If this is the first time we see this `key` or if the current entry's date is earlier, store it
-            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) > new Date(uniqueEntries[entryKey].changeDate)) {
+            if (!uniqueEntries[entryKey] || new Date(entry.changeDate) < new Date(uniqueEntries[entryKey].changeDate)) {
               uniqueEntries[entryKey] = entry;
             }
           });
