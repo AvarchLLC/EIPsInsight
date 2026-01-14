@@ -315,6 +315,52 @@ const extractEIPData = (markdownContent: string) => {
 
 type EipType = "eip" | "erc" | "rip";
 
+const markdownSectionDefinitions: Array<{
+  title: string;
+  key: keyof TemplateData;
+}> = [
+  { title: "Abstract", key: "abstract" },
+  { title: "Motivation", key: "motivation" },
+  { title: "Specification", key: "specification" },
+  { title: "Rationale", key: "rationale" },
+  { title: "Backwards Compatibility", key: "backwardsCompatibility" },
+  { title: "Test Cases", key: "testCases" },
+  { title: "Reference Implementation", key: "referenceImplementation" },
+  { title: "Security Considerations", key: "securityConsiderations" },
+];
+
+const normalizeRequires = (requiresValue: TemplateData["requires"]): string[] => {
+  if (typeof requiresValue === "string") {
+    return requiresValue
+      .split(",")
+      .map((value) => value.trim())
+      .filter((value) => value);
+  }
+
+  if (Array.isArray(requiresValue)) {
+    return requiresValue.filter(
+      (value): value is string => Boolean(value && typeof value === "string")
+    );
+  }
+
+  return [];
+};
+
+const buildMarkdownSections = (data: TemplateData, addBlankLine: boolean) => {
+  return markdownSectionDefinitions
+    .map((section) => ({
+      title: section.title,
+      value: data[section.key],
+    }))
+    .filter((section) => section.value?.trim())
+    .map((section) =>
+      addBlankLine
+        ? `## ${section.title}\n\n${section.value.trim()}`
+        : `## ${section.title}\n${section.value.trim()}`
+    )
+    .join("\n\n");
+};
+
 const getInitialSteps = (type: EipType): Step[] => {
   const commonStepsBeforeStatus: Step[] = [
     { label: "EIP", key: "eip", type: "input" },
@@ -493,46 +539,16 @@ const headerLines = [
   // requires block will be handled below
 ].filter(Boolean);
 
-interface RequiresArray extends Array<string> {}
-
-let requiresArr: RequiresArray = [];
-if (typeof data.requires === "string") {
-  requiresArr = data.requires
-    .split(",")
-    .map((v) => v.trim())
-    .filter((v) => v);
-} else if (Array.isArray(data.requires)) {
-  requiresArr = (data.requires as string[]).filter((v) => v);
-}
+const requiresArr = normalizeRequires(data.requires);
 
 if (requiresArr.length > 0) {
   headerLines.push('requires:');
-  requiresArr.forEach(req => {
+  requiresArr.forEach((req) => {
     headerLines.push(` - ${req}`);
   });
 }
 
-  const markdownSections = [
-    { title: "Abstract", value: data.abstract },
-    { title: "Motivation", value: data.motivation },
-    { title: "Specification", value: data.specification },
-    { title: "Rationale", value: data.rationale },
-    {
-      title: "Backwards Compatibility",
-      value: data.backwardsCompatibility,
-    },
-    { title: "Test Cases", value: data.testCases },
-    { title: "Reference Implementation", value: data.referenceImplementation },
-    {
-      title: "Security Considerations",
-      value: data.securityConsiderations,
-    },
-  ];
-
-  const sections = markdownSections
-    .filter((section) => section.value?.trim())
-    .map((section) => `## ${section.title}\n${section.value.trim()}`)
-    .join("\n\n");
+  const sections = buildMarkdownSections(data, false);
 
   const fullTemplate = `---
 ${headerLines.join("\n")}
@@ -565,36 +581,16 @@ const generateEipWlintMarkdown = (data: TemplateData): string => {
     `created: ${data.created}`,
   ].filter(Boolean);
 
-let requiresArr: string[] = [];
-if (typeof data.requires === "string") {
-  requiresArr = data.requires.split(",").map((v) => v.trim()).filter((v) => v);
-} else if (Array.isArray(data.requires)) {
-  requiresArr = (data.requires as string[]).filter((v) => v && typeof v === 'string');
-}
-if (requiresArr.length > 0) {
-  if (requiresArr.length === 1) {
-    headerLines.push(`requires: ${requiresArr[0]}`);
-  } else {
-    headerLines.push(`requires: ${requiresArr.join(', ')}`); // comma+space
+  const requiresArr = normalizeRequires(data.requires);
+  if (requiresArr.length > 0) {
+    if (requiresArr.length === 1) {
+      headerLines.push(`requires: ${requiresArr[0]}`);
+    } else {
+      headerLines.push(`requires: ${requiresArr.join(', ')}`); // comma+space
+    }
   }
-}
 
-
-  const markdownSections = [
-    { title: "Abstract", value: data.abstract },
-    { title: "Motivation", value: data.motivation },
-    { title: "Specification", value: data.specification },
-    { title: "Rationale", value: data.rationale },
-    { title: "Backwards Compatibility", value: data.backwardsCompatibility },
-    { title: "Test Cases", value: data.testCases },
-    { title: "Reference Implementation", value: data.referenceImplementation },
-    { title: "Security Considerations", value: data.securityConsiderations },
-  ];
-
-  const sections = markdownSections
-    .filter(section => section.value && section.value.trim())
-    .map(section => `## ${section.title}\n\n${section.value.trim()}`)
-    .join('\n\n');
+  const sections = buildMarkdownSections(data, true);
 
   return [
     "---",
@@ -645,29 +641,44 @@ const markdownValue =
   const parseMarkdownToTemplate = (md: string): Partial<TemplateData> => {
     const result: Partial<TemplateData> = {};
 
+    const frontMatterKeyMap: Record<string, TemplateDataKeys> = {
+      eip: "eip",
+      title: "title",
+      description: "description",
+      author: "author",
+      "discussions-to": "discussionsTo",
+      status: "status",
+      "last-call-deadline": "last-call-deadline",
+      type: "type",
+      category: "category",
+      created: "created",
+      requires: "requires",
+    };
+
+    const applyFrontMatterLine = (key: string, value: string) => {
+      const mappedKey = frontMatterKeyMap[key];
+      if (!mappedKey) return;
+      if (key === "discussions-to") {
+        result[mappedKey] = value === "null" ? "" : value;
+        return;
+      }
+      result[mappedKey] = value;
+    };
+
     // Extract front matter between --- and ---
     const fmMatch = md.match(/---\s*([\s\S]*?)\s*---/);
     const frontMatter = fmMatch ? fmMatch[1] : "";
     if (frontMatter) {
-      const lines = frontMatter.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const lines = frontMatter
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
       for (const line of lines) {
-        const m = line.match(/^([a-zA-Z-]+):\s*(.*)$/);
-        if (!m) continue;
-        const key = m[1].toLowerCase();
-        const val = m[2];
-        switch (key) {
-          case "eip": result.eip = val; break;
-          case "title": result.title = val; break;
-          case "description": result.description = val; break;
-          case "author": result.author = val; break;
-          case "discussions-to": result.discussionsTo = val === "null" ? "" : val; break;
-          case "status": result.status = val; break;
-          case "last-call-deadline": result["last-call-deadline"] = val; break;
-          case "type": result.type = val; break;
-          case "category": result.category = val; break;
-          case "created": result.created = val; break;
-          case "requires": result.requires = val; break; // keep raw; generator handles formatting
-        }
+        const match = line.match(/^([a-zA-Z-]+):\s*(.*)$/);
+        if (!match) continue;
+        const key = match[1].toLowerCase();
+        const value = match[2];
+        applyFrontMatterLine(key, value);
       }
     }
 
