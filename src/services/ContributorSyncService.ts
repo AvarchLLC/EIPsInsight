@@ -24,6 +24,7 @@ interface SyncLogger {
 const REPOSITORIES = ["ethereum/EIPs", "ethereum/ERCs", "ethereum/RIPs"];
 const RATE_LIMIT_THRESHOLD = 100;
 const DAYS_TO_SYNC = 365;
+const DEFAULT_DB_NAME = "eipsinsight";
 
 const ACTIVITY_WEIGHTS = {
   COMMIT: 3,
@@ -118,6 +119,7 @@ export class ContributorSyncService {
     const db = await this.getDb();
     const now = new Date();
 
+    const shouldClearError = status !== "failed" && !error;
     await db.collection("sync_state").updateOne(
       { repository },
       {
@@ -128,6 +130,7 @@ export class ContributorSyncService {
           ...(error && { error }),
           updatedAt: now,
         },
+        ...(shouldClearError && { $unset: { error: "" } }),
         $setOnInsert: {
           createdAt: now,
         },
@@ -153,7 +156,14 @@ export class ContributorSyncService {
   private async upsertContributor(
     username: string,
     repository: string,
-    activityCount: { [key: string]: number }
+    activityCount: {
+      commits?: number;
+      prs?: number;
+      reviewApproved?: number;
+      reviewChangesRequested?: number;
+      reviewCommented?: number;
+      comments?: number;
+    }
   ): Promise<string> {
     const db = await this.getDb();
     const profile = await this.fetchUserProfile(username);
@@ -168,7 +178,9 @@ export class ContributorSyncService {
     const score =
       (activityCount.commits || 0) * ACTIVITY_WEIGHTS.COMMIT +
       (activityCount.prs || 0) * ACTIVITY_WEIGHTS.PR_OPENED +
-      (activityCount.reviews || 0) * ACTIVITY_WEIGHTS.REVIEW_COMMENTED +
+      (activityCount.reviewApproved || 0) * ACTIVITY_WEIGHTS.REVIEW_APPROVED +
+      (activityCount.reviewChangesRequested || 0) * ACTIVITY_WEIGHTS.REVIEW_CHANGES_REQUESTED +
+      (activityCount.reviewCommented || 0) * ACTIVITY_WEIGHTS.REVIEW_COMMENTED +
       (activityCount.comments || 0) * ACTIVITY_WEIGHTS.ISSUE_COMMENT;
 
     const repoStats = {
@@ -176,7 +188,10 @@ export class ContributorSyncService {
       score,
       commits: activityCount.commits || 0,
       pullRequests: activityCount.prs || 0,
-      reviews: activityCount.reviews || 0,
+      reviews:
+        (activityCount.reviewApproved || 0) +
+        (activityCount.reviewChangesRequested || 0) +
+        (activityCount.reviewCommented || 0),
       comments: activityCount.comments || 0,
       lastActivityAt: new Date(),
     };
@@ -300,9 +315,9 @@ export class ContributorSyncService {
         }
 
         for (const commit of commits) {
-          if (!commit.author?.login || !commit.commit?.author?.date) continue;
+          const username = commit.author?.login || commit.committer?.login;
+          if (!username || !commit.commit?.author?.date) continue;
 
-          const username = commit.author.login;
           const entityRef = `commit:${commit.sha}`;
 
           const existing = await db.collection("activities").findOne({
@@ -318,6 +333,12 @@ export class ContributorSyncService {
 
           if (!contributorId) continue;
 
+          const { data: commitDetails } = await this.octokit.repos.getCommit({
+            owner,
+            repo,
+            ref: commit.sha,
+          });
+
           await db.collection("activities").insertOne({
             contributorId,
             username,
@@ -326,7 +347,7 @@ export class ContributorSyncService {
             entityRef,
             timestamp: new Date(commit.commit.author.date),
             metadata: {
-              url: commit.url,
+              url: commit.html_url,
               htmlUrl: commit.html_url,
               repositoryFullName: repository,
               sha: commit.sha,
@@ -337,10 +358,12 @@ export class ContributorSyncService {
               committerName: commit.commit.committer?.name,
               committerEmail: commit.commit.committer?.email,
               verified: commit.commit.verification?.verified,
-              changedFiles: commit.files?.length || 0,
-              additions: commit.stats?.additions,
-              deletions: commit.stats?.deletions,
-              totalChanges: (commit.stats?.additions || 0) + (commit.stats?.deletions || 0),
+              changedFiles: commitDetails.files?.length || 0,
+              additions: commitDetails.stats?.additions,
+              deletions: commitDetails.stats?.deletions,
+              totalChanges:
+                (commitDetails.stats?.additions || 0) +
+                (commitDetails.stats?.deletions || 0),
             },
             createdAt: new Date(),
           });
@@ -411,7 +434,7 @@ export class ContributorSyncService {
             repository,
           });
 
-          if (existing && existing.metadata?.state === pr.state) continue;
+          const stateChanged = existing?.metadata?.state !== pr.state;
 
           const contributorId = await this.upsertContributor(username, repository, {
             prs: 1,
@@ -458,13 +481,16 @@ export class ContributorSyncService {
                   changedFiles: pr.changed_files,
                   totalChanges: (pr.additions || 0) + (pr.deletions || 0),
                 },
-                createdAt: new Date(),
+                updatedAt: new Date(),
               },
+              $setOnInsert: { createdAt: new Date() },
             },
             { upsert: true }
           );
 
-          activitiesAdded++;
+          if (!existing || stateChanged) {
+            activitiesAdded++;
+          }
         }
 
         if (shouldBreak) break;
@@ -494,77 +520,130 @@ export class ContributorSyncService {
     this.logger.info(`Syncing reviews for ${repository}`);
 
     try {
-      const { data: prs } = await this.octokit.pulls.list({
-        owner,
-        repo,
-        state: "all",
-        sort: "updated",
-        direction: "desc",
-        per_page: 30,
-      });
+      let page = 1;
+      let hasMore = true;
 
-      for (const pr of prs) {
-        if (new Date(pr.updated_at) < since) break;
-
+      while (hasMore) {
         await this.checkRateLimit();
 
-        const { data: reviews } = await this.octokit.pulls.listReviews({
+        const { data: prs } = await this.octokit.pulls.list({
           owner,
           repo,
-          pull_number: pr.number,
+          state: "all",
+          sort: "updated",
+          direction: "desc",
+          per_page: 50,
+          page,
         });
 
-        for (const review of reviews) {
-          if (!review.user?.login) continue;
+        if (prs.length === 0) break;
 
-          const username = review.user.login;
-          const entityRef = `review:${pr.number}:${review.id}`;
+        let shouldBreak = false;
 
-          const existing = await db.collection("activities").findOne({
-            entityRef,
-            repository,
-          });
-
-          if (existing) continue;
-
-          const contributorId = await this.upsertContributor(username, repository, {
-            reviews: 1,
-          });
-
-          if (!contributorId) continue;
-
-          let activityType = ActivityType.REVIEW_COMMENTED;
-          if (review.state === "APPROVED") {
-            activityType = ActivityType.REVIEW_APPROVED;
-          } else if (review.state === "CHANGES_REQUESTED") {
-            activityType = ActivityType.REVIEW_CHANGES_REQUESTED;
+        for (const pr of prs) {
+          if (new Date(pr.updated_at) < since) {
+            shouldBreak = true;
+            break;
           }
 
-          await db.collection("activities").insertOne({
-            contributorId,
-            username,
-            repository,
-            activityType,
-            entityRef,
-            timestamp: new Date(review.submitted_at || new Date()),
-            metadata: {
-              url: review.html_url,
-              htmlUrl: review.html_url,
-              number: pr.number,
-              repositoryFullName: repository,
-              authorAssociation: review.author_association,
-              title: pr.title,
-              reviewId: review.id,
-              reviewState: review.state,
-              reviewBody: review.body || "",
-              reviewUrl: review.html_url,
-              reviewSubmittedAt: review.submitted_at ? new Date(review.submitted_at) : undefined,
-            },
-            createdAt: new Date(),
-          });
+          await this.checkRateLimit();
 
-          activitiesAdded++;
+          let reviewPage = 1;
+          let hasMoreReviews = true;
+
+          while (hasMoreReviews) {
+            const { data: reviews } = await this.octokit.pulls.listReviews({
+              owner,
+              repo,
+              pull_number: pr.number,
+              per_page: 100,
+              page: reviewPage,
+            });
+
+            if (reviews.length === 0) {
+              hasMoreReviews = false;
+              break;
+            }
+
+            for (const review of reviews) {
+              if (!review.user?.login) continue;
+
+              const username = review.user.login;
+              const entityRef = `review:${pr.number}:${review.id}`;
+
+              const existing = await db.collection("activities").findOne({
+                entityRef,
+                repository,
+              });
+
+              if (existing) continue;
+
+              if (
+                review.state !== "APPROVED" &&
+                review.state !== "CHANGES_REQUESTED" &&
+                review.state !== "COMMENTED"
+              ) {
+                continue;
+              }
+
+              const reviewCounts = {
+                reviewApproved: review.state === "APPROVED" ? 1 : 0,
+                reviewChangesRequested: review.state === "CHANGES_REQUESTED" ? 1 : 0,
+                reviewCommented: review.state === "COMMENTED" ? 1 : 0,
+              };
+
+              const contributorId = await this.upsertContributor(
+                username,
+                repository,
+                reviewCounts
+              );
+
+              if (!contributorId) continue;
+
+              let activityType = ActivityType.REVIEW_COMMENTED;
+              if (review.state === "APPROVED") {
+                activityType = ActivityType.REVIEW_APPROVED;
+              } else if (review.state === "CHANGES_REQUESTED") {
+                activityType = ActivityType.REVIEW_CHANGES_REQUESTED;
+              }
+
+              await db.collection("activities").insertOne({
+                contributorId,
+                username,
+                repository,
+                activityType,
+                entityRef,
+                timestamp: new Date(review.submitted_at || new Date()),
+                metadata: {
+                  url: review.html_url,
+                  htmlUrl: review.html_url,
+                  number: pr.number,
+                  repositoryFullName: repository,
+                  authorAssociation: review.author_association,
+                  title: pr.title,
+                  reviewId: review.id,
+                  reviewState: review.state,
+                  reviewBody: review.body || "",
+                  reviewUrl: review.html_url,
+                  reviewSubmittedAt: review.submitted_at
+                    ? new Date(review.submitted_at)
+                    : undefined,
+                },
+                createdAt: new Date(),
+              });
+
+              activitiesAdded++;
+            }
+
+            reviewPage++;
+            if (reviews.length < 100) hasMoreReviews = false;
+          }
         }
+
+        if (shouldBreak) break;
+
+        page++;
+        if (prs.length < 50) hasMore = false;
       }
 
       this.logger.info(`Synced ${activitiesAdded} reviews for ${repository}`);
