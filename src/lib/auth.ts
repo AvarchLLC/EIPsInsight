@@ -4,9 +4,15 @@ import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.ADMIN_JWT_SECRET || 'fallback-secret-change-in-production'
-);
+const adminJwtSecret = process.env.ADMIN_JWT_SECRET;
+
+if (!adminJwtSecret || adminJwtSecret.trim().length < 32) {
+  throw new Error(
+    'ADMIN_JWT_SECRET must be set to a strong secret (at least 32 characters).'
+  );
+}
+
+const JWT_SECRET = new TextEncoder().encode(adminJwtSecret);
 
 export interface AdminSession {
   userId: string;
