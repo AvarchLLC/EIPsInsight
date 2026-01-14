@@ -1,11 +1,11 @@
 
-# EIPs Insights
+# EIPs Insight
 
-Welcome to the Ethereum Insight Proposals (EIPs) Insights! This project aims to provide a user-friendly website that offers insights into Ethereum Improvement Proposals (EIPs) while also covering the contents of the official [ethereum/EIPs](https://github.com/ethereum/EIPs) repository. EIPs are design documents that provide information about new features, standards, and protocols for the Ethereum platform.
+Welcome to the Ethereum Improvement Proposals (EIPs) Insight! This project aims to provide a user-friendly website that offers insights into Ethereum Improvement Proposals (EIPs) while also covering the contents of the official [ethereum/EIPs](https://github.com/ethereum/EIPs) repository. EIPs are design documents that provide information about new features, standards, and protocols for the Ethereum platform.
 
 # Project Overview
 
-The Ethereum Insight Proposals Insights serves as a central hub for browsing and exploring the various EIPs that have been proposed for Ethereum. The website offers features such as:
+The Ethereum Improvement Proposals Insight serves as a central hub for browsing and exploring the various EIPs that have been proposed for Ethereum. The website offers features such as:
 
 - A searchable and filterable list of EIPs.
 - Detailed information about each EIP, including its status, author, and description.
@@ -15,7 +15,7 @@ The Ethereum Insight Proposals Insights serves as a central hub for browsing and
 
 # How to Contribute
 
-We welcome contributions from the community to enhance and improve the Ethereum Insight Proposals Explorer. If you're interested in contributing, here's how you can get started:
+We welcome contributions from the community to enhance and improve the Ethereum Improvement Proposals Explorer. If you're interested in contributing, here's how you can get started:
 
 ## 1. Clone the Repository
 First, clone this repository to your local machine using the following command:
@@ -52,7 +52,7 @@ When you're ready to submit your changes, follow these steps:
 
 # Deployment with Vercel
 
-The Ethereum Insight Proposals Insights is deployed using Vercel for seamless hosting and continuous deployment. The deployment process is automated through GitHub integration. When changes are pushed to the main branch, Vercel automatically builds and deploys the updated website.
+The Ethereum Improvement Proposals Insight is deployed using Vercel for seamless hosting and continuous deployment. The deployment process is automated through GitHub integration. When changes are pushed to the main branch, Vercel automatically builds and deploys the updated website.
 
 
 ## Contributors
@@ -65,7 +65,6 @@ The Ethereum Insight Proposals Insights is deployed using Vercel for seamless ho
 
 ---
 
-Thank you for your interest in the Ethereum Insight Proposals Insights. Let's work together to make Ethereum even better through collaborative development and insightful proposals. If you have any questions or need assistance, feel free to open an issue or reach out to us.
+Thank you for your interest in the Ethereum Improvement Proposals Insight. Let's work together to make Ethereum even better through collaborative development and insightful proposals. If you have any questions or need assistance, feel free to open an issue or reach out to us.
 
 Happy build! 🚀🌐
-

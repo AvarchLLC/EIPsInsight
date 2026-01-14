@@ -310,7 +310,7 @@ const generateCSVData = () => {
     return;
   }
 
-  console.log("recieved data:",data2)
+  console.log("received data:",data2)
 
   const csv = data2?.map((pr: PR) => ({
       PR_Number: pr.prNumber,
