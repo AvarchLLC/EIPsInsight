@@ -334,11 +334,11 @@ const normalizeRequires = (requiresValue: TemplateData["requires"]): string[] =>
     return requiresValue
       .split(",")
       .map((value) => value.trim())
-      .filter((value) => value);
+      .filter((value): value is string => Boolean(value));
   }
 
   if (Array.isArray(requiresValue)) {
-    return requiresValue.filter(
+    return (requiresValue as string[]).filter(
       (value): value is string => Boolean(value && typeof value === "string")
     );
   }

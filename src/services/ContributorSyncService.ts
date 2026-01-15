@@ -420,7 +420,10 @@ export class ContributorSyncService {
           break;
         }
 
-        const entityRefs = prs.map((pr) => `pr:${pr.number}`);
+        interface PR {
+          number: number;
+        }
+        const entityRefs: string[] = (prs as PR[]).map((pr) => `pr:${pr.number}`);
         const existingDocs = await db
           .collection("activities")
           .find({ entityRef: { $in: entityRefs }, repository })
