@@ -1716,6 +1716,7 @@ const glamsterdamScheduledData = [
 ];
 
 // CFI (Considered for Inclusion) EIPs for Glamsterdam
+// CFI (Considered for Inclusion) EIPs for Glamsterdam
 const glamsterdamData = [
   {
     eip: "2780",
@@ -1725,6 +1726,15 @@ const glamsterdamData = [
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-2780-reduce-intrinsic-cost-of-transactions/4413"
+  },
+  {
+    eip: "7688",
+    title: "Forward compatible consensus data structures",
+    author: "Etan Kissling (@ekissling), Consensus Layer Developers",
+    link: "https://eipsinsight.com/eips/eip-7688",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7688-forward-compatible-consensus-data-structures/22215"
   },
   {
     eip: "7708",
@@ -1743,15 +1753,6 @@ const glamsterdamData = [
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-7778-prevent-block-gas-smuggling/21234"
-  },
-  {
-    eip: "7805",
-    title: "Fork-choice enforced Inclusion Lists (FOCIL)",
-    author: "Thomas Thiery (@soispoke), Vitalik Buterin (@vbuterin), Mike Neuder (@michaelneuder), Justin Drake (@justindrake), Francesco D'Amato (@fradamt)",
-    link: "https://eipsinsight.com/eips/eip-7805",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7805-fork-choice-enforced-inclusion-lists-focil/21208"
   },
   {
     eip: "7843",
@@ -1790,6 +1791,15 @@ const glamsterdamData = [
     discussion: "https://ethereum-magicians.org/t/eip-7981-increase-access-list-cost/24680"
   },
   {
+    eip: "7997",
+    title: "Deterministic Factory Predeploy",
+    author: "Danno Ferrin (@shemnon)",
+    link: "https://eipsinsight.com/eips/eip-7997",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-7997-disallow-create-and-create2-to-deploy-empty-initcode/25021"
+  },
+  {
     eip: "8024",
     title: "Backward compatible SWAPN, DUPN, EXCHANGE",
     author: "Francisco Giordano (@frangio), Charles Cooper (@charles-cooper), Alex Beregszaszi (@axic)",
@@ -1815,29 +1825,39 @@ const glamsterdamData = [
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-8045-exclude-slashed-validators-from-proposing/25850"
+  },
+  {
+    eip: "8061",
+    title: "Increase exit and consolidation churn",
+    author: "Francesco D'Amato (@fradamt), Anders Elowsson (@anderselowsson)",
+    link: "https://eipsinsight.com/eips/eip-8061",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-8061-increase-churn-limits/25991"
+  },
+  {
+    eip: "8070",
+    title: "Sparse Blobpool",
+    author: "Raúl Kripalani (@raulk), Bosul Mun (@healthykim), Francesco D'Amato (@fradamt)",
+    link: "https://eipsinsight.com/eips/eip-8070",
+    type: "Standards Track",
+    category: "Networking",
+    discussion: "https://ethereum-magicians.org/t/eip-8070-sparse-blobpool/26023"
+  },
+  {
+    eip: "8080",
+    title: "Let exits use the consolidation queue",
+    author: "Francesco D'Amato (@fradamt)",
+    link: "https://eipsinsight.com/eips/eip-8080",
+    type: "Standards Track",
+    category: "Core",
+    discussion: "https://ethereum-magicians.org/t/eip-8080-let-exits-use-the-consolidation-queue/26552"
   }
 ];
 
 // PFI (Proposed for Inclusion) EIPs for Glamsterdam
+// PFI (Proposed for Inclusion) EIPs for Glamsterdam
 const glamsterdamProposedData = [
-  {
-    eip: "2780",
-    title: "Reduce intrinsic transaction gas",
-    author: "Matt Garnett (@lightclient), Uri Klarman (@uriklarman), Ben Adams (@benaadams)",
-    link: "https://eipsinsight.com/eips/eip-2780",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-2780-reduce-intrinsic-cost-of-transactions/4413"
-  },
-  {
-    eip: "2926",
-    title: "Chunk-based code merkelization",
-    author: "Alexey Akhunov (@AlexeyAkhunov), Sina Mahmoodi (@s1na)",
-    link: "https://eipsinsight.com/eips/eip-2926",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-2926-chunk-based-code-merkleization/4555"
-  },
   {
     eip: "5920",
     title: "PAY opcode",
@@ -1855,33 +1875,6 @@ const glamsterdamProposedData = [
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-7610-revert-creation-in-case-of-non-empty-storage/18938"
-  },
-  {
-    eip: "7668",
-    title: "Remove bloom filters",
-    author: "Vitalik Buterin (@vbuterin)",
-    link: "https://eipsinsight.com/eips/eip-7668",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7653-remove-bloom-filters/19447"
-  },
-  {
-    eip: "7688",
-    title: "Forward compatible consensus data structures",
-    author: "Etan Kissling (@ekissling), Consensus Layer Developers",
-    link: "https://eipsinsight.com/eips/eip-7688",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7688-forward-compatible-consensus-data-structures/22215"
-  },
-  {
-    eip: "7745",
-    title: "Trustless log index",
-    author: "Péter Garamvölgyi (@chfast), Matt Garnett (@lightclient)",
-    link: "https://eipsinsight.com/eips/eip-7745",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7745-two-dimensional-log-filter-data-structure/21313"
   },
   {
     eip: "7793",
@@ -1911,15 +1904,6 @@ const glamsterdamProposedData = [
     discussion: "https://ethereum-magicians.org/t/remove-initcode-size-limit/23066"
   },
   {
-    eip: "7904",
-    title: "General Repricing",
-    author: "Jacek Glen (@JacekGlen), Lukasz Glen (@lukasz-glen), Maria Silva (@misilva73)",
-    link: "https://eipsinsight.com/eips/eip-7904",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/gas-cost-repricing-to-reflect-computational-complexity/23067"
-  },
-  {
     eip: "7907",
     title: "Meter Contract Code Size And Increase Limit",
     author: "Jacek Glen (@JacekGlen)",
@@ -1940,52 +1924,16 @@ const glamsterdamProposedData = [
   {
     eip: "7971",
     title: "Hard Limits for Transient Storage",
-    author: "Charles Cooper (@charles-cooper), Ben Adams (@benaadams), Maria Silva (@misilva73), Jochem Brouwer (@jochem-brouwer)",
+    author: "Charles Cooper (@charles-cooper), Ben Adams (@benaadams)",
     link: "https://eipsinsight.com/eips/eip-7971",
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/add-eip-hard-limit-and-cost-reduction-for-transient-storage-allocation/24542"
   },
   {
-    eip: "7973",
-    title: "Warm Account Write Metering",
-    author: "Pascal Caversaccio (@pcaversaccio)",
-    link: "https://eipsinsight.com/eips/eip-7973",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7973-prevent-overwriting-existing-storage-keys-in-the-same-transaction/24571"
-  },
-  {
-    eip: "7976",
-    title: "Increase Calldata Floor Cost",
-    author: "Toni Wahrstätter (@nerolation)",
-    link: "https://eipsinsight.com/eips/eip-7976",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7976-further-increase-calldata-cost/24597"
-  },
-  {
-    eip: "7981",
-    title: "Increase Access List Cost",
-    author: "Toni Wahrstätter (@nerolation)",
-    link: "https://eipsinsight.com/eips/eip-7981",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7981-increase-access-list-cost/24680"
-  },
-  {
-    eip: "7997",
-    title: "Deterministic Factory Predeploy",
-    author: "Danno Ferrin (@shemnon)",
-    link: "https://eipsinsight.com/eips/eip-7997",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-7997-disallow-create-and-create2-to-deploy-empty-initcode/25021"
-  },
-  {
     eip: "8032",
     title: "Size-Based Storage Gas Pricing",
-    author: "Guillaume Ballet (@gballet), Ignacio Hagopian (@jsign), Gottfried Herold (@GottfriedHerold), Jamie Lokier (@jlokier)",
+    author: "Guillaume Ballet (@gballet), Ignacio Hagopian (@jsign)",
     link: "https://eipsinsight.com/eips/eip-8032",
     type: "Standards Track",
     category: "Core",
@@ -1994,20 +1942,11 @@ const glamsterdamProposedData = [
   {
     eip: "8037",
     title: "State Creation Gas Cost Increase",
-    author: "Mikhail Kalinin (@mkalinin), Francesco D'Amato (@fradamt), Aditya Asgaonkar (@adiasg)",
+    author: "Mikhail Kalinin (@mkalinin), Francesco D'Amato (@fradamt)",
     link: "https://eipsinsight.com/eips/eip-8037",
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/uncouple-execution-payload-from-beacon-block/23029"
-  },
-  {
-    eip: "8038",
-    title: "State-access gas cost increase",
-    author: "Maria Silva (@misilva73), Wei Han Ng (@weiihann), Ansgar Dietrichs (@adietrichs)",
-    link: "https://eipsinsight.com/eips/eip-8038",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8038-state-access-gas-cost-update/25693"
   },
   {
     eip: "8051",
@@ -2017,44 +1956,9 @@ const glamsterdamProposedData = [
     type: "Standards Track",
     category: "Core",
     discussion: "https://ethereum-magicians.org/t/eip-8051-precompile-for-ml-dsa/25800"
-  },
-  {
-    eip: "8058",
-    title: "Contract Bytecode Deduplication Discount",
-    author: "Danno Ferrin (@shemnon)",
-    link: "https://eipsinsight.com/eips/eip-8058",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8058-restrict-initcode-to-2-24/25947"
-  },
-  {
-    eip: "8061",
-    title: "Increase exit and consolidation churn",
-    author: "Francesco D'Amato (@fradamt), Anders Elowsson (@anderselowsson)",
-    link: "https://eipsinsight.com/eips/eip-8061",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8061-increase-churn-limits/25991"
-  },
-  {
-    eip: "8070",
-    title: "Sparse Blobpool",
-    author: "Raúl Kripalani (@raulk), Bosul Mun (@healthykim), Francesco D'Amato (@fradamt), Csaba Kiraly (@cskiraly), Felix Lange (@fjl), Marios Ioannou (@mariosioannou-create), Alex Stokes (@ralexstokes)",
-    link: "https://eipsinsight.com/eips/eip-8070",
-    type: "Standards Track",
-    category: "Networking",
-    discussion: "https://ethereum-magicians.org/t/eip-8070-sparse-blobpool/26023"
-  },
-  {
-    eip: "8080",
-    title: "Let exits use the consolidation queue",
-    author: "Francesco D'Amato (@fradamt)",
-    link: "https://eipsinsight.com/eips/eip-8080",
-    type: "Standards Track",
-    category: "Core",
-    discussion: "https://ethereum-magicians.org/t/eip-8080-let-exits-use-the-consolidation-queue/26552"
   }
 ];
+
 
   const fusakaData = [
     {
@@ -2268,7 +2172,7 @@ return (
           <AdHeader
             title="Ethereum Network Upgrades"
             emoji="⚡"
-            headingLevel="h2"
+            headingLevel="h3"
           />
 
           {/* Timeline Section */}
@@ -2312,13 +2216,14 @@ return (
           </Box>
 
           {/* Stats Cards & Flowchart Section */}
-          <Grid
-            id="network-stats"
-            templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
-            gap={5}
-            mb={5}
-            alignItems="start"
-          >
+<Grid
+  id="network-stats"
+  templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
+  gap={5}
+  mb={5}
+  alignItems="stretch"   // ⭐ KEY LINE
+>
+
             {/* Left: Stats Cards */}
             <GridItem display="flex">
               <VStack spacing={4} w="100%">
@@ -2341,7 +2246,7 @@ return (
                   <Stat>
                     <HStack spacing={2} mb={2}>
                       <Icon as={FaRocket} boxSize={5} color="blue.500" />
-                      <StatLabel fontSize="md" fontWeight="600" color={useColorModeValue('gray.600', 'gray.400')} >
+                      <StatLabel fontSize="18px" fontWeight="medium" color={useColorModeValue('gray.600', 'gray.400')} >
                         Total Network Upgrades
                       </StatLabel>
                     </HStack>
@@ -2373,7 +2278,7 @@ return (
                     <Stat>
                       <HStack spacing={2} mb={2}>
                         <Icon as={FaCode} boxSize={5} color="green.500" />
-                        <StatLabel fontSize="md" fontWeight="600" color={useColorModeValue('gray.600', 'gray.400')} >
+                        <StatLabel fontSize="18px" fontWeight="medium" color={useColorModeValue('gray.600', 'gray.400')} >
                           Execution Layer
                         </StatLabel>
                       </HStack>
@@ -2404,7 +2309,7 @@ return (
                     <Stat>
                       <HStack spacing={2} mb={2}>
                         <Icon as={FaLayerGroup} boxSize={5} color="purple.500" />
-                        <StatLabel fontSize="md" fontWeight="600" color={useColorModeValue('gray.600', 'gray.400')} >
+                        <StatLabel fontSize="18px" fontWeight="medium" color={useColorModeValue('gray.600', 'gray.400')} >
                           Consensus Layer
                         </StatLabel>
                       </HStack>
@@ -2437,7 +2342,7 @@ return (
                   <Stat>
                     <HStack spacing={2} mb={2}>
                       <Icon as={FaNetworkWired} boxSize={5} color="orange.500" />
-                      <StatLabel fontSize="md" fontWeight="600" color={useColorModeValue('gray.600', 'gray.400')} >
+                      <StatLabel fontSize="18px" fontWeight="medium" color={useColorModeValue('gray.600', 'gray.400')} >
                         Total Core EIPs
                       </StatLabel>
                     </HStack>
@@ -2453,48 +2358,32 @@ return (
             </GridItem>
 
             {/* Right: EIP Inclusion Flowchart */}
-            <GridItem display={{ base: 'none', lg: 'block' }}>
-              <Box
-                bg={useColorModeValue('gray.50', 'gray.900')}
-                borderRadius="xl"
-                overflow="hidden"
-                border="2px solid"
-                borderColor={useColorModeValue('gray.200', 'gray.700')}
-                boxShadow="md"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                w="100%"
-                h="100%"
-                maxH="500px"
-                position="relative"
-              >
-                <Image
-                  src="/stages/eip-incl.png"
-                  alt="EIP Inclusion Process Flowchart"
-                  w="100%"
-                  h="100%"
-                  objectFit="cover"
-                  objectPosition="center"
-                  fallback={
-                    <Box
-                      w="100%"
-                      h="100%"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      border="1px dashed"
-                      borderColor={useColorModeValue('gray.300', 'gray.600')}
-                      borderRadius="lg"
-                    >
-                      <Text fontSize="md" color={useColorModeValue('gray.500', 'gray.400')} textAlign="center" >
-                        EIP inclusion flowchart unavailable
-                      </Text>
-                    </Box>
-                  }
-                />
-              </Box>
-            </GridItem>
+          <GridItem display={{ base: 'none', lg: 'block' }}>
+  <Box
+    bg={useColorModeValue('gray.50', 'gray.900')}
+    borderRadius="xl"
+    overflow="hidden"
+    border="2px solid"
+    borderColor={useColorModeValue('gray.200', 'gray.700')}
+    boxShadow="md"
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
+    w="100%"
+    h="100%"            // ⭐ stretch to match left column
+    p={4}               // breathing room
+  >
+    <Image
+      src="/stages/eip-incl.png"
+      alt="EIP Inclusion Process Flowchart"
+      w="100%"
+      h="100%"
+      objectFit="contain"   // ⭐ diagrams ≠ cover images
+      objectPosition="center"
+    />
+  </Box>
+</GridItem>
+
 
             {/* Mobile: EIP Inclusion Flowchart */}
             <GridItem display={{ base: 'block', lg: 'none' }} colSpan={1}>
@@ -2552,16 +2441,11 @@ return (
           {/* Upgrade Selector Section */}
           <Box
             id="select-upgrade"
-            bg={useColorModeValue("white", "gray.800")}
-            borderRadius="xl"
-            boxShadow="sm"
-            border="1px solid"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
             p={4}
             mb={5}
           >
             <Flex alignItems="center" mb={4}>
-              <Heading size="md" mr={2}>Select Network Upgrade</Heading>
+              <Heading fontSize="28px" fontWeight="semibold" color="#48D1CC" mr={2}>Select Network Upgrade</Heading>
               <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#select-upgrade`} />
             </Flex>
             
@@ -2586,9 +2470,6 @@ return (
                 </Select>
               </Box>
               
-              <Box flex={{ base: '1', lg: '1' }} maxW={{ base: '100%', lg: '400px' }}>
-                <CloseableAdCard />
-              </Box>
             </Flex>
             
             {/* FUSAKA Countdown - Only show when Fusaka is selected */}
@@ -2612,7 +2493,7 @@ return (
               id="NetworkUpgrades"
             >
               <Flex alignItems="center" mb={4}>
-                <Heading size="lg" mr={2}>Network Upgrade Inclusion Stages</Heading>
+                <Heading fontSize="36px" fontWeight="bold" color="#40E0D0" mr={2}>Network Upgrade Inclusion Stages</Heading>
                 <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#NetworkUpgrades`} />
               </Flex>
               <UpgradesTimeline
@@ -2638,7 +2519,7 @@ return (
             mb={5}
           >
             <Flex alignItems="center" mb={4}>
-              <Heading size="lg" mr={2}>About {selectedOption === 'pectra' ? 'Pectra' : selectedOption === 'fusaka' ? 'Fusaka' : selectedOption === 'hegota' ? 'Hegotá' : 'Glamsterdam'}</Heading>
+              <Heading fontSize="36px" fontWeight="bold" color="#40E0D0" mr={2}>About {selectedOption === 'pectra' ? 'Pectra' : selectedOption === 'fusaka' ? 'Fusaka' : selectedOption === 'hegota' ? 'Hegotá' : 'Glamsterdam'}</Heading>
               <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#upgrade-description`} />
             </Flex>
             {selectedOption === 'pectra' ? (
@@ -2743,7 +2624,7 @@ return (
               id="upgrade-blogs"
             >
               <Flex alignItems="center" mb={4}>
-                <Heading size="lg" mr={2}>Related Articles</Heading>
+                <Heading fontSize="36px" fontWeight="bold" color="#40E0D0" mr={2}>Related Articles</Heading>
                 <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#upgrade-blogs`} />
               </Flex>
               <Box w="100%" position="relative">
@@ -2762,7 +2643,7 @@ return (
                     <button
                       onClick={clickHandler}
                       disabled={!hasPrev}
-                      className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-gray-700/90 rounded-full p-2 shadow-lg hover:bg-white dark:hover:bg-gray-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="absolute z-10 p-2 transition-all -translate-y-1/2 rounded-full shadow-lg -left-3 top-1/2 bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -2773,7 +2654,7 @@ return (
                     <button
                       onClick={clickHandler}
                       disabled={!hasNext}
-                      className="absolute -right-3 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-gray-700/90 rounded-full p-2 shadow-lg hover:bg-white dark:hover:bg-gray-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="absolute z-10 p-2 transition-all -translate-y-1/2 rounded-full shadow-lg -right-3 top-1/2 bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -2846,7 +2727,7 @@ return (
               mb={5}
             >
               <Flex alignItems="center" mb={4}>
-                <Heading size="lg" mr={2}>EIP Status Overview</Heading>
+                <Heading fontSize="36px" fontWeight="bold" color="#40E0D0" mr={2}>EIP Status Overview</Heading>
                 <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#eip-status`} />
               </Flex>
               {selectedOption === 'glamsterdam' ? (
@@ -2904,7 +2785,7 @@ return (
               mb={5}
             >
               <Flex alignItems="center" mb={4}>
-                <Heading size="lg" mr={2}>Declined for Inclusion</Heading>
+                <Heading fontSize="36px" fontWeight="bold" color="#40E0D0" mr={2}>Declined for Inclusion</Heading>
                 <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#declined-eips`} />
               </Flex>
               <DeclinedEIPListPage selectedUpgrade={selectedOption} />
@@ -2937,7 +2818,7 @@ return (
             mb={5}
           >
             <Flex alignItems="center" mb={4} id="NetworkUpgradesChartp">
-              <Heading size="lg" mr={2} color="#00CED1">
+              <Heading fontSize="36px" fontWeight="bold" color="#40E0D0" mr={2}>
                 Network Upgrades and EIPs Relationship Graph
               </Heading>
               <CopyLink link={`${typeof window !== 'undefined' ? window.location.origin : ''}/upgrade#NetworkUpgradesChartp`} />
