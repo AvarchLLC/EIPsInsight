@@ -16,9 +16,6 @@ interface ZoomableTimelineProps {
 
 const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Timeline' }) => {
   const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
@@ -34,37 +31,8 @@ const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Tim
 
   const handleReset = () => {
     setScale(1);
-    setPosition({ x: 0, y: 0 });
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (scale > 1) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      });
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && scale > 1) {
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setScale(prev => Math.max(0.5, Math.min(3, prev + delta)));
-  };
 
   return (
     <Box position="relative">
@@ -79,18 +47,12 @@ const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Tim
         position="relative"
         width="100%"
         height={{ base: '400px', md: '500px', lg: '600px' }}
-        cursor={scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
+        transition="all 0.2s ease"
+        boxShadow="sm"
         _hover={{
           borderColor: useColorModeValue('blue.400', 'blue.500'),
           boxShadow: useColorModeValue('0 4px 12px rgba(0,0,0,0.1)', '0 4px 12px rgba(0,0,0,0.3)')
         }}
-        transition="all 0.2s ease"
-        boxShadow="sm"
       >
         {/* Zoom Controls - Overlaid on image */}
         <HStack 
@@ -145,8 +107,8 @@ const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Tim
           position="absolute"
           top="50%"
           left="50%"
-          transform={`translate(-50%, -50%) translate(${position.x}px, ${position.y}px) scale(${scale})`}
-          transition={isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'}
+          transform={`translate(-50%, -50%) scale(${scale})`}
+          transition={'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'}
           width="100%"
           maxWidth="100%"
         >
