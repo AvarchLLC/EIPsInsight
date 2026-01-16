@@ -1,25 +1,19 @@
-
 ---
 title: "EL EIPs Under Spotlight as Glamsterdam Devnet 2 Narrows Upgrade Scope"
 slug: "el-eips-under-spotlight-as-glamsterdam-devnet-2-narrows-upgrade-scope"
 date: 2026-01-16
 author: "Yash Kamal Chaturvedi"
 category: "Ethereum Upgrades"
-tags: ["Ethereum", "Glamsterdam", "Devnet", "EIPs", "Execution Layer", "Protocol Upgrades", "Governance"]
+tags: ["Ethereum","Glamsterdam","Devnet","EIPs","Execution Layer","Protocol Upgrades","Governance"]
 readTime: 6
 featured: true
 excerpt: "A significant portion of recent developer discussions focused on refining the scope of Glamsterdam Devnet 2, with attention centered on execution layer EIPs already under testing or partial implementation. No proposal was fast-tracked, reinforcing a preference for disciplined scope control over feature expansion."
-image: "/blogs/el-eips-under-spotlight.png"
+image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/el-eips-under-spotlight.png"
 authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
 authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
 authorTwitter: "https://x.com/YashKamalChatu1"
 authorLinkedin: "https://etherworld.co/author/yash-kamal-chaturvedi/"
 authorGithub: "https://github.com/yashkamalchaturvedi"
-summaryPoints:
-	- "Glamsterdam Devnet 2 discussions focused on execution layer EIPs and scope discipline."
-	- "No EIP was fast-tracked, highlighting a preference for stability over rapid feature expansion."
-	- "Key EIPs discussed: 7778, 8024, 7708, 7843."
-	- "Developers emphasized the wide-ranging impact of even modest execution changes."
 ---
 
 # EL EIPs Under Spotlight as Glamsterdam Devnet 2 Narrows Upgrade Scope
@@ -28,10 +22,11 @@ A significant portion of recent developer discussions focused on refining the sc
 
 As a result, no proposal was fast-tracked, reinforcing a preference for disciplined scope control over feature expansion.
 
-- [EIP-7778: Block Gas Accounting without Refunds](#eip-7778-block-gas-accounting-without-refunds)
-- [EIP-8024: Backward compatible SWAPN, DUPN, EXCHANGE](#eip-8024-opcode-compatibility-challenges)
-- [EIP-7708: ETH transfers emit a log](#eip-7708-eth-transfers-emitting-logs)
-- [EIP-7843: SLOTNUM Opcode](#eip-7843-slotnum-opcode-discussion)
+- [EL EIPs Under Spotlight as Glamsterdam Devnet 2 Narrows Upgrade Scope](#el-eips-under-spotlight-as-glamsterdam-devnet-2-narrows-upgrade-scope)
+	- [EIP-7778: Block Gas Accounting without Refunds](#eip-7778-block-gas-accounting-without-refunds)
+	- [EIP-8024: Backward compatible SWAPN, DUPN, EXCHANGE](#eip-8024-backward-compatible-swapn-dupn-exchange)
+	- [EIP-7708: ETH transfers emit a log](#eip-7708-eth-transfers-emit-a-log)
+	- [EIP-7843: SLOTNUM Opcode](#eip-7843-slotnum-opcode)
 
 ## EIP-7778: Block Gas Accounting without Refunds
 
