@@ -5,7 +5,14 @@ slug: "glamsterdams-remaining-pfi-decisions-favor-caution-over-ambition"
 date: 2026-01-16
 author: "Yash Kamal Chaturvedi"
 category: "Ethereum Upgrades"
-tags: ["Ethereum", "Glamsterdam", "PFI", "Protocol Upgrades", "Governance", "Execution Layer", "State Growth"]
+tags:
+	- "Ethereum"
+	- "Glamsterdam"
+	- "PFI"
+	- "Protocol Upgrades"
+	- "Governance"
+	- "Execution Layer"
+	- "State Growth"
 readTime: 6
 featured: true
 excerpt: "As the Glamsterdam upgrade approaches finalization, the remaining PFI (Proposed for Inclusion) decisions highlight a shift toward scope discipline, with developers prioritizing client readiness, maintainability, and execution safety over late-stage feature expansion."
@@ -28,9 +35,10 @@ As the [Glamsterdam](https://etherworld.co/tag/glamsterdam/) upgrade approaches 
 
 These discussions mark the point where early ideas give way to firm commitments, forcing developers to weigh ambition against delivery risk.
 
-- [EIP-8037 & the State Growth Dilemma](#eip-8037--the-state-growth-dilemma)
-- [Execution Risk Pushes Conditional & Opcode Changes Out](#execution-risk-pushes-conditional--opcode-changes-out)
-- [Long-Term Ideas Deemed Too Early for Glamsterdam](#long-term-ideas-deemed-too-early-for-glamsterdam)
+- [Glamsterdam's Remaining PFI Decisions Favor Caution Over Ambition](#glamsterdams-remaining-pfi-decisions-favor-caution-over-ambition)
+  - [EIP-8037 \& the State Growth Dilemma](#eip-8037--the-state-growth-dilemma)
+  - [Execution Risk Pushes Conditional \& Opcode Changes Out](#execution-risk-pushes-conditional--opcode-changes-out)
+  - [Long-Term Ideas Deemed Too Early for Glamsterdam](#long-term-ideas-deemed-too-early-for-glamsterdam)
 
 ## EIP-8037 & the State Growth Dilemma
 
