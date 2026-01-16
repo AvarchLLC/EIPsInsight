@@ -382,6 +382,13 @@ const ResourcesPage: React.FC = () => {
       tag: "Ethereum Upgrades"
     },
     {
+      image: "/blogs/el-eips-under-spotlight.png",
+      title: "EL EIPs Under Spotlight as Glamsterdam Devnet 2 Narrows Upgrade Scope",
+      content: "A significant portion of recent developer discussions focused on refining the scope of Glamsterdam Devnet 2, with attention centered on execution layer EIPs already under testing or partial implementation. Developers repeatedly emphasized that even seemingly modest execution changes can have wide-ranging implications across client codebases, tooling, and analytics infrastructure. As a result, no proposal was fast-tracked, reinforcing a preference for disciplined scope control over feature expansion.",
+      link: "/Blogs/el-eips-under-spotlight-as-glamsterdam-devnet-2-narrows-upgrade-scope",
+      tag: "Ethereum Upgrades"
+    },
+    {
       image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/ethereum-acdg.png",
       title: "Ethereum Introduces ACDG to Bring Structure to Governance Discussions",
       content: "Ethereum core developers introduce ACDG (All Core Devs Governance) to formalize governance discussions, bringing structure and visibility to decision-making processes that have historically been scattered across multiple platforms.",

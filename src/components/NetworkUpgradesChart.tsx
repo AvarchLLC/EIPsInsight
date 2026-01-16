@@ -244,7 +244,7 @@ const rawData: UpgradeData[] = [
   },
 
   // Fulu — December 3, 2025 (Consensus layer)
-  { date: "2025-12-03", upgrade: "Fulu", layer: "consensus", forkEpoch: 411392, eips: ["CONSENSUS"] },
+  // { date: "2025-12-03", upgrade: "Fulu", layer: "consensus", forkEpoch: 411392, eips: ["CONSENSUS"] },
 
   // Prague — May 7, 2025 (Execution layer)
   { 
@@ -256,7 +256,7 @@ const rawData: UpgradeData[] = [
   },
 
   // Electra — May 7, 2025 (Consensus layer)
-  { date: "2025-05-07", upgrade: "Electra", layer: "consensus", forkEpoch: 364032, eips: ["CONSENSUS"] },
+  // { date: "2025-05-07", upgrade: "Electra", layer: "consensus", forkEpoch: 364032, eips: ["CONSENSUS"] },
 
   // Cancun — March 13, 2024 (Execution layer)
   { 
@@ -264,11 +264,11 @@ const rawData: UpgradeData[] = [
     upgrade: "Cancun", 
     layer: "execution",
     blockNumber: 19426587,
-    eips: ["EIP-1153", "EIP-4788", "EIP-4844", "EIP-5656", "EIP-6780", "EIP-7516"]
+    eips: ["EIP-1153", "EIP-4788", "EIP-4844", "EIP-5656", "EIP-6780", "EIP-7044", "EIP-7045", "EIP-7514","EIP-7516",]
   },
 
   // Deneb — March 13, 2024 (Consensus layer)
-  { date: "2024-03-13", upgrade: "Deneb", layer: "consensus", forkEpoch: 269568, eips: ["CONSENSUS","EIP-7044", "EIP-7045", "EIP-7514"] },
+  // { date: "2024-03-13", upgrade: "Deneb", layer: "consensus", forkEpoch: 269568, eips: ["CONSENSUS","EIP-7044", "EIP-7045", "EIP-7514"] },
 
   // Shanghai — April 12, 2023 (Execution layer)
   { 
@@ -280,7 +280,7 @@ const rawData: UpgradeData[] = [
   },
 
   // Capella — April 12, 2023 (Consensus layer)
-  { date: "2023-04-12", upgrade: "Capella", layer: "consensus", forkEpoch: 194048, eips: ["CONSENSUS"] },
+  // { date: "2023-04-12", upgrade: "Capella", layer: "consensus", forkEpoch: 194048, eips: ["CONSENSUS"] },
 
   // Paris (The Merge) — September 15, 2022 (Execution layer)
   { date: "2022-09-15", upgrade: "Paris", layer: "execution", blockNumber: 15537394, eips: ["EIP-3675", "EIP-4399"] },
