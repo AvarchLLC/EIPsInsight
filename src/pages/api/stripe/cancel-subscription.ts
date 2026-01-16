@@ -29,7 +29,7 @@ export default async function handler(
       email: session.user.email
     });
 
-    console.log("user data:",)
+    console.log("user data:", user);
 
     if (!user?.stripeCustomerId) {
       return res.status(400).json({ error: 'No subscription found' });
