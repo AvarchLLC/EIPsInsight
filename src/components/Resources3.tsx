@@ -382,6 +382,13 @@ const ResourcesPage: React.FC = () => {
       tag: "Ethereum Upgrades"
     },
     {
+      image: "/blogs/glamsterdams-remaining-pfi-decisions-favor-caution-over-ambition.png",
+      title: "Glamsterdam's Remaining PFI Decisions Favor Caution Over Ambition",
+      content: "As the Glamsterdam upgrade approaches finalization, the remaining PFI (Proposed for Inclusion) decisions highlight a shift toward scope discipline, with developers prioritizing client readiness, maintainability, and execution safety over late-stage feature expansion.",
+      link: "/Blogs/glamsterdams-remaining-pfi-decisions-favor-caution-over-ambition",
+      tag: "Ethereum Upgrades"
+    },
+    {
       image: "/blogs/el-eips-under-spotlight.png",
       title: "EL EIPs Under Spotlight as Glamsterdam Devnet 2 Narrows Upgrade Scope",
       content: "A significant portion of recent developer discussions focused on refining the scope of Glamsterdam Devnet 2, with attention centered on execution layer EIPs already under testing or partial implementation. Developers repeatedly emphasized that even seemingly modest execution changes can have wide-ranging implications across client codebases, tooling, and analytics infrastructure. As a result, no proposal was fast-tracked, reinforcing a preference for disciplined scope control over feature expansion.",
