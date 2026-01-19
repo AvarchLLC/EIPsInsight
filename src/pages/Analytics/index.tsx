@@ -484,8 +484,8 @@ const GitHubPRTracker: React.FC = () => {
           textAlign="center"
         >
           <Text
-            fontSize="lg"
-            fontWeight="bold"
+            fontSize="18px"
+            fontWeight="medium"
             color={useColorModeValue("blue.700", "blue.300")}
           >
             Total Filtered Count:{" "}
@@ -1788,7 +1788,7 @@ const GitHubPRTracker: React.FC = () => {
                 alignItems="center"
                 marginBottom="0.5rem"
               >
-                <Heading size="md" color={useColorModeValue('gray.800', 'white')} fontWeight="bold">
+                <Heading fontSize="36px" fontWeight="bold" color="#40E0D0">
                   {`Github PR Analytics (Monthly, since 2015)`}
                   <CopyLink
                     link={`https://eipsinsight.com//Analytics#GithubAnalytics`}
@@ -2082,7 +2082,7 @@ const GitHubPRTracker: React.FC = () => {
             <br />
             <hr></hr>
             <br />
-            <Text fontSize="3xl" fontWeight="bold">
+            <Text fontSize="36px" fontWeight="bold" color="#40E0D0">
               Comments
             </Text>
             <Comments page={"Analytics"} />

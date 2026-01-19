@@ -791,8 +791,9 @@ const DashboardPage = () => {
             <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
               <Heading
                 as="h2"
-                size="lg"
-                color={useColorModeValue("#3182CE", "blue.300")}
+                fontSize="36px"
+                fontWeight="bold"
+                color="#40E0D0"
               >
                 📋 {activeTab} BOARD ({filteredData.length})
               </Heading>
@@ -1063,7 +1064,7 @@ const DashboardPage = () => {
             <br />
             <hr></hr>
             <br />
-            <Text fontSize="3xl" fontWeight="bold">
+            <Text fontSize="36px" fontWeight="bold" color="#40E0D0">
               Comments
             </Text>
             <Comments page={"boards"} />
