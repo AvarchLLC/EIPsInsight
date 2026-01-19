@@ -195,13 +195,13 @@ const upgradeDescriptions: Record<string, string> = {
 };
 
 const professionalColorMap: Record<string, string> = {
-  "Osaka": "#10B981",             // Emerald 500 (2025-12-03) Execution
+  "Fusaka": "#10B981",             // Emerald 500 (2025-12-03) Execution
   "Fulu": "#10B981",              // Emerald 500 (2025-12-03) Consensus
-  "Prague": "#DC2626",            // Red 600 (2025-05-07) Execution
+  "Pectra": "#DC2626",            // Red 600 (2025-05-07) Execution
   "Electra": "#DC2626",           // Red 600 (2025-05-07) Consensus
-  "Cancun": "#2563EB",            // Blue 600 (2024-03-13) Execution
+  "Dencun": "#2563EB",            // Blue 600 (2024-03-13) Execution
   "Deneb": "#2563EB",             // Blue 600 (2024-03-13) Consensus
-  "Shanghai": "#059669",          // Emerald 600 (2023-04-12) Execution
+  "Shapella": "#059669",          // Emerald 600 (2023-04-12) Execution
   "Capella": "#059669",           // Emerald 600 (2023-04-12) Consensus
   "Paris": "#7C3AED",             // Violet 600 (2022-09-15)
   "Bellatrix": "#EA580C",         // Orange 600 (2022-09-06)
@@ -237,7 +237,7 @@ const rawData: UpgradeData[] = [
   // Osaka — December 3, 2025 (Execution layer)
   { 
     date: "2025-12-03", 
-    upgrade: "Osaka", 
+    upgrade: "Fusaka", 
     layer: "execution",
     blockNumber: 23935694,
     eips: ["EIP-7594", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7939", "EIP-7951"]
@@ -249,7 +249,7 @@ const rawData: UpgradeData[] = [
   // Prague — May 7, 2025 (Execution layer)
   { 
     date: "2025-05-07", 
-    upgrade: "Prague", 
+    upgrade: "Pectra", 
     layer: "execution",
     blockNumber: 22431084,
     eips: ["EIP-2537", "EIP-2935", "EIP-6110", "EIP-7002", "EIP-7251", "EIP-7549", "EIP-7623", "EIP-7685", "EIP-7691", "EIP-7702"]
@@ -261,7 +261,7 @@ const rawData: UpgradeData[] = [
   // Cancun — March 13, 2024 (Execution layer)
   { 
     date: "2024-03-13", 
-    upgrade: "Cancun", 
+    upgrade: "Dencun", 
     layer: "execution",
     blockNumber: 19426587,
     eips: ["EIP-1153", "EIP-4788", "EIP-4844", "EIP-5656", "EIP-6780", "EIP-7044", "EIP-7045", "EIP-7514","EIP-7516",]
@@ -273,7 +273,7 @@ const rawData: UpgradeData[] = [
   // Shanghai — April 12, 2023 (Execution layer)
   { 
     date: "2023-04-12", 
-    upgrade: "Shanghai", 
+    upgrade: "Shapella", 
     layer: "execution",
     blockNumber: 17034870,
     eips: ["EIP-3651", "EIP-3855", "EIP-3860", "EIP-4895"]

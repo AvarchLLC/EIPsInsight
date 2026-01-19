@@ -2357,32 +2357,13 @@ return (
               </VStack>
             </GridItem>
 
-            {/* Right: EIP Inclusion Flowchart */}
-          <GridItem display={{ base: 'none', lg: 'block' }}>
-  <Box
-    bg={useColorModeValue('gray.50', 'gray.900')}
-    borderRadius="xl"
-    overflow="hidden"
-    border="2px solid"
-    borderColor={useColorModeValue('gray.200', 'gray.700')}
-    boxShadow="md"
-    display="flex"
-    alignItems="center"
-    justifyContent="center"
-    w="100%"
-    h="100%"            // ⭐ stretch to match left column
-    p={4}               // breathing room
-  >
-    <Image
-      src="/stages/eip-incl.png"
-      alt="EIP Inclusion Process Flowchart"
-      w="100%"
-      h="100%"
-      objectFit="contain"   // ⭐ diagrams ≠ cover images
-      objectPosition="center"
-    />
-  </Box>
-</GridItem>
+            {/* Right: EIP Inclusion Flowchart (Zoomable controls like ZoomableTimeline) */}
+            <GridItem display={{ base: 'none', lg: 'block' }}>
+              <ZoomableTimeline
+                svgPath="/stages/eip-incl.png"
+                alt="EIP Inclusion Process Flowchart"
+              />
+            </GridItem>
 
 
             {/* Mobile: EIP Inclusion Flowchart */}
