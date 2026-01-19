@@ -94,6 +94,11 @@ const ReviewTracker = () => {
   const [Linechart, setLinechart] = useState<boolean>(true);
   const [loading4, setLoading4] = useState<boolean>(false);
   const [expandedCards, setExpandedCards] = useState<{ [key: string]: boolean }>({});
+  
+  // Time period filter for Leaderboard
+  const [leaderboardTimePeriod, setLeaderboardTimePeriod] = useState<'all' | 'week' | 'month' | 'year' | 'custom'>('all');
+  const [leaderboardCustomStart, setLeaderboardCustomStart] = useState<string>('');
+  const [leaderboardCustomEnd, setLeaderboardCustomEnd] = useState<string>('');
 
   const years = Array.from({ length: 2025 - 2015 + 1 }, (_, i) => (2025 - i).toString());
   const months = [
@@ -252,6 +257,7 @@ const ReviewTracker = () => {
     created_at?: string;
     closed_at?: string;
     merged_at?: string;
+    reviewComment?: string;
   };
 
   interface ColorsMap {
@@ -381,6 +387,91 @@ const generateCSVData9 = () => {
   }));
 
   setCsvData(csv); // Set the CSV data for reviewers
+};
+
+// Helper function to filter downloaddata by time period
+const filterDownloadDataByTimePeriod = (data: PR[], period: 'all' | 'week' | 'month' | 'year' | 'custom', customStart?: string, customEnd?: string): PR[] => {
+  if (period === 'all') {
+    return data;
+  }
+
+  const now = new Date();
+  let startDate: Date;
+  let endDate: Date = now;
+
+  switch (period) {
+    case 'week':
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      break;
+    case 'month':
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+    case 'year':
+      startDate = new Date(now.getFullYear(), 0, 1);
+      break;
+    case 'custom':
+      if (customStart && customEnd) {
+        startDate = new Date(customStart);
+        endDate = new Date(customEnd);
+        endDate.setHours(23, 59, 59, 999);
+      } else {
+        return data;
+      }
+      break;
+    default:
+      return data;
+  }
+
+  return data.filter((pr: PR) => {
+    if (!pr.reviewDate) return false;
+    const reviewDate = new Date(pr.reviewDate);
+    return reviewDate >= startDate && reviewDate <= endDate;
+  });
+};
+
+const generateCSVDataForLeaderboard = (isReviewer: boolean) => {
+  // Filter by reviewer/editor
+  let filteredData = isReviewer 
+    ? downloaddata?.filter((pr: PR) => reviewersList.includes(pr.reviewer))
+    : downloaddata?.filter((pr: PR) => !reviewersList.includes(pr.reviewer));
+
+  // Filter by time period
+  filteredData = filterDownloadDataByTimePeriod(
+    filteredData || [],
+    leaderboardTimePeriod,
+    leaderboardCustomStart,
+    leaderboardCustomEnd
+  );
+
+  // Sort by review date (most recent first)
+  filteredData = filteredData?.sort((a: PR, b: PR) => {
+    const dateA = a.reviewDate ? new Date(a.reviewDate).getTime() : 0;
+    const dateB = b.reviewDate ? new Date(b.reviewDate).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  let srNumber = 1;
+  const csv = filteredData?.map((pr: PR) => ({
+    "SR No.": srNumber++,
+    Repo: pr.repo || 'N/A',
+    PR_Number: pr.prNumber || 'N/A',
+    Title: pr.prTitle || 'N/A',
+    Reviewer: pr.reviewer || 'N/A',
+    Review_Date: pr.reviewDate ? new Date(pr.reviewDate).toISOString().split('T')[0] : '-',
+    Review_DateTime: pr.reviewDate ? new Date(pr.reviewDate).toLocaleString() : '-',
+    Created_Date: pr.created_at ? new Date(pr.created_at).toISOString().split('T')[0] : '-',
+    Created_DateTime: pr.created_at ? new Date(pr.created_at).toLocaleString() : '-',
+    Closed_Date: pr.closed_at ? new Date(pr.closed_at).toISOString().split('T')[0] : '-',
+    Closed_DateTime: pr.closed_at ? new Date(pr.closed_at).toLocaleString() : '-',
+    Merged_Date: pr.merged_at ? new Date(pr.merged_at).toISOString().split('T')[0] : '-',
+    Merged_DateTime: pr.merged_at ? new Date(pr.merged_at).toLocaleString() : '-',
+    Status: pr.merged_at ? 'Merged' : pr.closed_at ? 'Closed' : 'Open',
+    Review_Comment: pr.reviewComment || 'N/A',
+    PR_Link: `https://github.com/ethereum/${pr.repo}/pull/${pr.prNumber}`,
+    GitHub_Link: `https://github.com/ethereum/${pr.repo}`,
+  }));
+
+  setCsvData(csv || []);
 };
 
 const generateCSVData10 = () => {
@@ -767,6 +858,45 @@ const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) =>
 
 
 
+// Helper function to filter PRData by time period
+const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month' | 'year' | 'custom', customStart?: string, customEnd?: string): PRData[] => {
+  if (period === 'all') {
+    return data;
+  }
+
+  const now = new Date();
+  let startDate: Date;
+  let endDate: Date = now;
+
+  switch (period) {
+    case 'week':
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      break;
+    case 'month':
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+    case 'year':
+      startDate = new Date(now.getFullYear(), 0, 1);
+      break;
+    case 'custom':
+      if (customStart && customEnd) {
+        startDate = new Date(customStart);
+        endDate = new Date(customEnd);
+        endDate.setHours(23, 59, 59, 999); // Include entire end date
+      } else {
+        return data;
+      }
+      break;
+    default:
+      return data;
+  }
+
+  return data.filter(item => {
+    const itemDate = new Date(item.monthYear + '-01');
+    return itemDate >= startDate && itemDate <= endDate;
+  });
+};
+
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
   const reviewersList = helpers.REVIEWERS_LIST;
@@ -787,8 +917,11 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
     dataToUse = data;
   }
 
+  // Filter by time period
+  const filteredData = filterDataByTimePeriod(dataToUse, leaderboardTimePeriod, leaderboardCustomStart, leaderboardCustomEnd);
+
   // Get yearly data and format it
-  const yearlyData = helpers.getYearlyData(dataToUse, showReviewer);
+  const yearlyData = helpers.getYearlyData(filteredData, showReviewer);
   const yearlyChartData = helpers.formatChartData(yearlyData);
 
   // Verification logging for data consistency
@@ -800,19 +933,82 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   const reviewersData = yearlyChartData?.filter((item: any) => reviewersList.includes(item.reviewer));
   const editorsData = yearlyChartData?.filter((item: any) => !reviewersList.includes(item.reviewer));
 
+  // Get period label for title
+  const getPeriodLabel = () => {
+    switch (leaderboardTimePeriod) {
+      case 'week': return 'Last Week';
+      case 'month': return 'This Month';
+      case 'year': return 'This Year';
+      case 'custom': return 'Custom Period';
+      default: return 'All-Time';
+    }
+  };
+
   return (
     <Box padding={{ base: "1rem", md: "1.5rem" }}>
+      {/* Time Period Filter */}
+      <Box mb={4}>
+        <Flex direction={{ base: "column", md: "row" }} gap={4} alignItems={{ base: "stretch", md: "center" }} flexWrap="wrap">
+          <Select
+            value={leaderboardTimePeriod}
+            onChange={(e) => setLeaderboardTimePeriod(e.target.value as any)}
+            width={{ base: "100%", md: "200px" }}
+            colorScheme="blue"
+          >
+            <option value="all">All-Time</option>
+            <option value="week">Last Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="custom">Custom Range</option>
+          </Select>
+          
+          {leaderboardTimePeriod === 'custom' && (
+            <Flex gap={2} flexWrap="wrap" alignItems="center">
+              <Box>
+                <input
+                  type="date"
+                  value={leaderboardCustomStart}
+                  onChange={(e) => setLeaderboardCustomStart(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e0',
+                    fontSize: '14px',
+                    minWidth: '150px'
+                  }}
+                />
+              </Box>
+              <Text alignSelf="center" fontWeight="medium">to</Text>
+              <Box>
+                <input
+                  type="date"
+                  value={leaderboardCustomEnd}
+                  onChange={(e) => setLeaderboardCustomEnd(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e0',
+                    fontSize: '14px',
+                    minWidth: '150px'
+                  }}
+                />
+              </Box>
+            </Flex>
+          )}
+        </Flex>
+      </Box>
+
       <Flex direction={{ base: "column", md: "row" }} gap={{ base: "1rem", md: "1.5rem" }}>
         {/* Editors Leaderboard Grid */}
         <Box width={{ base: "100%", md: "50%" }}>
           <LeaderboardGrid
-            title="Editors - All-Time Contributions"
+            title={`Editors - ${getPeriodLabel()} Contributions`}
             data={editorsData}
             csvData={csvData}
-            csvFilename="editors_yearly_data.csv"
+            csvFilename={`editors_${leaderboardTimePeriod}_data.csv`}
             onDownloadCSV={async () => {
               try {
-                generateCSVData10();
+                generateCSVDataForLeaderboard(false);
                 await axios.post("/api/DownloadCounter");
               } catch (error) {
                 console.error("Error triggering download counter:", error);
@@ -831,13 +1027,13 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         {/* Reviewers Leaderboard Grid */}
         <Box width={{ base: "100%", md: "50%" }}>
           <LeaderboardGrid
-            title="Reviewers - All-Time Contributions"
+            title={`Reviewers - ${getPeriodLabel()} Contributions`}
             data={reviewersData}
             csvData={csvData}
-            csvFilename="reviewers_yearly_data.csv"
+            csvFilename={`reviewers_${leaderboardTimePeriod}_data.csv`}
             onDownloadCSV={async () => {
               try {
-                generateCSVData9();
+                generateCSVDataForLeaderboard(true);
                 await axios.post("/api/DownloadCounter");
               } catch (error) {
                 console.error("Error triggering download counter:", error);
