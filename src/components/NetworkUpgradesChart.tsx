@@ -31,7 +31,7 @@ interface UpgradeData {
 
 interface EIPInfo {
   title: string;
-  category: 'Core' | 'Meta' | 'Informational' | 'ERC' | 'Networking';
+  category: 'Core' | 'Meta' | 'Informational' | 'ERC' | 'Networking' | 'Interface';
 }
 
 const eipTitles: Record<string, EIPInfo> = {
@@ -112,6 +112,10 @@ const eipTitles: Record<string, EIPInfo> = {
   '2': { title: 'Homestead Hard-fork Changes', category: 'Core' },
   '7': { title: 'DELEGATECALL', category: 'Core' },
   '8': { title: 'devp2p Forward Compatibility Requirements for Homestead', category: 'Networking' },
+  '7892': { title: 'Blob Parameter Only Hardforks', category: 'Informational' },
+  '7642': { title: 'eth/69 - Drop pre-merge fields', category: 'Networking' },
+  '7910': { title: 'eth_config JSON-RPC Method', category: 'Interface' },
+  '7935': { title: 'Set default gas limit to 60M', category: 'Informational' },
 };
 
 const consensusSpecsLinks: Record<string, string> = {
@@ -161,9 +165,13 @@ const upgradeMetaEIPs: Record<string, string> = {
   'Gray Glacier': 'EIP-7568',
   'Paris': 'EIP-7568',
   'Shanghai': 'EIP-6987',
+  'Shapella': 'EIP-6987', // Paired name mapping
   'Cancun': 'EIP-7569',
+  'Dencun': 'EIP-7569', // Paired name mapping
   'Prague': 'EIP-7600',
+  'Pectra': 'EIP-7600', // Paired name mapping
   'Osaka': 'EIP-7607',
+  'Fusaka': 'EIP-7607', // Paired name mapping
 };
 
 const upgradeDescriptions: Record<string, string> = {
@@ -234,31 +242,31 @@ const pairedUpgradeNames: Record<string, string> = {
 
 // Grouped data structure - each upgrade has its EIPs in an array
 const rawData: UpgradeData[] = [
-  // Osaka — December 3, 2025 (Execution layer)
+  // Fusaka — December 3, 2025 (Execution layer)
   { 
     date: "2025-12-03", 
     upgrade: "Fusaka", 
     layer: "execution",
     blockNumber: 23935694,
-    eips: ["EIP-7594", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7939", "EIP-7951"]
+    eips: ["EIP-7594", "EIP-7823", "EIP-7825", "EIP-7883", "EIP-7917", "EIP-7918", "EIP-7934", "EIP-7939", "EIP-7951", "EIP-7892", "EIP-7642", "EIP-7910", "EIP-7935"]
   },
 
   // Fulu — December 3, 2025 (Consensus layer)
   // { date: "2025-12-03", upgrade: "Fulu", layer: "consensus", forkEpoch: 411392, eips: ["CONSENSUS"] },
 
-  // Prague — May 7, 2025 (Execution layer)
+  // Pectra — May 7, 2025 (Execution layer)
   { 
     date: "2025-05-07", 
     upgrade: "Pectra", 
     layer: "execution",
     blockNumber: 22431084,
-    eips: ["EIP-2537", "EIP-2935", "EIP-6110", "EIP-7002", "EIP-7251", "EIP-7549", "EIP-7623", "EIP-7685", "EIP-7691", "EIP-7702"]
+    eips: ["EIP-2537", "EIP-2935", "EIP-6110", "EIP-7002", "EIP-7251", "EIP-7549", "EIP-7623", "EIP-7685", "EIP-7691", "EIP-7702", "EIP-7642"]
   },
 
   // Electra — May 7, 2025 (Consensus layer)
   // { date: "2025-05-07", upgrade: "Electra", layer: "consensus", forkEpoch: 364032, eips: ["CONSENSUS"] },
 
-  // Cancun — March 13, 2024 (Execution layer)
+  // Dencun — March 13, 2024 (Execution layer)
   { 
     date: "2024-03-13", 
     upgrade: "Dencun", 
@@ -270,7 +278,7 @@ const rawData: UpgradeData[] = [
   // Deneb — March 13, 2024 (Consensus layer)
   // { date: "2024-03-13", upgrade: "Deneb", layer: "consensus", forkEpoch: 269568, eips: ["CONSENSUS","EIP-7044", "EIP-7045", "EIP-7514"] },
 
-  // Shanghai — April 12, 2023 (Execution layer)
+  // Shapella — April 12, 2023 (Execution layer)
   { 
     date: "2023-04-12", 
     upgrade: "Shapella", 
@@ -385,7 +393,9 @@ const rawData: UpgradeData[] = [
 // Process and format EIP display names, add meta EIP as separate entry
 const upgradeRows = rawData
   .flatMap(item => {
-    const metaEIP = upgradeMetaEIPs[item.upgrade];
+    // Check both direct upgrade name and paired name for meta EIP
+    const pairedName = pairedUpgradeNames[item.date];
+    const metaEIP = upgradeMetaEIPs[item.upgrade] || (pairedName ? upgradeMetaEIPs[pairedName] : null);
     const processedEips = item.eips.map(eip => 
       eip === "NO-EIP" || eip === "CONSENSUS" ? eip : eip.replace("EIP-", "")
     );
@@ -399,13 +409,17 @@ const upgradeRows = rawData
         isMeta: false
       });
     }
-    // Add meta EIP row if exists
+    // Add meta EIP row if exists (only once per date, prefer execution layer)
     if (metaEIP) {
-      rows.push({
-        ...item,
-        eips: [metaEIP.replace("EIP-", "")],
-        isMeta: true
-      });
+      // Only add meta EIP for execution layer upgrades, or if it's the first upgrade on this date
+      const isFirstOnDate = rawData.findIndex(r => r.date === item.date) === rawData.findIndex(r => r.date === item.date && r.upgrade === item.upgrade);
+      if (item.layer === 'execution' || (item.layer === 'consensus' && !rawData.some(r => r.date === item.date && r.layer === 'execution'))) {
+        rows.push({
+          ...item,
+          eips: [metaEIP.replace("EIP-", "")],
+          isMeta: true
+        });
+      }
     }
     return rows;
   })
@@ -939,7 +953,9 @@ const NetworkUpgradesChart: React.FC = () => {
                 dateTotals[item.date] = { core: 0, meta: 0, execution: 0, consensus: 0 };
               }
               
-              const metaEIP = upgradeMetaEIPs[item.upgrade];
+              // Check both direct upgrade name and paired name for meta EIP
+              const pairedName = pairedUpgradeNames[item.date];
+              const metaEIP = upgradeMetaEIPs[item.upgrade] || (pairedName ? upgradeMetaEIPs[pairedName] : null);
               const coreCount = item.eips.filter(eip => {
                 if (eip === 'NO-EIP' || eip === 'CONSENSUS') return false;
                 const eipNumber = eip.replace('EIP-', '').replace('-removed', '');
@@ -948,7 +964,12 @@ const NetworkUpgradesChart: React.FC = () => {
               }).length;
               
               dateTotals[item.date].core += coreCount;
-              if (metaEIP) dateTotals[item.date].meta += 1;
+              // Only count meta EIP once per date (prefer execution layer)
+              if (metaEIP && item.layer === 'execution') {
+                dateTotals[item.date].meta = 1;
+              } else if (metaEIP && item.layer === 'consensus' && !rawData.some(r => r.date === item.date && r.layer === 'execution')) {
+                dateTotals[item.date].meta = 1;
+              }
               
               if (item.layer === 'execution') {
                 dateTotals[item.date].execution += coreCount;
@@ -1094,14 +1115,38 @@ const NetworkUpgradesChart: React.FC = () => {
         const cleanEipNumber = hoveredData.eip.replace('-removed', '');
         const isRemoved = hoveredData.eip.includes('-removed');
         const eipInfo = hoveredData.eip !== 'CONSENSUS' && hoveredData.eip !== 'NO-EIP' ? eipTitles[cleanEipNumber] : null;
-        const upgradeData = rawData.find(r => r.upgrade === hoveredData.upgrade);
-        const coreEipsCount = upgradeData?.eips.filter(eip => {
+        // Get all upgrades on the same date (for paired upgrades)
+        const upgradesOnDate = rawData.filter(r => r.date === hoveredData.date);
+        const allEipsOnDate = upgradesOnDate.flatMap(r => r.eips);
+        
+        const coreEipsCount = allEipsOnDate.filter(eip => {
           if (eip === 'NO-EIP' || eip === 'CONSENSUS') return false;
           const eipNumber = eip.replace('EIP-', '').replace('-removed', '');
           const eipInfo = eipTitles[eipNumber];
           return eipInfo && eipInfo.category === 'Core';
-        }).length || 0;
-        const metaEIP = upgradeMetaEIPs[hoveredData.upgrade];
+        }).length;
+        
+        const otherEips = allEipsOnDate.filter(eip => {
+          if (eip === 'NO-EIP' || eip === 'CONSENSUS') return false;
+          const eipNumber = eip.replace('EIP-', '').replace('-removed', '');
+          const eipInfo = eipTitles[eipNumber];
+          return eipInfo && eipInfo.category !== 'Core';
+        });
+        
+        const otherEipsByCategory = otherEips.reduce((acc, eip) => {
+          const eipNumber = eip.replace('EIP-', '').replace('-removed', '');
+          const eipInfo = eipTitles[eipNumber];
+          if (eipInfo) {
+            const cat = eipInfo.category;
+            if (!acc[cat]) acc[cat] = [];
+            acc[cat].push(eipNumber);
+          }
+          return acc;
+        }, {} as Record<string, string[]>);
+        
+        // Check both direct upgrade name and paired name for meta EIP
+        const pairedName = pairedUpgradeNames[hoveredData.date];
+        const metaEIP = upgradeMetaEIPs[hoveredData.upgrade] || (pairedName ? upgradeMetaEIPs[pairedName] : null) || upgradeMetaEIPs[upgradesOnDate[0]?.upgrade || ''];
         const isMetaEIP = metaEIP && hoveredData.eip === metaEIP.replace('EIP-', '');
         
         // Better positioning logic to keep tooltip in frame
@@ -1220,9 +1265,9 @@ const NetworkUpgradesChart: React.FC = () => {
                   color={useColorModeValue('gray.900', 'white')}
                   lineHeight="1.2"
                 >
-                  {hoveredData.upgrade}
+                  {pairedUpgradeNames[hoveredData.date] || hoveredData.upgrade}
                 </Text>
-                {upgradeDescriptions[hoveredData.upgrade] && (
+                {(upgradeDescriptions[pairedUpgradeNames[hoveredData.date] || hoveredData.upgrade] || upgradeDescriptions[hoveredData.upgrade]) && (
                   <Text 
                     fontSize="2xs" 
                     color={useColorModeValue('gray.600', 'gray.300')}
@@ -1230,7 +1275,7 @@ const NetworkUpgradesChart: React.FC = () => {
                     mt={0.5}
                     noOfLines={2}
                   >
-                    {upgradeDescriptions[hoveredData.upgrade]}
+                    {upgradeDescriptions[pairedUpgradeNames[hoveredData.date] || hoveredData.upgrade] || upgradeDescriptions[hoveredData.upgrade]}
                   </Text>
                 )}
               </Box>
@@ -1279,6 +1324,41 @@ const NetworkUpgradesChart: React.FC = () => {
                     </Text>
                   </HStack>
                 </HStack>
+                
+                {/* Other EIPs count with categories */}
+                {otherEips.length > 0 && (
+                  <Box
+                    w="100%"
+                    mt={2}
+                    pt={2}
+                    borderTop="1px solid"
+                    borderColor={useColorModeValue('gray.200', 'gray.600')}
+                  >
+                    <HStack spacing={1} mb={1}>
+                      <Text fontWeight="600" color={useColorModeValue('gray.700', 'gray.300')} fontSize="2xs">
+                        Other EIPs
+                      </Text>
+                      <Text color={useColorModeValue('gray.600', 'gray.400')} fontSize="2xs" fontWeight="bold">
+                        {otherEips.length}
+                      </Text>
+                    </HStack>
+                    <Text fontSize="2xs" color={useColorModeValue('gray.600', 'gray.400')} lineHeight="1.4">
+                      ({Object.keys(otherEipsByCategory).join(', ')})
+                    </Text>
+                    <VStack align="start" spacing={0.5} mt={1}>
+                      {Object.entries(otherEipsByCategory).map(([category, eipNumbers]) => (
+                        <HStack key={category} spacing={1}>
+                          <Text fontSize="2xs" fontWeight="600" color={useColorModeValue('gray.700', 'gray.300')}>
+                            {category}:
+                          </Text>
+                          <Text fontSize="2xs" color={useColorModeValue('gray.600', 'gray.400')}>
+                            {eipNumbers.map(n => `EIP-${n}`).join(', ')}
+                          </Text>
+                        </HStack>
+                      ))}
+                    </VStack>
+                  </Box>
+                )}
               </Box>
 
               {/* Action hint - Compact */}

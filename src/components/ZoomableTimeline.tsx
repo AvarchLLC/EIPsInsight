@@ -12,9 +12,10 @@ import { AddIcon, MinusIcon, RepeatIcon } from '@chakra-ui/icons';
 interface ZoomableTimelineProps {
   svgPath: string;
   alt?: string;
+  height?: string | number;
 }
 
-const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Timeline' }) => {
+const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Timeline', height }) => {
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +36,7 @@ const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Tim
 
 
   return (
-    <Box position="relative">
+    <Box position="relative" h={height === '100%' ? '100%' : undefined}>
       {/* Timeline Container */}
       <Box
         ref={containerRef}
@@ -46,7 +47,7 @@ const ZoomableTimeline: React.FC<ZoomableTimelineProps> = ({ svgPath, alt = 'Tim
         overflow="hidden"
         position="relative"
         width="100%"
-        height={{ base: '400px', md: '500px', lg: '600px' }}
+        height={height === '100%' ? '100%' : (height || { base: '400px', md: '500px', lg: '600px' })}
         transition="all 0.2s ease"
         boxShadow="sm"
         _hover={{
