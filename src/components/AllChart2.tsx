@@ -8,6 +8,7 @@ import {
   Select,
   Flex,
   Link,
+  Button,
 } from "@chakra-ui/react";
 import { useWindowSize } from "react-use";
 import { motion } from "framer-motion";
@@ -15,6 +16,7 @@ import DateTime from "@/components/DateTime";
 import Dashboard from "./Dashboard";
 import NextLink from "next/link";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import { CSVLink } from "react-csv";
 
 const getCat = (cat: string) => {
   switch (cat) {
@@ -112,6 +114,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [isLoading, setIsLoading] = useState(true);
   const [chart, setchart] = useState("category");
+  const [csvData, setCsvData] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -197,6 +200,29 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     return acc;
   }, []);
 
+  // Prepare CSV data whenever API data changes
+  React.useEffect(() => {
+    const rows: any[] = [];
+
+    allBuckets.forEach((bucket) => {
+      const year = bucket.year;
+      const repo = bucket.repo;
+
+      bucket.statusChanges.forEach((sc) => {
+        rows.push({
+          Year: year,
+          Repo: repo.toUpperCase(),
+          EIP: sc.eip,
+          Title: sc.eipTitle,
+          Category: sc.eipCategory,
+          Final_Status: sc.lastStatus,
+        });
+      });
+    });
+
+    setCsvData(rows);
+  }, [JSON.stringify(data)]);
+
   const Area = dynamic(
     () => import("@ant-design/plots").then((item) => item.Column),
     {
@@ -207,12 +233,23 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
   const transformedData3 =
     chart === "status" ? transformedData2 : transformedData;
 
-  console.log(transformedData3);
+  const totalCount = transformedData3.reduce(
+    (sum, item) => sum + (item?.value || 0),
+    0
+  );
 
   const config = {
     data: transformedData3,
     xField: "year",
     yField: "value",
+    tooltip: {
+      formatter: (datum: any) => {
+        return {
+          name: `${datum.category} (${datum.year})`,
+          value: datum.value,
+        };
+      },
+    },
     interactions: [{ type: "element-selected" }, { type: "element-active" }],
     statistic: {
       title: false as const,
@@ -285,26 +322,40 @@ return (
                 cursor="pointer"
                 _hover={{ textDecoration: "underline" }}
               >
-                {`All EIPs (by final status year)`}
+                {`All EIPs [${totalCount}]`}
               </Text>
             </Link>
 
-            <Select
-              variant="outline"
-              value={chart}
-              mt={{ base: 2, md: 0 }}
-              size="md"
-              bg="#30A0E0"
-              color="black"
-              border="2px solid black"
-              borderRadius="0.5rem"
-              onChange={(e) => setchart(e.target.value)}
-              _hover={{ borderColor: "black" }}
-              width={{ base: "100%", md: "auto" }}
-            >
-              <option value="category">Category</option>
-              <option value="status">Status</option>
-            </Select>
+            <Flex gap={2} mt={{ base: 2, md: 0 }} align="center">
+              <CSVLink
+                data={csvData}
+                filename="eips_final_status_by_year.csv"
+              >
+                <Button
+                  size="sm"
+                  colorScheme="blue"
+                  variant="solid"
+                >
+                  Download CSV
+                </Button>
+              </CSVLink>
+
+              <Select
+                variant="outline"
+                value={chart}
+                size="md"
+                bg="#30A0E0"
+                color="black"
+                border="2px solid black"
+                borderRadius="0.5rem"
+                onChange={(e) => setchart(e.target.value)}
+                _hover={{ borderColor: "black" }}
+                width={{ base: "100%", md: "auto" }}
+              >
+                <option value="category">Category</option>
+                <option value="status">Status</option>
+              </Select>
+            </Flex>
           </Flex>
 
           <Box width="100%" pt={1}>

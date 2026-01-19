@@ -893,8 +893,9 @@ const DashboardPage = () => {
               {/* Left: Board Title with Count */}
               <Heading
                 as="h2"
-                size="lg"
-                color={useColorModeValue("#3182CE", "blue.300")}
+                fontSize="36px"
+                fontWeight="bold"
+                color="#40E0D0"
                 minW="200px"
               >
                 📋 {activeTab} BOARD ({filteredData.length})
