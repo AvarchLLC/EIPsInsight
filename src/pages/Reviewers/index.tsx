@@ -164,7 +164,7 @@ const ReviewTracker = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches?.map((m) => m.slice(2)))) : [];
-      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
       // Merge the two arrays and ensure uniqueness
       const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
@@ -578,7 +578,7 @@ const generateCSVData3 = (reviewer: string) => {
 
       // console.log("reviewers:",reviewers);
       // const githubHandles = await fetchReviewers();
-      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
       const githubHandles2 = await fetchReviewers();
       // console.log("active:",activereviewers);
       

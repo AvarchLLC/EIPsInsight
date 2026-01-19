@@ -144,6 +144,7 @@ export const fetchReviewers = async (): Promise<string[]> => {
       'nalepae',
       'SkandaBhat',
       'advaita-saha',
+      'jochem-brouwer',
       'Marchhill',
       'bomanaps',
       'daniellehrner',
