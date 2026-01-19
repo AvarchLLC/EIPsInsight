@@ -2221,12 +2221,12 @@ return (
   templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
   gap={5}
   mb={5}
-  alignItems="stretch"   // ⭐ KEY LINE
+  alignItems="stretch"
 >
 
             {/* Left: Stats Cards */}
-            <GridItem display="flex">
-              <VStack spacing={4} w="100%">
+            <GridItem display="flex" h="100%">
+              <VStack spacing={4} w="100%" h="100%" justify="flex-start">
                 <Box
                   as={motion.div}
                   whileHover={{ y: -4, scale: 1.02 }}
@@ -2358,10 +2358,11 @@ return (
             </GridItem>
 
             {/* Right: EIP Inclusion Flowchart (Zoomable controls like ZoomableTimeline) */}
-            <GridItem display={{ base: 'none', lg: 'block' }}>
+            <GridItem display={{ base: 'none', lg: 'block' }} h="100%">
               <ZoomableTimeline
                 svgPath="/stages/eip-incl.png"
                 alt="EIP Inclusion Process Flowchart"
+                height="100%"
               />
             </GridItem>
 
