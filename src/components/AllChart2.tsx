@@ -69,21 +69,18 @@ const getStatus = (status: string) => {
   }
 };
 
-interface EIP {
-  _id: string;
+// Data shape from /api/new/final-status-by-year
+interface FinalStatusChange {
   eip: string;
-  title: string;
-  author: string;
-  status: string;
-  type: string;
-  category: string;
-  created: Date;
-  discussion: string;
-  deadline: string;
-  requires: string;
-  repo: string;
-  unique_ID: number;
-  __v: number;
+  lastStatus: string;
+  eipTitle: string;
+  eipCategory: string;
+}
+
+interface FinalStatusYearBucket {
+  year: number;
+  statusChanges: FinalStatusChange[];
+  repo: "eip" | "erc" | "rip";
 }
 
 const categoryColors: string[] = [
@@ -100,18 +97,18 @@ const categoryColors: string[] = [
 ];
 
 interface APIResponse {
-  eip: EIP[];
-  erc: EIP[];
-  rip: EIP[];
+  eip: FinalStatusYearBucket[];
+  erc: FinalStatusYearBucket[];
+  rip: FinalStatusYearBucket[];
 }
 
 interface ChartProps {
   type: string;
-  dataset: APIResponse;
+  dataset: any; // kept for backward compatibility, but ignored now
 }
 
-const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
-  const [data, setData] = useState<EIP[]>([]);
+const AllChart: React.FC<ChartProps> = ({ type }) => {
+  const [data, setData] = useState<APIResponse>({ eip: [], erc: [], rip: [] });
   const bg = useColorModeValue("#f6f6f7", "#171923");
   const [isLoading, setIsLoading] = useState(true);
   const [chart, setchart] = useState("category");
@@ -119,31 +116,18 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eips = dataset?.eip ?? [];
-        const ercs = dataset?.erc ?? [];
-        const rips = dataset?.rip ?? [];
-
-        if (type === "EIP") {
-          setData(eips);
-        } else if (type === "ERC") {
-          setData(ercs);
-        } else if (type === "RIP") {
-          setData(rips);
-        } else if (type === "Total") {
-          setData([...eips, ...ercs, ...rips]);
-        } else {
-          setData([...eips, ...ercs, ...rips]);
-        }
+        const response = await fetch("/api/new/final-status-by-year");
+        const jsonData: APIResponse = await response.json();
+        setData(jsonData);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setData([]);
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [type, dataset]);
+  }, [type]);
 
   interface TransformedData {
     category: string;
@@ -157,50 +141,58 @@ const AllChart: React.FC<ChartProps> = ({ type, dataset }) => {
     value: number;
   }
 
-  const transformedData = (data ?? []).reduce<TransformedData[]>((acc, item) => {
-    const year = new Date(item.created).getFullYear();
-    const category = item.repo === "rip" ? "RIPs" : getCat(item.category);
+  // Use final-status-by-year data (aggregated by changeDate/year) instead of created date
+  const allBuckets: FinalStatusYearBucket[] = [
+    ...(data?.eip || []),
+    ...(data?.erc || []),
+    ...(data?.rip || []),
+  ];
 
-    // Check if a record for the same category and year already exists
-    const existingEntry = acc.find(
-      (entry) => entry.year === year && entry.category === category
-    );
+  const transformedData = allBuckets.reduce<TransformedData[]>((acc, bucket) => {
+    const year = bucket.year;
 
-    if (existingEntry) {
-      // If it exists, increment the value
-      existingEntry.value += 1;
-    } else {
-      // Otherwise, create a new entry
-      acc.push({
-        category: category,
-        year: year,
-        value: 1,
-      });
-    }
+    bucket.statusChanges.forEach((sc) => {
+      const baseCategory =
+        bucket.repo === "rip" ? "RIPs" : getCat(sc.eipCategory || "");
+
+      const existingEntry = acc.find(
+        (entry) => entry.year === year && entry.category === baseCategory
+      );
+
+      if (existingEntry) {
+        existingEntry.value += 1;
+      } else {
+        acc.push({
+          category: baseCategory,
+          year,
+          value: 1,
+        });
+      }
+    });
 
     return acc;
   }, []);
 
-  const transformedData2 = (data ?? []).reduce<TransformedData[]>((acc, item) => {
-    const year = new Date(item.created).getFullYear();
-    const status = getStatus(item.status);
+  const transformedData2 = allBuckets.reduce<TransformedData[]>((acc, bucket) => {
+    const year = bucket.year;
 
-    // Check if a record for the same category and year already exists
-    const existingEntry = acc.find(
-      (entry) => entry.year === year && entry.category === status
-    );
+    bucket.statusChanges.forEach((sc) => {
+      const status = getStatus(sc.lastStatus);
 
-    if (existingEntry) {
-      // If it exists, increment the value
-      existingEntry.value += 1;
-    } else {
-      // Otherwise, create a new entry
-      acc.push({
-        category: status,
-        year: year,
-        value: 1,
-      });
-    }
+      const existingEntry = acc.find(
+        (entry) => entry.year === year && entry.category === status
+      );
+
+      if (existingEntry) {
+        existingEntry.value += 1;
+      } else {
+        acc.push({
+          category: status,
+          year,
+          value: 1,
+        });
+      }
+    });
 
     return acc;
   }, []);
@@ -293,9 +285,7 @@ return (
                 cursor="pointer"
                 _hover={{ textDecoration: "underline" }}
               >
-                {type === "Total"
-                  ? `All EIPs [${data.length}]`
-                  : `${type} - [${data.length}]`}
+                {`All EIPs (by final status year)`}
               </Text>
             </Link>
 
