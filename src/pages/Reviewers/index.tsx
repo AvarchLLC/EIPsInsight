@@ -1013,6 +1013,11 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   if (filteredData.length > 0) {
     const uniqueFilteredMonths = [...new Set(filteredData.map(d => d.monthYear))].sort().reverse();
     console.log(`[Leaderboard Filter] Filtered monthYears:`, uniqueFilteredMonths);
+    // Check which reviewers are in the filtered data
+    const reviewersInFiltered = [...new Set(filteredData.map(d => d.reviewer))];
+    const reviewersSelected = Object.keys(showReviewer).filter(k => showReviewer[k]);
+    console.log(`[Leaderboard Filter] Reviewers in filtered data: ${reviewersInFiltered.length}, Reviewers selected: ${reviewersSelected.length}`);
+    console.log(`[Leaderboard Filter] Selected reviewers:`, reviewersSelected.slice(0, 10));
   } else if (leaderboardTimePeriod !== 'all') {
     const now = new Date();
     let expectedMonth = '';
@@ -1025,13 +1030,31 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   }
 
   // Get yearly data and format it
-  const yearlyData = helpers.getYearlyData(filteredData, showReviewer);
+  // For leaderboard, we want ALL reviewers/editors, not filtered by showReviewer
+  // So we create a version that includes everyone
+  const allReviewersSelected: ShowReviewerType = {};
+  // Get all unique reviewers from filtered data and set them all to true
+  const allReviewersInData = [...new Set(filteredData.map(d => d.reviewer))];
+  allReviewersInData.forEach(reviewer => {
+    allReviewersSelected[reviewer] = true;
+  });
+  
+  const yearlyData = helpers.getYearlyData(filteredData, allReviewersSelected);
   const yearlyChartData = helpers.formatChartData(yearlyData);
 
   // Verification logging for data consistency
   console.log(`[Leaderboard] Active Tab: ${activeTab}, Total entries in dataToUse: ${dataToUse.length}, Filtered: ${filteredData.length}`);
+  console.log(`[Leaderboard] Yearly data keys:`, Object.keys(yearlyData).length, Object.keys(yearlyData).slice(0, 5));
   const totalCount = yearlyChartData.reduce((sum: number, item: any) => sum + item.count, 0);
   console.log(`[Leaderboard] Total aggregated count: ${totalCount}`);
+  
+  // Check if showReviewer is the issue
+  if (filteredData.length > 0 && totalCount === 0) {
+    const reviewersInData = [...new Set(filteredData.map(d => d.reviewer))];
+    const reviewersWithShowReviewer = reviewersInData.filter(r => showReviewer[r]);
+    console.warn(`[Leaderboard] WARNING: ${filteredData.length} filtered items, but only ${reviewersWithShowReviewer.length} reviewers are selected in showReviewer`);
+    console.warn(`[Leaderboard] Reviewers in data but not selected:`, reviewersInData.filter(r => !showReviewer[r]).slice(0, 10));
+  }
   
   // Show available months in data for debugging
   if (dataToUse.length > 0) {
