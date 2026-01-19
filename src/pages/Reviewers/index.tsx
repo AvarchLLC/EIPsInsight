@@ -859,42 +859,126 @@ const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) =>
 
 
 // Helper function to filter PRData by time period
+// monthYear is in format "YYYY-MM"
 const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month' | 'year' | 'custom', customStart?: string, customEnd?: string): PRData[] => {
   if (period === 'all') {
     return data;
   }
 
+  if (!data || data.length === 0) {
+    return data;
+  }
+
   const now = new Date();
-  let startDate: Date;
-  let endDate: Date = now;
 
   switch (period) {
-    case 'week':
-      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      break;
-    case 'month':
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      break;
-    case 'year':
-      startDate = new Date(now.getFullYear(), 0, 1);
-      break;
-    case 'custom':
+    case 'week': {
+      // For week, include current month and previous month if week spans across
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const weekAgoMonth = `${weekAgo.getFullYear()}-${String(weekAgo.getMonth() + 1).padStart(2, '0')}`;
+      
+      const filtered = data.filter(item => {
+        if (!item.monthYear) return false;
+        return item.monthYear === currentMonth || item.monthYear === weekAgoMonth;
+      });
+      
+      console.log(`[Filter Week] Current: ${currentMonth}, WeekAgo: ${weekAgoMonth}, Filtered: ${filtered.length} of ${data.length}`);
+      return filtered;
+    }
+    case 'month': {
+      // Current month in YYYY-MM format
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      let filtered = data.filter(item => {
+        if (!item.monthYear) return false;
+        return item.monthYear === currentMonth;
+      });
+      
+      // If no data for current month, try previous month
+      if (filtered.length === 0 && data.length > 0) {
+        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const prevMonthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`;
+        filtered = data.filter(item => {
+          if (!item.monthYear) return false;
+          return item.monthYear === prevMonthStr;
+        });
+        console.log(`[Filter Month] No data for ${currentMonth}, trying previous month: ${prevMonthStr}, Found: ${filtered.length}`);
+      }
+      
+      console.log(`[Filter Month] Looking for: ${currentMonth}, Filtered: ${filtered.length} of ${data.length}`);
+      if (data.length > 0 && filtered.length === 0) {
+        const availableMonths = [...new Set(data.map(d => d.monthYear))].sort().reverse().slice(0, 5);
+        console.log(`[Filter Month] Available months in data:`, availableMonths);
+      }
+      return filtered;
+    }
+    case 'year': {
+      // Current year - all months starting with current year
+      const currentYear = now.getFullYear().toString();
+      let filtered = data.filter(item => {
+        if (!item.monthYear) return false;
+        return item.monthYear.startsWith(currentYear + '-');
+      });
+      
+      // If no data for current year, try previous year
+      if (filtered.length === 0 && data.length > 0) {
+        const prevYear = (now.getFullYear() - 1).toString();
+        filtered = data.filter(item => {
+          if (!item.monthYear) return false;
+          return item.monthYear.startsWith(prevYear + '-');
+        });
+        console.log(`[Filter Year] No data for ${currentYear}, trying previous year: ${prevYear}, Found: ${filtered.length}`);
+      }
+      
+      console.log(`[Filter Year] Looking for year: ${currentYear}, Filtered: ${filtered.length} of ${data.length}`);
+      if (data.length > 0 && filtered.length === 0) {
+        const availableYears = [...new Set(data.map(d => d.monthYear?.split('-')[0]).filter(Boolean))].sort().reverse().slice(0, 5);
+        console.log(`[Filter Year] Available years in data:`, availableYears);
+      }
+      return filtered;
+    }
+    case 'custom': {
       if (customStart && customEnd) {
-        startDate = new Date(customStart);
-        endDate = new Date(customEnd);
-        endDate.setHours(23, 59, 59, 999); // Include entire end date
+        const startDate = new Date(customStart);
+        const endDate = new Date(customEnd);
+        
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+          console.error('[Filter Custom] Invalid dates:', customStart, customEnd);
+          return data;
+        }
+        
+        const startYear = startDate.getFullYear();
+        const startMonth = startDate.getMonth() + 1;
+        const endYear = endDate.getFullYear();
+        const endMonth = endDate.getMonth() + 1;
+        
+        const filtered = data.filter(item => {
+          if (!item.monthYear) return false;
+          const [itemYearStr, itemMonthStr] = item.monthYear.split('-');
+          if (!itemYearStr || !itemMonthStr) return false;
+          
+          const itemYear = parseInt(itemYearStr, 10);
+          const itemMonth = parseInt(itemMonthStr, 10);
+          
+          if (isNaN(itemYear) || isNaN(itemMonth)) return false;
+          
+          // Check if month falls within range
+          const itemDate = new Date(itemYear, itemMonth - 1, 1);
+          const rangeStart = new Date(startYear, startMonth - 1, 1);
+          const rangeEnd = new Date(endYear, endMonth, 0); // Last day of end month
+          
+          return itemDate >= rangeStart && itemDate <= rangeEnd;
+        });
+        
+        console.log(`[Filter Custom] Range: ${customStart} to ${customEnd}, Filtered: ${filtered.length} of ${data.length}`);
+        return filtered;
       } else {
         return data;
       }
-      break;
+    }
     default:
       return data;
   }
-
-  return data.filter(item => {
-    const itemDate = new Date(item.monthYear + '-01');
-    return itemDate >= startDate && itemDate <= endDate;
-  });
 };
 
 const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
@@ -920,29 +1004,77 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   // Filter by time period
   const filteredData = filterDataByTimePeriod(dataToUse, leaderboardTimePeriod, leaderboardCustomStart, leaderboardCustomEnd);
 
+  // Debug logging
+  console.log(`[Leaderboard Filter] Period: ${leaderboardTimePeriod}, Original data: ${dataToUse.length}, Filtered data: ${filteredData.length}`);
+  if (dataToUse.length > 0) {
+    const uniqueMonths = [...new Set(dataToUse.map(d => d.monthYear))].sort().reverse().slice(0, 10);
+    console.log(`[Leaderboard Filter] Available monthYears in data:`, uniqueMonths);
+  }
+  if (filteredData.length > 0) {
+    const uniqueFilteredMonths = [...new Set(filteredData.map(d => d.monthYear))].sort().reverse();
+    console.log(`[Leaderboard Filter] Filtered monthYears:`, uniqueFilteredMonths);
+  } else if (leaderboardTimePeriod !== 'all') {
+    const now = new Date();
+    let expectedMonth = '';
+    if (leaderboardTimePeriod === 'month') {
+      expectedMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    } else if (leaderboardTimePeriod === 'year') {
+      expectedMonth = `${now.getFullYear()}-XX`;
+    }
+    console.warn(`[Leaderboard Filter] No data found for period "${leaderboardTimePeriod}". Expected: ${expectedMonth}`);
+  }
+
   // Get yearly data and format it
   const yearlyData = helpers.getYearlyData(filteredData, showReviewer);
   const yearlyChartData = helpers.formatChartData(yearlyData);
 
   // Verification logging for data consistency
-  console.log(`[Leaderboard] Active Tab: ${activeTab}, Total entries in dataToUse: ${dataToUse.length}`);
+  console.log(`[Leaderboard] Active Tab: ${activeTab}, Total entries in dataToUse: ${dataToUse.length}, Filtered: ${filteredData.length}`);
   const totalCount = yearlyChartData.reduce((sum: number, item: any) => sum + item.count, 0);
   console.log(`[Leaderboard] Total aggregated count: ${totalCount}`);
+  
+  // Show available months in data for debugging
+  if (dataToUse.length > 0) {
+    const availableMonths = [...new Set(dataToUse.map(d => d.monthYear))].sort().reverse().slice(0, 5);
+    console.log(`[Leaderboard] Available months in data (sample):`, availableMonths);
+  }
 
   // Separate data into reviewers and editors
   const reviewersData = yearlyChartData?.filter((item: any) => reviewersList.includes(item.reviewer));
   const editorsData = yearlyChartData?.filter((item: any) => !reviewersList.includes(item.reviewer));
-
+  
   // Get period label for title
-  const getPeriodLabel = () => {
-    switch (leaderboardTimePeriod) {
-      case 'week': return 'Last Week';
-      case 'month': return 'This Month';
-      case 'year': return 'This Year';
-      case 'custom': return 'Custom Period';
-      default: return 'All-Time';
-    }
+  const periodLabels: Record<string, string> = {
+    'week': 'Last Week',
+    'month': 'This Month',
+    'year': 'This Year',
+    'custom': 'Custom Period',
+    'all': 'All-Time'
   };
+  const periodLabel = periodLabels[leaderboardTimePeriod] || 'All-Time';
+  
+  // Show message if no data after filtering
+  if (filteredData.length === 0 && leaderboardTimePeriod !== 'all') {
+    return (
+      <Box padding={{ base: "1rem", md: "1.5rem" }}>
+        <Box 
+          bg={useColorModeValue("yellow.50", "yellow.900")} 
+          borderWidth="1px" 
+          borderColor={useColorModeValue("yellow.200", "yellow.700")}
+          borderRadius="md" 
+          p={4}
+          textAlign="center"
+        >
+          <Text fontSize="lg" fontWeight="bold" mb={2}>
+            No data found for {periodLabel}
+          </Text>
+          <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+            Try selecting "All-Time" or a different time period. The data may not include the selected period.
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box padding={{ base: "1rem", md: "1.5rem" }}>
@@ -1002,7 +1134,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         {/* Editors Leaderboard Grid */}
         <Box width={{ base: "100%", md: "50%" }}>
           <LeaderboardGrid
-            title={`Editors - ${getPeriodLabel()} Contributions`}
+            title={`Editors - ${periodLabel} Contributions`}
             data={editorsData}
             csvData={csvData}
             csvFilename={`editors_${leaderboardTimePeriod}_data.csv`}
@@ -1027,7 +1159,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
         {/* Reviewers Leaderboard Grid */}
         <Box width={{ base: "100%", md: "50%" }}>
           <LeaderboardGrid
-            title={`Reviewers - ${getPeriodLabel()} Contributions`}
+            title={`Reviewers - ${periodLabel} Contributions`}
             data={reviewersData}
             csvData={csvData}
             csvFilename={`reviewers_${leaderboardTimePeriod}_data.csv`}
