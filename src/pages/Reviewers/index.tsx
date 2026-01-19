@@ -164,7 +164,7 @@ const ReviewTracker = () => {
       // Match unique reviewers using a regex to handle YAML structure
       const matches = text.match(/-\s(\w+)/g);
       const reviewers = matches ? Array.from(new Set(matches?.map((m) => m.slice(2)))) : [];
-      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+      const additionalReviewers = ["nalepae","SkandaBhat","advaita-saha","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
 
       // Merge the two arrays and ensure uniqueness
       const updatedReviewers = Array.from(new Set([...reviewers, ...additionalReviewers]));
@@ -230,7 +230,7 @@ const ReviewTracker = () => {
   };
 
   const selectReviewers = () => {
-    const reviewers2= ["nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner"]
+    const reviewers2= ["nalepae","SkandaBhat","advaita-saha","Marchhill","bomanaps","daniellehrner"]
     const updatedReviewers = Object.keys(showReviewer)?.reduce((acc, reviewer) => {
       acc[reviewer] = reviewers2.includes(reviewer);
       return acc;
@@ -304,7 +304,7 @@ const ReviewTracker = () => {
     setCsvData(csv); 
   };
 
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill", "bomanaps","daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "Marchhill", "bomanaps","daniellehrner"];
 
   const generateCSVData11 = () => {
     if (!selectedYear || !selectedMonth) {
@@ -578,7 +578,7 @@ const generateCSVData3 = (reviewer: string) => {
 
       // console.log("reviewers:",reviewers);
       // const githubHandles = await fetchReviewers();
-      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","jochem-brouwer","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
+      const githubHandles = ["axic", "gcolvin", "lightclient", "SamWilsn", "xinbenlv", "g11tech", "cdetrio", "Pandapip1", "Souptacular", "wanderer", "MicahZoltu","nalepae","SkandaBhat","advaita-saha","Marchhill","bomanaps","daniellehrner","CarlBeek","nconsigny","yoavw", "adietrichs"];
       const githubHandles2 = await fetchReviewers();
       // console.log("active:",activereviewers);
       
@@ -860,7 +860,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
 
 const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "jochem-brouwer", "Marchhill","bomanaps", "daniellehrner"];
+  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "Marchhill","bomanaps", "daniellehrner"];
 
   // ALWAYS use eipdata, ercdata, ripdata for consistency
   let dataToUse: PRData[];
@@ -896,7 +896,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
           <Box width={{ base: "100%", md: "45%" }} padding={{ base: "0.5rem", md: "1rem" }}>
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
 
-              <Heading size="md" color="black">
+              <Heading fontSize="28px" fontWeight="semibold" color="#40E0D0">
                 {`Editors - Monthly Review Activity`}
               </Heading>
               <CSVLink
@@ -922,7 +922,7 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
           {/* Reviewers Chart */}
           <Box width={{ base: "100%", md: "45%" }} padding={{ base: "0.5rem", md: "1rem" }}>
             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-              <Heading size="md" color="black">
+              <Heading fontSize="28px" fontWeight="semibold" color="#40E0D0">
                 {`Contributors - Monthly Review Activity`}
               </Heading>
               <CSVLink
@@ -2064,9 +2064,9 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
       <section id = "PRs Reviewed" >
       <Heading 
-        size="lg" 
+        fontSize="36px"
         fontWeight="bold"
-        color={useColorModeValue("#3182CE", "blue.300")}
+        color="#40E0D0"
       >
         {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com/Reviewers#Monthly`} />
       </Heading>
@@ -2163,7 +2163,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         <Flex flexDirection={{ base: "column", md: "row" }} justifyContent="flex-start" gap="2rem" mb="1rem">
           
         <Box>
-          <Heading size="sm" mb="0.5rem" color="black">Start Date</Heading>
+          <Heading fontSize="22px" fontWeight="medium" mb="0.5rem" color="#40E0D0">Start Date</Heading>
           <Flex>
           <HStack spacing={4}>
             {/* Year Dropdown for Start Date */}
@@ -2221,7 +2221,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         </Box>
 
         <Box>
-          <Heading size="sm" mb="0.5rem" color="black">End Date</Heading>
+          <Heading fontSize="22px" fontWeight="medium" mb="0.5rem" color="#40E0D0">End Date</Heading>
           <Flex>
           <HStack spacing={4}>
             {/* Year Dropdown for End Date */}
@@ -2279,7 +2279,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         </Box>
 
                   <Box>
-          <Heading size="sm" mb="0.5rem" color="black">Select Reviewer</Heading>
+          <Heading fontSize="22px" fontWeight="medium" mb="0.5rem" color="#40E0D0">Select Reviewer</Heading>
           <Menu closeOnSelect={false}>
             <MenuButton
               as={Button}
@@ -2609,7 +2609,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         <hr></hr>
         <br/>
         <section id="comments">
-        <Text fontSize="3xl" fontWeight="bold">Comments</Text></section>
+        <Text fontSize="36px" fontWeight="bold" color="#40E0D0">Comments</Text></section>
           <Comments page={"Reviewers"}/>
           
         </Box>
