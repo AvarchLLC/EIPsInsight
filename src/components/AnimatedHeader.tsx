@@ -22,6 +22,7 @@ interface AnimatedHeaderProps {
   title: string;
   emoji?: string;
   faqItems?: FAQItem[];
+  compact?: boolean;
 }
 
 const fadeInUp = keyframes`
@@ -77,7 +78,8 @@ const pulse = keyframes`
 const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({ 
   title, 
   emoji = "🚀",
-  faqItems
+  faqItems,
+  compact = false,
 }) => {
   const [showFAQ, setShowFAQ] = useState(false);
   
@@ -96,7 +98,7 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
       position="relative"
       overflow="hidden"
       borderRadius="2xl"
-      mb={6}
+      mb={compact ? 3 : 6}
       borderWidth="2px"
       borderColor={borderColor}
       boxShadow={`0 20px 60px -15px ${glowColor}, 0 0 0 1px ${borderColor}`}
