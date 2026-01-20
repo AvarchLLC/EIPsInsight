@@ -390,26 +390,56 @@ const generateCSVData9 = () => {
 };
 
 // Helper function to filter downloaddata by time period
-const filterDownloadDataByTimePeriod = (data: PR[], period: 'all' | 'week' | 'month' | 'year' | 'custom', customStart?: string, customEnd?: string): PR[] => {
+const filterDownloadDataByTimePeriod = (
+  data: PR[],
+  period: 'all' | 'week' | 'month' | 'year' | 'custom',
+  customStart?: string,
+  customEnd?: string
+): PR[] => {
   if (period === 'all') {
     return data;
   }
 
-  const now = new Date();
+  if (!data || data.length === 0) {
+    return data;
+  }
+
+  // Work relative to the most recent reviewDate present in the dataset
+  const sortedDates = data
+    .filter(pr => pr.reviewDate)
+    .map(pr => new Date(pr.reviewDate as string))
+    .filter(d => !isNaN(d.getTime()))
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  if (sortedDates.length === 0) {
+    return data;
+  }
+
+  const lastDate = sortedDates[sortedDates.length - 1];
   let startDate: Date;
-  let endDate: Date = now;
+  let endDate: Date;
 
   switch (period) {
-    case 'week':
-      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    case 'week': {
+      // Last 7 days relative to the latest review date
+      endDate = new Date(lastDate.getTime());
+      endDate.setHours(23, 59, 59, 999);
+      startDate = new Date(lastDate.getTime() - 7 * 24 * 60 * 60 * 1000);
       break;
-    case 'month':
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+    case 'month': {
+      // Full month of the latest review date
+      endDate = new Date(lastDate.getFullYear(), lastDate.getMonth() + 1, 0, 23, 59, 59, 999);
+      startDate = new Date(lastDate.getFullYear(), lastDate.getMonth(), 1);
       break;
-    case 'year':
-      startDate = new Date(now.getFullYear(), 0, 1);
+    }
+    case 'year': {
+      // Full year of the latest review date
+      endDate = new Date(lastDate.getFullYear(), 11, 31, 23, 59, 59, 999);
+      startDate = new Date(lastDate.getFullYear(), 0, 1);
       break;
-    case 'custom':
+    }
+    case 'custom': {
       if (customStart && customEnd) {
         startDate = new Date(customStart);
         endDate = new Date(customEnd);
@@ -418,6 +448,7 @@ const filterDownloadDataByTimePeriod = (data: PR[], period: 'all' | 'week' | 'mo
         return data;
       }
       break;
+    }
     default:
       return data;
   }
@@ -425,6 +456,7 @@ const filterDownloadDataByTimePeriod = (data: PR[], period: 'all' | 'week' | 'mo
   return data.filter((pr: PR) => {
     if (!pr.reviewDate) return false;
     const reviewDate = new Date(pr.reviewDate);
+    if (isNaN(reviewDate.getTime())) return false;
     return reviewDate >= startDate && reviewDate <= endDate;
   });
 };
@@ -869,43 +901,35 @@ const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month'
     return data;
   }
 
-  const now = new Date();
+  // Derive available monthYear values from the data itself instead of "now"
+  const monthYears = [...new Set(data.map(d => d.monthYear).filter(Boolean as any))].sort(); // ascending
 
   switch (period) {
     case 'week': {
-      // For week, include current month and previous month if week spans across
-      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      const weekAgoMonth = `${weekAgo.getFullYear()}-${String(weekAgo.getMonth() + 1).padStart(2, '0')}`;
-      
+      // Approximate "last week" as data from the most recent 1–2 months present in the dataset
+      if (monthYears.length === 0) return data;
+
+      const lastIndex = monthYears.length - 1;
+      const lastMonth = monthYears[lastIndex];
+      const prevMonth = monthYears[lastIndex - 1] ?? lastMonth;
+      const targetMonths = new Set([lastMonth, prevMonth]);
+
       const filtered = data.filter(item => {
         if (!item.monthYear) return false;
-        return item.monthYear === currentMonth || item.monthYear === weekAgoMonth;
+        return targetMonths.has(item.monthYear);
       });
-      
-      console.log(`[Filter Week] Current: ${currentMonth}, WeekAgo: ${weekAgoMonth}, Filtered: ${filtered.length} of ${data.length}`);
+
+      console.log(`[Filter Week] Using last months from data: ${Array.from(targetMonths).join(', ')}, Filtered: ${filtered.length} of ${data.length}`);
       return filtered;
     }
     case 'month': {
-      // Current month in YYYY-MM format
-      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      let filtered = data.filter(item => {
-        if (!item.monthYear) return false;
-        return item.monthYear === currentMonth;
-      });
-      
-      // If no data for current month, try previous month
-      if (filtered.length === 0 && data.length > 0) {
-        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const prevMonthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`;
-        filtered = data.filter(item => {
-          if (!item.monthYear) return false;
-          return item.monthYear === prevMonthStr;
-        });
-        console.log(`[Filter Month] No data for ${currentMonth}, trying previous month: ${prevMonthStr}, Found: ${filtered.length}`);
-      }
-      
-      console.log(`[Filter Month] Looking for: ${currentMonth}, Filtered: ${filtered.length} of ${data.length}`);
+      // Use the most recent month present in the dataset
+      if (monthYears.length === 0) return data;
+
+      const lastMonth = monthYears[monthYears.length - 1];
+      const filtered = data.filter(item => item.monthYear === lastMonth);
+
+      console.log(`[Filter Month] Using latest month in data: ${lastMonth}, Filtered: ${filtered.length} of ${data.length}`);
       if (data.length > 0 && filtered.length === 0) {
         const availableMonths = [...new Set(data.map(d => d.monthYear))].sort().reverse().slice(0, 5);
         console.log(`[Filter Month] Available months in data:`, availableMonths);
@@ -913,24 +937,18 @@ const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month'
       return filtered;
     }
     case 'year': {
-      // Current year - all months starting with current year
-      const currentYear = now.getFullYear().toString();
-      let filtered = data.filter(item => {
+      // Use the year of the most recent month present in the dataset
+      if (monthYears.length === 0) return data;
+
+      const lastMonth = monthYears[monthYears.length - 1]; // "YYYY-MM"
+      const lastYear = lastMonth.split('-')[0];
+
+      const filtered = data.filter(item => {
         if (!item.monthYear) return false;
-        return item.monthYear.startsWith(currentYear + '-');
+        return item.monthYear.startsWith(`${lastYear}-`);
       });
-      
-      // If no data for current year, try previous year
-      if (filtered.length === 0 && data.length > 0) {
-        const prevYear = (now.getFullYear() - 1).toString();
-        filtered = data.filter(item => {
-          if (!item.monthYear) return false;
-          return item.monthYear.startsWith(prevYear + '-');
-        });
-        console.log(`[Filter Year] No data for ${currentYear}, trying previous year: ${prevYear}, Found: ${filtered.length}`);
-      }
-      
-      console.log(`[Filter Year] Looking for year: ${currentYear}, Filtered: ${filtered.length} of ${data.length}`);
+
+      console.log(`[Filter Year] Using latest year in data: ${lastYear}, Filtered: ${filtered.length} of ${data.length}`);
       if (data.length > 0 && filtered.length === 0) {
         const availableYears = [...new Set(data.map(d => d.monthYear?.split('-')[0]).filter(Boolean))].sort().reverse().slice(0, 5);
         console.log(`[Filter Year] Available years in data:`, availableYears);
@@ -981,7 +999,12 @@ const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month'
   }
 };
 
-const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
+const renderCharts = (
+  data: PRData[],
+  selectedYear: string | null,
+  selectedMonth: string | null,
+  showFilters: boolean = true
+) => {
   // List of reviewers (others are editors)
   const reviewersList = helpers.REVIEWERS_LIST;
 
@@ -1079,7 +1102,7 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   // Show message if no data after filtering
   if (filteredData.length === 0 && leaderboardTimePeriod !== 'all') {
     return (
-      <Box padding={{ base: "1rem", md: "1.5rem" }}>
+      <Box padding={{ base: "0.75rem", md: "1rem" }}>
         <Box 
           bg={useColorModeValue("yellow.50", "yellow.900")} 
           borderWidth="1px" 
@@ -1100,62 +1123,10 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
   }
 
   return (
-    <Box padding={{ base: "1rem", md: "1.5rem" }}>
-      {/* Time Period Filter */}
-      <Box mb={4}>
-        <Flex direction={{ base: "column", md: "row" }} gap={4} alignItems={{ base: "stretch", md: "center" }} flexWrap="wrap">
-          <Select
-            value={leaderboardTimePeriod}
-            onChange={(e) => setLeaderboardTimePeriod(e.target.value as any)}
-            width={{ base: "100%", md: "200px" }}
-            colorScheme="blue"
-          >
-            <option value="all">All-Time</option>
-            <option value="week">Last Week</option>
-            <option value="month">This Month</option>
-            <option value="year">This Year</option>
-            <option value="custom">Custom Range</option>
-          </Select>
-          
-          {leaderboardTimePeriod === 'custom' && (
-            <Flex gap={2} flexWrap="wrap" alignItems="center">
-              <Box>
-                <input
-                  type="date"
-                  value={leaderboardCustomStart}
-                  onChange={(e) => setLeaderboardCustomStart(e.target.value)}
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    border: '1px solid #cbd5e0',
-                    fontSize: '14px',
-                    minWidth: '150px'
-                  }}
-                />
-              </Box>
-              <Text alignSelf="center" fontWeight="medium">to</Text>
-              <Box>
-                <input
-                  type="date"
-                  value={leaderboardCustomEnd}
-                  onChange={(e) => setLeaderboardCustomEnd(e.target.value)}
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    border: '1px solid #cbd5e0',
-                    fontSize: '14px',
-                    minWidth: '150px'
-                  }}
-                />
-              </Box>
-            </Flex>
-          )}
-        </Flex>
-      </Box>
-
-      <Flex direction={{ base: "column", md: "row" }} gap={{ base: "1rem", md: "1.5rem" }}>
+    <Box padding={{ base: "0.75rem", md: "1rem" }}>
+      <Flex direction={{ base: "column", md: "row" }} gap={{ base: "0.75rem", md: "1rem" }} align="stretch">
         {/* Editors Leaderboard Grid */}
-        <Box width={{ base: "100%", md: "50%" }}>
+        <Box width={{ base: "100%", md: "50%" }} display="flex">
           <LeaderboardGrid
             title={`Editors - ${periodLabel} Contributions`}
             data={editorsData}
@@ -1174,13 +1145,10 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
             barChartConfig={getBarChartConfig(editorsData)}
             isReviewer={false}
           />
-          <Box mt={2}>
-            <LastUpdatedDateTime name="EditorsTool" />
-          </Box>
         </Box>
 
         {/* Reviewers Leaderboard Grid */}
-        <Box width={{ base: "100%", md: "50%" }}>
+        <Box width={{ base: "100%", md: "50%" }} display="flex">
           <LeaderboardGrid
             title={`Reviewers - ${periodLabel} Contributions`}
             data={reviewersData}
@@ -1199,9 +1167,6 @@ const renderCharts = (data: PRData[], selectedYear: string | null, selectedMonth
             barChartConfig={getBarChartConfig2(reviewersData)}
             isReviewer={true}
           />
-          <Box mt={2}>
-            <LastUpdatedDateTime name="EditorsTool" />
-          </Box>
         </Box>
       </Flex>
     </Box>
@@ -2124,14 +2089,28 @@ const renderEditorRepoGrid = () => {
   const reviewerTimeSeriesMap: { [key: string]: any[] } = {};
   const reviewerRepoTotals: { [key: string]: { eips: number; ercs: number; rips: number } } = {};
   
-  console.log("[Repository Distribution DEBUG] Raw data lengths:", {
+  console.log("[Repository Distribution DEBUG] Raw data lengths (unfiltered):", {
     eipdata: eipdata.length,
     ercdata: ercdata.length,
     ripdata: ripdata.length
   });
+
+  // Apply the same time-period filter used for the leaderboard
+  const filteredEipData = filterDataByTimePeriod(eipdata, leaderboardTimePeriod, leaderboardCustomStart, leaderboardCustomEnd);
+  const filteredErcData = filterDataByTimePeriod(ercdata, leaderboardTimePeriod, leaderboardCustomStart, leaderboardCustomEnd);
+  const filteredRipData = filterDataByTimePeriod(ripdata, leaderboardTimePeriod, leaderboardCustomStart, leaderboardCustomEnd);
+
+  console.log("[Repository Distribution DEBUG] Raw data lengths (filtered):", {
+    eipdata: filteredEipData.length,
+    ercdata: filteredErcData.length,
+    ripdata: filteredRipData.length,
+    period: leaderboardTimePeriod,
+    customStart: leaderboardCustomStart,
+    customEnd: leaderboardCustomEnd,
+  });
   
   // Process EIP data
-  eipdata.forEach(item => {
+  filteredEipData.forEach(item => {
     if (showReviewer[item.reviewer]) {
       if (!reviewerTimeSeriesMap[item.reviewer]) {
         reviewerTimeSeriesMap[item.reviewer] = [];
@@ -2149,7 +2128,7 @@ const renderEditorRepoGrid = () => {
   });
   
   // Process ERC data
-  ercdata.forEach(item => {
+  filteredErcData.forEach(item => {
     if (showReviewer[item.reviewer]) {
       if (!reviewerTimeSeriesMap[item.reviewer]) {
         reviewerTimeSeriesMap[item.reviewer] = [];
@@ -2167,7 +2146,7 @@ const renderEditorRepoGrid = () => {
   });
   
   // Process RIP data
-  ripdata.forEach(item => {
+  filteredRipData.forEach(item => {
     if (showReviewer[item.reviewer]) {
       if (!reviewerTimeSeriesMap[item.reviewer]) {
         reviewerTimeSeriesMap[item.reviewer] = [];
@@ -2280,20 +2259,21 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         {/* Rest of the component */}
         <Flex
           direction={{ base: "column", md: "row" }}
-          gap={{ base: 3, md: 6 }}
-          p={{ base: 3, md: 6 }}
+          gap={{ base: 2, md: 4 }}
+          p={{ base: 2, md: 4 }}
         >
           {/* Sidebar and other content */}
           {/* ... */}
         </Flex>
       
-      <Box p={{ base: 2, md: 3 }}>
+      <Box px={{ base: 2, md: 4 }} py={{ base: 1, md: 2 }}>
         <section id = "LeaderBoard">
           
       {/* Animated Header with FAQ */}
       <AnimatedHeader
         title="Editors & Reviewers Leaderboard"
         emoji="🏆"
+        compact
         faqItems={[
           {
             question: "💡 What does this tool do?",
@@ -2319,12 +2299,13 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       {/* Tab selector and Ad in one row */}
       <Flex 
         direction={{ base: "column", lg: "row" }} 
-        gap={{ base: 3, md: 4 }} 
+        gap={{ base: 2, md: 2 }} 
         align={{ base: "stretch", lg: "center" }}
         justify="space-between"
-        padding={{ base: "1rem", md: "1.5rem" }}
-        mt={4}
-        mb={4}
+        px={{ base: 2, md: 4 }}
+        py={{ base: 1, md: 2 }}
+        mt={1}
+        mb={2}
       >
         {/* Left: Tab buttons */}
         <Box>
@@ -2365,13 +2346,66 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         </Box>
 
         {/* Right: Advertisement */}
-        <Box width={{ base: "100%" }} flexShrink={0}>
-          <CloseableAdCard />
+        <Box width={{ base: "100%", lg: "auto" }} flexShrink={0}>
+          <Flex
+            justifyContent={{ base: "flex-start", lg: "flex-end" }}
+            alignItems="center"
+            gap={3}
+            flexWrap="wrap"
+          >
+            <Select
+              value={leaderboardTimePeriod}
+              onChange={(e) => setLeaderboardTimePeriod(e.target.value as any)}
+              width={{ base: "100%", md: "200px" }}
+              size="sm"
+              colorScheme="blue"
+            >
+              <option value="all">All-Time</option>
+              <option value="week">Last Week</option>
+              <option value="month">This Month</option>
+              <option value="year">This Year</option>
+              <option value="custom">Custom Range</option>
+            </Select>
+
+            {leaderboardTimePeriod === 'custom' && (
+              <Flex gap={2} flexWrap="wrap" alignItems="center">
+                <Box>
+                  <input
+                    type="date"
+                    value={leaderboardCustomStart}
+                    onChange={(e) => setLeaderboardCustomStart(e.target.value)}
+                    style={{
+                      padding: '6px 10px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e0',
+                      fontSize: '12px',
+                      minWidth: '140px'
+                    }}
+                  />
+                </Box>
+                <Text alignSelf="center" fontWeight="medium" fontSize="xs">to</Text>
+                <Box>
+                  <input
+                    type="date"
+                    value={leaderboardCustomEnd}
+                    onChange={(e) => setLeaderboardCustomEnd(e.target.value)}
+                    style={{
+                      padding: '6px 10px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e0',
+                      fontSize: '12px',
+                      minWidth: '140px'
+                    }}
+                  />
+                </Box>
+              </Flex>
+            )}
+          </Flex>
         </Box>
       </Flex>
 
      
-        <Box padding={{ base: "0.5rem", md: "1rem" }} borderRadius="0.55rem">
+        <Box padding={{ base: "0.5rem", md: "0.75rem" }} borderRadius="0.55rem">
           <Box
             // bgColor={bg}
             // padding="2rem"
@@ -2401,15 +2435,12 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
  
 
         <Box
-  bgColor={bg}
-  padding={{ base: "1rem", md: "1.5rem" }}
-  borderRadius="0.55rem"
-  mt={2}
-  // _hover={{
-  //   border: "1px",
-  //   borderColor: "#30A0E0",
-  // }}
->
+          bgColor={bg}
+          px={{ base: 2, md: 4 }}
+          py={{ base: 1, md: 2 }}
+          borderRadius="0.55rem"
+          mt={2}
+        >
   {/* The part that is breaking start */}
   <Box id="Monthly" className={"w-full"}>
     <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
@@ -2951,7 +2982,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       <br/>
       
       {/* Individual Editor/Reviewer Repository Distribution */}
-      <Box className="w-full" mt={8}>
+      <Box className="w-full" mt={4}>
         {renderEditorRepoGrid()}
       </Box>
             

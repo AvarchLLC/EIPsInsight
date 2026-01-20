@@ -20,6 +20,7 @@ import { BsListUl, BsBarChartFill } from 'react-icons/bs';
 import { CSVLink } from 'react-csv';
 import CopyLink from '@/components/CopyLink';
 import dynamic from 'next/dynamic';
+import DateTime from '@/components/DateTime';
 
 const Bar = dynamic(() => import('@ant-design/plots').then((mod) => mod.Bar), { ssr: false });
 
@@ -66,10 +67,10 @@ const LeaderboardGrid: React.FC<LeaderboardGridProps> = ({
       borderRadius="lg"
       borderWidth="1px"
       borderColor={borderColor}
-      p={6}
+      p={5}
       boxShadow="md"
       width="100%"
-      minH="500px"
+      minH="420px"
     >
       <Flex justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={2}>
         <Heading size="md" color="blue.500">
@@ -178,6 +179,10 @@ const LeaderboardGrid: React.FC<LeaderboardGridProps> = ({
           {barChartConfig && <Bar {...barChartConfig} />}
         </Box>
       )}
+
+      <Box mt={4}>
+        <DateTime />
+      </Box>
     </Box>
   );
 };
