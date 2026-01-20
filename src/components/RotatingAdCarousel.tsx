@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Flex, Text, Button, useColorModeValue, IconButton } from "@chakra-ui/react";
+import { Box, Flex, Text, Button, useColorModeValue, IconButton, usePrefersReducedMotion } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { FiChevronLeft, FiChevronRight, FiExternalLink } from "react-icons/fi";
 import { trackFeatureUsage } from "@/utils/analytics";
@@ -108,16 +108,20 @@ export default function RotatingAdCarousel({
 }: RotatingAdCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Permanently reduced: no auto-rotation by default
+  const autoRotateEnabled = false;
 
   useEffect(() => {
-    if (!autoRotate) return;
+    if (!autoRotateEnabled) return;
 
     const interval = setInterval(() => {
       handleNext();
     }, rotateInterval);
 
     return () => clearInterval(interval);
-  }, [currentIndex, autoRotate, rotateInterval]);
+  }, [currentIndex, autoRotateEnabled, rotateInterval]);
 
   const handleNext = () => {
     if (isAnimating) return;
@@ -152,10 +156,8 @@ export default function RotatingAdCarousel({
       borderRadius="xl"
       w="100%"
       bgGradient={currentAd.bgGradient}
-      sx={{
-        animation: `${glow} 2s ease-in-out infinite`,
-      }}
-      transition="all 0.5s ease"
+      // Permanently reduced: static card, no glow animation
+      transition="all 0.3s ease"
       p={6}
     >
       {/* Shimmer effect overlay */}
@@ -167,9 +169,7 @@ export default function RotatingAdCarousel({
         bottom="0"
         backgroundImage="linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)"
         backgroundSize="200% 100%"
-        sx={{
-          animation: `${shimmer} 3s infinite`,
-        }}
+        // Permanently reduced: no shimmer overlay
         pointerEvents="none"
         zIndex={1}
       />
@@ -211,9 +211,7 @@ export default function RotatingAdCarousel({
           <Text
             fontSize={{ base: "3xl", md: "5xl" }}
             mb={2}
-            sx={{
-              animation: `${pulse} 2s ease-in-out infinite`,
-            }}
+            // Permanently reduced: no pulsing emoji
           >
             {currentAd.emoji}
           </Text>

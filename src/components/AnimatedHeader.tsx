@@ -8,6 +8,7 @@ import {
   IconButton,
   Flex,
   VStack,
+  usePrefersReducedMotion,
 } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { keyframes } from '@emotion/react';
@@ -114,7 +115,7 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
         bottom={0}
         bgGradient={bgGradient}
         backgroundSize="400% 400%"
-        animation={`${gradientShift} 15s ease infinite`}
+        // Reduced: static subtle gradient, no animation
         opacity={useColorModeValue(0.15, 0.25)}
         zIndex={0}
       />
@@ -130,7 +131,7 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
         bgGradient="radial(circle, blue.500, transparent)"
         opacity={0.3}
         filter="blur(40px)"
-        animation={`${pulse} 4s ease-in-out infinite`}
+        // Reduced: static glow, no pulsing
         zIndex={0}
       />
       <Box
@@ -143,7 +144,7 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
         bgGradient="radial(circle, cyan.400, transparent)"
         opacity={0.3}
         filter="blur(40px)"
-        animation={`${pulse} 5s ease-in-out infinite 1s`}
+        // Reduced: static glow, no pulsing
         zIndex={0}
       />
       
@@ -160,13 +161,13 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
           p={{ base: 4, md: 5 }}
           cursor={faqItems ? "pointer" : "default"}
           onClick={() => faqItems && setShowFAQ(!showFAQ)}
-          animation={`${fadeInUp} 0.8s cubic-bezier(0.4, 0, 0.2, 1)`}
+        // Reduced: no entrance animation
         >
           <Flex align="center" gap={3}>
             <Box
               as="span"
               display="inline-block"
-              animation={`${float} 3s ease-in-out infinite`}
+              // Reduced: no floating animation
               fontSize={{ base: '2xl', md: '3xl' }}
               filter="drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))"
             >
@@ -184,7 +185,7 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
               )}
               bgClip="text"
               backgroundSize="200% auto"
-              animation={`${shimmer} 3s linear infinite`}
+              // Reduced: static gradient text, no shimmer
             >
               {title}
             </Heading>
@@ -243,26 +244,8 @@ const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({
         )}
       </Box>
       
-      {/* Bottom accent line with shimmer effect */}
-      <Box
-        position="relative"
-        h="5px"
-        bgGradient={bgGradient}
-        backgroundSize="400% 400%"
-        animation={`${gradientShift} 15s ease infinite`}
-        overflow="hidden"
-      >
-        <Box
-          position="absolute"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          bgGradient="linear(to-r, transparent, white, transparent)"
-          opacity={0.3}
-          animation={`${shimmer} 2s linear infinite`}
-        />
-      </Box>
+
+ 
     </Box>
   );
 };

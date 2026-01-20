@@ -36,21 +36,8 @@ import {
     return (
       <>
         <Box
-        
-         zIndex="1000"
-         borderRadius="50%"
-         sx={{
-           // Floating animation
-           '@keyframes float': {
-             '0%, 100%': {
-               transform: 'translateY(0)',
-             },
-             '50%': {
-               transform: 'translateY(-10px)',
-             },
-           },
-           animation: 'float 3s ease-in-out infinite',
-         }}
+          zIndex="1000"
+          borderRadius="50%"
         >
           <Tooltip label="View Bookmarks" placement="left">
             <IconButton

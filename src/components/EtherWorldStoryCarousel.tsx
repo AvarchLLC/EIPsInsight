@@ -11,6 +11,7 @@ import {
   IconButton,
   Image,
   Circle,
+  usePrefersReducedMotion,
 } from '@chakra-ui/react';
 import { 
   FaChevronLeft,
@@ -95,22 +96,23 @@ const storyScenes: StoryScene[] = [
 
 const EtherWorldStoryCarousel: React.FC = () => {
   const [currentScene, setCurrentScene] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false); // reduced: no autoplay by default
   const [direction, setDirection] = useState(1);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const bgBase = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.700', 'gray.200');
 
   useEffect(() => {
-    if (!isPlaying) return;
-    
+    if (!isPlaying || prefersReducedMotion) return;
+
     const timer = setInterval(() => {
       setDirection(1);
       setCurrentScene((prev) => (prev + 1) % storyScenes.length);
     }, 4000);
 
     return () => clearInterval(timer);
-  }, [isPlaying]);
+  }, [isPlaying, prefersReducedMotion]);
 
   const nextScene = () => {
     setDirection(1);
@@ -162,9 +164,9 @@ const EtherWorldStoryCarousel: React.FC = () => {
 
   return (
     <MotionBox
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+      initial={prefersReducedMotion ? undefined : { opacity: 0, y: 50 }}
+      animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+      transition={prefersReducedMotion ? undefined : { duration: 0.6 }}
       mb={6}
     >
       <Box
@@ -180,26 +182,42 @@ const EtherWorldStoryCarousel: React.FC = () => {
         <AnimatePresence mode="wait">
           <MotionBox
             key={currentScene}
-            initial={{ 
-              x: direction > 0 ? 300 : -300,
-              opacity: 0,
-              scale: 0.8
-            }}
-            animate={{ 
-              x: 0,
-              opacity: 1,
-              scale: 1
-            }}
-            exit={{ 
-              x: direction > 0 ? -300 : 300,
-              opacity: 0,
-              scale: 0.8
-            }}
-            transition={{ 
-              type: "spring",
-              stiffness: 300,
-              damping: 30
-            }}
+            initial={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    x: direction > 0 ? 300 : -300,
+                    opacity: 0,
+                    scale: 0.8,
+                  }
+            }
+            animate={
+              prefersReducedMotion
+                ? { opacity: 1, x: 0, scale: 1 }
+                : {
+                    x: 0,
+                    opacity: 1,
+                    scale: 1,
+                  }
+            }
+            exit={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    x: direction > 0 ? -300 : 300,
+                    opacity: 0,
+                    scale: 0.8,
+                  }
+            }
+            transition={
+              prefersReducedMotion
+                ? { duration: 0.2 }
+                : {
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                  }
+            }
             position="absolute"
             top={0}
             left={0}

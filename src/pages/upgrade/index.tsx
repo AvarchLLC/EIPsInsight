@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AllLayout from "@/components/Layout";
 import CloseableAdCard from "@/components/CloseableAdCard";
-import AdHeader from "@/components/AdHeader";
+import AnimatedHeader from "@/components/AnimatedHeader";
 import CopyLink from "@/components/CopyLink";
 import {
   Box,
@@ -57,6 +57,34 @@ const mont = Rajdhani({
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
+
+const upgradeFaqItems = [
+  {
+    question: "What is this page about?",
+    answer:
+      "This page gives you a high‑level view of past, current, and upcoming Ethereum network upgrades, along with the EIPs that are being considered, scheduled, or declined for each upgrade.",
+  },
+  {
+    question: "How do I read the upgrade timeline?",
+    answer:
+      "Each milestone on the timeline corresponds to an AllCoreDevs call or upgrade checkpoint. For every date, we group EIPs by status buckets like included, scheduled, declined, considered, and proposed.",
+  },
+  {
+    question: "Where do the EIP lists on this page come from?",
+    answer:
+      "The data is curated from Ethereum AllCoreDevs notes, EIP repository activity, and upgrade‑specific discussions, then normalized into a structured timeline so you can quickly scan which EIPs are in play.",
+  },
+  {
+    question: "Can I use this view to track a specific EIP?",
+    answer:
+      "Yes – you can scan the timeline and cards to see when an EIP first appeared as proposed, when it was considered or scheduled, and if it was eventually declined or included in a particular upgrade.",
+  },
+  {
+    question: "How often is this upgrade data updated?",
+    answer:
+      "Updates typically follow major AllCoreDevs calls and significant EIP status changes. The goal is to keep this view close to real‑time for active upgrades while preserving historical context.",
+  },
+];
 
 // Import glamsterDamData from UpgradesTimeline (we'll need to extract it or access it differently)
 // For now, let's define the glamsterDamData here since it's not exported from UpgradesTimeline
@@ -2168,11 +2196,10 @@ return (
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-          {/* AdHeader */}
-          <AdHeader
+          <AnimatedHeader
             title="Ethereum Network Upgrades"
             emoji="⚡"
-            headingLevel="h3"
+            faqItems={upgradeFaqItems}
           />
 
           {/* Timeline Section */}
