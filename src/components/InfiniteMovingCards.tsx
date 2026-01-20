@@ -30,7 +30,7 @@ export const InfiniteMovingCards = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [start, setStart] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true); // reduced: start paused by default
 
   const [translateX, setTranslateX] = useState(0);
 
@@ -76,13 +76,13 @@ const buttonColors = {
   }, [items]);
 
   useEffect(() => {
-  if (!isPaused) {
-    const interval = setInterval(() => {
-      setTranslateX((prev) => prev - 1);
-    }, 40); // adjust speed here
-    return () => clearInterval(interval);
-  }
-}, [isPaused]);
+    if (!isPaused) {
+      const interval = setInterval(() => {
+        setTranslateX((prev) => prev - 1);
+      }, 60); // reduced speed and only when user explicitly unpauses
+      return () => clearInterval(interval);
+    }
+  }, [isPaused]);
 
 return (
   <Box

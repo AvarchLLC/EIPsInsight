@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Flex, Text, Badge, Image, useColorModeValue, Icon, CloseButton } from "@chakra-ui/react";
+import { Box, Flex, Text, Badge, Image, useColorModeValue, Icon, CloseButton, usePrefersReducedMotion } from "@chakra-ui/react";
 import { motion } from 'framer-motion';
 import { keyframes } from "@emotion/react";
 import { FiExternalLink, FiClock, FiShield, FiTrendingUp } from "react-icons/fi";
@@ -46,7 +46,7 @@ const CloseableAdCard: React.FC = () => {
   );
 
   return (
-    <MotionBox
+      <MotionBox
       as="aside"
       role="complementary"
       aria-label="EtherWorld sponsor promotion"
@@ -82,8 +82,9 @@ const CloseableAdCard: React.FC = () => {
         outlineOffset: "2px",
       }}
   initial={{ scale: 1 }}
-  animate={{ scale: [1, 1.02, 1] }}
-  transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+  // Permanently reduced: no idle pulsing, keep only hover feedback
+  animate={{ scale: 1 }}
+  transition={{ duration: 0 }}
       style={{ willChange: 'transform' }}
     >
       {/* glow removed per request */}

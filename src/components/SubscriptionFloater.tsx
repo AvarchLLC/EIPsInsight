@@ -17,6 +17,7 @@ import {
   useDisclosure,
   useColorModeValue,
   Badge,
+  usePrefersReducedMotion,
 } from "@chakra-ui/react";
 import { FiBell, FiAward } from "react-icons/fi";
 import { useEffect, useState } from "react";
@@ -102,21 +103,8 @@ const SubscriptionFloater = () => {
   return (
     <>
       <Box
-
         zIndex="1000"
         borderRadius="50%"
-        sx={{
-          // Floating animation
-          '@keyframes float': {
-            '0%, 100%': {
-              transform: 'translateY(0)',
-            },
-            '50%': {
-              transform: 'translateY(-10px)',
-            },
-          },
-          animation: 'float 3s ease-in-out infinite',
-        }}
       >
         <Tooltip label="View Subscription" placement="left">
           <IconButton
