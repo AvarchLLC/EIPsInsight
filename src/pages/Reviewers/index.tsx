@@ -670,6 +670,36 @@ const generateCSVData3 = (reviewer: string) => {
     resetReviewerList(); // Reset reviewers when switching tabs
   }, [activeTab]); // Fetch data and reset reviewers when the active tab changes
   
+  // Fetch eipdata, ercdata, and ripdata separately so they're always available for filtering
+  useEffect(() => {
+    const fetchAllReposData = async () => {
+      try {
+        const [eipsResponse, ercsResponse, ripsResponse] = await Promise.all([
+          fetch('/api/ReviewersCharts/chart/eips'),
+          fetch('/api/ReviewersCharts/chart/ercs'),
+          fetch('/api/ReviewersCharts/chart/rips')
+        ]);
+
+        if (eipsResponse.ok) {
+          const eipsData: { monthYear: string; reviewer: string; count: number }[] = await eipsResponse.json();
+          seteipData(eipsData);
+        }
+        if (ercsResponse.ok) {
+          const ercsData: { monthYear: string; reviewer: string; count: number }[] = await ercsResponse.json();
+          setercData(ercsData);
+        }
+        if (ripsResponse.ok) {
+          const ripsData: { monthYear: string; reviewer: string; count: number }[] = await ripsResponse.json();
+          setripData(ripsData);
+        }
+      } catch (error) {
+        console.error("Error fetching repo data:", error);
+      }
+    };
+
+    fetchAllReposData();
+  }, []); // Fetch once on mount
+  
   const resetReviewerList = () => {
     setShowReviewer({}); // Clear previous reviewers list when switching tabs
   };
@@ -892,7 +922,12 @@ const getBarChartConfig2 = (chartData: { reviewer: string; count: number }[]) =>
 
 // Helper function to filter PRData by time period
 // monthYear is in format "YYYY-MM"
-const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month' | 'year' | 'custom', customStart?: string, customEnd?: string): PRData[] => {
+const filterDataByTimePeriod = (
+  data: PRData[],
+  period: 'all' | 'week' | 'month' | 'year' | 'custom',
+  customStart?: string,
+  customEnd?: string
+): PRData[] => {
   if (period === 'all') {
     return data;
   }
@@ -901,35 +936,49 @@ const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month'
     return data;
   }
 
-  // Derive available monthYear values from the data itself instead of "now"
-  const monthYears = [...new Set(data.map(d => d.monthYear).filter(Boolean as any))].sort(); // ascending
+  const now = new Date();
 
   switch (period) {
     case 'week': {
-      // Approximate "last week" as data from the most recent 1–2 months present in the dataset
-      if (monthYears.length === 0) return data;
-
-      const lastIndex = monthYears.length - 1;
-      const lastMonth = monthYears[lastIndex];
-      const prevMonth = monthYears[lastIndex - 1] ?? lastMonth;
-      const targetMonths = new Set([lastMonth, prevMonth]);
+      // For week, include current month and previous month (weeks span months)
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const weekAgoMonth = `${weekAgo.getFullYear()}-${String(weekAgo.getMonth() + 1).padStart(2, '0')}`;
 
       const filtered = data.filter(item => {
         if (!item.monthYear) return false;
-        return targetMonths.has(item.monthYear);
+        return item.monthYear === currentMonth || item.monthYear === weekAgoMonth;
       });
 
-      console.log(`[Filter Week] Using last months from data: ${Array.from(targetMonths).join(', ')}, Filtered: ${filtered.length} of ${data.length}`);
+      console.log(
+        `[Filter Week] Current: ${currentMonth}, WeekAgo: ${weekAgoMonth}, Filtered: ${filtered.length} of ${data.length}`
+      );
       return filtered;
     }
     case 'month': {
-      // Use the most recent month present in the dataset
-      if (monthYears.length === 0) return data;
+      // Current month in YYYY-MM format
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      let filtered = data.filter(item => {
+        if (!item.monthYear) return false;
+        return item.monthYear === currentMonth;
+      });
 
-      const lastMonth = monthYears[monthYears.length - 1];
-      const filtered = data.filter(item => item.monthYear === lastMonth);
+      // If no data for current month, try previous month
+      if (filtered.length === 0 && data.length > 0) {
+        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const prevMonthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`;
+        filtered = data.filter(item => {
+          if (!item.monthYear) return false;
+          return item.monthYear === prevMonthStr;
+        });
+        console.log(
+          `[Filter Month] No data for ${currentMonth}, trying previous month: ${prevMonthStr}, Found: ${filtered.length}`
+        );
+      }
 
-      console.log(`[Filter Month] Using latest month in data: ${lastMonth}, Filtered: ${filtered.length} of ${data.length}`);
+      console.log(
+        `[Filter Month] Looking for: ${currentMonth}, Filtered: ${filtered.length} of ${data.length}`
+      );
       if (data.length > 0 && filtered.length === 0) {
         const availableMonths = [...new Set(data.map(d => d.monthYear))].sort().reverse().slice(0, 5);
         console.log(`[Filter Month] Available months in data:`, availableMonths);
@@ -937,20 +986,33 @@ const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month'
       return filtered;
     }
     case 'year': {
-      // Use the year of the most recent month present in the dataset
-      if (monthYears.length === 0) return data;
-
-      const lastMonth = monthYears[monthYears.length - 1]; // "YYYY-MM"
-      const lastYear = lastMonth.split('-')[0];
-
-      const filtered = data.filter(item => {
+      // Current year - all months starting with current year
+      const currentYear = now.getFullYear().toString();
+      let filtered = data.filter(item => {
         if (!item.monthYear) return false;
-        return item.monthYear.startsWith(`${lastYear}-`);
+        return item.monthYear.startsWith(currentYear + '-');
       });
 
-      console.log(`[Filter Year] Using latest year in data: ${lastYear}, Filtered: ${filtered.length} of ${data.length}`);
+      // If no data for current year, try previous year
+      if (filtered.length === 0 && data.length > 0) {
+        const prevYear = (now.getFullYear() - 1).toString();
+        filtered = data.filter(item => {
+          if (!item.monthYear) return false;
+          return item.monthYear.startsWith(prevYear + '-');
+        });
+        console.log(
+          `[Filter Year] No data for ${currentYear}, trying previous year: ${prevYear}, Found: ${filtered.length}`
+        );
+      }
+
+      console.log(
+        `[Filter Year] Looking for year: ${currentYear}, Filtered: ${filtered.length} of ${data.length}`
+      );
       if (data.length > 0 && filtered.length === 0) {
-        const availableYears = [...new Set(data.map(d => d.monthYear?.split('-')[0]).filter(Boolean))].sort().reverse().slice(0, 5);
+        const availableYears = [...new Set(data.map(d => d.monthYear?.split('-')[0]).filter(Boolean))]
+          .sort()
+          .reverse()
+          .slice(0, 5);
         console.log(`[Filter Year] Available years in data:`, availableYears);
       }
       return filtered;
@@ -959,36 +1021,38 @@ const filterDataByTimePeriod = (data: PRData[], period: 'all' | 'week' | 'month'
       if (customStart && customEnd) {
         const startDate = new Date(customStart);
         const endDate = new Date(customEnd);
-        
+
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
           console.error('[Filter Custom] Invalid dates:', customStart, customEnd);
           return data;
         }
-        
+
         const startYear = startDate.getFullYear();
         const startMonth = startDate.getMonth() + 1;
         const endYear = endDate.getFullYear();
         const endMonth = endDate.getMonth() + 1;
-        
+
         const filtered = data.filter(item => {
           if (!item.monthYear) return false;
           const [itemYearStr, itemMonthStr] = item.monthYear.split('-');
           if (!itemYearStr || !itemMonthStr) return false;
-          
+
           const itemYear = parseInt(itemYearStr, 10);
           const itemMonth = parseInt(itemMonthStr, 10);
-          
+
           if (isNaN(itemYear) || isNaN(itemMonth)) return false;
-          
+
           // Check if month falls within range
           const itemDate = new Date(itemYear, itemMonth - 1, 1);
           const rangeStart = new Date(startYear, startMonth - 1, 1);
           const rangeEnd = new Date(endYear, endMonth, 0); // Last day of end month
-          
+
           return itemDate >= rangeStart && itemDate <= rangeEnd;
         });
-        
-        console.log(`[Filter Custom] Range: ${customStart} to ${customEnd}, Filtered: ${filtered.length} of ${data.length}`);
+
+        console.log(
+          `[Filter Custom] Range: ${customStart} to ${customEnd}, Filtered: ${filtered.length} of ${data.length}`
+        );
         return filtered;
       } else {
         return data;
