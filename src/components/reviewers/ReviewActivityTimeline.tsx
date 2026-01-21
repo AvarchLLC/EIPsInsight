@@ -132,13 +132,12 @@ const ReviewActivityTimeline: React.FC<ReviewActivityTimelineProps> = ({
       borderRadius="lg"
       borderWidth="1px"
       borderColor={borderColor}
-      p={6}
-      mt={8}
-      boxShadow="md"
+      p={{ base: 4, md: 5 }}
+      mt={{ base: 4, md: 6 }}
     >
       <Flex justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={4}>
         <Heading as="h3" size="lg" fontWeight="bold" color={headingColor}>
-          Review Activity Timeline (Time of Day Analysis)
+          Review Activity Timeline
           <CopyLink link="https://eipsinsight.com/Reviewers#ActivityTimeline" />
         </Heading>
         <Button

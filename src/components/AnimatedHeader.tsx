@@ -8,10 +8,9 @@ import {
   IconButton,
   Flex,
   VStack,
-  usePrefersReducedMotion,
+  Divider,
 } from '@chakra-ui/react';
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
-import { keyframes } from '@emotion/react';
+import { InfoIcon, ChevronUpIcon } from '@chakra-ui/icons';
 
 interface FAQItem {
   question: string;
@@ -20,234 +19,134 @@ interface FAQItem {
 
 interface AnimatedHeaderProps {
   title: string;
-  emoji?: string;
+  description: string;
   faqItems?: FAQItem[];
   compact?: boolean;
 }
 
-const fadeInUp = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
-const gradientShift = keyframes`
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-`;
-
-const float = keyframes`
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(5deg);
-  }
-`;
-
-const shimmer = keyframes`
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-`;
-
-const pulse = keyframes`
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-`;
-
 const AnimatedHeader: React.FC<AnimatedHeaderProps> = ({ 
-  title, 
-  emoji = "🚀",
+  title,
+  description,
   faqItems,
   compact = false,
 }) => {
-  const [showFAQ, setShowFAQ] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   
-  const bgGradient = useColorModeValue(
-    'linear(135deg, #3182ce 0%, #2c5282 25%, #2b6cb0 50%, #4299e1 75%, #63b3ed 100%)',
-    'linear(135deg, #1a365d 0%, #2c5282 25%, #2b6cb0 50%, #3182ce 75%, #4299e1 100%)'
-  );
-  
-  const textColor = useColorModeValue('gray.800', 'white');
-  const descriptionColor = useColorModeValue('gray.600', 'gray.300');
-  const borderColor = useColorModeValue('blue.200', 'blue.700');
-  const glowColor = useColorModeValue('rgba(49, 130, 206, 0.4)', 'rgba(66, 153, 225, 0.3)');
+  // Theme colors
+  const titleColor = useColorModeValue('#2b6cb0', '#4FD1FF');
+  const subtitleColor = useColorModeValue('gray.600', 'gray.400');
+  const borderColor = useColorModeValue('blue.100', 'blue.900');
+  const buttonBg = useColorModeValue('white', 'whiteAlpha.50');
+  const buttonBgHover = useColorModeValue('blue.50', 'blue.900');
+  const buttonBorder = useColorModeValue('blue.200', 'blue.700');
+  const buttonColor = useColorModeValue('#30A0E0', '#4FD1FF');
+  const faqBg = useColorModeValue('blue.50', 'whiteAlpha.50');
+  const faqBorder = useColorModeValue('blue.100', 'blue.800');
+  const questionColor = useColorModeValue('#2b6cb0', '#4FD1FF');
+  const answerColor = useColorModeValue('gray.700', 'gray.300');
 
   return (
-    <Box
-      position="relative"
-      overflow="hidden"
-      borderRadius="2xl"
-      mb={compact ? 3 : 6}
-      borderWidth="2px"
-      borderColor={borderColor}
-      boxShadow={`0 20px 60px -15px ${glowColor}, 0 0 0 1px ${borderColor}`}
-      transition="all 0.3s ease"
-      _hover={{
-        transform: 'translateY(-2px)',
-        boxShadow: `0 25px 70px -15px ${glowColor}, 0 0 0 2px ${borderColor}`,
-      }}
+    <Box 
+      as="header" 
+      w="full" 
+      mb={{ base: 4, md: 5 }}
+      pb={{ base: 3, md: 3 }}
+      borderBottomWidth="1px"
+      borderBottomColor={borderColor}
     >
-      {/* Animated gradient background */}
-      <Box
-        position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        bottom={0}
-        bgGradient={bgGradient}
-        backgroundSize="400% 400%"
-        // Reduced: static subtle gradient, no animation
-        opacity={useColorModeValue(0.15, 0.25)}
-        zIndex={0}
-      />
-
-      {/* Floating orbs */}
-      <Box
-        position="absolute"
-        top="-50px"
-        right="-50px"
-        w="200px"
-        h="200px"
-        borderRadius="full"
-        bgGradient="radial(circle, blue.500, transparent)"
-        opacity={0.3}
-        filter="blur(40px)"
-        // Reduced: static glow, no pulsing
-        zIndex={0}
-      />
-      <Box
-        position="absolute"
-        bottom="-30px"
-        left="-30px"
-        w="150px"
-        h="150px"
-        borderRadius="full"
-        bgGradient="radial(circle, cyan.400, transparent)"
-        opacity={0.3}
-        filter="blur(40px)"
-        // Reduced: static glow, no pulsing
-        zIndex={0}
-      />
-      
-      {/* Content */}
-      <Box
-        position="relative"
-        zIndex={1}
-        bg={useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.9)')}
-        backdropFilter="blur(10px)"
+      {/* Main Header */}
+      <Flex 
+        justify="space-between" 
+        align="flex-start" 
+        gap={4}
       >
-        <Flex
-          justify="space-between"
-          align="center"
-          p={{ base: 4, md: 5 }}
-          cursor={faqItems ? "pointer" : "default"}
-          onClick={() => faqItems && setShowFAQ(!showFAQ)}
-        // Reduced: no entrance animation
-        >
-          <Flex align="center" gap={3}>
-            <Box
-              as="span"
-              display="inline-block"
-              // Reduced: no floating animation
-              fontSize={{ base: '2xl', md: '3xl' }}
-              filter="drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))"
-            >
-              {emoji}
-            </Box>
-            <Heading
-              as="h1"
-              size={{ base: 'lg', md: 'xl' }}
-              color={textColor}
-              fontWeight="black"
-              letterSpacing="tight"
-              bgGradient={useColorModeValue(
-                'linear(to-r, #2b6cb0, #3182ce, #4299e1)',
-                'linear(to-r, #4299e1, #63b3ed, #90cdf4)'
-              )}
-              bgClip="text"
-              backgroundSize="200% auto"
-              // Reduced: static gradient text, no shimmer
-            >
-              {title}
-            </Heading>
-          </Flex>
-          
-          {faqItems && (
-            <IconButton
-              icon={showFAQ ? <ChevronUpIcon boxSize={6} /> : <ChevronDownIcon boxSize={6} />}
-              variant="ghost"
-              colorScheme="blue"
-              aria-label="Toggle FAQ"
-              size="md"
-              _hover={{ transform: 'scale(1.1)' }}
-              transition="transform 0.2s"
-            />
-          )}
-        </Flex>
+        <Box flex={1}>
+          {/* Title */}
+          <Heading
+            as="h1"
+            fontSize={{ base: '3xl', md: compact ? '4xl' : '5xl' }}
+            fontWeight="extrabold"
+            letterSpacing="tight"
+            color={titleColor}
+            mb={2}
+            lineHeight="1.2"
+          >
+            {title}
+          </Heading>
 
-        {faqItems && (
-          <Collapse in={showFAQ} animateOpacity>
-            <VStack
-              align="stretch"
-              spacing={3}
-              px={{ base: 4, md: 5 }}
-              pb={{ base: 4, md: 5 }}
-              pt={2}
-            >
+          {/* Description */}
+          <Text
+            fontSize={{ base: 'xs', md: 'sm' }}
+            color={subtitleColor}
+            maxW="4xl"
+            lineHeight="1.5"
+          >
+            {description}
+          </Text>
+        </Box>
+
+        {/* Info Toggle Button */}
+        {faqItems && faqItems.length > 0 && (
+          <Box pt={0.5}>
+            <IconButton
+              icon={showInfo ? <ChevronUpIcon boxSize={4.5} /> : <InfoIcon boxSize={4} />}
+              onClick={() => setShowInfo(!showInfo)}
+              size="sm"
+              variant="outline"
+              aria-label={showInfo ? 'Hide information' : 'Show information'}
+              bg={buttonBg}
+              borderColor={buttonBorder}
+              color={buttonColor}
+              _hover={{
+                bg: buttonBgHover,
+                borderColor: buttonBorder,
+                color: buttonColor,
+                shadow: 'sm',
+              }}
+              _active={{
+                bg: buttonBgHover,
+              }}
+              transition="all 0.2s ease"
+            />
+          </Box>
+        )}
+      </Flex>
+
+      {/* Collapsible FAQ Section */}
+      {faqItems && faqItems.length > 0 && (
+        <Collapse in={showInfo} animateOpacity>
+          <Box
+            mt={3}
+            p={{ base: 3, md: 4 }}
+            bg={faqBg}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor={faqBorder}
+          >
+            <VStack align="stretch" spacing={3} divider={<Divider borderColor={faqBorder} />}>
               {faqItems.map((item, index) => (
-                <Box
-                  key={index}
-                  p={3}
-                  bg={useColorModeValue('blue.50', 'gray.700')}
-                  borderRadius="md"
-                  borderLeft="3px solid"
-                  borderColor={useColorModeValue('blue.400', 'blue.500')}
-                >
+                <Box key={index}>
                   <Text
-                    fontWeight="bold"
-                    color={useColorModeValue('blue.700', 'blue.300')}
-                    mb={1}
+                    fontWeight="semibold"
+                    color={questionColor}
+                    mb={1.5}
                     fontSize="sm"
                   >
                     {item.question}
                   </Text>
                   <Text
                     fontSize="sm"
-                    color={descriptionColor}
-                    lineHeight="tall"
+                    color={answerColor}
+                    lineHeight="1.6"
                   >
                     {item.answer}
                   </Text>
                 </Box>
               ))}
             </VStack>
-          </Collapse>
-        )}
-      </Box>
-      
-
- 
+          </Box>
+        </Collapse>
+      )}
     </Box>
   );
 };

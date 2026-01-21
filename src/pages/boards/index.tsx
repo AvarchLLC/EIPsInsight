@@ -720,15 +720,15 @@ const DashboardPage = () => {
           {/* Animated Header with FAQ */}
           <AnimatedHeader
             title="EIP/ERC Board"
-            emoji="📋"
+            description="View and manage all open pull requests awaiting editor review across EIPs and ERCs. Filter by labels, search by title or PR number, and download detailed reports."
             faqItems={[
               {
-                question: "💡 What is EIP Board?",
-                answer: "The table below lists all Open Pull Requests (till date) that are awaiting editor review."
+                question: "What is the EIP Board?",
+                answer: "The table below lists all Open Pull Requests (till date) that are awaiting editor review. It provides a comprehensive overview of pending proposals and their current status."
               },
               {
-                question: "🏷️ How do label filters work?",
-                answer: "You can filter table data using label filters, and the same filters will apply to the downloaded reports."
+                question: "How do label filters work?",
+                answer: "You can filter table data using label filters to focus on specific types of PRs. The same filters will apply to the downloaded reports, ensuring consistency in your analysis."
               },
               {
                 question: "📊 How is prioritization determined?",

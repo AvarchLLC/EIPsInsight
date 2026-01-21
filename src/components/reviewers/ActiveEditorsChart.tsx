@@ -141,9 +141,8 @@ const ActiveEditorsChart: React.FC<ActiveEditorsChartProps> = ({
       borderRadius="lg"
       borderWidth="1px"
       borderColor={borderColor}
-      p={6}
-      mt={8}
-      boxShadow="md"
+      p={{ base: 4, md: 5 }}
+      mt={{ base: 4, md: 6 }}
     >
       <Heading 
         as="h3" 
@@ -151,10 +150,8 @@ const ActiveEditorsChart: React.FC<ActiveEditorsChartProps> = ({
         mb={4} 
         fontWeight="bold" 
         color={headingColor}
-        bgGradient="linear(to-r, blue.400, purple.500)"
-        bgClip="text"
       >
-        📊 Repository-wise Review Distribution
+        Repository-wise Review Distribution
         <CopyLink link="https://eipsinsight.com/Reviewers#Speciality" />
       </Heading>
       <Text fontSize="sm" color="gray.500" mb={4}>

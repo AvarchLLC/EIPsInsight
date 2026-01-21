@@ -2198,7 +2198,7 @@ return (
           >
           <AnimatedHeader
             title="Ethereum Network Upgrades"
-            emoji="⚡"
+            description="Explore the complete history and roadmap of Ethereum's network upgrades, from Frontier to the latest proposals. Track EIP inclusion, upgrade timelines, and development progress."
             faqItems={upgradeFaqItems}
           />
 

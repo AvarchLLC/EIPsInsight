@@ -166,10 +166,9 @@ const EditorRepoGrid: React.FC<EditorRepoGridProps> = ({
         borderRadius="lg"
         borderWidth="1px"
         borderColor={borderColor}
-        p={5}
-        boxShadow="sm"
+        p={{ base: 4, md: 5 }}
         transition="all 0.2s"
-        _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
+        _hover={{ transform: 'translateY(-2px)' }}
       >
         <Flex align="center" mb={4}>
           <Avatar
@@ -320,11 +319,10 @@ const EditorRepoGrid: React.FC<EditorRepoGridProps> = ({
         ) : (
           <Box 
             bg={bg} 
-            p={6} 
+            p={{ base: 4, md: 5 }} 
             borderRadius="lg" 
             borderWidth="1px" 
             borderColor={borderColor}
-            boxShadow="sm"
           >
             <Line {...lineChartConfig(editorsLineData)} />
           </Box>
@@ -389,11 +387,10 @@ const EditorRepoGrid: React.FC<EditorRepoGridProps> = ({
         ) : (
           <Box 
             bg={bg} 
-            p={6} 
+            p={{ base: 4, md: 5 }} 
             borderRadius="lg" 
             borderWidth="1px" 
             borderColor={borderColor}
-            boxShadow="sm"
           >
             <Line {...lineChartConfig(reviewersLineData)} />
           </Box>

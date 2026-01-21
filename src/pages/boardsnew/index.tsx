@@ -804,18 +804,18 @@ const DashboardPage = () => {
           {/* Animated Header with FAQ */}
           <AnimatedHeader
             title="EIP/ERC Board"
-            emoji="📋"
+            description="Prioritized view of all open pull requests sorted by longest-waiting interaction time. Filter by labels, search by title or PR number, and download detailed reports."
             faqItems={[
               {
-                question: "💡 What is EIP Board?",
+                question: "What is the EIP Board?",
                 answer: "The table below lists all Open Pull Requests (till date) in an order such that it uses oldest author interaction after the most recent editor response."
               },
               {
-                question: "🏷️ How do label filters work?",
+                question: "How do label filters work?",
                 answer: "You can filter table data using label filters, and the same filters will apply to the downloaded reports."
               },
               {
-                question: "📊 How is prioritization determined?",
+                question: "How is prioritization determined?",
                 answer: "PRs with the 's-withdrawn' label are given the lowest priority and moved to the bottom of the table. The remaining PRs are ranked based on the longest-waiting interaction time, with those having the oldest interaction appearing at the top."
               },
               {

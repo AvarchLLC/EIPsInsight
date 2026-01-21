@@ -184,19 +184,19 @@ export default function ContributorsPage() {
 
   const faqItems = [
     {
-      question: "💡 What is Contributors Analytics?",
+      question: "What is Contributors Analytics?",
       answer: "This dashboard provides comprehensive insights into Ethereum ecosystem contributors, tracking their activities, contributions, and engagement across EIPs, ERCs, and RIPs repositories."
     },
     {
-      question: "📊 How are contributor scores calculated?",
+      question: "How are contributor scores calculated?",
       answer: "Scores are weighted based on contribution type: Commits (base points), Pull Requests (higher for merged PRs), Reviews (points for approved reviews and comments), and Comments (engagement points). The scoring system rewards meaningful contributions and active participation."
     },
     {
-      question: "📈 What metrics are tracked?",
+      question: "What metrics are tracked?",
       answer: "We track various metrics including total contributors, active contributors (last 30 days), activity velocity (daily contributions with 7-day moving average), activity distribution by type, timeline trends, and repository-specific breakdowns."
     },
     {
-      question: "🔍 How can I explore the data?",
+      question: "How can I explore the data?",
       answer: "Use the tabs to switch between Analytics (charts and visualizations), Rankings (top contributors leaderboard), and Contributors (searchable directory). Filter by repository, sort by different criteria, and click on contributors to view detailed profiles."
     }
   ];
@@ -208,7 +208,7 @@ export default function ContributorsPage() {
         <div className="mx-auto px-8 pt-8">
           <AnimatedHeader
             title="Contributors Analytics"
-            emoji="👥"
+            description="Comprehensive analysis of contributor activity, rankings, and engagement patterns. Explore activity distributions, velocity trends, and detailed contributor performance metrics."
             faqItems={faqItems}
           />
         </div>
