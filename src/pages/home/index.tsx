@@ -33,7 +33,7 @@ const Dasboard = () => {
       <Dashboard />
       {/* Advertise With Us (moved lower for spacing) */}
       <Box my={12} width="100%">
-        <PlaceYourAdCard />
+        {/*<PlaceYourAdCard /> */}
       </Box>
       <ViewsShare path={'/home'} />
     </AllLayout>

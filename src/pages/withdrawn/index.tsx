@@ -135,7 +135,7 @@ const Withdrawn = () => {
               <StatusInsightsCard title="Withdrawal Insights" insights={[{ label: "Most Withdrawn", value: categoryDistribution[0]?.category || "N/A", icon: FiLayers, colorScheme: "blue" }, { label: "Core Withdrawn", value: withdrawnData.filter(item => item.category === "Core").length, icon: FiFileText, colorScheme: "red" }, { label: "Network Proposals", value: withdrawnData.filter(item => item.category === "Networking").length, icon: FiFileText, colorScheme: "orange" }, { label: "Categories", value: categoryDistribution.length, icon: FiLayers, colorScheme: "cyan" }]} />
             </Grid>
             <Box mb={6}><FAQSection title="About Withdrawn EIPs" faqs={faqs} /></Box>
-            <Box mb={6}><CloseableAdCard /></Box>
+            <Box mb={6}>{/* <CloseableAdCard /> */}</Box>
             <TableStatusByStatus status="Withdrawn" />
           </Box>
         </motion.div>

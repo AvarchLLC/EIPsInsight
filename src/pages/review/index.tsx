@@ -131,7 +131,7 @@ const Review = () => {
               <StatusInsightsCard title="Review Insights" insights={[{ label: "Top Category", value: categoryDistribution[0]?.category || "N/A", icon: FiLayers, colorScheme: "blue" }, { label: "Core Reviews", value: reviewData.filter(item => item.category === "Core").length, icon: FiFileText, colorScheme: "cyan" }, { label: "Networking", value: reviewData.filter(item => item.category === "Networking").length, icon: FiFileText, colorScheme: "green" }, { label: "Categories", value: categoryDistribution.length, icon: FiLayers, colorScheme: "purple" }]} />
             </Grid>
             <Box mb={6}><FAQSection title="About Review EIPs" faqs={faqs} /></Box>
-            <Box mb={6}><CloseableAdCard /></Box>
+            <Box mb={6}>{/* <CloseableAdCard /> */}</Box>
             <TableStatusByStatus status="Review" />
           </Box>
         </motion.div>

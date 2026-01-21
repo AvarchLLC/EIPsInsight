@@ -606,7 +606,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                           maxW={{ base: "100%", lg: "45%" }}
                           minW={{ base: "100%", lg: "280px" }}
                         >
-                          <CloseableAdCard />
+                          {/* <CloseableAdCard /> */}
                         </Box>
                       </Flex>
                       

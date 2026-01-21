@@ -32,7 +32,7 @@ const ERCTable = () => {
           
           {/* EtherWorld Advertisement */}
           <Box my={6}>
-            <CloseableAdCard />
+            {/* <CloseableAdCard /> */}
           </Box>
           
           <Table type="ERC" />

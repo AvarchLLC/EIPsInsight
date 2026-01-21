@@ -544,7 +544,7 @@ const TestComponent = () => {
 
               {/* EtherWorld Advertisement */}
               <Box my={6}>
-                <CloseableAdCard />
+                {/* <CloseableAdCard /> */}
               </Box>
 
               <Container maxW="1200px" mx="auto">

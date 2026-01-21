@@ -292,7 +292,7 @@ const ERC = () => {
 
               {/* EtherWorld Advertisement */}
               <Box my={6}>
-                <CloseableAdCard />
+                {/* <CloseableAdCard /> */}
               </Box>
 
               {/* Row: Subscription + Toggle Buttons */}

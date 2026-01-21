@@ -37,7 +37,7 @@ export default function RouteScopedEtherWorldAd() {
 
   return (
     <div style={{ marginTop: "2rem" }}>
-      <CloseableAdCard />
+      {/* <CloseableAdCard /> */}
     </div>
   );
 }

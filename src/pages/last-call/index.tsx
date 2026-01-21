@@ -131,7 +131,7 @@ const LastCall = () => {
               <StatusInsightsCard title="Last Call Insights" insights={[{ label: "Top Category", value: categoryDistribution[0]?.category || "N/A", icon: FiLayers, colorScheme: "blue" }, { label: "ERC Proposals", value: lastCallData.filter(item => item.category === "ERC").length, icon: FiFileText, colorScheme: "purple" }, { label: "Network Changes", value: lastCallData.filter(item => item.category === "Networking").length, icon: FiFileText, colorScheme: "green" }, { label: "Categories", value: categoryDistribution.length, icon: FiLayers, colorScheme: "cyan" }]} />
             </Grid>
             <Box mb={6}><FAQSection title="About Last Call EIPs" faqs={faqs} /></Box>
-            <Box mb={6}><CloseableAdCard /></Box>
+            <Box mb={6}>{/* <CloseableAdCard /> */}</Box>
             <TableStatusByStatus status="Last Call" />
           </Box>
         </motion.div>

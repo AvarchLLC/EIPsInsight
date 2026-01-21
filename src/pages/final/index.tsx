@@ -216,7 +216,7 @@ const Final = () => {
               <FAQSection title="About Final EIPs" faqs={faqs} />
             </Box>
             <Box mb={6}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
             
             <TableStatusByStatus status="Final" />

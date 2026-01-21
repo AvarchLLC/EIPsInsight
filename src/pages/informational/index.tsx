@@ -157,7 +157,7 @@ const Info = () => {
               <FAQSection title="About Informational EIPs" faqs={faqs} />
             </Box>
             <Box mb={6}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
             <TableStatus cat="Informational" />
             <Box

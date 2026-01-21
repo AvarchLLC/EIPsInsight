@@ -17,7 +17,7 @@ const Authors: React.FC = () => {
                 
                 {/* EtherWorld Advertisement */}
                 <Box my={6} mx={{ lg: "40", md: "2", sm: "2", base: "2" }} px={{ lg: "10", md: "5", sm: "5", base: "5" }}>
-                    <CloseableAdCard />
+                    {/* <CloseableAdCard /> */}
                 </Box>
             </AllLayout>
         </>

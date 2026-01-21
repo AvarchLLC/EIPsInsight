@@ -236,7 +236,7 @@ const AdHeader: React.FC<AdHeaderProps> = ({
                 maxW="500px"
               >
                 <Box mt={{ base: 0, lg: 2 }}>
-                  <CloseableAdCard />
+                   {/* <CloseableAdCard /> */} 
                 </Box>
               </GridItem>
             )}
@@ -249,7 +249,7 @@ const AdHeader: React.FC<AdHeaderProps> = ({
               mt={4}
               maxW="100%"
             >
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
           )}
         </Box>

@@ -769,7 +769,7 @@ const DashboardPage = () => {
             </HStack>
             
             <Box flex="1" maxW={{ base: "100%", md: "600px" }}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
 
             {/* Search Bar */}

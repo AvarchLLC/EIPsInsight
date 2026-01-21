@@ -52,7 +52,7 @@ const EIPsInsightRecap = () => {
 
         {/* EtherWorld Advertisement */}
         <Box w="100%" my={6}>
-          <CloseableAdCard />
+          {/* <CloseableAdCard /> */}
         </Box>
 
         <Stack 

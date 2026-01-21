@@ -220,7 +220,7 @@ const Draft = () => {
               <FAQSection title="About Draft EIPs" faqs={faqs} />
             </Box>
             <Box mb={6}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
             
             <TableStatusByStatus status="Draft" />

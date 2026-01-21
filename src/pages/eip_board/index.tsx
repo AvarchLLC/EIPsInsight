@@ -85,7 +85,7 @@ import {
           
           {/* EtherWorld Advertisement */}
           <Box my={6} width="100%">
-            <CloseableAdCard />
+            {/* <CloseableAdCard /> */}
           </Box>
   
           {/* Scrollable Table */}

@@ -341,7 +341,7 @@ const handleCancel = async () => {
       
       {/* EtherWorld Advertisement */}
       <Box my={4} width="100%">
-        <CloseableAdCard />
+        {/* <CloseableAdCard /> */}
       </Box>
       
       {/* Absolute positioned navigation buttons */}

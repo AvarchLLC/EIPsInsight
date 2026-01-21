@@ -41,7 +41,7 @@ const UnderConstructionPage: React.FC = () => {
        >
         {/* EtherWorld Advertisement */}
         <Box my={6}>
-          <CloseableAdCard />
+          {/* <CloseableAdCard /> */}
         </Box>
         
         <FactsSection/>

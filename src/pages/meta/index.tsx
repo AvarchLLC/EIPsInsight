@@ -317,7 +317,7 @@ const Meta = () => {
               <FAQSection title="About Meta EIPs" faqs={faqs} />
             </Box>
             <Box mb={6}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
             <TableStatus cat="Meta" />
             <Box
