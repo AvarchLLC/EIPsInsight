@@ -1131,7 +1131,12 @@ const renderCharts = (
   }
 
   // Filter by time period
-  const filteredData = filterDataByTimePeriod(dataToUse, leaderboardTimePeriod, leaderboardCustomStart, leaderboardCustomEnd);
+  let filteredData = filterDataByTimePeriod(
+    dataToUse,
+    leaderboardTimePeriod,
+    leaderboardCustomStart,
+    leaderboardCustomEnd
+  );
 
   // Debug logging
   console.log(`[Leaderboard Filter] Period: ${leaderboardTimePeriod}, Original data: ${dataToUse.length}, Filtered data: ${filteredData.length}`);
@@ -1148,14 +1153,13 @@ const renderCharts = (
     console.log(`[Leaderboard Filter] Reviewers in filtered data: ${reviewersInFiltered.length}, Reviewers selected: ${reviewersSelected.length}`);
     console.log(`[Leaderboard Filter] Selected reviewers:`, reviewersSelected.slice(0, 10));
   } else if (leaderboardTimePeriod !== 'all') {
-    const now = new Date();
-    let expectedMonth = '';
-    if (leaderboardTimePeriod === 'month') {
-      expectedMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    } else if (leaderboardTimePeriod === 'year') {
-      expectedMonth = `${now.getFullYear()}-XX`;
-    }
-    console.warn(`[Leaderboard Filter] No data found for period "${leaderboardTimePeriod}". Expected: ${expectedMonth}`);
+    // If no data was returned for the selected period, fall back to using all
+    // available data for the current tab so that the leaderboard still shows
+    // something instead of an empty state, similar to the bottom graphs.
+    console.warn(
+      `[Leaderboard Filter] No data found for period "${leaderboardTimePeriod}". Falling back to unfiltered data for leaderboard.`
+    );
+    filteredData = dataToUse;
   }
 
   // Get yearly data and format it
@@ -1205,8 +1209,8 @@ const renderCharts = (
   };
   const periodLabel = periodLabels[leaderboardTimePeriod] || 'All-Time';
   
-  // Show message if no data after filtering
-  if (filteredData.length === 0 && leaderboardTimePeriod !== 'all') {
+  // Show message only when there is truly no data at all (even after fallback)
+  if (filteredData.length === 0) {
     return (
       <Box>
         <Box 
