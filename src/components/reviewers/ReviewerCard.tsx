@@ -91,12 +91,12 @@ const ReviewerCard: React.FC<ReviewerCardProps> = ({
   return (
     <Box
       bg={bg}
-      borderRadius="md"
+      borderRadius="lg"
       borderWidth="1px"
       borderColor={borderColor}
-      p={4}
+      p={{ base: 3, md: 4 }}
       transition="all 0.2s"
-      _hover={{ borderColor: 'blue.400', boxShadow: 'md' }}
+      _hover={{ borderColor: 'blue.400' }}
     >
       <Flex
         justifyContent="space-between"

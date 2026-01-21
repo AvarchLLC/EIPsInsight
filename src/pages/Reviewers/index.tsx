@@ -940,18 +940,34 @@ const filterDataByTimePeriod = (
 
   switch (period) {
     case 'week': {
-      // For week, include current month and previous month (weeks span months)
+      // For week, get last 7 days of data
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      const weekAgoMonth = `${weekAgo.getFullYear()}-${String(weekAgo.getMonth() + 1).padStart(2, '0')}`;
+      const twoMonthsAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+      
+      // Try to get data from recent months (last 2 months)
+      const recentMonths = new Set<string>();
+      for (let i = 0; i < 3; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        recentMonths.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+      }
 
-      const filtered = data.filter(item => {
+      let filtered = data.filter(item => {
         if (!item.monthYear) return false;
-        return item.monthYear === currentMonth || item.monthYear === weekAgoMonth;
+        return recentMonths.has(item.monthYear);
       });
 
+      // If still no data, get most recent month available
+      if (filtered.length === 0 && data.length > 0) {
+        const availableMonths = [...new Set(data.map(d => d.monthYear))].filter(Boolean).sort().reverse();
+        if (availableMonths.length > 0) {
+          const mostRecentMonth = availableMonths[0];
+          filtered = data.filter(item => item.monthYear === mostRecentMonth);
+          console.log(`[Filter Week] No recent data, using most recent month: ${mostRecentMonth}`);
+        }
+      }
+
       console.log(
-        `[Filter Week] Current: ${currentMonth}, WeekAgo: ${weekAgoMonth}, Filtered: ${filtered.length} of ${data.length}`
+        `[Filter Week] Checked months: ${Array.from(recentMonths).join(', ')}, Filtered: ${filtered.length} of ${data.length}`
       );
       return filtered;
     }
@@ -963,26 +979,38 @@ const filterDataByTimePeriod = (
         return item.monthYear === currentMonth;
       });
 
-      // If no data for current month, try previous month
+      // If no data for current month, try previous months (up to 3 months back)
       if (filtered.length === 0 && data.length > 0) {
-        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const prevMonthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`;
-        filtered = data.filter(item => {
-          if (!item.monthYear) return false;
-          return item.monthYear === prevMonthStr;
-        });
-        console.log(
-          `[Filter Month] No data for ${currentMonth}, trying previous month: ${prevMonthStr}, Found: ${filtered.length}`
-        );
+        for (let i = 1; i <= 3; i++) {
+          const prevMonth = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const prevMonthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`;
+          filtered = data.filter(item => {
+            if (!item.monthYear) return false;
+            return item.monthYear === prevMonthStr;
+          });
+          
+          if (filtered.length > 0) {
+            console.log(
+              `[Filter Month] No data for ${currentMonth}, found data in month ${i} back: ${prevMonthStr}, Found: ${filtered.length}`
+            );
+            break;
+          }
+        }
+        
+        // If still no data, use most recent month available
+        if (filtered.length === 0) {
+          const availableMonths = [...new Set(data.map(d => d.monthYear))].filter(Boolean).sort().reverse();
+          if (availableMonths.length > 0) {
+            const mostRecentMonth = availableMonths[0];
+            filtered = data.filter(item => item.monthYear === mostRecentMonth);
+            console.log(`[Filter Month] Using most recent available month: ${mostRecentMonth}`);
+          }
+        }
       }
 
       console.log(
         `[Filter Month] Looking for: ${currentMonth}, Filtered: ${filtered.length} of ${data.length}`
       );
-      if (data.length > 0 && filtered.length === 0) {
-        const availableMonths = [...new Set(data.map(d => d.monthYear))].sort().reverse().slice(0, 5);
-        console.log(`[Filter Month] Available months in data:`, availableMonths);
-      }
       return filtered;
     }
     case 'year': {
@@ -993,28 +1021,42 @@ const filterDataByTimePeriod = (
         return item.monthYear.startsWith(currentYear + '-');
       });
 
-      // If no data for current year, try previous year
+      // If no data for current year, try previous years (up to 2 years back)
       if (filtered.length === 0 && data.length > 0) {
-        const prevYear = (now.getFullYear() - 1).toString();
-        filtered = data.filter(item => {
-          if (!item.monthYear) return false;
-          return item.monthYear.startsWith(prevYear + '-');
-        });
-        console.log(
-          `[Filter Year] No data for ${currentYear}, trying previous year: ${prevYear}, Found: ${filtered.length}`
-        );
+        for (let i = 1; i <= 2; i++) {
+          const prevYear = (now.getFullYear() - i).toString();
+          filtered = data.filter(item => {
+            if (!item.monthYear) return false;
+            return item.monthYear.startsWith(prevYear + '-');
+          });
+          
+          if (filtered.length > 0) {
+            console.log(
+              `[Filter Year] No data for ${currentYear}, found data in year ${i} back: ${prevYear}, Found: ${filtered.length}`
+            );
+            break;
+          }
+        }
+        
+        // If still no data, get most recent year available
+        if (filtered.length === 0) {
+          const availableYears = [...new Set(data.map(d => d.monthYear?.split('-')[0]).filter(Boolean))]
+            .sort()
+            .reverse();
+          if (availableYears.length > 0) {
+            const mostRecentYear = availableYears[0];
+            filtered = data.filter(item => {
+              if (!item.monthYear) return false;
+              return item.monthYear.startsWith(mostRecentYear + '-');
+            });
+            console.log(`[Filter Year] Using most recent available year: ${mostRecentYear}`);
+          }
+        }
       }
 
       console.log(
         `[Filter Year] Looking for year: ${currentYear}, Filtered: ${filtered.length} of ${data.length}`
       );
-      if (data.length > 0 && filtered.length === 0) {
-        const availableYears = [...new Set(data.map(d => d.monthYear?.split('-')[0]).filter(Boolean))]
-          .sort()
-          .reverse()
-          .slice(0, 5);
-        console.log(`[Filter Year] Available years in data:`, availableYears);
-      }
       return filtered;
     }
     case 'custom': {
@@ -1166,7 +1208,7 @@ const renderCharts = (
   // Show message if no data after filtering
   if (filteredData.length === 0 && leaderboardTimePeriod !== 'all') {
     return (
-      <Box padding={{ base: "0.75rem", md: "1rem" }}>
+      <Box>
         <Box 
           bg={useColorModeValue("yellow.50", "yellow.900")} 
           borderWidth="1px" 
@@ -1187,8 +1229,8 @@ const renderCharts = (
   }
 
   return (
-    <Box padding={{ base: "0.75rem", md: "1rem" }}>
-      <Flex direction={{ base: "column", md: "row" }} gap={{ base: "0.75rem", md: "1rem" }} align="stretch">
+    <Box>
+      <Flex direction={{ base: "column", md: "row" }} gap={{ base: 3, md: 4 }} align="stretch">
         {/* Editors Leaderboard Grid */}
         <Box width={{ base: "100%", md: "50%" }} display="flex">
           <LeaderboardGrid
@@ -1269,15 +1311,20 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
   const editorsData = monthlyChartData?.filter((item: any) => !reviewersList.includes(item.reviewer));
 
   return (
-    <Box padding={{ base: "1rem", md: "1.5rem" }}>
+    <Box>
       {selectedYear && selectedMonth && monthlyChartData && ( // Check if monthlyChartData is defined
-        <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap={{ base: "1rem", md: "1.5rem" }}>
+        <Flex direction={{ base: "column", md: "row" }} justifyContent="center" gap={{ base: 4, md: 6 }}>
           {/* Editors Chart */}
-          <Box width={{ base: "100%", md: "45%" }} padding={{ base: "0.5rem", md: "1rem" }}>
-            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+          <Box width={{ base: "100%", md: "45%" }}>
+            <Flex justifyContent="space-between" alignItems="center" mb={4}>
 
-              <Heading fontSize="28px" fontWeight="semibold" color="#40E0D0">
-                {`Editors - Monthly Review Activity`}
+              <Heading 
+                as="h4"
+                size="lg" 
+                fontWeight="bold" 
+                color={useColorModeValue('#2b6cb0', '#4FD1FF')}
+              >
+                Editors - Monthly Review Activity
               </Heading>
               <CSVLink
                 data={csvData?.length ? csvData : []}
@@ -1300,10 +1347,15 @@ const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMont
             <Bar {...getBarChartConfig(editorsData)} />
           </Box>
           {/* Reviewers Chart */}
-          <Box width={{ base: "100%", md: "45%" }} padding={{ base: "0.5rem", md: "1rem" }}>
-            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
-              <Heading fontSize="28px" fontWeight="semibold" color="#40E0D0">
-                {`Contributors - Monthly Review Activity`}
+          <Box width={{ base: "100%", md: "45%" }}>
+            <Flex justifyContent="space-between" alignItems="center" mb={4}>
+              <Heading 
+                as="h4"
+                size="lg" 
+                fontWeight="bold" 
+                color={useColorModeValue('#2b6cb0', '#4FD1FF')}
+              >
+                Contributors - Monthly Review Activity
               </Heading>
               <CSVLink
                 data={csvData?.length ? csvData : []} 
@@ -1595,8 +1647,8 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
       </section>
       <Grid
         templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}
-        gap={4}
-        mb={8}
+        gap={{ base: 4, md: 6 }}
+        mb={6}
       >
         {editorCharts}
       </Grid>
@@ -1615,7 +1667,7 @@ const renderCharts3 = (reviewsdata: PRData[]) => {
       </section>
       <Grid
         templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}
-        gap={4}
+        gap={{ base: 4, md: 6 }}
       >
         {reviewerCharts}
       </Grid>
@@ -2324,27 +2376,26 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         <Flex
           direction={{ base: "column", md: "row" }}
           gap={{ base: 2, md: 4 }}
-          p={{ base: 2, md: 4 }}
         >
           {/* Sidebar and other content */}
           {/* ... */}
         </Flex>
       
-      <Box px={{ base: 2, md: 4 }} py={{ base: 1, md: 2 }}>
+      <Box px={{ base: 4, md: 6 }} pt={{ base: 4, md: 6 }}>
         <section id = "LeaderBoard">
           
       {/* Animated Header with FAQ */}
       <AnimatedHeader
         title="Editors & Reviewers Leaderboard"
-        emoji="🏆"
+        description="Track and analyze EIP editor and reviewer activity, contributions, and review patterns. Monitor monthly statistics, compare performance metrics, and explore detailed review histories."
         compact
         faqItems={[
           {
-            question: "💡 What does this tool do?",
+            question: "What does this tool do?",
             answer: "This tool provides a comprehensive overview of all EIP editor/reviewer reviews conducted to date. It displays the total number of reviews each month for each editor/reviewer, allowing you to easily track and analyze review activity across different months and editors."
           },
           {
-            question: "📅 How can I view data for a specific Month?",
+            question: "How can I view data for a specific month?",
             answer: "To view data for a specific month, you can use the timeline scroll bar or click the View More button. From there, select the desired Year and Month using the dropdown menus, and the table and graph will automatically update to display data for that selected month."
           },
           {
@@ -2352,7 +2403,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
             answer: "You can refine the data by selecting or deselecting specific editors from the checkbox list. This will filter the chart and table to show data only for the selected editors, enabling you to focus on individual contributions."
           },
           {
-            question: "⚙️ How does this tool work?",
+            question: "How does this tool work?",
             answer: "The tool will be going through all the reviews made by the editor/reviewer and update the database every 24 hours. This tool captures reviews only if the person is marked as a reviewer and has performed a review activity on the PR. If no review is made, it won't be counted, even if the person is listed as a reviewer. Note: The reviews made by the editor during their active time as an editor are considered for plotting the charts."
           }
         ]}
@@ -2363,13 +2414,10 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       {/* Tab selector and Ad in one row */}
       <Flex 
         direction={{ base: "column", lg: "row" }} 
-        gap={{ base: 2, md: 2 }} 
+        gap={{ base: 3, md: 4 }} 
         align={{ base: "stretch", lg: "center" }}
         justify="space-between"
-        px={{ base: 2, md: 4 }}
-        py={{ base: 1, md: 2 }}
-        mt={1}
-        mb={2}
+        my={4}
       >
         {/* Left: Tab buttons */}
         <Box>
@@ -2469,52 +2517,33 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       </Flex>
 
      
-        <Box padding={{ base: "0.5rem", md: "0.75rem" }} borderRadius="0.55rem">
-          <Box
-            // bgColor={bg}
-            // padding="2rem"
-            borderRadius="0.55rem"
-            // _hover={{
-            //   border: "1px",
-            //   borderColor: "#30A0E0",
-            // }}
-          >
-
-        
-            
-            <Box id="Leaderboard" className="w-full">
-              {renderCharts(chart1data, selectedYear, selectedMonth)}
-              
-            </Box>
-          </Box>
-          {/* <br /> */}
-          {/* <br /> */}
+        <Box id="Leaderboard" className="w-full">
+          {renderCharts(chart1data, selectedYear, selectedMonth)}
         </Box>
 
-        {/* <br/> */}
-
-            <section id="ActivityTimeline">
-              {editorsActivity()}
-            </section>
- 
+        <section id="ActivityTimeline">
+          {editorsActivity()}
+        </section>
 
         <Box
-          bgColor={bg}
-          px={{ base: 2, md: 4 }}
-          py={{ base: 1, md: 2 }}
-          borderRadius="0.55rem"
-          mt={2}
+          bg={bg}
+          borderRadius="lg"
+          borderWidth="1px"
+          borderColor={useColorModeValue('gray.200', 'gray.600')}
+          p={{ base: 4, md: 5 }}
+          mt={{ base: 4, md: 6 }}
         >
-  {/* The part that is breaking start */}
   <Box id="Monthly" className={"w-full"}>
-    <Flex justifyContent="space-between" alignItems="center" marginBottom="0.5rem">
+    <Flex justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={2}>
       <section id = "PRs Reviewed" >
       <Heading 
-        fontSize="36px"
+        as="h4"
+        size="lg"
         fontWeight="bold"
-        color="#40E0D0"
+        color={useColorModeValue('#2b6cb0', '#4FD1FF')}
       >
-        {`PRs Reviewed (Monthly, since 2015)`}<CopyLink link={`https://eipsinsight.com/Reviewers#Monthly`} />
+        PRs Reviewed (Monthly)
+        <CopyLink link={`https://eipsinsight.com/Reviewers#Monthly`} />
       </Heading>
       </section>
       <Flex alignItems="center">
@@ -2601,15 +2630,23 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
     
     {showFilters && (
       <Box
-        bg="blue.50"
+        bg={useColorModeValue('blue.50', 'whiteAlpha.50')}
         borderRadius="md"
         p={4}
-        mt="1rem"
+        mt={4}
       >
-        <Flex flexDirection={{ base: "column", md: "row" }} justifyContent="flex-start" gap="2rem" mb="1rem">
+        <Flex flexDirection={{ base: "column", md: "row" }} justifyContent="flex-start" gap={{ base: 4, md: 8 }} mb={4}>
           
         <Box>
-          <Heading fontSize="22px" fontWeight="medium" mb="0.5rem" color="#40E0D0">Start Date</Heading>
+          <Heading 
+            as="h5"
+            size="sm" 
+            fontWeight="semibold" 
+            mb={2} 
+            color={useColorModeValue('#2b6cb0', '#4FD1FF')}
+          >
+            Start Date
+          </Heading>
           <Flex>
           <HStack spacing={4}>
             {/* Year Dropdown for Start Date */}
@@ -2667,7 +2704,15 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         </Box>
 
         <Box>
-          <Heading fontSize="22px" fontWeight="medium" mb="0.5rem" color="#40E0D0">End Date</Heading>
+          <Heading 
+            as="h5"
+            size="sm" 
+            fontWeight="semibold" 
+            mb={2} 
+            color={useColorModeValue('#2b6cb0', '#4FD1FF')}
+          >
+            End Date
+          </Heading>
           <Flex>
           <HStack spacing={4}>
             {/* Year Dropdown for End Date */}
@@ -2725,7 +2770,15 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         </Box>
 
                   <Box>
-          <Heading fontSize="22px" fontWeight="medium" mb="0.5rem" color="#40E0D0">Select Reviewer</Heading>
+          <Heading 
+            as="h5"
+            size="sm" 
+            fontWeight="semibold" 
+            mb={2} 
+            color={useColorModeValue('#2b6cb0', '#4FD1FF')}
+          >
+            Select Reviewer
+          </Heading>
           <Menu closeOnSelect={false}>
             <MenuButton
               as={Button}
@@ -2980,7 +3033,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
       <br/>
 
       {selectedMonth && (
-        <Box padding={{ base: "0.5rem", md: "1rem" }} borderRadius="0.55rem">
+        <Box borderRadius="0.55rem">
           <Box
             bgColor={bg}
             // padding="2rem"
@@ -3053,9 +3106,17 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
     <Box>
           <br/>
         <hr></hr>
-        <br/>
         <section id="comments">
-        <Text fontSize="36px" fontWeight="bold" color="#40E0D0">Comments</Text></section>
+        <Heading 
+          as="h4"
+          size="lg" 
+          fontWeight="bold" 
+          color={useColorModeValue('#2b6cb0', '#4FD1FF')}
+          mb={4}
+        >
+          Comments
+        </Heading>
+        </section>
           <Comments page={"Reviewers"}/>
           
         </Box>

@@ -67,13 +67,16 @@ const LeaderboardGrid: React.FC<LeaderboardGridProps> = ({
       borderRadius="lg"
       borderWidth="1px"
       borderColor={borderColor}
-      p={5}
-      boxShadow="md"
+      p={{ base: 4, md: 5 }}
       width="100%"
       minH="420px"
     >
       <Flex justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={2}>
-        <Heading size="md" color="blue.500">
+        <Heading 
+          size="lg" 
+          fontWeight="bold"
+          color={useColorModeValue('#2b6cb0', '#4FD1FF')}
+        >
           {title}
           {copyLink && <CopyLink link={copyLink} />}
         </Heading>

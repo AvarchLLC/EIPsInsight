@@ -1705,18 +1705,18 @@ const GitHubPRTracker: React.FC = () => {
           {/* Animated Header with FAQ */}
           <AnimatedHeader
             title="PR Analytics"
-            emoji="📊"
+            description="Track and analyze pull request metrics across GitHub repositories. Monitor trends in created, closed, merged, and open PRs with interactive visualizations and detailed monthly breakdowns."
             faqItems={[
               {
-                question: "💡 What does this tool do?",
+                question: "What does this tool do?",
                 answer: "This tool aims to automate the process of tracking PRs and issues in GitHub repositories, providing visualizations and reports to streamline project management. The default view utilizes the timeline to observe trends in the number of Created, Closed, Merged, and Open PRs/Issues at the end of each month."
               },
               {
-                question: "📅 How can I view data for a specific month?",
+                question: "How can I view data for a specific month?",
                 answer: "To focus on a specific month, click the View More button and choose the desired Year and Month from the dropdown menus. The table and graph will then update to display data exclusively for that selected month."
               },
               {
-                question: "🎨 How to customize the chart?",
+                question: "How can I customize the chart?",
                 answer: "To customize the chart, you can adjust the timeline scroll bar to display data for a specific month/year. Additionally, you can tailor the graph by selecting or deselecting checkboxes for Created, Closed, Merged, and Open PRs/Issues, allowing you to focus on the trends that are most relevant to you."
               },
               {
