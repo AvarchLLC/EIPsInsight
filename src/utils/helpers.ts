@@ -165,10 +165,14 @@ export const getYearlyData = (
   data: PRData[],
   showReviewer: ShowReviewerType
 ): Record<string, number> => {
+  const currentYear = new Date().getFullYear();
+
   const yearlyData: Record<string, number> = data
     ?.filter((item) => {
       const itemYear = parseInt(item.monthYear.split('-')[0], 10);
-      return itemYear >= 2015 && itemYear <= 2025;
+      // Include data from 2015 up to the current year so that new
+      // years (e.g. 2026, 2027, ...) are not accidentally dropped.
+      return itemYear >= 2015 && itemYear <= currentYear;
     })
     ?.reduce((acc, item) => {
       if (showReviewer[item.reviewer]) {

@@ -310,7 +310,9 @@ const ReviewTracker = () => {
     setCsvData(csv); 
   };
 
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "Marchhill", "bomanaps","daniellehrner"];
+  // Canonical reviewers list – keep in sync with helpers.REVIEWERS_LIST so
+  // leaderboard, charts, and CSVs all classify reviewers/editors the same way.
+  const reviewersList = helpers.REVIEWERS_LIST;
 
   const generateCSVData11 = () => {
     if (!selectedYear || !selectedMonth) {
@@ -1286,7 +1288,7 @@ const renderCharts = (
 
 const renderCharts2 = (data: PRData[], selectedYear: string | null, selectedMonth: string | null) => {
   // List of reviewers (others are editors)
-  const reviewersList = ["nalepae", "SkandaBhat", "advaita-saha", "Marchhill","bomanaps", "daniellehrner"];
+  const reviewersList = helpers.REVIEWERS_LIST;
 
   // ALWAYS use eipdata, ercdata, ripdata for consistency
   let dataToUse: PRData[];
