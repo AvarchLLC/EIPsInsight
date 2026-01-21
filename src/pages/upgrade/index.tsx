@@ -2847,7 +2847,7 @@ return (
 
         {/* Place Your Ad Card */}
         <Box mb={5}>
-          <PlaceYourAdCard />
+          {/*<PlaceYourAdCard /> */}
         </Box>
       </Box>
     </AllLayout>

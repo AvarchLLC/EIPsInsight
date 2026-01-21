@@ -320,7 +320,7 @@ const EthereumV2 = () => {
         
           {/* EtherWorld Advertisement */}
           <Box my={4} width="100%">
-            <CloseableAdCard />
+            {/* <CloseableAdCard /> */}
           </Box>
           
           {headerBar}

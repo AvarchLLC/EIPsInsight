@@ -433,7 +433,7 @@ const RIP = () => {
                 
                 {/* EtherWorld Advertisement */}
                 <Box my={6} width="100%">
-                  <CloseableAdCard />
+                  {/* <CloseableAdCard /> */}
                 </Box>
 
                 <Text fontSize="md" mt={4} textAlign="justify">

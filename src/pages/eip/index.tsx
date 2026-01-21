@@ -323,7 +323,7 @@ const Type = () => {
 
             {/* EtherWorld Advertisement */}
             <Box mb={4} width="100%">
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
 
             <Flex

@@ -161,7 +161,7 @@ const Networking = () => {
               <FAQSection title="About Networking EIPs" faqs={faqs} />
             </Box>
             <Box mb={6}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
             <TableStatus cat="Networking" />
             <Box

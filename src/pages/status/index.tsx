@@ -202,7 +202,7 @@ const Status = () => {
 
             {/* EtherWorld Advertisement */}
             <Box my={6}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
 
             <Text

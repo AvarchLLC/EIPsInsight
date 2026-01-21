@@ -133,7 +133,7 @@ const Core = () => {
               <FAQSection title="About Core EIPs" faqs={faqs} />
             </Box>
             <Box mb={6}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
             <TableStatus cat="Core" />
             <Box

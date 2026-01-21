@@ -131,7 +131,7 @@ const Living = () => {
               <StatusInsightsCard title="Living Standards Insights" insights={[{ label: "Top Category", value: categoryDistribution[0]?.category || "N/A", icon: FiLayers, colorScheme: "blue" }, { label: "Core Living", value: livingData.filter(item => item.category === "Core").length, icon: FiFileText, colorScheme: "teal" }, { label: "Informational", value: livingData.filter(item => item.category === "Informational").length, icon: FiFileText, colorScheme: "purple" }, { label: "Categories", value: categoryDistribution.length, icon: FiLayers, colorScheme: "cyan" }]} />
             </Grid>
             <Box mb={6}><FAQSection title="About Living EIPs" faqs={faqs} /></Box>
-            <Box mb={6}><CloseableAdCard /></Box>
+            <Box mb={6}>{/* <CloseableAdCard /> */}</Box>
             <TableStatusByStatus status="Living" />
           </Box>
         </motion.div>

@@ -5,11 +5,11 @@ import mongoose from 'mongoose';
 
 // Connect to MongoDB
 if (mongoose.connection.readyState === 0) {
-    if (typeof process.env.MONGODB_URI === 'string') {
-        mongoose.connect(process.env.MONGODB_URI);
+    if (typeof process.env.CONTRI_URI === 'string') {
+        mongoose.connect(process.env.CONTRI_URI);
     } else {
         // Handle the case where the environment variable is not defined
-        console.error('MONGODB_URI environment variable is not defined');
+        console.error('CONTRI_URI environment variable is not defined');
     }
 }
 

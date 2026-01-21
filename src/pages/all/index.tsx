@@ -291,7 +291,7 @@ useEffect(() => {
 
         {/* EtherWorld Ad - Strategic placement before table */}
         <Box mb={6}>
-          <CloseableAdCard />
+          {/* <CloseableAdCard /> */}
         </Box>
 
         {/* Table */}

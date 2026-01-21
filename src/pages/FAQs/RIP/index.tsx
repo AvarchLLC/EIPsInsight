@@ -93,7 +93,7 @@ const EIPsInsightRecap = () => {
 
             {/* EtherWorld Advertisement */}
             <Box my={6} width="100%">
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
 
             <Text fontSize={{ base: "sm", sm: "xs", md: "md" }} className="text-4xl font-semibold text-blue-400 text-left mt-10" textAlign="justify">

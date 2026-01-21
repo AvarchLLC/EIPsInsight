@@ -1765,7 +1765,7 @@ const GitHubPRTracker: React.FC = () => {
 
             {/* Advertisement - Right side */}
             <Box flex={{ base: "1", md: "0 0 auto" }} w={{ base: "100%", md: "auto" }}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
           </Flex>
 
@@ -1969,7 +1969,7 @@ const GitHubPRTracker: React.FC = () => {
           </Box>
 
                     <Box my={12}>
-            <PlaceYourAdCard />
+            {/*<PlaceYourAdCard /> */}
           </Box>
 
   <br />

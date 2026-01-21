@@ -37,12 +37,12 @@ const Dasboard = () => {
             
             {/* EtherWorld Advertisement */}
             <Box my={6} width="100%">
-                <CloseableAdCard />
+                {/* <CloseableAdCard /> */}
             </Box>
             <Dashboard/>
             {/* Advertise With Us (moved lower for spacing) */}
             <Box my={12} width="100%">
-                <PlaceYourAdCard />
+                {/*<PlaceYourAdCard /> */}
             </Box>
 
         </AllLayout>

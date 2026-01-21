@@ -66,7 +66,7 @@ const EIPsInsightRecap = () => {
 
         {/* EtherWorld Advertisement */}
         <Box w="100%" my={6}>
-          <CloseableAdCard />
+          {/* <CloseableAdCard /> */}
         </Box>
         {/* Advertise With Us (moved lower for spacing) */}
         
@@ -118,7 +118,7 @@ const EIPsInsightRecap = () => {
 
         {/* Advertise With Us (placed after hero section) */}
         <Box w="100%" my={12}>
-          <PlaceYourAdCard />
+          {/*<PlaceYourAdCard /> */}
         </Box>
 
 

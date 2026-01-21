@@ -131,7 +131,7 @@ const Stagnant = () => {
               <StatusInsightsCard title="Stagnant Insights" insights={[{ label: "Most Affected", value: categoryDistribution[0]?.category || "N/A", icon: FiLayers, colorScheme: "blue" }, { label: "Core Stagnant", value: stagnantData.filter(item => item.category === "Core").length, icon: FiFileText, colorScheme: "gray" }, { label: "Network Proposals", value: stagnantData.filter(item => item.category === "Networking").length, icon: FiFileText, colorScheme: "orange" }, { label: "Categories", value: categoryDistribution.length, icon: FiLayers, colorScheme: "cyan" }]} />
             </Grid>
             <Box mb={6}><FAQSection title="About Stagnant EIPs" faqs={faqs} /></Box>
-            <Box mb={6}><CloseableAdCard /></Box>
+            <Box mb={6}>{/* <CloseableAdCard /> */}</Box>
             <TableStatusByStatus status="Stagnant" />
           </Box>
         </motion.div>

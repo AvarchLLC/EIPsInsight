@@ -93,7 +93,7 @@ const Feedback: React.FC = () => {
 
         {/* EtherWorld Advertisement */}
         <Box my={4} width="100%">
-          <CloseableAdCard />
+          {/* <CloseableAdCard /> */}
         </Box>
 
         {isLoading ? (

@@ -32,7 +32,7 @@ const EIPTable = () => {
           
           {/* EtherWorld Advertisement */}
           <Box my={6}>
-            <CloseableAdCard />
+            {/* <CloseableAdCard /> */}
           </Box>
           
           <Table type="EIP" />

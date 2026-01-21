@@ -225,7 +225,7 @@ const Interface = () => {
               <FAQSection title="About Interface EIPs" faqs={faqs} />
             </Box>
             <Box mb={6}>
-              <CloseableAdCard />
+              {/* <CloseableAdCard /> */}
             </Box>
             <TableStatus cat="Interface" />
           </Box>
