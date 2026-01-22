@@ -21,7 +21,7 @@ import NLink from "next/link";
 import EipTemplateEditor from "@/components/eiptemplate";
 import { motion } from "framer-motion";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
-import ProposalEditor from "@/components/Edtor/ProposalEditor";
+import ProposalEditor from "@/components/Editor/ProposalEditor";
 
 
 const All = () => {
