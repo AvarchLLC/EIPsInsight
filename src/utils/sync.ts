@@ -2,6 +2,8 @@ import { getAllSubscriptions, getLastProcessedSha, setLastProcessedSha } from '.
 import { getChangesSince } from './trackChanges';
 import { buildChangeEmail, sendEmailNotification } from './email';
 import { buildFeedItemsFromEvents, generateRSSFeed } from './rss';
+import { mkdir, writeFile } from 'fs/promises';
+import path from 'path';
 
 interface GroupKey {
   type: 'eips' | 'ercs' | 'rips';
@@ -82,7 +84,7 @@ export async function syncEipChanges() {
       );
     }
 
-    // RSS (per (type,id)) – you can persist this (DB/S3/public folder)
+    // RSS (per (type,id)) – persisted to /public/rss for a public endpoint
     try {
       const baseLink =
         key.type === 'rips'
@@ -98,8 +100,13 @@ export async function syncEipChanges() {
         link: baseLink,
         items: feedItems
       });
-      // TODO: store rssXml (e.g. in Mongo or a file) for a public endpoint.
-      console.log(`📰 RSS generated for ${key.type}-${key.id} (${feedItems.length} items)`);
+      const rssDir = path.join(process.cwd(), 'public', 'rss');
+      await mkdir(rssDir, { recursive: true });
+      const rssPath = path.join(rssDir, `${key.type}-${key.id}.xml`);
+      await writeFile(rssPath, rssXml, 'utf8');
+      console.log(
+        `📰 RSS generated for ${key.type}-${key.id} (${feedItems.length} items) at /rss/${key.type}-${key.id}.xml`
+      );
     } catch (err) {
       console.error('❌ RSS generation failed', err);
     }
