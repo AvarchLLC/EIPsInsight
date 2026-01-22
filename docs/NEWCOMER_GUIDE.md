@@ -15,7 +15,7 @@ These files set up the app and build system:
   (core build, routing middleware, and deployment)
 
 - **Dependencies & scripts:**
-  `package.json` defines scripts (`dev`, `build`, `start`, `lint`, `create-admin`, `migrate-blogs`) and the dependency stack (React + Next.js + UI libs + charts + data tooling).
+  `package.json` defines scripts (`dev`, `build`, `start`, `lint`, `test`, `create-admin`, `migrate-blogs`) and the dependency stack (React + Next.js + UI libs + charts + data tooling).
 
 ---
 
