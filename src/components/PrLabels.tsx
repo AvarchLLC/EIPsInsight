@@ -89,6 +89,26 @@ const CUSTOM_LABELS_ALL: LabelSpec[] = [
   { value: "Misc", label: "Miscellaneous", color: "#64748b" },
 ];
 
+// Graph 2: Process (same open PRs as Graph 1 Open; sum of counts = Graph 1 Open per month)
+const PROCESS_LABELS: LabelSpec[] = [
+  { value: "PR DRAFT", label: "PR DRAFT", color: "#6366f1" },
+  { value: "Typo", label: "Typo", color: "#22c55e" },
+  { value: "NEW EIP", label: "NEW EIP", color: "#f59e0b" },
+  { value: "Website", label: "Website", color: "#0ea5e9" },
+  { value: "EIP-1", label: "EIP-1", color: "#ec4899" },
+  { value: "Tooling", label: "Tooling", color: "#14b8a6" },
+  { value: "Status Change", label: "Status Change", color: "#ef4444" },
+  { value: "Other", label: "Other", color: "#64748b" },
+];
+// Graph 2: Participants (subcategory); Awaited = draft PRs when Process is PR DRAFT and not stagnant; empty/unknown → Misc
+const PARTICIPANTS_LABELS: LabelSpec[] = [
+  { value: "Waiting on Editor", label: "Waiting on Editor", color: "#6366f1" },
+  { value: "Waiting on Author", label: "Waiting on Author", color: "#22c55e" },
+  { value: "Stagnant", label: "Stagnant", color: "#f59e0b" },
+  { value: "Awaited", label: "Awaited", color: "#8b5cf6" },
+  { value: "Misc", label: "Misc", color: "#64748b" },
+];
+
 const REPOS = [
   { key: "all", label: "All Open PRs", api: "" },
   { key: "eip", label: "EIP Open PRs", api: "/api/pr-stats" },
@@ -111,31 +131,74 @@ function formatMonthLabel(monthYear: string) {
   return date.toLocaleString("default", { month: "short", year: "numeric" });
 }
 
+// Graph 2 Process: PR DRAFT | Typo | NEW EIP | Website | EIP-1 | Tooling | Status Change | Other
+function labelsToProcess(labelsStr: string, repo: string, isPrDraft?: boolean): string {
+  const labels = labelsStr.split(";").map((l) => l.trim()).filter(Boolean);
+  if (isPrDraft === true || labels.some((l) => l === "PR DRAFT")) return "PR DRAFT";
+  if (labels.some((l) => /^Typo Fix$/i.test(l))) return "Typo";
+  if (labels.some((l) => /^Status Change$/i.test(l))) return "Status Change";
+  if (labels.some((l) => /^New EIP$/i.test(l))) return "NEW EIP";
+  if (labels.some((l) => /^New ERC$/i.test(l))) return "NEW EIP";
+  if (labels.some((l) => /^New RIP$/i.test(l))) return "NEW EIP";
+  if (labels.some((l) => /website|r-website/i.test(l))) return "Website";
+  if (labels.some((l) => /eip-?1|EIP-?1/i.test(l))) return "EIP-1";
+  if (labels.some((l) => /tooling|r-ci|r-process/i.test(l))) return "Tooling";
+  return "Other";
+}
+// Graph 2 Participants: only Awaited when draft (PR DRAFT) and not stagnant; else Misc if no label match (backend uses analysis criteria)
+function labelsToParticipants(labelsStr: string, process: string, isPrDraft?: boolean): string {
+  const labels = labelsStr.split(";").map((l) => (l || "").trim()).filter(Boolean);
+  const lower = labels.map((l) => l.toLowerCase());
+  if (lower.some((l) => l === "e-review" || l === "editor review")) return "Waiting on Editor";
+  if (lower.some((l) => l === "a-review" || l === "author review")) return "Waiting on Author";
+  if (lower.some((l) => l === "s-stagnant" || l === "stagnant")) return "Stagnant";
+  if ((process === "PR DRAFT" || isPrDraft) && !lower.some((l) => l === "s-stagnant" || l === "stagnant")) return "Awaited";
+  return "Misc";
+}
+
+/** Normalize Graph 2a API type (category) to display: e.g. "New EIP" → "NEW EIP". Chart doc: category "eips"|"ercs"|"rips"|"all", type = category name. */
+function normalizeProcessTypeFromApi(type: string): string {
+  const t = (type || "").trim();
+  if (/^New\s*EIP$/i.test(t)) return "NEW EIP";
+  if (/^PR\s*DRAFT$/i.test(t)) return "PR DRAFT";
+  if (t === "Typo") return "Typo";
+  if (t === "Website") return "Website";
+  if (/^EIP-?1$/i.test(t)) return "EIP-1";
+  if (t === "Tooling") return "Tooling";
+  if (/^Status\s*Change$/i.test(t)) return "Status Change";
+  if (t === "Other") return "Other";
+  return t || "Other";
+}
+
+/** Normalize Graph 2b API type (subcategory) to display: e.g. "AWAITED" → "Awaited". Chart doc type = subcategory name. */
+function normalizeParticipantsTypeFromApi(type: string): string {
+  const t = (type || "").trim();
+  if (/^AWAITED$/i.test(t)) return "Awaited";
+  if (/Waiting\s*on\s*Editor/i.test(t)) return "Waiting on Editor";
+  if (/Waiting\s*on\s*Author/i.test(t)) return "Waiting on Author";
+  if (/Stagnant/i.test(t)) return "Stagnant";
+  if (/Uncategorized|Misc/i.test(t)) return "Misc";
+  return t || "Misc";
+}
+
 export default function PRAnalyticsCard() {
   const cardBg = useColorModeValue("white", "#252529");
   const textColor = useColorModeValue("#2D3748", "#F7FAFC");
   const accentColor = useColorModeValue("#4299e1", "#63b3ed");
   const badgeText = useColorModeValue("white", "#171923");
+  const axisColor = useColorModeValue("#e2e8f0", "#4a5568");
+  const splitLineColor = useColorModeValue("#f7fafc", "#2d3748");
 
   const [repoKey, setRepoKey] = useState<"all" | "eip" | "erc" | "rip">("eip");
-  const [labelSet, setLabelSet] = useState<"customLabels" | "githubLabels">("customLabels");
+  const [labelSet, setLabelSet] = useState<"process" | "participants">("process");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>(''); // For CSV download
 
-  // Select correct label spec
+  // Graph 2: Process or Participants (same open PRs as Graph 1 Open; sum = Graph 1 Open per month)
   const labelSpecs: LabelSpec[] = useMemo(() => {
-    if (labelSet === "customLabels") {
-      if (repoKey === "all") return CUSTOM_LABELS_ALL;
-      return repoKey === "eip"
-        ? CUSTOM_LABELS_EIP
-        : repoKey === "erc"
-        ? CUSTOM_LABELS_ERC
-        : CUSTOM_LABELS_RIP;
-    } else {
-      return WORKFLOW_LABELS;
-    }
-  }, [repoKey, labelSet]);
+    return labelSet === "process" ? PROCESS_LABELS : PARTICIPANTS_LABELS;
+  }, [labelSet]);
 
   // Filter state setup
   const [selectedLabels, setSelectedLabels] = useState<string[]>(labelSpecs.map(l => l.value));
@@ -198,42 +261,33 @@ export default function PRAnalyticsCard() {
 
   const workflowLabelValues = new Set(WORKFLOW_LABELS.map(l => l.value));
 
-  // Fetch API
+  // Map repo key to Graph 2 API name (eips, ercs, rips, all)
+  const graph2ApiName = repoKey === "eip" ? "eips" : repoKey === "erc" ? "ercs" : repoKey === "rip" ? "rips" : "all";
+
+  // Fetch API: prefer Graph 2 chart API (same open PR set as Graph 1); fallback to pr-details + client aggregate
   useEffect(() => {
     setLoading(true);
     const controller = new AbortController();
 
-    const fetchSingle = async (api: string) => {
-      const res = await fetch(`${api}?labelType=${labelSet}`, { signal: controller.signal });
-      if (!res.ok) throw new Error(`${api} -> ${res.status}`);
-      const json = await res.json();
-      return Array.isArray(json) ? (json as AggregatedLabelCount[]) : [];
-    };
-
     const fetchDetails = async (repo: string) => {
-      const qs = new URLSearchParams({ repo, mode: "detail", labelType: labelSet }).toString();
+      const qs = new URLSearchParams({ repo, mode: "detail", labelType: "customLabels" }).toString();
       const res = await fetch(`/api/pr-details?${qs}`, { signal: controller.signal });
       if (!res.ok) throw new Error(`/api/pr-details (${repo}) -> ${res.status}`);
       const json = await res.json();
       return Array.isArray(json) ? json : [];
     };
 
-  const aggregateDetails = (rows: any[]): AggregatedLabelCount[] => {
+    const aggregateDetails = (rows: any[]): AggregatedLabelCount[] => {
       const acc = new Map<string, AggregatedLabelCount>();
       for (const pr of rows) {
         const monthYear: string = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
         if (!monthYear) continue;
-        
-        // For custom labels, categorize based on ALL labels
-        let label: string;
-        if (labelSet === "customLabels") {
-          const allLabelsStr = pr.Labels || "";
-          const categorized = categorizePRByLabels(allLabelsStr, pr.Repo || "");
-          label = normalizeCustomLabel(pr.Repo || "", categorized);
-        } else {
-          label = pr.Label || "";
-        }
-        
+
+        const process = (labelSet === "process" && pr.Category) ? pr.Category : labelsToProcess(pr.Labels || "", pr.Repo || "", pr.Draft);
+        const label = labelSet === "process"
+          ? process
+          : (pr.Subcategory != null && pr.Subcategory !== "" ? pr.Subcategory : labelsToParticipants(pr.Labels || "", process, pr.Draft));
+
         const key = `${monthYear}__${label}`;
         const curr = acc.get(key) || { monthYear, label, count: 0, labelType: labelSet, prNumbers: [] };
         curr.count += 1;
@@ -243,24 +297,39 @@ export default function PRAnalyticsCard() {
       return Array.from(acc.values());
     };
 
+    const view = labelSet === "process" ? "category" : "subcategory";
+
     const run = async () => {
       try {
-        if (repoKey !== "all") {
-          const repoObj = REPOS.find(r => r.key === repoKey)!;
-          const arr = await fetchSingle(repoObj.api);
-          setData(arr);
-        } else {
-          // Fetch detailed rows for all repos and aggregate client-side
-          const [eipD, ercD, ripD] = await Promise.allSettled([
-            fetchDetails("eip"),
-            fetchDetails("erc"),
-            fetchDetails("rip"),
-          ]);
-          const toRows = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
-          const combinedRows = [...toRows(eipD), ...toRows(ercD), ...toRows(ripD)];
-          const aggregated = aggregateDetails(combinedRows);
-          setData(aggregated);
+        // Prefer Graph 2 API (pre-aggregated chart data; sum = Graph 1 Open per month)
+        const graph2Res = await fetch(
+          `/api/AnalyticsCharts/graph2/${graph2ApiName}?view=${view}`,
+          { signal: controller.signal }
+        );
+        if (graph2Res.ok) {
+          const json = await graph2Res.json();
+          // Graph 2a = category (Process), Graph 2b = subcategory (Participants). Chart doc: _id, category, monthYear, type, count.
+          const arr = labelSet === "process" ? (json?.data?.category ?? []) : (json?.data?.subcategory ?? []);
+          if (Array.isArray(arr) && arr.length > 0) {
+            const aggregated: AggregatedLabelCount[] = arr.map((d: { monthYear?: string; type?: string; count?: number }) => ({
+              monthYear: d.monthYear ?? "",
+              label: labelSet === "process" ? normalizeProcessTypeFromApi(d.type ?? "") : normalizeParticipantsTypeFromApi(d.type ?? ""),
+              count: typeof d.count === "number" ? d.count : 0,
+              labelType: labelSet,
+              prNumbers: [],
+            }));
+            setData(aggregated);
+            return;
+          }
         }
+        // Fallback: pr-details + client-side aggregate
+        const reposToFetch = repoKey === "all" ? ["eip", "erc", "rip"] : [repoKey];
+        const results = await Promise.allSettled(
+          reposToFetch.map((r) => fetchDetails(r))
+        );
+        const toRows = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
+        const combinedRows = results.flatMap(toRows);
+        setData(aggregateDetails(combinedRows));
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
           // eslint-disable-next-line no-console
@@ -274,7 +343,7 @@ export default function PRAnalyticsCard() {
 
     run();
     return () => controller.abort();
-  }, [repoKey, labelSet]);
+  }, [repoKey, labelSet, graph2ApiName]);
 
   // Build filtered dataset and chart options
   const filteredData = useMemo(() => {
@@ -305,8 +374,10 @@ export default function PRAnalyticsCard() {
         const found = filteredData.find(d => d.monthYear === month && d.label === value);
         return found ? found.count : 0;
       }),
-      itemStyle: { color },
-      barMaxWidth: 40
+      itemStyle: { color, barBorderRadius: [4, 4, 0, 0] },
+      barMaxWidth: 40,
+      emphasis: { itemStyle: { shadowBlur: 12, shadowColor: "rgba(0,0,0,0.2)" } },
+      animationDelay: (dataIndex: number) => dataIndex * 25,
     }))
   }), [months, filteredData, labelSpecs]);
 
@@ -363,12 +434,8 @@ export default function PRAnalyticsCard() {
         margin: 12,
         hideOverlap: true
       },
-      axisLine: {
-        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
-      },
-      axisTick: {
-        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
-      }
+      axisLine: { lineStyle: { color: axisColor } },
+      axisTick: { lineStyle: { color: axisColor } }
     }],
     yAxis: [{
       type: "value",
@@ -382,14 +449,9 @@ export default function PRAnalyticsCard() {
         color: textColor,
         fontWeight: 500
       },
-      axisLine: {
-        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
-      },
+      axisLine: { lineStyle: { color: axisColor } },
       splitLine: {
-        lineStyle: { 
-          color: useColorModeValue('#f7fafc', '#2d3748'),
-          type: 'dashed'
-        }
+        lineStyle: { color: splitLineColor, type: 'dashed' }
       }
     }],
     series: chartData.series,
@@ -405,9 +467,11 @@ export default function PRAnalyticsCard() {
       },
     ],
     grid: { left: 70, right: 40, top: 90, bottom: 70 },
-    animationDuration: 800,
-    animationEasing: 'cubicOut'
-  }), [chartData, textColor, cardBg, defaultZoomStart]);
+    animation: true,
+    animationDuration: 1000,
+    animationEasing: "cubicOut",
+    animationDelayUpdate: (idx: number) => idx * 20,
+  }), [chartData, textColor, cardBg, defaultZoomStart, axisColor, splitLineColor]);
 
   // CSV download
   const downloadCSV = async () => {
@@ -416,7 +480,7 @@ export default function PRAnalyticsCard() {
     const buildParams = (repo: string) => new URLSearchParams({
       repo,
       mode: "detail",
-      labelType: labelSet,
+      labelType: "customLabels",
     }).toString();
 
     const fetchRows = async (repo: string) => {
@@ -451,37 +515,17 @@ export default function PRAnalyticsCard() {
         return;
       }
 
-      // Filter only PRs from the selected month and apply selected label filter
+      // Filter only PRs from the selected month and apply selected label filter (Process or Participants)
       const filteredRows = combined
         .map((pr: any) => {
-          // For custom labels, categorize based on ALL labels (from Labels field)
-          // For github labels, use the single Label field
-          let actualLabel: string;
-          
-          if (labelSet === "customLabels") {
-            // Use ALL labels to determine the correct category (matching API aggregation logic)
-            const allLabelsStr = pr.Labels || "";
-            actualLabel = categorizePRByLabels(allLabelsStr, pr.Repo || repoKey);
-          } else {
-            // For github labels, use the single label
-            actualLabel = pr.Label || "";
-          }
-          
-          // Only normalize for 'all' view to match the graph display
-          let displayLabel = actualLabel;
-          if (repoKey === "all") {
-            if (labelSet === "customLabels") {
-              displayLabel = normalizeCustomLabel(pr.Repo || repoKey, actualLabel);
-            } else if (labelSet === "githubLabels") {
-              displayLabel = normalizeGithubLabel(actualLabel);
-            }
-          }
-          
-          // Store both actual and display label in the PR object
+          const process = (labelSet === "process" && pr.Category) ? pr.Category : labelsToProcess(pr.Labels || "", pr.Repo || repoKey, pr.Draft);
+          const actualLabel = labelSet === "process"
+            ? process
+            : (pr.Subcategory != null && pr.Subcategory !== "" ? pr.Subcategory : labelsToParticipants(pr.Labels || "", process, pr.Draft));
           return {
             ...pr,
             ActualLabel: actualLabel,
-            DisplayLabel: displayLabel
+            DisplayLabel: actualLabel
           };
         })
         .filter((pr: any) => {
@@ -490,11 +534,7 @@ export default function PRAnalyticsCard() {
 
           // For 'all' view, check if the normalized DisplayLabel is in selectedLabels
           // For individual repos, check if the ActualLabel is in selectedLabels
-          const passesFilter = repoKey === "all" 
-            ? selectedLabels.includes(pr.DisplayLabel)
-            : selectedLabels.includes(pr.ActualLabel);
-
-          return passesFilter;
+          return selectedLabels.includes(pr.ActualLabel);
         });
 
       const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
@@ -543,10 +583,10 @@ export default function PRAnalyticsCard() {
   const selectAll = () => setSelectedLabels(labelSpecs.map(l => l.value));
   const clearAll = () => setSelectedLabels([]);
 
-  // Label set switch drop-down
+  // Graph 2: toggle Process (category) or Participants (subcategory); same open PRs, sum = Graph 1 Open
   const labelSetOptions = [
-    { key: "customLabels", label: "Custom Labels" },
-    { key: "githubLabels", label: "GitHub Labels" }
+    { key: "process", label: "Process" },
+    { key: "participants", label: "Participants" }
   ];
 
   return (
@@ -554,7 +594,7 @@ export default function PRAnalyticsCard() {
       <CardHeader>
         <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
           <Heading size="md" color={accentColor} mb={2} id="PrLabelsChart">
-            {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label} Distribution
+            Graph 2: {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label}
             <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
           </Heading>
           <Flex gap={3} align="center">
@@ -592,7 +632,7 @@ export default function PRAnalyticsCard() {
                       size="sm"
                       justifyContent="flex-start"
                       colorScheme={labelSet === opt.key ? "teal" : undefined}
-                      onClick={() => setLabelSet(opt.key as "customLabels" | "githubLabels")}
+                      onClick={() => setLabelSet(opt.key as "process" | "participants")}
                     >
                       {opt.label}
                     </Button>
@@ -626,6 +666,9 @@ export default function PRAnalyticsCard() {
             </Button>
           </Flex>
         </Flex>
+        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} mt={2}>
+          Same open PRs as Graph 1 Open. Toggle <strong>Process</strong> (category) or <strong>Participants</strong> (subcategory); sum of counts = Graph 1 Open per month. <strong>Awaited</strong> = draft PRs when Process is PR DRAFT and not stagnant.
+        </Text>
       </CardHeader>
       <CardBody>
         <Flex gap={4} wrap="wrap" mb={4} align="center">
@@ -641,7 +684,7 @@ export default function PRAnalyticsCard() {
               <CheckboxGroup value={selectedLabels} onChange={(v: string[]) => setSelectedLabels(v)}>
                 <Stack pl={2} pr={2} gap={1}>
                   {labelSpecs.map(lbl => (
-                    <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme={labelSet === "customLabels" ? "blue" : "purple"} iconColor={badgeText}>
+                    <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme={labelSet === "process" ? "blue" : "purple"} iconColor={badgeText}>
                       <Badge
                         mr={2}
                         fontSize="sm"
@@ -675,7 +718,7 @@ export default function PRAnalyticsCard() {
             }
           </Text>
           <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={1}>
-            (Based on {selectedLabels.length} selected label{selectedLabels.length !== 1 ? 's' : ''} - CSV downloads {selectedMonth ? formatMonthLabel(selectedMonth) : 'selected month'} data)
+            Same open PRs as Graph 1 Open. Sum = Graph 1 Open per month. CSV: {selectedMonth ? formatMonthLabel(selectedMonth) : "selected month"}.
           </Text>
         </Box>
         <Divider my={3} />
