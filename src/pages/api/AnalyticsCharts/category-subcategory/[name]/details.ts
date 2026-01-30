@@ -1,13 +1,23 @@
+/**
+ * Category-subcategory details API: table with metadata (per-PR rows).
+ *
+ * Reads from PR collections (eipprs, ercprs, ripprs) and uses stored category/subcategory
+ * so the table matches Graph 2/3 and board aggregation (same data as pranalyti charts).
+ *
+ * Query: name=eips|ercs|rips|all, month=YYYY-MM
+ * Response: same row shape as before (MonthKey, Month, Repo, Process, Participants,
+ *   PRNumber, PRId, PRLink, Title, Author, State, CreatedAt, ClosedAt, Labels, GitHubRepo).
+ */
 import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose, { Schema, Connection } from "mongoose";
 
 const MONGODB_URI = process.env.OPENPRS_MONGODB_URI || "";
 const DB_NAME = process.env.OPENPRS_DATABASE || "prsdb";
 
-const SNAPSHOT_COLLECTIONS: Record<string, string> = {
-  eips: "open_pr_snapshots",
-  ercs: "open_erc_pr_snapshots",
-  rips: "open_rip_pr_snapshots",
+const PR_COLLECTIONS: Record<string, string> = {
+  eips: "eipprs",
+  ercs: "ercprs",
+  rips: "ripprs",
 };
 
 const REPO_LABELS: Record<string, string> = {
@@ -22,41 +32,49 @@ const GITHUB_REPOS: Record<string, string> = {
   rips: "ethereum/RIPs",
 };
 
-// Graph 2 Process: PR DRAFT | Typo | NEW EIP | Website | EIP-1 | Tooling | Status Change | Other
-function deriveCategory(repoKey: string, labels: string[], state?: string, isPrDraft?: boolean): string {
-  const customLabels = labels.map((l) => (l || "").trim()).filter(Boolean);
-  if (isPrDraft === true || customLabels.some((l) => l === "PR DRAFT")) return "PR DRAFT";
-  if (customLabels.some((l) => /^Typo Fix$/i.test(l))) return "Typo";
-  if (customLabels.some((l) => /^Status Change$/i.test(l))) return "Status Change";
-  if (repoKey === "ercs" && customLabels.some((l) => /^New ERC$/i.test(l))) return "NEW EIP";
-  if (repoKey === "rips" && customLabels.some((l) => /^New RIP$/i.test(l))) return "NEW EIP";
-  if (customLabels.some((l) => /^New EIP$/i.test(l))) return "NEW EIP";
-  if (customLabels.some((l) => /website|r-website/i.test(l))) return "Website";
-  if (customLabels.some((l) => /eip-?1|EIP-?1/i.test(l))) return "EIP-1";
-  if (customLabels.some((l) => /tooling|r-ci|r-process/i.test(l))) return "Tooling";
-  return "Other";
+interface PRDoc {
+  prId?: number;
+  number: number;
+  title?: string;
+  author?: string;
+  prUrl?: string;
+  state?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  closedAt?: Date;
+  mergedAt?: Date;
+  specType?: string;
+  draft?: boolean;
+  category?: string;
+  subcategory?: string;
+  githubLabels?: string[];
 }
 
-// Participants: must match Graph 2 subcategory logic so board count matches "Waiting on Editor" from Graph 2
-function deriveSubcategory(labels: string[], state?: string, isPrDraft?: boolean): string {
-  const all = labels.map((l) => (l || "").toLowerCase()).filter(Boolean);
-  // Waiting on Editor: all label variants that Graph 2 / ETL may use
-  if (
-    all.some(
-      (l) =>
-        l === "e-review" ||
-        l === "editor review" ||
-        l === "needs-editor-review" ||
-        l === "custom:needs-editor-review" ||
-        l === "e-consensus" ||
-        (l && l.includes("editor") && l.includes("review"))
-    )
-  )
-    return "Waiting on Editor";
-  if (all.some((l) => l === "a-review" || l === "author review")) return "Waiting on Author";
-  if (all.some((l) => l === "s-stagnant" || l === "stagnant")) return "Stagnant";
-  if (isPrDraft === true || labels.some((l) => l === "PR DRAFT")) return "Awaited";
-  return "Misc";
+const prSchema = new Schema<PRDoc>(
+  {
+    prId: Number,
+    number: Number,
+    title: String,
+    author: String,
+    prUrl: String,
+    state: String,
+    createdAt: Date,
+    updatedAt: Date,
+    closedAt: Date,
+    mergedAt: Date,
+    specType: String,
+    draft: Boolean,
+    category: String,
+    subcategory: String,
+    githubLabels: [String],
+  },
+  { strict: false }
+);
+
+function inMonth(d: Date | null | undefined, year: number, month: number): boolean {
+  if (!d) return false;
+  const x = d instanceof Date ? d : new Date(d);
+  return x.getFullYear() === year && x.getMonth() === month - 1;
 }
 
 async function getConn(): Promise<Connection> {
@@ -71,21 +89,6 @@ async function getConn(): Promise<Connection> {
     conn.once("error", (err) => reject(err));
   });
   return conn;
-}
-
-interface SnapshotDoc {
-  month: string;
-  prs?: {
-    number: number;
-    prId?: number;
-    title?: string;
-    author?: string;
-    state?: string;
-    createdAt?: Date;
-    closedAt?: Date;
-    customLabels?: string[];
-    githubLabels?: string[];
-  }[];
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -105,7 +108,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const conn = await getConn();
-    const schema = new Schema<SnapshotDoc>({ month: String, prs: [{}] }, { strict: false });
+    const [y, m] = month.split("-").map(Number);
+    const monthLabel = new Date(y, m - 1, 1).toLocaleString("default", {
+      month: "short",
+      year: "numeric",
+    });
 
     const repoKeys = name === "all" ? (["eips", "ercs", "rips"] as const) : ([name] as const);
     const rows: {
@@ -126,24 +133,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       GitHubRepo: string;
     }[] = [];
 
-    const [y, m] = month.split("-").map(Number);
-    const monthLabel = new Date(y, m - 1, 1).toLocaleString("default", { month: "short", year: "numeric" });
-
     for (const repoKey of repoKeys) {
-      const coll = SNAPSHOT_COLLECTIONS[repoKey];
-      const modelName = `Snap_${repoKey}`;
-      const Model = conn.models[modelName] ?? conn.model<SnapshotDoc>(modelName, schema, coll);
-      const snap = await Model.findOne({ month }).lean();
-      if (!snap?.prs?.length) continue;
+      const coll = PR_COLLECTIONS[repoKey];
+      const modelName = `PR_${repoKey}`;
+      const Model = conn.models[modelName] ?? conn.model<PRDoc>(modelName, prSchema, coll);
+
+      // Same scope as pranalyti board aggregation: open PRs with createdAt or updatedAt in this month
+      const prs = await Model.find({ state: "open" }).lean();
+      const inScope = (prs as unknown as PRDoc[]).filter(
+        (pr) => inMonth(pr.createdAt, y, m) || inMonth(pr.updatedAt, y, m)
+      );
 
       const repoLabel = REPO_LABELS[repoKey];
       const githubRepo = GITHUB_REPOS[repoKey];
 
-      for (const pr of snap.prs) {
-        const labels = pr.customLabels ?? pr.githubLabels ?? [];
-        const isPrDraft = !!(pr as any).draft;
-        const processVal = deriveCategory(repoKey, labels, pr.state, isPrDraft);
-        const participantsVal = deriveSubcategory(labels, pr.state, isPrDraft);
+      for (const pr of inScope) {
+        const processVal = pr.category ?? "Other";
+        const participantsVal = pr.subcategory ?? "Misc";
+        const labels = Array.isArray(pr.githubLabels) ? pr.githubLabels : [];
+
         rows.push({
           MonthKey: month,
           Month: monthLabel,
@@ -152,13 +160,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           Participants: participantsVal,
           PRNumber: pr.number ?? 0,
           PRId: pr.prId ?? pr.number ?? 0,
-          PRLink: `https://github.com/${githubRepo}/pull/${pr.number}`,
+          PRLink: pr.prUrl ?? `https://github.com/${githubRepo}/pull/${pr.number}`,
           Title: (pr.title ?? "").replace(/"/g, '""'),
           Author: pr.author ?? "",
-          State: pr.state ?? "",
+          State: pr.state ?? "open",
           CreatedAt: pr.createdAt ? new Date(pr.createdAt).toISOString() : "",
           ClosedAt: pr.closedAt ? new Date(pr.closedAt).toISOString() : "",
-          Labels: (Array.isArray(labels) ? labels : []).join("; "),
+          Labels: labels.join("; "),
           GitHubRepo: githubRepo,
         });
       }
@@ -167,7 +175,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await conn.close();
     return res.status(200).json(rows);
   } catch (error) {
-    console.error("[category-subcategory details]", error);
+    console.error("[category-subcategory details from PR collections]", error);
     return res.status(500).json({
       error: "Failed to fetch PR details",
       details: error instanceof Error ? error.message : "Unknown error",

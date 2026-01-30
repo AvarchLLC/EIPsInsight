@@ -23,8 +23,6 @@ import {
   TableContainer,
   Input,
   Link,
-  InputGroup,
-  InputLeftElement,
   Badge,
   HStack,
 } from "@chakra-ui/react";
@@ -112,23 +110,11 @@ interface ChartDocument {
 
 type AxisLayout = "processOnAxis" | "participantsOnAxis";
 
-/** Table row from details API (open PRs only). */
-interface PRTableRow {
-  MonthKey: string;
-  Month: string;
-  Repo: string;
+/** Table row from Graph 3 API (same as chart) — Process × Participants count. */
+interface Graph3CountRow {
   Process: string;
   Participants: string;
-  PRNumber: number;
-  PRId: number;
-  PRLink: string;
-  Title: string;
-  Author: string;
-  State: string;
-  CreatedAt: string;
-  ClosedAt: string;
-  Labels: string;
-  GitHubRepo: string;
+  Count: number;
 }
 
 export default function CategorySubcategoryChart() {
@@ -151,17 +137,13 @@ export default function CategorySubcategoryChart() {
   const [data, setData] = useState<ChartDocument[]>([]);
   const [selectedMonthYear, setSelectedMonthYear] = useState<string>(getCurrentMonthYear());
   const [downloading, setDownloading] = useState(false);
-  const [tableRows, setTableRows] = useState<PRTableRow[]>([]);
-  const [tableLoading, setTableLoading] = useState(false);
-  const [filterSearch, setFilterSearch] = useState("");
   const [filterProcess, setFilterProcess] = useState("");
   const [filterParticipants, setFilterParticipants] = useState("");
-  const [filterTitle, setFilterTitle] = useState("");
-  const [filterPrNumber, setFilterPrNumber] = useState("");
   const [tablePage, setTablePage] = useState(1);
   const [showTable, setShowTable] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
 
-  const TABLE_PAGE_SIZE = 10;
+  const TABLE_PAGE_SIZE = 15;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -186,32 +168,33 @@ export default function CategorySubcategoryChart() {
     return () => controller.abort();
   }, [repoKey]);
 
-  useEffect(() => {
-    if (!selectedMonthYear || !/^\d{4}-\d{2}$/.test(selectedMonthYear)) {
-      setTableRows([]);
-      return;
-    }
-    const controller = new AbortController();
-    setTableLoading(true);
-    fetch(
-      `/api/AnalyticsCharts/category-subcategory/${repoKey}/details?month=${selectedMonthYear}`,
-      { signal: controller.signal }
-    )
-      .then((res) => (res.ok ? res.json() : []))
-      .then((rows: PRTableRow[]) => {
-        setTableRows(Array.isArray(rows) ? rows : []);
-      })
-      .catch((err) => {
-        if ((err as Error).name !== "AbortError") setTableRows([]);
-      })
-      .finally(() => setTableLoading(false));
-    return () => controller.abort();
-  }, [repoKey, selectedMonthYear]);
-
   const months = useMemo(() => {
     const set = new Set(data.map((d) => d.monthYear).filter(Boolean));
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [data]);
+
+  /** Table rows from Graph 3 API only (same data as chart) — Process × Participants counts for selected month. */
+  const countTableRows = useMemo((): Graph3CountRow[] => {
+    if (!selectedMonthYear || !/^\d{4}-\d{2}$/.test(selectedMonthYear)) return [];
+    const monthData = data.filter((d) => d.monthYear === selectedMonthYear);
+    const processParticipantCount = new Map<string, number>();
+    monthData.forEach((d) => {
+      if (!d.type) return;
+      const pipe = d.type.indexOf("|");
+      const rawProcess = pipe >= 0 ? d.type.slice(0, pipe).trim() : d.type.trim();
+      const rawPart = pipe >= 0 ? d.type.slice(pipe + 1).trim() : "";
+      const processVal = normalizeCategoryToPrLabels(rawProcess);
+      const participantVal = normalizeSubcategoryToPrLabels(rawPart);
+      const key = `${processVal}|${participantVal}`;
+      processParticipantCount.set(key, (processParticipantCount.get(key) || 0) + (d.count || 0));
+    });
+    return Array.from(processParticipantCount.entries())
+      .map(([key, count]) => {
+        const [Process, Participants] = key.split("|");
+        return { Process: Process || "—", Participants: Participants || "—", Count: count };
+      })
+      .sort((a, b) => (b.Count - a.Count) || (a.Process || "").localeCompare(b.Process || "") || (a.Participants || "").localeCompare(b.Participants || ""));
+  }, [data, selectedMonthYear]);
 
   useEffect(() => {
     if (months.length === 0) return;
@@ -335,9 +318,25 @@ export default function CategorySubcategoryChart() {
         top: 12,
         itemGap: 16,
       },
-      grid: { left: 140, right: 50, top: 70, bottom: 50 },
+      grid: { left: 60, right: 50, top: 70, bottom: 80 },
       backgroundColor: cardBg,
       xAxis: [
+        {
+          type: "category",
+          data: chartData.axisLabels,
+          axisLabel: {
+            color: textColor,
+            fontWeight: 600,
+            fontSize: 11,
+            interval: 0,
+            rotate: chartData.axisLabels.length > 8 ? 35 : 0,
+            margin: 12,
+          },
+          axisLine: { lineStyle: { color: axisColor } },
+          axisTick: { lineStyle: { color: axisColor } },
+        },
+      ],
+      yAxis: [
         {
           type: "value",
           name: "Open PRs",
@@ -345,22 +344,6 @@ export default function CategorySubcategoryChart() {
           axisLabel: { color: textColor, fontWeight: 500 },
           axisLine: { lineStyle: { color: axisColor } },
           splitLine: { lineStyle: { color: splitLineColor, type: "dashed" } },
-        },
-      ],
-      yAxis: [
-        {
-          type: "category",
-          data: chartData.axisLabels,
-          axisLabel: {
-            color: textColor,
-            fontWeight: 600,
-            fontSize: 12,
-            interval: 0,
-            margin: 10,
-          },
-          axisLine: { lineStyle: { color: axisColor } },
-          axisTick: { lineStyle: { color: axisColor } },
-          inverse: false,
         },
       ],
       series: chartData.series,
@@ -377,19 +360,7 @@ export default function CategorySubcategoryChart() {
   const noDataAtAll = months.length === 0;
 
   const filteredTableRows = useMemo(() => {
-    let list = [...tableRows];
-    const search = filterSearch.trim().toLowerCase();
-    if (search) {
-      list = list.filter(
-        (r) =>
-          (r.Title ?? "").toLowerCase().includes(search) ||
-          (r.Author ?? "").toLowerCase().includes(search) ||
-          (r.Process ?? "").toLowerCase().includes(search) ||
-          (r.Participants ?? "").toLowerCase().includes(search) ||
-          String(r.PRNumber ?? "").includes(search) ||
-          (r.Repo ?? "").toLowerCase().includes(search)
-      );
-    }
+    let list = [...countTableRows];
     if (filterProcess.trim()) {
       const p = filterProcess.trim().toLowerCase();
       list = list.filter((r) => (r.Process ?? "").toLowerCase().includes(p));
@@ -398,16 +369,8 @@ export default function CategorySubcategoryChart() {
       const s = filterParticipants.trim().toLowerCase();
       list = list.filter((r) => (r.Participants ?? "").toLowerCase().includes(s));
     }
-    if (filterTitle.trim()) {
-      const t = filterTitle.trim().toLowerCase();
-      list = list.filter((r) => (r.Title ?? "").toLowerCase().includes(t));
-    }
-    if (filterPrNumber.trim()) {
-      const n = filterPrNumber.trim();
-      list = list.filter((r) => String(r.PRNumber ?? "").includes(n));
-    }
     return list;
-  }, [tableRows, filterSearch, filterProcess, filterParticipants, filterTitle, filterPrNumber]);
+  }, [countTableRows, filterProcess, filterParticipants]);
 
   const totalTablePages = Math.max(1, Math.ceil(filteredTableRows.length / TABLE_PAGE_SIZE));
   const paginatedTableRows = useMemo(
@@ -421,40 +384,22 @@ export default function CategorySubcategoryChart() {
 
   useEffect(() => {
     setTablePage(1);
-  }, [filterSearch, filterProcess, filterParticipants, filterTitle, filterPrNumber]);
+  }, [filterProcess, filterParticipants]);
 
   useEffect(() => {
-    if (tablePage > totalTablePages) setTablePage(Math.max(1, totalTablePages));
+    if (tablePage > totalTablePages && totalTablePages > 0) setTablePage(Math.max(1, totalTablePages));
   }, [tablePage, totalTablePages]);
 
   const processBadgeColor = (process: string) => PROCESS_COLORS[process] ?? "#64748b";
   const participantsBadgeColor = (part: string) => PARTICIPANTS_COLORS[part] ?? "#64748b";
 
-  const formatCreatedDate = (iso: string) => {
-    if (!iso) return "—";
-    try {
-      const d = new Date(iso);
-      return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-    } catch {
-      return iso;
-    }
-  };
-
-  const downloadCSV = async () => {
+  const downloadCSV = () => {
     setDownloading(true);
     try {
-      const res = await fetch(
-        `/api/AnalyticsCharts/category-subcategory/${repoKey}/details?month=${selectedMonthYear}`
-      );
-      const raw = await res.json();
-      if (!res.ok) {
-        const msg = raw?.error || raw?.details || res.statusText || "Download failed";
-        throw new Error(msg);
-      }
-      const rows = Array.isArray(raw) ? raw : [];
-      const csv = rows.length > 0
-        ? Papa.unparse(rows)
-        : Papa.unparse([{ MonthKey: selectedMonthYear, Month: formatMonthLabel(selectedMonthYear), Repo: repoKey, Process: "", Participants: "", PRNumber: "", PRId: "", PRLink: "", Title: "No data for selected month", Author: "", State: "", CreatedAt: "", ClosedAt: "", Labels: "", GitHubRepo: "" }]);
+      const rows = filteredTableRows.length > 0
+        ? filteredTableRows
+        : [{ Process: "", Participants: "", Count: 0 }];
+      const csv = Papa.unparse(rows);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -513,8 +458,8 @@ export default function CategorySubcategoryChart() {
                 isDisabled={noDataAtAll}
               >
                 {axisLayout === "processOnAxis"
-                  ? "Y-axis: Process (stacked: Participants)"
-                  : "Y-axis: Participants (stacked: Process)"}
+                  ? "X-axis: Process (stacked: Participants)"
+                  : "X-axis: Participants (stacked: Process)"}
               </MenuButton>
               <MenuList minWidth="220px">
                 <Stack p={2}>
@@ -525,7 +470,7 @@ export default function CategorySubcategoryChart() {
                     justifyContent="flex-start"
                     onClick={() => setAxisLayout("processOnAxis")}
                   >
-                    Y-axis: Process — stacked: Participants
+                    X-axis: Process — stacked: Participants
                   </Button>
                   <Button
                     size="sm"
@@ -534,7 +479,7 @@ export default function CategorySubcategoryChart() {
                     justifyContent="flex-start"
                     onClick={() => setAxisLayout("participantsOnAxis")}
                   >
-                    Y-axis: Participants — stacked: Process
+                    X-axis: Participants — stacked: Process
                   </Button>
                 </Stack>
               </MenuList>
@@ -580,12 +525,21 @@ export default function CategorySubcategoryChart() {
             </Button>
           </Flex>
         </Flex>
-        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} mt={2}>
-          Same open PRs as Graph 1 Open and Graph 2. Toggle to put <strong>Process</strong> or <strong>Participants</strong> on the Y-axis (the other is stacked). Sum of segments = open PR count for the month.
-        </Text>
-        <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.500")} mt={1}>
-          <strong>Awaited</strong> = draft PRs (when Process is PR DRAFT and not stagnant). Horizontal bar; one month per view.
-        </Text>
+        <Flex align="center" gap={2} mt={2} flexWrap="wrap">
+          <Button
+            size="xs"
+            variant="ghost"
+            colorScheme="gray"
+            onClick={() => setShowDescription((v) => !v)}
+          >
+            {showDescription ? "Hide description" : "Show description"}
+          </Button>
+          {showDescription && (
+            <Box fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+              Same open PRs as Graph 1 Open and Graph 2. Toggle to put <strong>Process</strong> or <strong>Participants</strong> on the X-axis (the other is stacked). Sum of segments = open PR count for the month. <strong>Awaited</strong> = draft PRs (when Process is PR DRAFT and not stagnant). Vertical bar; one month per view. Legend is above the chart.
+            </Box>
+          )}
+        </Flex>
       </CardHeader>
       <CardBody>
         <Box minH="350px">
@@ -662,21 +616,8 @@ export default function CategorySubcategoryChart() {
                 </Menu>
               </Flex>
               <Text fontSize="xs" color={tableMutedColor} mb={3}>
-                Table uses snapshot (open_pr_snapshots); Graph 2 uses chart collections (eipsSubcategoryCharts). Counts can differ (e.g. 272 vs 34) due to different sources or repo scope (All vs EIPs). Filter by search or column inputs below.
+                Table uses the same data as the chart (Graph 3 API). For a per-PR list, use the Boards or EIP Board page.
               </Text>
-
-              <InputGroup size="sm" maxW="280px" mb={3}>
-                <InputLeftElement pointerEvents="none">
-                  <SearchIcon color="gray.400" />
-                </InputLeftElement>
-                <Input
-                  placeholder="Search all columns..."
-                  value={filterSearch}
-                  onChange={(e) => setFilterSearch(e.target.value)}
-                  bg={tableInputBg}
-                  borderColor={tableInputBorder}
-                />
-              </InputGroup>
 
               <TableContainer
                 overflowX="auto"
@@ -689,144 +630,110 @@ export default function CategorySubcategoryChart() {
                   <Thead>
                     <Tr bg={tableHeaderBg}>
                       <Th w="48px" color={textColor} fontWeight="600">#</Th>
-                      <Th color={textColor} fontWeight="600">PR #</Th>
-                      <Th minW="200px" color={textColor} fontWeight="600">Title</Th>
-                      <Th color={textColor} fontWeight="600">Created</Th>
                       <Th color={textColor} fontWeight="600">Process</Th>
                       <Th color={textColor} fontWeight="600">Participants</Th>
-                      <Th w="90px" color={textColor} fontWeight="600">View PR</Th>
+                      <Th w="80px" color={textColor} fontWeight="600">Count</Th>
+                      <Th w="90px" color={textColor} fontWeight="600">View PRs</Th>
                     </Tr>
-                <Tr bg={tableFilterBg}>
-                  <Th px={2} />
-                  <Th px={2}>
-                    <Input
-                      size="xs"
-                      placeholder="PR #"
-                      value={filterPrNumber}
-                      onChange={(e) => setFilterPrNumber(e.target.value)}
-                      bg={tableInputBg}
-                      borderColor={tableInputBorder}
-                    />
-                  </Th>
-                  <Th px={2}>
-                    <Input
-                      size="xs"
-                      placeholder="Title"
-                      value={filterTitle}
-                      onChange={(e) => setFilterTitle(e.target.value)}
-                      bg={tableInputBg}
-                      borderColor={tableInputBorder}
-                    />
-                  </Th>
-                  <Th px={2} />
-                  <Th px={2}>
-                    <Input
-                      size="xs"
-                      placeholder="Process"
-                      value={filterProcess}
-                      onChange={(e) => setFilterProcess(e.target.value)}
-                      bg={tableInputBg}
-                      borderColor={tableInputBorder}
-                    />
-                  </Th>
-                  <Th px={2}>
-                    <Input
-                      size="xs"
-                      placeholder="Participants"
-                      value={filterParticipants}
-                      onChange={(e) => setFilterParticipants(e.target.value)}
-                      bg={tableInputBg}
-                      borderColor={tableInputBorder}
-                    />
-                  </Th>
-                  <Th px={2} />
-                </Tr>
-              </Thead>
-              <Tbody>
-                {tableLoading ? (
-                  <Tr>
-                    <Td colSpan={7} py={8} textAlign="center" color={accentColor} fontWeight="bold">
-                      Loading table...
-                    </Td>
-                  </Tr>
-                ) : filteredTableRows.length === 0 ? (
-                  <Tr>
-                    <Td colSpan={7} py={8} textAlign="center" color="gray.500">
-                      {tableRows.length === 0
-                        ? "No open PRs for this month."
-                        : "No rows match the current filters."}
-                    </Td>
-                  </Tr>
-                ) : (
-                  paginatedTableRows.map((row, idx) => {
-                    const sr = (tablePage - 1) * TABLE_PAGE_SIZE + idx + 1;
-                    const processColor = processBadgeColor(row.Process);
-                    const partColor = participantsBadgeColor(row.Participants);
-                    return (
-                      <Tr key={`${row.Repo}-${row.PRNumber}-${sr}`} _hover={{ bg: tableRowHoverBg }}>
-                        <Td fontWeight="semibold" color={tableMutedColor}>
-                          {sr}
-                        </Td>
-                        <Td fontWeight="700" color={useColorModeValue("blue.600", "blue.300")}>
-                          {row.PRNumber}
-                        </Td>
-                        <Td maxW="280px" isTruncated title={row.Title}>
-                          {row.Title || "—"}
-                        </Td>
-                        <Td whiteSpace="nowrap" fontSize="xs" color={tableMutedColor}>
-                          {formatCreatedDate(row.CreatedAt)}
-                        </Td>
-                        <Td>
-                          <Badge
-                            bg={processColor}
-                            color="white"
-                            px={2}
-                            py={0.5}
-                            borderRadius="md"
-                            fontSize="xs"
-                            variant="solid"
-                          >
-                            {row.Process || "—"}
-                          </Badge>
-                        </Td>
-                        <Td>
-                          <Badge
-                            bg={partColor}
-                            color="white"
-                            px={2}
-                            py={0.5}
-                            borderRadius="md"
-                            fontSize="xs"
-                            variant="solid"
-                          >
-                            {row.Participants || "—"}
-                          </Badge>
-                        </Td>
-                        <Td>
-                          <Link
-                            href={row.PRLink}
-                            isExternal
-                            fontSize="sm"
-                            display="inline-flex"
-                            alignItems="center"
-                            gap={1}
-                            color={accentColor}
-                          >
-                            View <ExternalLinkIcon mx="2px" />
-                          </Link>
+                    <Tr bg={tableFilterBg}>
+                      <Th px={2} />
+                      <Th px={2}>
+                        <Input
+                          size="xs"
+                          placeholder="Process"
+                          value={filterProcess}
+                          onChange={(e) => setFilterProcess(e.target.value)}
+                          bg={tableInputBg}
+                          borderColor={tableInputBorder}
+                        />
+                      </Th>
+                      <Th px={2}>
+                        <Input
+                          size="xs"
+                          placeholder="Participants"
+                          value={filterParticipants}
+                          onChange={(e) => setFilterParticipants(e.target.value)}
+                          bg={tableInputBg}
+                          borderColor={tableInputBorder}
+                        />
+                      </Th>
+                      <Th px={2} />
+                      <Th px={2} />
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {filteredTableRows.length === 0 ? (
+                      <Tr>
+                        <Td colSpan={5} py={8} textAlign="center" color="gray.500">
+                          {countTableRows.length === 0
+                            ? "No data for this month."
+                            : "No rows match the current filters."}
                         </Td>
                       </Tr>
-                    );
-                  })
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
+                    ) : (
+                      paginatedTableRows.map((row, idx) => {
+                        const sr = (tablePage - 1) * TABLE_PAGE_SIZE + idx + 1;
+                        const processColor = processBadgeColor(row.Process);
+                        const partColor = participantsBadgeColor(row.Participants);
+                        const viewPrsUrl = `/eipboards?month=${selectedMonthYear}&process=${encodeURIComponent(row.Process)}&participants=${encodeURIComponent(row.Participants)}`;
+                        return (
+                          <Tr key={`${row.Process}-${row.Participants}-${sr}`} _hover={{ bg: tableRowHoverBg }}>
+                            <Td fontWeight="semibold" color={tableMutedColor}>
+                              {sr}
+                            </Td>
+                            <Td>
+                              <Badge
+                                bg={processColor}
+                                color="white"
+                                px={2}
+                                py={0.5}
+                                borderRadius="md"
+                                fontSize="xs"
+                                variant="solid"
+                              >
+                                {row.Process || "—"}
+                              </Badge>
+                            </Td>
+                            <Td>
+                              <Badge
+                                bg={partColor}
+                                color="white"
+                                px={2}
+                                py={0.5}
+                                borderRadius="md"
+                                fontSize="xs"
+                                variant="solid"
+                              >
+                                {row.Participants || "—"}
+                              </Badge>
+                            </Td>
+                            <Td fontWeight="700" color={textColor}>
+                              {row.Count}
+                            </Td>
+                            <Td>
+                              <Link
+                                href={viewPrsUrl}
+                                fontSize="sm"
+                                display="inline-flex"
+                                alignItems="center"
+                                gap={1}
+                                color={accentColor}
+                              >
+                                View PRs <ExternalLinkIcon mx="2px" />
+                              </Link>
+                            </Td>
+                          </Tr>
+                        );
+                      })
+                    )}
+                  </Tbody>
+                </Table>
+              </TableContainer>
 
               {filteredTableRows.length > 0 && (
                 <HStack mt={4} justify="space-between" wrap="wrap" gap={2}>
                   <Text fontSize="sm" color={tableMutedColor}>
-                    Showing {(tablePage - 1) * TABLE_PAGE_SIZE + 1}–{Math.min(tablePage * TABLE_PAGE_SIZE, filteredTableRows.length)} of {filteredTableRows.length} PRs
+                    Showing {(tablePage - 1) * TABLE_PAGE_SIZE + 1}–{Math.min(tablePage * TABLE_PAGE_SIZE, filteredTableRows.length)} of {filteredTableRows.length} rows
                   </Text>
                   <HStack gap={2}>
                     <Button
