@@ -42,6 +42,19 @@ test('generates a slug id from heading text', () => {
   assert.equal(headings[0].id, 'my-heading');
 });
 
+test('handles headings with up to three leading spaces', () => {
+  const markdown = ['   # Heading 1', '  ## Heading 2', ' ### Heading 3'].join('\n');
+
+  const headings = extractHeadingsFromMarkdown(markdown);
+
+  assert.deepEqual(headings.map(heading => heading.depth), [1, 2, 3]);
+  assert.deepEqual(headings.map(heading => heading.text), [
+    'Heading 1',
+    'Heading 2',
+    'Heading 3',
+  ]);
+});
+
 test('ignores headings inside fenced code blocks', () => {
   const markdown = [
     '# Real Heading',

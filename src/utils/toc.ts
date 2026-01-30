@@ -19,12 +19,12 @@ export function extractHeadingsFromMarkdown(markdown: string) {
 
     if (inFence) return false;
 
-    return /^#{1,4}\s/.test(line);
+    return /^\s{0,3}#{1,4}\s/.test(line);
   });
 
   return headingLines.map(line => {
-    const depth = line.match(/^#+/)![0].length;
-    const text = line.replace(/^#+\s?/, '').trim();
+    const depth = line.match(/#{1,4}/)![0].length;
+    const text = line.replace(/^\s{0,3}#+\s?/, '').trim();
     const id = text
       .toLowerCase()
       .replace(/[^\w]+/g, '-')
