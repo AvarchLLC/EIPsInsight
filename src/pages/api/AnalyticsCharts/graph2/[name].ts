@@ -77,7 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (endDate) baseQuery.monthYear.$lte = endDate;
     }
 
-    const sort = { monthYear: -1, type: 1 };
+    const sort: { monthYear: 1 | -1; type: 1 | -1 } = { monthYear: -1, type: 1 };
 
     const fetchCategory = async (spec: 'eips' | 'ercs' | 'rips') => {
       const q = { ...baseQuery, category: spec };
@@ -164,10 +164,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       const spec = name as 'eips' | 'ercs' | 'rips';
       if (viewCategory) {
-        categoryData = (await fetchCategory(spec)) as ChartDoc[];
+        const rawCategoryData = await fetchCategory(spec);
+        categoryData = (rawCategoryData as any[]).map((d: any) => ({
+          _id: String(d._id ?? `${d.monthYear}-${d.type}`),
+          category: d.category ?? spec,
+          monthYear: d.monthYear ?? '',
+          type: d.type ?? '',
+          count: typeof d.count === 'number' ? d.count : 0,
+        }));
       }
       if (viewSubcategory) {
-        subcategoryData = (await fetchSubcategory(spec)) as ChartDoc[];
+        const rawSubcategoryData = await fetchSubcategory(spec);
+        subcategoryData = (rawSubcategoryData as any[]).map((d: any) => ({
+          _id: String(d._id ?? `${d.monthYear}-${d.type}`),
+          category: d.category ?? spec,
+          monthYear: d.monthYear ?? '',
+          type: d.type ?? '',
+          count: typeof d.count === 'number' ? d.count : 0,
+        }));
       }
     }
 

@@ -55,7 +55,8 @@ interface DetailsRow {
   GitHubRepo?: string;
 }
 
-const PROCESS_ORDER = ["PR DRAFT", "Typo", "NEW EIP", "Website", "EIP-1", "Tooling", "Status Change", "Other"];
+/** Order and labels match stored category from PR collections (pranalyti). */
+const PROCESS_ORDER = ["PR DRAFT", "Typo", "New EIP", "Website", "EIP-1", "Tooling", "Status Change", "Other"];
 
 const REPO_TABS = [
   { key: "eips" as const, label: "EIPs" },
@@ -64,11 +65,13 @@ const REPO_TABS = [
   { key: "all" as const, label: "All (EIPs + ERCs + RIPs)" },
 ];
 
+/** Subcategory (Participants) options; match stored subcategory from PR collections (pranalyti). */
 const SUBCATEGORY_OPTIONS = [
   { value: "Waiting on Editor", label: "Waiting on Editor" },
   { value: "Waiting on Author", label: "Waiting on Author" },
   { value: "Stagnant", label: "Stagnant" },
-  { value: "Awaited", label: "Awaited" },
+  { value: "AWAITED", label: "Awaited" },
+  { value: "Uncategorized", label: "Uncategorized" },
   { value: "Misc", label: "Misc" },
   { value: "", label: "All (Participants)" },
 ];
@@ -160,9 +163,7 @@ export default function EipBoardsPage() {
     let list = rows;
     if (selectedSubcategory) {
       list = list.filter(
-        (r) =>
-          (r.Participants ?? "").toLowerCase() === selectedSubcategory.toLowerCase() ||
-          (selectedSubcategory === "Awaited" && (r.Participants ?? "") === "Awaited")
+        (r) => (r.Participants ?? "").toLowerCase() === selectedSubcategory.toLowerCase()
       );
     }
     if (selectedCategories.length > 0) {
