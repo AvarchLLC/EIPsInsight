@@ -594,7 +594,7 @@ export default function PRAnalyticsCard() {
       <CardHeader>
         <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
           <Heading size="md" color={accentColor} mb={2} id="PrLabelsChart">
-            Graph 2: {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label}
+           {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label}
             <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
           </Heading>
           <Flex gap={3} align="center">

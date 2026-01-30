@@ -423,7 +423,7 @@ export default function CategorySubcategoryChart() {
       <CardHeader>
         <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
           <Heading size="md" color={accentColor} mb={2} id="CategorySubcategoryChart">
-            Graph 3: Process × Participants (stacked)
+            Process × Participants (stacked)
             <CopyLink link="https://eipsinsight.com/Analytics#CategorySubcategoryChart" />
           </Heading>
           <Flex gap={2} wrap="wrap">
