@@ -35,6 +35,9 @@ import {
   MenuList,
   MenuItem,
   MenuDivider,
+  Checkbox,
+  CheckboxGroup,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import React, { useEffect, useState, useMemo } from "react";
 import AllLayout from "@/components/Layout";
@@ -43,7 +46,6 @@ import { BiGitPullRequest } from "react-icons/bi";
 import { format } from "date-fns";
 import axios from "axios";
 import CloseableAdCard from "@/components/CloseableAdCard";
-import LabelFilter from "@/components/LabelFilter";
 import LastUpdatedDateTime from "@/components/LastUpdatedDateTime";
 import Comments from "@/components/comments";
 import AnimatedHeader from "@/components/AnimatedHeader";
@@ -257,204 +259,222 @@ const labelColors: { [key: string]: { color: string; description: string } } = {
   },
 };
 
-interface BoardData {
-  _id: string;
-  prNumber: number;
+/** Board row — mapped from /api/AnalyticsCharts/category-subcategory/[name]/details (same as Graph 3 table). */
+interface BoardRow {
+  index: number;
+  number: number;
   title: string;
-  prUrl: string;
   author: string;
   createdAt: string;
-  updatedAt: string;
-  waitingSince: string;
-  waitTime: string;
-  reviewStatus: 'needs-editor-review' | 'needs-author-review';
-  actualLabels: string[];
-  customLabels: string[];
-  allLabels: string[];
-  draft: boolean;
-  additions: number;
-  deletions: number;
-  changedFiles: number;
-  type: 'EIP' | 'ERC' | 'RIP';
+  waitTimeDays: number | null;
+  category: string;
+  subcategory: string;
+  labels: string[];
+  prUrl: string;
+  specType: string;
 }
 
+const PROCESS_ORDER = ["PR DRAFT", "Typo", "NEW EIP", "Website", "EIP-1", "Tooling", "Status Change", "Other"];
+
+const SUBCATEGORY_OPTIONS = [
+  { value: "", label: "All (Participants)" },
+  { value: "Waiting on Editor", label: "Waiting on Editor" },
+  { value: "Waiting on Author", label: "Waiting on Author" },
+  { value: "Stagnant", label: "Stagnant" },
+  { value: "Awaited", label: "Awaited" },
+  { value: "Misc", label: "Misc" },
+];
+
+/** Row shape from /api/AnalyticsCharts/category-subcategory/[name]/details — same as Graph 3 table. */
+interface DetailsRow {
+  MonthKey?: string;
+  Month?: string;
+  Repo?: string;
+  Process?: string;
+  Participants?: string;
+  PRNumber?: number;
+  PRId?: number;
+  PRLink?: string;
+  Title?: string;
+  Author?: string;
+  State?: string;
+  CreatedAt?: string;
+  ClosedAt?: string;
+  Labels?: string;
+  GitHubRepo?: string;
+}
+
+function getCurrentMonthYear(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function formatMonthLabel(monthYear: string): string {
+  if (!/^\d{4}-\d{2}$/.test(monthYear)) return monthYear;
+  const [y, m] = monthYear.split("-").map(Number);
+  return new Date(y, m - 1, 1).toLocaleString("default", { month: "short", year: "numeric" });
+}
+
+function detailsRowToBoardRow(row: DetailsRow, index: number): BoardRow {
+  const createdAt = row.CreatedAt ?? "";
+  const waitTimeDays =
+    createdAt
+      ? Math.floor((Date.now() - new Date(createdAt).getTime()) / (24 * 60 * 60 * 1000))
+      : null;
+  const specType =
+    row.Repo === "ERC PRs" ? "ERC" : row.Repo === "RIP PRs" ? "RIP" : "EIP";
+  return {
+    index: index + 1,
+    number: row.PRNumber ?? 0,
+    title: row.Title ?? "",
+    author: row.Author ?? "",
+    createdAt,
+    waitTimeDays,
+    category: row.Process ?? "",
+    subcategory: row.Participants ?? "",
+    labels: row.Labels ? row.Labels.split("; ").filter(Boolean) : [],
+    prUrl: row.PRLink ?? "",
+    specType,
+  };
+}
+
+
 const DashboardPage = () => {
-  const [boardData, setBoardData] = useState<BoardData[]>([]);
+  const [boardData, setBoardData] = useState<BoardRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [activeTab, setActiveTab] = useState("EIPs");
-  const [selectedFilter, setSelectedFilter] = useState<string>("needs-editor-review"); // Review status filter
-  const [selectedLabels, setSelectedLabels] = useState<string[]>([]); // Multi-select label filter
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"EIPs" | "ERCs" | "RIPs" | "All">("EIPs");
+  const [selectedMonth, setSelectedMonth] = useState<string>(getCurrentMonthYear());
+  const [availableMonths, setAvailableMonths] = useState<string[]>([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("Waiting on Editor");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(PROCESS_ORDER);
+  const [sort, setSort] = useState<"waitTime" | "created">("waitTime");
   const [searchQuery, setSearchQuery] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 20,
   });
 
-  // Review status options for the main dropdown
-  const filterOptions = [
-    { value: "needs-editor-review", label: "Needs Editor Review" },
-    { value: "needs-author-review", label: "Needs Author Review" },
-  ];
+  const repoKey = activeTab === "EIPs" ? "eips" : activeTab === "ERCs" ? "ercs" : activeTab === "RIPs" ? "rips" : "all";
 
-  // Label filter options (separate multi-select)
-  const labelFilterOptions = [
-    // Topic Labels
-    { value: "t-core", label: "Core" },
-    { value: "t-erc", label: "ERC" },
-    { value: "t-networking", label: "Networking" },
-    { value: "t-interface", label: "Interface" },
-    // Status Labels
-    { value: "s-draft", label: "Draft" },
-    { value: "s-review", label: "Review" },
-    { value: "s-lastcall", label: "Last Call" },
-    { value: "s-final", label: "Final" },
-    { value: "s-stagnant", label: "Stagnant" },
-    // Creation/Modification Labels
-    { value: "c-new", label: "New" },
-    { value: "c-update", label: "Update" },
-    { value: "c-status", label: "Status Change" },
-    // Editor Labels
-    { value: "e-review", label: "Editor Review" },
-    { value: "e-consensus", label: "Editor Consensus" },
-    // Waiting Labels
-    { value: "w-ci", label: "Waiting CI" },
-    { value: "w-response", label: "Waiting Response" },
-    // Custom Labels
-    { value: "custom:bump", label: "Bump" },
-    { value: "custom:ci", label: "CI/Workflow" },
-    { value: "custom:website", label: "Website/Docs" },
-    { value: "custom:typo", label: "Typo Fix" },
-  ];
-
-  // All labels that can be displayed in the table
-  const allowedLabels = [
-    "t-core", "t-erc", "t-networking", "t-interface",
-    "s-draft", "s-review", "s-lastcall", "s-final", "s-stagnant",
-    "c-new", "c-update", "c-status",
-    "e-review", "e-consensus",
-    "w-ci", "w-response",
-    "custom:bump", "custom:ci", "custom:website", "custom:typo",
-    "custom:needs-editor-review", "custom:needs-author-review",
-    "needs-editor-review", "needs-author-review",
-  ];
-
-
-  const handleFilterChange = (filterValue: string) => {
-    setSelectedFilter(filterValue);
-    setPagination({ pageIndex: 0, pageSize: 20 }); // Reset pagination on filter change
-  };
-
-  const handleLabelToggle = (label: string) => {
-    setSelectedLabels((prev) =>
-      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
-    );
-  };
-
-  const handleSelectAllLabels = () => {
-    setSelectedLabels(labelFilterOptions.map(opt => opt.value));
-  };
-
-  const handleClearLabels = () => {
-    setSelectedLabels([]);
-  };
-
-  // Parse wait time string to hours for sorting
-  const parseWaitTime = (waitTime: string): number => {
-    const match = waitTime.match(/(\d+)\s*(day|hour|minute)s?/);
-    if (!match) return 0;
-    const value = parseInt(match[1]);
-    const unit = match[2];
-    if (unit === 'day') return value * 24;
-    if (unit === 'hour') return value;
-    if (unit === 'minute') return value / 60;
-    return 0;
-  };
-
-  const filteredData = useMemo(() => {
-    let filtered = boardData.filter(item => {
-      // Filter by type (EIP, ERC, or RIP)
-      const typeMatch = activeTab === "EIPs" ? "EIP" : 
-                        activeTab === "ERCs" ? "ERC" : "RIP";
-      if (item.type !== typeMatch) return false;
-      
-      return true;
-    });
-    
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.prNumber.toString().includes(searchQuery)
-      );
-    }
-    
-    // Apply review status filter
-    if (selectedFilter) {
-      filtered = filtered.filter(item => item.reviewStatus === selectedFilter);
-    }
-    
-    // Apply label filters (if any selected)
-    if (selectedLabels.length > 0) {
-      filtered = filtered.filter(item => 
-        selectedLabels.some(label => item.allLabels?.includes(label))
-      );
-    }
-    
-    // Sort by wait time (longer wait = higher priority)
-    return filtered.sort((a, b) => {
-      const aWaitHours = parseWaitTime(a.waitTime);
-      const bWaitHours = parseWaitTime(b.waitTime);
-      return bWaitHours - aWaitHours;
-    });
-  }, [boardData, activeTab, searchQuery, selectedFilter, selectedLabels]);
-
-  // Fetch data from the new API
+  // Fetch available months from Graph 3 API (same source as Graph 3 chart).
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("/api/boards");
-        if (response.data.success) {
-          setBoardData(response.data.data || []);
+    const controller = new AbortController();
+    fetch(`/api/AnalyticsCharts/graph3/${repoKey}`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : { data: [] }))
+      .then((json: { data?: { monthYear?: string }[] }) => {
+        const data = Array.isArray(json?.data) ? json.data : [];
+        const monthStrings = data.map((d) => d.monthYear).filter((m): m is string => !!m);
+        const months: string[] = [...new Set(monthStrings)].sort((a, b) => b.localeCompare(a));
+        setAvailableMonths(months);
+        if (months.length > 0 && !months.includes(selectedMonth)) {
+          const current = getCurrentMonthYear();
+          setSelectedMonth(months.includes(current) ? current : months[0]);
         }
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setHasError(true);
-        setIsLoading(false);
-      }
-    };
+      })
+      .catch(() => setAvailableMonths([]));
+    return () => controller.abort();
+  }, [repoKey]);
 
-    fetchData();
-  }, []);
+  // Fetch all open PRs for selected month from details API — same as Graph 3 table.
+  useEffect(() => {
+    if (!selectedMonth || !/^\d{4}-\d{2}$/.test(selectedMonth)) {
+      setBoardData([]);
+      setIsLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    setIsLoading(true);
+    setHasError(false);
+    setErrorMessage("");
+    const url = `/api/AnalyticsCharts/category-subcategory/${repoKey}/details?month=${selectedMonth}`;
+    fetch(url, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((raw: DetailsRow[]) => {
+        const rows = Array.isArray(raw) ? raw.map((r, i) => detailsRowToBoardRow(r, i)) : [];
+        setBoardData(rows);
+      })
+      .catch((err) => {
+        if (err?.name !== "AbortError") {
+          setErrorMessage(err?.message ?? "Failed to load board data.");
+          setHasError(true);
+          setBoardData([]);
+        }
+      })
+      .finally(() => setIsLoading(false));
+    return () => controller.abort();
+  }, [repoKey, selectedMonth]);
 
-  // Extract unique labels for the filter dropdown
-  const allLabels = useMemo(() => {
-    const labels = new Set<string>();
-    boardData.forEach(item => {
-      item.allLabels?.forEach(label => {
-        labels.add(label);
-      });
-    });
-    return Array.from(labels).sort();
+  // Categories present in data (ordered like eipboards)
+  const categoriesInData = useMemo(() => {
+    const set = new Set(boardData.map((r) => r.category || "Other"));
+    return PROCESS_ORDER.filter((p) => set.has(p)).concat(
+      [...set].filter((p) => !PROCESS_ORDER.includes(p)).sort()
+    );
   }, [boardData]);
 
-  const columnHelper = createColumnHelper<BoardData>();
+  // Filter by subcategory (Participants), category (Process), search; then sort. Client-side so we have full Graph 3 set.
+  const filteredData = useMemo(() => {
+    let list = boardData;
+    if (selectedSubcategory) {
+      list = list.filter(
+        (r) =>
+          r.subcategory.toLowerCase() === selectedSubcategory.toLowerCase() ||
+          (selectedSubcategory === "Awaited" && r.subcategory === "Awaited") ||
+          (selectedSubcategory === "Uncategorized" && r.subcategory === "Misc")
+      );
+    }
+    if (selectedCategories.length > 0) {
+      list = list.filter((r) => selectedCategories.includes(r.category || "Other"));
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter(
+        (item) =>
+          item.title.toLowerCase().includes(q) ||
+          item.author.toLowerCase().includes(q) ||
+          String(item.number).includes(q)
+      );
+    }
+    const sorted = [...list];
+    if (sort === "created") {
+      sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    } else {
+      sorted.sort((a, b) => (b.waitTimeDays ?? -1) - (a.waitTimeDays ?? -1));
+    }
+    return sorted.map((r, i) => ({ ...r, index: i + 1 }));
+  }, [boardData, selectedSubcategory, selectedCategories, searchQuery, sort]);
 
-  const columns = useMemo<ColumnDef<BoardData, any>[]>(
+  const totalByCategory = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of filteredData) {
+      const p = r.category || "Other";
+      map.set(p, (map.get(p) ?? 0) + 1);
+    }
+    return map;
+  }, [filteredData]);
+
+  const columnHelper = createColumnHelper<BoardRow>();
+
+  const formatWaitTime = (days: number | null) => {
+    if (days == null) return "—";
+    if (days >= 7) return `${Math.floor(days / 7)} week${days >= 14 ? "s" : ""}`;
+    return `${days} day${days !== 1 ? "s" : ""}`;
+  };
+
+  const columns = useMemo<ColumnDef<BoardRow, any>[]>(
     () => [
-      columnHelper.display({
-        id: 'serial',
+      columnHelper.accessor('index', {
         header: '#',
         cell: (info) => (
           <Text fontSize="md" fontWeight="semibold" color="gray.600">
-            {pagination.pageIndex * pagination.pageSize + info.row.index + 1}
+            {info.getValue()}
           </Text>
         ),
         size: 60,
       }),
-      columnHelper.accessor('prNumber', {
+      columnHelper.accessor('number', {
         header: 'PR #',
         cell: (info) => {
           const row = info.row.original;
@@ -462,9 +482,9 @@ const DashboardPage = () => {
             <Link href={row.prUrl} isExternal _hover={{ textDecoration: 'none' }}>
               <HStack justify="center" spacing={1}>
                 <Icon as={BiGitPullRequest} color="blue.500" boxSize={5} />
-                <Text 
-                  fontSize="md" 
-                  fontWeight="bold" 
+                <Text
+                  fontSize="md"
+                  fontWeight="bold"
                   color="blue.500"
                   _hover={{
                     color: useColorModeValue("blue.800", "blue.100"),
@@ -481,6 +501,19 @@ const DashboardPage = () => {
         },
         size: 100,
       }),
+      ...(activeTab === "All"
+        ? [
+            columnHelper.accessor('specType', {
+              header: 'Repo',
+              cell: (info) => (
+                <Badge colorScheme="purple" fontSize="xs" px={2} py={0.5}>
+                  {info.getValue()}
+                </Badge>
+              ),
+              size: 70,
+            }),
+          ]
+        : []),
       columnHelper.accessor('title', {
         header: 'Title',
         cell: (info) => {
@@ -515,17 +548,17 @@ const DashboardPage = () => {
             fontWeight="medium"
             color={useColorModeValue("gray.600", "gray.300")}
           >
-            {format(new Date(info.getValue()), 'MMM dd, yyyy')}
+            {info.getValue() ? format(new Date(info.getValue()), 'MMM dd, yyyy') : '—'}
           </Text>
         ),
         size: 120,
       }),
-      columnHelper.accessor('waitTime', {
+      columnHelper.accessor('waitTimeDays', {
         header: 'Wait Time',
         cell: (info) => {
-          const waitTime = info.getValue();
-          const daysMatch = waitTime.match(/(\d+)\s*days?/);
-          const waitDays = daysMatch ? parseInt(daysMatch[1]) : 0;
+          const days = info.getValue();
+          const display = formatWaitTime(days);
+          const waitDays = days ?? 0;
           return (
             <Badge
               colorScheme={
@@ -539,56 +572,36 @@ const DashboardPage = () => {
               borderRadius="md"
               fontWeight="bold"
             >
-              {waitTime}
+              {display}
             </Badge>
           );
         },
         size: 120,
       }),
-      columnHelper.accessor('allLabels', {
-        header: 'Labels',
+      columnHelper.accessor('category', {
+        header: 'Process',
+        cell: (info) => (
+          <Text fontSize="sm" fontWeight="medium">
+            {info.getValue() || '—'}
+          </Text>
+        ),
+        size: 120,
+      }),
+      columnHelper.display({
+        id: 'viewPr',
+        header: 'View PR',
         cell: (info) => {
-          const itemLabels = info.getValue()?.filter((label: string) =>
-            allowedLabels.includes(label)
-          ) || [];
+          const row = info.row.original;
           return (
-            <Wrap justify="center" spacing={1}>
-              {itemLabels.length > 0 ? (
-                itemLabels.slice(0, 3).map((label: string, idx: number) => {
-                  const { color } = labelColors[label.toLowerCase()] || { color: "gray.400" };
-                  return (
-                    <WrapItem key={idx}>
-                      <Tag
-                        size="md"
-                        bg={color}
-                        color="white"
-                        borderRadius="md"
-                        fontWeight="semibold"
-                        px={2}
-                        py={1}
-                      >
-                        <TagLabel fontSize="sm">{label}</TagLabel>
-                      </Tag>
-                    </WrapItem>
-                  );
-                })
-              ) : (
-                <Text fontSize="sm" color="gray.400">-</Text>
-              )}
-              {itemLabels.length > 3 && (
-                <Tooltip label={itemLabels.slice(3).join(', ')} placement="top">
-                  <Tag size="md" bg="gray.500" color="white" borderRadius="md" px={2} py={1}>
-                    <TagLabel fontSize="sm">+{itemLabels.length - 3}</TagLabel>
-                  </Tag>
-                </Tooltip>
-              )}
-            </Wrap>
+            <Link href={row.prUrl} isExternal color="blue.500" fontWeight="600" fontSize="sm">
+              View <ExternalLinkIcon mx="2px" />
+            </Link>
           );
         },
-        size: 280,
+        size: 90,
       }),
     ],
-    [pagination.pageIndex, pagination.pageSize, allowedLabels]
+    [activeTab]
   );
 
   const table = useReactTable({
@@ -612,7 +625,7 @@ const DashboardPage = () => {
     downloadCSV(filteredData, activeTab);
   };
 
-  const downloadCSV = (data: any, type: string) => {
+  const downloadCSV = (data: BoardRow[], type: string) => {
     const csv = convertToCSV(data, type);
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -640,8 +653,7 @@ const DashboardPage = () => {
       return;
     }
 
-    // Group PRs by status change type
-    const statusGroups: { [key: string]: BoardData[] } = {
+    const statusGroups: { [key: string]: BoardRow[] } = {
       'Final': [],
       'Last Call': [],
       'Review': [],
@@ -651,64 +663,40 @@ const DashboardPage = () => {
 
     filteredData.forEach(item => {
       const titleLower = item.title.toLowerCase();
-      if (titleLower.includes('move to final')) {
-        statusGroups['Final'].push(item);
-      } else if (titleLower.includes('move to last call')) {
-        statusGroups['Last Call'].push(item);
-      } else if (titleLower.includes('move to review')) {
-        statusGroups['Review'].push(item);
-      } else if (titleLower.includes('move to draft') || titleLower.includes('add erc') || titleLower.includes('add eip')) {
-        statusGroups['Draft'].push(item);
-      } else {
-        statusGroups['Other'].push(item);
-      }
+      if (titleLower.includes('move to final')) statusGroups['Final'].push(item);
+      else if (titleLower.includes('move to last call')) statusGroups['Last Call'].push(item);
+      else if (titleLower.includes('move to review')) statusGroups['Review'].push(item);
+      else if (titleLower.includes('move to draft') || titleLower.includes('add erc') || titleLower.includes('add eip')) statusGroups['Draft'].push(item);
+      else statusGroups['Other'].push(item);
     });
 
-    // Build markdown string
     let markdown = '';
-
-    // Add each section if it has items
     if (statusGroups['Final'].length > 0) {
       markdown += '### To `Final` \n';
-      statusGroups['Final'].forEach(item => {
-        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
-      });
+      statusGroups['Final'].forEach(item => { markdown += `* [${item.title} #${item.number}](${item.prUrl})\n`; });
       markdown += '\n';
     }
-
     if (statusGroups['Last Call'].length > 0) {
       markdown += '### To `Last Call` \n';
-      statusGroups['Last Call'].forEach(item => {
-        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
-      });
+      statusGroups['Last Call'].forEach(item => { markdown += `* [${item.title} #${item.number}](${item.prUrl})\n`; });
       markdown += '\n';
     }
-
     if (statusGroups['Review'].length > 0) {
       markdown += '### To `Review` \n';
-      statusGroups['Review'].forEach(item => {
-        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
-      });
+      statusGroups['Review'].forEach(item => { markdown += `* [${item.title} #${item.number}](${item.prUrl})\n`; });
       markdown += '\n';
     }
-
     if (statusGroups['Draft'].length > 0) {
       markdown += '### To `Draft` \n';
-      statusGroups['Draft'].forEach(item => {
-        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
-      });
+      statusGroups['Draft'].forEach(item => { markdown += `* [${item.title} #${item.number}](${item.prUrl})\n`; });
       markdown += '\n';
     }
-
     if (statusGroups['Other'].length > 0) {
       markdown += '#### Other\n';
-      statusGroups['Other'].forEach(item => {
-        markdown += `* [${item.title} #${item.prNumber}](${item.prUrl})\n`;
-      });
+      statusGroups['Other'].forEach(item => { markdown += `* [${item.title} #${item.number}](${item.prUrl})\n`; });
       markdown += '\n';
     }
 
-    // Copy to clipboard
     navigator.clipboard.writeText(markdown).then(() => {
       toast({
         title: "Copied to clipboard!",
@@ -729,16 +717,15 @@ const DashboardPage = () => {
     });
   };
 
-  const convertToCSV = (data: BoardData[], type: string) => {
+  const convertToCSV = (data: BoardRow[], type: string) => {
     const headers = [
-      "Serial Number",
+      "#",
       "PR Number",
-      "PR Title",
+      "Title",
       "Author",
-      "Review Status",
-      "Wait Time",
-      "Labels",
-      "Created Date",
+      "Created",
+      "Wait Time (days)",
+      "Process",
       "URL",
     ];
 
@@ -754,13 +741,12 @@ const DashboardPage = () => {
     data.forEach((item, index) => {
       const rowValues = [
         index + 1,
-        item.prNumber,
+        item.number,
         item.title,
         item.author,
-        item.reviewStatus === "needs-editor-review" ? "Editor Review" : "Author Review",
-        item.waitTime,
-        item.allLabels?.join("; ") || "",
-        new Date(item.createdAt).toLocaleDateString(),
+        item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "",
+        item.waitTimeDays != null ? item.waitTimeDays : "",
+        item.category || "",
         item.prUrl,
       ];
       csvRows.push(rowValues.map(escapeField).join(","));
@@ -782,9 +768,17 @@ const DashboardPage = () => {
   if (hasError) {
     return (
       <AllLayout>
-        <Box textAlign="center" mt="20">
-          <Text fontSize="lg" color="red.500">
-            Failed to load data.
+        <Box textAlign="center" mt="20" px={4}>
+          <Text fontSize="lg" color="red.500" mb={2}>
+            Failed to load board data.
+          </Text>
+          {errorMessage && (
+            <Text fontSize="sm" color="gray.600" maxW="xl" mx="auto">
+              {errorMessage}
+            </Text>
+          )}
+          <Text fontSize="sm" color="gray.500" mt={2}>
+            Check the console for details. Ensure OPENPRS_MONGODB_URI is set and the board API is available.
           </Text>
         </Box>
       </AllLayout>
@@ -833,7 +827,7 @@ const DashboardPage = () => {
             gap={4}
             my={6}
           >
-            <HStack spacing={4}>
+            <HStack spacing={4} flexWrap="wrap">
               <Button
                 colorScheme="blue"
                 onClick={() => setActiveTab("EIPs")}
@@ -857,6 +851,14 @@ const DashboardPage = () => {
                 size="lg"
               >
                 RIPs
+              </Button>
+              <Button
+                colorScheme="teal"
+                onClick={() => setActiveTab("All")}
+                variant={activeTab === "All" ? "solid" : "outline"}
+                size="lg"
+              >
+                All (EIPs + ERCs + RIPs)
               </Button>
             </HStack>
             
@@ -891,96 +893,75 @@ const DashboardPage = () => {
               boxShadow="md"
             >
               {/* Left: Board Title with Count */}
-              <Heading
-                as="h2"
-                fontSize="36px"
-                fontWeight="bold"
-                color="#40E0D0"
-                minW="200px"
-              >
-                📋 {activeTab} BOARD ({filteredData.length})
-              </Heading>
-              
-              {/* Center: Review Status Dropdown & Label Filter Menu */}
-              <HStack spacing={3} minW="300px">
+              <VStack align="start" spacing={0}>
+                <Heading
+                  as="h2"
+                  fontSize="36px"
+                  fontWeight="bold"
+                  color="#40E0D0"
+                  minW="200px"
+                >
+                  📋 {activeTab} BOARD ({filteredData.length})
+                </Heading>
+                <Text fontSize="xs" color="gray.500" mt={1}>
+                  Same data as Graph 3 table. Pick month, then filter by Participants (subcategory) or Process.
+                </Text>
+              </VStack>
+
+              {/* Month (same as Graph 3); Subcategory (Participants); Sort */}
+              <HStack spacing={3} minW="300px" flexWrap="wrap">
                 <Select
-                  value={selectedFilter}
-                  onChange={(e) => handleFilterChange(e.target.value)}
+                  value={selectedMonth}
+                  onChange={(e) => {
+                    setSelectedMonth(e.target.value);
+                    setPagination({ pageIndex: 0, pageSize: 20 });
+                  }}
+                  bg={useColorModeValue("blue.50", "gray.700")}
+                  borderColor={useColorModeValue("blue.300", "blue.500")}
+                  fontWeight="semibold"
+                  maxW="140px"
+                  title="Month — same as Graph 3"
+                >
+                  {availableMonths.length > 0 ? (
+                    availableMonths.map((m) => (
+                      <option key={m} value={m}>
+                        {formatMonthLabel(m)}
+                      </option>
+                    ))
+                  ) : (
+                    <option value={selectedMonth}>{formatMonthLabel(selectedMonth)}</option>
+                  )}
+                </Select>
+                <Select
+                  value={selectedSubcategory}
+                  onChange={(e) => {
+                    setSelectedSubcategory(e.target.value);
+                    setPagination({ pageIndex: 0, pageSize: 20 });
+                  }}
                   bg={useColorModeValue("blue.50", "gray.700")}
                   borderColor={useColorModeValue("blue.300", "blue.500")}
                   fontWeight="semibold"
                   color={useColorModeValue("blue.700", "blue.200")}
                   _hover={{ borderColor: useColorModeValue("blue.400", "blue.400") }}
-                  maxW="250px"
+                  maxW="220px"
                 >
-                  {filterOptions.map(option => (
+                  {SUBCATEGORY_OPTIONS.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
                 </Select>
-                
-                {/* Label Filter Dropdown */}
-                <Menu closeOnSelect={false}>
-                  <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    bg={useColorModeValue("blue.50", "gray.700")}
-                    borderWidth="1px"
-                    borderColor={useColorModeValue("blue.300", "blue.500")}
-                    fontWeight="semibold"
-                    color={useColorModeValue("blue.700", "blue.200")}
-                    _hover={{ 
-                      bg: useColorModeValue("blue.100", "gray.600"),
-                      borderColor: useColorModeValue("blue.400", "blue.400")
-                    }}
-                    minW="150px"
-                  >
-                    {selectedLabels.length > 0 ? (
-                      <HStack spacing={2}>
-                        <Text>Labels</Text>
-                        <Badge colorScheme="blue" borderRadius="full" fontSize="xs">
-                          {selectedLabels.length}
-                        </Badge>
-                      </HStack>
-                    ) : (
-                      "Labels"
-                    )}
-                  </MenuButton>
-                  <MenuList maxH="400px" overflowY="auto">
-                    <MenuItem
-                      icon={<Icon as={BiGitPullRequest} />}
-                      onClick={handleSelectAllLabels}
-                      fontWeight="semibold"
-                    >
-                      Select All Labels
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleClearLabels}
-                      isDisabled={selectedLabels.length === 0}
-                      color="red.500"
-                      fontWeight="semibold"
-                    >
-                      Clear All Labels
-                    </MenuItem>
-                    <MenuDivider />
-                    {labelFilterOptions.map((option) => (
-                      <MenuItem
-                        key={option.value}
-                        onClick={() => handleLabelToggle(option.value)}
-                        bg={selectedLabels.includes(option.value) ? useColorModeValue("blue.50", "blue.900") : undefined}
-                        _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
-                      >
-                        <HStack justify="space-between" w="100%">
-                          <Text>{option.label}</Text>
-                          {selectedLabels.includes(option.value) && (
-                            <Icon as={BiGitPullRequest} color="blue.500" />
-                          )}
-                        </HStack>
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </Menu>
+                <Select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as "waitTime" | "created")}
+                  bg={useColorModeValue("blue.50", "gray.700")}
+                  borderColor={useColorModeValue("blue.300", "blue.500")}
+                  fontWeight="semibold"
+                  maxW="140px"
+                >
+                  <option value="waitTime">Longest wait first</option>
+                  <option value="created">Oldest first</option>
+                </Select>
               </HStack>
               
               {/* Right: Export Actions */}
@@ -1018,6 +999,68 @@ const DashboardPage = () => {
                 </Button>
               </HStack>
             </Flex>
+
+            {/* Process (Category) checkboxes — same as eipboards */}
+            <Box p={4} borderRadius="lg" bg={useColorModeValue("gray.50", "gray.800")} borderWidth="1px" mt={4}>
+              <Flex justify="space-between" align="center" mb={3} flexWrap="wrap" gap={2}>
+                <Text fontWeight="semibold">Filter by Category (Process):</Text>
+                <HStack spacing={2}>
+                  <Button
+                    size="sm"
+                    colorScheme="teal"
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedCategories([...categoriesInData]);
+                      setPagination({ pageIndex: 0, pageSize: 20 });
+                    }}
+                  >
+                    Select all
+                  </Button>
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedCategories(categoriesInData.slice(0, 2));
+                      setPagination({ pageIndex: 0, pageSize: 20 });
+                    }}
+                  >
+                    Select few
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setSelectedCategories([]);
+                      setPagination({ pageIndex: 0, pageSize: 20 });
+                    }}
+                  >
+                    Clear
+                  </Button>
+                </HStack>
+              </Flex>
+              <CheckboxGroup
+                value={selectedCategories}
+                onChange={(v) => {
+                  setSelectedCategories(v as string[]);
+                  setPagination({ pageIndex: 0, pageSize: 20 });
+                }}
+              >
+                <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing={2}>
+                  {categoriesInData.map((cat) => (
+                    <Flex key={cat} align="center" gap={1}>
+                      <Checkbox value={cat} size="sm" />
+                      <Text as="span" fontSize="sm">{cat}</Text>
+                      {totalByCategory.has(cat) && (
+                        <Badge ml={1} colorScheme="blue" fontSize="xs">
+                          {totalByCategory.get(cat)}
+                        </Badge>
+                      )}
+                    </Flex>
+                  ))}
+                </SimpleGrid>
+              </CheckboxGroup>
+            </Box>
           </Box>
 
           {/* TanStack Table with Pagination */}
@@ -1069,7 +1112,7 @@ const DashboardPage = () => {
                 <Tbody>
                   {table.getRowModel().rows.length === 0 ? (
                   <Tr>
-                    <Td colSpan={6} textAlign="center" py={8}>
+                    <Td colSpan={8} textAlign="center" py={8}>
                       <VStack spacing={2}>
                         <Icon as={BiGitPullRequest} boxSize={12} color="gray.400" />
                         <Text color="gray.500" fontSize="lg">No PRs found</Text>
@@ -1077,14 +1120,9 @@ const DashboardPage = () => {
                     </Td>
                   </Tr>
                 ) : (
-                    table.getRowModel().rows.map((row) => {
-                      const item = row.original;
-                      const isWithdrawn = item.allLabels?.includes('s-withdrawn') || false;
-                      return (
+                    table.getRowModel().rows.map((row) => (
                         <Tr
                           key={row.id}
-                          bg={isWithdrawn ? useColorModeValue("red.50", "red.900") : undefined}
-                          opacity={isWithdrawn ? 0.7 : 1}
                           _hover={{
                             bg: useColorModeValue("blue.50", "gray.700"),
                             transition: "all 0.2s"
@@ -1100,8 +1138,7 @@ const DashboardPage = () => {
                             </Td>
                           ))}
                         </Tr>
-                      );
-                    })
+                    ))
                   )}
                 </Tbody>
               </Table>

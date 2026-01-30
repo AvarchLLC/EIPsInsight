@@ -43,6 +43,7 @@ import FeedbackWidget from "@/components/FeedbackWidget";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import ERCsPRChart from "@/components/Ercsprs";
 import PRAnalyticsCard from "@/components/PrLabels";
+import CategorySubcategoryChart from "@/components/CategorySubcategoryChart";
 import AnimatedHeader from "@/components/AnimatedHeader";
 
 // Dynamic import for Ant Design's Column chart
@@ -1968,114 +1969,15 @@ const GitHubPRTracker: React.FC = () => {
             <PRAnalyticsCard/>
           </Box>
 
+          <Box mt={6} id="CategorySubcategoryChart">
+            <CategorySubcategoryChart />
+          </Box>
+
                     <Box my={12}>
             {/*<PlaceYourAdCard /> */}
           </Box>
 
   <br />
-          <Flex justify="center" mb={8}>
-            <Button 
-              colorScheme="blue" 
-              onClick={toggleDropdown}
-              size="lg"
-              fontWeight="semibold"
-              px={8}
-              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-              transition="all 0.2s"
-            >
-              {showDropdown ? "Hide" : "View More"}
-            </Button>
-          </Flex>
-
-          {showDropdown && (
-            <Box mb={8} display="flex" justifyContent="center">
-              <HStack spacing={4}>
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    colorScheme="blue"
-                  >
-                    {selectedYear ? `Year: ${selectedYear}` : "Select Year"}
-                  </MenuButton>
-                  <MenuList>
-                    {getYears()?.map((year) => (
-                      <MenuItem
-                        key={year}
-                        onClick={() => {
-                          setSelectedYear(year.toString());
-                          setSelectedMonth(null);
-                        }}
-                      >
-                        {year}
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </Menu>
-
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    colorScheme="blue"
-                    isDisabled={!selectedYear}
-                  >
-                    {selectedMonth ? `Month: ${selectedMonth}` : "Select Month"}
-                  </MenuButton>
-                  <MenuList>
-                    {selectedYear &&
-                      getMonths()?.map((month, index) => (
-                        <MenuItem
-                          key={index}
-                          onClick={() => setSelectedMonth(month)}
-                        >
-                          {month}
-                        </MenuItem>
-                      ))}
-                  </MenuList>
-                </Menu>
-              </HStack>
-            </Box>
-          )}
-
-          {selectedYear && selectedMonth && (
-            <Box mt={8} display="flex" justifyContent="flex-end" flexDirection="column" alignItems="flex-end" gap={2}>
-              <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-                Download filtered data for {selectedMonth} {selectedYear}
-              </Text>
-              <Button
-                colorScheme="blue"
-                onClick={async () => {
-                  try {
-                    // Trigger the CSV conversion and download
-                    handleDownload();
-
-                    // Trigger the API call
-                    await axios.post("/api/DownloadCounter");
-                  } catch (error) {
-                    console.error("Error triggering download counter:", error);
-                  }
-                }}
-                disabled={loading2}
-                leftIcon={<DownloadIcon />}
-              >
-                {loading2 ? <Spinner size="sm" /> : `Download ${selectedMonth} ${selectedYear} CSV`}
-              </Button>
-            </Box>
-          )}
-          {showDropdown && (
-            <>
-              {selectedYear && selectedMonth && (
-                <Box mt={2}>
-                  {renderTable(selectedYear, selectedMonth, activeTab)}
-                </Box>
-              )}
-            </>
-          )}
-
-          <Box mt={2} id="EIPsLabelChart">
-            <EipsLabelChart />
-          </Box>
 
 
           <Box>
