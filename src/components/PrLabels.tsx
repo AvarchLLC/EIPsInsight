@@ -653,7 +653,7 @@ export default function PRAnalyticsCard() {
           </Flex>
         </Flex>
         <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} mt={2}>
-          Same open PRs as Graph 1 Open. Toggle <strong>Process</strong> (category) or <strong>Participants</strong> (subcategory); sum of counts = Graph 1 Open per month. <strong>Awaited</strong> = draft PRs when Process is PR DRAFT and not stagnant.
+          Open PRs by <strong>Process</strong> type (e.g. Typo, NEW EIP, PR DRAFT) or by <strong>Participants</strong> status (e.g. Waiting on Editor, Awaited). Toggle the dropdown to switch. Sum of bars = total open PRs for that month. <strong>Awaited</strong> = draft PRs when process is PR DRAFT and not stagnant.
         </Text>
       </CardHeader>
       <CardBody>
@@ -705,11 +705,11 @@ export default function PRAnalyticsCard() {
           </Text>
           {selectedMonth && tableMonthTotal != null && (
             <Text fontSize="md" fontWeight="semibold" color={useColorModeValue('green.700', 'green.300')} mt={2}>
-              Table total for {formatMonthLabel(selectedMonth)} (matches eipboards): <Text as="span" color={accentColor}>{tableMonthTotal}</Text>
+              Table total for {formatMonthLabel(selectedMonth)} (filtered by selected labels): <Text as="span" color={accentColor}>{tableMonthTotal}</Text>
             </Text>
           )}
           <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={2}>
-            Chart, table (eipboards), and CSV all use the same <strong>snapshot</strong> data (hourly pre-aggregation). Counts match.
+            Chart, table, and CSV show the same open PRs for the selected month and labels.
           </Text>
         </Box>
         <Divider my={3} />

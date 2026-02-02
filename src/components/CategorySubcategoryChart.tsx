@@ -536,7 +536,7 @@ export default function CategorySubcategoryChart() {
           </Button>
           {showDescription && (
             <Box fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-              Same open PRs as Graph 1 Open and Graph 2. Toggle to put <strong>Process</strong> or <strong>Participants</strong> on the X-axis (the other is stacked). Sum of segments = open PR count for the month. <strong>Awaited</strong> = draft PRs (when Process is PR DRAFT and not stagnant). Vertical bar; one month per view. Legend is above the chart.
+              Open PRs by process type and participant status. Choose <strong>Process</strong> or <strong>Participants</strong> on the X-axis (the other is stacked). Sum of segments = total open PRs for the month. <strong>Awaited</strong> = draft PRs when process is PR DRAFT and not stagnant. One month per view; legend above the chart.
             </Box>
           )}
         </Flex>
@@ -549,7 +549,7 @@ export default function CategorySubcategoryChart() {
             </Text>
           ) : noDataAtAll ? (
             <Text color="gray.500" py={12} fontWeight="bold" fontSize="lg">
-              No category-subcategory data for this repo. Run populate-charts to fill the collection.
+              No open PRs by process/participants for this repo or period.
             </Text>
           ) : !hasDataForMonth ? (
             <Text color="gray.500" py={12} fontWeight="bold" fontSize="lg">
@@ -616,7 +616,7 @@ export default function CategorySubcategoryChart() {
                 </Menu>
               </Flex>
               <Text fontSize="xs" color={tableMutedColor} mb={3}>
-                Table uses the same data as the chart (Graph 3 API). For a per-PR list, use the Boards or EIP Board page.
+                Table shows the same counts as the chart. For a per-PR list with links, use the EIP Board or Boards page.
               </Text>
 
               <TableContainer
