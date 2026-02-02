@@ -12,13 +12,19 @@ const theme = extendTheme({
     useSystemColorMode: false,
   },
   styles: {
-
     global: (props: StyleFunctionProps) => ({
       body: {
         bg: props.colorMode === 'light' ? '#ffffff' : '#000000',
         color: props.colorMode === 'dark' ? 'whiteAlpha.900' : 'gray.800',
       },
     }),
+  },
+  components: {
+    Tooltip: {
+      baseStyle: {
+        zIndex: 10001, // above floaters (z-index 2000) so tooltips show on top
+      },
+    },
   },
 });
 
