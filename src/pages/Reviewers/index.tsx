@@ -3109,7 +3109,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
         {renderEditorRepoGrid()}
       </Box>
             
-    <Box>
+    {/* <Box>
           <br/>
         <hr></hr>
         <section id="comments">
@@ -3123,9 +3123,9 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
           Comments
         </Heading>
         </section>
-          {/* <Comments page={"Reviewers"}/> */}
+          <Comments page={"Reviewers"}/>
           
-        </Box>
+        </Box> */}
         </Box>
       </Box>
     </AllLayout>

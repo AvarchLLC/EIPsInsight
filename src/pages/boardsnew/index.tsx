@@ -1254,12 +1254,12 @@ const DashboardPage = () => {
           </Box>
 
           <Box>
-            <br />
+            {/* <br />
             <hr></hr>
             <br />
             <Text fontSize="3xl" fontWeight="bold">
               Comments
-            </Text>
+            </Text> */}
             {/* <Comments page={"boards"} /> */}
           </Box>
         </Box>
