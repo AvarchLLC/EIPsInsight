@@ -91,23 +91,25 @@ const CUSTOM_LABELS_ALL: LabelSpec[] = [
 
 // Graph 2: Process (same open PRs as Graph 1 Open; sum of counts = Graph 1 Open per month)
 const PROCESS_LABELS: LabelSpec[] = [
-  { value: "PR DRAFT", label: "PR DRAFT", color: "#6366f1" },
-  { value: "Typo", label: "Typo", color: "#22c55e" },
-  { value: "NEW EIP", label: "NEW EIP", color: "#f59e0b" },
-  { value: "Website", label: "Website", color: "#0ea5e9" },
-  { value: "EIP-1", label: "EIP-1", color: "#ec4899" },
-  { value: "Tooling", label: "Tooling", color: "#14b8a6" },
-  { value: "Status Change", label: "Status Change", color: "#ef4444" },
-  { value: "Other", label: "Other", color: "#64748b" },
+  { value: "PR DRAFT", label: "PR DRAFT", color: "#94a3b8" },      // neutral grey → work-in-progress, not alarming
+  { value: "Typo", label: "Typo", color: "#22c55e" },               // green → minor, harmless fixes
+  { value: "NEW EIP", label: "NEW EIP", color: "#0ea5e9" },         // blue → fresh, official, structured
+  { value: "Website", label: "Website", color: "#38bdf8" },         // lighter blue → web/UX vibe
+  { value: "EIP-1", label: "EIP-1", color: "#8b5cf6" },             // violet → special / foundational
+  { value: "Tooling", label: "Tooling", color: "#14b8a6" },         // teal → engineering / infra feel
+  { value: "Status Change", label: "Status Change", color: "#f97316" }, // orange → action / transition
+  { value: "Other", label: "Other", color: "#64748b" },             // muted slate → miscellaneous
 ];
+
 // Graph 2: Participants (subcategory); Awaited = draft PRs when Process is PR DRAFT and not stagnant; empty/unknown → Misc
 const PARTICIPANTS_LABELS: LabelSpec[] = [
-  { value: "Waiting on Editor", label: "Waiting on Editor", color: "#6366f1" },
-  { value: "Waiting on Author", label: "Waiting on Author", color: "#22c55e" },
-  { value: "Stagnant", label: "Stagnant", color: "#f59e0b" },
-  { value: "Awaited", label: "Awaited", color: "#8b5cf6" },
-  { value: "Misc", label: "Misc", color: "#64748b" },
+  { value: "Waiting on Editor", label: "Waiting on Editor", color: "#facc15" }, // yellow → paused, pending review
+  { value: "Waiting on Author", label: "Waiting on Author", color: "#22c55e" }, // green → ball is with author, normal state
+  { value: "Stagnant", label: "Stagnant", color: "#ef4444" },                   // red → actually concerning
+  { value: "Awaited", label: "Awaited", color: "#8b5cf6" },                     // purple → anticipated / queued
+  { value: "Misc", label: "Misc", color: "#94a3b8" },                           // neutral grey → unknown bucket
 ];
+
 
 const REPOS = [
   { key: "all", label: "All Open PRs", api: "" },
