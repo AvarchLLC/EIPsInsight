@@ -1260,7 +1260,7 @@ const DashboardPage = () => {
             <Text fontSize="3xl" fontWeight="bold">
               Comments
             </Text>
-            <Comments page={"boards"} />
+            {/* <Comments page={"boards"} /> */}
           </Box>
         </Box>
       </AllLayout>
