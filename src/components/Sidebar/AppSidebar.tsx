@@ -357,7 +357,10 @@ const sidebarStructure = [
       {
         label: "Boards",
         href: "/boards",
-        children: [{ label: "EIPs BOARD", href: "/boards#EIPsBOARD" }],
+        children: [
+          { label: "EIPs BOARD", href: "/boards#EIPsBOARD" },
+          { label: "ERCs BOARD", href: "/boards#ERCsBOARD" },
+        ],
       },
       {
         label: "Editors & Reviewers Leaderboard",

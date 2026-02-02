@@ -236,7 +236,10 @@ const DashboardPage = () => {
   const [ercData, setErcData] = useState<BoardData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [activeTab, setActiveTab] = useState("EIPs");
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window === "undefined") return "EIPs";
+    return window.location.hash.slice(1) === "ERCsBOARD" ? "ERCs" : "EIPs";
+  });
   const [show, setShow] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -244,6 +247,17 @@ const DashboardPage = () => {
     pageIndex: 0,
     pageSize: 20,
   });
+
+  // Sync tab with URL hash when hash changes (e.g. back/forward)
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.slice(1);
+      if (hash === "ERCsBOARD") setActiveTab("ERCs");
+      else if (hash === "EIPsBOARD") setActiveTab("EIPs");
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   // Labels available in the filter dropdown
   const filterLabels = [
@@ -751,16 +765,24 @@ const DashboardPage = () => {
           >
             <HStack spacing={4}>
               <Button
+                id="EIPsBOARD"
                 colorScheme="blue"
-                onClick={() => setActiveTab("EIPs")}
+                onClick={() => {
+                  setActiveTab("EIPs");
+                  if (typeof window !== "undefined") window.history.replaceState(null, "", `${window.location.pathname}#EIPsBOARD`);
+                }}
                 variant={activeTab === "EIPs" ? "solid" : "outline"}
                 size="lg"
               >
                 EIPs
               </Button>
               <Button
+                id="ERCsBOARD"
                 colorScheme="blue"
-                onClick={() => setActiveTab("ERCs")}
+                onClick={() => {
+                  setActiveTab("ERCs");
+                  if (typeof window !== "undefined") window.history.replaceState(null, "", `${window.location.pathname}#ERCsBOARD`);
+                }}
                 variant={activeTab === "ERCs" ? "solid" : "outline"}
                 size="lg"
               >
@@ -787,7 +809,7 @@ const DashboardPage = () => {
           </Flex>
 
           {/* Board Header with Filters */}
-          <Box p={4} id="EIPsBOARD">
+          <Box p={4} id="BOARD">
             <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={4}>
               <Heading
                 as="h2"
@@ -1064,9 +1086,9 @@ const DashboardPage = () => {
             <br />
             <hr></hr>
             <br />
-            <Text fontSize="36px" fontWeight="bold" color="#40E0D0">
+            {/* <Text fontSize="36px" fontWeight="bold" color="#40E0D0">
               Comments
-            </Text>
+            </Text> */}
             {/* <Comments page={"boards"} /> */}
           </Box>
         </Box>
