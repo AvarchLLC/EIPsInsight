@@ -147,14 +147,18 @@ function labelsToProcess(labelsStr: string, repo: string, isPrDraft?: boolean): 
   if (labels.some((l) => /tooling|r-ci|r-process/i.test(l))) return "Tooling";
   return "Other";
 }
-// Graph 2 Participants: only Awaited when draft (PR DRAFT) and not stagnant; else Misc if no label match (backend uses analysis criteria)
-function labelsToParticipants(labelsStr: string, process: string, isPrDraft?: boolean): string {
+// Graph 2 Participants: match backend deriveSubcategory (boards) so chart fallback and CSV derivation align
+function labelsToParticipants(labelsStr: string, _process: string, isPrDraft?: boolean): string {
   const labels = labelsStr.split(";").map((l) => (l || "").trim()).filter(Boolean);
   const lower = labels.map((l) => l.toLowerCase());
+  // Waiting on Editor: same variants as backend (e-review, e-consensus, needs-editor-review, editor+review)
   if (lower.some((l) => l === "e-review" || l === "editor review")) return "Waiting on Editor";
+  if (lower.some((l) => l === "needs-editor-review" || l === "custom:needs-editor-review" || l === "e-consensus")) return "Waiting on Editor";
+  if (lower.some((l) => l && l.includes("editor") && l.includes("review"))) return "Waiting on Editor";
   if (lower.some((l) => l === "a-review" || l === "author review")) return "Waiting on Author";
   if (lower.some((l) => l === "s-stagnant" || l === "stagnant")) return "Stagnant";
-  if ((process === "PR DRAFT" || isPrDraft) && !lower.some((l) => l === "s-stagnant" || l === "stagnant")) return "Awaited";
+  // Awaited: draft (same as backend — no stagnant check so counts match)
+  if (isPrDraft === true || labels.some((l) => l === "PR DRAFT")) return "Awaited";
   return "Misc";
 }
 
@@ -196,6 +200,7 @@ export default function PRAnalyticsCard() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>(''); // For CSV download
+  const [tableMonthTotal, setTableMonthTotal] = useState<number | null>(null); // From details API; matches eipboards (activity month)
 
   // Graph 2: Process or Participants (same open PRs as Graph 1 Open; sum = Graph 1 Open per month)
   const labelSpecs: LabelSpec[] = useMemo(() => {
@@ -347,6 +352,29 @@ export default function PRAnalyticsCard() {
     return () => controller.abort();
   }, [repoKey, labelSet, graph2ApiName]);
 
+  // Fetch table total for selected month (details API = activity month) so we can show the number that matches eipboards
+  useEffect(() => {
+    if (!selectedMonth || !/^\d{4}-\d{2}$/.test(selectedMonth)) {
+      setTableMonthTotal(null);
+      return;
+    }
+    const ac = new AbortController();
+    fetch(`/api/AnalyticsCharts/category-subcategory/${graph2ApiName}/details?month=${selectedMonth}&source=snapshot`, { signal: ac.signal })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((rows: any[]) => {
+        const arr = Array.isArray(rows) ? rows : [];
+        const filtered = arr.filter((row: any) => {
+          const processNorm = normalizeProcessTypeFromApi(row.Process ?? "Other");
+          const participantsNorm = normalizeParticipantsTypeFromApi(row.Participants ?? "Misc");
+          const actualLabel = labelSet === "process" ? processNorm : participantsNorm;
+          return selectedLabels.includes(actualLabel);
+        });
+        setTableMonthTotal(filtered.length);
+      })
+      .catch(() => setTableMonthTotal(null));
+    return () => ac.abort();
+  }, [selectedMonth, graph2ApiName, labelSet, selectedLabels]);
+
   // Build filtered dataset and chart options
   const filteredData = useMemo(() => {
     const arr = Array.isArray(data) ? data : [];
@@ -475,88 +503,44 @@ export default function PRAnalyticsCard() {
     animationDelayUpdate: (idx: number) => idx * 20,
   }), [chartData, textColor, cardBg, defaultZoomStart, axisColor, splitLineColor]);
 
-  // CSV download
+  // CSV download: use category-subcategory details API (same as Board/Graph 3 table) so counts match that source
   const downloadCSV = async () => {
     setLoading(true);
 
-    const buildParams = (repo: string) => new URLSearchParams({
-      repo,
-      mode: "detail",
-      labelType: "customLabels",
-    }).toString();
-
-    const fetchRows = async (repo: string) => {
-      const url = `/api/pr-details?${buildParams(repo)}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Failed to fetch PR details (${repo}): ${res.status}`);
-      const rows = await res.json();
-      return Array.isArray(rows) ? rows : [];
-    };
+    const downloadMonthKey = selectedMonth || (months.length > 0 ? months[months.length - 1] : null);
+    if (!downloadMonthKey) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      let combined: any[] = [];
-      if (repoKey === "all") {
-        const [eip, erc, rip] = await Promise.allSettled([
-          fetchRows("eip"),
-          fetchRows("erc"),
-          fetchRows("rip"),
-        ]);
-        const toArr = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
-        combined = [...toArr(eip), ...toArr(erc), ...toArr(rip)];
-      } else {
-        const repo = repoKey;
-        const rows = await fetchRows(repo);
-        combined = rows;
-      }
+      const detailsUrl = `/api/AnalyticsCharts/category-subcategory/${graph2ApiName}/details?month=${downloadMonthKey}&source=snapshot`;
+      const res = await fetch(detailsUrl);
+      if (!res.ok) throw new Error(`Failed to fetch details: ${res.status}`);
+      const rows: any[] = await res.json();
+      const combined = Array.isArray(rows) ? rows : [];
 
-      // Use selected month for filtering
-      const downloadMonthKey = selectedMonth || (months.length > 0 ? months[months.length - 1] : null);
-
-      if (!downloadMonthKey) {
-        console.error("No month selected for download");
-        return;
-      }
-
-      // Filter only PRs from the selected month and apply selected label filter (Process or Participants)
+      // Details API returns Process, Participants (from stored category/subcategory). Normalize to match chart & selectedLabels
       const filteredRows = combined
-        .map((pr: any) => {
-          const process = (labelSet === "process" && pr.Category) ? pr.Category : labelsToProcess(pr.Labels || "", pr.Repo || repoKey, pr.Draft);
-          const actualLabel = labelSet === "process"
-            ? process
-            : (pr.Subcategory != null && pr.Subcategory !== "" ? pr.Subcategory : labelsToParticipants(pr.Labels || "", process, pr.Draft));
-          return {
-            ...pr,
-            ActualLabel: actualLabel,
-            DisplayLabel: actualLabel
-          };
+        .map((row: any) => {
+          const processNorm = normalizeProcessTypeFromApi(row.Process ?? "Other");
+          const participantsNorm = normalizeParticipantsTypeFromApi(row.Participants ?? "Misc");
+          const actualLabel = labelSet === "process" ? processNorm : participantsNorm;
+          return { ...row, ActualLabel: actualLabel };
         })
-        .filter((pr: any) => {
-          const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
-          if (mk !== downloadMonthKey) return false;
+        .filter((row: any) => selectedLabels.includes(row.ActualLabel));
 
-          // For 'all' view, check if the normalized DisplayLabel is in selectedLabels
-          // For individual repos, check if the ActualLabel is in selectedLabels
-          return selectedLabels.includes(pr.ActualLabel);
-        });
-
-      const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
-
-      const csvData = filteredRows.map((pr: any) => {
-        // Use DisplayLabel which is normalized for 'all' view, or ActualLabel for individual repos
-        const csvLabel = pr.DisplayLabel || pr.ActualLabel || "Misc";
-
-        return {
-          Month: pr.Month || formatMonthLabel(pr.MonthKey),
-          MonthKey: pr.MonthKey,
-          Label: csvLabel, // Show the label that matches what's displayed in the graph
-          Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
-          PRNumber: pr.PRNumber,
-          PRLink: pr.PRLink,
-          Author: pr.Author,
-          Title: pr.Title,
-          CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
-        };
-      });
+      const csvData = filteredRows.map((row: any) => ({
+        Month: row.Month ?? formatMonthLabel(row.MonthKey),
+        MonthKey: row.MonthKey,
+        Label: row.ActualLabel,
+        Repo: row.Repo ?? (repoKey === "all" ? undefined : repoKey),
+        PRNumber: row.PRNumber,
+        PRLink: row.PRLink,
+        Author: row.Author ?? "",
+        Title: row.Title ?? "",
+        CreatedAt: row.CreatedAt ? new Date(row.CreatedAt).toISOString() : "",
+      }));
 
       const csv = Papa.unparse(csvData);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
@@ -715,12 +699,17 @@ export default function PRAnalyticsCard() {
         >
           <Text fontSize="lg" fontWeight="bold" color={useColorModeValue('blue.700', 'blue.300')}>
             {latestMonth
-              ? <>Current Month ({formatMonthLabel(latestMonth)}) Total Open PRs: <Text as="span" color={accentColor}>{currentMonthTotal}</Text></>
+              ? <>Chart total ({formatMonthLabel(latestMonth)}): <Text as="span" color={accentColor}>{currentMonthTotal}</Text></>
               : <>No data available</>
             }
           </Text>
-          <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={1}>
-            Same open PRs as Graph 1 Open. Sum = Graph 1 Open per month. CSV: {selectedMonth ? formatMonthLabel(selectedMonth) : "selected month"}.
+          {selectedMonth && tableMonthTotal != null && (
+            <Text fontSize="md" fontWeight="semibold" color={useColorModeValue('green.700', 'green.300')} mt={2}>
+              Table total for {formatMonthLabel(selectedMonth)} (matches eipboards): <Text as="span" color={accentColor}>{tableMonthTotal}</Text>
+            </Text>
+          )}
+          <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={2}>
+            Chart, table (eipboards), and CSV all use the same <strong>snapshot</strong> data (hourly pre-aggregation). Counts match.
           </Text>
         </Box>
         <Divider my={3} />

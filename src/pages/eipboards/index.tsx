@@ -17,24 +17,27 @@ import {
   HStack,
   Wrap,
   WrapItem,
-  Tag,
-  TagLabel,
   VStack,
   Select,
-  Checkbox,
-  CheckboxGroup,
   Flex,
   Button,
-  SimpleGrid,
   useToast,
   Input,
   InputGroup,
   InputLeftElement,
+  IconButton,
+  Tooltip,
+  Card,
+  CardBody,
+  CardHeader,
+  SimpleGrid,
+  Divider,
 } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
-import { ExternalLinkIcon, SearchIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon, SearchIcon, DownloadIcon, ChevronLeftIcon, ChevronRightIcon, CopyIcon } from "@chakra-ui/icons";
 import { BiGitPullRequest } from "react-icons/bi";
 import { format } from "date-fns";
+import Papa from "papaparse";
 
 /** Row from /api/AnalyticsCharts/category-subcategory/[name]/details (Graph 3 table). */
 interface DetailsRow {
@@ -55,26 +58,66 @@ interface DetailsRow {
   GitHubRepo?: string;
 }
 
-/** Order and labels match stored category from PR collections (pranalyti). */
-const PROCESS_ORDER = ["PR DRAFT", "Typo", "New EIP", "Website", "EIP-1", "Tooling", "Status Change", "Other"];
+function normalizeProcess(p: string | undefined): string {
+  const t = (p ?? "").trim();
+  if (/^New\s*EIP$/i.test(t)) return "NEW EIP";
+  if (/^PR\s*DRAFT$/i.test(t)) return "PR DRAFT";
+  if (t === "Typo") return "Typo";
+  if (t === "Website") return "Website";
+  if (/^EIP-?1$/i.test(t)) return "EIP-1";
+  if (t === "Tooling") return "Tooling";
+  if (/^Status\s*Change$/i.test(t)) return "Status Change";
+  if (t === "Other") return "Other";
+  return t || "Other";
+}
+
+function normalizeParticipants(s: string | undefined): string {
+  const t = (s ?? "").trim();
+  if (!t) return "Misc";
+  if (/^AWAITED$/i.test(t)) return "Awaited";
+  if (/Waiting\s*on\s*Editor/i.test(t)) return "Waiting on Editor";
+  if (/Waiting\s*on\s*Author/i.test(t)) return "Waiting on Author";
+  if (/Stagnant/i.test(t)) return "Stagnant";
+  if (/Uncategorized|Misc/i.test(t)) return "Misc";
+  return t || "Misc";
+}
+
+const PROCESS_ORDER = ["PR DRAFT", "Typo", "NEW EIP", "Website", "EIP-1", "Tooling", "Status Change", "Other"];
+const PROCESS_COLORS: Record<string, string> = {
+  "PR DRAFT": "purple",
+  Typo: "green",
+  "NEW EIP": "orange",
+  Website: "cyan",
+  "EIP-1": "pink",
+  Tooling: "teal",
+  "Status Change": "red",
+  Other: "gray",
+};
+const PARTICIPANT_COLORS: Record<string, string> = {
+  "Waiting on Editor": "blue",
+  "Waiting on Author": "green",
+  Stagnant: "orange",
+  Awaited: "purple",
+  Misc: "gray",
+};
 
 const REPO_TABS = [
   { key: "eips" as const, label: "EIPs" },
   { key: "ercs" as const, label: "ERCs" },
   { key: "rips" as const, label: "RIPs" },
-  { key: "all" as const, label: "All (EIPs + ERCs + RIPs)" },
+  { key: "all" as const, label: "All" },
 ];
 
-/** Subcategory (Participants) options; match stored subcategory from PR collections (pranalyti). */
 const SUBCATEGORY_OPTIONS = [
-  { value: "Waiting on Editor", label: "Waiting on Editor" },
-  { value: "Waiting on Author", label: "Waiting on Author" },
+  { value: "", label: "All" },
+  { value: "Waiting on Editor", label: "Waiting for Editor" },
+  { value: "Waiting on Author", label: "Waiting for Author" },
   { value: "Stagnant", label: "Stagnant" },
-  { value: "AWAITED", label: "Awaited" },
-  { value: "Uncategorized", label: "Uncategorized" },
+  { value: "Awaited", label: "Awaited" },
   { value: "Misc", label: "Misc" },
-  { value: "", label: "All (Participants)" },
 ];
+
+const PAGE_SIZES = [10, 25, 50, 100];
 
 function getCurrentMonthYear(): string {
   const d = new Date();
@@ -94,8 +137,8 @@ function getWaitTimeDays(createdAt: string): number | null {
 
 function formatWaitTime(days: number | null): string {
   if (days == null) return "—";
-  if (days >= 7) return `${Math.floor(days / 7)} week${days >= 14 ? "s" : ""}`;
-  return `${days} day${days !== 1 ? "s" : ""}`;
+  if (days >= 7) return `${Math.floor(days / 7)}w`;
+  return `${days}d`;
 }
 
 export default function EipBoardsPage() {
@@ -108,12 +151,18 @@ export default function EipBoardsPage() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("Waiting on Editor");
   const [selectedCategories, setSelectedCategories] = useState<string[]>(PROCESS_ORDER);
   const [searchQuery, setSearchQuery] = useState("");
-  const tableBg = useColorModeValue("white", "gray.800");
-  const headerBg = useColorModeValue("gray.100", "gray.700");
-  const filterBg = useColorModeValue("gray.50", "gray.800");
-  const toast = useToast();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
+  const toast = useToast();
   const repoKey = activeTab;
+
+  const cardBg = useColorModeValue("white", "gray.800");
+  const headerBg = useColorModeValue("gray.50", "gray.700");
+  const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const mutedColor = useColorModeValue("gray.600", "gray.400");
+  const accent = useColorModeValue("teal.600", "teal.400");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -141,11 +190,12 @@ export default function EipBoardsPage() {
     }
     setLoading(true);
     setError(null);
-    const url = `/api/AnalyticsCharts/category-subcategory/${repoKey}/details?month=${selectedMonth}`;
+    const url = `/api/AnalyticsCharts/category-subcategory/${repoKey}/details?month=${selectedMonth}&source=snapshot`;
     fetch(url)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: DetailsRow[]) => {
         setRows(Array.isArray(data) ? data : []);
+        setPage(1);
       })
       .catch((err) => {
         setError(err?.message ?? "Failed to load data.");
@@ -155,19 +205,17 @@ export default function EipBoardsPage() {
   }, [repoKey, selectedMonth]);
 
   const categoriesInData = useMemo(() => {
-    const set = new Set(rows.map((r) => r.Process ?? "Other"));
-    return PROCESS_ORDER.filter((p) => set.has(p)).concat([...set].filter((p) => !PROCESS_ORDER.includes(p)).sort());
+    const set = new Set(rows.map((r) => normalizeProcess(r.Process)));
+    return [...PROCESS_ORDER].concat([...set].filter((p) => !PROCESS_ORDER.includes(p)).sort());
   }, [rows]);
 
   const filteredRows = useMemo(() => {
     let list = rows;
     if (selectedSubcategory) {
-      list = list.filter(
-        (r) => (r.Participants ?? "").toLowerCase() === selectedSubcategory.toLowerCase()
-      );
+      list = list.filter((r) => normalizeParticipants(r.Participants) === selectedSubcategory);
     }
     if (selectedCategories.length > 0) {
-      list = list.filter((r) => selectedCategories.includes(r.Process ?? "Other"));
+      list = list.filter((r) => selectedCategories.includes(normalizeProcess(r.Process)));
     }
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
@@ -185,38 +233,112 @@ export default function EipBoardsPage() {
     });
   }, [rows, selectedSubcategory, selectedCategories, searchQuery]);
 
-  const totalInData = rows.length;
   const totalFiltered = filteredRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedRows = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredRows.slice(start, start + pageSize);
+  }, [filteredRows, currentPage, pageSize]);
+
   const totalByCategory = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of filteredRows) {
-      const p = r.Process ?? "Other";
+      const p = normalizeProcess(r.Process);
       map.set(p, (map.get(p) ?? 0) + 1);
     }
     return map;
   }, [filteredRows]);
 
-  const handleSelectAllCategories = () => {
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
+    setPage(1);
+  };
+
+  const selectAllCategories = () => {
     setSelectedCategories([...categoriesInData]);
-    toast({ title: "All categories selected", status: "info", duration: 2000, isClosable: true });
+    setPage(1);
   };
 
-  const handleClearCategories = () => {
+  const clearCategories = () => {
     setSelectedCategories([]);
-    toast({ title: "Categories cleared — select few to see PRs", status: "info", duration: 2000, isClosable: true });
+    setPage(1);
   };
 
-  const handleSelectFew = () => {
-    setSelectedCategories(categoriesInData.slice(0, 2));
-    toast({ title: "Select few applied", status: "info", duration: 2000, isClosable: true });
+  const downloadCSV = () => {
+    const csvData = filteredRows.map((row) => ({
+      Month: row.Month ?? formatMonthLabel(selectedMonth),
+      Repo: row.Repo ?? "",
+      Process: normalizeProcess(row.Process),
+      Participants: normalizeParticipants(row.Participants),
+      PRNumber: row.PRNumber ?? "",
+      PRLink: row.PRLink ?? "",
+      Title: row.Title ?? "",
+      Author: row.Author ?? "",
+      CreatedAt: row.CreatedAt ? new Date(row.CreatedAt).toISOString() : "",
+      Labels: row.Labels ?? "",
+    }));
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `eipboards_${activeTab}_${selectedMonth}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "CSV downloaded", status: "success", duration: 2000, isClosable: true });
   };
 
-  if (loading) {
+  const copyAsMarkdown = () => {
+    const byProcess = new Map<string, DetailsRow[]>();
+    for (const row of filteredRows) {
+      const process = normalizeProcess(row.Process);
+      if (!byProcess.has(process)) byProcess.set(process, []);
+      byProcess.get(process)!.push(row);
+    }
+    let markdown = "";
+    const order = PROCESS_ORDER.concat([...byProcess.keys()].filter((p) => !PROCESS_ORDER.includes(p)));
+    for (const process of order) {
+      const items = byProcess.get(process);
+      if (!items?.length) continue;
+      markdown += `### ${process}\n`;
+      items.forEach((row) => {
+        const title = (row.Title ?? "").replace(/\]/g, "\\]"); // escape ] so markdown link doesn't break
+        markdown += `* [${title} #${row.PRNumber ?? ""}](${row.PRLink ?? ""})\n`;
+      });
+      markdown += "\n";
+    }
+    navigator.clipboard
+      .writeText(markdown.trim())
+      .then(() => {
+        toast({
+          title: "Copied to clipboard",
+          description: `${filteredRows.length} PRs copied as markdown.`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      })
+      .catch(() => {
+        toast({
+          title: "Failed to copy",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      });
+  };
+
+  if (loading && rows.length === 0) {
     return (
       <AllLayout>
-        <Box textAlign="center" py={20}>
-          <Spinner size="xl" color="teal.500" />
-          <Text mt={4}>Loading open PRs for {formatMonthLabel(selectedMonth)}…</Text>
+        <Box py={20} textAlign="center">
+          <Spinner size="xl" color={accent} thickness="3px" />
+          <Text mt={4} fontSize="lg" color={mutedColor}>
+            Loading open PRs for {formatMonthLabel(selectedMonth)}…
+          </Text>
         </Box>
       </AllLayout>
     );
@@ -225,8 +347,8 @@ export default function EipBoardsPage() {
   if (error) {
     return (
       <AllLayout>
-        <Box textAlign="center" py={20}>
-          <Text color="red.500">{error}</Text>
+        <Box py={20} textAlign="center">
+          <Text fontSize="lg" color="red.500">{error}</Text>
         </Box>
       </AllLayout>
     );
@@ -234,225 +356,318 @@ export default function EipBoardsPage() {
 
   return (
     <AllLayout>
-      <Box p={{ base: 2, md: 6 }} maxW="1600px" mx="auto">
+      <Box p={{ base: 4, md: 8 }} maxW="1600px" mx="auto">
         <VStack align="stretch" spacing={6}>
-          <Heading size="lg" color="teal.500">
-            EIP/ERC/RIP Board — Process × Participants
-          </Heading>
-          <Text color="gray.500" fontSize="sm">
-            Graph 3 open PRs for <strong>{formatMonthLabel(selectedMonth)}</strong>. Same data as Boards page. Filter by repo, Subcategory (Participants), and Category (Process).
-          </Text>
+          {/* Header */}
+          <Box>
+            <Heading size="xl" color={accent} fontWeight="700" letterSpacing="-0.02em">
+              EIP / ERC / RIP Board
+            </Heading>
+            <Text mt={2} fontSize="lg" color={mutedColor} lineHeight="tall">
+              Open pull requests by type and status for the selected month. Filter by repo, process type, and participant status.
+            </Text>
+          </Box>
 
-          {/* Repo tabs + month selector (synced with boardsnew) */}
-          <Flex direction={{ base: "column", md: "row" }} gap={4} align={{ base: "stretch", md: "center" }} flexWrap="wrap">
-            <HStack spacing={2} flexWrap="wrap">
-              {REPO_TABS.map((tab) => (
-                <Button
-                  key={tab.key}
-                  size="sm"
-                  colorScheme={tab.key === activeTab ? "teal" : "gray"}
-                  variant={tab.key === activeTab ? "solid" : "outline"}
-                  onClick={() => setActiveTab(tab.key)}
-                >
-                  {tab.label}
-                </Button>
-              ))}
-            </HStack>
-            <Select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              maxW="160px"
-              bg={filterBg}
-              borderColor={useColorModeValue("blue.200", "blue.600")}
-            >
-              {availableMonths.length > 0
-                ? availableMonths.map((m) => (
-                    <option key={m} value={m}>
-                      {formatMonthLabel(m)}
-                    </option>
-                  ))
-                : (
-                    <option value={selectedMonth}>{formatMonthLabel(selectedMonth)}</option>
-                  )}
-            </Select>
-          </Flex>
+          {/* Repo + Month + Participants + Search */}
+          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="xl" overflow="hidden">
+            <CardBody p={{ base: 4, md: 5 }}>
+              <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                <Flex flexWrap="wrap" gap={3} align="center">
+                  {REPO_TABS.map((tab) => (
+                    <Button
+                      key={tab.key}
+                      size="md"
+                      colorScheme={tab.key === activeTab ? "teal" : "gray"}
+                      variant={tab.key === activeTab ? "solid" : "outline"}
+                      onClick={() => setActiveTab(tab.key)}
+                      fontWeight="600"
+                    >
+                      {tab.label}
+                    </Button>
+                  ))}
+                  <Select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    maxW="180px"
+                    size="md"
+                    fontWeight="600"
+                  >
+                    {availableMonths.length > 0
+                      ? availableMonths.map((m) => (
+                          <option key={m} value={m}>{formatMonthLabel(m)}</option>
+                        ))
+                      : <option value={selectedMonth}>{formatMonthLabel(selectedMonth)}</option>}
+                  </Select>
+                </Flex>
+                <Flex flexWrap="wrap" gap={3} align="center">
+                  <HStack>
+                    <Text fontWeight="600" color={mutedColor}>Status</Text>
+                    <Select
+                      value={selectedSubcategory}
+                      onChange={(e) => { setSelectedSubcategory(e.target.value); setPage(1); }}
+                      maxW="160px"
+                      size="md"
+                    >
+                      {SUBCATEGORY_OPTIONS.map((opt) => (
+                        <option key={opt.value || "all"} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </Select>
+                  </HStack>
+                  <InputGroup maxW="280px">
+                    <InputLeftElement pointerEvents="none" height="100%">
+                      <SearchIcon color="gray.400" />
+                    </InputLeftElement>
+                    <Input
+                      placeholder="Search title, author, PR #"
+                      value={searchQuery}
+                      onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+                      size="md"
+                    />
+                  </InputGroup>
+                </Flex>
+              </SimpleGrid>
 
-          {/* Subcategory dropdown + search */}
-          <Flex direction={{ base: "column", md: "row" }} gap={4} align={{ base: "stretch", md: "center" }} flexWrap="wrap">
-            <HStack>
-              <Text fontWeight="semibold" whiteSpace="nowrap">
-                Subcategory (Participants):
+              <Divider my={4} borderColor={borderColor} />
+
+              {/* Process filter chips */}
+              <Box>
+                <Flex align="center" gap={2} mb={3} flexWrap="wrap">
+                  <Text fontWeight="600" fontSize="md">Process type</Text>
+                  <Badge colorScheme="teal" fontSize="md" px={2} py={0.5}>{totalFiltered}</Badge>
+                  <Button size="xs" variant="ghost" colorScheme="teal" onClick={selectAllCategories}>
+                    All
+                  </Button>
+                  <Button size="xs" variant="ghost" onClick={clearCategories}>
+                    Clear
+                  </Button>
+                </Flex>
+                <Wrap spacing={2}>
+                  {categoriesInData.map((cat) => {
+                    const count = totalByCategory.get(cat) ?? 0;
+                    const isSelected = selectedCategories.includes(cat);
+                    return (
+                      <WrapItem key={cat}>
+                        <Badge
+                          as="button"
+                          colorScheme={PROCESS_COLORS[cat] ?? "gray"}
+                          variant={isSelected ? "solid" : "outline"}
+                          fontSize="md"
+                          px={3}
+                          py={1.5}
+                          borderRadius="full"
+                          cursor="pointer"
+                          _hover={{ opacity: 0.9 }}
+                          onClick={() => toggleCategory(cat)}
+                        >
+                          {cat} {count > 0 && `(${count})`}
+                        </Badge>
+                      </WrapItem>
+                    );
+                  })}
+                </Wrap>
+              </Box>
+            </CardBody>
+          </Card>
+
+          {/* Summary + Download */}
+          <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
+            <HStack gap={2} flexWrap="wrap">
+              <Text fontWeight="700" fontSize="lg">
+                Showing{" "}
+                <Badge colorScheme="teal" fontSize="md" px={2}>
+                  {totalFiltered === 0 ? 0 : (currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalFiltered)}
+                </Badge>
+                {" "}of {totalFiltered} PRs
               </Text>
               <Select
-                value={selectedSubcategory}
-                onChange={(e) => setSelectedSubcategory(e.target.value)}
-                maxW="220px"
-                bg={filterBg}
-                borderColor={useColorModeValue("blue.200", "blue.600")}
+                value={pageSize}
+                onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+                maxW="100px"
+                size="sm"
               >
-                {SUBCATEGORY_OPTIONS.map((opt) => (
-                  <option key={opt.value || "all"} value={opt.value}>
-                    {opt.label}
-                  </option>
+                {PAGE_SIZES.map((n) => (
+                  <option key={n} value={n}>{n} per page</option>
                 ))}
               </Select>
             </HStack>
-            <InputGroup maxW="280px">
-              <InputLeftElement pointerEvents="none">
-                <SearchIcon color="gray.400" />
-              </InputLeftElement>
-              <Input
-                placeholder="Search title, author, PR #…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                bg={filterBg}
-              />
-            </InputGroup>
+            <HStack gap={2}>
+              <Button
+                leftIcon={<CopyIcon />}
+                size="md"
+                colorScheme="teal"
+                variant="outline"
+                onClick={copyAsMarkdown}
+                isDisabled={totalFiltered === 0}
+              >
+                Copy as MD
+              </Button>
+              <Button
+                leftIcon={<DownloadIcon />}
+                size="md"
+                colorScheme="teal"
+                variant="outline"
+                onClick={downloadCSV}
+                isDisabled={totalFiltered === 0}
+              >
+                Download CSV
+              </Button>
+            </HStack>
           </Flex>
 
-          {/* Category filter: checkboxes + Select all / Select few / Clear */}
-          <Box p={4} borderRadius="lg" bg={filterBg} borderWidth="1px">
-            <Flex justify="space-between" align="center" mb={3} flexWrap="wrap" gap={2}>
-              <Text fontWeight="semibold">Filter by Category (Process):</Text>
-              <HStack spacing={2}>
-                <Button size="sm" colorScheme="teal" variant="outline" onClick={handleSelectAllCategories}>
-                  Select all
-                </Button>
-                <Button size="sm" colorScheme="blue" variant="outline" onClick={handleSelectFew}>
-                  Select few
-                </Button>
-                <Button size="sm" variant="ghost" onClick={handleClearCategories}>
-                  Clear
-                </Button>
-              </HStack>
-            </Flex>
-            <CheckboxGroup value={selectedCategories} onChange={(v) => setSelectedCategories(v as string[])}>
-              <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing={2}>
-                {categoriesInData.map((cat) => (
-                  <Checkbox key={cat} value={cat} size="sm">
-                    {cat}
-                    {totalByCategory.has(cat) && (
-                      <Badge ml={1} colorScheme="blue" fontSize="xs">
-                        {totalByCategory.get(cat)}
-                      </Badge>
-                    )}
-                  </Checkbox>
-                ))}
-              </SimpleGrid>
-            </CheckboxGroup>
-          </Box>
-
-          {/* Total count */}
-          <Flex justify="space-between" align="center" flexWrap="wrap" gap={2}>
-            <Text fontWeight="bold" fontSize="md">
-              Total: <Badge colorScheme="teal" fontSize="md">{totalFiltered}</Badge> PR{totalFiltered !== 1 ? "s" : ""} shown
-              {totalInData !== totalFiltered && (
-                <Text as="span" fontWeight="normal" color="gray.500" fontSize="sm" ml={2}>
-                  (of {totalInData} in {formatMonthLabel(selectedMonth)})
-                </Text>
-              )}
-            </Text>
-          </Flex>
-
-          {/* Advanced table */}
-          <TableContainer borderWidth="1px" borderRadius="lg" overflowX="auto" bg={tableBg}>
-            <Table size="sm" variant="simple">
-              <Thead bg={headerBg}>
-                <Tr>
-                  <Th>#</Th>
-                  {activeTab === "all" && <Th>Repo</Th>}
-                  <Th>PR #</Th>
-                  <Th>Title</Th>
-                  <Th>Created</Th>
-                  <Th>Wait Time</Th>
-                  <Th>Category</Th>
-                  <Th>Subcategory</Th>
-                  <Th>Labels</Th>
-                  <Th>View PR</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {filteredRows.map((row, idx) => {
-                  const createdAt = row.CreatedAt ?? "";
-                  const waitDays = getWaitTimeDays(createdAt);
-                  const labels = row.Labels ? row.Labels.split("; ").filter(Boolean) : [];
-                  const repoBadge = row.Repo === "ERC PRs" ? "ERC" : row.Repo === "RIP PRs" ? "RIP" : "EIP";
-                  return (
-                    <Tr key={`${row.PRNumber}-${row.Repo ?? ""}-${idx}`} _hover={{ bg: useColorModeValue("gray.50", "gray.700") }}>
-                      <Td fontWeight="medium">{idx + 1}</Td>
-                      {activeTab === "all" && (
+          {/* Table */}
+          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="xl" overflow="hidden">
+            <TableContainer>
+              <Table size="md" variant="simple">
+                <Thead bg={headerBg}>
+                  <Tr>
+                    <Th fontWeight="700">#</Th>
+                    {activeTab === "all" && <Th fontWeight="700">Repo</Th>}
+                    <Th fontWeight="700">PR</Th>
+                    <Th fontWeight="700">Title</Th>
+                    <Th fontWeight="700">Created</Th>
+                    <Th fontWeight="700">Wait</Th>
+                    <Th fontWeight="700">Process</Th>
+                    <Th fontWeight="700">Status</Th>
+                    <Th fontWeight="700">Labels</Th>
+                    <Th fontWeight="700">Link</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {paginatedRows.map((row, idx) => {
+                    const createdAt = row.CreatedAt ?? "";
+                    const waitDays = getWaitTimeDays(createdAt);
+                    const labels = row.Labels ? row.Labels.split("; ").filter(Boolean) : [];
+                    const repoShort = row.Repo === "ERC PRs" ? "ERC" : row.Repo === "RIP PRs" ? "RIP" : "EIP";
+                    const processNorm = normalizeProcess(row.Process);
+                    const participantsNorm = normalizeParticipants(row.Participants);
+                    return (
+                      <Tr
+                        key={`${row.PRNumber}-${row.Repo ?? ""}-${idx}`}
+                        _hover={{ bg: hoverBg }}
+                        borderBottomWidth="1px"
+                        borderColor={borderColor}
+                      >
+                        <Td fontWeight="600">{(currentPage - 1) * pageSize + idx + 1}</Td>
+                        {activeTab === "all" && (
+                          <Td>
+                            <Badge colorScheme="purple" fontSize="sm" px={2} py={0.5}>
+                              {repoShort}
+                            </Badge>
+                          </Td>
+                        )}
                         <Td>
-                          <Badge colorScheme="purple" fontSize="xs">
-                            {repoBadge}
+                          <Link href={row.PRLink ?? "#"} isExternal color="blue.500" fontWeight="600" display="inline-flex" alignItems="center" gap={1}>
+                            <BiGitPullRequest /> #{row.PRNumber ?? "—"}
+                          </Link>
+                        </Td>
+                        <Td maxW="320px" noOfLines={1} title={row.Title ?? ""} fontSize="md">
+                          {row.Title ?? "—"}
+                        </Td>
+                        <Td whiteSpace="nowrap" fontSize="md">
+                          {createdAt ? format(new Date(createdAt), "MMM d, yyyy") : "—"}
+                        </Td>
+                        <Td>
+                          <Badge
+                            colorScheme={waitDays != null && waitDays > 30 ? "red" : waitDays != null && waitDays > 14 ? "orange" : "green"}
+                            fontSize="sm"
+                            px={2}
+                            py={0.5}
+                          >
+                            {formatWaitTime(waitDays)}
                           </Badge>
                         </Td>
-                      )}
-                      <Td>
-                        <Link href={row.PRLink ?? "#"} isExternal color="blue.500" display="inline-flex" alignItems="center" gap={1}>
-                          <BiGitPullRequest />
-                          {row.PRNumber ?? "—"}
-                        </Link>
-                      </Td>
-                      <Td maxW="300px" noOfLines={1} title={row.Title ?? ""}>
-                        {row.Title ?? "—"}
-                      </Td>
-                      <Td whiteSpace="nowrap">
-                        {createdAt ? format(new Date(createdAt), "MMM dd, yyyy") : "—"}
-                      </Td>
-                      <Td>
-                        <Badge
-                          colorScheme={waitDays != null && waitDays > 30 ? "red" : waitDays != null && waitDays > 14 ? "orange" : "green"}
-                          fontSize="xs"
-                        >
-                          {formatWaitTime(waitDays)}
-                        </Badge>
-                      </Td>
-                      <Td>
-                        <Badge colorScheme="purple" fontSize="xs">
-                          {row.Process ?? "—"}
-                        </Badge>
-                      </Td>
-                      <Td>
-                        <Badge colorScheme="blue" fontSize="xs">
-                          {row.Participants ?? "—"}
-                        </Badge>
-                      </Td>
-                      <Td maxW="220px">
-                        <Wrap spacing={1}>
-                          {labels.slice(0, 3).map((l, i) => (
-                            <WrapItem key={i}>
-                              <Tag size="sm" colorScheme="gray">
-                                <TagLabel>{l}</TagLabel>
-                              </Tag>
-                            </WrapItem>
-                          ))}
-                          {labels.length > 3 && (
-                            <WrapItem>
-                              <Tag size="sm" colorScheme="gray">
-                                <TagLabel>+{labels.length - 3}</TagLabel>
-                              </Tag>
-                            </WrapItem>
-                          )}
-                          {labels.length === 0 && <Text color="gray.400">—</Text>}
-                        </Wrap>
-                      </Td>
-                      <Td>
-                        <Link href={row.PRLink ?? "#"} isExternal color="blue.500" fontSize="sm" fontWeight="600">
-                          View <ExternalLinkIcon mx="1px" />
-                        </Link>
-                      </Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-            </Table>
-          </TableContainer>
+                        <Td>
+                          <Badge colorScheme={PROCESS_COLORS[processNorm] ?? "gray"} fontSize="sm" px={2} py={0.5}>
+                            {processNorm || "—"}
+                          </Badge>
+                        </Td>
+                        <Td>
+                          <Badge colorScheme={PARTICIPANT_COLORS[participantsNorm] ?? "gray"} fontSize="sm" px={2} py={0.5}>
+                            {participantsNorm || "—"}
+                          </Badge>
+                        </Td>
+                        <Td maxW="200px">
+                          <Wrap spacing={1}>
+                            {labels.slice(0, 3).map((l, i) => (
+                              <WrapItem key={i}>
+                                <Badge colorScheme="gray" fontSize="xs" px={1.5} py={0}>
+                                  {l}
+                                </Badge>
+                              </WrapItem>
+                            ))}
+                            {labels.length > 3 && (
+                              <WrapItem>
+                                <Badge colorScheme="gray" fontSize="xs">+{labels.length - 3}</Badge>
+                              </WrapItem>
+                            )}
+                            {labels.length === 0 && <Text color={mutedColor}>—</Text>}
+                          </Wrap>
+                        </Td>
+                        <Td>
+                          <Tooltip label="Open PR on GitHub">
+                            <Link href={row.PRLink ?? "#"} isExternal display="inline-flex" alignItems="center" fontWeight="600" color="teal.500">
+                              Open <ExternalLinkIcon ml={1} />
+                            </Link>
+                          </Tooltip>
+                        </Td>
+                      </Tr>
+                    );
+                  })}
+                </Tbody>
+              </Table>
+            </TableContainer>
 
-          {filteredRows.length === 0 && (
-            <Text color="gray.500" py={8} textAlign="center">
-              No PRs match the current filters. Try changing Subcategory or selecting more Categories.
-            </Text>
-          )}
+            {filteredRows.length === 0 && (
+              <Box py={12} textAlign="center">
+                <Text fontSize="lg" color={mutedColor}>
+                  No PRs match the current filters. Try changing status or selecting more process types.
+                </Text>
+              </Box>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Flex justify="space-between" align="center" px={4} py={4} borderTopWidth="1px" borderColor={borderColor} bg={headerBg} flexWrap="wrap" gap={3}>
+                <Text fontWeight="600" fontSize="md">
+                  Page {currentPage} of {totalPages}
+                </Text>
+                <HStack gap={1}>
+                  <IconButton
+                    aria-label="Previous page"
+                    icon={<ChevronLeftIcon />}
+                    size="md"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    isDisabled={currentPage <= 1}
+                  />
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 5) pageNum = i + 1;
+                    else if (currentPage <= 3) pageNum = i + 1;
+                    else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                    else pageNum = currentPage - 2 + i;
+                    return (
+                      <Button
+                        key={pageNum}
+                        size="md"
+                        colorScheme={pageNum === currentPage ? "teal" : "gray"}
+                        variant={pageNum === currentPage ? "solid" : "outline"}
+                        onClick={() => setPage(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                  <IconButton
+                    aria-label="Next page"
+                    icon={<ChevronRightIcon />}
+                    size="md"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    isDisabled={currentPage >= totalPages}
+                  />
+                </HStack>
+              </Flex>
+            )}
+          </Card>
         </VStack>
       </Box>
     </AllLayout>

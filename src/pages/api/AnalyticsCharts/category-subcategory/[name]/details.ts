@@ -1,12 +1,12 @@
 /**
  * Category-subcategory details API: table with metadata (per-PR rows).
  *
- * Reads from PR collections (eipprs, ercprs, ripprs) and uses stored category/subcategory
- * so the table matches Graph 2/3 and board aggregation (same data as pranalyti charts).
+ * Two modes (same response shape):
+ * - default: PR collections (eipprs, ercprs, ripprs) with activity month (createdAt or updatedAt in month).
+ * - source=snapshot: snapshot collections (open_*_pr_snapshots) for that month — same PRs the chart counts (hourly pre-aggregation).
  *
- * Query: name=eips|ercs|rips|all, month=YYYY-MM
- * Response: same row shape as before (MonthKey, Month, Repo, Process, Participants,
- *   PRNumber, PRId, PRLink, Title, Author, State, CreatedAt, ClosedAt, Labels, GitHubRepo).
+ * Query: name=eips|ercs|rips|all, month=YYYY-MM[, source=snapshot]
+ * Response: MonthKey, Month, Repo, Process, Participants, PRNumber, PRId, PRLink, Title, Author, State, CreatedAt, ClosedAt, Labels, GitHubRepo.
  */
 import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose, { Schema, Connection } from "mongoose";
@@ -18,6 +18,12 @@ const PR_COLLECTIONS: Record<string, string> = {
   eips: "eipprs",
   ercs: "ercprs",
   rips: "ripprs",
+};
+
+const SNAPSHOT_COLLECTIONS: Record<string, string> = {
+  eips: "open_pr_snapshots",
+  ercs: "open_erc_pr_snapshots",
+  rips: "open_rip_pr_snapshots",
 };
 
 const REPO_LABELS: Record<string, string> = {
@@ -98,6 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const name = req.query.name as string;
   const month = typeof req.query.month === "string" ? req.query.month : "";
+  const source = typeof req.query.source === "string" ? req.query.source : "";
 
   if (!name || !["eips", "ercs", "rips", "all"].includes(name)) {
     return res.status(400).json({ error: "Invalid name. Use eips, ercs, rips, or all." });
@@ -106,39 +113,95 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid month. Use YYYY-MM." });
   }
 
+  const [y, m] = month.split("-").map(Number);
+  const monthLabel = new Date(y, m - 1, 1).toLocaleString("default", {
+    month: "short",
+    year: "numeric",
+  });
+
+  type Row = {
+    MonthKey: string;
+    Month: string;
+    Repo: string;
+    Process: string;
+    Participants: string;
+    PRNumber: number;
+    PRId: number;
+    PRLink: string;
+    Title: string;
+    Author: string;
+    State: string;
+    CreatedAt: string;
+    ClosedAt: string;
+    Labels: string;
+    GitHubRepo: string;
+  };
+
+  const repoKeys = name === "all" ? (["eips", "ercs", "rips"] as const) : ([name] as const);
+
+  // source=snapshot: read from open_*_pr_snapshots (same PRs the chart counts; hourly pre-aggregation)
+  // Use LATEST snapshot per month only (sort snapshotDate desc, take first) so counts match Graph 2/3 aggregation
+  if (source === "snapshot") {
+    try {
+      const conn = await getConn();
+      const snapshotSchema = new Schema({ snapshotDate: String, month: String, prs: [{}] }, { strict: false });
+      const rows: Row[] = [];
+
+      for (const repoKey of repoKeys) {
+        const coll = SNAPSHOT_COLLECTIONS[repoKey];
+        const modelName = `Snap_${repoKey}`;
+        const Snap = conn.models[modelName] ?? conn.model(modelName, snapshotSchema, coll);
+        const snap = await Snap.findOne({ month }).sort({ snapshotDate: -1, _id: -1 }).lean(); // latest snapshot per month
+        const repoLabel = REPO_LABELS[repoKey];
+        const githubRepo = GITHUB_REPOS[repoKey];
+        if (!snap) continue;
+
+        const prs = (snap as { prs?: unknown[] }).prs ?? [];
+        for (const pr of prs) {
+          const p = pr as { number?: number; prId?: number; title?: string; author?: string; state?: string; createdAt?: string; closedAt?: string; category?: string; subcategory?: string; githubLabels?: string[]; customLabels?: string[]; prUrl?: string };
+          const prNum = p.number ?? 0;
+          const labels = Array.isArray(p.githubLabels) ? p.githubLabels : Array.isArray(p.customLabels) ? p.customLabels : [];
+          rows.push({
+            MonthKey: month,
+            Month: monthLabel,
+            Repo: repoLabel,
+            Process: p.category ?? "Other",
+            Participants: p.subcategory ?? "Misc",
+            PRNumber: prNum,
+            PRId: p.prId ?? prNum,
+            PRLink: p.prUrl ?? `https://github.com/${githubRepo}/pull/${prNum}`,
+            Title: (p.title ?? "").replace(/"/g, '""'),
+            Author: p.author ?? "",
+            State: p.state ?? "open",
+            CreatedAt: p.createdAt ? new Date(p.createdAt).toISOString() : "",
+            ClosedAt: p.closedAt ? new Date(p.closedAt).toISOString() : "",
+            Labels: labels.join("; "),
+            GitHubRepo: githubRepo,
+          });
+        }
+      }
+
+      await conn.close();
+      return res.status(200).json(rows);
+    } catch (error) {
+      console.error("[category-subcategory details from snapshots]", error);
+      return res.status(500).json({
+        error: "Failed to fetch PR details from snapshots",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
+  // default: PR collections with activity month (createdAt or updatedAt in month)
   try {
     const conn = await getConn();
-    const [y, m] = month.split("-").map(Number);
-    const monthLabel = new Date(y, m - 1, 1).toLocaleString("default", {
-      month: "short",
-      year: "numeric",
-    });
-
-    const repoKeys = name === "all" ? (["eips", "ercs", "rips"] as const) : ([name] as const);
-    const rows: {
-      MonthKey: string;
-      Month: string;
-      Repo: string;
-      Process: string;
-      Participants: string;
-      PRNumber: number;
-      PRId: number;
-      PRLink: string;
-      Title: string;
-      Author: string;
-      State: string;
-      CreatedAt: string;
-      ClosedAt: string;
-      Labels: string;
-      GitHubRepo: string;
-    }[] = [];
+    const rows: Row[] = [];
 
     for (const repoKey of repoKeys) {
       const coll = PR_COLLECTIONS[repoKey];
       const modelName = `PR_${repoKey}`;
       const Model = conn.models[modelName] ?? conn.model<PRDoc>(modelName, prSchema, coll);
 
-      // Same scope as pranalyti board aggregation: open PRs with createdAt or updatedAt in this month
       const prs = await Model.find({ state: "open" }).lean();
       const inScope = (prs as unknown as PRDoc[]).filter(
         (pr) => inMonth(pr.createdAt, y, m) || inMonth(pr.updatedAt, y, m)

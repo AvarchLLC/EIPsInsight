@@ -388,7 +388,7 @@ const DashboardPage = () => {
     setIsLoading(true);
     setHasError(false);
     setErrorMessage("");
-    const url = `/api/AnalyticsCharts/category-subcategory/${repoKey}/details?month=${selectedMonth}`;
+    const url = `/api/AnalyticsCharts/category-subcategory/${repoKey}/details?month=${selectedMonth}&source=snapshot`;
     fetch(url, { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : []))
       .then((raw: DetailsRow[]) => {
