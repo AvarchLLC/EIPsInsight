@@ -25,6 +25,8 @@ import {
   Link,
   Badge,
   HStack,
+  Checkbox,
+  CheckboxGroup,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DownloadIcon, SearchIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import CopyLink from "./CopyLink";
@@ -117,6 +119,21 @@ interface Graph3CountRow {
   Count: number;
 }
 
+/** Row from category-subcategory details API (per-PR with links). */
+interface DetailsRow {
+  MonthKey?: string;
+  Month?: string;
+  Repo?: string;
+  Process?: string;
+  Participants?: string;
+  PRNumber?: number;
+  PRLink?: string;
+  Title?: string;
+  Author?: string;
+  CreatedAt?: string;
+  Labels?: string;
+}
+
 export default function CategorySubcategoryChart() {
   const cardBg = useColorModeValue("white", "#252529");
   const textColor = useColorModeValue("#2D3748", "#F7FAFC");
@@ -139,6 +156,8 @@ export default function CategorySubcategoryChart() {
   const [downloading, setDownloading] = useState(false);
   const [filterProcess, setFilterProcess] = useState("");
   const [filterParticipants, setFilterParticipants] = useState("");
+  const [selectedProcesses, setSelectedProcesses] = useState<string[]>(PROCESS_ORDER);
+  const [selectedParticipants, setSelectedParticipants] = useState<string[]>(PARTICIPANTS_ORDER);
   const [tablePage, setTablePage] = useState(1);
   const [showTable, setShowTable] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
@@ -236,11 +255,15 @@ export default function CategorySubcategoryChart() {
       ...PROCESS_ORDER.filter((p) => processesSeen.has(p)),
       ...Array.from(processesSeen).filter((p) => !PROCESS_ORDER.includes(p)).sort(),
     ];
+    const processOrderFiltered =
+      selectedProcesses.length > 0 ? processOrder.filter((p) => selectedProcesses.includes(p)) : [];
+    const participantOrderFiltered =
+      selectedParticipants.length > 0 ? participantOrder.filter((s) => selectedParticipants.includes(s)) : [];
 
     if (axisLayout === "processOnAxis") {
-      const series = participantOrder.map((part) => {
+      const series = participantOrderFiltered.map((part) => {
         const color = PARTICIPANTS_COLORS[part] ?? "#8b5cf6";
-        const values = processOrder.map((proc) => processParticipantCount.get(`${proc}|${part}`) ?? 0);
+        const values = processOrderFiltered.map((proc) => processParticipantCount.get(`${proc}|${part}`) ?? 0);
         return {
           name: part,
           type: "bar",
@@ -253,16 +276,16 @@ export default function CategorySubcategoryChart() {
         };
       });
       return {
-        axisLabels: processOrder,
+        axisLabels: processOrderFiltered,
         series,
         monthLabel: formatMonthLabel(selectedMonthYear),
         axisRole: "Process" as const,
         stackRole: "Participants" as const,
       };
     } else {
-      const series = processOrder.map((proc) => {
+      const series = processOrderFiltered.map((proc) => {
         const color = PROCESS_COLORS[proc] ?? "#64748b";
-        const values = participantOrder.map((part) => processParticipantCount.get(`${proc}|${part}`) ?? 0);
+        const values = participantOrderFiltered.map((part) => processParticipantCount.get(`${proc}|${part}`) ?? 0);
         return {
           name: proc,
           type: "bar",
@@ -275,14 +298,14 @@ export default function CategorySubcategoryChart() {
         };
       });
       return {
-        axisLabels: participantOrder,
+        axisLabels: participantOrderFiltered,
         series,
         monthLabel: formatMonthLabel(selectedMonthYear),
         axisRole: "Participants" as const,
         stackRole: "Process" as const,
       };
     }
-  }, [data, selectedMonthYear, axisLayout]);
+  }, [data, selectedMonthYear, axisLayout, selectedProcesses, selectedParticipants]);
 
   const option = useMemo(
     () => ({
@@ -361,6 +384,12 @@ export default function CategorySubcategoryChart() {
 
   const filteredTableRows = useMemo(() => {
     let list = [...countTableRows];
+    if (selectedProcesses.length > 0) {
+      list = list.filter((r) => selectedProcesses.includes(r.Process ?? ""));
+    }
+    if (selectedParticipants.length > 0) {
+      list = list.filter((r) => selectedParticipants.includes(r.Participants ?? ""));
+    }
     if (filterProcess.trim()) {
       const p = filterProcess.trim().toLowerCase();
       list = list.filter((r) => (r.Process ?? "").toLowerCase().includes(p));
@@ -370,7 +399,7 @@ export default function CategorySubcategoryChart() {
       list = list.filter((r) => (r.Participants ?? "").toLowerCase().includes(s));
     }
     return list;
-  }, [countTableRows, filterProcess, filterParticipants]);
+  }, [countTableRows, selectedProcesses, selectedParticipants, filterProcess, filterParticipants]);
 
   const totalTablePages = Math.max(1, Math.ceil(filteredTableRows.length / TABLE_PAGE_SIZE));
   const paginatedTableRows = useMemo(
@@ -393,23 +422,49 @@ export default function CategorySubcategoryChart() {
   const processBadgeColor = (process: string) => PROCESS_COLORS[process] ?? "#64748b";
   const participantsBadgeColor = (part: string) => PARTICIPANTS_COLORS[part] ?? "#64748b";
 
-  const downloadCSV = () => {
+  const downloadCSV = async () => {
+    if (!selectedMonthYear || !/^\d{4}-\d{2}$/.test(selectedMonthYear)) return;
     setDownloading(true);
     try {
-      const rows = filteredTableRows.length > 0
-        ? filteredTableRows
-        : [{ Process: "", Participants: "", Count: 0 }];
-      const csv = Papa.unparse(rows);
+      const url = `/api/AnalyticsCharts/category-subcategory/${repoKey}/details?month=${selectedMonthYear}&source=snapshot`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed to fetch details: ${res.status}`);
+      const rows: DetailsRow[] = await res.json();
+      const allRows = Array.isArray(rows) ? rows : [];
+      const filtered = allRows
+        .map((row) => ({
+          ...row,
+          ProcessNorm: normalizeCategoryToPrLabels(row.Process ?? "Other"),
+          ParticipantsNorm: normalizeSubcategoryToPrLabels(row.Participants ?? "Misc"),
+        }))
+        .filter(
+          (row) =>
+            (selectedProcesses.length === 0 || selectedProcesses.includes(row.ProcessNorm)) &&
+            (selectedParticipants.length === 0 || selectedParticipants.includes(row.ParticipantsNorm))
+        );
+      const csvData = filtered.map((row) => ({
+        Month: row.Month ?? formatMonthLabel(selectedMonthYear),
+        Process: row.ProcessNorm,
+        Participants: row.ParticipantsNorm,
+        PRNumber: row.PRNumber ?? "",
+        PRLink: row.PRLink ?? "",
+        Title: row.Title ?? "",
+        Author: row.Author ?? "",
+        CreatedAt: row.CreatedAt ?? "",
+        Repo: row.Repo ?? "",
+        Labels: row.Labels ?? "",
+      }));
+      const csv = Papa.unparse(csvData);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
+      const urlObj = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
-      a.download = `graph3_process_participants_${repoKey}_${selectedMonthYear}.csv`;
+      a.href = urlObj;
+      a.download = `process_participants_prs_${repoKey}_${selectedMonthYear}.csv`;
       a.style.display = "none";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(urlObj);
     } catch (e) {
       console.error("[CategorySubcategoryChart] CSV download error", e);
       alert(`CSV download failed: ${e instanceof Error ? e.message : "Unknown error"}`);
@@ -542,6 +597,52 @@ export default function CategorySubcategoryChart() {
         </Flex>
       </CardHeader>
       <CardBody>
+        <Flex gap={4} wrap="wrap" mb={4} align="center">
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="blue" borderRadius="md" minW={180}>
+              Filter by Process
+            </MenuButton>
+            <MenuList minWidth="280px" px={2} py={2}>
+              <HStack mb={2} gap={2}>
+                <Button size="xs" colorScheme="teal" onClick={() => setSelectedProcesses([...PROCESS_ORDER])}>Select All</Button>
+                <Button size="xs" variant="outline" onClick={() => setSelectedProcesses([])}>Clear</Button>
+              </HStack>
+              <CheckboxGroup value={selectedProcesses} onChange={(v: string[]) => setSelectedProcesses(v)}>
+                <Stack pl={2} pr={2} gap={1}>
+                  {PROCESS_ORDER.map((p) => (
+                    <Checkbox key={p} value={p} py={1.5} px={2} colorScheme="blue">
+                      <Badge mr={2} fontSize="sm" colorScheme="blue" variant="outline" px={2} py={0.5}>
+                        {p}
+                      </Badge>
+                    </Checkbox>
+                  ))}
+                </Stack>
+              </CheckboxGroup>
+            </MenuList>
+          </Menu>
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="purple" borderRadius="md" minW={200}>
+              Filter by Participants
+            </MenuButton>
+            <MenuList minWidth="280px" px={2} py={2}>
+              <HStack mb={2} gap={2}>
+                <Button size="xs" colorScheme="teal" onClick={() => setSelectedParticipants([...PARTICIPANTS_ORDER])}>Select All</Button>
+                <Button size="xs" variant="outline" onClick={() => setSelectedParticipants([])}>Clear</Button>
+              </HStack>
+              <CheckboxGroup value={selectedParticipants} onChange={(v: string[]) => setSelectedParticipants(v)}>
+                <Stack pl={2} pr={2} gap={1}>
+                  {PARTICIPANTS_ORDER.map((s) => (
+                    <Checkbox key={s} value={s} py={1.5} px={2} colorScheme="purple">
+                      <Badge mr={2} fontSize="sm" colorScheme="purple" variant="outline" px={2} py={0.5}>
+                        {s}
+                      </Badge>
+                    </Checkbox>
+                  ))}
+                </Stack>
+              </CheckboxGroup>
+            </MenuList>
+          </Menu>
+        </Flex>
         <Box minH="350px">
           {loading ? (
             <Text color={accentColor} fontWeight="bold" my={10} fontSize="xl">
