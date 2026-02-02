@@ -3123,7 +3123,7 @@ const handleFeedbackClick = (type: 'positive' | 'negative') => {
           Comments
         </Heading>
         </section>
-          <Comments page={"Reviewers"}/>
+          {/* <Comments page={"Reviewers"}/> */}
           
         </Box>
         </Box>
