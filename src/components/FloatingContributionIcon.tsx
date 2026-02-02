@@ -50,7 +50,7 @@ const FloatingContributionIcon = () => {
       zIndex="1000"
       borderRadius="50%"
     >
-      <Tooltip label="View in Github!" placement="left">
+      <Tooltip label="View in Github!" placement="left" zIndex={10001}>
         <IconButton
           aria-label="Contribute"
           icon={<FaGithub />}
