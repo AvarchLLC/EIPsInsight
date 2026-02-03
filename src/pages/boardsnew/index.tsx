@@ -340,7 +340,9 @@ export default function EipBoardsPage() {
       list = list.filter((r) => r.waitDays != null && r.waitDays >= min && r.waitDays <= max);
     }
     return [...list].sort((a, b) => {
-      if (b.attentionScore !== a.attentionScore) return b.attentionScore - a.attentionScore;
+      const waitA = a.waitDays ?? -1;
+      const waitB = b.waitDays ?? -1;
+      if (waitB !== waitA) return waitB - waitA;
       const da = a.CreatedAt ? new Date(a.CreatedAt).getTime() : 0;
       const db = b.CreatedAt ? new Date(b.CreatedAt).getTime() : 0;
       return db - da;
@@ -563,7 +565,7 @@ export default function EipBoardsPage() {
               </Text>
               <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
                 <HStack>
-                  <Text fontWeight="600" fontSize="sm">Status</Text>
+                  <Text fontWeight="600" fontSize="sm">PR Status</Text>
                   <Select
                     value={selectedSubcategory}
                     onChange={(e) => { setSelectedSubcategory(e.target.value); setWaitPresetDays(null); setPage(1); }}
@@ -724,7 +726,7 @@ export default function EipBoardsPage() {
                     <Th fontWeight="700">Created</Th>
                     <Th fontWeight="700">Wait</Th>
                     <Th fontWeight="700">Process</Th>
-                    <Th fontWeight="700">Status</Th>
+                    <Th fontWeight="700">PR Status</Th>
                     <Th fontWeight="700">Labels</Th>
                     <Th fontWeight="700">Link</Th>
                   </Tr>
