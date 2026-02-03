@@ -99,7 +99,7 @@ const GitHubPRTracker: React.FC = () => {
   const { isOpen: showDropdown, onToggle: toggleDropdown } = useDisclosure();
   const [show, setShow] = useState(false);
   const bg = useColorModeValue("#f6f6f7", "#171923");
-``
+
   const toggleCollapse = () => setShow(!show);
   // const [selectedYear, setSelectedYear] = useState(null);
   // const [selectedMonth, setSelectedMonth] = useState(null);
@@ -597,43 +597,29 @@ const GitHubPRTracker: React.FC = () => {
           borderTopColor="gray.200"
         >
           <Table variant="striped" colorScheme="gray">
-            <Thead bg="#2D3748">
+            <Thead bg={useColorModeValue("gray.50", "gray.900")}>
               <Tr>
-                <Th
-                  color="white"
-                  textAlign="center"
-                  borderTopLeftRadius="10px"
-                  minWidth="6rem"
-                  p="8px"
-                >
+                <Th fontSize="xs" color={useColorModeValue("gray.700", "gray.300")} textAlign="center" borderTopLeftRadius="10px" minWidth="6rem" p="6px">
                   Number
                 </Th>
-                <Th
-                  color="white"
-                  textAlign="center"
-                  minWidth="20rem"
-                  whiteSpace="normal" // Allow wrapping
-                  overflow="hidden" // Prevent overflow
-                  textOverflow="ellipsis" // Add ellipsis for overflowed text
-                  p="8px"
-                >
+                <Th fontSize="xs" color={useColorModeValue("gray.700", "gray.300")} textAlign="left" minWidth="20rem" whiteSpace="normal" overflow="hidden" textOverflow="ellipsis" p="6px">
                   Title
                 </Th>
-                <Th color="white" textAlign="center" minWidth="6rem" p="8px">
+                <Th fontSize="xs" color={useColorModeValue("gray.700", "gray.300")} textAlign="center" minWidth="6rem" p="6px">
                   State
                 </Th>
-                <Th color="white" textAlign="center" minWidth="6rem" p="8px">
+                <Th fontSize="xs" color={useColorModeValue("gray.700", "gray.300")} textAlign="center" minWidth="6rem" p="6px">
                   Created At
                 </Th>
-                <Th color="white" textAlign="center" minWidth="6rem" p="8px">
+                <Th fontSize="xs" color={useColorModeValue("gray.700", "gray.300")} textAlign="center" minWidth="6rem" p="6px">
                   Closed At
                 </Th>
                 {type === "PRs" && (
-                  <Th color="white" textAlign="center" minWidth="6rem" p="8px">
+                  <Th fontSize="xs" color={useColorModeValue("gray.700", "gray.300")} textAlign="center" minWidth="6rem" p="6px">
                     Merged At
                   </Th>
                 )}
-                <Th color="white" textAlign="center" minWidth="10rem" p="8px">
+                <Th fontSize="xs" color={useColorModeValue("gray.700", "gray.300")} textAlign="left" minWidth="10rem" p="6px">
                   Link
                 </Th>
               </Tr>
@@ -665,28 +651,29 @@ const GitHubPRTracker: React.FC = () => {
                         borderWidth="1px"
                         borderColor="gray.200"
                       >
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {type === "PRs"
                             ? (item as PR).prNumber
                             : (item as Issue).IssueNumber}
                         </Td>
                         <Td
-                          p="8px"
+                          p="6px"
+                          textAlign="left"
                           style={{ wordWrap: "break-word", maxWidth: "200px" }}
                         >
                           {type === "PRs"
                             ? (item as PR).prTitle
                             : (item as Issue).IssueTitle}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           Created
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.created_at
                             ? new Date(item.created_at).toLocaleDateString()
                             : "-"}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.closed_at
                             ? new Date(item.closed_at).toLocaleDateString()
                             : "-"}
@@ -700,7 +687,7 @@ const GitHubPRTracker: React.FC = () => {
                               : "-"}
                           </Td>
                         )}
-                        <Td p="8px">
+                        <Td p="6px">
                           <button
                             style={{
                               backgroundColor: "#428bca",
@@ -743,14 +730,14 @@ const GitHubPRTracker: React.FC = () => {
                         borderWidth="1px"
                         borderColor="gray.200"
                       >
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {type === "PRs"
                             ? (item as PR).prNumber
                             : (item as Issue).IssueNumber}
                         </Td>
                         <Td
-                          p="8px"
-                          textAlign="center"
+                          p="6px"
+                          textAlign="left"
                           verticalAlign="middle"
                           whiteSpace="normal"
                           overflow="hidden"
@@ -760,21 +747,21 @@ const GitHubPRTracker: React.FC = () => {
                             ? (item as PR).prTitle
                             : (item as Issue).IssueTitle}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           Closed
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.created_at
                             ? new Date(item.created_at).toLocaleDateString()
                             : "-"}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.closed_at
                             ? new Date(item.closed_at).toLocaleDateString()
                             : "-"}
                         </Td>
                         {type === "PRs" && (
-                          <Td p="8px" textAlign="center" verticalAlign="middle">
+                          <Td p="6px" textAlign="center" verticalAlign="middle">
                             {(item as PR).merged_at
                               ? new Date(
                                   (item as PR).merged_at!
@@ -782,7 +769,7 @@ const GitHubPRTracker: React.FC = () => {
                               : "-"}
                           </Td>
                         )}
-                        <Td p="8px">
+                        <Td p="6px">
                           <button
                             style={{
                               backgroundColor: "#428bca",
@@ -822,12 +809,12 @@ const GitHubPRTracker: React.FC = () => {
                         borderWidth="1px"
                         borderColor="gray.200"
                       >
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.prNumber}
                         </Td>
                         <Td
-                          p="8px"
-                          textAlign="center"
+                          p="6px"
+                          textAlign="left"
                           verticalAlign="middle"
                           whiteSpace="normal"
                           overflow="hidden"
@@ -835,25 +822,25 @@ const GitHubPRTracker: React.FC = () => {
                         >
                           {item.prTitle}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           Merged
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.created_at
                             ? new Date(item.created_at).toLocaleDateString()
                             : "-"}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.closed_at
                             ? new Date(item.closed_at).toLocaleDateString()
                             : "-"}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.merged_at
                             ? new Date(item.merged_at!).toLocaleDateString()
                             : "-"}
                         </Td>
-                        <Td p="8px">
+                        <Td p="6px">
                           <button
                             style={{
                               backgroundColor: "#428bca",
@@ -888,14 +875,14 @@ const GitHubPRTracker: React.FC = () => {
                         borderWidth="1px"
                         borderColor="gray.200"
                       >
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {type === "PRs"
                             ? (item as PR).prNumber
                             : (item as Issue).IssueNumber}
                         </Td>
                         <Td
-                          p="8px"
-                          textAlign="center"
+                          p="6px"
+                          textAlign="left"
                           verticalAlign="middle"
                           whiteSpace="normal"
                           overflow="hidden"
@@ -905,21 +892,21 @@ const GitHubPRTracker: React.FC = () => {
                             ? (item as PR).prTitle
                             : (item as Issue).IssueTitle}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           Open
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.created_at
                             ? new Date(item.created_at).toLocaleDateString()
                             : "-"}
                         </Td>
-                        <Td p="8px" textAlign="center" verticalAlign="middle">
+                        <Td p="6px" textAlign="center" verticalAlign="middle">
                           {item.closed_at
                             ? new Date(item.closed_at).toLocaleDateString()
                             : "-"}
                         </Td>
                         {type === "PRs" && (
-                          <Td p="8px" textAlign="center" verticalAlign="middle">
+                          <Td p="6px" textAlign="center" verticalAlign="middle">
                             {(item as PR).merged_at
                               ? new Date(
                                   (item as PR).merged_at!
@@ -927,7 +914,7 @@ const GitHubPRTracker: React.FC = () => {
                               : "-"}
                           </Td>
                         )}
-                        <Td p="8px">
+                        <Td p="6px">
                           <button
                             style={{
                               backgroundColor: "#428bca",
@@ -1576,11 +1563,11 @@ const GitHubPRTracker: React.FC = () => {
           color: (datum: any) => {
             switch (datum.type) {
               case "Closed":
-                return "#ff4d4d"; // Soft red
+                return "#EF4444";
               case "Merged":
-                return "#4caf50"; // Balanced green
+                return "#22C55E";
               case "Created":
-                return "#2196f3"; // Medium blue
+                return "#3B82F6";
               default:
                 return "defaultColor";
             }
@@ -1590,7 +1577,7 @@ const GitHubPRTracker: React.FC = () => {
           geometry: "line", // Line chart for trend (Open)
           smooth: true,
           lineStyle: {
-            stroke: "#ff00ff", // Magenta line color
+            stroke: "#8B5CF6",
             lineWidth: 2,
           },
           // tooltip: {
@@ -1639,7 +1626,7 @@ const GitHubPRTracker: React.FC = () => {
               };
             },
           },
-          color: "#ff00ff",
+          color: "#8B5CF6",
         },
       ],
       yAxis: [
@@ -1702,292 +1689,161 @@ const GitHubPRTracker: React.FC = () => {
     <>
       <FeedbackWidget />
       <AllLayout>
-        <Box padding={{ base: 3, md: 6 }} margin={{ base: 2, md: 3 }}>
-          {/* Animated Header with FAQ */}
+        <Box
+          px={{ base: 3, md: 4 }}
+          py={{ base: 3, md: 4 }}
+          mx="auto"
+        >
           <AnimatedHeader
             title="PR Analytics"
-            description="Track and analyze pull request metrics across GitHub repositories. Monitor trends in created, closed, merged, and open PRs with interactive visualizations and detailed monthly breakdowns."
+            description="Monthly trends in created, merged, closed, and open PRs across EIPs, ERCs, and RIPs."
             faqItems={[
               {
-                question: "What does this tool do?",
-                answer: "This tool aims to automate the process of tracking PRs and issues in GitHub repositories, providing visualizations and reports to streamline project management. The default view utilizes the timeline to observe trends in the number of Created, Closed, Merged, and Open PRs/Issues at the end of each month."
+                question: "How to read the chart",
+                answer: "The chart shows monthly counts: bars for Created (blue), Merged (green), and Closed (red); the line shows Open (purple). Use the toggle chips to show or hide each series. Select a repository to filter by EIPs, ERCs, RIPs, or All."
               },
               {
-                question: "How can I view data for a specific month?",
-                answer: "To focus on a specific month, click the View More button and choose the desired Year and Month from the dropdown menus. The table and graph will then update to display data exclusively for that selected month."
-              },
-              {
-                question: "How can I customize the chart?",
-                answer: "To customize the chart, you can adjust the timeline scroll bar to display data for a specific month/year. Additionally, you can tailor the graph by selecting or deselecting checkboxes for Created, Closed, Merged, and Open PRs/Issues, allowing you to focus on the trends that are most relevant to you."
-              },
-              {
-                question: "📥 How to download reports?",
-                answer: "After selecting your preferred data using the View More option, you can download reports based on the filtered data for further analysis or record-keeping. Simply click the download button to export the data in your chosen format."
+                question: "How to download data",
+                answer: "Click Download CSV to export the chart data for the selected repository and visible series. The export reflects the current repo and category toggles."
               }
             ]}
           />
 
-          {/* Tabs and Advertisement in same row */}
-          <Flex 
-            direction={{ base: "column", md: "row" }} 
-            justify="space-between" 
-            align="center" 
-            mb={4} 
-            gap={4}
-            my={5}
-          >
-            {/* EIPs/ERCs Tabs - Left side */}
-            <Flex justify={{ base: "center", md: "flex-start" }} gap={4} flex="1">
-              <Button
-                colorScheme="blue"
-                onClick={() => setActiveTab("PRs")}
-                isActive={activeTab === "PRs"}
-                variant={activeTab === "PRs" ? "solid" : "outline"}
-                fontWeight="semibold"
-                px={8}
-                _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-                transition="all 0.2s"
-              >
-                PRs
-              </Button>
-              <Button
-                colorScheme="blue"
-                onClick={() => setActiveTab("Issues")}
-                isActive={activeTab === "Issues"}
-                variant={activeTab === "Issues" ? "solid" : "outline"}
-                fontWeight="semibold"
-                px={8}
-                _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-                transition="all 0.2s"
-              >
-                Issues
-              </Button>
+          {/* Tabs — compact pill, top-left */}
+          <Flex align="center" mb={4}>
+            <Flex
+              bg={useColorModeValue("gray.100", "gray.900")}
+              p="2px"
+              borderRadius="full"
+            >
+              {(["PRs", "Issues"] as const).map((tab) => (
+                <Button
+                  key={tab}
+                  size="sm"
+                  variant={activeTab === tab ? "solid" : "ghost"}
+                  colorScheme={activeTab === tab ? "blue" : "gray"}
+                  borderRadius="full"
+                  onClick={() => setActiveTab(tab)}
+                  px={4}
+                  h="32px"
+                >
+                  {tab}
+                </Button>
+              ))}
             </Flex>
-
-            {/* Advertisement - Right side */}
-            <Box flex={{ base: "1", md: "0 0 auto" }} w={{ base: "100%", md: "auto" }}>
-              {/* <CloseableAdCard /> */}
-            </Box>
           </Flex>
 
+          {/* Repo + Download filter bar */}
+          <Flex align="center" justify="space-between" mt={3} mb={3}>
+            <Flex align="center" gap={2}>
+              <Text fontSize="sm" fontWeight="medium">Repository</Text>
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  size="sm"
+                  rightIcon={<ChevronDownIcon />}
+                  variant="outline"
+                >
+                  {selectedRepo || "Select"}
+                </MenuButton>
+                <MenuList maxHeight="200px" overflowY="auto">
+                  <MenuItem onClick={() => setSelectedRepo("All")}>All</MenuItem>
+                  <MenuItem onClick={() => setSelectedRepo("EIPs")}>EIPs</MenuItem>
+                  <MenuItem onClick={() => setSelectedRepo("ERCs")}>ERCs</MenuItem>
+                  <MenuItem onClick={() => setSelectedRepo("RIPs")}>RIPs</MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
+            <Button
+              size="sm"
+              leftIcon={loading3 ? undefined : <DownloadIcon />}
+              variant="outline"
+              onClick={async () => {
+                try {
+                  handleDownload2();
+                  await axios.post("/api/DownloadCounter");
+                } catch (e) {
+                  console.error("Download counter error:", e);
+                }
+              }}
+              disabled={loading3}
+            >
+              {loading3 ? <Spinner size="sm" mr={2} /> : null}
+              Download CSV
+            </Button>
+          </Flex>
+
+          {/* Chart — single clean card */}
           <Box
-            bgColor={bg}
-            padding={{ base: "1rem", md: "1.5rem" }}
-            borderRadius="lg"
-            boxShadow="lg"
+            id="GithubAnalytics"
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="xl"
             borderWidth="1px"
-            borderColor={useColorModeValue('gray.200', 'gray.600')}
-            transition="all 0.3s"
-            _hover={{
-              boxShadow: "xl",
-              transform: "translateY(-2px)",
-            }}
+            borderColor={useColorModeValue("gray.200", "gray.700")}
+            boxShadow="sm"
+            p={4}
           >
-            <Box id="GithubAnalytics" borderRadius={"lg"} bg={useColorModeValue('white', 'gray.800')} p={{ base: 3, md: 4 }}>
-              <Flex
-                justifyContent="space-between"
-                alignItems="center"
-                marginBottom="0.5rem"
-              >
-                <Heading fontSize="36px" fontWeight="bold" color="#40E0D0">
-                  {`Github PR Analytics (Monthly, since 2015)`}
-                  <CopyLink
-                    link={`https://eipsinsight.com//Analytics#GithubAnalytics`}
-                  />
-                </Heading>
-                {/* Download all data button */}
-                <Button
-                  colorScheme="blue"
-                  variant="solid"
-                  leftIcon={loading3 ? undefined : <DownloadIcon />}
-                  onClick={async () => {
-                    try {
-                      // Trigger the CSV conversion and download
-                      handleDownload2();
-
-                      // Trigger the API call
-                      await axios.post("/api/DownloadCounter");
-                    } catch (error) {
-                      console.error(
-                        "Error triggering download counter:",
-                        error
-                      );
-                    }
-                  }}
-                  disabled={loading3}
-                  fontSize={{ base: "0.6rem", md: "md" }}
-                  _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-                  transition="all 0.2s"
-                  title={loading3 ? "Loading data..." : "Download all historical data with selected category filters"}
-                >
-                  {loading3 ? (
-                    <>
-                      <Spinner size="sm" mr={2} /> Loading...
-                    </>
-                  ) : (
-                    "Download All Data (CSV)"
-                  )}
-                </Button>
-              </Flex>
-              <Flex justify="center" mb={8}>
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    colorScheme="blue"
-                    size="md"
-                    width="200px"
-                    fontWeight="semibold"
-                    _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-                    transition="all 0.2s"
-                  >
-                    {selectedRepo || "Select an option"}
-                  </MenuButton>
-
-                  <MenuList maxHeight="200px" overflowY="auto">
-                    {/* Option for All */}
-                    <MenuItem onClick={() => setSelectedRepo("All")}>
-                      All
-                    </MenuItem>
-
-                    {/* Option for EIPs */}
-                    <MenuItem onClick={() => setSelectedRepo("EIPs")}>
-                      EIPs
-                    </MenuItem>
-
-                    {/* Option for ERCs */}
-                    <MenuItem onClick={() => setSelectedRepo("ERCs")}>
-                      ERCs
-                    </MenuItem>
-
-                    {/* Option for RIPs */}
-                    <MenuItem onClick={() => setSelectedRepo("RIPs")}>
-                      RIPs
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Flex>
-
-              {renderChart()}
-              <Box className={"w-full"}>
-                <LastUpdatedDateTime name="AnalyticsScheduler" />
-              </Box>
-              <Box mt={2}>
-                <Text color="gray.500" fontStyle="italic" textAlign="center">
-                  *Note: The data is updated daily at 15:00 UTC to maintain
-                  accuracy and provide the most current information.*
-                </Text>
-                <Text color="gray.500" fontStyle="italic" textAlign="center">
-                  *Note: The data related to the number of PRs might vary when
-                  compared to official github repository due to factors like
-                  deleted PRs.*
-                </Text>
-              </Box>
-              <br />
-
-              <Flex justify="center" ml={3} mb={8} flexWrap="wrap" gap={2}>
-                <Checkbox
-                  isChecked={showCategory.created}
-                  onChange={() =>
-                    setShowCategory((prev) => ({
-                      ...prev,
-                      created: !prev.created,
-                    }))
-                  }
-                  colorScheme="blue"
-                  mr={3}
-                  fontSize={{ base: "xs", md: "sm" }}
-                  fontWeight="medium"
-                >
-                  {activeTab === "PRs" ? "Created PRs" : "Created Issues"}
-                </Checkbox>
-
-                <Checkbox
-                  isChecked={showCategory.open}
-                  onChange={() =>
-                    setShowCategory((prev) => ({ ...prev, open: !prev.open }))
-                  }
-                  colorScheme="purple"
-                  mr={3}
-                  fontSize={{ base: "xs", md: "sm" }}
-                  fontWeight="medium"
-                >
-                  Open PRs
-                </Checkbox>
-
-                <Checkbox
-                  isChecked={showCategory.closed}
-                  onChange={() =>
-                    setShowCategory((prev) => ({
-                      ...prev,
-                      closed: !prev.closed,
-                    }))
-                  }
-                  colorScheme="red"
-                  mr={3}
-                  fontSize={{ base: "xs", md: "sm" }}
-                  fontWeight="medium"
-                >
-                  {activeTab === "PRs" ? "Closed PRs" : "Closed Issues"}
-                </Checkbox>
-                {activeTab === "PRs" && (
-                  <Checkbox
-                    isChecked={showCategory.merged}
-                    onChange={() =>
-                      setShowCategory((prev) => ({
-                        ...prev,
-                        merged: !prev.merged,
-                      }))
-                    }
-                    colorScheme="green"
-                    mr={3}
-                    fontSize={{ base: "xs", md: "sm" }}
-                    fontWeight="medium"
-                  >
-                    Merged PRs
-                  </Checkbox>
-                )}
-              </Flex>
-              <Box
-                bg={useColorModeValue("blue.50", "gray.700")}
-                p={3}
-                borderRadius="md"
-                textAlign="center"
-                mt={4}
-              >
-                <Text fontSize="sm" color={useColorModeValue("blue.700", "blue.300")} fontWeight="medium">
-                  💡 Tip: The checkboxes above control both the chart display and CSV downloads
-                </Text>
-              </Box>
-            </Box>
-          </Box>
-
-          <br />
-
-          
-          <Box mt={2} id="EIPsLabelChart">
-            <PRAnalyticsCard/>
-          </Box>
-
-          <Box mt={6} id="CategorySubcategoryChart">
-            <CategorySubcategoryChart />
-          </Box>
-
-                    <Box my={12}>
-            {/*<PlaceYourAdCard /> */}
-          </Box>
-
-  <br />
-
-
-          <Box>
-            <br />
-            <hr></hr>
-            <br />
-            {/* <Text fontSize="36px" fontWeight="bold" color="#40E0D0">
-              Comments
+            <Text fontSize="xs" fontWeight="600" letterSpacing="wider" color={useColorModeValue("gray.500", "gray.400")} mb={1}>
+              Monthly activity
             </Text>
-            {/* <Comments page={"Analytics"} /> */}
+            <Heading size="md" fontWeight="700" letterSpacing="-0.01em" mb={2}>
+              Monthly PR Activity
+              <CopyLink link="https://eipsinsight.com/Analytics#GithubAnalytics" />
+            </Heading>
+
+            <Box position="relative" minH="280px">
+              {renderChart()}
+              <Text
+                position="absolute"
+                top="50%"
+                left="50%"
+                transform="translate(-50%, -50%)"
+                fontSize="3xl"
+                fontWeight="700"
+                letterSpacing="0.05em"
+                color={useColorModeValue("gray.400", "gray.500")}
+                opacity={0.45}
+                pointerEvents="none"
+                userSelect="none"
+                whiteSpace="nowrap"
+                textShadow="0 1px 2px rgba(255,255,255,0.5)"
+                _dark={{ textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}
+              >
+                EIPsInsight.com
+              </Text>
+            </Box>
+
+            <Box mt={2}>
+              <LastUpdatedDateTime name="AnalyticsScheduler" />
+            </Box>
+            <Text mt={2} fontSize="xs" color="gray.500">
+              Data updated daily at 15:00 UTC.
+            </Text>
+
+            {/* Toggle chips for series */}
+            <Flex gap={2} mt={3} flexWrap="wrap">
+              {["created", "open", "closed", ...(activeTab === "PRs" ? ["merged"] : [])].map((cat) => (
+                <Button
+                  key={cat}
+                  size="xs"
+                  variant={showCategory[cat] ? "solid" : "outline"}
+                  borderRadius="full"
+                  onClick={() =>
+                    setShowCategory((prev) => ({ ...prev, [cat]: !prev[cat] }))
+                  }
+                >
+                  {cat}
+                </Button>
+              ))}
+            </Flex>
+          </Box>
+
+          <Box id="EIPsLabelChart">
+            <PRAnalyticsCard />
+          </Box>
+
+          <Box id="CategorySubcategoryChart">
+            <CategorySubcategoryChart />
           </Box>
         </Box>
       </AllLayout>
