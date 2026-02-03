@@ -36,7 +36,7 @@ import {
 } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
 import AnimatedHeader from "@/components/AnimatedHeader";
-import { ExternalLinkIcon, SearchIcon, DownloadIcon, ChevronLeftIcon, ChevronRightIcon, CopyIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon, SearchIcon, DownloadIcon, ChevronLeftIcon, ChevronRightIcon, CopyIcon, CheckIcon } from "@chakra-ui/icons";
 import { BiGitPullRequest } from "react-icons/bi";
 import { format } from "date-fns";
 import Papa from "papaparse";
@@ -112,12 +112,19 @@ const REPO_TABS = [
 
 const SUBCATEGORY_OPTIONS = [
   { value: "", label: "All" },
-  { value: "Waiting on Editor", label: "Waiting for Editor" },
-  { value: "Waiting on Author", label: "Waiting for Author" },
-  { value: "Stagnant", label: "Stagnant" },
-  { value: "Awaited", label: "Awaited" },
-  { value: "Misc", label: "Misc" },
+  { value: "Waiting on Editor", label: "⏳ Awaiting Editor" },
+  { value: "Waiting on Author", label: "✍️ Awaiting Author" },
+  { value: "Stagnant", label: "💤 Stagnant" },
+  { value: "Awaited", label: "📬 Awaited" },
+  { value: "Misc", label: "📦 Misc" },
 ];
+
+/** Repo badge color when viewing "All" */
+const REPO_BADGE_COLORS: Record<string, string> = {
+  EIP: "purple",
+  ERC: "blue",
+  RIP: "orange",
+};
 
 const PAGE_SIZES = [10, 25, 50, 100];
 
@@ -143,6 +150,30 @@ function formatWaitTime(days: number | null): string {
   return `${days}d`;
 }
 
+/** Display wait time for table: "⏳ 18 days" or "⏳ 2 weeks" */
+function formatWaitTimeDisplay(days: number | null): string {
+  if (days == null) return "—";
+  if (days >= 7) {
+    const weeks = Math.floor(days / 7);
+    return `⏳ ${weeks} week${weeks !== 1 ? "s" : ""}`;
+  }
+  return `⏳ ${days} day${days !== 1 ? "s" : ""}`;
+}
+
+/** Editor attention score: higher = more urgent. +10 if wait > 30d, +5 if Waiting on Editor, +3 if NEW EIP */
+function getAttentionScore(
+  waitDays: number | null,
+  participantsNorm: string,
+  processNorm: string
+): number {
+  let score = 0;
+  if (waitDays != null && waitDays > 30) score += 10;
+  else if (waitDays != null && waitDays > 14) score += 5;
+  if (participantsNorm === "Waiting on Editor") score += 5;
+  if (processNorm === "NEW EIP") score += 3;
+  return score;
+}
+
 const VALID_PROCESS = new Set(PROCESS_ORDER);
 const VALID_PARTICIPANTS = new Set([
   "Waiting on Editor",
@@ -165,6 +196,7 @@ export default function EipBoardsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [waitPresetDays, setWaitPresetDays] = useState<[number, number] | null>(null);
   const skipNextUrlUpdate = useRef(false);
 
   const toast = useToast();
@@ -212,12 +244,16 @@ export default function EipBoardsPage() {
     }
   }, [selectedMonth, selectedSubcategory, selectedCategories, router.isReady]);
 
+  // EIP Editor aesthetic: slate/charcoal, purple + teal
+  const bg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
+  const subtle = useColorModeValue("gray.100", "gray.700");
   const headerBg = useColorModeValue("gray.50", "gray.700");
-  const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
   const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
-  const accent = useColorModeValue("teal.600", "teal.400");
+  const accent = "purple.500";
+  const accent2 = "teal.400";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -259,18 +295,36 @@ export default function EipBoardsPage() {
       .finally(() => setLoading(false));
   }, [repoKey, selectedMonth]);
 
+  const normalizedRows = useMemo(
+    () =>
+      rows.map((r) => {
+        const ProcessNorm = normalizeProcess(r.Process);
+        const ParticipantsNorm = normalizeParticipants(r.Participants);
+        const waitDays = getWaitTimeDays(r.CreatedAt ?? "");
+        const attentionScore = getAttentionScore(waitDays, ParticipantsNorm, ProcessNorm);
+        return {
+          ...r,
+          ProcessNorm,
+          ParticipantsNorm,
+          waitDays,
+          attentionScore,
+        };
+      }),
+    [rows]
+  );
+
   const categoriesInData = useMemo(() => {
-    const set = new Set(rows.map((r) => normalizeProcess(r.Process)));
+    const set = new Set(normalizedRows.map((r) => r.ProcessNorm));
     return [...PROCESS_ORDER].concat([...set].filter((p) => !PROCESS_ORDER.includes(p)).sort());
-  }, [rows]);
+  }, [normalizedRows]);
 
   const filteredRows = useMemo(() => {
-    let list = rows;
+    let list = normalizedRows;
     if (selectedSubcategory) {
-      list = list.filter((r) => normalizeParticipants(r.Participants) === selectedSubcategory);
+      list = list.filter((r) => r.ParticipantsNorm === selectedSubcategory);
     }
     if (selectedCategories.length > 0) {
-      list = list.filter((r) => selectedCategories.includes(normalizeProcess(r.Process)));
+      list = list.filter((r) => selectedCategories.includes(r.ProcessNorm));
     }
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
@@ -281,12 +335,17 @@ export default function EipBoardsPage() {
           String(r.PRNumber ?? "").includes(q)
       );
     }
+    if (waitPresetDays) {
+      const [min, max] = waitPresetDays;
+      list = list.filter((r) => r.waitDays != null && r.waitDays >= min && r.waitDays <= max);
+    }
     return [...list].sort((a, b) => {
+      if (b.attentionScore !== a.attentionScore) return b.attentionScore - a.attentionScore;
       const da = a.CreatedAt ? new Date(a.CreatedAt).getTime() : 0;
       const db = b.CreatedAt ? new Date(b.CreatedAt).getTime() : 0;
-      return da - db;
+      return db - da;
     });
-  }, [rows, selectedSubcategory, selectedCategories, searchQuery]);
+  }, [normalizedRows, selectedSubcategory, selectedCategories, searchQuery, waitPresetDays]);
 
   const totalFiltered = filteredRows.length;
   const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
@@ -299,8 +358,7 @@ export default function EipBoardsPage() {
   const totalByCategory = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of filteredRows) {
-      const p = normalizeProcess(r.Process);
-      map.set(p, (map.get(p) ?? 0) + 1);
+      map.set(r.ProcessNorm, (map.get(r.ProcessNorm) ?? 0) + 1);
     }
     return map;
   }, [filteredRows]);
@@ -322,12 +380,19 @@ export default function EipBoardsPage() {
     setPage(1);
   };
 
+  const applyWaitPreset = (preset: "critical" | "backlog" | "fresh") => {
+    if (preset === "critical") setWaitPresetDays([31, 9999]);
+    else if (preset === "backlog") setWaitPresetDays([14, 30]);
+    else setWaitPresetDays([0, 13]);
+    setPage(1);
+  };
+
   const downloadCSV = () => {
     const csvData = filteredRows.map((row) => ({
       Month: row.Month ?? formatMonthLabel(selectedMonth),
       Repo: row.Repo ?? "",
-      Process: normalizeProcess(row.Process),
-      Participants: normalizeParticipants(row.Participants),
+      Process: row.ProcessNorm,
+      Participants: row.ParticipantsNorm,
       PRNumber: row.PRNumber ?? "",
       PRLink: row.PRLink ?? "",
       Title: row.Title ?? "",
@@ -346,10 +411,23 @@ export default function EipBoardsPage() {
     toast({ title: "CSV downloaded", status: "success", duration: 2000, isClosable: true });
   };
 
+  const copyLinkToFilters = () => {
+    const params = new URLSearchParams();
+    params.set("month", selectedMonth);
+    if (selectedSubcategory) params.set("participants", selectedSubcategory);
+    if (selectedCategories.length > 0 && selectedCategories.length < PROCESS_ORDER.length) {
+      params.set("process", selectedCategories.map((p) => encodeURIComponent(p)).join(","));
+    }
+    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/eipboards?${params.toString()}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast({ title: "Link copied to clipboard", status: "success", duration: 2000, isClosable: true });
+    });
+  };
+
   const copyAsMarkdown = () => {
-    const byProcess = new Map<string, DetailsRow[]>();
+    const byProcess = new Map<string, typeof filteredRows[0][]>();
     for (const row of filteredRows) {
-      const process = normalizeProcess(row.Process);
+      const process = row.ProcessNorm;
       if (!byProcess.has(process)) byProcess.set(process, []);
       byProcess.get(process)!.push(row);
     }
@@ -390,7 +468,7 @@ export default function EipBoardsPage() {
     return (
       <AllLayout>
         <Box py={20} textAlign="center">
-          <Spinner size="xl" color={accent} thickness="3px" />
+          <Spinner size="xl" color="purple.500" thickness="3px" />
           <Text mt={4} fontSize="lg" color={mutedColor}>
             Loading open PRs for {formatMonthLabel(selectedMonth)}…
           </Text>
@@ -411,42 +489,42 @@ export default function EipBoardsPage() {
 
   return (
     <AllLayout>
-      <Box p={{ base: 4, md: 8 }} maxW="1600px" mx="auto">
-        <VStack align="stretch" spacing={6}>
-          {/* Animated Header with FAQ */}
+      <Box padding={{ base: 1, md: 4 }} margin={{ base: 2, md: 4 }}>
+        <VStack align="stretch" spacing={4}>
           <AnimatedHeader
-            title="EIP/ERC/RIP Board"
-            description="View and manage all open pull requests awaiting editor review across EIPs and ERCs. Filter by labels, search by title or PR number, and download detailed reports."
+            title="EIP / ERC / RIP Board"
+            description="Open pull requests by type and status for the selected month. Filter by repo, process type, and participant status. Mission control for protocol changes."
             faqItems={[
               {
-                question: "What is the EIP Board?",
-                answer: "The table below lists all Open Pull Requests (till date) that are awaiting editor review. It provides a comprehensive overview of pending proposals and their current status."
+                question: "What does this page show?",
+                answer: "This page lists open PRs for a chosen month, grouped by process type (e.g. Typo, NEW EIP, PR DRAFT) and participant status (e.g. Awaiting Editor, Awaited). You can switch between EIPs, ERCs, RIPs, or view All. The table and counts match the Analytics Process × Participants chart for that month."
               },
               {
-                question: "How do label filters work?",
-                answer: "You can filter table data using label filters to focus on specific types of PRs. The same filters will apply to the downloaded reports, ensuring consistency in your analysis."
+                question: "How can I view data for a specific month?",
+                answer: "Use the month dropdown (Layer 2) to select a month. The table and counts update to show open PRs at the end of that month. You can also land on this page with a link that includes the month (and filters) in the URL."
               },
               {
-                question: "📊 How is prioritization determined?",
-                answer: "PRs with the 's-withdrawn' label are given the lowest priority and moved to the bottom of the table."
+                question: "How can I filter the list?",
+                answer: "Filter by Status (participant: Awaiting Editor, Awaiting Author, Stagnant, Awaited, Misc, or All), and by Process type using the chips. Use Quick presets (Critical / Backlog / Fresh) to filter by wait time. Use the search box to filter by title, author, or PR number."
               },
               {
-                question: "👥 Who would use this tool?",
-                answer: "This tool is created to support EIP/ERC Editors to identify the longest waiting PRs for Editor's review. These PRs can also be discussed in EIP Editing Office Hour and EIPIP Meetings in case it requires attention of more than one editor/reviewer. Note: This tool is based on a fork from gaudren/eip-board."
+                question: "How do I download or share the data?",
+                answer: "Use Download CSV to export the currently filtered table. Use Copy as MD to copy a markdown list of PRs (grouped by process) to the clipboard. Use Copy link to copy the current filters to the clipboard. All respect your current filters and selected month."
               }
             ]}
           />
 
-          {/* Repo + Month + Participants + Search */}
-          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="xl" overflow="hidden">
-            <CardBody p={{ base: 4, md: 5 }}>
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                <Flex flexWrap="wrap" gap={3} align="center">
+          {/* Layer A — Scope & Time (What am I looking at?) */}
+          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="lg" overflow="hidden">
+            <CardBody py={4} px={5}>
+              <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
+                <HStack spacing={2}>
+                  <Text fontSize="xs" fontWeight="600" color={mutedColor}>Scope</Text>
                   {REPO_TABS.map((tab) => (
                     <Button
                       key={tab.key}
-                      size="md"
-                      colorScheme={tab.key === activeTab ? "teal" : "gray"}
+                      size="sm"
+                      colorScheme={tab.key === activeTab ? "purple" : "gray"}
                       variant={tab.key === activeTab ? "solid" : "outline"}
                       onClick={() => setActiveTab(tab.key)}
                       fontWeight="600"
@@ -454,11 +532,16 @@ export default function EipBoardsPage() {
                       {tab.label}
                     </Button>
                   ))}
+                </HStack>
+                <HStack spacing={3}>
+                  <Text fontSize="lg" fontWeight="800" color={accent}>
+                    Open PRs for {formatMonthLabel(selectedMonth)}
+                  </Text>
                   <Select
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    maxW="180px"
-                    size="md"
+                    maxW="140px"
+                    size="sm"
                     fontWeight="600"
                   >
                     {availableMonths.length > 0
@@ -467,74 +550,109 @@ export default function EipBoardsPage() {
                         ))
                       : <option value={selectedMonth}>{formatMonthLabel(selectedMonth)}</option>}
                   </Select>
-                </Flex>
-                <Flex flexWrap="wrap" gap={3} align="center">
-                  <HStack>
-                    <Text fontWeight="600" color={mutedColor}>Status</Text>
-                    <Select
-                      value={selectedSubcategory}
-                      onChange={(e) => { setSelectedSubcategory(e.target.value); setPage(1); }}
-                      maxW="160px"
-                      size="md"
-                    >
-                      {SUBCATEGORY_OPTIONS.map((opt) => (
-                        <option key={opt.value || "all"} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </Select>
-                  </HStack>
-                  <InputGroup maxW="280px">
-                    <InputLeftElement pointerEvents="none" height="100%">
-                      <SearchIcon color="gray.400" />
-                    </InputLeftElement>
-                    <Input
-                      placeholder="Search title, author, PR #"
-                      value={searchQuery}
-                      onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-                      size="md"
-                    />
-                  </InputGroup>
-                </Flex>
-              </SimpleGrid>
+                </HStack>
+              </Flex>
+            </CardBody>
+          </Card>
 
-              <Divider my={4} borderColor={borderColor} />
+          {/* Layer B — Priority Filters (How urgent is this?) */}
+          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="lg" overflow="hidden">
+            <CardBody p={4}>
+              <Text fontSize="xs" fontWeight="700" color={mutedColor} mb={3} letterSpacing="wider">
+                PRIORITY FILTERS
+              </Text>
+              <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
+                <HStack>
+                  <Text fontWeight="600" fontSize="sm">Status</Text>
+                  <Select
+                    value={selectedSubcategory}
+                    onChange={(e) => { setSelectedSubcategory(e.target.value); setWaitPresetDays(null); setPage(1); }}
+                    maxW="180px"
+                    size="sm"
+                  >
+                    {SUBCATEGORY_OPTIONS.map((opt) => (
+                      <option key={opt.value || "all"} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </Select>
+                </HStack>
+                <HStack gap={2} flexWrap="wrap">
+                  <Button size="sm" colorScheme="red" variant={waitPresetDays?.[0] === 31 ? "solid" : "outline"} onClick={() => applyWaitPreset("critical")}>
+                    🔴 Critical (&gt;30d)
+                  </Button>
+                  <Button size="sm" colorScheme="orange" variant={waitPresetDays?.[0] === 14 ? "solid" : "outline"} onClick={() => applyWaitPreset("backlog")}>
+                    🟡 Backlog (14–30d)
+                  </Button>
+                  <Button size="sm" colorScheme="green" variant={waitPresetDays?.[1] === 13 ? "solid" : "outline"} onClick={() => applyWaitPreset("fresh")}>
+                    🟢 Fresh (&lt;14d)
+                  </Button>
+                  {waitPresetDays && (
+                    <Button size="sm" variant="ghost" onClick={() => setWaitPresetDays(null)}>Clear preset</Button>
+                  )}
+                </HStack>
+              </Flex>
+            </CardBody>
+          </Card>
 
-              {/* Process filter chips */}
-              <Box>
-                <Flex align="center" gap={2} mb={3} flexWrap="wrap">
-                  <Text fontWeight="600" fontSize="md">Process type</Text>
-                  <Badge colorScheme="teal" fontSize="md" px={2} py={0.5}>{totalFiltered}</Badge>
-                  <Button size="xs" variant="ghost" colorScheme="teal" onClick={selectAllCategories}>
-                    All
-                  </Button>
-                  <Button size="xs" variant="ghost" onClick={clearCategories}>
-                    Clear
-                  </Button>
-                </Flex>
-                <Wrap spacing={2}>
-                  {categoriesInData.map((cat) => {
-                    const count = totalByCategory.get(cat) ?? 0;
-                    const isSelected = selectedCategories.includes(cat);
-                    return (
-                      <WrapItem key={cat}>
-                        <Badge
-                          as="button"
-                          colorScheme={PROCESS_COLORS[cat] ?? "gray"}
-                          variant={isSelected ? "solid" : "outline"}
-                          fontSize="md"
-                          px={3}
-                          py={1.5}
-                          borderRadius="full"
-                          cursor="pointer"
-                          _hover={{ opacity: 0.9 }}
-                          onClick={() => toggleCategory(cat)}
-                        >
-                          {cat} {count > 0 && `(${count})`}
-                        </Badge>
-                      </WrapItem>
-                    );
-                  })}
-                </Wrap>
-              </Box>
+          {/* Layer C — Content Filters (What type of work is this?) */}
+          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="lg" overflow="hidden">
+            <CardBody p={4}>
+              <Text fontSize="xs" fontWeight="700" color={mutedColor} mb={3} letterSpacing="wider">
+                CONTENT FILTERS
+              </Text>
+              <Flex justify="space-between" align="center" flexWrap="wrap" gap={4} mb={2}>
+                <InputGroup maxW="320px">
+                  <InputLeftElement pointerEvents="none" height="100%">
+                    <SearchIcon color="gray.400" />
+                  </InputLeftElement>
+                  <Input
+                    placeholder="Search title, author, PR #"
+                    value={searchQuery}
+                    onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+                    size="sm"
+                  />
+                </InputGroup>
+                <HStack spacing={2} flexWrap="wrap">
+                  <Text fontWeight="700" fontSize="sm">Process type</Text>
+                  <Text fontSize="sm" color={mutedColor}>•</Text>
+                  <Badge colorScheme="purple" fontSize="sm" px={2} py={0.5}>
+                    {totalFiltered} matching
+                  </Badge>
+                  <Button size="xs" variant="ghost" colorScheme="purple" onClick={selectAllCategories}>All</Button>
+                  <Button size="xs" variant="ghost" onClick={clearCategories}>Clear</Button>
+                </HStack>
+              </Flex>
+              <Wrap spacing={3} rowGap={3} justify="flex-start">
+                    {categoriesInData.map((cat) => {
+                      const count = totalByCategory.get(cat) ?? 0;
+                      const isSelected = selectedCategories.includes(cat);
+                      return (
+                        <WrapItem key={cat}>
+                          <Badge
+                            as="button"
+                            colorScheme={PROCESS_COLORS[cat] ?? "gray"}
+                            variant={isSelected ? "solid" : "outline"}
+                            fontSize="md"
+                            px={3}
+                            py={1.5}
+                            borderRadius="full"
+                            cursor="pointer"
+                            _hover={{ opacity: 0.9 }}
+                            boxShadow={
+                              isSelected
+                                ? "0 0 0 2px var(--chakra-colors-purple-400), 0 0 10px rgba(128, 90, 213, 0.2)"
+                                : undefined
+                            }
+                            onClick={() => toggleCategory(cat)}
+                          >
+                            <HStack spacing={1} display="inline-flex">
+                              {isSelected && <CheckIcon boxSize={3} />}
+                              <span>{cat} {count > 0 && `(${count})`}</span>
+                            </HStack>
+                          </Badge>
+                        </WrapItem>
+                      );
+                    })}
+              </Wrap>
             </CardBody>
           </Card>
 
@@ -543,7 +661,7 @@ export default function EipBoardsPage() {
             <HStack gap={2} flexWrap="wrap">
               <Text fontWeight="700" fontSize="lg">
                 Showing{" "}
-                <Badge colorScheme="teal" fontSize="md" px={2}>
+                <Badge colorScheme="purple" fontSize="md" px={2}>
                   {totalFiltered === 0 ? 0 : (currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalFiltered)}
                 </Badge>
                 {" "}of {totalFiltered} PRs
@@ -559,7 +677,16 @@ export default function EipBoardsPage() {
                 ))}
               </Select>
             </HStack>
-            <HStack gap={2}>
+            <HStack gap={2} flexWrap="wrap">
+              <Button
+                size="md"
+                colorScheme="purple"
+                variant="outline"
+                onClick={copyLinkToFilters}
+                title="Copy link to current filters"
+              >
+                Copy link
+              </Button>
               <Button
                 leftIcon={<CopyIcon />}
                 size="md"
@@ -584,13 +711,14 @@ export default function EipBoardsPage() {
           </Flex>
 
           {/* Table */}
-          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="xl" overflow="hidden">
+          <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="lg" overflow="hidden">
             <TableContainer>
               <Table size="md" variant="simple">
                 <Thead bg={headerBg}>
                   <Tr>
                     <Th fontWeight="700">#</Th>
                     {activeTab === "all" && <Th fontWeight="700">Repo</Th>}
+                    <Th fontWeight="700">🔥</Th>
                     <Th fontWeight="700">PR</Th>
                     <Th fontWeight="700">Title</Th>
                     <Th fontWeight="700">Created</Th>
@@ -604,11 +732,11 @@ export default function EipBoardsPage() {
                 <Tbody>
                   {paginatedRows.map((row, idx) => {
                     const createdAt = row.CreatedAt ?? "";
-                    const waitDays = getWaitTimeDays(createdAt);
                     const labels = row.Labels ? row.Labels.split("; ").filter(Boolean) : [];
                     const repoShort = row.Repo === "ERC PRs" ? "ERC" : row.Repo === "RIP PRs" ? "RIP" : "EIP";
-                    const processNorm = normalizeProcess(row.Process);
-                    const participantsNorm = normalizeParticipants(row.Participants);
+                    const attentionLabel = row.attentionScore > 12 ? "High" : row.attentionScore > 6 ? "Medium" : "Low";
+                    const attentionColor = row.attentionScore > 12 ? "red" : row.attentionScore > 6 ? "orange" : "green";
+                    const titleTooltip = [row.Title ?? "", row.Repo ?? "", labels.join(", ")].filter(Boolean).join(" · ");
                     return (
                       <Tr
                         key={`${row.PRNumber}-${row.Repo ?? ""}-${idx}`}
@@ -619,40 +747,47 @@ export default function EipBoardsPage() {
                         <Td fontWeight="600">{(currentPage - 1) * pageSize + idx + 1}</Td>
                         {activeTab === "all" && (
                           <Td>
-                            <Badge colorScheme="purple" fontSize="sm" px={2} py={0.5}>
+                            <Badge colorScheme={REPO_BADGE_COLORS[repoShort] ?? "gray"} fontSize="sm" px={2} py={0.5}>
                               {repoShort}
                             </Badge>
                           </Td>
                         )}
                         <Td>
+                          <Badge colorScheme={attentionColor} fontSize="sm" px={2} py={0.5}>
+                            {attentionLabel}
+                          </Badge>
+                        </Td>
+                        <Td>
                           <Link href={row.PRLink ?? "#"} isExternal color="blue.500" fontWeight="600" display="inline-flex" alignItems="center" gap={1}>
                             <BiGitPullRequest /> #{row.PRNumber ?? "—"}
                           </Link>
                         </Td>
-                        <Td maxW="320px" noOfLines={1} title={row.Title ?? ""} fontSize="md">
-                          {row.Title ?? "—"}
+                        <Td maxW="320px" noOfLines={1} fontSize="md">
+                          <Tooltip label={titleTooltip} placement="top" maxW="400px">
+                            <span>{row.Title ?? "—"}</span>
+                          </Tooltip>
                         </Td>
                         <Td whiteSpace="nowrap" fontSize="md">
                           {createdAt ? format(new Date(createdAt), "MMM d, yyyy") : "—"}
                         </Td>
                         <Td>
                           <Badge
-                            colorScheme={waitDays != null && waitDays > 30 ? "red" : waitDays != null && waitDays > 14 ? "orange" : "green"}
+                            colorScheme={row.waitDays != null && row.waitDays > 30 ? "red" : row.waitDays != null && row.waitDays > 14 ? "orange" : "green"}
                             fontSize="sm"
                             px={2}
                             py={0.5}
                           >
-                            {formatWaitTime(waitDays)}
+                            {formatWaitTimeDisplay(row.waitDays)}
                           </Badge>
                         </Td>
                         <Td>
-                          <Badge colorScheme={PROCESS_COLORS[processNorm] ?? "gray"} fontSize="sm" px={2} py={0.5}>
-                            {processNorm || "—"}
+                          <Badge colorScheme={PROCESS_COLORS[row.ProcessNorm] ?? "gray"} fontSize="sm" px={2} py={0.5}>
+                            {row.ProcessNorm || "—"}
                           </Badge>
                         </Td>
                         <Td>
-                          <Badge colorScheme={PARTICIPANT_COLORS[participantsNorm] ?? "gray"} fontSize="sm" px={2} py={0.5}>
-                            {participantsNorm || "—"}
+                          <Badge colorScheme={PARTICIPANT_COLORS[row.ParticipantsNorm] ?? "gray"} fontSize="sm" px={2} py={0.5}>
+                            {row.ParticipantsNorm || "—"}
                           </Badge>
                         </Td>
                         <Td maxW="200px">
@@ -674,7 +809,7 @@ export default function EipBoardsPage() {
                         </Td>
                         <Td>
                           <Tooltip label="Open PR on GitHub">
-                            <Link href={row.PRLink ?? "#"} isExternal display="inline-flex" alignItems="center" fontWeight="600" color="teal.500">
+                            <Link href={row.PRLink ?? "#"} isExternal display="inline-flex" alignItems="center" fontWeight="600" color={accent2}>
                               Open <ExternalLinkIcon ml={1} />
                             </Link>
                           </Tooltip>
@@ -718,7 +853,7 @@ export default function EipBoardsPage() {
                       <Button
                         key={pageNum}
                         size="md"
-                        colorScheme={pageNum === currentPage ? "teal" : "gray"}
+                        colorScheme={pageNum === currentPage ? "purple" : "gray"}
                         variant={pageNum === currentPage ? "solid" : "outline"}
                         onClick={() => setPage(pageNum)}
                       >
