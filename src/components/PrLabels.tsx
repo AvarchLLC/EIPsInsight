@@ -2,11 +2,12 @@ import React, { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import {
   Box, Card, CardHeader, CardBody, Heading, Text, Stack, Button, Checkbox,
-  CheckboxGroup, Menu, MenuButton, MenuList, useColorModeValue, Flex, Badge, HStack, Divider
+  CheckboxGroup, Menu, MenuButton, MenuList, MenuItem, useColorModeValue, Flex, Badge, HStack, Divider
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
 import Papa from "papaparse";
 import CopyLink from "./CopyLink";
+import DateTime from "./DateTime";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -200,7 +201,7 @@ export default function PRAnalyticsCard() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>(''); // For CSV download
-  const [tableMonthTotal, setTableMonthTotal] = useState<number | null>(null); // From details API; matches eipboards (activity month)
+  const [tableMonthTotal, setTableMonthTotal] = useState<number | null>(null); // From details API; matches boardsnew (activity month)
 
   // Graph 2: Process or Participants (same open PRs as Graph 1 Open; sum = Graph 1 Open per month)
   const labelSpecs: LabelSpec[] = useMemo(() => {
@@ -352,7 +353,7 @@ export default function PRAnalyticsCard() {
     return () => controller.abort();
   }, [repoKey, labelSet, graph2ApiName]);
 
-  // Fetch table total for selected month (details API = activity month) so we can show the number that matches eipboards
+  // Fetch table total for selected month (details API = activity month) so we can show the number that matches boardsnew
   useEffect(() => {
     if (!selectedMonth || !/^\d{4}-\d{2}$/.test(selectedMonth)) {
       setTableMonthTotal(null);
@@ -576,111 +577,103 @@ export default function PRAnalyticsCard() {
   ];
 
   return (
-    <Card bg={cardBg} color={textColor} mx="auto" mt={8} borderRadius="2xl" p={4}>
-      <CardHeader>
-        <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
-          <Heading size="md" color={accentColor} mb={2} id="PrLabelsChart">
-           {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label}
-            <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
-          </Heading>
-          <Flex gap={3} align="center">
+    <Card
+      bg={cardBg}
+      color={textColor}
+      mx="auto"
+      mt={6}
+      borderRadius="xl"
+      borderWidth="1px"
+      borderColor={useColorModeValue("gray.200", "gray.700")}
+      boxShadow="sm"
+      p={4}
+    >
+      <CardHeader pb={3}>
+        <Flex align="center" justify="space-between" wrap="wrap" gap={3}>
+          <Box>
+            <Text fontSize="xs" fontWeight="600" letterSpacing="wider" color={useColorModeValue("gray.500", "gray.400")} mb={1}>
+              Label distribution
+            </Text>
+            <Heading size="md" fontWeight="700" id="PrLabelsChart" letterSpacing="-0.01em">
+              {REPOS.find(r => r.key === repoKey)?.label}
+            </Heading>
+            <Flex align="center" gap={2} mt={1}>
+              <Badge
+                variant="subtle"
+                colorScheme={labelSet === "process" ? "blue" : "purple"}
+                px={2}
+                py={0.5}
+                borderRadius="full"
+                fontSize="xs"
+                fontWeight="600"
+              >
+                {labelSetOptions.find(o => o.key === labelSet)?.label}
+              </Badge>
+              <CopyLink link="https://eipsinsight.com/Analytics#PrLabelsChart" />
+            </Flex>
+          </Box>
+          <Flex gap={3} align="center" wrap="wrap">
             <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="solid" colorScheme="purple" minW={140}>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={140}>
                 {REPOS.find(r => r.key === repoKey)?.label}
               </MenuButton>
-              <MenuList minWidth="140px">
-                <Stack>
-                  {REPOS.map(repo => (
-                    <Button
-                      key={repo.key}
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      colorScheme={repoKey === repo.key ? "blue" : undefined}
-                      onClick={() => setRepoKey(repo.key as "all" | "eip" | "erc" | "rip")}
-                    >
-                      {repo.label}
-                    </Button>
-                  ))}
-                </Stack>
+              <MenuList>
+                {REPOS.map(repo => (
+                  <MenuItem key={repo.key} onClick={() => setRepoKey(repo.key as "all" | "eip" | "erc" | "rip")}>
+                    {repo.label}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Menu>
             <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="teal" minW={160}>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={140}>
                 {labelSetOptions.find(o => o.key === labelSet)?.label}
               </MenuButton>
-              <MenuList minWidth="160px">
-                <Stack>
-                  {labelSetOptions.map(opt =>
-                    <Button
-                      key={opt.key}
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      colorScheme={labelSet === opt.key ? "teal" : undefined}
-                      onClick={() => setLabelSet(opt.key as "process" | "participants")}
-                    >
-                      {opt.label}
-                    </Button>
-                  )}
-                </Stack>
+              <MenuList>
+                {labelSetOptions.map(opt => (
+                  <MenuItem key={opt.key} onClick={() => setLabelSet(opt.key as "process" | "participants")}>
+                    {opt.label}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Menu>
             <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="green" minW={160}>
-                {selectedMonth ? formatMonthLabel(selectedMonth) : 'Select Month'}
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={160}>
+                {selectedMonth ? formatMonthLabel(selectedMonth) : "Select Month"}
               </MenuButton>
-              <MenuList maxHeight="300px" overflowY="auto" minWidth="160px">
-                <Stack>
-                  {months.slice().reverse().map(month => (
-                    <Button
-                      key={month}
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      colorScheme={selectedMonth === month ? "green" : undefined}
-                      onClick={() => setSelectedMonth(month)}
-                    >
-                      {formatMonthLabel(month)}
-                    </Button>
-                  ))}
-                </Stack>
+              <MenuList maxH="280px" overflowY="auto">
+                {months.slice().reverse().map(month => (
+                  <MenuItem key={month} onClick={() => setSelectedMonth(month)}>
+                    {formatMonthLabel(month)}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Menu>
-            <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md" isDisabled={!selectedMonth}>
+            <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} size="sm" borderRadius="md" isDisabled={!selectedMonth}>
               Download CSV
             </Button>
           </Flex>
         </Flex>
-        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} mt={2}>
-          Open PRs by <strong>Process</strong> type (e.g. Typo, NEW EIP, PR DRAFT) or by <strong>Participants</strong> status (e.g. Waiting on Editor, Awaited). Toggle the dropdown to switch. Sum of bars = total open PRs for that month. <strong>Awaited</strong> = draft PRs when process is PR DRAFT and not stagnant.
+        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} mt={3} maxW="900px">
+          Open PRs by <strong>Process</strong> type (Typo, NEW EIP, PR DRAFT) or by <strong>Participants</strong> status (Waiting on Editor, Awaited). Sum of bars = total open PRs for that month.
         </Text>
       </CardHeader>
       <CardBody>
-        <Flex gap={4} wrap="wrap" mb={4} align="center">
+        <Flex gap={4} wrap="wrap" mb={3} align="center">
           <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="blue" borderRadius="md" minW={180}>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={180}>
               Filter by {labelSetOptions.find(o => o.key === labelSet)?.label}
             </MenuButton>
-            <MenuList minWidth="280px" px={2} py={2}>
+            <MenuList minWidth="260px" px={2} py={2}>
               <HStack mb={2} gap={2}>
                 <Button size="xs" colorScheme="teal" onClick={selectAll}>Select All</Button>
-                <Button size="xs" colorScheme="red" variant="outline" onClick={clearAll}>Clear All</Button>
+                <Button size="xs" variant="outline" onClick={clearAll}>Clear</Button>
               </HStack>
               <CheckboxGroup value={selectedLabels} onChange={(v: string[]) => setSelectedLabels(v)}>
-                <Stack pl={2} pr={2} gap={1}>
+                <Stack gap={1}>
                   {labelSpecs.map(lbl => (
-                    <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme={labelSet === "process" ? "blue" : "purple"} iconColor={badgeText}>
-                      <Badge
-                        mr={2}
-                        fontSize="sm"
-                        bg={lbl.color}
-                        color={badgeText}
-                        borderRadius="base"
-                        px={2} py={1}
-                        fontWeight={600}
-                        variant="solid"
-                      >
+                    <Checkbox key={lbl.value} value={lbl.value} py={1} px={2} colorScheme={labelSet === "process" ? "blue" : "purple"}>
+                      <Badge mr={2} fontSize="sm" bg={lbl.color} color={badgeText} borderRadius="md" px={2} py={0.5}>
                         {lbl.label}
                       </Badge>
                     </Checkbox>
@@ -690,30 +683,36 @@ export default function PRAnalyticsCard() {
             </MenuList>
           </Menu>
         </Flex>
-        <Box 
-          bg={useColorModeValue('blue.50', 'gray.700')} 
-          p={3} 
-          borderRadius="md" 
+        <Box
+          bg={useColorModeValue("blue.50", "gray.700")}
+          p={3}
+          borderRadius="md"
           mb={3}
           textAlign="center"
         >
-          <Text fontSize="lg" fontWeight="bold" color={useColorModeValue('blue.700', 'blue.300')}>
-            {latestMonth
-              ? <>Chart total ({formatMonthLabel(latestMonth)}): <Text as="span" color={accentColor}>{currentMonthTotal}</Text></>
-              : <>No data available</>
-            }
+          <Text fontSize="md" fontWeight="bold">
+            Chart total ({latestMonth ? formatMonthLabel(latestMonth) : "—"}):{" "}
+            <Text as="span" color={accentColor} ml={1}>
+              {latestMonth ? currentMonthTotal : "—"}
+            </Text>
           </Text>
           {selectedMonth && tableMonthTotal != null && (
-            <Text fontSize="md" fontWeight="semibold" color={useColorModeValue('green.700', 'green.300')} mt={2}>
-              Table total for {formatMonthLabel(selectedMonth)} (filtered by selected labels): <Text as="span" color={accentColor}>{tableMonthTotal}</Text>
+            <Text fontSize="sm" fontWeight="semibold" color="green.500" mt={1}>
+              Table total (filtered): {tableMonthTotal}
             </Text>
           )}
-          <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={2}>
-            Chart, table, and CSV show the same open PRs for the selected month and labels.
+          <Text fontSize="xs" color="gray.500" mt={1}>
+            Chart, table, and CSV use the same open PR set.
           </Text>
         </Box>
-        <Divider my={3} />
-        <Box minH="350px">
+        <Box
+          minH="380px"
+          borderRadius="lg"
+          borderWidth="1px"
+          borderColor={useColorModeValue("gray.200", "gray.700")}
+          p={2}
+          position="relative"
+        >
           {loading ? (
             <Text color={accentColor} fontWeight="bold" my={10} fontSize="xl">Loading...</Text>
           ) : chartData.months.length === 0 ? (
@@ -721,8 +720,37 @@ export default function PRAnalyticsCard() {
               No PR label data found for this filter or period.
             </Text>
           ) : (
-            <ReactECharts style={{ height: "460px", width: "100%" }} option={option} notMerge lazyUpdate theme={useColorModeValue("light", "dark")} />
+            <>
+              <ReactECharts
+                style={{ height: "440px", width: "100%" }}
+                option={option}
+                notMerge
+                lazyUpdate
+                theme={useColorModeValue("light", "dark")}
+              />
+              <Text
+                position="absolute"
+                top="50%"
+                left="50%"
+                transform="translate(-50%, -50%)"
+                fontSize="3xl"
+                fontWeight="700"
+                letterSpacing="0.05em"
+                color={useColorModeValue("gray.400", "gray.500")}
+                opacity={0.45}
+                pointerEvents="none"
+                userSelect="none"
+                whiteSpace="nowrap"
+                textShadow="0 1px 2px rgba(255,255,255,0.5)"
+                _dark={{ textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}
+              >
+                EIPsInsight.com
+              </Text>
+            </>
           )}
+        </Box>
+        <Box mt={3}>
+          <DateTime />
         </Box>
       </CardBody>
     </Card>

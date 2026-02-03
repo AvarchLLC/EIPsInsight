@@ -10,6 +10,7 @@ import {
   Menu,
   MenuButton,
   MenuList,
+  MenuItem,
   Button,
   Stack,
   useColorModeValue,
@@ -30,6 +31,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DownloadIcon, SearchIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import CopyLink from "./CopyLink";
+import DateTime from "./DateTime";
 import Papa from "papaparse";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
@@ -160,7 +162,6 @@ export default function CategorySubcategoryChart() {
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(PARTICIPANTS_ORDER);
   const [tablePage, setTablePage] = useState(1);
   const [showTable, setShowTable] = useState(false);
-  const [showDescription, setShowDescription] = useState(false);
 
   const TABLE_PAGE_SIZE = 15;
 
@@ -473,34 +474,61 @@ export default function CategorySubcategoryChart() {
     }
   };
 
+  const chartTotal = useMemo(() => {
+    if (!chartData.series?.length) return 0;
+    return (chartData.series as { data: number[] }[]).reduce(
+      (acc, s) => acc + (s.data || []).reduce((a, b) => a + b, 0),
+      0
+    );
+  }, [chartData.series]);
+
   return (
-    <Card bg={cardBg} color={textColor} mx="auto" mt={8} borderRadius="2xl" p={4}>
-      <CardHeader>
-        <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
-          <Heading size="md" color={accentColor} mb={2} id="CategorySubcategoryChart">
-            Process × Participants (stacked)
-            <CopyLink link="https://eipsinsight.com/Analytics#CategorySubcategoryChart" />
-          </Heading>
-          <Flex gap={2} wrap="wrap">
+    <Card
+      bg={cardBg}
+      color={textColor}
+      mx="auto"
+      mt={6}
+      borderRadius="xl"
+      borderWidth="1px"
+      borderColor={useColorModeValue("gray.200", "gray.700")}
+      boxShadow="sm"
+      p={4}
+    >
+      <CardHeader pb={3}>
+        <Flex align="center" justify="space-between" wrap="wrap" gap={3}>
+          <Box>
+            <Text fontSize="xs" fontWeight="600" letterSpacing="wider" color={useColorModeValue("gray.500", "gray.400")} mb={1}>
+              Category breakdown
+            </Text>
+            <Heading size="md" fontWeight="700" id="CategorySubcategoryChart" letterSpacing="-0.01em">
+              Process × Participants
+            </Heading>
+            <Flex align="center" gap={2} mt={1}>
+              <Badge
+                variant="subtle"
+                colorScheme={axisLayout === "processOnAxis" ? "blue" : "purple"}
+                px={2}
+                py={0.5}
+                borderRadius="full"
+                fontSize="xs"
+                fontWeight="600"
+              >
+                {axisLayout === "processOnAxis" ? "X: Process" : "X: Participants"}
+              </Badge>
+              <CopyLink link="https://eipsinsight.com/Analytics#CategorySubcategoryChart" />
+            </Flex>
+          </Box>
+          <Flex gap={3} align="center" wrap="wrap">
             <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="solid" colorScheme="purple" minW={100}>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={140}>
                 {repoLabel}
               </MenuButton>
-              <MenuList minWidth="100px">
-                <Stack>
-                  {REPOS.map((repo) => (
-                    <Button
-                      key={repo.key}
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      colorScheme={repoKey === repo.key ? "blue" : undefined}
-                      onClick={() => setRepoKey(repo.key as "eips" | "ercs" | "rips" | "all")}
-                    >
-                      {repo.label}
-                    </Button>
-                  ))}
-                </Stack>
+              <MenuList>
+                {REPOS.map((repo) => (
+                  <MenuItem key={repo.key} onClick={() => setRepoKey(repo.key as "eips" | "ercs" | "rips" | "all")}>
+                    {repo.label}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Menu>
             <Menu>
@@ -508,35 +536,19 @@ export default function CategorySubcategoryChart() {
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
                 variant="outline"
-                colorScheme={axisLayout === "processOnAxis" ? "blue" : "purple"}
-                minW={180}
+                size="sm"
+                minW={160}
                 isDisabled={noDataAtAll}
               >
-                {axisLayout === "processOnAxis"
-                  ? "X-axis: Process (stacked: Participants)"
-                  : "X-axis: Participants (stacked: Process)"}
+                {axisLayout === "processOnAxis" ? "X: Process (stack: Participants)" : "X: Participants (stack: Process)"}
               </MenuButton>
               <MenuList minWidth="220px">
-                <Stack p={2}>
-                  <Button
-                    size="sm"
-                    variant={axisLayout === "processOnAxis" ? "solid" : "ghost"}
-                    colorScheme="blue"
-                    justifyContent="flex-start"
-                    onClick={() => setAxisLayout("processOnAxis")}
-                  >
-                    X-axis: Process — stacked: Participants
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={axisLayout === "participantsOnAxis" ? "solid" : "ghost"}
-                    colorScheme="purple"
-                    justifyContent="flex-start"
-                    onClick={() => setAxisLayout("participantsOnAxis")}
-                  >
-                    X-axis: Participants — stacked: Process
-                  </Button>
-                </Stack>
+                <MenuItem onClick={() => setAxisLayout("processOnAxis")}>
+                  X-axis: Process — stacked: Participants
+                </MenuItem>
+                <MenuItem onClick={() => setAxisLayout("participantsOnAxis")}>
+                  X-axis: Participants — stacked: Process
+                </MenuItem>
               </MenuList>
             </Menu>
             <Menu>
@@ -544,33 +556,23 @@ export default function CategorySubcategoryChart() {
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
                 variant="outline"
-                colorScheme="teal"
-                minW={140}
+                size="sm"
+                minW={160}
                 isDisabled={noDataAtAll}
               >
-                {selectedMonthYear ? formatMonthLabel(selectedMonthYear) : "Month"}
+                {selectedMonthYear ? formatMonthLabel(selectedMonthYear) : "Select Month"}
               </MenuButton>
-              <MenuList maxH="300px" overflowY="auto" minWidth="140px">
-                <Stack>
-                  {months.slice().reverse().map((m) => (
-                    <Button
-                      key={m}
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      colorScheme={selectedMonthYear === m ? "teal" : undefined}
-                      onClick={() => setSelectedMonthYear(m)}
-                    >
-                      {formatMonthLabel(m)}
-                    </Button>
-                  ))}
-                </Stack>
+              <MenuList maxH="280px" overflowY="auto">
+                {months.slice().reverse().map((m) => (
+                  <MenuItem key={m} onClick={() => setSelectedMonthYear(m)}>
+                    {formatMonthLabel(m)}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Menu>
             <Button
               leftIcon={<DownloadIcon />}
               colorScheme="blue"
-              variant="solid"
               size="sm"
               onClick={downloadCSV}
               isLoading={downloading}
@@ -580,38 +582,26 @@ export default function CategorySubcategoryChart() {
             </Button>
           </Flex>
         </Flex>
-        <Flex align="center" gap={2} mt={2} flexWrap="wrap">
-          <Button
-            size="xs"
-            variant="ghost"
-            colorScheme="gray"
-            onClick={() => setShowDescription((v) => !v)}
-          >
-            {showDescription ? "Hide description" : "Show description"}
-          </Button>
-          {showDescription && (
-            <Box fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
-              Open PRs by process type and participant status. Choose <strong>Process</strong> or <strong>Participants</strong> on the X-axis (the other is stacked). Sum of segments = total open PRs for the month. <strong>Awaited</strong> = draft PRs when process is PR DRAFT and not stagnant. One month per view; legend above the chart.
-            </Box>
-          )}
-        </Flex>
+        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} mt={3} maxW="900px">
+          Open PRs by <strong>Process</strong> type and <strong>Participants</strong> status. Choose Process or Participants on the X-axis (the other is stacked). Sum of segments = total open PRs for that month.
+        </Text>
       </CardHeader>
       <CardBody>
-        <Flex gap={4} wrap="wrap" mb={4} align="center">
+        <Flex gap={4} wrap="wrap" mb={3} align="center">
           <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="blue" borderRadius="md" minW={180}>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={180}>
               Filter by Process
             </MenuButton>
-            <MenuList minWidth="280px" px={2} py={2}>
+            <MenuList minWidth="260px" px={2} py={2}>
               <HStack mb={2} gap={2}>
                 <Button size="xs" colorScheme="teal" onClick={() => setSelectedProcesses([...PROCESS_ORDER])}>Select All</Button>
                 <Button size="xs" variant="outline" onClick={() => setSelectedProcesses([])}>Clear</Button>
               </HStack>
               <CheckboxGroup value={selectedProcesses} onChange={(v: string[]) => setSelectedProcesses(v)}>
-                <Stack pl={2} pr={2} gap={1}>
+                <Stack gap={1}>
                   {PROCESS_ORDER.map((p) => (
-                    <Checkbox key={p} value={p} py={1.5} px={2} colorScheme="blue">
-                      <Badge mr={2} fontSize="sm" colorScheme="blue" variant="outline" px={2} py={0.5}>
+                    <Checkbox key={p} value={p} py={1} px={2} colorScheme="blue">
+                      <Badge mr={2} fontSize="sm" colorScheme="blue" variant="outline" px={2} py={0.5} borderRadius="md">
                         {p}
                       </Badge>
                     </Checkbox>
@@ -621,19 +611,19 @@ export default function CategorySubcategoryChart() {
             </MenuList>
           </Menu>
           <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="purple" borderRadius="md" minW={200}>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={180}>
               Filter by Participants
             </MenuButton>
-            <MenuList minWidth="280px" px={2} py={2}>
+            <MenuList minWidth="260px" px={2} py={2}>
               <HStack mb={2} gap={2}>
                 <Button size="xs" colorScheme="teal" onClick={() => setSelectedParticipants([...PARTICIPANTS_ORDER])}>Select All</Button>
                 <Button size="xs" variant="outline" onClick={() => setSelectedParticipants([])}>Clear</Button>
               </HStack>
               <CheckboxGroup value={selectedParticipants} onChange={(v: string[]) => setSelectedParticipants(v)}>
-                <Stack pl={2} pr={2} gap={1}>
+                <Stack gap={1}>
                   {PARTICIPANTS_ORDER.map((s) => (
-                    <Checkbox key={s} value={s} py={1.5} px={2} colorScheme="purple">
-                      <Badge mr={2} fontSize="sm" colorScheme="purple" variant="outline" px={2} py={0.5}>
+                    <Checkbox key={s} value={s} py={1} px={2} colorScheme="purple">
+                      <Badge mr={2} fontSize="sm" colorScheme="purple" variant="outline" px={2} py={0.5} borderRadius="md">
                         {s}
                       </Badge>
                     </Checkbox>
@@ -643,7 +633,31 @@ export default function CategorySubcategoryChart() {
             </MenuList>
           </Menu>
         </Flex>
-        <Box minH="350px">
+        <Box
+          bg={useColorModeValue("blue.50", "gray.700")}
+          p={3}
+          borderRadius="md"
+          mb={3}
+          textAlign="center"
+        >
+          <Text fontSize="md" fontWeight="bold">
+            Chart total ({selectedMonthYear ? formatMonthLabel(selectedMonthYear) : "—"}):{" "}
+            <Text as="span" color={accentColor} ml={1}>
+              {hasDataForMonth ? chartTotal : "—"}
+            </Text>
+          </Text>
+          <Text fontSize="xs" color="gray.500" mt={1}>
+            Chart, table, and CSV use the same open PR set.
+          </Text>
+        </Box>
+        <Box
+          minH="380px"
+          borderRadius="lg"
+          borderWidth="1px"
+          borderColor={useColorModeValue("gray.200", "gray.700")}
+          p={2}
+          position="relative"
+        >
           {loading ? (
             <Text color={accentColor} fontWeight="bold" my={10} fontSize="xl">
               Loading...
@@ -657,14 +671,37 @@ export default function CategorySubcategoryChart() {
               No open PRs for {formatMonthLabel(selectedMonthYear)}. Try another month.
             </Text>
           ) : (
-            <ReactECharts
-              style={{ height: "400px", width: "100%" }}
-              option={option}
-              notMerge
-              lazyUpdate
-              theme={cardBg === "white" ? "light" : "dark"}
-            />
+            <>
+              <ReactECharts
+                style={{ height: "440px", width: "100%" }}
+                option={option}
+                notMerge
+                lazyUpdate
+                theme={cardBg === "white" ? "light" : "dark"}
+              />
+              <Text
+                position="absolute"
+                top="50%"
+                left="50%"
+                transform="translate(-50%, -50%)"
+                fontSize="3xl"
+                fontWeight="700"
+                letterSpacing="0.05em"
+                color={useColorModeValue("gray.400", "gray.500")}
+                opacity={0.45}
+                pointerEvents="none"
+                userSelect="none"
+                whiteSpace="nowrap"
+                textShadow="0 1px 2px rgba(255,255,255,0.5)"
+                _dark={{ textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}
+              >
+                EIPsInsight.com
+              </Text>
+            </>
           )}
+        </Box>
+        <Box mt={3}>
+          <DateTime />
         </Box>
 
         {/* Open PRs table — show/hide toggle, then clean table (only badges colorful) */}
@@ -698,21 +735,12 @@ export default function CategorySubcategoryChart() {
                   >
                     {selectedMonthYear ? formatMonthLabel(selectedMonthYear) : "Month"}
                   </MenuButton>
-                  <MenuList maxH="300px" overflowY="auto" minWidth="140px">
-                    <Stack>
-                      {months.slice().reverse().map((m) => (
-                        <Button
-                          key={m}
-                          variant="ghost"
-                          size="sm"
-                          justifyContent="flex-start"
-                          colorScheme={selectedMonthYear === m ? "gray" : undefined}
-                          onClick={() => setSelectedMonthYear(m)}
-                        >
-                          {formatMonthLabel(m)}
-                        </Button>
-                      ))}
-                    </Stack>
+                  <MenuList maxH="280px" overflowY="auto">
+                    {months.slice().reverse().map((m) => (
+                      <MenuItem key={m} onClick={() => setSelectedMonthYear(m)}>
+                        {formatMonthLabel(m)}
+                      </MenuItem>
+                    ))}
                   </MenuList>
                 </Menu>
               </Flex>
@@ -776,7 +804,7 @@ export default function CategorySubcategoryChart() {
                         const sr = (tablePage - 1) * TABLE_PAGE_SIZE + idx + 1;
                         const processColor = processBadgeColor(row.Process);
                         const partColor = participantsBadgeColor(row.Participants);
-                        const viewPrsUrl = `/eipboards?month=${selectedMonthYear}&process=${encodeURIComponent(row.Process)}&participants=${encodeURIComponent(row.Participants)}`;
+                        const viewPrsUrl = `/boardsnew?month=${selectedMonthYear}&process=${encodeURIComponent(row.Process)}&participants=${encodeURIComponent(row.Participants)}`;
                         return (
                           <Tr key={`${row.Process}-${row.Participants}-${sr}`} _hover={{ bg: tableRowHoverBg }}>
                             <Td fontWeight="semibold" color={tableMutedColor}>
