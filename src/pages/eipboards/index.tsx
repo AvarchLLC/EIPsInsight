@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { useRouter } from "next/router";
 import {
   Box,
   Heading,
@@ -34,6 +35,7 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import AllLayout from "@/components/Layout";
+import AnimatedHeader from "@/components/AnimatedHeader";
 import { ExternalLinkIcon, SearchIcon, DownloadIcon, ChevronLeftIcon, ChevronRightIcon, CopyIcon } from "@chakra-ui/icons";
 import { BiGitPullRequest } from "react-icons/bi";
 import { format } from "date-fns";
@@ -141,7 +143,17 @@ function formatWaitTime(days: number | null): string {
   return `${days}d`;
 }
 
+const VALID_PROCESS = new Set(PROCESS_ORDER);
+const VALID_PARTICIPANTS = new Set([
+  "Waiting on Editor",
+  "Waiting on Author",
+  "Stagnant",
+  "Awaited",
+  "Misc",
+]);
+
 export default function EipBoardsPage() {
+  const router = useRouter();
   const [rows, setRows] = useState<DetailsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -153,9 +165,52 @@ export default function EipBoardsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const skipNextUrlUpdate = useRef(false);
 
   const toast = useToast();
   const repoKey = activeTab;
+
+  // Read ?month= &process= &participants= from URL (e.g. from Analytics / Graph 3 "View PRs" link)
+  useEffect(() => {
+    if (!router.isReady) return;
+    const q = router.query as Record<string, string | string[] | undefined>;
+    const month = typeof q.month === "string" ? q.month.trim() : "";
+    const processParam = typeof q.process === "string" ? q.process : Array.isArray(q.process) ? q.process[0] : "";
+    const participantsParam = typeof q.participants === "string" ? q.participants : Array.isArray(q.participants) ? q.participants[0] : "";
+    if (month && /^\d{4}-\d{2}$/.test(month)) {
+      setSelectedMonth(month);
+    }
+    if (participantsParam) {
+      const decoded = decodeURIComponent(participantsParam);
+      if (VALID_PARTICIPANTS.has(decoded)) setSelectedSubcategory(decoded);
+    }
+    if (processParam) {
+      const processes = processParam.split(",").map((p) => normalizeProcess(decodeURIComponent(p.trim())));
+      const valid = processes.filter((p) => VALID_PROCESS.has(p));
+      if (valid.length > 0) setSelectedCategories(valid);
+    }
+    skipNextUrlUpdate.current = true;
+  }, [router.isReady, router.query.month, router.query.process, router.query.participants]);
+
+  // Keep URL in sync with filters so link is shareable
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (skipNextUrlUpdate.current) {
+      skipNextUrlUpdate.current = false;
+      return;
+    }
+    const params = new URLSearchParams();
+    params.set("month", selectedMonth);
+    if (selectedSubcategory) params.set("participants", selectedSubcategory);
+    if (selectedCategories.length > 0 && selectedCategories.length < PROCESS_ORDER.length) {
+      params.set("process", selectedCategories.map((p) => encodeURIComponent(p)).join(","));
+    }
+    const queryString = params.toString();
+    const newUrl = queryString ? `/eipboards?${queryString}` : "/eipboards";
+    if (router.asPath !== newUrl) {
+      router.replace(newUrl, undefined, { shallow: true });
+    }
+  }, [selectedMonth, selectedSubcategory, selectedCategories, router.isReady]);
 
   const cardBg = useColorModeValue("white", "gray.800");
   const headerBg = useColorModeValue("gray.50", "gray.700");
@@ -358,15 +413,29 @@ export default function EipBoardsPage() {
     <AllLayout>
       <Box p={{ base: 4, md: 8 }} maxW="1600px" mx="auto">
         <VStack align="stretch" spacing={6}>
-          {/* Header */}
-          <Box>
-            <Heading size="xl" color={accent} fontWeight="700" letterSpacing="-0.02em">
-              EIP / ERC / RIP Board
-            </Heading>
-            <Text mt={2} fontSize="lg" color={mutedColor} lineHeight="tall">
-              Open pull requests by type and status for the selected month. Filter by repo, process type, and participant status.
-            </Text>
-          </Box>
+          {/* Animated Header with FAQ */}
+          <AnimatedHeader
+            title="EIP/ERC/RIP Board"
+            description="View and manage all open pull requests awaiting editor review across EIPs and ERCs. Filter by labels, search by title or PR number, and download detailed reports."
+            faqItems={[
+              {
+                question: "What is the EIP Board?",
+                answer: "The table below lists all Open Pull Requests (till date) that are awaiting editor review. It provides a comprehensive overview of pending proposals and their current status."
+              },
+              {
+                question: "How do label filters work?",
+                answer: "You can filter table data using label filters to focus on specific types of PRs. The same filters will apply to the downloaded reports, ensuring consistency in your analysis."
+              },
+              {
+                question: "📊 How is prioritization determined?",
+                answer: "PRs with the 's-withdrawn' label are given the lowest priority and moved to the bottom of the table."
+              },
+              {
+                question: "👥 Who would use this tool?",
+                answer: "This tool is created to support EIP/ERC Editors to identify the longest waiting PRs for Editor's review. These PRs can also be discussed in EIP Editing Office Hour and EIPIP Meetings in case it requires attention of more than one editor/reviewer. Note: This tool is based on a fork from gaudren/eip-board."
+              }
+            ]}
+          />
 
           {/* Repo + Month + Participants + Search */}
           <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} shadow="sm" borderRadius="xl" overflow="hidden">
