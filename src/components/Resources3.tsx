@@ -403,11 +403,25 @@ const ResourcesPage: React.FC = () => {
       tag: "Ethereum Governance"
     },
     {
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/ethereum-hegta-headlner-race.png",
+      title: "Glamsterdam: ACDE #230 — Execution readiness, Devnet stress & networking cautions",
+      content: "ACDE #230 prioritized execution-layer readiness, disciplined scoping, and empirical benchmarking as Glamsterdam preparation moved into stress testing.",
+      link: "Blogs/glamsterdam-acdc-230-summary",
+      tag: "Ethereum Upgrades"
+    },
+    {
       image: "https://github.com/user-attachments/assets/aec9e416-7f4d-4d16-8d86-50fd3567f881",
       title: "Top 10 EIPs That Defined Ethereum in 2025",
       content: "In 2025, Ethereum stopped rebuilding itself and started refining itself. Across Pectra and Fusaka upgrades, Ethereum shifted from heavy architectural work toward removing friction for users, developers, and operators through targeted improvements.",
       link: "Blogs/top-ten-eips-2025",
       tag: "Ethereum"
+    },
+    {
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/after-devnet.png",
+      title: "Hegotá Headliners: Encrypted Mempools, LUCID, SSZ Execution Blocks & Frame Transactions",
+      content: "ACDE #230 closed the execution headliner window for Hegotá. Four contenders — Frame Transactions, SSZ Execution Blocks, Universal Enshrined Encrypted Mempool, and LUCID — each propose different trade-offs for transaction visibility and ordering.",
+      link: "Blogs/hegota-headliners-encrypted-mempools-lucid-ssz-frame-transactions",
+      tag: "Hegotá"
     },
     {
       image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/tentative-scoping.png",
