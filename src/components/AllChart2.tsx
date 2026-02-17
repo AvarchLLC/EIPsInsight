@@ -71,18 +71,28 @@ const getStatus = (status: string) => {
   }
 };
 
-// Data shape from /api/new/final-status-by-year
-interface FinalStatusChange {
+// Data shape from /api/new/all
+interface EIP {
+  _id: string;
   eip: string;
-  lastStatus: string;
-  eipTitle: string;
-  eipCategory: string;
+  title?: string;
+  author?: string;
+  status?: string;
+  type?: string;
+  category?: string;
+  created?: string;
+  discussion?: string;
+  deadline?: string;
+  requires?: string;
+  repo?: "eip" | "erc" | "rip";
+  unique_ID?: number;
+  __v?: number;
 }
 
-interface FinalStatusYearBucket {
-  year: number;
-  statusChanges: FinalStatusChange[];
-  repo: "eip" | "erc" | "rip";
+interface APIResponse {
+  eip: EIP[];
+  erc: EIP[];
+  rip: EIP[];
 }
 
 // Enhanced color palette - vibrant and distinct
@@ -117,11 +127,7 @@ const fallbackColors: string[] = [
   "rgb(249, 115, 22)", // Orange 500
 ];
 
-interface APIResponse {
-  eip: FinalStatusYearBucket[];
-  erc: FinalStatusYearBucket[];
-  rip: FinalStatusYearBucket[];
-}
+ 
 
 interface ChartProps {
   type: string;
@@ -138,7 +144,7 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/new/final-status-by-year");
+        const response = await fetch("/api/new/all");
         const jsonData: APIResponse = await response.json();
         setData(jsonData);
         setIsLoading(false);
@@ -158,114 +164,71 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
   }
 
   interface TransformedData2 {
-    category: string;
+    status: string;
     year: number;
     value: number;
   }
 
-  // Use final-status-by-year data (aggregated by changeDate/year) instead of created date
-  const allBuckets: FinalStatusYearBucket[] = [
-    ...(data?.eip || []),
-    ...(data?.erc || []),
-    ...(data?.rip || []),
-  ];
+  // Use /api/new/all data: merge arrays and aggregate by created year
+  const allData: EIP[] = [...(data?.eip || []), ...(data?.erc || []), ...(data?.rip || [])];
 
-  const transformedData = allBuckets.reduce<TransformedData[]>((acc, bucket) => {
-    const year = bucket.year;
+  const transformedData = allData.reduce<TransformedData[]>((acc, item) => {
+    const year = item.created ? new Date(item.created).getFullYear() : new Date().getFullYear();
+    const baseCategory = item.repo === "rip" ? "RIPs" : getCat(item.category || "");
 
-    bucket.statusChanges.forEach((sc) => {
-      const baseCategory =
-        bucket.repo === "rip" ? "RIPs" : getCat(sc.eipCategory || "");
-
-      const existingEntry = acc.find(
-        (entry) => entry.year === year && entry.category === baseCategory
-      );
-
-      if (existingEntry) {
-        existingEntry.value += 1;
-      } else {
-        acc.push({
-          category: baseCategory,
-          year,
-          value: 1,
-        });
-      }
-    });
-
+    const existingEntry = acc.find((entry) => entry.year === year && entry.category === baseCategory);
+    if (existingEntry) existingEntry.value += 1;
+    else acc.push({ category: baseCategory, year, value: 1 });
     return acc;
   }, []);
 
-  const transformedData2 = allBuckets.reduce<TransformedData[]>((acc, bucket) => {
-    const year = bucket.year;
+  const transformedData2 = allData.reduce<TransformedData2[]>((acc, item) => {
+    const year = item.created ? new Date(item.created).getFullYear() : new Date().getFullYear();
+    const status = getStatus(item.status || "");
 
-    bucket.statusChanges.forEach((sc) => {
-      const status = getStatus(sc.lastStatus);
-
-      const existingEntry = acc.find(
-        (entry) => entry.year === year && entry.category === status
-      );
-
-      if (existingEntry) {
-        existingEntry.value += 1;
-      } else {
-        acc.push({
-          category: status,
-          year,
-          value: 1,
-        });
-      }
-    });
-
+    const existingEntry = acc.find((entry) => entry.year === year && entry.status === status);
+    if (existingEntry) existingEntry.value += 1;
+    else acc.push({ status, year, value: 1 } as any);
     return acc;
   }, []);
 
-  // Prepare CSV data whenever API data changes (raw status-change rows)
+  // Prepare CSV data from /api/new/all (one row per current EIP entry)
   React.useEffect(() => {
     const rows: any[] = [];
     let srNumber = 1;
 
-    // Sort all buckets by year, then by repo, then by EIP number
-    const sortedBuckets = [...allBuckets].sort((a, b) => {
-      if (a.year !== b.year) return a.year - b.year;
+    const merged = [...allData].sort((a, b) => {
+      const aYear = a.created ? new Date(a.created).getFullYear() : 0;
+      const bYear = b.created ? new Date(b.created).getFullYear() : 0;
+      if (aYear !== bYear) return aYear - bYear;
       const repoOrder = { eip: 1, erc: 2, rip: 3 };
-      if (repoOrder[a.repo] !== repoOrder[b.repo]) {
-        return (repoOrder[a.repo] || 99) - (repoOrder[b.repo] || 99);
-      }
-      // Sort by EIP number within same year and repo
-      const aEipNum = parseInt(a.statusChanges[0]?.eip.replace("EIP-", "") || "0");
-      const bEipNum = parseInt(b.statusChanges[0]?.eip.replace("EIP-", "") || "0");
-      return aEipNum - bEipNum;
+      const ra = repoOrder[a.repo || "eip"] || 99;
+      const rb = repoOrder[b.repo || "eip"] || 99;
+      if (ra !== rb) return ra - rb;
+      const aNum = parseInt((a.eip || "").replace("EIP-", "") || "0");
+      const bNum = parseInt((b.eip || "").replace("EIP-", "") || "0");
+      return aNum - bNum;
     });
 
-    sortedBuckets.forEach((bucket) => {
-      const year = bucket.year;
-      const repo = bucket.repo;
+    merged.forEach((item) => {
+      const year = item.created ? new Date(item.created).getFullYear() : "";
+      const repo = item.repo || "eip";
+      const eipNumber = (item.eip || "").replace("EIP-", "");
+      const normalizedCategory = repo === "rip" ? "RIPs" : getCat(item.category || "");
+      const normalizedStatus = getStatus(item.status || "");
 
-      // Sort statusChanges by EIP number
-      const sortedStatusChanges = [...bucket.statusChanges].sort((a, b) => {
-        const aNum = parseInt(a.eip.replace("EIP-", "") || "0");
-        const bNum = parseInt(b.eip.replace("EIP-", "") || "0");
-        return aNum - bNum;
-      });
-
-      sortedStatusChanges.forEach((sc) => {
-        const eipNumber = sc.eip.replace("EIP-", "");
-        const normalizedCategory = bucket.repo === "rip" ? "RIPs" : getCat(sc.eipCategory || "");
-        const normalizedStatus = getStatus(sc.lastStatus);
-
-        rows.push({
-          "SR No.": srNumber++,
-          Year: year,
-          Repo: repo.toUpperCase(),
-          EIP: sc.eip,
-          "EIP Number": eipNumber,
-          Title: sc.eipTitle || "N/A",
-          Category: normalizedCategory,
-          "Original Category": sc.eipCategory || "N/A",
-          "Final Status": normalizedStatus,
-          "Original Status": sc.lastStatus,
-          "EIP Link": `https://eipsinsight.com/eips/eip-${eipNumber}`,
-        });
+      rows.push({
+        "SR No.": srNumber++,
+        Year: year,
+        Repo: repo.toUpperCase(),
+        EIP: item.eip,
+        "EIP Number": eipNumber,
+        Title: item.title || "N/A",
+        Category: normalizedCategory,
+        "Original Category": item.category || "N/A",
+        "Final Status": normalizedStatus,
+        "Original Status": item.status || "N/A",
+        "EIP Link": `https://eipsinsight.com/eips/eip-${eipNumber}`,
       });
     });
 
@@ -294,12 +257,21 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
   }, {} as Record<number, number>);
 
   // Generate dynamic color function
-  const getColorForCategory = (category: string, index: number) => {
-    return categoryColors[category] || fallbackColors[index % fallbackColors.length];
+  const getColorForCategory = (key: string, index: number) => {
+    return categoryColors[key] || fallbackColors[index % fallbackColors.length];
   };
 
-  // Get unique categories/statuses for color mapping
-  const uniqueCategories = Array.from(new Set(transformedData3.map(d => d.category)));
+  // series field depends on chart mode
+  const seriesField = chart === "status" ? "status" : "category";
+
+  // Get unique keys for color mapping based on seriesField
+  const uniqueCategories = Array.from(
+    new Set(
+      transformedData3.map((d: any) =>
+        seriesField === "status" ? (d as any).status : (d as any).category
+      )
+    )
+  );
   const colorMap = uniqueCategories.map((cat, idx) => getColorForCategory(cat, idx));
 
   // Get color mode values for tooltip and chart
@@ -391,11 +363,11 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
       },
     },
     color: (datum: any) => {
-      const category = datum.category;
-      const index = uniqueCategories.indexOf(category);
-      return getColorForCategory(category, index);
+      const key = datum[seriesField];
+      const index = uniqueCategories.indexOf(key);
+      return getColorForCategory(key, index);
     },
-    seriesField: "category",
+    seriesField: seriesField,
     isStack: true,
     columnStyle: {
       radius: [4, 4, 0, 0],
