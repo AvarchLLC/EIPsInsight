@@ -170,92 +170,91 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     ...(data?.rip || []),
   ];
 
-  // To avoid double-counting the same EIP multiple times within the same year,
-  // deduplicate by (year, eip). This ensures totals match unique EIP counts shown elsewhere.
-  const seenYearEip = new Set<string>();
-  const transformedData = [] as TransformedData[];
-  const transformedData2 = [] as TransformedData2[];
-
-  allBuckets.forEach((bucket) => {
+  const transformedData = allBuckets.reduce<TransformedData[]>((acc, bucket) => {
     const year = bucket.year;
-    bucket.statusChanges.forEach((sc) => {
-      const yearEipKey = `${year}|${sc.eip}`;
-      if (seenYearEip.has(yearEipKey)) return; // skip duplicate status changes for same EIP in same year
-      seenYearEip.add(yearEipKey);
 
+    bucket.statusChanges.forEach((sc) => {
       const baseCategory =
         bucket.repo === "rip" ? "RIPs" : getCat(sc.eipCategory || "");
 
-      const catEntry = transformedData.find(
+      const existingEntry = acc.find(
         (entry) => entry.year === year && entry.category === baseCategory
       );
-      if (catEntry) {
-        catEntry.value += 1;
+
+      if (existingEntry) {
+        existingEntry.value += 1;
       } else {
-        transformedData.push({
+        acc.push({
           category: baseCategory,
           year,
           value: 1,
         });
       }
+    });
 
+    return acc;
+  }, []);
+
+  const transformedData2 = allBuckets.reduce<TransformedData[]>((acc, bucket) => {
+    const year = bucket.year;
+
+    bucket.statusChanges.forEach((sc) => {
       const status = getStatus(sc.lastStatus);
-      // normalize status into the same shape as transformedData (use category field)
-      const statusCategory = status;
-      const statusEntry = transformedData2.find(
-        (entry) => entry.year === year && entry.category === statusCategory
+
+      const existingEntry = acc.find(
+        (entry) => entry.year === year && entry.category === status
       );
-      if (statusEntry) {
-        statusEntry.value += 1;
+
+      if (existingEntry) {
+        existingEntry.value += 1;
       } else {
-        transformedData2.push({
-          category: statusCategory,
+        acc.push({
+          category: status,
           year,
           value: 1,
-        } as any);
+        });
       }
     });
-  });
 
-  // Prepare CSV data whenever API data changes
+    return acc;
+  }, []);
+
+  // Prepare CSV data whenever API data changes (raw status-change rows)
   React.useEffect(() => {
-    // Build a map of unique EIPs -> choose the most recent year entry for that EIP
-    const eipMap: Record<
-      string,
-      { year: number; repo: string; sc: FinalStatusChange }
-    > = {};
+    const rows: any[] = [];
+    let srNumber = 1;
 
-    const repoOrder: Record<string, number> = { eip: 1, erc: 2, rip: 3 };
-
-    allBuckets.forEach((bucket) => {
-      const year = bucket.year;
-      const repo = bucket.repo;
-      bucket.statusChanges.forEach((sc) => {
-        const key = sc.eip;
-        const existing = eipMap[key];
-        if (!existing) {
-          eipMap[key] = { year, repo, sc };
-        } else {
-          // prefer the entry with later year; if same year prefer repo order (eip > erc > rip)
-          if (
-            year > existing.year ||
-            (year === existing.year &&
-              (repoOrder[repo] || 99) < (repoOrder[existing.repo] || 99))
-          ) {
-            eipMap[key] = { year, repo, sc };
-          }
-        }
-      });
+    // Sort all buckets by year, then by repo, then by EIP number
+    const sortedBuckets = [...allBuckets].sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      const repoOrder = { eip: 1, erc: 2, rip: 3 };
+      if (repoOrder[a.repo] !== repoOrder[b.repo]) {
+        return (repoOrder[a.repo] || 99) - (repoOrder[b.repo] || 99);
+      }
+      // Sort by EIP number within same year and repo
+      const aEipNum = parseInt(a.statusChanges[0]?.eip.replace("EIP-", "") || "0");
+      const bEipNum = parseInt(b.statusChanges[0]?.eip.replace("EIP-", "") || "0");
+      return aEipNum - bEipNum;
     });
 
-    // Convert map to rows and sort by year, repo, eip number
-    const rows = Object.values(eipMap)
-      .map(({ year, repo, sc }, idx) => {
+    sortedBuckets.forEach((bucket) => {
+      const year = bucket.year;
+      const repo = bucket.repo;
+
+      // Sort statusChanges by EIP number
+      const sortedStatusChanges = [...bucket.statusChanges].sort((a, b) => {
+        const aNum = parseInt(a.eip.replace("EIP-", "") || "0");
+        const bNum = parseInt(b.eip.replace("EIP-", "") || "0");
+        return aNum - bNum;
+      });
+
+      sortedStatusChanges.forEach((sc) => {
         const eipNumber = sc.eip.replace("EIP-", "");
-        const normalizedCategory = repo === "rip" ? "RIPs" : getCat(sc.eipCategory || "");
+        const normalizedCategory = bucket.repo === "rip" ? "RIPs" : getCat(sc.eipCategory || "");
         const normalizedStatus = getStatus(sc.lastStatus);
-        return {
-          "SR No.": idx + 1,
+
+        rows.push({
+          "SR No.": srNumber++,
           Year: year,
           Repo: repo.toUpperCase(),
           EIP: sc.eip,
@@ -266,17 +265,9 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
           "Final Status": normalizedStatus,
           "Original Status": sc.lastStatus,
           "EIP Link": `https://eipsinsight.com/eips/eip-${eipNumber}`,
-        };
-      })
-      .sort((a: any, b: any) => {
-        if (a.Year !== b.Year) return a.Year - b.Year;
-        const orderA = repoOrder[a.Repo.toLowerCase()] || 99;
-        const orderB = repoOrder[b.Repo.toLowerCase()] || 99;
-        if (orderA !== orderB) return orderA - orderB;
-        const aNum = parseInt(a["EIP Number"] || "0");
-        const bNum = parseInt(b["EIP Number"] || "0");
-        return aNum - bNum;
+        });
       });
+    });
 
     setCsvData(rows);
   }, [JSON.stringify(data)]);
