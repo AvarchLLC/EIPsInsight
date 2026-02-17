@@ -155,8 +155,8 @@ const Dashboard = () => {
   console.log("unique eip1:", uniqueeip);
   const uniqueeip2 = allData.filter((item) => item.status === " ");
   console.log("unique eip2:", uniqueeip2);
-  // Unique EIP count (deduplicated by EIP identifier) to keep dashboard totals consistent
-  const uniqueEipCount = new Set(allData.map((item) => item.eip)).size;
+  // Raw entry count (includes status-change rows)
+  const rawEntryCount = allData.length;
 const textColor = useColorModeValue("gray.800", "gray.200");
 const linkColor = useColorModeValue("blue.600", "blue.300");
 
@@ -990,7 +990,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                         paddingBottom={6}
                         padding={2}
                       >
-                      {`Category - [${uniqueEipCount}]`}
+                      {`Category - [${rawEntryCount}]`}
                       </Text>
                     </NextLink>
                     <DashboardDonut2 dataset={data} />
@@ -1028,7 +1028,7 @@ const linkColor = useColorModeValue("blue.600", "blue.300");
                         paddingBottom={6}
                         padding={2}
                       >
-                        {`Status - [${uniqueEipCount}]`}
+                        {`Status - [${rawEntryCount}]`}
                       </Text>
                     </NextLink>
                     <DashboardDonut dataset={data} />

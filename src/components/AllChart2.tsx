@@ -279,29 +279,19 @@ const AllChart: React.FC<ChartProps> = ({ type }) => {
     }
   );
 
+  // Total raw entries across transformed data (counts every status-change row)
   const transformedData3 = chart === "status" ? transformedData2 : transformedData;
 
-  // Total unique EIPs across all buckets (deduplicated across years)
-  const uniqueEips = new Set<string>();
-  allBuckets.forEach((bucket) => {
-    bucket.statusChanges.forEach((sc) => uniqueEips.add(sc.eip));
-  });
-  const totalCount = uniqueEips.size;
+  const totalCount = transformedData3.reduce(
+    (sum, item) => sum + (item?.value || 0),
+    0
+  );
 
-  // Calculate year totals (unique EIPs per year) for tooltip
-  const yearTotals = allBuckets.reduce((acc, bucket) => {
-    const year = bucket.year;
-    if (!acc[year]) acc[year] = new Set<string>();
-    bucket.statusChanges.forEach((sc) => {
-      acc[year].add(sc.eip);
-    });
+  // Calculate year totals (raw counts per year) for tooltip
+  const yearTotalsCount = transformedData3.reduce((acc, item) => {
+    acc[item.year] = (acc[item.year] || 0) + item.value;
     return acc;
-  }, {} as Record<number, Set<string>>);
-  // Convert sets to counts
-  const yearTotalsCount: Record<number, number> = {};
-  Object.keys(yearTotals).forEach((y) => {
-    yearTotalsCount[Number(y)] = yearTotals[Number(y)].size;
-  });
+  }, {} as Record<number, number>);
 
   // Generate dynamic color function
   const getColorForCategory = (category: string, index: number) => {
