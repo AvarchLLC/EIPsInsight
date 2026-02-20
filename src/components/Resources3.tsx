@@ -42,7 +42,7 @@ const ResourcesPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
   const [loadingBlogs, setLoadingBlogs] = useState(false);
-  
+
   const bg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.700", "gray.200");
@@ -109,56 +109,56 @@ const ResourcesPage: React.FC = () => {
     tag?: string;
   }) => (
     <Link
-        href={link}
-        _hover={{ textDecoration: "none" }}
-      >
-    <Box
-      bg={cardBg}
-      p={5}
-      borderRadius="xl"
-      boxShadow="md"
-      height="100%"
-      transition="all 0.2s ease"
-      _hover={{
-        transform: "translateY(-5px)",
-        boxShadow: "lg",
-      }}
+      href={link}
+      _hover={{ textDecoration: "none" }}
     >
-      {image && (
-        <AspectRatio ratio={16 / 9} mb={4} borderRadius="lg" overflow="hidden">
-          <Image 
-            src={image} 
-            alt={title} 
-            objectFit="cover"
-            fallbackSrc="/blog-placeholder.png"
-            onError={(e: any) => {
-              e.target.style.display = 'none';
-            }}
-          />
-        </AspectRatio>
-      )}
-      {tag && (
-        <Badge colorScheme="blue" mb={2} fontSize="xs">
-          {tag}
-        </Badge>
-      )}
-      <Heading fontSize={{ base: "lg", md: "xl" }} mb={2} noOfLines={2}>
-        {title}
-      </Heading>
-      <Text fontSize="md" color={textColor} noOfLines={3} mb={4}>
-        {content}
-      </Text>
-      <Link
-        href={link}
-        color={accentColor}
-        fontWeight="semibold"
-        isExternal={!link.startsWith("/")}
-        display="inline-flex"
-        alignItems="center"
+      <Box
+        bg={cardBg}
+        p={5}
+        borderRadius="xl"
+        boxShadow="md"
+        height="100%"
+        transition="all 0.2s ease"
+        _hover={{
+          transform: "translateY(-5px)",
+          boxShadow: "lg",
+        }}
       >
-        Read more →
-      </Link>
-    </Box>
+        {image && (
+          <AspectRatio ratio={16 / 9} mb={4} borderRadius="lg" overflow="hidden">
+            <Image
+              src={image}
+              alt={title}
+              objectFit="cover"
+              fallbackSrc="/blog-placeholder.png"
+              onError={(e: any) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </AspectRatio>
+        )}
+        {tag && (
+          <Badge colorScheme="blue" mb={2} fontSize="xs">
+            {tag}
+          </Badge>
+        )}
+        <Heading fontSize={{ base: "lg", md: "xl" }} mb={2} noOfLines={2}>
+          {title}
+        </Heading>
+        <Text fontSize="md" color={textColor} noOfLines={3} mb={4}>
+          {content}
+        </Text>
+        <Link
+          href={link}
+          color={accentColor}
+          fontWeight="semibold"
+          isExternal={!link.startsWith("/")}
+          display="inline-flex"
+          alignItems="center"
+        >
+          Read more →
+        </Link>
+      </Box>
     </Link>
   );
 
@@ -404,9 +404,9 @@ const ResourcesPage: React.FC = () => {
     },
     {
       image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/ethereum-hegta-headlner-race.png",
-      title: "Glamsterdam: ACDE #230 — Execution readiness, Devnet stress & networking cautions",
-      content: "ACDE #230 prioritized execution-layer readiness, disciplined scoping, and empirical benchmarking as Glamsterdam preparation moved into stress testing.",
-      link: "Blogs/glamsterdam-acdc-230-summary",
+      title: "After Devnet 2 Stabilizes, Ethereum Gears Up for Glamsterdam Devnet 3",
+      content: "After Devnet 2 stabilizes, Ethereum gears up for Glamsterdam Devnet 3, with a focus on execution-layer readiness and disciplined scoping.",
+      link: "Blogs/after-devnet-2-stabilizes-ethereum-gears-up-for-glamsterdam-devnet-3",
       tag: "Ethereum Upgrades"
     },
     {
@@ -418,7 +418,7 @@ const ResourcesPage: React.FC = () => {
     },
     {
       image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/after-devnet.png",
-      title: "Hegotá Headliners: Encrypted Mempools, LUCID, SSZ Execution Blocks & Frame Transactions",
+      title: "Ethereum’s Hegotá Headliner Race Narrows to Final Four",
       content: "ACDE #230 closed the execution headliner window for Hegotá. Four contenders — Frame Transactions, SSZ Execution Blocks, Universal Enshrined Encrypted Mempool, and LUCID — each propose different trade-offs for transaction visibility and ordering.",
       link: "Blogs/hegota-headliners-encrypted-mempools-lucid-ssz-frame-transactions",
       tag: "Hegotá"
@@ -473,33 +473,27 @@ const ResourcesPage: React.FC = () => {
       tag: "Technical"
     },
     {
-      image: "/EIP_blog1.png",
-      title: "EIPsInsight Newsletter Issue #[01] | [02-07-2025]",
-      content: "Bringing You the Latest in Ethereum Improvement Proposals",
-      link: "/newsletter",
-    },
-   {
       image: "/ePBS-eip-7732.jpg",
       title: "Enshrined Proposer Builder Separation (ePBS) (EIP-7732)",
       content: "Understand Ethereum’s EIP-7732 upgrade with a breakdown of what ePBS is, why it’s needed, key architectural changes, its advantages, challenges, and how it compares to PBS.",
       link: "/Blogs/ePBS-EIP-7732",
       tag: "Technical"
     },
-     {
+    {
       image: "/hiring-full-stack-developer.png",
       title: "Join EIPsInsight.com as a Full-Stack Developer (Remote)",
       content: "Join EIPsInsight.com as a remote Full-Stack Developer to build open source Ethereum tools using Next.js, TypeScript, & MongoDB.",
       link: "/Blogs/hiring-full-stack-developer",
       tag: "Hiring"
     },
-      {
+    {
       image: "/Gas Limit Cap.jpg",
       title: "Importance of Transaction Gas Limit Cap (EIP-7825)",
       content: "EIP-7825 enforces a 30 million gas cap per transaction to thwart DoS attacks, curb state bloat, & bring predictable fees and node performance.",
       link: "/Blogs/gas-limit-cap-eip-7825",
       tag: "Technical"
     },
-      {
+    {
       image: "/Importance of Block Size Limit (EIP-7934).jpg",
       title: "Importance of Block Size Limit (EIP-7934)",
       content: "Learn how EIP 7934’s 10 MiB RLP block size cap enhances Ethereum’s stability & security by preventing invisible forks, resource exhaustion, & denial of service attacks.",
