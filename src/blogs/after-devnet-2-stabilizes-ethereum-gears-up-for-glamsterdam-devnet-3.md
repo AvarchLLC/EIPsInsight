@@ -1,6 +1,6 @@
 ---
-title: "Glamsterdam: ACDE #230 — Execution readiness, Devnet stress & networking cautions"
-slug: "glamsterdam-acdc-230-summary"
+title: "After Devnet 2 Stabilizes, Ethereum Gears Up for Glamsterdam Devnet 3"
+slug: "after-devnet-2-stabilizes-ethereum-gears-up-for-glamsterdam-devnet-3"
 date: 2026-02-13
 author: "Avarch Team"
 category: "Ethereum Upgrades"
@@ -8,7 +8,7 @@ tags: ["Glamsterdam", "BAL Devnet", "eth/70", "EIP-8024", "Benchmarking", "Netwo
 readTime: 5
 featured: false
 excerpt: "ACDE #230 prioritized execution-layer readiness, disciplined scoping, and empirical benchmarking as Glamsterdam preparation moves into stress testing."
-image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/ethereum-hegta-headlner-race.png"
+image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/after-devnet.png"
 authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
 authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
 authorTwitter: "https://x.com/YashKamalChatu1"

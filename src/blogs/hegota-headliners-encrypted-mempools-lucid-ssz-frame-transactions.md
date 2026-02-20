@@ -1,5 +1,5 @@
 ---
-title: "Hegotá Headliners: Encrypted Mempools, LUCID, SSZ Execution Blocks & Frame Transactions"
+title: "Ethereum’s Hegotá Headliner Race Narrows to Final Four"
 slug: "hegota-headliners-encrypted-mempools-lucid-ssz-frame-transactions"
 date: 2026-02-13
 author: "Avarch Team"
@@ -8,7 +8,7 @@ tags: ["Hegotá", "Encrypted Mempool", "LUCID", "SSZ", "Frame Transactions", "ME
 readTime: 7
 featured: false
 excerpt: "ACDE #230 closed the execution headliner window for Hegotá. Four contenders — Frame Transactions, SSZ Execution Blocks, Universal Enshrined Encrypted Mempool, and LUCID — each propose different trade-offs for transaction visibility and ordering."
-image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/after-devnet.png"
+image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/hegota-final-four.png"
 authorAvatar: "https://etherworld.co/content/images/size/w300/2022/05/IMG.jpg"
 authorBio: "Blockchain Content & Ops Specialist, Avarch LLC"
 authorTwitter: "https://x.com/YashKamalChatu1"
