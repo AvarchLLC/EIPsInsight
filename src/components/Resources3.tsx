@@ -442,7 +442,28 @@ const ResourcesPage: React.FC = () => {
       title: "Why Ethereum Core Developers Removed FOCIL from the Glamsterdam Upgrade",
       content: "Ethereum core developers confirmed that FOCIL will not ship in the Glamsterdam upgrade, not due to technical failure but because of Ethereum's evolving governance model, prioritizing process discipline and predictable upgrade cycles.",
       link: "Blogs/why-ethereum-core-devs-removed-focil-from-glamsterdam-upgrade",
+    },
+    {
+      image: "/blog-placeholder.png",
+      title: "Glamsterdam Moves Closer to ePBS Devnet Zero as Client Teams Align",
+      content: "The Glamsterdam upgrade is progressing with focus on ePBS Devnet Zero, as client teams report steady alignment and readiness.",
+      link: "Blogs/glamsterdam-moves-closer-to-epbs-devnet-zero-as-client-teams-align",
       tag: "Ethereum Upgrades"
+    },
+    {
+      image: "/blog-placeholder.png",
+      title: "Hegotá Locks in FOCIL as Consensus Layer Headliner",
+      content: "Consensus layer teams have locked in FOCIL as the headliner for Hegotá, highlighting its importance for censorship resistance.",
+      link: "Blogs/hegota-locks-in-focil-as-consensus-layer-headliner",
+      tag: "Ethereum Upgrades"
+    },
+    {
+      image: "/Nody2.png",
+      title: "EIP Proposal Builder and Validation Issues with Legacy EIPs",
+      content: "The Proposal Builder simulates EIPW Lint to let authors import drafts and validate them against the latest linting rules before submission.",
+      link: "Blogs/eip-proposal-builder-validation-legacy",
+      tag: "Technical"
+
     },
     {
       image: "/Nody2.png",
