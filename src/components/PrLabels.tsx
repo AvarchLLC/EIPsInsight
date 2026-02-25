@@ -99,7 +99,7 @@ const PROCESS_LABELS: LabelSpec[] = [
   { value: "EIP-1", label: "EIP-1", color: "#8b5cf6" },             // violet → special / foundational
   { value: "Tooling", label: "Tooling", color: "#14b8a6" },         // teal → engineering / infra feel
   { value: "Status Change", label: "Status Change", color: "#f97316" }, // orange → action / transition
-  { value: "Other", label: "Other", color: "#64748b" },             // muted slate → miscellaneous
+  { value: "Content Edit", label: "Content Edit", color: "#64748b" },             // muted slate → miscellaneous
 ];
 
 // Graph 2: Participants (subcategory); Awaited = draft PRs when Process is PR DRAFT and not stagnant; empty/unknown → Misc
@@ -146,7 +146,7 @@ function labelsToProcess(labelsStr: string, repo: string, isPrDraft?: boolean): 
   if (labels.some((l) => /website|r-website/i.test(l))) return "Website";
   if (labels.some((l) => /eip-?1|EIP-?1/i.test(l))) return "EIP-1";
   if (labels.some((l) => /tooling|r-ci|r-process/i.test(l))) return "Tooling";
-  return "Other";
+  return "Content Edit";
 }
 // Graph 2 Participants: match backend deriveSubcategory (boards) so chart fallback and CSV derivation align
 function labelsToParticipants(labelsStr: string, _process: string, isPrDraft?: boolean): string {
@@ -173,8 +173,8 @@ function normalizeProcessTypeFromApi(type: string): string {
   if (/^EIP-?1$/i.test(t)) return "EIP-1";
   if (t === "Tooling") return "Tooling";
   if (/^Status\s*Change$/i.test(t)) return "Status Change";
-  if (t === "Other") return "Other";
-  return t || "Other";
+  if (t === "Other") return "Content Edit";
+  return t || "Content Edit";
 }
 
 /** Normalize Graph 2b API type (subcategory) to display: e.g. "AWAITED" → "Awaited". Chart doc type = subcategory name. */

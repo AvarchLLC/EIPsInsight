@@ -44,7 +44,7 @@ const REPOS = [
 ];
 
 // Graph 3: Process × Participants. type = "Process|Participants". Sum per month = Graph 1 Open.
-const PROCESS_ORDER = ["PR DRAFT", "Typo", "NEW EIP", "Website", "EIP-1", "Tooling", "Status Change", "Other"];
+const PROCESS_ORDER = ["PR DRAFT", "Typo", "NEW EIP", "Website", "EIP-1", "Tooling", "Status Change", "Content Edit"];
 const PARTICIPANTS_ORDER = ["Waiting on Editor", "Waiting on Author", "Stagnant", "Awaited", "Misc"];
 const PARTICIPANTS_COLORS: Record<string, string> = {
   "Waiting on Editor": "#6366f1",
@@ -61,7 +61,7 @@ const PROCESS_COLORS: Record<string, string> = {
   "EIP-1": "#ec4899",
   Tooling: "#14b8a6",
   "Status Change": "#ef4444",
-  Other: "#64748b",
+  "Content Edit": "#64748b",
 };
 
 /** Normalize API category to Graph 2 Process values */
@@ -74,8 +74,8 @@ function normalizeCategoryToPrLabels(cat: string): string {
   if (/^EIP-?1$/i.test(c)) return "EIP-1";
   if (/^Tooling$/i.test(c)) return "Tooling";
   if (/^Status\s*Change$/i.test(c)) return "Status Change";
-  if (/^Other$/i.test(c)) return "Other";
-  return "Other";
+  if (/^Other$/i.test(c)) return "Content Edit";
+  return "Content Edit";
 }
 
 /** Normalize API subcategory to Participants. Doc: AWAITED, Waiting on Editor, Waiting on Author, Stagnant, Misc. Graph 2 may store "Editor Review" from e-review label. */
