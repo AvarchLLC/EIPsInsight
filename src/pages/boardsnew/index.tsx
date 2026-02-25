@@ -69,8 +69,8 @@ function normalizeProcess(p: string | undefined): string {
   if (/^EIP-?1$/i.test(t)) return "EIP-1";
   if (t === "Tooling") return "Tooling";
   if (/^Status\s*Change$/i.test(t)) return "Status Change";
-  if (t === "Other") return "Other";
-  return t || "Other";
+  if (t === "Other") return "Content Edit";
+  return t || "Content Edit";
 }
 
 function normalizeParticipants(s: string | undefined): string {
@@ -84,15 +84,16 @@ function normalizeParticipants(s: string | undefined): string {
   return t || "Misc";
 }
 
-const PROCESS_ORDER = ["PR DRAFT", "Typo", "NEW EIP", "Website", "EIP-1", "Tooling", "Status Change", "Other"];
+const PROCESS_ORDER = ["PR DRAFT", "Typo", "NEW EIP", "Status Change", "Website", "Tooling", "EIP-1", "Content Edit", "Other"];
 const PROCESS_COLORS: Record<string, string> = {
   "PR DRAFT": "purple",
   Typo: "green",
   "NEW EIP": "orange",
-  Website: "cyan",
-  "EIP-1": "pink",
-  Tooling: "teal",
   "Status Change": "red",
+  Website: "cyan",
+  Tooling: "teal",
+  "EIP-1": "pink",
+  "Content Edit": "yellow",
   Other: "gray",
 };
 const PARTICIPANT_COLORS: Record<string, string> = {
