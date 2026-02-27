@@ -424,6 +424,13 @@ const ResourcesPage: React.FC = () => {
       tag: "Hegotá"
     },
     {
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/hegota-execution-layer-headliner.png",
+      title: "Hegotá Execution Layer Headliner Decision Remains Open",
+      content: "ACDE #231 left Hegotá’s execution layer headliner undecided, with Frame Transactions, LUCID, and the option of no EL headliner all still under active discussion.",
+      link: "Blogs/hegota-execution-layer-headliner-decision-remains-open",
+      tag: "Hegotá"
+    },
+    {
       image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/tentative-scoping.png",
       title: "Tentative Scoping Timeline for Ethereum's Heka/Bogotá Upgrade",
       content: "Ethereum core developers introduce a tentative scoping timeline for the Heka/Bogotá upgrade via EIP-8081, outlining how headliners will be selected, when proposals will be evaluated, and how upgrade decisions will be finalized.",
