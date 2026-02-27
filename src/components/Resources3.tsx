@@ -431,6 +431,13 @@ const ResourcesPage: React.FC = () => {
       tag: "Hegotá"
     },
     {
+      image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/glamsterdam-devnet-3.png",
+      title: "Glamsterdam Devnet 3 Gears Up for Launch",
+      content: "ACDE #231 confirmed that Glamsterdam's execution layer work is entering a focused testing phase, with Devnet 3 scoped tightly around stability, client coordination, and realistic performance validation.",
+      link: "Blogs/glamsterdam-devnet-3-gears-up-for-launch",
+      tag: "Ethereum Upgrades"
+    },
+    {
       image: "https://raw.githubusercontent.com/AvarchLLC/EIPsInsight/refs/heads/main/public/blogs/tentative-scoping.png",
       title: "Tentative Scoping Timeline for Ethereum's Heka/Bogotá Upgrade",
       content: "Ethereum core developers introduce a tentative scoping timeline for the Heka/Bogotá upgrade via EIP-8081, outlining how headliners will be selected, when proposals will be evaluated, and how upgrade decisions will be finalized.",

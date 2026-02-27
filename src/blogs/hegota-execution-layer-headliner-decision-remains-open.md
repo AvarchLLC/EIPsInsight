@@ -59,4 +59,4 @@ For now, the fork remains open ended, and the direction Ethereum chooses will si
 
 ---
 
-Published Feb 20, 2026
+Published Feb 27, 2026
