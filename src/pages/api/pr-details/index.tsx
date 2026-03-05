@@ -92,6 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return !label || labels.includes(label);
         }).map((pr) => {
           const labels = labelType === "customLabels" ? pr.customLabels ?? [] : pr.githubLabels ?? [];
+          const p = pr as any;
           return {
             MonthKey: snap.month,
             Month: formatMonthLabel(snap.month),
@@ -105,8 +106,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             Title: pr.title || "",
             Labels: labels.join("; "),
             State: pr.state || "",
+            Draft: !!p.draft,
             CreatedAt: pr.createdAt,
             ClosedAt: pr.closedAt,
+            Category: p.category ?? undefined,
+            Subcategory: p.subcategory ?? undefined,
           };
         })
       );

@@ -106,7 +106,7 @@ const SubscriptionFloater = () => {
         zIndex="1000"
         borderRadius="50%"
       >
-        <Tooltip label="View Subscription" placement="left">
+        <Tooltip label="View Subscription" placement="left" zIndex={10001}>
           <IconButton
             aria-label="Subscription"
             icon={<FiAward />}

@@ -39,7 +39,7 @@ import {
           zIndex="1000"
           borderRadius="50%"
         >
-          <Tooltip label="View Bookmarks" placement="left">
+          <Tooltip label="View Bookmarks" placement="left" zIndex={10001}>
             <IconButton
               aria-label="Bookmarks"
               icon={<FiBookmark />}

@@ -2,11 +2,12 @@ import React, { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import {
   Box, Card, CardHeader, CardBody, Heading, Text, Stack, Button, Checkbox,
-  CheckboxGroup, Menu, MenuButton, MenuList, useColorModeValue, Flex, Badge, HStack, Divider
+  CheckboxGroup, Menu, MenuButton, MenuList, MenuItem, useColorModeValue, Flex, Badge, HStack, Divider
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DownloadIcon } from "@chakra-ui/icons";
 import Papa from "papaparse";
 import CopyLink from "./CopyLink";
+import DateTime from "./DateTime";
 
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
@@ -89,6 +90,28 @@ const CUSTOM_LABELS_ALL: LabelSpec[] = [
   { value: "Misc", label: "Miscellaneous", color: "#64748b" },
 ];
 
+// Graph 2: Process (same open PRs as Graph 1 Open; sum of counts = Graph 1 Open per month)
+const PROCESS_LABELS: LabelSpec[] = [
+  { value: "PR DRAFT", label: "PR DRAFT", color: "#94a3b8" },      // neutral grey → work-in-progress, not alarming
+  { value: "Typo", label: "Typo", color: "#22c55e" },               // green → minor, harmless fixes
+  { value: "NEW EIP", label: "NEW EIP", color: "#0ea5e9" },         // blue → fresh, official, structured
+  { value: "Website", label: "Website", color: "#38bdf8" },         // lighter blue → web/UX vibe
+  { value: "EIP-1", label: "EIP-1", color: "#8b5cf6" },             // violet → special / foundational
+  { value: "Tooling", label: "Tooling", color: "#14b8a6" },         // teal → engineering / infra feel
+  { value: "Status Change", label: "Status Change", color: "#f97316" }, // orange → action / transition
+  { value: "Content Edit", label: "Content Edit", color: "#64748b" },             // muted slate → miscellaneous
+];
+
+// Graph 2: Participants (subcategory); Awaited = draft PRs when Process is PR DRAFT and not stagnant; empty/unknown → Misc
+const PARTICIPANTS_LABELS: LabelSpec[] = [
+  { value: "Waiting on Editor", label: "Waiting on Editor", color: "#facc15" }, // yellow → paused, pending review
+  { value: "Waiting on Author", label: "Waiting on Author", color: "#22c55e" }, // green → ball is with author, normal state
+  { value: "Stagnant", label: "Stagnant", color: "#ef4444" },                   // red → actually concerning
+  { value: "Awaited", label: "Awaited", color: "#8b5cf6" },                     // purple → anticipated / queued
+  { value: "Misc", label: "Misc", color: "#94a3b8" },                           // neutral grey → unknown bucket
+];
+
+
 const REPOS = [
   { key: "all", label: "All Open PRs", api: "" },
   { key: "eip", label: "EIP Open PRs", api: "/api/pr-stats" },
@@ -111,31 +134,79 @@ function formatMonthLabel(monthYear: string) {
   return date.toLocaleString("default", { month: "short", year: "numeric" });
 }
 
+// Graph 2 Process: PR DRAFT | Typo | NEW EIP | Website | EIP-1 | Tooling | Status Change | Other
+function labelsToProcess(labelsStr: string, repo: string, isPrDraft?: boolean): string {
+  const labels = labelsStr.split(";").map((l) => l.trim()).filter(Boolean);
+  if (isPrDraft === true || labels.some((l) => l === "PR DRAFT")) return "PR DRAFT";
+  if (labels.some((l) => /^Typo Fix$/i.test(l))) return "Typo";
+  if (labels.some((l) => /^Status Change$/i.test(l))) return "Status Change";
+  if (labels.some((l) => /^New EIP$/i.test(l))) return "NEW EIP";
+  if (labels.some((l) => /^New ERC$/i.test(l))) return "NEW EIP";
+  if (labels.some((l) => /^New RIP$/i.test(l))) return "NEW EIP";
+  if (labels.some((l) => /website|r-website/i.test(l))) return "Website";
+  if (labels.some((l) => /eip-?1|EIP-?1/i.test(l))) return "EIP-1";
+  if (labels.some((l) => /tooling|r-ci|r-process/i.test(l))) return "Tooling";
+  return "Content Edit";
+}
+// Graph 2 Participants: match backend deriveSubcategory (boards) so chart fallback and CSV derivation align
+function labelsToParticipants(labelsStr: string, _process: string, isPrDraft?: boolean): string {
+  const labels = labelsStr.split(";").map((l) => (l || "").trim()).filter(Boolean);
+  const lower = labels.map((l) => l.toLowerCase());
+  // Waiting on Editor: same variants as backend (e-review, e-consensus, needs-editor-review, editor+review)
+  if (lower.some((l) => l === "e-review" || l === "editor review")) return "Waiting on Editor";
+  if (lower.some((l) => l === "needs-editor-review" || l === "custom:needs-editor-review" || l === "e-consensus")) return "Waiting on Editor";
+  if (lower.some((l) => l && l.includes("editor") && l.includes("review"))) return "Waiting on Editor";
+  if (lower.some((l) => l === "a-review" || l === "author review")) return "Waiting on Author";
+  if (lower.some((l) => l === "s-stagnant" || l === "stagnant")) return "Stagnant";
+  // Awaited: draft (same as backend — no stagnant check so counts match)
+  if (isPrDraft === true || labels.some((l) => l === "PR DRAFT")) return "Awaited";
+  return "Misc";
+}
+
+/** Normalize Graph 2a API type (category) to display: e.g. "New EIP" → "NEW EIP". Chart doc: category "eips"|"ercs"|"rips"|"all", type = category name. */
+function normalizeProcessTypeFromApi(type: string): string {
+  const t = (type || "").trim();
+  if (/^New\s*EIP$/i.test(t)) return "NEW EIP";
+  if (/^PR\s*DRAFT$/i.test(t)) return "PR DRAFT";
+  if (t === "Typo") return "Typo";
+  if (t === "Website") return "Website";
+  if (/^EIP-?1$/i.test(t)) return "EIP-1";
+  if (t === "Tooling") return "Tooling";
+  if (/^Status\s*Change$/i.test(t)) return "Status Change";
+  if (t === "Other") return "Content Edit";
+  return t || "Content Edit";
+}
+
+/** Normalize Graph 2b API type (subcategory) to display: e.g. "AWAITED" → "Awaited". Chart doc type = subcategory name. */
+function normalizeParticipantsTypeFromApi(type: string): string {
+  const t = (type || "").trim();
+  if (/^AWAITED$/i.test(t)) return "Awaited";
+  if (/Waiting\s*on\s*Editor/i.test(t)) return "Waiting on Editor";
+  if (/Waiting\s*on\s*Author/i.test(t)) return "Waiting on Author";
+  if (/Stagnant/i.test(t)) return "Stagnant";
+  if (/Uncategorized|Misc/i.test(t)) return "Misc";
+  return t || "Misc";
+}
+
 export default function PRAnalyticsCard() {
   const cardBg = useColorModeValue("white", "#252529");
   const textColor = useColorModeValue("#2D3748", "#F7FAFC");
   const accentColor = useColorModeValue("#4299e1", "#63b3ed");
   const badgeText = useColorModeValue("white", "#171923");
+  const axisColor = useColorModeValue("#e2e8f0", "#4a5568");
+  const splitLineColor = useColorModeValue("#f7fafc", "#2d3748");
 
   const [repoKey, setRepoKey] = useState<"all" | "eip" | "erc" | "rip">("eip");
-  const [labelSet, setLabelSet] = useState<"customLabels" | "githubLabels">("customLabels");
+  const [labelSet, setLabelSet] = useState<"process" | "participants">("process");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<AggregatedLabelCount[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>(''); // For CSV download
+  const [tableMonthTotal, setTableMonthTotal] = useState<number | null>(null); // From details API; matches boardsnew (activity month)
 
-  // Select correct label spec
+  // Graph 2: Process or Participants (same open PRs as Graph 1 Open; sum = Graph 1 Open per month)
   const labelSpecs: LabelSpec[] = useMemo(() => {
-    if (labelSet === "customLabels") {
-      if (repoKey === "all") return CUSTOM_LABELS_ALL;
-      return repoKey === "eip"
-        ? CUSTOM_LABELS_EIP
-        : repoKey === "erc"
-        ? CUSTOM_LABELS_ERC
-        : CUSTOM_LABELS_RIP;
-    } else {
-      return WORKFLOW_LABELS;
-    }
-  }, [repoKey, labelSet]);
+    return labelSet === "process" ? PROCESS_LABELS : PARTICIPANTS_LABELS;
+  }, [labelSet]);
 
   // Filter state setup
   const [selectedLabels, setSelectedLabels] = useState<string[]>(labelSpecs.map(l => l.value));
@@ -198,42 +269,33 @@ export default function PRAnalyticsCard() {
 
   const workflowLabelValues = new Set(WORKFLOW_LABELS.map(l => l.value));
 
-  // Fetch API
+  // Map repo key to Graph 2 API name (eips, ercs, rips, all)
+  const graph2ApiName = repoKey === "eip" ? "eips" : repoKey === "erc" ? "ercs" : repoKey === "rip" ? "rips" : "all";
+
+  // Fetch API: prefer Graph 2 chart API (same open PR set as Graph 1); fallback to pr-details + client aggregate
   useEffect(() => {
     setLoading(true);
     const controller = new AbortController();
 
-    const fetchSingle = async (api: string) => {
-      const res = await fetch(`${api}?labelType=${labelSet}`, { signal: controller.signal });
-      if (!res.ok) throw new Error(`${api} -> ${res.status}`);
-      const json = await res.json();
-      return Array.isArray(json) ? (json as AggregatedLabelCount[]) : [];
-    };
-
     const fetchDetails = async (repo: string) => {
-      const qs = new URLSearchParams({ repo, mode: "detail", labelType: labelSet }).toString();
+      const qs = new URLSearchParams({ repo, mode: "detail", labelType: "customLabels" }).toString();
       const res = await fetch(`/api/pr-details?${qs}`, { signal: controller.signal });
       if (!res.ok) throw new Error(`/api/pr-details (${repo}) -> ${res.status}`);
       const json = await res.json();
       return Array.isArray(json) ? json : [];
     };
 
-  const aggregateDetails = (rows: any[]): AggregatedLabelCount[] => {
+    const aggregateDetails = (rows: any[]): AggregatedLabelCount[] => {
       const acc = new Map<string, AggregatedLabelCount>();
       for (const pr of rows) {
         const monthYear: string = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
         if (!monthYear) continue;
-        
-        // For custom labels, categorize based on ALL labels
-        let label: string;
-        if (labelSet === "customLabels") {
-          const allLabelsStr = pr.Labels || "";
-          const categorized = categorizePRByLabels(allLabelsStr, pr.Repo || "");
-          label = normalizeCustomLabel(pr.Repo || "", categorized);
-        } else {
-          label = pr.Label || "";
-        }
-        
+
+        const process = (labelSet === "process" && pr.Category) ? pr.Category : labelsToProcess(pr.Labels || "", pr.Repo || "", pr.Draft);
+        const label = labelSet === "process"
+          ? process
+          : (pr.Subcategory != null && pr.Subcategory !== "" ? pr.Subcategory : labelsToParticipants(pr.Labels || "", process, pr.Draft));
+
         const key = `${monthYear}__${label}`;
         const curr = acc.get(key) || { monthYear, label, count: 0, labelType: labelSet, prNumbers: [] };
         curr.count += 1;
@@ -243,24 +305,39 @@ export default function PRAnalyticsCard() {
       return Array.from(acc.values());
     };
 
+    const view = labelSet === "process" ? "category" : "subcategory";
+
     const run = async () => {
       try {
-        if (repoKey !== "all") {
-          const repoObj = REPOS.find(r => r.key === repoKey)!;
-          const arr = await fetchSingle(repoObj.api);
-          setData(arr);
-        } else {
-          // Fetch detailed rows for all repos and aggregate client-side
-          const [eipD, ercD, ripD] = await Promise.allSettled([
-            fetchDetails("eip"),
-            fetchDetails("erc"),
-            fetchDetails("rip"),
-          ]);
-          const toRows = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
-          const combinedRows = [...toRows(eipD), ...toRows(ercD), ...toRows(ripD)];
-          const aggregated = aggregateDetails(combinedRows);
-          setData(aggregated);
+        // Prefer Graph 2 API (pre-aggregated chart data; sum = Graph 1 Open per month)
+        const graph2Res = await fetch(
+          `/api/AnalyticsCharts/graph2/${graph2ApiName}?view=${view}`,
+          { signal: controller.signal }
+        );
+        if (graph2Res.ok) {
+          const json = await graph2Res.json();
+          // Graph 2a = category (Process), Graph 2b = subcategory (Participants). Chart doc: _id, category, monthYear, type, count.
+          const arr = labelSet === "process" ? (json?.data?.category ?? []) : (json?.data?.subcategory ?? []);
+          if (Array.isArray(arr) && arr.length > 0) {
+            const aggregated: AggregatedLabelCount[] = arr.map((d: { monthYear?: string; type?: string; count?: number }) => ({
+              monthYear: d.monthYear ?? "",
+              label: labelSet === "process" ? normalizeProcessTypeFromApi(d.type ?? "") : normalizeParticipantsTypeFromApi(d.type ?? ""),
+              count: typeof d.count === "number" ? d.count : 0,
+              labelType: labelSet,
+              prNumbers: [],
+            }));
+            setData(aggregated);
+            return;
+          }
         }
+        // Fallback: pr-details + client-side aggregate
+        const reposToFetch = repoKey === "all" ? ["eip", "erc", "rip"] : [repoKey];
+        const results = await Promise.allSettled(
+          reposToFetch.map((r) => fetchDetails(r))
+        );
+        const toRows = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
+        const combinedRows = results.flatMap(toRows);
+        setData(aggregateDetails(combinedRows));
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
           // eslint-disable-next-line no-console
@@ -274,7 +351,30 @@ export default function PRAnalyticsCard() {
 
     run();
     return () => controller.abort();
-  }, [repoKey, labelSet]);
+  }, [repoKey, labelSet, graph2ApiName]);
+
+  // Fetch table total for selected month (details API = activity month) so we can show the number that matches boardsnew
+  useEffect(() => {
+    if (!selectedMonth || !/^\d{4}-\d{2}$/.test(selectedMonth)) {
+      setTableMonthTotal(null);
+      return;
+    }
+    const ac = new AbortController();
+    fetch(`/api/AnalyticsCharts/category-subcategory/${graph2ApiName}/details?month=${selectedMonth}&source=snapshot`, { signal: ac.signal })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((rows: any[]) => {
+        const arr = Array.isArray(rows) ? rows : [];
+        const filtered = arr.filter((row: any) => {
+          const processNorm = normalizeProcessTypeFromApi(row.Process ?? "Other");
+          const participantsNorm = normalizeParticipantsTypeFromApi(row.Participants ?? "Misc");
+          const actualLabel = labelSet === "process" ? processNorm : participantsNorm;
+          return selectedLabels.includes(actualLabel);
+        });
+        setTableMonthTotal(filtered.length);
+      })
+      .catch(() => setTableMonthTotal(null));
+    return () => ac.abort();
+  }, [selectedMonth, graph2ApiName, labelSet, selectedLabels]);
 
   // Build filtered dataset and chart options
   const filteredData = useMemo(() => {
@@ -305,8 +405,10 @@ export default function PRAnalyticsCard() {
         const found = filteredData.find(d => d.monthYear === month && d.label === value);
         return found ? found.count : 0;
       }),
-      itemStyle: { color },
-      barMaxWidth: 40
+      itemStyle: { color, barBorderRadius: [4, 4, 0, 0] },
+      barMaxWidth: 40,
+      emphasis: { itemStyle: { shadowBlur: 12, shadowColor: "rgba(0,0,0,0.2)" } },
+      animationDelay: (dataIndex: number) => dataIndex * 25,
     }))
   }), [months, filteredData, labelSpecs]);
 
@@ -363,12 +465,8 @@ export default function PRAnalyticsCard() {
         margin: 12,
         hideOverlap: true
       },
-      axisLine: {
-        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
-      },
-      axisTick: {
-        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
-      }
+      axisLine: { lineStyle: { color: axisColor } },
+      axisTick: { lineStyle: { color: axisColor } }
     }],
     yAxis: [{
       type: "value",
@@ -382,14 +480,9 @@ export default function PRAnalyticsCard() {
         color: textColor,
         fontWeight: 500
       },
-      axisLine: {
-        lineStyle: { color: useColorModeValue('#e2e8f0', '#4a5568') }
-      },
+      axisLine: { lineStyle: { color: axisColor } },
       splitLine: {
-        lineStyle: { 
-          color: useColorModeValue('#f7fafc', '#2d3748'),
-          type: 'dashed'
-        }
+        lineStyle: { color: splitLineColor, type: 'dashed' }
       }
     }],
     series: chartData.series,
@@ -405,116 +498,50 @@ export default function PRAnalyticsCard() {
       },
     ],
     grid: { left: 70, right: 40, top: 90, bottom: 70 },
-    animationDuration: 800,
-    animationEasing: 'cubicOut'
-  }), [chartData, textColor, cardBg, defaultZoomStart]);
+    animation: true,
+    animationDuration: 1000,
+    animationEasing: "cubicOut",
+    animationDelayUpdate: (idx: number) => idx * 20,
+  }), [chartData, textColor, cardBg, defaultZoomStart, axisColor, splitLineColor]);
 
-  // CSV download
+  // CSV download: use category-subcategory details API (same as Board/Graph 3 table) so counts match that source
   const downloadCSV = async () => {
     setLoading(true);
 
-    const buildParams = (repo: string) => new URLSearchParams({
-      repo,
-      mode: "detail",
-      labelType: labelSet,
-    }).toString();
-
-    const fetchRows = async (repo: string) => {
-      const url = `/api/pr-details?${buildParams(repo)}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Failed to fetch PR details (${repo}): ${res.status}`);
-      const rows = await res.json();
-      return Array.isArray(rows) ? rows : [];
-    };
+    const downloadMonthKey = selectedMonth || (months.length > 0 ? months[months.length - 1] : null);
+    if (!downloadMonthKey) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      let combined: any[] = [];
-      if (repoKey === "all") {
-        const [eip, erc, rip] = await Promise.allSettled([
-          fetchRows("eip"),
-          fetchRows("erc"),
-          fetchRows("rip"),
-        ]);
-        const toArr = (r: PromiseSettledResult<any[]>) => (r.status === "fulfilled" ? r.value : []);
-        combined = [...toArr(eip), ...toArr(erc), ...toArr(rip)];
-      } else {
-        const repo = repoKey;
-        const rows = await fetchRows(repo);
-        combined = rows;
-      }
+      const detailsUrl = `/api/AnalyticsCharts/category-subcategory/${graph2ApiName}/details?month=${downloadMonthKey}&source=snapshot`;
+      const res = await fetch(detailsUrl);
+      if (!res.ok) throw new Error(`Failed to fetch details: ${res.status}`);
+      const rows: any[] = await res.json();
+      const combined = Array.isArray(rows) ? rows : [];
 
-      // Use selected month for filtering
-      const downloadMonthKey = selectedMonth || (months.length > 0 ? months[months.length - 1] : null);
-
-      if (!downloadMonthKey) {
-        console.error("No month selected for download");
-        return;
-      }
-
-      // Filter only PRs from the selected month and apply selected label filter
+      // Details API returns Process, Participants (from stored category/subcategory). Normalize to match chart & selectedLabels
       const filteredRows = combined
-        .map((pr: any) => {
-          // For custom labels, categorize based on ALL labels (from Labels field)
-          // For github labels, use the single Label field
-          let actualLabel: string;
-          
-          if (labelSet === "customLabels") {
-            // Use ALL labels to determine the correct category (matching API aggregation logic)
-            const allLabelsStr = pr.Labels || "";
-            actualLabel = categorizePRByLabels(allLabelsStr, pr.Repo || repoKey);
-          } else {
-            // For github labels, use the single label
-            actualLabel = pr.Label || "";
-          }
-          
-          // Only normalize for 'all' view to match the graph display
-          let displayLabel = actualLabel;
-          if (repoKey === "all") {
-            if (labelSet === "customLabels") {
-              displayLabel = normalizeCustomLabel(pr.Repo || repoKey, actualLabel);
-            } else if (labelSet === "githubLabels") {
-              displayLabel = normalizeGithubLabel(actualLabel);
-            }
-          }
-          
-          // Store both actual and display label in the PR object
-          return {
-            ...pr,
-            ActualLabel: actualLabel,
-            DisplayLabel: displayLabel
-          };
+        .map((row: any) => {
+          const processNorm = normalizeProcessTypeFromApi(row.Process ?? "Other");
+          const participantsNorm = normalizeParticipantsTypeFromApi(row.Participants ?? "Misc");
+          const actualLabel = labelSet === "process" ? processNorm : participantsNorm;
+          return { ...row, ActualLabel: actualLabel };
         })
-        .filter((pr: any) => {
-          const mk = pr.MonthKey || (pr.CreatedAt ? new Date(pr.CreatedAt).toISOString().slice(0, 7) : "");
-          if (mk !== downloadMonthKey) return false;
+        .filter((row: any) => selectedLabels.includes(row.ActualLabel));
 
-          // For 'all' view, check if the normalized DisplayLabel is in selectedLabels
-          // For individual repos, check if the ActualLabel is in selectedLabels
-          const passesFilter = repoKey === "all" 
-            ? selectedLabels.includes(pr.DisplayLabel)
-            : selectedLabels.includes(pr.ActualLabel);
-
-          return passesFilter;
-        });
-
-      const repoLabel = (rk: typeof repoKey) => (REPOS.find(r => r.key === rk)?.label || rk);
-
-      const csvData = filteredRows.map((pr: any) => {
-        // Use DisplayLabel which is normalized for 'all' view, or ActualLabel for individual repos
-        const csvLabel = pr.DisplayLabel || pr.ActualLabel || "Misc";
-
-        return {
-          Month: pr.Month || formatMonthLabel(pr.MonthKey),
-          MonthKey: pr.MonthKey,
-          Label: csvLabel, // Show the label that matches what's displayed in the graph
-          Repo: pr.Repo || (repoKey === "all" ? undefined : repoKey),
-          PRNumber: pr.PRNumber,
-          PRLink: pr.PRLink,
-          Author: pr.Author,
-          Title: pr.Title,
-          CreatedAt: pr.CreatedAt ? new Date(pr.CreatedAt).toISOString() : "",
-        };
-      });
+      const csvData = filteredRows.map((row: any) => ({
+        Month: row.Month ?? formatMonthLabel(row.MonthKey),
+        MonthKey: row.MonthKey,
+        Label: row.ActualLabel,
+        Repo: row.Repo ?? (repoKey === "all" ? undefined : repoKey),
+        PRNumber: row.PRNumber,
+        PRLink: row.PRLink,
+        Author: row.Author ?? "",
+        Title: row.Title ?? "",
+        CreatedAt: row.CreatedAt ? new Date(row.CreatedAt).toISOString() : "",
+      }));
 
       const csv = Papa.unparse(csvData);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
@@ -543,115 +570,110 @@ export default function PRAnalyticsCard() {
   const selectAll = () => setSelectedLabels(labelSpecs.map(l => l.value));
   const clearAll = () => setSelectedLabels([]);
 
-  // Label set switch drop-down
+  // Graph 2: toggle Process (category) or Participants (subcategory); same open PRs, sum = Graph 1 Open
   const labelSetOptions = [
-    { key: "customLabels", label: "Custom Labels" },
-    { key: "githubLabels", label: "GitHub Labels" }
+    { key: "process", label: "Process" },
+    { key: "participants", label: "Participants" }
   ];
 
   return (
-    <Card bg={cardBg} color={textColor} mx="auto" mt={8} borderRadius="2xl" p={4}>
-      <CardHeader>
-        <Flex align="center" justify="space-between" wrap="wrap" gap={4}>
-          <Heading size="md" color={accentColor} mb={2} id="PrLabelsChart">
-            {REPOS.find(r => r.key === repoKey)?.label} &mdash; {labelSetOptions.find(o => o.key === labelSet)?.label} Distribution
-            <CopyLink link={`https://eipsinsight.com//Analytics#PrLabelsChart`} />
-          </Heading>
-          <Flex gap={3} align="center">
+    <Card
+      bg={cardBg}
+      color={textColor}
+      mx="auto"
+      mt={6}
+      borderRadius="xl"
+      borderWidth="1px"
+      borderColor={useColorModeValue("gray.200", "gray.700")}
+      boxShadow="sm"
+      p={4}
+    >
+      <CardHeader pb={3}>
+        <Flex align="center" justify="space-between" wrap="wrap" gap={3}>
+          <Box>
+            <Text fontSize="xs" fontWeight="600" letterSpacing="wider" color={useColorModeValue("gray.500", "gray.400")} mb={1}>
+              Label distribution
+            </Text>
+            <Heading size="md" fontWeight="700" id="PrLabelsChart" letterSpacing="-0.01em">
+              {REPOS.find(r => r.key === repoKey)?.label}
+            </Heading>
+            <Flex align="center" gap={2} mt={1}>
+              <Badge
+                variant="subtle"
+                colorScheme={labelSet === "process" ? "blue" : "purple"}
+                px={2}
+                py={0.5}
+                borderRadius="full"
+                fontSize="xs"
+                fontWeight="600"
+              >
+                {labelSetOptions.find(o => o.key === labelSet)?.label}
+              </Badge>
+              <CopyLink link="https://eipsinsight.com/Analytics#PrLabelsChart" />
+            </Flex>
+          </Box>
+          <Flex gap={3} align="center" wrap="wrap">
             <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="solid" colorScheme="purple" minW={140}>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={140}>
                 {REPOS.find(r => r.key === repoKey)?.label}
               </MenuButton>
-              <MenuList minWidth="140px">
-                <Stack>
-                  {REPOS.map(repo => (
-                    <Button
-                      key={repo.key}
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      colorScheme={repoKey === repo.key ? "blue" : undefined}
-                      onClick={() => setRepoKey(repo.key as "all" | "eip" | "erc" | "rip")}
-                    >
-                      {repo.label}
-                    </Button>
-                  ))}
-                </Stack>
+              <MenuList>
+                {REPOS.map(repo => (
+                  <MenuItem key={repo.key} onClick={() => setRepoKey(repo.key as "all" | "eip" | "erc" | "rip")}>
+                    {repo.label}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Menu>
             <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="teal" minW={160}>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={140}>
                 {labelSetOptions.find(o => o.key === labelSet)?.label}
               </MenuButton>
-              <MenuList minWidth="160px">
-                <Stack>
-                  {labelSetOptions.map(opt =>
-                    <Button
-                      key={opt.key}
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      colorScheme={labelSet === opt.key ? "teal" : undefined}
-                      onClick={() => setLabelSet(opt.key as "customLabels" | "githubLabels")}
-                    >
-                      {opt.label}
-                    </Button>
-                  )}
-                </Stack>
+              <MenuList>
+                {labelSetOptions.map(opt => (
+                  <MenuItem key={opt.key} onClick={() => setLabelSet(opt.key as "process" | "participants")}>
+                    {opt.label}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Menu>
             <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="green" minW={160}>
-                {selectedMonth ? formatMonthLabel(selectedMonth) : 'Select Month'}
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={160}>
+                {selectedMonth ? formatMonthLabel(selectedMonth) : "Select Month"}
               </MenuButton>
-              <MenuList maxHeight="300px" overflowY="auto" minWidth="160px">
-                <Stack>
-                  {months.slice().reverse().map(month => (
-                    <Button
-                      key={month}
-                      variant="ghost"
-                      size="sm"
-                      justifyContent="flex-start"
-                      colorScheme={selectedMonth === month ? "green" : undefined}
-                      onClick={() => setSelectedMonth(month)}
-                    >
-                      {formatMonthLabel(month)}
-                    </Button>
-                  ))}
-                </Stack>
+              <MenuList maxH="280px" overflowY="auto">
+                {months.slice().reverse().map(month => (
+                  <MenuItem key={month} onClick={() => setSelectedMonth(month)}>
+                    {formatMonthLabel(month)}
+                  </MenuItem>
+                ))}
               </MenuList>
             </Menu>
-            <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} variant="solid" size="sm" borderRadius="md" isDisabled={!selectedMonth}>
+            <Button leftIcon={<DownloadIcon />} colorScheme="blue" onClick={downloadCSV} size="sm" borderRadius="md" isDisabled={!selectedMonth}>
               Download CSV
             </Button>
           </Flex>
         </Flex>
+        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} mt={3} maxW="900px">
+          Open PRs by <strong>Process</strong> type (Typo, NEW EIP, PR DRAFT) or by <strong>Participants</strong> status (Waiting on Editor, Awaited). Sum of bars = total open PRs for that month.
+        </Text>
       </CardHeader>
       <CardBody>
-        <Flex gap={4} wrap="wrap" mb={4} align="center">
+        <Flex gap={4} wrap="wrap" mb={3} align="center">
           <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" colorScheme="blue" borderRadius="md" minW={180}>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline" size="sm" minW={180}>
               Filter by {labelSetOptions.find(o => o.key === labelSet)?.label}
             </MenuButton>
-            <MenuList minWidth="280px" px={2} py={2}>
+            <MenuList minWidth="260px" px={2} py={2}>
               <HStack mb={2} gap={2}>
                 <Button size="xs" colorScheme="teal" onClick={selectAll}>Select All</Button>
-                <Button size="xs" colorScheme="red" variant="outline" onClick={clearAll}>Clear All</Button>
+                <Button size="xs" variant="outline" onClick={clearAll}>Clear</Button>
               </HStack>
               <CheckboxGroup value={selectedLabels} onChange={(v: string[]) => setSelectedLabels(v)}>
-                <Stack pl={2} pr={2} gap={1}>
+                <Stack gap={1}>
                   {labelSpecs.map(lbl => (
-                    <Checkbox key={lbl.value} value={lbl.value} py={1.5} px={2} colorScheme={labelSet === "customLabels" ? "blue" : "purple"} iconColor={badgeText}>
-                      <Badge
-                        mr={2}
-                        fontSize="sm"
-                        bg={lbl.color}
-                        color={badgeText}
-                        borderRadius="base"
-                        px={2} py={1}
-                        fontWeight={600}
-                        variant="solid"
-                      >
+                    <Checkbox key={lbl.value} value={lbl.value} py={1} px={2} colorScheme={labelSet === "process" ? "blue" : "purple"}>
+                      <Badge mr={2} fontSize="sm" bg={lbl.color} color={badgeText} borderRadius="md" px={2} py={0.5}>
                         {lbl.label}
                       </Badge>
                     </Checkbox>
@@ -661,25 +683,36 @@ export default function PRAnalyticsCard() {
             </MenuList>
           </Menu>
         </Flex>
-        <Box 
-          bg={useColorModeValue('blue.50', 'gray.700')} 
-          p={3} 
-          borderRadius="md" 
+        <Box
+          bg={useColorModeValue("blue.50", "gray.700")}
+          p={3}
+          borderRadius="md"
           mb={3}
           textAlign="center"
         >
-          <Text fontSize="lg" fontWeight="bold" color={useColorModeValue('blue.700', 'blue.300')}>
-            {latestMonth
-              ? <>Current Month ({formatMonthLabel(latestMonth)}) Total Open PRs: <Text as="span" color={accentColor}>{currentMonthTotal}</Text></>
-              : <>No data available</>
-            }
+          <Text fontSize="md" fontWeight="bold">
+            Chart total ({latestMonth ? formatMonthLabel(latestMonth) : "—"}):{" "}
+            <Text as="span" color={accentColor} ml={1}>
+              {latestMonth ? currentMonthTotal : "—"}
+            </Text>
           </Text>
-          <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')} mt={1}>
-            (Based on {selectedLabels.length} selected label{selectedLabels.length !== 1 ? 's' : ''} - CSV downloads {selectedMonth ? formatMonthLabel(selectedMonth) : 'selected month'} data)
+          {selectedMonth && tableMonthTotal != null && (
+            <Text fontSize="sm" fontWeight="semibold" color="green.500" mt={1}>
+              Table total (filtered): {tableMonthTotal}
+            </Text>
+          )}
+          <Text fontSize="xs" color="gray.500" mt={1}>
+            Chart, table, and CSV use the same open PR set.
           </Text>
         </Box>
-        <Divider my={3} />
-        <Box minH="350px">
+        <Box
+          minH="380px"
+          borderRadius="lg"
+          borderWidth="1px"
+          borderColor={useColorModeValue("gray.200", "gray.700")}
+          p={2}
+          position="relative"
+        >
           {loading ? (
             <Text color={accentColor} fontWeight="bold" my={10} fontSize="xl">Loading...</Text>
           ) : chartData.months.length === 0 ? (
@@ -687,8 +720,37 @@ export default function PRAnalyticsCard() {
               No PR label data found for this filter or period.
             </Text>
           ) : (
-            <ReactECharts style={{ height: "460px", width: "100%" }} option={option} notMerge lazyUpdate theme={useColorModeValue("light", "dark")} />
+            <>
+              <ReactECharts
+                style={{ height: "440px", width: "100%" }}
+                option={option}
+                notMerge
+                lazyUpdate
+                theme={useColorModeValue("light", "dark")}
+              />
+              <Text
+                position="absolute"
+                top="50%"
+                left="50%"
+                transform="translate(-50%, -50%)"
+                fontSize="3xl"
+                fontWeight="700"
+                letterSpacing="0.05em"
+                color={useColorModeValue("gray.400", "gray.500")}
+                opacity={0.45}
+                pointerEvents="none"
+                userSelect="none"
+                whiteSpace="nowrap"
+                textShadow="0 1px 2px rgba(255,255,255,0.5)"
+                _dark={{ textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}
+              >
+                EIPsInsight.com
+              </Text>
+            </>
           )}
+        </Box>
+        <Box mt={3}>
+          <DateTime />
         </Box>
       </CardBody>
     </Card>
