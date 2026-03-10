@@ -804,7 +804,7 @@ export default function CategorySubcategoryChart() {
                         const sr = (tablePage - 1) * TABLE_PAGE_SIZE + idx + 1;
                         const processColor = processBadgeColor(row.Process);
                         const partColor = participantsBadgeColor(row.Participants);
-                        const viewPrsUrl = `/boardsnew?month=${selectedMonthYear}&process=${encodeURIComponent(row.Process)}&participants=${encodeURIComponent(row.Participants)}`;
+                        const viewPrsUrl = `/boards?month=${selectedMonthYear}&process=${encodeURIComponent(row.Process)}&participants=${encodeURIComponent(row.Participants)}`;
                         return (
                           <Tr key={`${row.Process}-${row.Participants}-${sr}`} _hover={{ bg: tableRowHoverBg }}>
                             <Td fontWeight="semibold" color={tableMutedColor}>

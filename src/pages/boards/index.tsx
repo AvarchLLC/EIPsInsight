@@ -239,7 +239,7 @@ export default function EipBoardsPage() {
       params.set("process", selectedCategories.map((p) => encodeURIComponent(p)).join(","));
     }
     const queryString = params.toString();
-    const newUrl = queryString ? `/boardsnew?${queryString}` : "/boardsnew";
+    const newUrl = queryString ? `/boards?${queryString}` : "/boards";
     if (router.asPath !== newUrl) {
       router.replace(newUrl, undefined, { shallow: true });
     }
@@ -408,7 +408,7 @@ export default function EipBoardsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `boardsnew_${activeTab}_${selectedMonth}.csv`;
+    a.download = `boards_${activeTab}_${selectedMonth}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast({ title: "CSV downloaded", status: "success", duration: 2000, isClosable: true });
@@ -421,7 +421,7 @@ export default function EipBoardsPage() {
     if (selectedCategories.length > 0 && selectedCategories.length < PROCESS_ORDER.length) {
       params.set("process", selectedCategories.map((p) => encodeURIComponent(p)).join(","));
     }
-    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/boardsnew?${params.toString()}`;
+    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/boards?${params.toString()}`;
     navigator.clipboard.writeText(url).then(() => {
       toast({ title: "Link copied to clipboard", status: "success", duration: 2000, isClosable: true });
     });
