@@ -25,7 +25,6 @@ import CatTable2 from "@/components/CatTable2";
 import NextLink from "next/link";
 import RipTable from "@/components/RipTable";
 import { useRouter } from "next/router";
-import SubscriptionButton from "@/components/SubscribtionButton";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 
 interface EIP {
@@ -313,8 +312,8 @@ const RIP = () => {
                 gap={4}
               >
                 {/* Left: Subscription Button */}
-                <Box>
-                  <SubscriptionButton type="rips" id="all" />
+                <Box color="gray.500" fontSize="sm">
+                  Subscribe from an individual RIP page to get proposal-specific updates.
                 </Box>
 
                 {/* Right: Category / Status Toggle Buttons */}

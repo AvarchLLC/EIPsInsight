@@ -55,7 +55,6 @@ const SubscriptionFloater = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: session?.user?.email,
           type: sub.type,
           id: sub.id,
           filter: sub.filter,
@@ -63,7 +62,7 @@ const SubscriptionFloater = () => {
       });
 
       setSubscriptions(prev =>
-        prev.filter(s => !(s.type === sub.type && s.id === sub.id))
+        prev.filter(s => !(s.type === sub.type && s.id === sub.id && s.filter === sub.filter))
       );
     } catch (err) {
       console.error("Unsubscribe failed", err);
@@ -193,7 +192,7 @@ const SubscriptionFloater = () => {
                               {sub.type.toUpperCase()}-{sub.id}
                             </Text>
                             <Text fontSize="sm" color="gray.500">
-                              {sub.filter === "all" ? "All changes" : "Status only"}
+                              {sub.filter === "all" ? "All changes" : sub.filter === "content" ? "Content only" : "Status only"}
                             </Text>
                           </Box>
                           <Button

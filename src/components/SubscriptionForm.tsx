@@ -91,6 +91,7 @@
 
 "use client";
 import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 
 interface SubscribeFormProps {
   type?: "eips" | "ercs" | "rips";
@@ -99,71 +100,41 @@ interface SubscribeFormProps {
 }
 
 export function SubscribeForm({ type = "eips", id = "", filter = "all" }: SubscribeFormProps) {
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const { data: session } = useSession();
   const [selectedType, setSelectedType] = useState(type);
   const [selectedId, setSelectedId] = useState(id.toString());
   const [selectedFilter, setSelectedFilter] = useState(filter);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-
-    if (!stored) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(stored);
-      const email = parsed.email;
-
-      fetch(`/api/user/me?email=${email}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.email) {
-            setUserEmail(data.email);
-          }
-        })
-        .finally(() => setLoading(false));
-    } catch (err) {
-      console.error("Failed to fetch verified user", err);
-      setLoading(false);
-    }
-  }, []);
+    setSelectedType(type);
+    setSelectedId(id.toString());
+    setSelectedFilter(filter);
+  }, [type, id, filter]);
 
   async function subscribe() {
-    const finalEmail = userEmail;
-    if (!finalEmail) {
-      alert("Email not found");
+    if (!session?.user?.email) {
+      signIn(undefined, { callbackUrl: window.location.href });
       return;
     }
 
+    setLoading(true);
     await fetch("/api/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: finalEmail,
         type: selectedType,
         id: selectedId,
         filter: selectedFilter,
       }),
     });
 
+    setLoading(false);
     alert("Subscribed successfully!");
   }
 
-  if (loading) return <p>Loading...</p>;
-
   return (
     <form onSubmit={(e) => { e.preventDefault(); subscribe(); }} className="space-y-4 p-4 bg-white rounded-xl shadow-md">
-      {!userEmail && (
-        <input
-          placeholder="Enter your email"
-          className="w-full p-2 border rounded"
-          onChange={(e) => setUserEmail(e.target.value)}
-        />
-      )}
-
       <select value={selectedType} onChange={(e) => setSelectedType(e.target.value as any)} className="w-full p-2 border rounded">
         <option value="eips">EIP</option>
         <option value="ercs">ERC</option>
@@ -187,8 +158,8 @@ export function SubscribeForm({ type = "eips", id = "", filter = "all" }: Subscr
         <option value="content">Content Only</option>
       </select>
 
-      <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-        Subscribe
+      <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded" disabled={loading}>
+        {loading ? "Subscribing..." : session?.user?.email ? "Subscribe" : "Sign in to subscribe"}
       </button>
     </form>
   );

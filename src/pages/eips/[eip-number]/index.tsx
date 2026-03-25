@@ -42,6 +42,7 @@ import Header from "@/components/Header2";
 import LoaderComponent from "@/components/Loader";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { EipAiSummary } from "@/components/EipAiSummary";
+import glamsterdamTimelineData from "@/data/upgrades/glamsterdam-timeline.json";
 import {
   LineChart,
   Line,
@@ -137,14 +138,6 @@ const TestComponent = () => {
       : `EIP-${eipIdentifier}`;
 
     // Improved status checker that properly checks all arrays
-    const getStatus = (data: UpgradeEntry, eip: string): string | null => {
-      if (data.included.includes(eip)) return 'Included';
-      if (data.scheduled.includes(eip)) return 'SFI';
-      if (data.considered.includes(eip)) return 'CFI';
-      if (data.declined.includes(eip)) return 'DFI';
-      return null;
-    };
-
     // Get latest entries (using proper date sorting)
     const latestPectra = [...PectraData2].sort((a, b) =>
       new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -170,6 +163,8 @@ const TestComponent = () => {
       statuses.push('Pectra-SFI');
     } else if (latestPectra.considered.includes(normalizedEip)) {
       statuses.push('Pectra-CFI');
+    } else if (latestPectra.proposed.includes(normalizedEip)) {
+      statuses.push('Pectra-PFI');
     }
 
     // Check Fusaka status
@@ -181,9 +176,11 @@ const TestComponent = () => {
       statuses.push('Fusaka-SFI');
     } else if (latestFusaka.considered.includes(normalizedEip)) {
       statuses.push('Fusaka-CFI');
+    } else if (latestFusaka.proposed.includes(normalizedEip)) {
+      statuses.push('Fusaka-PFI');
     }
 
-        if (latestGlamsterdam.declined.includes(normalizedEip)) {
+    if (latestGlamsterdam.declined.includes(normalizedEip)) {
       statuses.push('Glamsterdam-DFI');
     } else if (latestGlamsterdam.included.includes(normalizedEip)) {
       statuses.push('Glamsterdam-Included');
@@ -191,6 +188,8 @@ const TestComponent = () => {
       statuses.push('Glamsterdam-SFI');
     } else if (latestGlamsterdam.considered.includes(normalizedEip)) {
       statuses.push('Glamsterdam-CFI');
+    } else if (latestGlamsterdam.proposed.includes(normalizedEip)) {
+      statuses.push('Glamsterdam-PFI');
     }
 
     console.log("statuses: ", statuses);
@@ -395,207 +394,14 @@ const FusakaData: readonly UpgradeEntry[] = [
     declined: [], considered: [] , proposed: []},
 ] as const;
 
-const GlamsterdamData: readonly UpgradeEntry[] = [
-  {
-    date: '2024-09-28',
-    included: [],
-    scheduled: [],
-    declined: [],
-    considered: ['EIP-4762', 'EIP-6800', 'EIP-6873', 'EIP-7545', 'EIP-7667'],
-    proposed: []
-  },
-  {
-    date: '2025-06-09',
-    included: [],
-    scheduled: [],
-    declined: [],
-    considered: ['EIP-4762', 'EIP-6800', 'EIP-6873', 'EIP-7545', 'EIP-7667'],
-    proposed: ['EIP-7793', 'EIP-7843']
-  },
-  {
-    date: '2025-06-10',
-    included: [],
-    scheduled: [],
-    declined: [],
-    considered: ['EIP-4762', 'EIP-6800', 'EIP-6873', 'EIP-7545', 'EIP-7667'],
-    proposed: ['EIP-7793', 'EIP-7843', 'EIP-7919']
-  },
-  {
-    date: '2025-07-04',
-    included: [],
-    scheduled: [],
-    declined: [],
-    considered: [],
-    proposed : ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7843', 'EIP-7919']
-  },
-  {
-    date: '2025-07-25',
-    included: [],
-    scheduled: [],
-    declined: [],
-    considered: ['EIP-7732', 'EIP-7782', 'EIP-7805'],
-    proposed: ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7819', 'EIP-7843', 'EIP-7919']
-  },
-  {
-    date: '2025-07-31',
-    included: [],
-    scheduled: [],
-    declined: [],
-    considered: ['EIP-7732', 'EIP-7782', 'EIP-7805', 'EIP-7928'],
-    proposed: ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7819', 'EIP-7843', 'EIP-7919']  
-  },
-    {
-    date: '2025-08-11',
-    included: [],
-    scheduled: [],
-    declined: [],
-    considered: ['EIP-7732', 'EIP-7782', 'EIP-7805', 'EIP-7928'],
-    proposed: ['EIP-6873', 'EIP-7667', 'EIP-7793', 'EIP-7819', 'EIP-7843', 'EIP-7919', 'EIP-5920', 'EIP-7791', 'EIP-7903', 'EIP-7907', 'EIP-7923' ]  
-  },
-      {
-    date: '2025-08-14',
-    included: [],
-    scheduled: ['EIP-7732',  'EIP-7928'],
-    declined: ['EIP-7782'],
-    considered: [ 'EIP-7805'],
-proposed: [
-  'EIP-2926',
-  'EIP-6873',
-  'EIP-7667',
-  'EIP-7793',
-  'EIP-7819',
-  'EIP-7843',
-  'EIP-7919',
-  'EIP-5920',
-  'EIP-7791',
-  'EIP-7903',
-  'EIP-7907',
-  'EIP-7923',
-  'EIP-7997'
-]
-
-  },
-      {
-    date: '2025-08-27',
-    included: [],
-    scheduled: ['EIP-7732',  'EIP-7928'],
-    declined: ['EIP-7782'],
-    considered: [ 'EIP-7805'],
-proposed: [
-  'EIP-2926',
-  'EIP-6873',
-  'EIP-7667',
-  'EIP-7793',
-  'EIP-7819',
-  'EIP-7843',
-  'EIP-7919',
-  'EIP-5920',
-  'EIP-7791',
-  'EIP-7903',
-  'EIP-7907',
-  'EIP-7923',
-  'EIP-7932',
-  'EIP-7980',
-  'EIP-7981',
-  'EIP-7997',
-  'EIP-7999'
-]
-
-  },
-        {
-    date: '2025-09-04',
-    included: [],
-    scheduled: ['EIP-7732',  'EIP-7928'],
-    declined: ['EIP-7782'],
-    considered: [ 'EIP-7805'],
-proposed: [
-  'EIP-2926',
-  'EIP-6873',
-  'EIP-7667',
-  'EIP-7793',
-  'EIP-7819',
-  'EIP-7843',
-  'EIP-7919',
-  'EIP-5920',
-  'EIP-7791',
-  'EIP-7903',
-  'EIP-7907',
-  'EIP-7923',
-  'EIP-7932',
-  'EIP-7980',
-  'EIP-7981',
-  'EIP-7997',
-  'EIP-7999',
-  'EIP-7778',
-  'EIP-7976',
-  'EIP-7688',
-]
-
-  },
-          {
-    date: '2025-09-12',
-    included: [],
-    scheduled: ['EIP-7732',  'EIP-7928'],
-    declined: ['EIP-7782'],
-    considered: [ 'EIP-7805'],
-proposed: [
-  'EIP-2926',
-  'EIP-6873',
-  'EIP-7667',
-  'EIP-7793',
-  'EIP-7819',
-  'EIP-7843',
-  'EIP-7919',
-  'EIP-5920',
-  'EIP-7791',
-  'EIP-7903',
-  'EIP-7907',
-  'EIP-7923',
-  'EIP-7932',
-  'EIP-7980',
-  'EIP-7981',
-  'EIP-7997',
-  'EIP-7999',
-  'EIP-7778',
-  'EIP-7976',
-  'EIP-7688',
-  'EIP-2780',
-]
-
-  },
-            {
-    date: '2025-09-24',
-    included: [],
-    scheduled: ['EIP-7732',  'EIP-7928'],
-    declined: ['EIP-7782'],
-    considered: [ 'EIP-7805'],
-proposed: [
-  'EIP-2926',
-  'EIP-6873',
-  'EIP-7667',
-  'EIP-7793',
-  'EIP-7819',
-  'EIP-7843',
-  'EIP-7919',
-  'EIP-5920',
-  'EIP-7791',
-  'EIP-7903',
-  'EIP-7907',
-  'EIP-7923',
-  'EIP-7932',
-  'EIP-7980',
-  'EIP-7981',
-  'EIP-7997',
-  'EIP-7999',
-  'EIP-7778',
-  'EIP-7976',
-  'EIP-7688',
-  'EIP-2780',
-  'EIP-7610'
-]
-
-  },
-] as const;
+const GlamsterdamData: readonly UpgradeEntry[] = glamsterdamTimelineData.map((entry) => ({
+  date: entry.date,
+  included: entry.included ?? [],
+  scheduled: entry.scheduled ?? [],
+  declined: entry.declined ?? [],
+  considered: entry.considered ?? [],
+  proposed: entry.proposed ?? [],
+}));
 
   const getNetworkUpgrades = (eipNo: number) => {
     console.log("eip:", eipNo);

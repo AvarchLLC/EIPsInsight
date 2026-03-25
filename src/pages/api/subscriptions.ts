@@ -1,11 +1,13 @@
 // pages/api/subscriptions.ts
 import { connectToDatabase } from '@/lib/mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { email } = req.query;
-
-  if (!email) return res.status(400).json({ error: 'Missing email' });
+  const session = await getServerSession(req, res, authOptions);
+  const email = session?.user?.email;
+  if (!email) return res.status(401).json({ error: 'Authentication required' });
 
   try {
     const client = await connectToDatabase();

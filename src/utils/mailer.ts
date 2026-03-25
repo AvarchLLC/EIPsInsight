@@ -12,7 +12,7 @@ export const transporter = nodemailer.createTransport({
 
 export async function sendSubscriptionEmail(
   email: string,
-  subscription: { type: string; id: string }
+  subscription: { type: string; id: string; unsubscribeUrl?: string }
 ) {
   const subscriptionLabel = `${subscription.type.toUpperCase()}-${subscription.id}`;
   const mailOptions = {
@@ -25,6 +25,7 @@ export async function sendSubscriptionEmail(
         <p>Hey there 👋,</p>
         <p>You’ve successfully subscribed to updates on <strong>${subscriptionLabel}</strong>.</p>
         <p>We’ll notify you when there are changes or new discussions related to this ${subscription.type.toUpperCase()}.</p>
+        ${subscription.unsubscribeUrl ? `<p><a href="${subscription.unsubscribeUrl}">Unsubscribe from these updates</a></p>` : ""}
         <p style="margin-top: 20px;">Stay curious,<br/>The EIPs Insight Team</p>
       </div>
     `,
