@@ -178,7 +178,6 @@ export default function SingleSubscriptionButton({ type, id }: SingleSubscriptio
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: session.user?.email,
           type,
           id,
           filter: "all",
@@ -205,7 +204,6 @@ export default function SingleSubscriptionButton({ type, id }: SingleSubscriptio
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: session?.user?.email,
           type,
           id,
           filter: "all",

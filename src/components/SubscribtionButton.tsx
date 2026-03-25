@@ -95,7 +95,6 @@ export default function SubscriptionButton({ type, id }: {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: session.user.email,
           type,
           id,
           filter: "all",
@@ -123,7 +122,6 @@ export default function SubscriptionButton({ type, id }: {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: session?.user?.email,
           type,
           id,
           filter: "all",
@@ -158,7 +156,7 @@ export default function SubscriptionButton({ type, id }: {
           : "Subscribing..."
         : isSubscribed
           ? `Unsubscribe from ${type.toUpperCase()}-${id}`
-          : `Subscribe to All ${type.toUpperCase()}s`}
+          : `Subscribe to ${type.toUpperCase()}-${id}`}
     </button>
   );
 }

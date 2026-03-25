@@ -2,6 +2,7 @@ import { getAllSubscriptions, getLastProcessedSha, setLastProcessedSha } from '.
 import { getChangesSince } from './trackChanges';
 import { buildChangeEmail, sendEmailNotification } from './email';
 import { buildFeedItemsFromEvents, generateRSSFeed } from './rss';
+import { buildUnsubscribeUrl } from './subscriptionLinks';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 
@@ -68,8 +69,14 @@ export async function syncEipChanges() {
         const { html, text, subject } = buildChangeEmail({
           type: key.type,
           id: key.id,
-            // De-duplicate status + content that refer to same commit if desired:
-          events: dedupeEvents(relevant)
+          // De-duplicate status + content that refer to same commit if desired:
+          events: dedupeEvents(relevant),
+          unsubscribeUrl: buildUnsubscribeUrl({
+            email: sub.email,
+            type: String(sub.type),
+            id: String(sub.id),
+            filter: String(sub.filter),
+          }),
         });
         await sendEmailNotification({ email: sub.email, subject, html, text });
         console.log(`✅ Notified ${sub.email} (${relevant.length} events)`);

@@ -31,7 +31,6 @@ import CatTable2 from "@/components/CatTable2";
 import ErcTable from "@/components/ErcTable";
 import { useRouter } from "next/router";
 import ERCsPRChart from "@/components/Ercsprs";
-import SubscriptionButton from "@/components/SubscribtionButton";
 
 interface EIP {
   _id: string;
@@ -304,8 +303,8 @@ const ERC = () => {
                 gap={4}
               >
                 {/* Subscription Button (left) */}
-                <Box>
-                  <SubscriptionButton type="ercs" id="all" />
+                <Box color="gray.500" fontSize="sm">
+                  Subscribe from an individual ERC page to get proposal-specific updates.
                 </Box>
 
                 {/* Toggle Buttons (right) */}
@@ -562,4 +561,3 @@ const ERC = () => {
 };
 
 export default ERC;
-

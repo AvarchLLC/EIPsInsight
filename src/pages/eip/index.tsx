@@ -117,9 +117,7 @@ interface Data {
 import OtherBox from "@/components/OtherStats";
 import EipTable from "@/components/EipTable";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
-import SubscriptionButton from '@/components/SubscribtionButton';
 import Header from "@/components/Header";
-import { SubscribeForm } from '@/components/SubscriptionForm';
 
 
 const ALL_OPTIONS = ["Core", "Networking", "Interface", "Meta", "Informational"];
@@ -360,9 +358,9 @@ const Type = () => {
                 gap={4}
               >
                 {/* Left: Subscription Button */}
-                <div className="flex items-center">
-                  <SubscriptionButton type="eips" id="all" />
-                </div>
+                <Box color="gray.500" fontSize="sm">
+                  Subscribe from an individual EIP page to get proposal-specific updates.
+                </Box>
 
                 {/* Right: Category/Status Buttons */}
                 <ButtonGroup size="md" isAttached>

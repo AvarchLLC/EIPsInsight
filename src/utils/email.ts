@@ -21,8 +21,9 @@ export function buildChangeEmail(params: {
   type: 'eips' | 'ercs' | 'rips';
   id: string | number;
   events: ChangeEvent[];
+  unsubscribeUrl?: string;
 }) {
-  const { type, id, events } = params;
+  const { type, id, events, unsubscribeUrl } = params;
   const title = `${type.toUpperCase()}-${id} Updates`;
   const baseLink =
     type === 'rips'
@@ -84,7 +85,7 @@ export function buildChangeEmail(params: {
       </table>
       <p style="font-size:12px;color:#64748b;margin-top:24px;">
         You received this because you subscribed to ${type.toUpperCase()}-${id} updates.
-        To change preferences or unsubscribe (coming soon), reply to this email.
+        ${unsubscribeUrl ? `<a href="${unsubscribeUrl}" style="color:#2563eb;text-decoration:none;">Unsubscribe from these updates</a>.` : 'Reply to this email if you need help unsubscribing.'}
       </p>
     </div>
   </div>
@@ -103,7 +104,8 @@ export function buildChangeEmail(params: {
         : `CONTENT: ${escapedSummary} | ${escapedMessage} (${e.url})`;
     }),
     '',
-    `More: ${baseLink}`
+    `More: ${baseLink}`,
+    unsubscribeUrl ? `Unsubscribe: ${unsubscribeUrl}` : ''
   ].join('\n');
 
   return { html, text, subject: title };
