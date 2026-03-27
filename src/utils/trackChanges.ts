@@ -85,28 +85,67 @@ function extractStatus(markdown: string | null): string | undefined {
  * Returns change events since (but NOT including) sinceSha (exclusive).
  * Commits are processed oldest → newest to detect status transitions.
  */
-export async function getChangesSince(params: GetChangesParams): Promise<{ events: ChangeEvent[]; latestSha?: string }> {
-  const { type, id, sinceSha = null, maxCommits = 30 } = params;
+export async function getChangesSince(
+  params: GetChangesParams
+): Promise<{ events: ChangeEvent[]; latestSha?: string }> {
+  const { type, id, sinceSha = null, maxCommits = 500 } = params;
   const { repoPath, filePath } = resolveRepoAndPath(type, id);
 
-  // Get commit list (newest first) limited
-  const commitsResp = await octokit.request('GET /repos/{owner}/{repo}/commits', {
-    owner: repoPath.split('/')[0],
-    repo: repoPath.split('/')[1],
-    path: filePath,
-    per_page: maxCommits
-  });
+  const owner = repoPath.split('/')[0];
+  const repo = repoPath.split('/')[1];
+  const perPage = 100;
 
-  const allCommits = commitsResp.data;
+  let page = 1;
+  let reachedSinceSha = false;
+  let truncated = false;
+  const allCommits: any[] = [];
+
+  while (true) {
+    const commitsResp = await octokit.request('GET /repos/{owner}/{repo}/commits', {
+      owner,
+      repo,
+      path: filePath,
+      per_page: perPage,
+      page
+    });
+
+    const pageCommits = commitsResp.data;
+    if (!pageCommits.length) {
+      break;
+    }
+
+    for (const commit of pageCommits) {
+      if (commit.sha === sinceSha) {
+        reachedSinceSha = true;
+        break;
+      }
+      allCommits.push(commit);
+      if (allCommits.length >= maxCommits) {
+        truncated = true;
+        break;
+      }
+    }
+
+    if (reachedSinceSha || truncated) {
+      break;
+    }
+
+    if (pageCommits.length < perPage) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  if (truncated) {
+    return { events: [] };
+  }
 
   // Slice until we reach sinceSha (exclusive)
-  const newCommits: typeof allCommits = [];
-  for (const c of allCommits) {
-    if (c.sha === sinceSha) break;
-    newCommits.push(c);
-  }
+  const newCommits = allCommits;
   if (newCommits.length === 0) {
-    return { events: [], latestSha: sinceSha || allCommits[0]?.sha };
+    const latestSha = sinceSha || allCommits[0]?.sha;
+    return { events: [], latestSha };
   }
 
   // Process in chronological order (oldest first)
@@ -176,7 +215,7 @@ export async function getChangeLog(
   type: 'eips' | 'ercs' | 'rips',
   id: string | number,
   sinceSha?: string | null,
-  maxCommits = 30
+  maxCommits = 500
 ): Promise<{ events: ChangeEvent[]; latestSha?: string }> {
   return getChangesSince({ type, id, sinceSha, maxCommits });
 }
